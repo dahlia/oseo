@@ -86,16 +86,13 @@ static OseoResult await_reaction_create(
 }
 
 /*
- * The virtualized %AsyncGeneratorPrototype% methods, cached on the
- * context so each stays permanently rooted the way the synchronous
- * iterator methods are. `next`, `return`, and `throw` each declare one
- * parameter, and `Symbol.asyncIterator` declares none.
+ * The %AsyncGeneratorPrototype% methods occupy realm intrinsic slots.
  */
 OseoResult oseo_internal_async_generator_method(
     OseoContext *context,
     size_t code_id
 ) {
-    OseoValue *cache;
+    OseoIntrinsic intrinsic;
     static const uint16_t next_units[] = {'n', 'e', 'x', 't'};
     static const uint16_t return_units[] = {
         'r', 'e', 't', 'u', 'r', 'n'
@@ -109,23 +106,24 @@ OseoResult oseo_internal_async_generator_method(
     size_t name_length;
     size_t parameter_count = 1u;
     if (code_id == OSEO_ASYNC_GENERATOR_NEXT_CODE_ID) {
-        cache = &context->async_generator_next_function;
+        intrinsic = OSEO_INTRINSIC_ASYNC_GENERATOR_NEXT;
         name = next_units;
         name_length = sizeof(next_units) / sizeof(*next_units);
     } else if (code_id == OSEO_ASYNC_GENERATOR_RETURN_CODE_ID) {
-        cache = &context->async_generator_return_function;
+        intrinsic = OSEO_INTRINSIC_ASYNC_GENERATOR_RETURN;
         name = return_units;
         name_length = sizeof(return_units) / sizeof(*return_units);
     } else if (code_id == OSEO_ASYNC_GENERATOR_THROW_CODE_ID) {
-        cache = &context->async_generator_throw_function;
+        intrinsic = OSEO_INTRINSIC_ASYNC_GENERATOR_THROW;
         name = throw_units;
         name_length = sizeof(throw_units) / sizeof(*throw_units);
     } else {
-        cache = &context->async_iterator_self_function;
+        intrinsic = OSEO_INTRINSIC_ASYNC_ITERATOR_SELF;
         name = symbol_units;
         name_length = sizeof(symbol_units) / sizeof(*symbol_units);
         parameter_count = 0u;
     }
+    OseoValue *cache = &context->intrinsics[intrinsic];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);

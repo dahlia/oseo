@@ -201,12 +201,10 @@ static bool enumeration_own_key(
 
 /*
  * HasProperty over the receiver's chain, which runs no user code here.
- * It consults the virtualized intrinsic table as well as stored
- * properties, so a collected own key whose deletion uncovers an
- * inherited intrinsic of the same name stays reportable.
+ * A collected own key whose deletion uncovers an inherited property of
+ * the same name stays reportable.
  */
 static bool enumeration_reachable(
-    OseoContext *context,
     OseoValue receiver,
     OseoValue key
 ) {
@@ -217,7 +215,6 @@ static bool enumeration_reachable(
     OseoValue current = receiver;
     while (is_object(current)) {
         if (enumeration_own_key(current, key, &enumerable)) return true;
-        if (oseo_internal_virtual_property(context, current, key)) return true;
         current = ordinary_object(current)->prototype;
     }
     return false;
@@ -320,9 +317,9 @@ OseoResult oseo_enumerate_get(
      * means no symbol and no chain to walk.
      */
     OseoValue symbol_prototype = oseo_undefined();
-    if (is_symbol(subject) && is_function(context->symbol_constructor)) {
+    if (is_symbol(subject)) {
         symbol_prototype =
-            function_object(context->symbol_constructor)->prototype_object;
+            context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE];
     }
     frame.slots[0] = is_object(subject) || is_string(subject)
         ? subject
@@ -388,7 +385,7 @@ OseoResult oseo_enumerate_next(
         OseoValue candidate = values[enumeration->index];
         enumeration->index += 1u;
         /* A key deleted before it is processed is ignored. */
-        if (!enumeration_reachable(context, enumeration->receiver, candidate)) {
+        if (!enumeration_reachable(enumeration->receiver, candidate)) {
             continue;
         }
         *key = candidate;

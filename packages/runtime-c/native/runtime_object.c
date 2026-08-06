@@ -59,8 +59,7 @@ bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index) {
 
 static OseoResult object_create(
     OseoContext *context,
-    OseoValue prototype,
-    bool default_intrinsics
+    OseoValue prototype
 ) {
     if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
         return type_error(
@@ -94,8 +93,6 @@ static OseoResult object_create(
     object->iterator_index = 0u;
     object->async_from_sync = false;
     object->async_sync_iterator = oseo_undefined();
-    object->default_intrinsics = default_intrinsics;
-    object->generator_prototype = false;
     object->generator = NULL;
     object->mapped_arguments = false;
     return oseo_internal_publish_heap(
@@ -103,11 +100,16 @@ static OseoResult object_create(
 }
 
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
-    return object_create(context, prototype, false);
+    return object_create(context, prototype);
 }
 
 OseoResult oseo_object_literal_create(OseoContext *context) {
-    return object_create(context, oseo_null(), true);
+    OseoResult prototype = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_OBJECT_PROTOTYPE
+    );
+    if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
+    return object_create(context, prototype.value);
 }
 
 OseoResult oseo_require_object_coercible(
@@ -245,7 +247,7 @@ OseoResult oseo_object_set_prototype(
             : type_error(context, "Cannot change a namespace prototype.");
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
-    if (!object->default_intrinsics && object->prototype == prototype) {
+    if (object->prototype == prototype) {
         return normal(object_value);
     }
     if (!object->extensible) {
@@ -265,7 +267,6 @@ OseoResult oseo_object_set_prototype(
         current = ordinary_object(current)->prototype;
     }
     object->prototype = prototype;
-    object->default_intrinsics = false;
     object->dictionary = true;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;

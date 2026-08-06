@@ -189,12 +189,14 @@ OseoResult oseo_internal_promise_builtin_dispatch(
  */
 
 OseoResult oseo_internal_promise_create(OseoContext *context) {
+    OseoResult prototype = oseo_internal_promise_prototype(context);
+    if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
     OseoPromise *promise =
         oseo_internal_allocate_heap_bytes(context, sizeof(*promise));
     if (promise == NULL) {
         return failure(context, "OSEO2001", "Promise allocation failed.");
     }
-    promise->ordinary.prototype = oseo_null();
+    promise->ordinary.prototype = prototype.value;
     promise->ordinary.properties = NULL;
     promise->ordinary.property_capacity = 0u;
     promise->ordinary.property_count = 0u;
@@ -215,8 +217,6 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
     promise->ordinary.iterator_index = 0u;
     promise->ordinary.async_from_sync = false;
     promise->ordinary.async_sync_iterator = oseo_undefined();
-    promise->ordinary.default_intrinsics = true;
-    promise->ordinary.generator_prototype = false;
     promise->ordinary.generator = NULL;
     promise->ordinary.mapped_arguments = false;
     promise->result = oseo_undefined();
@@ -242,7 +242,7 @@ OseoResult oseo_internal_promise_method_function(
     OseoContext *context,
     const char *name
 ) {
-    OseoValue *cache;
+    OseoIntrinsic intrinsic;
     size_t code_id;
     const uint16_t *units;
     size_t length;
@@ -252,23 +252,24 @@ OseoResult oseo_internal_promise_method_function(
     };
     static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
     if (strcmp(name, "then") == 0) {
-        cache = &context->promise_then_function;
+        intrinsic = OSEO_INTRINSIC_PROMISE_THEN;
         code_id = OSEO_PROMISE_THEN_CODE_ID;
         units = then_units;
         length = sizeof(then_units) / sizeof(*then_units);
     } else if (strcmp(name, "catch") == 0) {
-        cache = &context->promise_catch_function;
+        intrinsic = OSEO_INTRINSIC_PROMISE_CATCH;
         code_id = OSEO_PROMISE_CATCH_CODE_ID;
         units = catch_units;
         length = sizeof(catch_units) / sizeof(*catch_units);
     } else if (strcmp(name, "finally") == 0) {
-        cache = &context->promise_finally_function;
+        intrinsic = OSEO_INTRINSIC_PROMISE_FINALLY;
         code_id = OSEO_PROMISE_FINALLY_CODE_ID;
         units = finally_units;
         length = sizeof(finally_units) / sizeof(*finally_units);
     } else {
         return failure(context, "OSEO2001", "Unknown promise method.");
     }
+    OseoValue *cache = &context->intrinsics[intrinsic];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -290,6 +291,56 @@ OseoResult oseo_internal_promise_method_function(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) *cache = result.value;
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_promise_prototype(OseoContext *context) {
+    OseoValue *cache =
+        &context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE];
+    if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_OBJECT_PROTOTYPE
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[1] = result.value;
+    }
+    static const char *const names[] = {"then", "catch", "finally"};
+    const OseoPropertyAttributes method = {true, false, true, false};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         index += 1u) {
+        result = oseo_internal_promise_method_function(
+            context,
+            names[index]
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_internal_ascii_string(context, names[index]);
+        frame.slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[2],
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *cache = frame.slots[1];
+        result = normal(*cache);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    }
     oseo_roots_release(context, &frame);
     return result;
 }

@@ -2,9 +2,7 @@
 
 /*
  * The generic property access paths: [[Get]] and its `super` form,
- * [[Set]] and its `super` form, HasOwnProperty, and the classification
- * of the virtualized intrinsic methods this runtime serves without
- * materializing the prototype objects that own them.
+ * [[Set]] and its `super` form, and HasOwnProperty.
  */
 
 static OseoResult type_error(OseoContext *context, const char *message) {
@@ -23,38 +21,6 @@ OseoResult oseo_internal_require_property_key(
         );
     }
     return normal(key);
-}
-
-/* The method one classified virtualized property serves. */
-static OseoResult virtual_property_value(
-    OseoContext *context,
-    OseoVirtualProperty property
-) {
-    if (property == OSEO_VIRTUAL_PROMISE_THEN) {
-        return oseo_internal_promise_method_function(context, "then");
-    }
-    if (property == OSEO_VIRTUAL_PROMISE_CATCH) {
-        return oseo_internal_promise_method_function(context, "catch");
-    }
-    if (property == OSEO_VIRTUAL_PROMISE_FINALLY) {
-        return oseo_internal_promise_method_function(context, "finally");
-    }
-    if (property == OSEO_VIRTUAL_ARRAY_PUSH) {
-        return oseo_internal_array_push_function(context);
-    }
-    size_t code_id = OSEO_ITERATOR_SELF_CODE_ID;
-    if (property == OSEO_VIRTUAL_ARRAY_ITERATOR_NEXT) {
-        code_id = OSEO_ARRAY_ITERATOR_NEXT_CODE_ID;
-    } else if (property == OSEO_VIRTUAL_GENERATOR_NEXT) {
-        code_id = OSEO_GENERATOR_NEXT_CODE_ID;
-    } else if (property == OSEO_VIRTUAL_GENERATOR_RETURN) {
-        code_id = OSEO_GENERATOR_RETURN_CODE_ID;
-    } else if (property == OSEO_VIRTUAL_GENERATOR_THROW) {
-        code_id = OSEO_GENERATOR_THROW_CODE_ID;
-    } else if (property == OSEO_VIRTUAL_ARRAY_VALUES) {
-        code_id = OSEO_ARRAY_VALUES_CODE_ID;
-    }
-    return oseo_internal_iterator_method(context, code_id);
 }
 
 /*
@@ -120,102 +86,9 @@ static OseoResult object_get(
             }
             return normal(value);
         }
-        OseoVirtualProperty virtual_property =
-            oseo_internal_classify_virtual_property(context, current, key);
-        if (virtual_property != OSEO_VIRTUAL_NONE) {
-            return virtual_property_value(context, virtual_property);
-        }
         current = object->prototype;
     }
     return normal(oseo_undefined());
-}
-
-/*
- * Whether one level of a prototype chain answers `key` from the
- * virtualized intrinsic table, and with which method.
- *
- * Several intrinsic methods are served without materializing the
- * prototype objects that own them. Every operation that asks about such
- * a name has to agree with every other one, so the conditions live here
- * only, and both the property read above and the existence checks
- * HasProperty and for-in enumeration perform consume this one
- * classification. Adding a virtualized method therefore cannot leave one
- * caller behind.
- *
- * `%AsyncGeneratorPrototype%` and `%AsyncIteratorPrototype%` need no case
- * of their own: every method they carry is an ordinary own property of
- * the intrinsic objects the cluster in *runtime_generator.c* builds, so
- * an own-descriptor read already reports them.
- */
-OseoVirtualProperty oseo_internal_classify_virtual_property(
-    OseoContext *context,
-    OseoValue object_value,
-    OseoValue key
-) {
-    if (!is_object(object_value)) return OSEO_VIRTUAL_NONE;
-    const OseoOrdinaryObject *object = ordinary_object(object_value);
-    if (is_promise(object_value) && object->default_intrinsics) {
-        if (oseo_internal_string_is_ascii(key, "then")) {
-            return OSEO_VIRTUAL_PROMISE_THEN;
-        }
-        if (oseo_internal_string_is_ascii(key, "catch")) {
-            return OSEO_VIRTUAL_PROMISE_CATCH;
-        }
-        if (oseo_internal_string_is_ascii(key, "finally")) {
-            return OSEO_VIRTUAL_PROMISE_FINALLY;
-        }
-    }
-    if (object->array_iterator && object->default_intrinsics) {
-        if (oseo_internal_string_is_ascii(key, "next")) {
-            return OSEO_VIRTUAL_ARRAY_ITERATOR_NEXT;
-        }
-        if (oseo_internal_iterator_key_matches(context, key)) {
-            return OSEO_VIRTUAL_ITERATOR_SELF;
-        }
-    }
-    /* Only %GeneratorPrototype% carries this brand, and generator
-     * objects reach it through their function's `prototype` object, so an
-     * own property on either, or a replacement `prototype` object,
-     * shadows these methods the way the specified prototype chain does.
-     * `next` is an own property of the intrinsic, so it survives a
-     * replaced prototype; `Symbol.iterator` is inherited from
-     * %IteratorPrototype% and does not. `return` is an own property of
-     * the intrinsic like `next`, and `IteratorClose` reaches it whenever
-     * a consumer stops early. */
-    if (object->generator_prototype) {
-        if (oseo_internal_string_is_ascii(key, "next")) {
-            return OSEO_VIRTUAL_GENERATOR_NEXT;
-        }
-        if (oseo_internal_string_is_ascii(key, "return")) {
-            return OSEO_VIRTUAL_GENERATOR_RETURN;
-        }
-        if (oseo_internal_string_is_ascii(key, "throw")) {
-            return OSEO_VIRTUAL_GENERATOR_THROW;
-        }
-        if (object->default_intrinsics &&
-            oseo_internal_iterator_key_matches(context, key)) {
-            return OSEO_VIRTUAL_ITERATOR_SELF;
-        }
-    }
-    if (is_array(object_value) && object->default_intrinsics) {
-        if (oseo_internal_string_is_ascii(key, "push")) {
-            return OSEO_VIRTUAL_ARRAY_PUSH;
-        }
-        if (oseo_internal_iterator_key_matches(context, key)) {
-            return OSEO_VIRTUAL_ARRAY_VALUES;
-        }
-    }
-    return OSEO_VIRTUAL_NONE;
-}
-
-bool oseo_internal_virtual_property(
-    OseoContext *context,
-    OseoValue object_value,
-    OseoValue key
-) {
-    OseoVirtualProperty property =
-        oseo_internal_classify_virtual_property(context, object_value, key);
-    return property != OSEO_VIRTUAL_NONE;
 }
 
 OseoResult oseo_object_get(

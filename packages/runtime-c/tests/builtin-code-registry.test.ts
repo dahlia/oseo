@@ -24,6 +24,7 @@ const components = [
   "ASYNC_GENERATOR",
   "ARRAY",
   "ARGUMENTS",
+  "FUNCTION",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

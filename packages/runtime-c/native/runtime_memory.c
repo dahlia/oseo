@@ -186,37 +186,15 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->microtask_tail, &worklist);
     mark_value(context->pending_rejections, &worklist);
     mark_value(context->pending_rejection_tail, &worklist);
-    mark_value(context->promise_catch_function, &worklist);
-    mark_value(context->promise_finally_function, &worklist);
-    mark_value(context->promise_then_function, &worklist);
-    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-        mark_value(context->error_constructors[kind], &worklist);
-        mark_value(context->error_prototypes[kind], &worklist);
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        mark_value(context->intrinsics[index], &worklist);
     }
-    mark_value(context->symbol_constructor, &worklist);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
     mark_value(context->global_this, &worklist);
-    mark_value(context->throw_type_error_function, &worklist);
-    mark_value(context->array_push_function, &worklist);
-    mark_value(context->iterator_values_function, &worklist);
-    mark_value(context->iterator_next_function, &worklist);
-    mark_value(context->iterator_self_function, &worklist);
-    mark_value(context->generator_next_function, &worklist);
-    mark_value(context->generator_return_function, &worklist);
-    mark_value(context->generator_throw_function, &worklist);
-    mark_value(context->generator_prototype, &worklist);
-    mark_value(context->async_generator_next_function, &worklist);
-    mark_value(context->async_generator_return_function, &worklist);
-    mark_value(context->async_generator_throw_function, &worklist);
-    mark_value(context->async_generator_prototype, &worklist);
-    mark_value(context->async_iterator_prototype, &worklist);
-    mark_value(context->async_generator_intrinsic, &worklist);
-    mark_value(context->async_generator_function, &worklist);
-    mark_value(context->async_iterator_self_function, &worklist);
     OseoTemplateCacheEntry *template_cache = context->template_cache;
     for (size_t index = 0u;
          index < context->template_cache_count;

@@ -60,26 +60,6 @@ static OseoGenerator *generator_state(OseoValue value) {
     return ordinary_object(value)->generator;
 }
 
-/*
- * %GeneratorPrototype%, created once per context and permanently rooted.
- * It carries the brand that serves the virtualized `next` and
- * `Symbol.iterator`, and every generator function's own `prototype`
- * object inherits from it, so the specified lookup order and the shared
- * identity both hold without materializing the rest of the intrinsic.
- */
-OseoResult oseo_internal_generator_prototype(OseoContext *context) {
-    if (tag_of(context->generator_prototype) != OSEO_TAG_UNDEFINED) {
-        return normal(context->generator_prototype);
-    }
-    OseoResult result = oseo_object_create(context, oseo_null());
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    OseoOrdinaryObject *object = ordinary_object(result.value);
-    object->default_intrinsics = true;
-    object->generator_prototype = true;
-    context->generator_prototype = result.value;
-    return result;
-}
-
 static OseoResult ascii_generator_string(
     OseoContext *context,
     const char *text
@@ -208,6 +188,55 @@ static OseoResult define_method(
     return result;
 }
 
+/* The materialized %GeneratorPrototype% and its ordinary methods. */
+OseoResult oseo_internal_generator_prototype(OseoContext *context) {
+    OseoValue *cache =
+        &context->intrinsics[OSEO_INTRINSIC_GENERATOR_PROTOTYPE];
+    if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_array_iterator_prototype(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(
+            context,
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE]
+        );
+        frame.slots[0] = result.value;
+    }
+    static const char *const names[] = {"next", "return", "throw"};
+    static const size_t codes[] = {
+        OSEO_GENERATOR_NEXT_CODE_ID,
+        OSEO_GENERATOR_RETURN_CODE_ID,
+        OSEO_GENERATOR_THROW_CODE_ID,
+    };
+    const OseoPropertyAttributes method = {true, false, true, false};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         index += 1u) {
+        result = oseo_internal_iterator_method(context, codes[index]);
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_ascii_property(
+            context,
+            frame.slots[0],
+            names[index],
+            frame.slots[1],
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *cache = frame.slots[0];
+        result = normal(*cache);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 /*
  * The asynchronous generator intrinsics, created as one cluster because
  * their links are circular: %AsyncGeneratorFunction% names
@@ -227,25 +256,37 @@ static OseoResult define_method(
  * the error intrinsics restore theirs, because an intrinsic created on
  * first use is not one the observed program performed.
  *
- * Three of the cluster's [[Prototype]] links stay null because this
- * profile materializes neither %Object.prototype% nor the Function
- * intrinsics: %AsyncIteratorPrototype% is specified to inherit from
- * %Object.prototype%, %AsyncGeneratorFunction.prototype% from
- * %Function.prototype%, and %AsyncGeneratorFunction% from %Function%.
+ * Every rootward [[Prototype]] link uses the realm-owned object or
+ * function prototype rather than a parallel null-terminated chain.
  */
 static OseoResult async_generator_intrinsics(OseoContext *context) {
-    if (tag_of(context->async_generator_prototype) != OSEO_TAG_UNDEFINED) {
-        return normal(context->async_generator_prototype);
+    OseoValue cached =
+        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE];
+    if (tag_of(cached) != OSEO_TAG_UNDEFINED) {
+        return normal(cached);
     }
     size_t entry_allocations = context->allocations;
     const OseoPropertyAttributes hidden = {true, false, false, false};
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_object_create(context, oseo_null());
-    frame.slots[0] = result.value;
+    result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_OBJECT_PROTOTYPE
+    );
+    frame.slots[4] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[0])->default_intrinsics = true;
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_FUNCTION_PROTOTYPE
+        );
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[4]);
+        frame.slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_async_generator_method(
             context,
             OSEO_ASYNC_ITERATOR_SELF_CODE_ID
@@ -266,7 +307,6 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[1])->default_intrinsics = true;
         result = define_method(
             context,
             frame.slots[1],
@@ -291,11 +331,10 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_create(context, oseo_null());
+        result = oseo_object_create(context, frame.slots[5]);
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[2])->default_intrinsics = true;
         result = oseo_environment_create(context, 0u);
         frame.slots[3] = result.value;
     }
@@ -322,7 +361,6 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         OseoFunction *constructor = function_object(frame.slots[3]);
         constructor->prototype_object = frame.slots[2];
         constructor->prototype_writable = false;
-        constructor->ordinary.default_intrinsics = true;
         result = define_ascii_property(
             context,
             frame.slots[2],
@@ -366,10 +404,15 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->async_iterator_prototype = frame.slots[0];
-        context->async_generator_prototype = frame.slots[1];
-        context->async_generator_intrinsic = frame.slots[2];
-        context->async_generator_function = frame.slots[3];
+        context->intrinsics[OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE] =
+            frame.slots[0];
+        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE] =
+            frame.slots[1];
+        context->intrinsics[
+            OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION_PROTOTYPE
+        ] = frame.slots[2];
+        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION] =
+            frame.slots[3];
         result.value = frame.slots[1];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
@@ -382,13 +425,17 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
 OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
     OseoResult result = async_generator_intrinsics(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->async_generator_prototype);
+    return normal(context->intrinsics[
+        OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE
+    ]);
 }
 
 OseoResult oseo_internal_async_generator_intrinsic(OseoContext *context) {
     OseoResult result = async_generator_intrinsics(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->async_generator_intrinsic);
+    return normal(context->intrinsics[
+        OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION_PROTOTYPE
+    ]);
 }
 
 OseoResult oseo_generator_create(
@@ -490,7 +537,6 @@ OseoResult oseo_generator_create(
     }
     if (completion_bytes > 0u) memset(state->completions, 0, completion_bytes);
     OseoOrdinaryObject *object = ordinary_object(generator);
-    object->default_intrinsics = true;
     object->generator = state;
     oseo_roots_release(context, &frame);
     return normal(generator);

@@ -255,9 +255,8 @@ current evidence assessment. Those live only in the indexed records above.
     and no name is collected twice; and a surviving name is collected
     only if its own property was enumerable when its level was read.
     Each step then reports the next collected name while the receiver
-    still has a property of that name anywhere on its chain, including
-    one this runtime serves from its virtualized intrinsic table rather
-    than from a materialized prototype object, which is what makes a
+    still has a property of that name anywhere on its materialized
+    prototype chain, which is what makes a
     property deleted before it is processed ignored, while
     a property added during the enumeration, a prototype replaced during
     it, and a collected property made non-enumerable during it are all
@@ -376,8 +375,8 @@ current evidence assessment. Those live only in the indexed records above.
     through the shared property-key conversion and walks the prototype
     chain with the same visibility as generic property reads, and
     `instanceof` implements `OrdinaryHasInstance` without well-known
-    symbols, which the profile does not admit yet. `in` consults the same
-    virtualized intrinsic table a property read does, so it reports an
+    symbols, which the profile does not admit yet. `in` walks the same
+    ordinary intrinsic prototype chain as a property read, so it reports an
     array's `push` and a generator prototype's `throw`; M5a Unit 8.5l
     moved that table beside the read and corrected those two names, which
     the `in` operator's own copy had been missing. Non-object `in` right
@@ -752,9 +751,9 @@ current evidence assessment. Those live only in the indexed records above.
     `valueOf` and `toString` run in hint order with the receiver, an
     object result falls through to the next method, and an object with
     neither convertible method throws a catchable `TypeError`. Objects
-    on a default-intrinsics prototype chain use the virtualized
+    on the realm-owned intrinsic prototype chain use deferred
     `Object.prototype` and `Array.prototype` conversions selected by
-    the first default-intrinsics provider on the chain: the
+    the first applicable intrinsic identity on the chain: the
     receiver-sensitive `Object.prototype.toString` tags
     (`"[object Array]"`, `"[object Function]"`, `"[object Error]"`
     through the internal error brand, and `"[object Object]"`,
@@ -823,7 +822,7 @@ current evidence assessment. Those live only in the indexed records above.
     `value` fields; `IteratorClose` calls a present `return` method,
     preserving an in-flight error over a throwing or non-object return
     result. A default array exposes a first-class array iterator
-    through its virtualized `Symbol.iterator`: the iterator is an
+    through the realm-owned `%Array.prototype%`: the iterator is an
     ordinary object whose `next` steps the array by re-reading its
     length each call and whose `Symbol.iterator` returns itself, so
     `array[Symbol.iterator]().next()` and user-defined iterables with a
@@ -1395,8 +1394,8 @@ current evidence assessment. Those live only in the indexed records above.
     `prototype` object carries no `constructor` property. Each generator
     function's `prototype` object inherits from one shared
     `%GeneratorPrototype%` that the context creates lazily and roots
-    permanently; that intrinsic serves the virtualized `next`, `return`,
-    and `Symbol.iterator`, so all three resolve through the specified
+    permanently; that intrinsic owns `next` and `return` and inherits
+    `Symbol.iterator`, so all three resolve through the specified
     lookup order and an own property on the function's `prototype`, or a
     replacement `prototype` object, shadows them. A `prototype` that is not an
     object falls back to `%GeneratorPrototype%` as
@@ -1451,11 +1450,10 @@ current evidence assessment. Those live only in the indexed records above.
     during the generator call, including abrupt completion and later-parameter
     temporal dead zones, before the suspended body can first resume. Simple
     and rest parameters keep the ordinary call ABI. `%GeneratorPrototype%`
-    exists as a reachable object with virtualized methods rather than own
-    properties, and
+    exists as a reachable object with ordinary own methods, and
     `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
-    materialized at all, matching how the array iterator prototype is already
-    virtualized. ECMAScript exposes no `GeneratorFunction` global binding, so
+    materialized at all. ECMAScript exposes no `GeneratorFunction` global
+    binding, so
     admitting one would be a deliberate divergence rather than a step toward
     the intrinsic; every specified route to `%GeneratorFunction%` starts at
     `Object.getPrototypeOf(function* () {})`, which this profile does not
@@ -2218,8 +2216,8 @@ current evidence assessment. Those live only in the indexed records above.
     function expressions are admitted, and calling one runs its parameter and
     environment prologue and returns a suspended asynchronous generator whose
     `[[Prototype]]` is the function's own `prototype` object. That object
-    inherits from a lazily created `%AsyncGeneratorPrototype%`, which serves
-    virtualized `next`, `return`, `throw`, and `Symbol.asyncIterator` methods,
+    inherits from a lazily created `%AsyncGeneratorPrototype%`, which reaches
+    ordinary `next`, `return`, `throw`, and `Symbol.asyncIterator` methods,
     so a generator is its own asynchronous iterable and a `for await` head
     consumes it through the ordinary protocol. An asynchronous generator
     function is not constructible and carries no `constructor` on its
@@ -2281,7 +2279,7 @@ current evidence assessment. Those live only in the indexed records above.
     through `Symbol.asyncIterator`, the absent `Symbol.iterator`, a shared
     method identity across two generators, the `prototype` object's own
     property set with no `constructor`, `in` agreeing with a property read on
-    the virtualized `next`, `return`, `throw`, and `Symbol.asyncIterator`,
+    `next`, `return`, `throw`, and `Symbol.asyncIterator`,
     non-constructibility, `throw` into
     `try`/`catch`, `return` through `finally` including a `finally` that
     awaits and one that yields, unstarted `return` and `throw`, delegation to
@@ -2348,12 +2346,12 @@ current evidence assessment. Those live only in the indexed records above.
     `length` 1, and a non-writable, non-configurable `prototype`, and every
     asynchronous generator function has it as its `constructor` because
     `%AsyncGeneratorFunction.prototype%` is that function's `[[Prototype]]`.
-    Deliberate boundaries: three of the cluster's `[[Prototype]]` links are
-    null because this profile materializes neither `%Object.prototype%` nor
-    the `Function` intrinsics. `%AsyncIteratorPrototype%` should inherit
-    from `%Object.prototype%`, `%AsyncGeneratorFunction.prototype%` from
-    `%Function.prototype%`, and `%AsyncGeneratorFunction%` from
-    `%Function%`. Calling or constructing `%AsyncGeneratorFunction%` reports
+    `%AsyncIteratorPrototype%` now inherits from `%Object.prototype%`, and
+    `%AsyncGeneratorFunction.prototype%` and callable asynchronous generator
+    functions inherit from `%Function.prototype%` through the realm intrinsic
+    graph. Deliberate boundary: `%Function%` is not materialized, so
+    `%AsyncGeneratorFunction%` cannot yet inherit from that constructor.
+    Calling or constructing `%AsyncGeneratorFunction%` reports
     the `OSEO1001` dynamic-source diagnostic of
     [ADR 0016](./adr/0016-dynamic-source-boundary.md) instead of compiling
     source text. The reviewed
@@ -2974,6 +2972,21 @@ no semantic, harness, or infrastructure failures. The suite revision,
 policy are unchanged. The public realm context layout moves the runtime ABI to
 `oseo-runtime-m5-45`.
 
+M5b node `intrinsic-graph-root` replaces the component-local intrinsic caches
+and name-compared virtual property classification with one collector-traced
+realm table. It materializes `%Object.prototype%` and the callable
+`%Function.prototype%`, makes ordinary objects and functions reach those roots,
+and links the admitted array, promise, iterator, generator, error, symbol, and
+asynchronous-generator prototypes and constructors through ordinary property
+lookup. Deferred `Object.prototype` and `Array.prototype` coercions remain
+behavior-preserving fallbacks selected by intrinsic identity until their method
+nodes land. Fixed native differential evidence and the generated array domain
+with seed `0x60003100` cover shared identity, explicit prototype replacement,
+both specialization policies, and forced collection. The node owns no test262
+inventory roots and admits no new semantics, so all 4,899 reviewed results and
+their 2,958 passes remain unchanged. The public context and intrinsic-access
+ABI moves to `oseo-runtime-m5-46`.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3008,13 +3021,14 @@ complete. The remaining gaps retain their existing owners.
     array pattern must consume. Owner: the intrinsics and built-in objects
     stream.
  -  A `super` property reference in a class body without `extends` and in an
-    object literal method stays rejected until the intrinsic graph provides
-    the `Object.prototype` object such a lookup reaches. Owner: the intrinsics
-    and built-in objects stream.
- -  The intrinsic
-    graph behind standard constructors other than the error and symbol
-    families is
-    unimplemented, and no built-in dispatches through
+    object literal method stays rejected until the `object-prototype` and
+    `super-without-extends` graph nodes land. The empty intrinsic root alone
+    does not admit that separate language surface. Owner: the intrinsics and
+    built-in objects stream.
+ -  The realm root now owns one collector-traced intrinsic graph, but standard
+    constructors other than the already admitted error and symbol families
+    remain assigned to their dependency-ordered M5b nodes. No built-in
+    dispatches through
     `Symbol.hasInstance` or `Symbol.toStringTag` yet. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
@@ -3034,9 +3048,9 @@ complete. The remaining gaps retain their existing owners.
     before its first assignment, where a conforming realm would still
     expose the intrinsic value, is part of this gap, and a case that
     observes it surfaces as a semantic failure at manifest review rather
-    than entering silently. Admitting the global object
-    requires the intrinsic graph to expose standard constructors as real
-    values first, the restricted-global and non-extensible cases a
+    than entering silently. Admitting the global object still requires the
+    remaining standard constructors to become real values, the
+    restricted-global and non-extensible cases a
     complete Global Environment Record answers, and an owned architecture
     decision on how a mutable global object meets closed-world name
     resolution before any dynamically created global binding is admitted.

@@ -16,6 +16,26 @@ typedef struct {
     OseoBuiltinDispatcher dispatch;
 } OseoBuiltinDispatchRange;
 
+OseoResult oseo_internal_function_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    if (code_id == OSEO_FUNCTION_PROTOTYPE_CODE_ID) {
+        return normal(oseo_undefined());
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
 static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_PROMISE_CODE_ID_RANGE_FIRST,
      OSEO_PROMISE_CODE_ID_RANGE_LAST,
@@ -41,6 +61,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST,
      OSEO_ARGUMENTS_CODE_ID_RANGE_LAST,
      oseo_internal_arguments_builtin_dispatch},
+    {OSEO_FUNCTION_CODE_ID_RANGE_FIRST,
+     OSEO_FUNCTION_CODE_ID_RANGE_LAST,
+     oseo_internal_function_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -205,6 +228,145 @@ static OseoResult accessor_function_name(
     return result;
 }
 
+/*
+ * Build the two roots every ordinary intrinsic chain reaches. The
+ * bootstrap Function.prototype call skips this helper once, then the
+ * completed pair is published together so no partial graph is observable.
+ */
+static OseoResult intrinsic_graph_root(OseoContext *context) {
+    OseoValue object_prototype =
+        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+    OseoValue function_prototype =
+        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
+    if (is_object(object_prototype) && is_function(function_prototype)) {
+        return normal(object_prototype);
+    }
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_object_create(context, oseo_null());
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] = frame.slots[0];
+        result = oseo_function_create(
+            context,
+            OSEO_FUNCTION_PROTOTYPE_CODE_ID,
+            oseo_undefined(),
+            NULL,
+            0u,
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] =
+            frame.slots[1];
+        result = normal(frame.slots[0]);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    } else {
+        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] =
+            oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
+    if ((size_t)intrinsic >= OSEO_INTRINSIC_COUNT) {
+        return failure(context, "OSEO2001", "Unknown realm intrinsic.");
+    }
+    OseoResult materialized = normal(oseo_undefined());
+    if (intrinsic == OSEO_INTRINSIC_OBJECT_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_FUNCTION_PROTOTYPE) {
+        materialized = intrinsic_graph_root(context);
+    } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
+        materialized = oseo_internal_array_prototype(context);
+    } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
+        materialized = oseo_internal_promise_prototype(context);
+    } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE) {
+        materialized = oseo_internal_array_iterator_prototype(context);
+    } else if (intrinsic == OSEO_INTRINSIC_GENERATOR_PROTOTYPE) {
+        materialized = oseo_internal_generator_prototype(context);
+    } else if (
+        intrinsic >= OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE &&
+        intrinsic <= OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION
+    ) {
+        materialized = oseo_internal_async_generator_prototype(context);
+    } else if (intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_SYMBOL) {
+        materialized = oseo_symbol_intrinsic(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_ERROR_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_AGGREGATE_ERROR_PROTOTYPE) {
+        OseoErrorKind kind = (OseoErrorKind)(
+            intrinsic - OSEO_INTRINSIC_ERROR_PROTOTYPE
+        );
+        materialized = oseo_internal_error_prototype(context, kind);
+    } else if (intrinsic >= OSEO_INTRINSIC_ERROR &&
+               intrinsic <= OSEO_INTRINSIC_AGGREGATE_ERROR) {
+        OseoErrorKind kind =
+            (OseoErrorKind)(intrinsic - OSEO_INTRINSIC_ERROR);
+        materialized = oseo_error_intrinsic(context, kind);
+    } else if (intrinsic == OSEO_INTRINSIC_THROW_TYPE_ERROR) {
+        materialized = oseo_internal_throw_type_error_function(context);
+    } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PUSH) {
+        materialized = oseo_internal_array_push_function(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_ARRAY_VALUES &&
+               intrinsic <= OSEO_INTRINSIC_GENERATOR_THROW) {
+        static const size_t codes[] = {
+            OSEO_ARRAY_VALUES_CODE_ID,
+            OSEO_ARRAY_ITERATOR_NEXT_CODE_ID,
+            OSEO_ITERATOR_SELF_CODE_ID,
+            OSEO_GENERATOR_NEXT_CODE_ID,
+            OSEO_GENERATOR_RETURN_CODE_ID,
+            OSEO_GENERATOR_THROW_CODE_ID,
+        };
+        size_t index = (size_t)(intrinsic - OSEO_INTRINSIC_ARRAY_VALUES);
+        materialized = oseo_internal_iterator_method(context, codes[index]);
+    } else if (intrinsic >= OSEO_INTRINSIC_PROMISE_THEN &&
+               intrinsic <= OSEO_INTRINSIC_PROMISE_FINALLY) {
+        static const char *const names[] = {"then", "catch", "finally"};
+        size_t index = (size_t)(intrinsic - OSEO_INTRINSIC_PROMISE_THEN);
+        materialized = oseo_internal_promise_method_function(
+            context,
+            names[index]
+        );
+    } else {
+        static const size_t codes[] = {
+            OSEO_ASYNC_GENERATOR_NEXT_CODE_ID,
+            OSEO_ASYNC_GENERATOR_RETURN_CODE_ID,
+            OSEO_ASYNC_GENERATOR_THROW_CODE_ID,
+            OSEO_ASYNC_ITERATOR_SELF_CODE_ID,
+        };
+        size_t index =
+            (size_t)(intrinsic - OSEO_INTRINSIC_ASYNC_GENERATOR_NEXT);
+        materialized = oseo_internal_async_generator_method(
+            context,
+            codes[index]
+        );
+    }
+    if (materialized.status != OSEO_STATUS_NORMAL) return materialized;
+    OseoValue value = context->intrinsics[intrinsic];
+    if (tag_of(value) == OSEO_TAG_UNDEFINED) {
+        return failure(context, "OSEO2001", "Realm intrinsic is unavailable.");
+    }
+    return normal(value);
+}
+
+OseoResult oseo_internal_intrinsic(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+) {
+    return oseo_intrinsic(context, intrinsic);
+}
+
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
@@ -217,7 +379,11 @@ OseoResult oseo_function_create(
     OseoValue inferred_name,
     OseoFunctionNamePrefix name_prefix
 ) {
-    if (!is_environment(environment)) {
+    bool bootstrapping_function_prototype =
+        code_id == OSEO_FUNCTION_PROTOTYPE_CODE_ID &&
+        tag_of(context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE]) ==
+            OSEO_TAG_UNDEFINED;
+    if (!bootstrapping_function_prototype && !is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -238,22 +404,44 @@ OseoResult oseo_function_create(
     OseoResult result = oseo_roots_allocate(context, &frame, 10u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[5] = inferred_name;
-    /* The [[Prototype]] of the created `prototype` object. */
-    frame.slots[8] = oseo_null();
-    /* The [[Prototype]] of the function itself. */
-    frame.slots[9] = oseo_null();
+    if (bootstrapping_function_prototype) {
+        frame.slots[8] =
+            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+        frame.slots[9] = frame.slots[8];
+    } else {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
+        frame.slots[8] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_FUNCTION_PROTOTYPE
+            );
+            frame.slots[9] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+    }
     frame.slots[7] = function_kind == OSEO_FUNCTION_ARROW ||
         function_kind == OSEO_FUNCTION_ASYNC_ARROW
         ? lexical_this
         : oseo_undefined();
-    result = oseo_environment_clone(context, environment);
-    frame.slots[0] = result.value;
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
+    if (bootstrapping_function_prototype) {
+        frame.slots[0] = oseo_undefined();
+    } else {
+        result = oseo_environment_clone(context, environment);
+        frame.slots[0] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
     }
     /* A generator function's `prototype` object inherits from
-     * %GeneratorPrototype%, so its generators reach the virtualized
+     * %GeneratorPrototype%, so its generators reach the materialized
      * `next` and `Symbol.iterator` through the specified lookup order,
      * and, unlike a constructor's prototype, it has no `constructor`
      * property. */
@@ -270,9 +458,8 @@ OseoResult oseo_function_create(
     }
     /* An asynchronous generator function itself inherits from
      * %AsyncGeneratorFunction.prototype%, which is what makes its
-     * `constructor` reach %AsyncGeneratorFunction%. The synchronous
-     * counterpart has no materialized intrinsic yet, so a synchronous
-     * generator function keeps a null [[Prototype]]. */
+     * `constructor` reach %AsyncGeneratorFunction%. Every other function
+     * inherits from the realm's %Function.prototype%. */
     if (function_kind == OSEO_FUNCTION_ASYNC_GENERATOR) {
         result = oseo_internal_async_generator_intrinsic(context);
         frame.slots[9] = result.value;
@@ -281,9 +468,14 @@ OseoResult oseo_function_create(
             return result;
         }
     }
-    result = oseo_object_create(context, frame.slots[8]);
+    if (bootstrapping_function_prototype) {
+        result = normal(oseo_undefined());
+    } else {
+        result = oseo_object_create(context, frame.slots[8]);
+    }
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL &&
+        !bootstrapping_function_prototype &&
         context->observe_specialization && context->allocations > 0u) {
         context->allocations -= 1u;
     }
@@ -318,8 +510,6 @@ OseoResult oseo_function_create(
     function->ordinary.iterator_index = 0u;
     function->ordinary.async_from_sync = false;
     function->ordinary.async_sync_iterator = oseo_undefined();
-    function->ordinary.default_intrinsics = true;
-    function->ordinary.generator_prototype = false;
     function->ordinary.generator = NULL;
     function->ordinary.mapped_arguments = false;
     function->environment = frame.slots[0];
@@ -428,6 +618,7 @@ OseoResult oseo_function_create(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL &&
+        !bootstrapping_function_prototype &&
         function_kind != OSEO_FUNCTION_GENERATOR &&
         function_kind != OSEO_FUNCTION_ASYNC_GENERATOR) {
         static const uint16_t constructor_name[] = {
@@ -445,6 +636,7 @@ OseoResult oseo_function_create(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL &&
+        !bootstrapping_function_prototype &&
         function_kind != OSEO_FUNCTION_GENERATOR &&
         function_kind != OSEO_FUNCTION_ASYNC_GENERATOR) {
         OseoPropertyAttributes attributes = {true, false, true, false};
@@ -516,10 +708,15 @@ OseoResult oseo_constructor_receiver(
     OseoContext *context,
     OseoValue prototype
 ) {
-    return oseo_object_create(
-        context,
-        is_object(prototype) ? prototype : oseo_null()
-    );
+    OseoResult fallback = normal(prototype);
+    if (!is_object(prototype)) {
+        fallback = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
+    }
+    if (fallback.status != OSEO_STATUS_NORMAL) return fallback;
+    return oseo_object_create(context, fallback.value);
 }
 
 OseoResult oseo_constructor_result(
@@ -559,7 +756,14 @@ OseoResult oseo_class_heritage(
     if (!is_function(constructor)) {
         return failure(context, "OSEO2001", "Class heritage needs a class.");
     }
-    if (tag_of(heritage) == OSEO_TAG_NULL) return normal(constructor);
+    if (tag_of(heritage) == OSEO_TAG_NULL) {
+        OseoValue class_prototype =
+            function_object(constructor)->prototype_object;
+        if (is_object(class_prototype)) {
+            relink_prototype(context, class_prototype, oseo_null());
+        }
+        return normal(constructor);
+    }
     if (!function_is_constructible(heritage)) {
         return oseo_internal_throw_error(
             context,

@@ -280,7 +280,9 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->symbol_constructor = frame.slots[1];
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
+            function_object(frame.slots[1])->prototype_object;
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[1];
         result.value = frame.slots[1];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
@@ -291,8 +293,9 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
 }
 
 OseoResult oseo_symbol_intrinsic(OseoContext *context) {
-    if (tag_of(context->symbol_constructor) != OSEO_TAG_UNDEFINED) {
-        return normal(context->symbol_constructor);
+    OseoValue value = context->intrinsics[OSEO_INTRINSIC_SYMBOL];
+    if (tag_of(value) != OSEO_TAG_UNDEFINED) {
+        return normal(value);
     }
     return symbol_intrinsic_create(context);
 }

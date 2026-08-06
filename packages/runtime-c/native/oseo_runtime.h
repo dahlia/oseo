@@ -26,7 +26,7 @@ typedef enum {
     OSEO_FUNCTION_METHOD = 5,
     /* Dynamic `this` and never constructible. Calling one runs only the
      * environment and parameter prologue and returns a suspended
-     * generator whose `prototype` object serves the virtualized
+     * generator whose `prototype` object reaches the realm-owned
      * %GeneratorPrototype% methods. */
     OSEO_FUNCTION_GENERATOR = 6,
     /* A class constructor: constructible, with a non-writable,
@@ -35,7 +35,7 @@ typedef enum {
     OSEO_FUNCTION_CLASS = 7,
     /* Like OSEO_FUNCTION_GENERATOR, but the generator it returns reports
      * every step through a promise and its body suspends to await as
-     * well as to yield. Its `prototype` object serves the virtualized
+     * well as to yield. Its `prototype` object reaches the realm-owned
      * %AsyncGeneratorPrototype% methods. */
     OSEO_FUNCTION_ASYNC_GENERATOR = 8,
 } OseoFunctionKind;
@@ -102,6 +102,59 @@ typedef enum {
     OSEO_ERROR_AGGREGATE = 7,
 } OseoErrorKind;
 
+/*
+ * Realm-owned intrinsic identities. The table is the single permanent
+ * collector root for intrinsic objects and functions; component-specific
+ * builders fill their assigned slots without creating parallel caches.
+ */
+typedef enum {
+    OSEO_INTRINSIC_OBJECT_PROTOTYPE = 0,
+    OSEO_INTRINSIC_FUNCTION_PROTOTYPE = 1,
+    OSEO_INTRINSIC_ARRAY_PROTOTYPE = 2,
+    OSEO_INTRINSIC_PROMISE_PROTOTYPE = 3,
+    OSEO_INTRINSIC_ITERATOR_PROTOTYPE = 4,
+    OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE = 5,
+    OSEO_INTRINSIC_GENERATOR_PROTOTYPE = 6,
+    OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE = 7,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE = 8,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION_PROTOTYPE = 9,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION = 10,
+    OSEO_INTRINSIC_SYMBOL_PROTOTYPE = 11,
+    OSEO_INTRINSIC_SYMBOL = 12,
+    OSEO_INTRINSIC_ERROR_PROTOTYPE = 13,
+    OSEO_INTRINSIC_EVAL_ERROR_PROTOTYPE = 14,
+    OSEO_INTRINSIC_RANGE_ERROR_PROTOTYPE = 15,
+    OSEO_INTRINSIC_REFERENCE_ERROR_PROTOTYPE = 16,
+    OSEO_INTRINSIC_SYNTAX_ERROR_PROTOTYPE = 17,
+    OSEO_INTRINSIC_TYPE_ERROR_PROTOTYPE = 18,
+    OSEO_INTRINSIC_URI_ERROR_PROTOTYPE = 19,
+    OSEO_INTRINSIC_AGGREGATE_ERROR_PROTOTYPE = 20,
+    OSEO_INTRINSIC_ERROR = 21,
+    OSEO_INTRINSIC_EVAL_ERROR = 22,
+    OSEO_INTRINSIC_RANGE_ERROR = 23,
+    OSEO_INTRINSIC_REFERENCE_ERROR = 24,
+    OSEO_INTRINSIC_SYNTAX_ERROR = 25,
+    OSEO_INTRINSIC_TYPE_ERROR = 26,
+    OSEO_INTRINSIC_URI_ERROR = 27,
+    OSEO_INTRINSIC_AGGREGATE_ERROR = 28,
+    OSEO_INTRINSIC_THROW_TYPE_ERROR = 29,
+    OSEO_INTRINSIC_ARRAY_PUSH = 30,
+    OSEO_INTRINSIC_ARRAY_VALUES = 31,
+    OSEO_INTRINSIC_ARRAY_ITERATOR_NEXT = 32,
+    OSEO_INTRINSIC_ITERATOR_SELF = 33,
+    OSEO_INTRINSIC_GENERATOR_NEXT = 34,
+    OSEO_INTRINSIC_GENERATOR_RETURN = 35,
+    OSEO_INTRINSIC_GENERATOR_THROW = 36,
+    OSEO_INTRINSIC_PROMISE_THEN = 37,
+    OSEO_INTRINSIC_PROMISE_CATCH = 38,
+    OSEO_INTRINSIC_PROMISE_FINALLY = 39,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_NEXT = 40,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_RETURN = 41,
+    OSEO_INTRINSIC_ASYNC_GENERATOR_THROW = 42,
+    OSEO_INTRINSIC_ASYNC_ITERATOR_SELF = 43,
+    OSEO_INTRINSIC_COUNT = 44,
+} OseoIntrinsic;
+
 typedef struct {
     bool configurable;
     bool enumerable;
@@ -153,14 +206,9 @@ struct OseoContext {
     OseoValue microtask_tail;
     OseoValue pending_rejections;
     OseoValue pending_rejection_tail;
-    OseoValue promise_catch_function;
-    OseoValue promise_finally_function;
-    OseoValue promise_then_function;
-    /* Lazily created error intrinsics indexed by OseoErrorKind. */
-    OseoValue error_constructors[8];
-    OseoValue error_prototypes[8];
-    /* The lazily created Symbol intrinsic and well-known symbols. */
-    OseoValue symbol_constructor;
+    /* The realm's single intrinsic graph, indexed by OseoIntrinsic. */
+    OseoValue intrinsics[OSEO_INTRINSIC_COUNT];
+    /* The realm's well-known symbols are a separate edition-fixed table. */
     OseoValue well_known_symbols[13];
     /*
      * The realm's global this value, which is the [[GlobalThisValue]] a
@@ -169,32 +217,6 @@ struct OseoContext {
      * every non-strict nullish receiver observe one identity.
      */
     OseoValue global_this;
-    /*
-     * The realm's %ThrowTypeError% intrinsic, created on first use and
-     * permanently rooted so every unmapped arguments object's poisoned
-     * `callee` accessor shares one function identity.
-     */
-    OseoValue throw_type_error_function;
-    /* Cached virtualized Array and iterator methods, permanently rooted. */
-    OseoValue array_push_function;
-    OseoValue iterator_values_function;
-    OseoValue iterator_next_function;
-    OseoValue iterator_self_function;
-    OseoValue generator_next_function;
-    OseoValue generator_return_function;
-    OseoValue generator_throw_function;
-    OseoValue generator_prototype;
-    OseoValue async_generator_next_function;
-    OseoValue async_generator_return_function;
-    OseoValue async_generator_throw_function;
-    OseoValue async_generator_prototype;
-    OseoValue async_iterator_prototype;
-    /* %AsyncGeneratorFunction.prototype% and the %AsyncGeneratorFunction%
-     * intrinsic it names, created with the two prototypes above because
-     * their `constructor` and `prototype` links are circular. */
-    OseoValue async_generator_intrinsic;
-    OseoValue async_generator_function;
-    OseoValue async_iterator_self_function;
     /*
      * Realm-local GetTemplateObject cache. The private entry layout stays
      * behind this public generated-code boundary.
@@ -275,6 +297,8 @@ void oseo_context_init(
     const char *source_id,
     size_t source_id_length
 );
+/* Materializes and returns one realm-owned intrinsic identity. */
+OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic);
 void oseo_context_destroy(OseoContext *context);
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt);
 void oseo_context_clear_language_error(OseoContext *context);

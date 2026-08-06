@@ -1,0 +1,50 @@
+version: 1
+id: intrinsic-graph-root
+title: "Realm intrinsic graph root"
+scope:
+  - "The single realm-owned table for intrinsic objects and functions."
+  - "%Object.prototype%, %Function.prototype%, and admitted constructors."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-intrinsic-graph-root.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-intrinsic-graph-root.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The storage refactor adds no specialized path or new guard."
+    replacements:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - tests/property/m5-intrinsic-graph-root.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-intrinsic-graph-root.property.test.ts
+  standards:
+    status: omitted
+    reason: "The graph node owns no test262 inventory roots or new semantics."
+    replacements:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - tests/native/fixtures/objects.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts

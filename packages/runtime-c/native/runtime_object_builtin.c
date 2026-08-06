@@ -542,7 +542,7 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         return normal(oseo_undefined());
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_create(context, oseo_null());
+        result = oseo_object_literal_create(context);
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {

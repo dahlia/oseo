@@ -161,6 +161,13 @@
  * instead of exposing the running function. */
 #define OSEO_THROW_TYPE_ERROR_CODE_ID \
     OSEO_ARGUMENTS_CODE_ID_RANGE_LAST
+
+#define OSEO_FUNCTION_CODE_ID_RANGE_INDEX ((size_t)8u)
+#define OSEO_FUNCTION_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_FUNCTION_CODE_ID_RANGE_INDEX)
+#define OSEO_FUNCTION_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_FUNCTION_CODE_ID_RANGE_INDEX)
+#define OSEO_FUNCTION_PROTOTYPE_CODE_ID OSEO_FUNCTION_CODE_ID_RANGE_LAST
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -459,7 +466,6 @@ typedef struct {
      * the cell, so a binding and its property never diverge.
      */
     bool global_object;
-    bool default_intrinsics;
     /* The [[ErrorData]] brand Object.prototype.toString observes. */
     bool error_data;
     /* Array iterator state: a flagged object backs a default array's
@@ -489,10 +495,6 @@ typedef struct {
      * the parameter stop observing each other.
      */
     bool mapped_arguments;
-    /* A generator function's `prototype` object, which serves the
-     * virtualized %GeneratorPrototype% methods to the generators created
-     * from it. Replacing the object drops the brand with it. */
-    bool generator_prototype;
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
 } OseoOrdinaryObject;
@@ -838,6 +840,15 @@ typedef OseoResult (*OseoBuiltinDispatcher)(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_function_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_internal_promise_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1101,6 +1112,7 @@ OseoResult oseo_internal_promise_invoke_then(
  * capability every internal await and asynchronous generator step
  * reports through. */
 OseoResult oseo_internal_promise_create(OseoContext *context);
+OseoResult oseo_internal_promise_prototype(OseoContext *context);
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%
  * methods and its `Symbol.asyncIterator`, selected by code id. */
 OseoResult oseo_internal_async_generator_method(
@@ -1115,34 +1127,10 @@ OseoResult oseo_internal_promise_method_function(
     const char *name
 );
 bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
-/*
- * The virtualized intrinsic methods this runtime serves without
- * materializing the prototype objects that own them. One classification
- * feeds both the property read and every existence check, so the two can
- * never disagree about whether such a name exists.
- */
-typedef enum {
-    OSEO_VIRTUAL_NONE = 0,
-    OSEO_VIRTUAL_PROMISE_THEN = 1,
-    OSEO_VIRTUAL_PROMISE_CATCH = 2,
-    OSEO_VIRTUAL_PROMISE_FINALLY = 3,
-    OSEO_VIRTUAL_ARRAY_ITERATOR_NEXT = 4,
-    OSEO_VIRTUAL_ITERATOR_SELF = 5,
-    OSEO_VIRTUAL_GENERATOR_NEXT = 6,
-    OSEO_VIRTUAL_GENERATOR_RETURN = 7,
-    OSEO_VIRTUAL_GENERATOR_THROW = 8,
-    OSEO_VIRTUAL_ARRAY_PUSH = 9,
-    OSEO_VIRTUAL_ARRAY_VALUES = 10,
-} OseoVirtualProperty;
-OseoVirtualProperty oseo_internal_classify_virtual_property(
+/* Materializes one slot of the realm-owned intrinsic graph. */
+OseoResult oseo_internal_intrinsic(
     OseoContext *context,
-    OseoValue object_value,
-    OseoValue key
-);
-bool oseo_internal_virtual_property(
-    OseoContext *context,
-    OseoValue object_value,
-    OseoValue key
+    OseoIntrinsic intrinsic
 );
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_to_primitive(
@@ -1168,6 +1156,8 @@ OseoResult oseo_internal_well_known_symbol(
 );
 /* The lazily created, permanently rooted %GeneratorPrototype%. */
 OseoResult oseo_internal_generator_prototype(OseoContext *context);
+OseoResult oseo_internal_array_prototype(OseoContext *context);
+OseoResult oseo_internal_array_iterator_prototype(OseoContext *context);
 /* The same for %AsyncGeneratorPrototype%. Reaching it creates the whole
  * asynchronous generator intrinsic cluster, because its `constructor`
  * and the chain above it are circular. */
@@ -1225,7 +1215,7 @@ OseoResult oseo_internal_async_from_sync_rejected(
  * accessor observes one function identity, as 10.2.4.1 requires.
  */
 OseoResult oseo_internal_throw_type_error_function(OseoContext *context);
-/* The cached virtualized %Array.prototype%.push function and its generic
+/* The realm-owned %Array.prototype%.push function and its generic
  * body. The body deliberately uses ordinary Get and Set so borrowed calls
  * preserve accessors, abrupt completion, and array length semantics. */
 OseoResult oseo_internal_array_push_function(OseoContext *context);
@@ -1248,8 +1238,7 @@ bool oseo_internal_jobs_reached_promise(OseoValue promise);
  * asynchronous iteration as a host diagnostic.
  */
 OseoResult oseo_internal_await_step(OseoContext *context, OseoValue value);
-/* The well-known Symbol.asyncIterator, matched the way the synchronous
- * key is, so a virtualized lookup recognizes it without allocating. */
+/* The well-known Symbol.asyncIterator identity. */
 bool oseo_internal_async_iterator_key_matches(
     OseoContext *context,
     OseoValue key

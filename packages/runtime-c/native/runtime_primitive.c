@@ -485,9 +485,8 @@ static bool conversion_property_exists(
 }
 
 /*
- * The virtualized default toString is selected by the first
- * default-intrinsics object on the prototype chain, mirroring which
- * prototype's method an ordinary lookup would reach first.
+ * The deferred default toString is selected by the first materialized
+ * intrinsic prototype on the chain.
  */
 typedef enum {
     OSEO_CONVERSION_NONE = 0,
@@ -497,18 +496,29 @@ typedef enum {
     OSEO_CONVERSION_PROMISE = 4,
 } DefaultConversionKind;
 
-static DefaultConversionKind default_conversion_kind(OseoValue value) {
+static DefaultConversionKind default_conversion_kind(
+    OseoContext *context,
+    OseoValue value
+) {
     OseoValue current = value;
     while (is_object(current)) {
-        OseoOrdinaryObject *object = ordinary_object(current);
-        if (!object->default_intrinsics) {
-            current = object->prototype;
-            continue;
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]) {
+            return OSEO_CONVERSION_ARRAY;
         }
-        if (is_array(current)) return OSEO_CONVERSION_ARRAY;
-        if (is_function(current)) return OSEO_CONVERSION_FUNCTION;
-        if (is_promise(current)) return OSEO_CONVERSION_PROMISE;
-        return OSEO_CONVERSION_OBJECT;
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE]) {
+            return OSEO_CONVERSION_FUNCTION;
+        }
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE]) {
+            return OSEO_CONVERSION_PROMISE;
+        }
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
+            return OSEO_CONVERSION_OBJECT;
+        }
+        current = ordinary_object(current)->prototype;
     }
     return OSEO_CONVERSION_NONE;
 }
@@ -699,7 +709,7 @@ static OseoResult array_join_text(
     return result;
 }
 
-/* The virtualized Array.prototype.toString: a user join is honored. */
+/* The deferred Array.prototype.toString: a user join is honored. */
 static OseoResult default_array_text(
     OseoContext *context,
     OseoValue array_value,
@@ -744,7 +754,7 @@ static OseoResult default_array_text(
 /*
  * The generic ToPrimitive over OrdinaryToPrimitive: user-reachable
  * valueOf and toString run in hint order, and objects on a
- * default-intrinsics chain fall back to the virtualized
+ * intrinsic-prototype chain fall back to the deferred
  * Object.prototype and Array.prototype conversions. Function and
  * promise text needs Function.prototype.toString or well-known
  * symbols, so it stays an owned unsupported boundary.
@@ -844,12 +854,12 @@ static OseoResult to_primitive_value(
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         if (!conversion_property_exists(frame.slots[0], frame.slots[1])) {
-            /* The virtualized Object.prototype.valueOf returns the
+            /* The deferred Object.prototype.valueOf returns the
              * object, so a missing valueOf falls through to the next
              * method. */
             if (!trying_to_string) continue;
             DefaultConversionKind kind =
-                default_conversion_kind(frame.slots[0]);
+                default_conversion_kind(context, frame.slots[0]);
             if (kind == OSEO_CONVERSION_NONE) continue;
             if (kind == OSEO_CONVERSION_ARRAY) {
                 result = default_array_text(
@@ -1603,9 +1613,6 @@ OseoResult oseo_has_property(
         if (oseo_internal_own_descriptor(
             current, property, &value, &attributes,
             &ignored_getter, &ignored_setter)) {
-            return normal(oseo_boolean(true));
-        }
-        if (oseo_internal_virtual_property(context, current, property)) {
             return normal(oseo_boolean(true));
         }
         OseoOrdinaryObject *object = ordinary_object(current);
