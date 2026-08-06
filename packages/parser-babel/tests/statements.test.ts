@@ -819,6 +819,7 @@ test("rejects typeof of an unimplemented standard global name", () => {
   // profile admits it as a value, inside and outside `with` alike.
   for (const source of [
     "console.log(typeof Math);",
+    "console.log(typeof Array);",
     "console.log(typeof JSON);",
     "console.log(typeof RegExp);",
     "console.log(typeof BigInt);",

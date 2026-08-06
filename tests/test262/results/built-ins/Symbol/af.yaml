@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/Symbol/species/builtin-getter-name.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Symbol/species/builtin-getter-name.js:8\
-        8:32: error[OSEO1001]: Unknown binding 'Map'.\\n\""
+        7:32: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

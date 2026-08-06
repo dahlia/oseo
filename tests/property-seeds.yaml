@@ -208,7 +208,3 @@ families:
     owner: tests/property/m5-function-prototype.property.test.ts
     start: 0x60003300
     end: 0x600033ff
-  - family: m5-array-constructor
-    owner: tests/property/m5-array-constructor.property.test.ts
-    start: 0x60003400
-    end: 0x600034ff

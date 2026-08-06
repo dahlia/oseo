@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 5,595
-reviewed cases: 3,319 passes, 1,355 expected negatives, and 921 unsupported
+honest unsupported classifications. The current reviewed manifest records 5,078
+reviewed cases: 3,016 passes, 1,355 expected negatives, and 707 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 67 indexed records in the normative
+M5a is complete. The 65 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 3,319
-passes across 5,595 paths, and the property inventory records 63 domains,
-63 seeds, and an ordinary case budget of 2,762.
+the M5b and M5c dependency order below. The reviewed manifest now records 3,016
+passes across 5,078 paths, and the property inventory records 61 domains,
+61 seeds, and an ordinary case budget of 2,738.
 
 
 M5a implementation history
@@ -2744,8 +2744,8 @@ profile admits only as call targets, so answering `"undefined"` would
 misreport them; the rejection reuses the `isRuntimeOwnedIntrinsicName`
 boundary the Unit 8.1b identifier delete records. The same honesty rule
 covers every other global name ECMA-262 clause 19 requires of the
-ECMAScript 2025 realm ADR 0013 pins, such as `Math`, `JSON`, `eval`, and
-`globalThis`: a conforming realm always
+ECMAScript 2025 realm ADR 0013 pins, such as `Math`, `JSON`, `Array`,
+`Function`, `eval`, and `globalThis`: a conforming realm always
 resolves them, so an unshadowed `typeof` of one is a source-located
 rejection through the owned `isStandardGlobalName` classification
 rather than a misreported `"undefined"`, and the fold answers
@@ -2753,10 +2753,9 @@ rather than a misreported `"undefined"`, and the fold answers
 edition is required to bind. Annex B additions such as `escape` stay
 excluded from the claim and remain ordinary unresolvable names. A
 shadowing declaration keeps the ordinary binding read, and the admitted
-intrinsic values `undefined`, `NaN`, `Infinity`, `Array`, `Function`,
-`Symbol`, and the error constructors keep their existing resolutions. No MIR,
-backend, or runtime change is needed and the runtime ABI stays
-`oseo-runtime-m5-41`.
+intrinsic values `undefined`, `NaN`, `Infinity`, `Symbol`, and the
+error constructors keep their existing resolutions. No MIR, backend, or
+runtime change is needed and the runtime ABI stays `oseo-runtime-m5-41`.
 
 Focused tests pin each side: compiler tests assert the fold produces the
 string constant with no typeof operation or binding read and that an
@@ -3646,20 +3645,6 @@ pass and 221 retain explicit prerequisite boundaries. Two existing
 global-binding cases also become passes. The manifest moves to 3,141 passes
 across 5,422 paths, and the runtime ABI moves to `oseo-runtime-m5-48`, without
 changing the graph's orchestration state.
-
-Implemented M5b node `array-constructor` makes `Array` a replaceable intrinsic
-value and completes its realm cluster with length-argument construction,
-`Symbol.species`, `from`, `of`, and `isArray`. `Array.from` constructs a custom
-receiver before iterator acquisition and closes an acquired iterator on abrupt
-mapping or indexed definition. Fixed native and generated differential evidence
-at seed `0x60003400` covers both specialization policies, forced collection,
-generic constructor receivers, iterator closing, and deliberate shape-guard
-misses. Of the node's 176 inventory paths, 173 are applicable at this boundary:
-117 pass and 56 retain explicit prerequisite boundaries. Three cases remain
-owned by later Array-prototype or global-binding nodes and are not promoted.
-Sixty-one existing dependency cases also become passes. The manifest moves to
-3,319 passes across 5,595 paths, and the runtime ABI moves to
-`oseo-runtime-m5-49`, without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

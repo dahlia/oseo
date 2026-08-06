@@ -2614,11 +2614,6 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     state.usesAbrupt = true;
     line(state, renderC(emittedC.functionIntrinsic.resultAssign));
     line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
-  } else if (operation.kind === "array-intrinsic") {
-    location(state, operation.range);
-    state.usesAbrupt = true;
-    line(state, renderC(emittedC.arrayIntrinsic.resultAssign));
-    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "module-namespace-create") {
     emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {

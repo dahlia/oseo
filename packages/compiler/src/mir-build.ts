@@ -3745,32 +3745,6 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
-  if (expression.kind === "array-intrinsic") {
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "array intrinsic allocation",
-      [],
-      expression.range,
-    );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [],
-      detail: "intrinsic Array",
-      id,
-      kind: "array-intrinsic",
-      range: expression.range,
-    });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
-    );
-    return recordRoot(builder, id, expression.range);
-  }
   if (expression.kind === "function-intrinsic") {
     appendMirMetadata(
       builder,

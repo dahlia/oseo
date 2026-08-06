@@ -348,7 +348,6 @@ export function intrinsicGlobalKind(
     return "restricted";
   }
   if (
-    name === "Array" ||
     name === "Function" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
@@ -737,9 +736,6 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly errorName: ErrorIntrinsicName;
       readonly kind: "error-intrinsic";
-    })
-  | (LocatedSyntax & {
-      readonly kind: "array-intrinsic";
     })
   | (LocatedSyntax & {
       readonly kind: "function-intrinsic";
