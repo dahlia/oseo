@@ -11,5 +11,5 @@ inventory:
 dependencies:
   - intrinsic-graph-root
   - well-known-symbols
-landed: false
+landed: true
 status: ready

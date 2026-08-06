@@ -13,4 +13,4 @@ inventory:
 dependencies:
   - object-prototype
 landed: false
-status: blocked
+status: ready
