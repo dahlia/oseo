@@ -4,6 +4,11 @@ on:
   pull_request:
   push:
   workflow_dispatch:
+    inputs:
+      baseline:
+        description: "Commit to use as the compatibility baseline"
+        required: true
+        type: string
 
 jobs:
   check:

@@ -702,7 +702,18 @@ test("omits deleted property sources from the current worktree", () => {
   );
 });
 
-test("selects baselines for pull requests, pushes, and local branches", () => {
+test("selects baselines for CI events and local branches", () => {
+  assert.deepEqual(
+    selectBaselineIntent(
+      {
+        GITHUB_ACTIONS: "true",
+        GITHUB_EVENT_NAME: "workflow_dispatch",
+      },
+      { inputs: { baseline: "manual-base-sha" } },
+      undefined,
+    ),
+    { kind: "commit", revision: "manual-base-sha" },
+  );
   assert.deepEqual(
     selectBaselineIntent(
       {

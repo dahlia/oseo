@@ -1031,6 +1031,13 @@ export function selectBaselineIntent(
         ? { kind: "merge-base-main" }
         : { kind: "commit", revision: before };
     }
+    if (eventName === "workflow_dispatch") {
+      const inputs = record(payload.inputs, "workflow dispatch inputs");
+      return {
+        kind: "commit",
+        revision: stringValue(inputs.baseline, "workflow baseline SHA"),
+      };
+    }
     throw new Error(`unsupported GitHub event ${eventName}.`);
   }
   if (localBranch == null) {
