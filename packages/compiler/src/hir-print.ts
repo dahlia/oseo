@@ -132,6 +132,9 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "symbol-intrinsic") {
     return "intrinsic Symbol";
   }
+  if (expression.kind === "array-intrinsic") {
+    return "intrinsic Array";
+  }
   if (expression.kind === "function-intrinsic") {
     return "intrinsic Function";
   }

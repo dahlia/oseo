@@ -28,6 +28,7 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { arrayCtorFixtures } from "./native/fixtures/array-constructor.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
@@ -78,6 +79,7 @@ Object.defineProperty(globalThis, "console", {
 `;
 
 const fixtures: readonly Fixture[] = [
+  ...arrayCtorFixtures,
   ...functionFixtures,
   ...objectFixtures,
   ...classFixtures,
@@ -209,6 +211,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "array-constructor" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype"
   ) {
@@ -273,6 +276,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "closures-and-methods" ||
+    fixture.name === "array-constructor" ||
     fixture.name === "function-prototype" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
@@ -435,6 +439,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "array-constructor" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype"
           ) {

@@ -197,6 +197,7 @@ function identifierFallback(
   }
   const errorName = errorIntrinsicName(name);
   if (errorName != null) return { errorName, kind: "error-intrinsic", range };
+  if (name === "Array") return { kind: "array-intrinsic", range };
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
   if (name === "Function") return { kind: "function-intrinsic", range };
   return bindingExpression(withFallbackBinding(name, state, false), range);
@@ -352,6 +353,7 @@ function resolveOptionalChain(
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
+    name === "Array" ||
     name === "Function" ||
     name === "Object" ||
     name === "Promise" ||
@@ -448,6 +450,7 @@ function resolveTypeofIdentifier(
     argument.name === "undefined" ||
     argument.name === "NaN" ||
     argument.name === "Infinity" ||
+    argument.name === "Array" ||
     argument.name === "Function" ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
@@ -796,6 +799,9 @@ function resolveExpression(
           kind: "error-intrinsic",
           range: expression.range,
         };
+      }
+      if (expression.name === "Array") {
+        return { kind: "array-intrinsic", range: expression.range };
       }
       if (expression.name === "Symbol") {
         return { kind: "symbol-intrinsic", range: expression.range };

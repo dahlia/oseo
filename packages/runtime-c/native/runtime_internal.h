@@ -149,6 +149,16 @@
 #define OSEO_ARRAY_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ARRAY_CODE_ID_RANGE_INDEX)
 #define OSEO_ARRAY_PUSH_CODE_ID OSEO_ARRAY_CODE_ID_RANGE_LAST
+#define OSEO_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_ARRAY_FROM_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_ARRAY_IS_ARRAY_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_ARRAY_OF_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_ARRAY_SPECIES_GETTER_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 5u)
 
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
@@ -1137,8 +1147,9 @@ OseoResult oseo_internal_require_property_key(
  * The array `length` property's shared [[Set]] and [[DefineOwnProperty]]
  * body, including the descending truncation that stops at the first
  * non-configurable element. `allow_same_value` admits a redefinition
- * that leaves a non-writable length unchanged, and *valid_length reports
- * whether the requested value was a valid array length at all.
+ * that leaves a non-writable length unchanged. `validate_only` performs
+ * conversion without mutation, and *valid_length reports whether the
+ * requested value was a valid array length at all.
  */
 OseoResult oseo_internal_set_array_length(
     OseoContext *context,
@@ -1146,6 +1157,7 @@ OseoResult oseo_internal_set_array_length(
     OseoValue value,
     bool strict,
     bool allow_same_value,
+    bool validate_only,
     bool *valid_length
 );
 OseoResult oseo_internal_promise_aggregate_settle(

@@ -154,6 +154,7 @@ export interface MirOperation {
     | "delete-object-coercible"
     | "error-intrinsic"
     | "symbol-intrinsic"
+    | "array-intrinsic"
     | "function-intrinsic"
     | "template-object"
     | "count-guard-hit"

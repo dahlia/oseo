@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 63
+M5a is complete. The normative family records described below inventory 67
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -157,19 +157,18 @@ current evidence assessment. Those live only in the indexed records above.
     global, is itself a source-located rejection until that strict
     throw is lowered, so it neither runs with sloppy semantics nor
     poisons the fold.
-    `typeof` of an unshadowed runtime-owned intrinsic name, such
-    as `Object` or `Promise`, stays a source-located rejection: the
-    realm binds those names as call targets the profile does not admit
-    as values, so `"undefined"` would misreport them, the same boundary
-    the Unit 8.1b identifier delete records. The same rule covers every
-    other global name ECMA-262 clause 19 requires of the pinned
-    ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
-    `globalThis`: an unshadowed `typeof` of one stays a source-located
-    rejection until the profile admits the name as a value, so the fold
-    answers `"undefined"` only for a name no conforming realm of the
-    pinned edition is required to bind; Annex B additions such as
-    `escape` stay excluded from the claim and remain ordinary
-    unresolvable names. HIR and MIR structural
+    `typeof` of an unshadowed admitted intrinsic value, including `Array`,
+    `Function`, `Symbol`, and the error constructors, resolves that value and
+    reports `"function"`. A runtime-owned name such as `Object` or `Promise`
+    stays a source-located rejection because the realm currently admits it
+    only as a call target, so `"undefined"` would misreport it. The same rule
+    covers every other global name ECMA-262 clause 19 requires of the pinned
+    ECMAScript 2025 realm, such as `Math`, `JSON`, `eval`, and `globalThis`:
+    an unshadowed `typeof` of one stays a source-located rejection until the
+    profile admits the name as a value, so the fold answers `"undefined"`
+    only for a name no conforming realm of the pinned edition is required to
+    bind. Annex B additions such as `escape` stay excluded from the claim and
+    remain ordinary unresolvable names. HIR and MIR structural
     tests, a fixed native differential fixture, a generated property
     suite with seed `0x60002d00`, and the reviewed test262
     unresolvable-reference case cover the boundary.
@@ -3037,6 +3036,23 @@ schema and vocabulary, and zero-override policy are unchanged. The public
 function-kind and intrinsic tables move the runtime ABI to
 `oseo-runtime-m5-48` without changing the graph's orchestration state.
 
+M5b node `array-constructor` makes `Array` a replaceable intrinsic value and
+completes its realm cluster with length-argument construction,
+`Symbol.species`, `from`, `of`, and `isArray`. Fixed native and generated
+differential evidence at seed `0x60003400` covers generic constructor
+receivers, iterator closing, descriptors, both specialization policies,
+forced collection, and a deliberate shape-guard miss. Of the 176 paths in the
+node inventory, 173 are applicable at this boundary: 117 pass and 56 retain
+explicit prerequisite boundaries. Three cases depend on later
+Array-prototype or global-binding nodes and are not promoted. Sixty-one
+existing dependency cases also move from unsupported to pass. The manifest
+reaches 5,595 cases: 3,319 passes, 1,355 expected negatives, and 921
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, and zero-override policy are unchanged. The public intrinsic table
+moves the runtime ABI to `oseo-runtime-m5-49` without changing the graph's
+orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3075,11 +3091,12 @@ complete. The remaining gaps retain their existing owners.
     graph node lands. The object prototype root is now populated, but that
     does not admit the separate language surface. Owner: the intrinsics and
     built-in objects stream.
- -  The realm root now owns one collector-traced intrinsic graph and the
-    `Object` constructor identity, but that constructor's callable behavior
-    and primitive wrappers and the remaining standard constructors stay
-    assigned to their dependency-ordered M5b nodes. No built-in dispatches
-    through `Symbol.hasInstance` yet. test262 runtime
+ -  The realm root now owns one collector-traced intrinsic graph, the
+    `Object` and `Function` constructor identities, and the callable `Array`
+    constructor. Callable `Object` behavior, primitive wrappers, the remaining
+    standard constructors, and Array prototype methods beyond the narrow
+    admitted `push` and iterator dependencies stay assigned to their
+    dependency-ordered M5b nodes. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
     `Test262Error`, classify as unsupported with the

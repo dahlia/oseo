@@ -1,0 +1,30 @@
+group: built-ins/Array
+key: 1b
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/from/source-object-length-set-elem-prop-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - iterator-protocol
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/Array/from/source-object-length-set-elem-prop-e\
+        rr.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/from/source-object-length-set-ele\
+        m-prop-err.js:105:3: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

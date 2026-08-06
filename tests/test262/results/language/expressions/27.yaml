@@ -112,17 +112,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-iteration
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/async-generator/yield-spread-arr-sin\
-        gle.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/async-generator/yield-spread\
-        -arr-single.js:123:10: error[OSEO1001]: Unknown binding
-        'Array'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

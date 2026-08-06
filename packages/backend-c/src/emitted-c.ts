@@ -769,6 +769,9 @@ export const emittedC = {
       ["result = oseo_intrinsic(context, OSEO_INTRINSIC_FUNCTION);"],
     ],
   },
+  arrayIntrinsic: {
+    resultAssign: [["result = oseo_intrinsic(context, OSEO_INTRINSIC_ARRAY);"]],
+  },
   constructReceiver: {
     resultAssignOseoConstructorReceiverContext: [
       ["    result = oseo_constructor_receiver(context, ", "result.value);"],

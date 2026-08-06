@@ -100,6 +100,32 @@ test("lets with object environments shadow the Function intrinsic", () => {
   );
 });
 
+test("lowers the Array intrinsic and preserves ordinary shadowing", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(Array, Array(2), new Array(3), Array.of(4));\n" +
+      "function local(Array) { return Array(); }\n" +
+      "console.log(local(function () { return 5; }), typeof Array);",
+    sourceId: "array-intrinsic.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /intrinsic Array/u);
+  assert.match(printMir(result.mir), /array-intrinsic intrinsic Array/u);
+  assert.match(printHir(result.hir), /call %b\d+\(Array\)\(\)/u);
+
+  const deleteResult = compileSource(babelFrontend, {
+    source: "delete Array;",
+    sourceId: "delete-array.ts",
+  });
+  assert.equal(deleteResult.mir, undefined);
+  assert.match(
+    deleteResult.diagnostics[0]?.message ?? "",
+    /Deleting runtime intrinsic binding 'Array'/u,
+  );
+});
+
 test("starts static class method source at the method definition", () => {
   const source = `class C {
   static /* omitted */ plain() {}

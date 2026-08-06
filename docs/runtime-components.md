@@ -354,6 +354,22 @@ bound calls and construction, source forms, custom has-instance dispatch, both
 specialization policies, deliberate shape-guard misses, and forced collection.
 The node reviews all four of its declared test262 inventory roots.
 
+### Array constructor evidence
+
+M5b node `array-constructor` makes `Array` a replaceable intrinsic value and
+completes its realm cluster in *runtime\_array.c*. The component owns the
+length-argument constructor, `Symbol.species`, `from`, `of`, and `isArray`.
+`Array.from` shares the iterator component and closes an active iterator when
+mapping or indexed definition becomes abrupt. Both `from` and `of` use the
+ordinary construction ABI for a constructible receiver and fall back to a
+realm array otherwise.
+
+The public intrinsic table expands, moving `abiVersion` to `m5-49`. Fixed and
+generated native differential evidence covers descriptors, sparse length
+construction, generic receivers, iterator closing, both specialization
+policies, deliberate shape-guard misses, and forced collection. The node
+reviews only its declared Array test262 inventory roots.
+
 ### Object-family split evidence
 
 The M5b preparation unit divided the 3,168-line *runtime\_object.c* into
