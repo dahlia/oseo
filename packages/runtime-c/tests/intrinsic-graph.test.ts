@@ -105,3 +105,26 @@ test("populates the realm-owned Function prototype", () => {
   assert.match(functionSource, /OSEO_WELL_KNOWN_HAS_INSTANCE/u);
   assert.match(functionSource, /oseo_internal_throw_type_error_function/u);
 });
+
+test("populates the realm-owned Iterator intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+
+  for (const intrinsic of [
+    "ITERATOR",
+    "ITERATOR_FROM",
+    "WRAP_FOR_VALID_ITERATOR_PROTOTYPE",
+    "WRAP_FOR_VALID_ITERATOR_NEXT",
+    "WRAP_FOR_VALID_ITERATOR_RETURN",
+    "ITERATOR_CONSTRUCTOR_GETTER",
+    "ITERATOR_CONSTRUCTOR_SETTER",
+    "ITERATOR_TAG_GETTER",
+    "ITERATOR_TAG_SETTER",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  assert.match(iteratorSource, /OSEO_ITERATOR_CONSTRUCTOR_CODE_ID/u);
+  assert.match(iteratorSource, /OSEO_ITERATOR_FROM_CODE_ID/u);
+  assert.match(iteratorSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(iteratorSource, /wrap_for_valid_iterator/u);
+});

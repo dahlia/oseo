@@ -64,6 +64,10 @@ static void trace_object(
         if (ordinary->async_from_sync) {
             mark_value(ordinary->async_sync_iterator, worklist);
         }
+        if (ordinary->wrap_for_valid_iterator) {
+            mark_value(ordinary->wrapped_iterator, worklist);
+            mark_value(ordinary->wrapped_next, worklist);
+        }
         if (ordinary->generator != NULL) {
             OseoGenerator *generator = ordinary->generator;
             mark_value(generator->callee, worklist);

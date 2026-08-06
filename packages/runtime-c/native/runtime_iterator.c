@@ -4,6 +4,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+static OseoResult iterator_from(
+    OseoContext *context,
+    OseoValue value
+);
+static OseoResult wrap_for_valid_iterator_next(
+    OseoContext *context,
+    OseoValue receiver
+);
+static OseoResult wrap_for_valid_iterator_return(
+    OseoContext *context,
+    OseoValue receiver
+);
+static OseoResult iterator_prototype_accessor(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+
 OseoResult oseo_internal_iterator_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -13,7 +33,38 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 ) {
-    (void)new_target;
+    if (code_id == OSEO_ITERATOR_CONSTRUCTOR_CODE_ID) {
+        if (tag_of(new_target) == OSEO_TAG_UNDEFINED || new_target == callee) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Iterator must be constructed through a derived class."
+            );
+        }
+        return normal(receiver);
+    }
+    if (code_id == OSEO_ITERATOR_FROM_CODE_ID) {
+        OseoValue value = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        return iterator_from(context, value);
+    }
+    if (code_id == OSEO_WRAP_FOR_VALID_ITERATOR_NEXT_CODE_ID) {
+        return wrap_for_valid_iterator_next(context, receiver);
+    }
+    if (code_id == OSEO_WRAP_FOR_VALID_ITERATOR_RETURN_CODE_ID) {
+        return wrap_for_valid_iterator_return(context, receiver);
+    }
+    if (code_id >= OSEO_ITERATOR_TAG_SETTER_CODE_ID &&
+        code_id <= OSEO_ITERATOR_CONSTRUCTOR_GETTER_CODE_ID) {
+        return iterator_prototype_accessor(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
         return oseo_internal_array_values(context, receiver);
     }
@@ -162,15 +213,91 @@ OseoResult oseo_internal_iterator_method(
     return result;
 }
 
+static OseoResult create_iterator_builtin(
+    OseoContext *context,
+    size_t code_id,
+    const char *name,
+    size_t length,
+    OseoFunctionKind kind,
+    OseoFunctionNamePrefix prefix
+) {
+    size_t name_length = strlen(name);
+    if (name_length > 31u) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
+    uint16_t units[31];
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            environment,
+            units,
+            name_length,
+            length,
+            kind,
+            oseo_undefined(),
+            oseo_undefined(),
+            prefix
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult define_iterator_data(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value
+) {
+    return oseo_object_define(
+        context,
+        object,
+        key,
+        value,
+        (OseoPropertyAttributes){true, false, true, false}
+    );
+}
+
+static OseoResult define_iterator_accessor(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue getter,
+    OseoValue setter
+) {
+    return oseo_object_define_accessor(
+        context,
+        object,
+        key,
+        getter,
+        setter,
+        true,
+        true,
+        (OseoPropertyAttributes){true, false, false, true}
+    );
+}
+
 OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
     OseoValue *array_cache =
         &context->intrinsics[OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE];
-    if (tag_of(*array_cache) != OSEO_TAG_UNDEFINED) {
+    OseoValue *marker =
+        &context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER];
+    if (is_function(*marker)) {
         return normal(*array_cache);
     }
+    if (is_object(*marker)) return normal(*array_cache);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_internal_intrinsic(
         context,
@@ -182,64 +309,480 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
+            frame.slots[1];
+        *marker = frame.slots[1];
+        result = create_iterator_builtin(
+            context,
+            OSEO_ITERATOR_CONSTRUCTOR_CODE_ID,
+            "Iterator",
+            0u,
+            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR] = frame.slots[2];
+        OseoFunction *constructor = function_object(frame.slots[2]);
+        constructor->prototype_object = frame.slots[1];
+        constructor->prototype_writable = false;
+    }
+    static const OseoIntrinsic intrinsics[] = {
+        OSEO_INTRINSIC_ITERATOR_FROM,
+        OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_NEXT,
+        OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_RETURN,
+        OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_GETTER,
+        OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_SETTER,
+        OSEO_INTRINSIC_ITERATOR_TAG_GETTER,
+        OSEO_INTRINSIC_ITERATOR_TAG_SETTER,
+    };
+    static const size_t codes[] = {
+        OSEO_ITERATOR_FROM_CODE_ID,
+        OSEO_WRAP_FOR_VALID_ITERATOR_NEXT_CODE_ID,
+        OSEO_WRAP_FOR_VALID_ITERATOR_RETURN_CODE_ID,
+        OSEO_ITERATOR_CONSTRUCTOR_GETTER_CODE_ID,
+        OSEO_ITERATOR_CONSTRUCTOR_SETTER_CODE_ID,
+        OSEO_ITERATOR_TAG_GETTER_CODE_ID,
+        OSEO_ITERATOR_TAG_SETTER_CODE_ID,
+    };
+    static const char *const names[] = {
+        "from",
+        "next",
+        "return",
+        "constructor",
+        "constructor",
+        "[Symbol.toStringTag]",
+        "[Symbol.toStringTag]",
+    };
+    static const size_t lengths[] = {1u, 0u, 0u, 0u, 1u, 0u, 1u};
+    static const OseoFunctionNamePrefix prefixes[] = {
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_GET,
+        OSEO_FUNCTION_NAME_PREFIX_SET,
+        OSEO_FUNCTION_NAME_PREFIX_GET,
+        OSEO_FUNCTION_NAME_PREFIX_SET,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 7u;
+         index += 1u) {
+        result = create_iterator_builtin(
+            context,
+            codes[index],
+            names[index],
+            lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            prefixes[index]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->intrinsics[intrinsics[index]] = result.value;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "from");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_data(
+            context,
+            frame.slots[2],
+            frame.slots[3],
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_FROM]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_method(
             context,
             OSEO_ITERATOR_SELF_CODE_ID
         );
-        frame.slots[2] = result.value;
+        frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_well_known_symbol(
             context,
             OSEO_WELL_KNOWN_ITERATOR
         );
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_data(
+            context,
+            frame.slots[1],
+            frame.slots[5],
+            frame.slots[4]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "constructor");
         frame.slots[3] = result.value;
     }
-    const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
+        result = define_iterator_accessor(
             context,
             frame.slots[1],
             frame.slots[3],
-            frame.slots[2],
-            method
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_GETTER],
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_SETTER]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_accessor(
+            context,
+            frame.slots[1],
+            frame.slots[5],
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_GETTER],
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER]
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, frame.slots[1]);
-        frame.slots[4] = result.value;
+        frame.slots[6] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->intrinsics[
+                OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_PROTOTYPE
+            ] = frame.slots[6];
+        }
+    }
+    static const char *const wrap_names[] = {"next", "return"};
+    static const OseoIntrinsic wrap_methods[] = {
+        OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_NEXT,
+        OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_RETURN,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = ascii_iterator_string(context, wrap_names[index]);
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_iterator_data(
+                context,
+                frame.slots[6],
+                frame.slots[3],
+                context->intrinsics[wrap_methods[index]]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[1]);
+        frame.slots[7] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_method(
             context,
             OSEO_ARRAY_ITERATOR_NEXT_CODE_ID
         );
-        frame.slots[5] = result.value;
+        frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = ascii_iterator_string(context, "next");
-        frame.slots[6] = result.value;
+        frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
+        result = define_iterator_data(
             context,
-            frame.slots[4],
-            frame.slots[6],
-            frame.slots[5],
-            method
+            frame.slots[7],
+            frame.slots[3],
+            frame.slots[4]
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
-            frame.slots[1];
-        *array_cache = frame.slots[4];
+        *array_cache = frame.slots[7];
         result = normal(*array_cache);
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
         }
+    } else {
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
+            oseo_undefined();
+        *array_cache = oseo_undefined();
+        for (size_t index = OSEO_INTRINSIC_ITERATOR;
+             index <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER;
+             index += 1u) {
+            context->intrinsics[index] = oseo_undefined();
+        }
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+static OseoResult iterator_type_error(
+    OseoContext *context,
+    const char *message
+) {
+    return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
+}
+
+static bool inherits_iterator_prototype(
+    OseoValue iterator,
+    OseoValue iterator_prototype
+) {
+    OseoValue current = ordinary_object(iterator)->prototype;
+    while (is_object(current)) {
+        if (current == iterator_prototype) return true;
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
+}
+
+static OseoResult iterator_from(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_string(value)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "String iteration is not admitted yet."
+        );
+    }
+    if (!is_object(value)) {
+        return iterator_type_error(
+            context,
+            "Iterator.from requires an object or string."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ITERATOR
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_nullish(frame.slots[1]) &&
+        !is_function(frame.slots[1])) {
+        result = iterator_type_error(
+            context,
+            "The Symbol.iterator property is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_function(frame.slots[1])) {
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        frame.slots[2] = result.value;
+    } else {
+        frame.slots[2] = frame.slots[0];
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[2])) {
+        result = iterator_type_error(
+            context,
+            "The iterator method did not return an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "next");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[2], frame.slots[3]);
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_ITERATOR_PROTOTYPE
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        inherits_iterator_prototype(frame.slots[2], frame.slots[4])) {
+        result = normal(frame.slots[2]);
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_PROTOTYPE
+        );
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_create(context, frame.slots[4]);
+            frame.slots[5] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoOrdinaryObject *wrapper = ordinary_object(frame.slots[5]);
+            wrapper->wrap_for_valid_iterator = true;
+            wrapper->wrapped_iterator = frame.slots[2];
+            wrapper->wrapped_next = frame.slots[3];
+            result = normal(frame.slots[5]);
+        }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult wrap_for_valid_iterator_next(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_wrap_for_valid_iterator(receiver)) {
+        return iterator_type_error(
+            context,
+            "Iterator wrapper next requires a valid wrapper receiver."
+        );
+    }
+    OseoValue slots[2] = {
+        ordinary_object(receiver)->wrapped_iterator,
+        ordinary_object(receiver)->wrapped_next,
+    };
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        0u,
+        NULL,
+        oseo_undefined()
+    );
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult wrap_for_valid_iterator_return(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_wrap_for_valid_iterator(receiver)) {
+        return iterator_type_error(
+            context,
+            "Iterator wrapper return requires a valid wrapper receiver."
+        );
+    }
+    OseoValue slots[2] = {
+        ordinary_object(receiver)->wrapped_iterator,
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "return");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        result = oseo_internal_iterator_result(
+            context,
+            oseo_undefined(),
+            true
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[1])) {
+        result = iterator_type_error(
+            context,
+            "The iterator return property is not callable."
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult iterator_setter(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    OseoValue value
+) {
+    if (!is_object(receiver)) {
+        return iterator_type_error(
+            context,
+            "Iterator prototype setter requires an object receiver."
+        );
+    }
+    OseoValue slots[3] = {receiver, value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = code_id == OSEO_ITERATOR_CONSTRUCTOR_SETTER_CODE_ID
+        ? ascii_iterator_string(context, "constructor")
+        : oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+    slots[2] = result.value;
+    OseoValue home =
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
+    if (result.status == OSEO_STATUS_NORMAL && slots[0] == home) {
+        result = iterator_type_error(
+            context,
+            "Cannot assign to an Iterator prototype accessor."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue ignored = oseo_undefined();
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        bool own = oseo_internal_own_descriptor(
+            slots[0],
+            slots[2],
+            &ignored,
+            &attributes,
+            &getter,
+            &setter
+        );
+        result = own
+            ? oseo_object_set(context, slots[0], slots[2], slots[1], true)
+            : oseo_object_define(
+                context,
+                slots[0],
+                slots[2],
+                slots[1],
+                (OseoPropertyAttributes){true, true, true, false}
+            );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_undefined());
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult iterator_prototype_accessor(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (code_id == OSEO_ITERATOR_CONSTRUCTOR_GETTER_CODE_ID) {
+        return oseo_internal_intrinsic(context, OSEO_INTRINSIC_ITERATOR);
+    }
+    if (code_id == OSEO_ITERATOR_TAG_GETTER_CODE_ID) {
+        return ascii_iterator_string(context, "Iterator");
+    }
+    OseoValue value = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    return iterator_setter(context, code_id, receiver, value);
 }
 
 /* ToLength's clamp: 2^53 - 1. */

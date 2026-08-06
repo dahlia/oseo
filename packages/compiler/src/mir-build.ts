@@ -3771,6 +3771,32 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "iterator-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "iterator intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "intrinsic Iterator",
+      id,
+      kind: "iterator-intrinsic",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "binding") {
     return lowerBindingRead(
       expression.bindingId,

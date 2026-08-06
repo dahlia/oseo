@@ -1597,6 +1597,117 @@ tests:
   - path: test/built-ins/GeneratorPrototype/return/try-finally-within-try.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/Iterator/constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/get-return-method-when-call-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/iterable-primitives.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/iterable-to-iterator-fallback.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/primitives.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/result-proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/return-method-calls-base-return-method.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/return-method-returns-iterator-result.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/supports-iterable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/from/supports-iterator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/newtarget-or-active-function-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.iterator/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.iterator/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.iterator/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.iterator/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.iterator/return-val.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.toStringTag/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.toStringTag/weird-setter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/constructor/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/constructor/weird-setter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/subclassable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
   - path: test/built-ins/NativeErrors/EvalError/constructor.js
     expectedClassification: pass
     dependencies: [error-intrinsics]

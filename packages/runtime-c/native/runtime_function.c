@@ -970,7 +970,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
         materialized = oseo_internal_promise_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
-               intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE) {
+               intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
+               (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
+                intrinsic <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER)) {
         materialized = oseo_internal_array_iterator_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_GENERATOR_PROTOTYPE) {
         materialized = oseo_internal_generator_prototype(context);
@@ -1190,6 +1192,9 @@ OseoResult oseo_function_create(
     function->ordinary.iterator_index = 0u;
     function->ordinary.async_from_sync = false;
     function->ordinary.async_sync_iterator = oseo_undefined();
+    function->ordinary.wrap_for_valid_iterator = false;
+    function->ordinary.wrapped_iterator = oseo_undefined();
+    function->ordinary.wrapped_next = oseo_undefined();
     function->ordinary.generator = NULL;
     function->ordinary.arguments_object = false;
     function->ordinary.mapped_arguments = false;

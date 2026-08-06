@@ -135,6 +135,9 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "function-intrinsic") {
     return "intrinsic Function";
   }
+  if (expression.kind === "iterator-intrinsic") {
+    return "intrinsic Iterator";
+  }
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }
