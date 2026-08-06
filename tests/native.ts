@@ -208,7 +208,10 @@ for (const fixture of selectedFixtures) {
     assert.match(enabledText, /property-get generic/u);
   }
 
-  if (fixture.name === "object-prototype") {
+  if (
+    fixture.name === "object-prototype" ||
+    fixture.name === "function-prototype"
+  ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
     assert.match(enabledText, /guard-shape/u);
@@ -270,6 +273,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "closures-and-methods" ||
+    fixture.name === "function-prototype" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -430,7 +434,10 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
-          if (fixture.name === "object-prototype") {
+          if (
+            fixture.name === "object-prototype" ||
+            fixture.name === "function-prototype"
+          ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
               assert.ok(native.counters.guardMisses > 0);
@@ -587,7 +594,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
-            assert.equal(native.counters.allocations, 5);
+            assert.equal(native.counters.allocations, 6);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

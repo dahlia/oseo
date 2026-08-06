@@ -15,6 +15,127 @@ test("normalizes Babel parse failures", () => {
   assert.equal(result.diagnostics[0]?.sourceId, "invalid.ts");
 });
 
+test("preserves function source and lowers the Function intrinsic", () => {
+  const source = `console.log(Function);
+function sample(value) { return value; }
+`;
+  const parsed = babelFrontend.parse({ source, sourceId: "function.ts" });
+  assert.ok(parsed.parsed);
+  const declaration = parsed.program?.body[1];
+  assert.equal(declaration?.kind, "function");
+  if (declaration?.kind !== "function") return;
+  assert.equal(
+    declaration.sourceText,
+    "function sample(value) { return value; }",
+  );
+
+  const compiled = compileSource(babelFrontend, {
+    source,
+    sourceId: "function.ts",
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  assert.ok(compiled.mir != null);
+  assert.match(printHir(compiled.hir), /intrinsic Function/u);
+  assert.match(
+    printMir(compiled.mir),
+    /function-intrinsic intrinsic Function/u,
+  );
+  const sample = compiled.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .find(
+      (operation) =>
+        operation.kind === "function-create" &&
+        operation.functionName === "sample",
+    );
+  assert.equal(sample?.functionSource, declaration.sourceText);
+
+  for (const dynamicSource of ["Function('return 1')", "new Function()"]) {
+    const rejected = compileSource(babelFrontend, {
+      source: dynamicSource,
+      sourceId: "dynamic-function.ts",
+    });
+    assert.equal(rejected.mir, undefined);
+    assert.match(
+      rejected.diagnostics[0]?.message ?? "",
+      /Function constructor requires dynamic source/u,
+    );
+  }
+});
+
+test("resolves typeof Function and rejects deleting its binding", () => {
+  const typeofResult = compileSource(babelFrontend, {
+    source: "console.log(typeof Function);",
+    sourceId: "typeof-function.ts",
+  });
+  assert.deepEqual(typeofResult.diagnostics, []);
+  assert.ok(typeofResult.hir != null);
+  assert.match(printHir(typeofResult.hir), /intrinsic Function/u);
+
+  const deleteResult = compileSource(babelFrontend, {
+    source: "delete Function;",
+    sourceId: "delete-function.ts",
+  });
+  assert.equal(deleteResult.mir, undefined);
+  assert.match(
+    deleteResult.diagnostics[0]?.message ?? "",
+    /Deleting runtime intrinsic binding 'Function'/u,
+  );
+});
+
+test("lets with object environments shadow the Function intrinsic", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function custom() { return {}; }\n" +
+      "with ({ Function: custom }) { Function(); new Function(); }",
+    sourceId: "with-function.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.equal(
+    printHir(result.hir).match(
+      /with\[%b\d+\] Function fallback intrinsic Function/gu,
+    )?.length,
+    2,
+  );
+});
+
+test("starts static class method source at the method definition", () => {
+  const source = `class C {
+  static /* omitted */ plain() {}
+  static /* omitted */ get getter() {}
+  static /* omitted */ set setter(value) {}
+  static /* omitted */ *generator() {}
+  static /* omitted */ #privateMethod() {}
+  static /* omitted */ get #privateGetter() {}
+  static /* omitted */ set #privateSetter(value) {}
+  static /* omitted */ *#privateGenerator() {}
+}`;
+  const result = compileSource(babelFrontend, {
+    source,
+    sourceId: "static-method-source.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const functionSources = [result.mir.script, ...result.mir.functions]
+    .flatMap((functionValue) => functionValue.blocks)
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.kind === "function-create" ? [operation.functionSource] : [],
+    )
+    .filter((value): value is string => value != null);
+  assert.deepEqual(functionSources.slice(1), [
+    "plain() {}",
+    "get getter() {}",
+    "set setter(value) {}",
+    "*generator() {}",
+    "#privateMethod() {}",
+    "get #privateGetter() {}",
+    "set #privateSetter(value) {}",
+    "*#privateGenerator() {}",
+  ]);
+});
+
 test("converts the M1 profile to owned syntax and retains hints", () => {
   const result = babelFrontend.parse({
     source:

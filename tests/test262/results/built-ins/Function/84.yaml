@@ -1,0 +1,45 @@
+group: built-ins/Function
+key: "84"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - nativeFunctionMatcher.js
+      mode: script
+      path: test/built-ins/Function/prototype/toString/class-declaration-implicit-ctor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: unsupported harness nativeFunctionMatcher.js."
+      passed: false
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-methods-private
+      flags: []
+      includes:
+        - nativeFunctionMatcher.js
+      mode: script
+      path: test/built-ins/Function/prototype/toString/private-static-method-class-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: unsupported harness nativeFunctionMatcher.js."
+      passed: false
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

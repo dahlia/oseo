@@ -107,6 +107,11 @@ static void trace_object(
             mark_value(function->lexical_super, worklist);
             mark_value(function->prototype_object, worklist);
             mark_value(function->home_object, worklist);
+            mark_value(function->initial_name, worklist);
+            mark_value(function->source_text, worklist);
+            mark_value(function->bound_target, worklist);
+            mark_value(function->bound_this, worklist);
+            mark_value(function->bound_arguments, worklist);
             for (size_t index = 0u;
                  index < function->element_count;
                  index += 1u) {

@@ -123,6 +123,10 @@ const reviewedExecutionPoolLimit = Math.min(
   availableParallelism(),
 );
 const reviewedExecutionRetryLimit = 1;
+const unavailableHarnessIncludes = new Set([
+  "nativeFunctionMatcher.js",
+  "wellKnownIntrinsicObjects.js",
+]);
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -287,7 +291,7 @@ export function parseTest262Case(
     throw new Error(`${path} does not contain test262 frontmatter.`);
   }
   const metadata = record(
-    (parseYaml(match[1]) ?? {}) as unknown,
+    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as unknown,
     `${path} frontmatter`,
   );
   const flags = stringArray(metadata.flags, `${path} flags`);
@@ -469,6 +473,22 @@ function detail(
     `failed (${result.exitStatus}): stdout=${JSON.stringify(result.stdout)} ` +
     `stderr=${JSON.stringify(result.stderr)}`
   );
+}
+
+/** A runtime value can reach a reviewed, explicit profile boundary. */
+function unsupportedRuntimeCapability(stderr: string): string | undefined {
+  if (
+    unhandledErrorType(stderr) != null ||
+    stderr.includes(untypedThrowMessage)
+  ) {
+    return undefined;
+  }
+  const diagnostic = /^.+?:\d+:\d+: error\[OSEO2001\]: (.+)$/mu.exec(
+    stderr,
+  )?.[1];
+  return diagnostic === "Primitive wrapper objects are not admitted yet."
+    ? "primitive-wrapper"
+    : undefined;
 }
 
 function unsupportedResult(
@@ -917,6 +937,9 @@ async function executedResult(
         // no native program executed.
         const parseRejected = code === "OSEO0001";
         const compileStage = unsupportedSyntax || parseRejected;
+        const runtimeCapability = unsupportedRuntimeCapability(
+          observation.stderr,
+        );
         // A genuine unhandled JavaScript throw is either a typed error
         // instance, identified by the stable thrown marker, or the exact
         // untyped-throw diagnostic. A non-catchable resource diagnostic
@@ -950,7 +973,9 @@ async function executedResult(
               ? { unsupportedCapability: "profile-syntax" }
               : parseRejected
                 ? { failedPhase: "parse" as const }
-                : { failedPhase: "runtime" as const }),
+                : runtimeCapability == null
+                  ? { failedPhase: "runtime" as const }
+                  : { unsupportedCapability: runtimeCapability }),
             ...(!compileStage && infrastructureFailure(observation)
               ? { failureKind: "infrastructure" as const }
               : {}),
@@ -1088,6 +1113,25 @@ export async function executeTest262Case(
   );
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
+  }
+  const unsupportedInclude = parsed.flags.includes("raw")
+    ? undefined
+    : parsed.case.includes.find(
+        (include) =>
+          unavailableHarnessIncludes.has(include) &&
+          !harnesses.includes.has(include),
+      );
+  if (unsupportedInclude != null) {
+    return classifyTest262(
+      parsed.case,
+      {
+        detail: `Not executed: unsupported harness ${unsupportedInclude}.`,
+        passed: false,
+        unsupportedCapability: "harness-include",
+      },
+      supportedFeatures,
+      evidence,
+    );
   }
   if (parsed.case.mode === "module") {
     if (location == null) {

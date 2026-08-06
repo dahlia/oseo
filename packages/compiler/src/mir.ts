@@ -154,6 +154,7 @@ export interface MirOperation {
     | "delete-object-coercible"
     | "error-intrinsic"
     | "symbol-intrinsic"
+    | "function-intrinsic"
     | "template-object"
     | "count-guard-hit"
     | "count-guard-miss"
@@ -227,6 +228,7 @@ export interface MirOperation {
   readonly functionKind?: FunctionKind;
   readonly functionLength?: number;
   readonly functionName?: string;
+  readonly functionSource?: string;
   readonly functionNameBinding?: boolean;
   readonly importedBinding?: boolean;
   readonly hint?: MirHint;

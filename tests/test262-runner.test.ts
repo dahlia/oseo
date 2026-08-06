@@ -83,6 +83,16 @@ throw 1;
   });
 });
 
+test("normalizes legacy test262 frontmatter line endings", () => {
+  const parsed = parseTest262Case(
+    "/*---\rfeatures: []\rflags: [noStrict]\rincludes: []\r---*/\r",
+    "test/cr-only.js",
+    revision,
+  );
+  assert.deepEqual(parsed.case.strictness, ["non-strict"]);
+  assert.deepEqual(parsed.flags, ["noStrict"]);
+});
+
 test("rejects contradictory strictness flags", () => {
   assert.throws(
     () =>
@@ -753,6 +763,45 @@ null.item;
     resourceLimit.observation.unsupportedCapability,
     "runtime-error-observation",
   );
+
+  const primitiveWrapper = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "Primitive wrapper objects are not admitted yet.\n",
+    ),
+  );
+  assert.equal(
+    primitiveWrapper.observation.unsupportedCapability,
+    "primitive-wrapper",
+  );
+  assert.equal(primitiveWrapper.classification, "unsupported-profile-feature");
+});
+
+test("keeps user-thrown runtime-boundary text as a failure", async () => {
+  const source = `/*---
+---*/
+throw new Error("Primitive wrapper objects are not admitted yet.");
+`;
+  const parsed = parseTest262Case(source, "test/user-throw.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-throw.js:3:1: error[OSEO2001]: Error: " +
+        "Primitive wrapper objects are not admitted yet.\n" +
+        "OSEO_THROWN Error\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(result.classification, "semantic-failure");
+  assert.equal(result.observation.failedPhase, "runtime");
+  assert.equal(result.observation.unsupportedCapability, undefined);
 });
 
 test("classifies unsupported features without native execution", async () => {
@@ -774,6 +823,41 @@ test("classifies unsupported features without native execution", async () => {
     executor,
   );
   assert.equal(result.classification, "unsupported-profile-feature");
+});
+
+test("classifies reviewed missing includes as unsupported", async () => {
+  await Promise.all(
+    ["nativeFunctionMatcher.js", "wellKnownIntrinsicObjects.js"].map(
+      async (include) => {
+        const source = `/*---
+includes: [${include}]
+---*/
+`;
+        const parsed = parseTest262Case(
+          source,
+          "test/harness-gap.js",
+          revision,
+        );
+        const result = await executeTest262Case(
+          source,
+          parsed,
+          new Set(),
+          harnesses,
+          {
+            async execute() {
+              return assert.fail("unsupported harness case must not execute");
+            },
+          },
+          ["functions"],
+        );
+        assert.equal(result.classification, "unsupported-profile-feature");
+        assert.equal(
+          result.observation.unsupportedCapability,
+          "harness-include",
+        );
+      },
+    ),
+  );
 });
 
 test("recognizes strict early errors as expected parse failures", async () => {

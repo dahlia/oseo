@@ -389,6 +389,558 @@ partitions:
   - group: built-ins/Error
     key: f2
     path: results/built-ins/Error/f2.yaml
+  - group: built-ins/Function
+    key: "00"
+    path: results/built-ins/Function/00.yaml
+  - group: built-ins/Function
+    key: "01"
+    path: results/built-ins/Function/01.yaml
+  - group: built-ins/Function
+    key: "02"
+    path: results/built-ins/Function/02.yaml
+  - group: built-ins/Function
+    key: "03"
+    path: results/built-ins/Function/03.yaml
+  - group: built-ins/Function
+    key: "04"
+    path: results/built-ins/Function/04.yaml
+  - group: built-ins/Function
+    key: "05"
+    path: results/built-ins/Function/05.yaml
+  - group: built-ins/Function
+    key: "06"
+    path: results/built-ins/Function/06.yaml
+  - group: built-ins/Function
+    key: "07"
+    path: results/built-ins/Function/07.yaml
+  - group: built-ins/Function
+    key: 0a
+    path: results/built-ins/Function/0a.yaml
+  - group: built-ins/Function
+    key: 0b
+    path: results/built-ins/Function/0b.yaml
+  - group: built-ins/Function
+    key: 0c
+    path: results/built-ins/Function/0c.yaml
+  - group: built-ins/Function
+    key: 0d
+    path: results/built-ins/Function/0d.yaml
+  - group: built-ins/Function
+    key: 0f
+    path: results/built-ins/Function/0f.yaml
+  - group: built-ins/Function
+    key: "10"
+    path: results/built-ins/Function/10.yaml
+  - group: built-ins/Function
+    key: "12"
+    path: results/built-ins/Function/12.yaml
+  - group: built-ins/Function
+    key: "13"
+    path: results/built-ins/Function/13.yaml
+  - group: built-ins/Function
+    key: "15"
+    path: results/built-ins/Function/15.yaml
+  - group: built-ins/Function
+    key: "16"
+    path: results/built-ins/Function/16.yaml
+  - group: built-ins/Function
+    key: "17"
+    path: results/built-ins/Function/17.yaml
+  - group: built-ins/Function
+    key: "18"
+    path: results/built-ins/Function/18.yaml
+  - group: built-ins/Function
+    key: "19"
+    path: results/built-ins/Function/19.yaml
+  - group: built-ins/Function
+    key: 1a
+    path: results/built-ins/Function/1a.yaml
+  - group: built-ins/Function
+    key: 1d
+    path: results/built-ins/Function/1d.yaml
+  - group: built-ins/Function
+    key: 1f
+    path: results/built-ins/Function/1f.yaml
+  - group: built-ins/Function
+    key: "20"
+    path: results/built-ins/Function/20.yaml
+  - group: built-ins/Function
+    key: "22"
+    path: results/built-ins/Function/22.yaml
+  - group: built-ins/Function
+    key: "24"
+    path: results/built-ins/Function/24.yaml
+  - group: built-ins/Function
+    key: "25"
+    path: results/built-ins/Function/25.yaml
+  - group: built-ins/Function
+    key: "26"
+    path: results/built-ins/Function/26.yaml
+  - group: built-ins/Function
+    key: "29"
+    path: results/built-ins/Function/29.yaml
+  - group: built-ins/Function
+    key: 2b
+    path: results/built-ins/Function/2b.yaml
+  - group: built-ins/Function
+    key: 2c
+    path: results/built-ins/Function/2c.yaml
+  - group: built-ins/Function
+    key: 2d
+    path: results/built-ins/Function/2d.yaml
+  - group: built-ins/Function
+    key: "30"
+    path: results/built-ins/Function/30.yaml
+  - group: built-ins/Function
+    key: "31"
+    path: results/built-ins/Function/31.yaml
+  - group: built-ins/Function
+    key: "32"
+    path: results/built-ins/Function/32.yaml
+  - group: built-ins/Function
+    key: "33"
+    path: results/built-ins/Function/33.yaml
+  - group: built-ins/Function
+    key: "35"
+    path: results/built-ins/Function/35.yaml
+  - group: built-ins/Function
+    key: "36"
+    path: results/built-ins/Function/36.yaml
+  - group: built-ins/Function
+    key: "37"
+    path: results/built-ins/Function/37.yaml
+  - group: built-ins/Function
+    key: "38"
+    path: results/built-ins/Function/38.yaml
+  - group: built-ins/Function
+    key: "39"
+    path: results/built-ins/Function/39.yaml
+  - group: built-ins/Function
+    key: 3a
+    path: results/built-ins/Function/3a.yaml
+  - group: built-ins/Function
+    key: 3b
+    path: results/built-ins/Function/3b.yaml
+  - group: built-ins/Function
+    key: 3c
+    path: results/built-ins/Function/3c.yaml
+  - group: built-ins/Function
+    key: 3d
+    path: results/built-ins/Function/3d.yaml
+  - group: built-ins/Function
+    key: 3e
+    path: results/built-ins/Function/3e.yaml
+  - group: built-ins/Function
+    key: 3f
+    path: results/built-ins/Function/3f.yaml
+  - group: built-ins/Function
+    key: "40"
+    path: results/built-ins/Function/40.yaml
+  - group: built-ins/Function
+    key: "41"
+    path: results/built-ins/Function/41.yaml
+  - group: built-ins/Function
+    key: "43"
+    path: results/built-ins/Function/43.yaml
+  - group: built-ins/Function
+    key: "44"
+    path: results/built-ins/Function/44.yaml
+  - group: built-ins/Function
+    key: "46"
+    path: results/built-ins/Function/46.yaml
+  - group: built-ins/Function
+    key: "47"
+    path: results/built-ins/Function/47.yaml
+  - group: built-ins/Function
+    key: "48"
+    path: results/built-ins/Function/48.yaml
+  - group: built-ins/Function
+    key: "49"
+    path: results/built-ins/Function/49.yaml
+  - group: built-ins/Function
+    key: 4a
+    path: results/built-ins/Function/4a.yaml
+  - group: built-ins/Function
+    key: 4b
+    path: results/built-ins/Function/4b.yaml
+  - group: built-ins/Function
+    key: 4c
+    path: results/built-ins/Function/4c.yaml
+  - group: built-ins/Function
+    key: 4d
+    path: results/built-ins/Function/4d.yaml
+  - group: built-ins/Function
+    key: 4e
+    path: results/built-ins/Function/4e.yaml
+  - group: built-ins/Function
+    key: 4f
+    path: results/built-ins/Function/4f.yaml
+  - group: built-ins/Function
+    key: "50"
+    path: results/built-ins/Function/50.yaml
+  - group: built-ins/Function
+    key: "51"
+    path: results/built-ins/Function/51.yaml
+  - group: built-ins/Function
+    key: "53"
+    path: results/built-ins/Function/53.yaml
+  - group: built-ins/Function
+    key: "55"
+    path: results/built-ins/Function/55.yaml
+  - group: built-ins/Function
+    key: "56"
+    path: results/built-ins/Function/56.yaml
+  - group: built-ins/Function
+    key: "58"
+    path: results/built-ins/Function/58.yaml
+  - group: built-ins/Function
+    key: 5c
+    path: results/built-ins/Function/5c.yaml
+  - group: built-ins/Function
+    key: 5d
+    path: results/built-ins/Function/5d.yaml
+  - group: built-ins/Function
+    key: 5e
+    path: results/built-ins/Function/5e.yaml
+  - group: built-ins/Function
+    key: "60"
+    path: results/built-ins/Function/60.yaml
+  - group: built-ins/Function
+    key: "62"
+    path: results/built-ins/Function/62.yaml
+  - group: built-ins/Function
+    key: "64"
+    path: results/built-ins/Function/64.yaml
+  - group: built-ins/Function
+    key: "65"
+    path: results/built-ins/Function/65.yaml
+  - group: built-ins/Function
+    key: "66"
+    path: results/built-ins/Function/66.yaml
+  - group: built-ins/Function
+    key: "68"
+    path: results/built-ins/Function/68.yaml
+  - group: built-ins/Function
+    key: "69"
+    path: results/built-ins/Function/69.yaml
+  - group: built-ins/Function
+    key: 6a
+    path: results/built-ins/Function/6a.yaml
+  - group: built-ins/Function
+    key: 6b
+    path: results/built-ins/Function/6b.yaml
+  - group: built-ins/Function
+    key: 6d
+    path: results/built-ins/Function/6d.yaml
+  - group: built-ins/Function
+    key: 6e
+    path: results/built-ins/Function/6e.yaml
+  - group: built-ins/Function
+    key: 6f
+    path: results/built-ins/Function/6f.yaml
+  - group: built-ins/Function
+    key: "70"
+    path: results/built-ins/Function/70.yaml
+  - group: built-ins/Function
+    key: "71"
+    path: results/built-ins/Function/71.yaml
+  - group: built-ins/Function
+    key: "73"
+    path: results/built-ins/Function/73.yaml
+  - group: built-ins/Function
+    key: "75"
+    path: results/built-ins/Function/75.yaml
+  - group: built-ins/Function
+    key: "76"
+    path: results/built-ins/Function/76.yaml
+  - group: built-ins/Function
+    key: "77"
+    path: results/built-ins/Function/77.yaml
+  - group: built-ins/Function
+    key: "78"
+    path: results/built-ins/Function/78.yaml
+  - group: built-ins/Function
+    key: "79"
+    path: results/built-ins/Function/79.yaml
+  - group: built-ins/Function
+    key: 7a
+    path: results/built-ins/Function/7a.yaml
+  - group: built-ins/Function
+    key: 7b
+    path: results/built-ins/Function/7b.yaml
+  - group: built-ins/Function
+    key: 7c
+    path: results/built-ins/Function/7c.yaml
+  - group: built-ins/Function
+    key: 7d
+    path: results/built-ins/Function/7d.yaml
+  - group: built-ins/Function
+    key: 7e
+    path: results/built-ins/Function/7e.yaml
+  - group: built-ins/Function
+    key: 7f
+    path: results/built-ins/Function/7f.yaml
+  - group: built-ins/Function
+    key: "81"
+    path: results/built-ins/Function/81.yaml
+  - group: built-ins/Function
+    key: "82"
+    path: results/built-ins/Function/82.yaml
+  - group: built-ins/Function
+    key: "83"
+    path: results/built-ins/Function/83.yaml
+  - group: built-ins/Function
+    key: "84"
+    path: results/built-ins/Function/84.yaml
+  - group: built-ins/Function
+    key: "85"
+    path: results/built-ins/Function/85.yaml
+  - group: built-ins/Function
+    key: "86"
+    path: results/built-ins/Function/86.yaml
+  - group: built-ins/Function
+    key: "87"
+    path: results/built-ins/Function/87.yaml
+  - group: built-ins/Function
+    key: 8a
+    path: results/built-ins/Function/8a.yaml
+  - group: built-ins/Function
+    key: 8b
+    path: results/built-ins/Function/8b.yaml
+  - group: built-ins/Function
+    key: 8d
+    path: results/built-ins/Function/8d.yaml
+  - group: built-ins/Function
+    key: 8e
+    path: results/built-ins/Function/8e.yaml
+  - group: built-ins/Function
+    key: 8f
+    path: results/built-ins/Function/8f.yaml
+  - group: built-ins/Function
+    key: "90"
+    path: results/built-ins/Function/90.yaml
+  - group: built-ins/Function
+    key: "92"
+    path: results/built-ins/Function/92.yaml
+  - group: built-ins/Function
+    key: "93"
+    path: results/built-ins/Function/93.yaml
+  - group: built-ins/Function
+    key: "94"
+    path: results/built-ins/Function/94.yaml
+  - group: built-ins/Function
+    key: "95"
+    path: results/built-ins/Function/95.yaml
+  - group: built-ins/Function
+    key: "97"
+    path: results/built-ins/Function/97.yaml
+  - group: built-ins/Function
+    key: "98"
+    path: results/built-ins/Function/98.yaml
+  - group: built-ins/Function
+    key: "99"
+    path: results/built-ins/Function/99.yaml
+  - group: built-ins/Function
+    key: 9a
+    path: results/built-ins/Function/9a.yaml
+  - group: built-ins/Function
+    key: 9b
+    path: results/built-ins/Function/9b.yaml
+  - group: built-ins/Function
+    key: 9c
+    path: results/built-ins/Function/9c.yaml
+  - group: built-ins/Function
+    key: 9e
+    path: results/built-ins/Function/9e.yaml
+  - group: built-ins/Function
+    key: 9f
+    path: results/built-ins/Function/9f.yaml
+  - group: built-ins/Function
+    key: a0
+    path: results/built-ins/Function/a0.yaml
+  - group: built-ins/Function
+    key: a1
+    path: results/built-ins/Function/a1.yaml
+  - group: built-ins/Function
+    key: a2
+    path: results/built-ins/Function/a2.yaml
+  - group: built-ins/Function
+    key: a3
+    path: results/built-ins/Function/a3.yaml
+  - group: built-ins/Function
+    key: a4
+    path: results/built-ins/Function/a4.yaml
+  - group: built-ins/Function
+    key: a5
+    path: results/built-ins/Function/a5.yaml
+  - group: built-ins/Function
+    key: a7
+    path: results/built-ins/Function/a7.yaml
+  - group: built-ins/Function
+    key: a8
+    path: results/built-ins/Function/a8.yaml
+  - group: built-ins/Function
+    key: ab
+    path: results/built-ins/Function/ab.yaml
+  - group: built-ins/Function
+    key: ad
+    path: results/built-ins/Function/ad.yaml
+  - group: built-ins/Function
+    key: af
+    path: results/built-ins/Function/af.yaml
+  - group: built-ins/Function
+    key: b0
+    path: results/built-ins/Function/b0.yaml
+  - group: built-ins/Function
+    key: b1
+    path: results/built-ins/Function/b1.yaml
+  - group: built-ins/Function
+    key: b2
+    path: results/built-ins/Function/b2.yaml
+  - group: built-ins/Function
+    key: b3
+    path: results/built-ins/Function/b3.yaml
+  - group: built-ins/Function
+    key: b6
+    path: results/built-ins/Function/b6.yaml
+  - group: built-ins/Function
+    key: b7
+    path: results/built-ins/Function/b7.yaml
+  - group: built-ins/Function
+    key: b9
+    path: results/built-ins/Function/b9.yaml
+  - group: built-ins/Function
+    key: bc
+    path: results/built-ins/Function/bc.yaml
+  - group: built-ins/Function
+    key: bd
+    path: results/built-ins/Function/bd.yaml
+  - group: built-ins/Function
+    key: bf
+    path: results/built-ins/Function/bf.yaml
+  - group: built-ins/Function
+    key: c1
+    path: results/built-ins/Function/c1.yaml
+  - group: built-ins/Function
+    key: c3
+    path: results/built-ins/Function/c3.yaml
+  - group: built-ins/Function
+    key: c5
+    path: results/built-ins/Function/c5.yaml
+  - group: built-ins/Function
+    key: c7
+    path: results/built-ins/Function/c7.yaml
+  - group: built-ins/Function
+    key: c9
+    path: results/built-ins/Function/c9.yaml
+  - group: built-ins/Function
+    key: cd
+    path: results/built-ins/Function/cd.yaml
+  - group: built-ins/Function
+    key: cf
+    path: results/built-ins/Function/cf.yaml
+  - group: built-ins/Function
+    key: d1
+    path: results/built-ins/Function/d1.yaml
+  - group: built-ins/Function
+    key: d4
+    path: results/built-ins/Function/d4.yaml
+  - group: built-ins/Function
+    key: d5
+    path: results/built-ins/Function/d5.yaml
+  - group: built-ins/Function
+    key: d7
+    path: results/built-ins/Function/d7.yaml
+  - group: built-ins/Function
+    key: d8
+    path: results/built-ins/Function/d8.yaml
+  - group: built-ins/Function
+    key: da
+    path: results/built-ins/Function/da.yaml
+  - group: built-ins/Function
+    key: dd
+    path: results/built-ins/Function/dd.yaml
+  - group: built-ins/Function
+    key: de
+    path: results/built-ins/Function/de.yaml
+  - group: built-ins/Function
+    key: df
+    path: results/built-ins/Function/df.yaml
+  - group: built-ins/Function
+    key: e0
+    path: results/built-ins/Function/e0.yaml
+  - group: built-ins/Function
+    key: e1
+    path: results/built-ins/Function/e1.yaml
+  - group: built-ins/Function
+    key: e3
+    path: results/built-ins/Function/e3.yaml
+  - group: built-ins/Function
+    key: e5
+    path: results/built-ins/Function/e5.yaml
+  - group: built-ins/Function
+    key: e6
+    path: results/built-ins/Function/e6.yaml
+  - group: built-ins/Function
+    key: e7
+    path: results/built-ins/Function/e7.yaml
+  - group: built-ins/Function
+    key: e9
+    path: results/built-ins/Function/e9.yaml
+  - group: built-ins/Function
+    key: ea
+    path: results/built-ins/Function/ea.yaml
+  - group: built-ins/Function
+    key: eb
+    path: results/built-ins/Function/eb.yaml
+  - group: built-ins/Function
+    key: ed
+    path: results/built-ins/Function/ed.yaml
+  - group: built-ins/Function
+    key: ee
+    path: results/built-ins/Function/ee.yaml
+  - group: built-ins/Function
+    key: ef
+    path: results/built-ins/Function/ef.yaml
+  - group: built-ins/Function
+    key: f0
+    path: results/built-ins/Function/f0.yaml
+  - group: built-ins/Function
+    key: f1
+    path: results/built-ins/Function/f1.yaml
+  - group: built-ins/Function
+    key: f2
+    path: results/built-ins/Function/f2.yaml
+  - group: built-ins/Function
+    key: f3
+    path: results/built-ins/Function/f3.yaml
+  - group: built-ins/Function
+    key: f5
+    path: results/built-ins/Function/f5.yaml
+  - group: built-ins/Function
+    key: f6
+    path: results/built-ins/Function/f6.yaml
+  - group: built-ins/Function
+    key: f7
+    path: results/built-ins/Function/f7.yaml
+  - group: built-ins/Function
+    key: f8
+    path: results/built-ins/Function/f8.yaml
+  - group: built-ins/Function
+    key: fa
+    path: results/built-ins/Function/fa.yaml
+  - group: built-ins/Function
+    key: fb
+    path: results/built-ins/Function/fb.yaml
+  - group: built-ins/Function
+    key: fc
+    path: results/built-ins/Function/fc.yaml
+  - group: built-ins/Function
+    key: fd
+    path: results/built-ins/Function/fd.yaml
+  - group: built-ins/Function
+    key: fe
+    path: results/built-ins/Function/fe.yaml
   - group: built-ins/GeneratorFunction
     key: "04"
     path: results/built-ins/GeneratorFunction/04.yaml
@@ -1205,6 +1757,48 @@ partitions:
   - group: built-ins/Symbol
     key: fe
     path: results/built-ins/Symbol/fe.yaml
+  - group: built-ins/ThrowTypeError
+    key: "07"
+    path: results/built-ins/ThrowTypeError/07.yaml
+  - group: built-ins/ThrowTypeError
+    key: 0a
+    path: results/built-ins/ThrowTypeError/0a.yaml
+  - group: built-ins/ThrowTypeError
+    key: "13"
+    path: results/built-ins/ThrowTypeError/13.yaml
+  - group: built-ins/ThrowTypeError
+    key: "21"
+    path: results/built-ins/ThrowTypeError/21.yaml
+  - group: built-ins/ThrowTypeError
+    key: "34"
+    path: results/built-ins/ThrowTypeError/34.yaml
+  - group: built-ins/ThrowTypeError
+    key: 5f
+    path: results/built-ins/ThrowTypeError/5f.yaml
+  - group: built-ins/ThrowTypeError
+    key: "76"
+    path: results/built-ins/ThrowTypeError/76.yaml
+  - group: built-ins/ThrowTypeError
+    key: "81"
+    path: results/built-ins/ThrowTypeError/81.yaml
+  - group: built-ins/ThrowTypeError
+    key: 8a
+    path: results/built-ins/ThrowTypeError/8a.yaml
+  - group: built-ins/ThrowTypeError
+    key: 9a
+    path: results/built-ins/ThrowTypeError/9a.yaml
+  - group: built-ins/ThrowTypeError
+    key: a3
+    path: results/built-ins/ThrowTypeError/a3.yaml
+  - group: built-ins/ThrowTypeError
+    key: ad
+    path: results/built-ins/ThrowTypeError/ad.yaml
+  - group: built-ins/ThrowTypeError
+    key: e8
+    path: results/built-ins/ThrowTypeError/e8.yaml
+  - group: built-ins/ThrowTypeError
+    key: f9
+    path: results/built-ins/ThrowTypeError/f9.yaml
   - group: language/arguments-object
     key: "03"
     path: results/language/arguments-object/03.yaml
@@ -3970,9 +4564,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 3016
+  passes: 3141
   semanticFailures: 0
-  unsupportedProfileFeatures: 707
+  unsupportedProfileFeatures: 926
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -3985,9 +4579,9 @@ summary:
       expectedNegatives: 161
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 453
+      passes: 455
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 8
     - dependency: async-iteration
       expectedNegatives: 211
       harnessFailures: 0
@@ -4055,9 +4649,9 @@ summary:
       expectedNegatives: 122
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 441
+      passes: 564
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 243
     - dependency: generators
       expectedNegatives: 82
       harnessFailures: 0
@@ -4185,6 +4779,13 @@ summary:
       passes: 16
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/Function
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 116
+      semanticFailures: 0
+      unsupportedProfileFeatures: 214
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -4227,6 +4828,13 @@ summary:
       passes: 20
       semanticFailures: 0
       unsupportedProfileFeatures: 15
+    - group: built-ins/ThrowTypeError
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 7
+      semanticFailures: 0
+      unsupportedProfileFeatures: 7
     - group: language/arguments-object
       expectedNegatives: 1
       harnessFailures: 0
@@ -4266,9 +4874,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1328
+      passes: 1329
       semanticFailures: 0
-      unsupportedProfileFeatures: 263
+      unsupportedProfileFeatures: 262
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -4336,6 +4944,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1140
+      passes: 1141
       semanticFailures: 0
-      unsupportedProfileFeatures: 156
+      unsupportedProfileFeatures: 155

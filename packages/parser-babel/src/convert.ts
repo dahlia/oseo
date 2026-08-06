@@ -3210,6 +3210,48 @@ export function hoistedVarDeclarations(
 }
 
 /**
+ * Finds the MethodDefinition start after a static class-element modifier.
+ * Function source excludes `static` and its following trivia, while retaining
+ * an accessor, async, or generator prefix that belongs to MethodDefinition.
+ */
+function functionSourceStart(
+  context: ConvertContext,
+  value: BabelNode,
+): number | undefined {
+  if (
+    value.static !== true ||
+    (value.type !== "ClassMethod" && value.type !== "ClassPrivateMethod") ||
+    value.start == null
+  ) {
+    return value.start;
+  }
+  const source = context.input.source;
+  const afterStatic = value.start + "static".length;
+  if (source.slice(value.start, afterStatic) !== "static") return value.start;
+  const keyStart = node(value.key)?.start ?? value.end ?? source.length;
+  let index = afterStatic;
+  while (index < keyStart) {
+    const character = source[index];
+    if (character != null && /\s/u.test(character)) {
+      index += 1;
+      continue;
+    }
+    if (source.startsWith("/*", index)) {
+      const commentEnd = source.indexOf("*/", index + 2);
+      index = commentEnd < 0 ? keyStart : Math.min(commentEnd + 2, keyStart);
+      continue;
+    }
+    if (source.startsWith("//", index)) {
+      const lineEnd = source.indexOf("\n", index + 2);
+      index = lineEnd < 0 ? keyStart : Math.min(lineEnd + 1, keyStart);
+      continue;
+    }
+    break;
+  }
+  return index;
+}
+
+/**
  * Converts one function-like node. `memberKind` selects the owned
  * function kind for the definition forms that are not plain function
  * declarations or expressions: `"method"` for a MethodDefinition and
@@ -3584,6 +3626,7 @@ export function functionDeclaration(
     (generator || value.async === true) && parameterEnvironment
       ? parameterInitializers.length + parameterCopyCount
       : 0;
+  const sourceStart = functionSourceStart(context, value);
   return {
     ...location(context, value),
     ...(argumentsFormal ? { argumentsFormal: true as const } : {}),
@@ -3608,6 +3651,11 @@ export function functionDeclaration(
     name,
     parameters,
     returnHints,
+    ...(sourceStart == null || value.end == null
+      ? {}
+      : {
+          sourceText: context.input.source.slice(sourceStart, value.end),
+        }),
     ...(simpleParameterList ? { simpleParameterList: true } : {}),
     strict,
   };
@@ -3928,7 +3976,15 @@ export function classExpression(
       element.staticPlacement !== true &&
       (element.kind === "field" || element.key.kind === "private-name"),
   );
-  const classConstructor = constructorFunction ?? implicitConstructor;
+  const classSource =
+    value.start == null || value.end == null
+      ? undefined
+      : context.input.source.slice(value.start, value.end);
+  const selectedConstructor = constructorFunction ?? implicitConstructor;
+  const classConstructor =
+    classSource == null
+      ? selectedConstructor
+      : { ...selectedConstructor, sourceText: classSource };
   return {
     ...located,
     constructorFunction: instanceElements

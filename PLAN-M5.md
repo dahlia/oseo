@@ -3633,6 +3633,19 @@ prerequisite boundaries. The manifest moves to 3,016 passes across 5,078 paths,
 and the runtime ABI moves to `oseo-runtime-m5-47`, without changing the graph's
 orchestration state.
 
+Implemented M5b node `function-prototype` completes the callable realm root
+with `call`, `apply`, `bind`, `toString`, `Symbol.hasInstance`, the `Function`
+constructor identity, and the restricted accessors backed by the existing
+`%ThrowTypeError%`. Dynamic source and primitive wrappers remain explicit
+later-node boundaries. Fixed native and generated differential evidence at
+seed `0x60003300` covers both specialization policies, forced collection,
+bound construction, custom has-instance dispatch, and deliberate shape-guard
+misses. All 344 paths under the node's four inventory roots are reviewed: 123
+pass and 221 retain explicit prerequisite boundaries. Two existing
+global-binding cases also become passes. The manifest moves to 3,141 passes
+across 5,422 paths, and the runtime ABI moves to `oseo-runtime-m5-48`, without
+changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

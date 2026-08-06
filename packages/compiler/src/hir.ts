@@ -347,7 +347,11 @@ export function intrinsicGlobalKind(
   if (name === "undefined" || name === "NaN" || name === "Infinity") {
     return "restricted";
   }
-  if (name === "Symbol" || errorIntrinsicName(name) != null) {
+  if (
+    name === "Function" ||
+    name === "Symbol" ||
+    errorIntrinsicName(name) != null
+  ) {
     return "replaceable";
   }
   return undefined;
@@ -719,6 +723,7 @@ export type HirExpression =
       readonly kind: "function";
       readonly name: string;
       readonly functionLength: number;
+      readonly sourceText?: string;
     })
   | (LocatedSyntax & {
       readonly bindingId: number;
@@ -731,6 +736,9 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly errorName: ErrorIntrinsicName;
       readonly kind: "error-intrinsic";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "function-intrinsic";
     })
   | (LocatedSyntax & {
       readonly kind: "symbol-intrinsic";
@@ -1033,6 +1041,7 @@ export type HirStatement =
       readonly kind: "function-init";
       readonly name: string;
       readonly functionLength: number;
+      readonly sourceText?: string;
     })
   | (LocatedSyntax & {
       readonly alternate: HirStatement | undefined;
@@ -1142,6 +1151,8 @@ export interface HirFunction extends LocatedSyntax {
   readonly name: string;
   readonly parameters: readonly HirParameter[];
   readonly returnHints: readonly Hint[];
+  /** Original ECMAScript source text retained for callable reflection. */
+  readonly sourceText?: string;
   readonly selfBindingId?: number;
   readonly strict?: boolean;
 }

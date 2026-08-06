@@ -1012,12 +1012,12 @@ static void test_accessor_descriptor_gc_safety(
 }
 
 static void test_this_value(OseoContext *context, OseoValue *roots) {
-    /* A non-nullish receiver stands unchanged and allocates nothing. */
+    /* An object receiver stands unchanged and allocates nothing. Primitive
+     * wrapper allocation remains outside the admitted runtime. */
     roots[0] = require_normal(oseo_object_create(context, oseo_null()));
     assert(require_normal(oseo_this_value(context, roots[0])) == roots[0]);
     assert(
-        require_normal(oseo_this_value(context, oseo_number(1.0))) ==
-        oseo_number(1.0)
+        oseo_this_value(context, oseo_number(1.0)).status == OSEO_STATUS_THROW
     );
     /* Both nullish receivers resolve to the one global this value. */
     roots[1] = require_normal(oseo_this_value(context, oseo_undefined()));

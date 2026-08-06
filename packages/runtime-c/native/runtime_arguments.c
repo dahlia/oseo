@@ -73,6 +73,15 @@ OseoResult oseo_internal_throw_type_error_function(OseoContext *context) {
         );
         frame.slots[0] = result.value;
     }
+    /* Materializing Function.prototype above may have requested and cached
+     * this intrinsic while the outer allocation was still in progress. Keep
+     * that completed function as the realm identity instead of replacing it
+     * with the outer allocation. */
+    if (result.status == OSEO_STATUS_NORMAL && is_function(*cache)) {
+        result = normal(*cache);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     const OseoPropertyAttributes frozen =
         (OseoPropertyAttributes){false, false, false, false};
     const char *const hardened[] = {"length", "name"};

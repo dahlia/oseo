@@ -309,12 +309,9 @@ fail();
     },
     host,
   );
-  assert.equal(functionCoercion.exitStatus, 1);
-  assert.equal(functionCoercion.stdout, "");
-  assert.match(
-    functionCoercion.stderr,
-    /error\[OSEO2001\].*Function and promise text conversion is unsupported/u,
-  );
+  assert.equal(functionCoercion.exitStatus, 0);
+  assert.equal(functionCoercion.stdout, "function probe() {}1\n");
+  assert.equal(functionCoercion.stderr, "");
 
   const objectTimerDelay = await runNativeCli(
     {

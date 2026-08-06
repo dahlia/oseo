@@ -1,0 +1,46 @@
+group: built-ins/Function
+key: d7
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-4.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "test/built-ins/Function/prototype/bind/15.3.4.5.2-4-4.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5.2-4-4.\
+        js:82:14: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - nativeFunctionMatcher.js
+      mode: script
+      path: test/built-ins/Function/prototype/toString/function-declaration-non-simple-parameter-list.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: unsupported harness nativeFunctionMatcher.js."
+      passed: false
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

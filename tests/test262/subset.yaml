@@ -460,6 +460,996 @@ tests:
   - path: test/built-ins/Error/prototype/toString/name.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Call/class-ctor.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/derived-return-val-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/derived-return-val.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/derived-this-uninitialized-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/internals/Construct/derived-this-uninitialized.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/15.3.3.2-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.3.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.3.1_A2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.3.1_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.3.1_A4.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A2_T2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A2_T3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.4_A5.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/length.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/this-val-bound-target.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/this-val-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/this-val-poisoned-prototype.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/this-val-prototype-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-get-prototype-of-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-negative.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-positive.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/15.3.4.3-1-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/15.3.4.3-2-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/15.3.4.3-3-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A1_T2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T6.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T8.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T5.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/argarray-not-object-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/argarray-not-object.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/get-index-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/get-length-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/length.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/this-not-callable-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/apply/this-not-callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/arguments/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-0-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-10-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-11-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-16-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-16-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-10.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-11.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-13.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-14.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-15.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-16.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-20-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-20-3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-21-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-21-3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-3-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-10.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-11.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-4.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-5.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-6.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-7.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-8.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-6-9.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-8-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-8-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-9-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5-9-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-10.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-11.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-13.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-14.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-15.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-4.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-5.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-6.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-7.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-8.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.1-4-9.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/BoundFunction_restricted-properties.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A13.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A14.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A15.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A4.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/get-fn-realm-recursive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/get-fn-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-construct-newtarget-boundtarget-bound.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-construct-newtarget-boundtarget.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-construct-newtarget-self-new.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-construct-newtarget-self-reflect.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-length-default-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-length-exceeds-int32.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-length-prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-length-remaining-args.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-length-tointeger.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-name-chained.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-name-error.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-name-non-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/instance-name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/length.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/bind/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/15.3.4.4-1-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/15.3.4.4-2-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/15.3.4.4-3-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A11.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A13.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A14.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A15.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A1_T2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T6.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T8.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T4.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T5.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T3.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A9.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/call/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/caller-arguments/accessor-properties.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/caller/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/constructor/S15.3.4.1_A1_T1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/length.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/property-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/AsyncFunction.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/AsyncGenerator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/Function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/GeneratorFunction.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A11.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A12.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A13.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A14.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A6.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A8.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/S15.3.4.2_A9.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/arrow-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-arrow-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-function-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-function-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-method-class-expression-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-method-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-method-class-statement-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-method-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-generator-method-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-method-class-expression-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-method-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-method-class-statement-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-method-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/async-method-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/bound-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/built-in-function-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/class-declaration-complex-heritage.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/class-declaration-explicit-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/class-declaration-implicit-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/class-expression-explicit-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/class-expression-implicit-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/function-declaration-non-simple-parameter-list.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/function-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/function-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/generator-function-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/generator-function-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/generator-method.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/getter-class-expression-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/getter-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/getter-class-statement-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/getter-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/getter-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/line-terminator-normalisation-CR-LF.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/line-terminator-normalisation-CR.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/line-terminator-normalisation-LF.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-class-expression-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-class-statement-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-computed-property-name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/method-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/private-method-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/private-method-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/private-static-method-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/private-static-method-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-arrow-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-async-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-async-generator-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-async-generator-method-definition.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-async-method-definition.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-bound-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-class.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-function-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-generator-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-method-definition.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/proxy-non-callable-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/setter-class-expression-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/setter-class-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/setter-class-statement-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/setter-class-statement.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/setter-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/symbol-named-builtins.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/prototype/toString/unicode.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
   - path: test/built-ins/GeneratorFunction/extensibility.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, generators]
@@ -1456,6 +2446,48 @@ tests:
   - path: test/built-ins/Symbol/unscopables/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/ThrowTypeError/distinct-cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/forbidden-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/forbidden-caller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/frozen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/is-function.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/length.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/name.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/property-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/throws-type-error.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/unique-per-realm-function-proto.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/unique-per-realm-non-simple.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/ThrowTypeError/unique-per-realm-unmapped-args.js
+    expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/arguments-object/10.5-1gs.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
@@ -4817,7 +5849,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
   - path: test/language/expressions/await/await-BindingIdentifier-in-global.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/expressions/await/await-BindingIdentifier-nested.js
     expectedClassification: expected-negative
@@ -10231,7 +11263,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions, functions, object-properties]
   - path: test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/statements/async-function/syntax-declaration-no-line-terminator.js
     expectedClassification: unsupported-profile-feature

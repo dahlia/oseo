@@ -79,8 +79,9 @@ property-key, console, error-message, and timer-delay conversions.
 hint order; objects on the realm intrinsic chain use deferred
 `Object.prototype` and `Array.prototype` conversions with cycle-safe,
 call-depth-bounded array joins, and an object with no convertible
-method throws a catchable `TypeError`. Function and promise text
-conversion remains an owned unsupported diagnostic.
+method throws a catchable `TypeError`. Functions preserve their AOT-known
+source or use the native-function form; promise text conversion remains an
+owned unsupported diagnostic.
 The `m5-7` ABI adds `oseo_symbol_intrinsic` and the *runtime\_symbol.c*
 component: unique GC-traced symbol primitives with descriptions, the
 lazily created non-constructible `Symbol` intrinsic carrying the
@@ -309,6 +310,11 @@ standard methods and `constructor` link. The intrinsic table gains stable
 slots for those functions and the `Object` constructor identity. Callable
 constructor behavior and primitive wrappers remain owned by their later M5b
 node.
+
+The `m5-48` ABI completes `%Function.prototype%` with its standard call,
+apply, bind, source-text, and has-instance behavior. The intrinsic table gains
+stable slots for the `Function` identity and those methods, and function heap
+objects gain traced initial-name, source, and bound-call state.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
