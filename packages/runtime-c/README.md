@@ -316,6 +316,12 @@ apply, bind, source-text, and has-instance behavior. The intrinsic table gains
 stable slots for the `Function` identity and those methods, and function heap
 objects gain traced initial-name, source, and bound-call state.
 
+The `m5-49` ABI materializes `%Iterator%`, `%IteratorPrototype%`, and
+`Iterator.from`. The intrinsic table gains stable slots for the constructor,
+method, accessors, and wrap-for-valid-iterator prototype and methods. Ordinary
+objects also gain traced state for the wrapped iterator and its captured
+`next` method.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

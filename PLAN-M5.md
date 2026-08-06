@@ -3646,6 +3646,21 @@ global-binding cases also become passes. The manifest moves to 3,141 passes
 across 5,422 paths, and the runtime ABI moves to `oseo-runtime-m5-48`, without
 changing the graph's orchestration state.
 
+Implemented M5b node `iterator-intrinsic` materializes `%Iterator%`,
+`%IteratorPrototype%`, `Iterator.from`, and the wrap-for-valid-iterator object
+that later helper methods extend. `Iterator.from` captures `next` once,
+preserves an iterator that already inherits from `%IteratorPrototype%`, and
+otherwise forwards `next` and a dynamically retrieved `return` through the
+collector-traced wrapper. Fixed native and generated differential evidence at
+seed `0x60003400` covers both specialization policies, forced collection,
+direct and iterable inputs, late `return` lookup, and deliberate shape-guard
+misses. All 37 paths under the node's six inventory roots are reviewed. They
+retain the honest `iterator-helpers` feature boundary until the later helper
+method nodes complete that upstream feature tag, so the manifest moves to
+5,459 paths with 3,141 passes and 963 unsupported profile features. The
+runtime ABI moves to `oseo-runtime-m5-49` without changing the graph's
+orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

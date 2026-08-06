@@ -3037,6 +3037,26 @@ schema and vocabulary, and zero-override policy are unchanged. The public
 function-kind and intrinsic tables move the runtime ABI to
 `oseo-runtime-m5-48` without changing the graph's orchestration state.
 
+M5b node `iterator-intrinsic` materializes `%Iterator%`,
+`%IteratorPrototype%`, `Iterator.from`, and the wrap-for-valid-iterator object
+that later helper methods extend. `Iterator.from` captures `next` once,
+preserves an iterator that already inherits from `%IteratorPrototype%`, and
+otherwise returns a collector-traced wrapper whose `next` forwards through the
+captured method and whose `return` performs a fresh lookup. The prototype's
+`constructor` and `Symbol.toStringTag` accessors retain their standard
+setter-that-ignores-prototype behavior. Fixed native and generated
+differential evidence at seed `0x60003400` covers both specialization
+policies, forced collection, direct and iterable inputs, late `return` lookup,
+and deliberate shape-guard misses. All 37 paths under the node's six inventory
+roots are reviewed. Their common upstream `iterator-helpers` feature tag
+remains unsupported until the later helper method nodes complete that feature,
+so the manifest reaches 5,459 cases: 3,141 passes, 1,355 expected negatives,
+and 963 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. The expanded
+intrinsic table and traced wrapper state move the runtime ABI to
+`oseo-runtime-m5-49` without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

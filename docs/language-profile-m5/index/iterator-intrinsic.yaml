@@ -1,0 +1,3 @@
+version: 1
+id: iterator-intrinsic
+record: docs/language-profile-m5/families/iterator-intrinsic.yaml

@@ -101,6 +101,22 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 3u)
 #define OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_ITERATOR_CONSTRUCTOR_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_ITERATOR_FROM_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_WRAP_FOR_VALID_ITERATOR_NEXT_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_WRAP_FOR_VALID_ITERATOR_RETURN_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_ITERATOR_CONSTRUCTOR_GETTER_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_ITERATOR_CONSTRUCTOR_SETTER_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_ITERATOR_TAG_GETTER_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_ITERATOR_TAG_SETTER_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 12u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -514,6 +530,10 @@ typedef struct {
      */
     bool async_from_sync;
     OseoValue async_sync_iterator;
+    /* Iterator.from wrappers retain the direct iterator record. */
+    bool wrap_for_valid_iterator;
+    OseoValue wrapped_iterator;
+    OseoValue wrapped_next;
     /* Both mapped and unmapped arguments objects carry the Arguments tag. */
     bool arguments_object;
     /*
@@ -788,6 +808,11 @@ static inline bool is_async_from_sync_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
         ordinary_object(value)->async_from_sync;
+}
+static inline bool is_wrap_for_valid_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->wrap_for_valid_iterator;
 }
 static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&

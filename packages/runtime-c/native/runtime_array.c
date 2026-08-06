@@ -154,6 +154,9 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->iterator_index = 0u;
     array->async_from_sync = false;
     array->async_sync_iterator = oseo_undefined();
+    array->wrap_for_valid_iterator = false;
+    array->wrapped_iterator = oseo_undefined();
+    array->wrapped_next = oseo_undefined();
     array->generator = NULL;
     array->arguments_object = false;
     array->mapped_arguments = false;

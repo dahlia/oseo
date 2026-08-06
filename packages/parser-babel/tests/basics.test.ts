@@ -100,6 +100,30 @@ test("lets with object environments shadow the Function intrinsic", () => {
   );
 });
 
+test("lowers the Iterator intrinsic as a replaceable global value", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof Iterator, Iterator.from);\n" +
+      "class Local extends Iterator {}",
+    sourceId: "iterator-intrinsic.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /intrinsic Iterator/u);
+  assert.match(printMir(result.mir), /iterator-intrinsic intrinsic Iterator/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete Iterator;",
+    sourceId: "delete-iterator.ts",
+  });
+  assert.equal(deleted.mir, undefined);
+  assert.match(
+    deleted.diagnostics[0]?.message ?? "",
+    /Deleting runtime intrinsic binding 'Iterator'/u,
+  );
+});
+
 test("starts static class method source at the method definition", () => {
   const source = `class C {
   static /* omitted */ plain() {}

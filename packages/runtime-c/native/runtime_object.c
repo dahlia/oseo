@@ -93,6 +93,9 @@ static OseoResult object_create(
     object->iterator_index = 0u;
     object->async_from_sync = false;
     object->async_sync_iterator = oseo_undefined();
+    object->wrap_for_valid_iterator = false;
+    object->wrapped_iterator = oseo_undefined();
+    object->wrapped_next = oseo_undefined();
     object->generator = NULL;
     object->arguments_object = false;
     object->mapped_arguments = false;

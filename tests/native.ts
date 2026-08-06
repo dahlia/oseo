@@ -37,6 +37,7 @@ import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
+import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 
@@ -86,6 +87,7 @@ const fixtures: readonly Fixture[] = [
   ...expressionFixtures,
   ...receiverFixtures,
   ...generatorFixtures,
+  ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -210,7 +212,8 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "object-prototype" ||
-    fixture.name === "function-prototype"
+    fixture.name === "function-prototype" ||
+    fixture.name === "iterator-intrinsic"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -274,6 +277,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
+    fixture.name === "iterator-intrinsic" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -436,7 +440,8 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "object-prototype" ||
-            fixture.name === "function-prototype"
+            fixture.name === "function-prototype" ||
+            fixture.name === "iterator-intrinsic"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

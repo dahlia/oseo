@@ -1082,6 +1082,105 @@ partitions:
   - group: built-ins/GeneratorPrototype
     key: fe
     path: results/built-ins/GeneratorPrototype/fe.yaml
+  - group: built-ins/Iterator
+    key: "05"
+    path: results/built-ins/Iterator/05.yaml
+  - group: built-ins/Iterator
+    key: "09"
+    path: results/built-ins/Iterator/09.yaml
+  - group: built-ins/Iterator
+    key: "16"
+    path: results/built-ins/Iterator/16.yaml
+  - group: built-ins/Iterator
+    key: 2b
+    path: results/built-ins/Iterator/2b.yaml
+  - group: built-ins/Iterator
+    key: 2d
+    path: results/built-ins/Iterator/2d.yaml
+  - group: built-ins/Iterator
+    key: "30"
+    path: results/built-ins/Iterator/30.yaml
+  - group: built-ins/Iterator
+    key: "34"
+    path: results/built-ins/Iterator/34.yaml
+  - group: built-ins/Iterator
+    key: "48"
+    path: results/built-ins/Iterator/48.yaml
+  - group: built-ins/Iterator
+    key: "49"
+    path: results/built-ins/Iterator/49.yaml
+  - group: built-ins/Iterator
+    key: 4b
+    path: results/built-ins/Iterator/4b.yaml
+  - group: built-ins/Iterator
+    key: "57"
+    path: results/built-ins/Iterator/57.yaml
+  - group: built-ins/Iterator
+    key: "59"
+    path: results/built-ins/Iterator/59.yaml
+  - group: built-ins/Iterator
+    key: "64"
+    path: results/built-ins/Iterator/64.yaml
+  - group: built-ins/Iterator
+    key: "65"
+    path: results/built-ins/Iterator/65.yaml
+  - group: built-ins/Iterator
+    key: "76"
+    path: results/built-ins/Iterator/76.yaml
+  - group: built-ins/Iterator
+    key: 8d
+    path: results/built-ins/Iterator/8d.yaml
+  - group: built-ins/Iterator
+    key: "92"
+    path: results/built-ins/Iterator/92.yaml
+  - group: built-ins/Iterator
+    key: "93"
+    path: results/built-ins/Iterator/93.yaml
+  - group: built-ins/Iterator
+    key: "94"
+    path: results/built-ins/Iterator/94.yaml
+  - group: built-ins/Iterator
+    key: a0
+    path: results/built-ins/Iterator/a0.yaml
+  - group: built-ins/Iterator
+    key: a2
+    path: results/built-ins/Iterator/a2.yaml
+  - group: built-ins/Iterator
+    key: a8
+    path: results/built-ins/Iterator/a8.yaml
+  - group: built-ins/Iterator
+    key: b7
+    path: results/built-ins/Iterator/b7.yaml
+  - group: built-ins/Iterator
+    key: bb
+    path: results/built-ins/Iterator/bb.yaml
+  - group: built-ins/Iterator
+    key: bf
+    path: results/built-ins/Iterator/bf.yaml
+  - group: built-ins/Iterator
+    key: c6
+    path: results/built-ins/Iterator/c6.yaml
+  - group: built-ins/Iterator
+    key: cd
+    path: results/built-ins/Iterator/cd.yaml
+  - group: built-ins/Iterator
+    key: de
+    path: results/built-ins/Iterator/de.yaml
+  - group: built-ins/Iterator
+    key: df
+    path: results/built-ins/Iterator/df.yaml
+  - group: built-ins/Iterator
+    key: e4
+    path: results/built-ins/Iterator/e4.yaml
+  - group: built-ins/Iterator
+    key: e7
+    path: results/built-ins/Iterator/e7.yaml
+  - group: built-ins/Iterator
+    key: ec
+    path: results/built-ins/Iterator/ec.yaml
+  - group: built-ins/Iterator
+    key: f6
+    path: results/built-ins/Iterator/f6.yaml
   - group: built-ins/NativeErrors
     key: "00"
     path: results/built-ins/NativeErrors/00.yaml
@@ -4566,7 +4665,7 @@ summary:
   infrastructureFailures: 0
   passes: 3141
   semanticFailures: 0
-  unsupportedProfileFeatures: 926
+  unsupportedProfileFeatures: 963
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -4665,7 +4764,7 @@ summary:
       infrastructureFailures: 0
       passes: 789
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 54
     - dependency: lexical-bindings
       expectedNegatives: 147
       harnessFailures: 0
@@ -4800,6 +4899,13 @@ summary:
       passes: 24
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - group: built-ins/Iterator
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 37
     - group: built-ins/NativeErrors
       expectedNegatives: 0
       harnessFailures: 0
