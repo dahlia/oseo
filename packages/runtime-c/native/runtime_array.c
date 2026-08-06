@@ -642,6 +642,72 @@ static OseoResult array_from_array_like(
     return result;
 }
 
+/*
+ * Primitive strings do not yet expose the separate M5b string iterator.
+ * Array.from still admits them, so consume one Unicode code point at a time
+ * here instead of falling back to their code-unit indexed properties.
+ */
+static OseoResult array_from_string(
+    OseoContext *context,
+    OseoRootFrame *frame
+) {
+    OseoResult result = function_is_constructible(frame->slots[0])
+        ? construct_function(context, frame->slots[0], 0u, NULL)
+        : oseo_array_create(context, 0u);
+    frame->slots[7] = result.value;
+    size_t offset = 0u;
+    double index = 0.0;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        OseoString *source = string_object(frame->slots[1]);
+        if (offset >= source->length) break;
+        size_t element_length = 1u;
+        uint16_t first = source->units[offset];
+        if (first >= UINT16_C(0xd800) &&
+            first <= UINT16_C(0xdbff) &&
+            offset + 1u < source->length) {
+            uint16_t second = source->units[offset + 1u];
+            if (second >= UINT16_C(0xdc00) &&
+                second <= UINT16_C(0xdfff)) {
+                element_length = 2u;
+            }
+        }
+        result = oseo_string_from_units(
+            context,
+            &source->units[offset],
+            element_length
+        );
+        frame->slots[8] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            tag_of(frame->slots[2]) != OSEO_TAG_UNDEFINED) {
+            frame->slots[9] = oseo_number(index);
+            result = oseo_call_function(
+                context,
+                frame->slots[2],
+                frame->slots[3],
+                2u,
+                &frame->slots[8],
+                oseo_undefined()
+            );
+            frame->slots[8] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = create_index_property(
+                context,
+                frame->slots[7],
+                index,
+                frame->slots[8]
+            );
+        }
+        offset += element_length;
+        index += 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(context, frame->slots[7], index);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame->slots[7];
+    return result;
+}
+
 static OseoResult array_from(
     OseoContext *context,
     OseoValue receiver,
@@ -682,9 +748,13 @@ static OseoResult array_from(
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = is_nullish(frame.slots[4])
-            ? array_from_array_like(context, &frame)
-            : array_from_iterator(context, &frame);
+        if (is_nullish(frame.slots[4]) && is_string(frame.slots[1])) {
+            result = array_from_string(context, &frame);
+        } else {
+            result = is_nullish(frame.slots[4])
+                ? array_from_array_like(context, &frame)
+                : array_from_iterator(context, &frame);
+        }
     }
     oseo_roots_release(context, &frame);
     return result;

@@ -80,6 +80,14 @@ console.log(
   fromString[2],
   fromString[3],
 );
+const fromCodePoints = Array.from("A💩B");
+console.log(
+  "from code points",
+  fromCodePoints.length,
+  fromCodePoints[0] === "A",
+  fromCodePoints[1] === "💩",
+  fromCodePoints[2] === "B",
+);
 const mapThis = { offset: 10 };
 const mapped = Array.from([2, 3], function (value, index) {
   return this.offset + value + index;
@@ -138,6 +146,7 @@ try {
 
 function Bag(length) { this.createdLength = length; }
 const fromBag = Array.from.call(Bag, { 0: "x", length: 1 });
+const fromStringBag = Array.from.call(Bag, "💩");
 const ofBag = Array.of.call(Bag, "y", "z");
 console.log(
   "generic",
@@ -145,6 +154,10 @@ console.log(
   fromBag.createdLength,
   fromBag.length,
   fromBag[0],
+  fromStringBag instanceof Bag,
+  fromStringBag.createdLength,
+  fromStringBag.length,
+  fromStringBag[0] === "💩",
   ofBag instanceof Bag,
   ofBag.createdLength,
   ofBag.length,
