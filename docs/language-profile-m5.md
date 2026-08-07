@@ -3057,6 +3057,25 @@ schema and vocabulary, and zero-override policy are unchanged. The expanded
 intrinsic table and traced wrapper state move the runtime ABI to
 `oseo-runtime-m5-49` without changing the graph's orchestration state.
 
+M5b node `number-intrinsic` materializes the `Number` constructor, its
+branded wrapper objects, standard numeric constants, predicate statics, and
+parser statics. `Number` is also the standard writable, non-enumerable,
+configurable property of the realm's global object. Fixed native and generated
+differential evidence at seed `0x60003500` covers both specialization policies,
+forced collection, string and BigInt conversion, wrapper construction, parser
+prefixes, false numeric hints, and deliberate shape-guard misses. All 172 paths
+under the node's eleven inventory roots are reviewed: 135 pass and 37 retain
+explicit prerequisite boundaries for Number prototype formatting, other
+primitive wrappers and constructors, global numeric aliases, and unavailable
+harness capabilities. Twenty-four previously reviewed cross-family cases also
+become passes because their Number prerequisites are now present. The manifest
+reaches 5,631 cases: 3,300 passes, 1,355 expected negatives, and 976 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The expanded intrinsic table, branded
+wrapper state, and Number component move the runtime ABI to
+`oseo-runtime-m5-50` without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

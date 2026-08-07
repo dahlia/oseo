@@ -200,6 +200,7 @@ function identifierFallback(
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
   if (name === "Function") return { kind: "function-intrinsic", range };
   if (name === "Iterator") return { kind: "iterator-intrinsic", range };
+  if (name === "Number") return { kind: "number-intrinsic", range };
   return bindingExpression(withFallbackBinding(name, state, false), range);
 }
 
@@ -355,6 +356,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "console" ||
     name === "Function" ||
     name === "Iterator" ||
+    name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
     name === "Symbol" ||
@@ -452,6 +454,7 @@ function resolveTypeofIdentifier(
     argument.name === "Infinity" ||
     argument.name === "Function" ||
     argument.name === "Iterator" ||
+    argument.name === "Number" ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
   if (resolvesValue) {
@@ -808,6 +811,9 @@ function resolveExpression(
       }
       if (expression.name === "Iterator") {
         return { kind: "iterator-intrinsic", range: expression.range };
+      }
+      if (expression.name === "Number") {
+        return { kind: "number-intrinsic", range: expression.range };
       }
       state.diagnostics.push(
         sourceDiagnostic(

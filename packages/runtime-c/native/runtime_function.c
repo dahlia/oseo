@@ -139,6 +139,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_OBJECT_CODE_ID_RANGE_FIRST,
      OSEO_OBJECT_CODE_ID_RANGE_LAST,
      oseo_internal_object_builtin_dispatch},
+    {OSEO_NUMBER_CODE_ID_RANGE_FIRST,
+     OSEO_NUMBER_CODE_ID_RANGE_LAST,
+     oseo_internal_number_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -967,6 +970,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         }
     } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
         materialized = oseo_internal_array_prototype(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
+        materialized = oseo_internal_number_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
         materialized = oseo_internal_promise_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
@@ -1187,6 +1193,8 @@ OseoResult oseo_function_create(
     function->ordinary.module_namespace = false;
     function->ordinary.global_object = false;
     function->ordinary.error_data = false;
+    function->ordinary.number_data = false;
+    function->ordinary.number_value = oseo_undefined();
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;

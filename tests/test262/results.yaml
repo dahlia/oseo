@@ -1256,6 +1256,396 @@ partitions:
   - group: built-ins/NativeErrors
     key: fd
     path: results/built-ins/NativeErrors/fd.yaml
+  - group: built-ins/Number
+    key: "01"
+    path: results/built-ins/Number/01.yaml
+  - group: built-ins/Number
+    key: "02"
+    path: results/built-ins/Number/02.yaml
+  - group: built-ins/Number
+    key: "03"
+    path: results/built-ins/Number/03.yaml
+  - group: built-ins/Number
+    key: "04"
+    path: results/built-ins/Number/04.yaml
+  - group: built-ins/Number
+    key: "05"
+    path: results/built-ins/Number/05.yaml
+  - group: built-ins/Number
+    key: "07"
+    path: results/built-ins/Number/07.yaml
+  - group: built-ins/Number
+    key: "08"
+    path: results/built-ins/Number/08.yaml
+  - group: built-ins/Number
+    key: "09"
+    path: results/built-ins/Number/09.yaml
+  - group: built-ins/Number
+    key: 0a
+    path: results/built-ins/Number/0a.yaml
+  - group: built-ins/Number
+    key: 0d
+    path: results/built-ins/Number/0d.yaml
+  - group: built-ins/Number
+    key: 0e
+    path: results/built-ins/Number/0e.yaml
+  - group: built-ins/Number
+    key: "11"
+    path: results/built-ins/Number/11.yaml
+  - group: built-ins/Number
+    key: "12"
+    path: results/built-ins/Number/12.yaml
+  - group: built-ins/Number
+    key: "18"
+    path: results/built-ins/Number/18.yaml
+  - group: built-ins/Number
+    key: "19"
+    path: results/built-ins/Number/19.yaml
+  - group: built-ins/Number
+    key: 1a
+    path: results/built-ins/Number/1a.yaml
+  - group: built-ins/Number
+    key: 1b
+    path: results/built-ins/Number/1b.yaml
+  - group: built-ins/Number
+    key: 1c
+    path: results/built-ins/Number/1c.yaml
+  - group: built-ins/Number
+    key: 1d
+    path: results/built-ins/Number/1d.yaml
+  - group: built-ins/Number
+    key: 1e
+    path: results/built-ins/Number/1e.yaml
+  - group: built-ins/Number
+    key: 1f
+    path: results/built-ins/Number/1f.yaml
+  - group: built-ins/Number
+    key: "20"
+    path: results/built-ins/Number/20.yaml
+  - group: built-ins/Number
+    key: "21"
+    path: results/built-ins/Number/21.yaml
+  - group: built-ins/Number
+    key: "25"
+    path: results/built-ins/Number/25.yaml
+  - group: built-ins/Number
+    key: "27"
+    path: results/built-ins/Number/27.yaml
+  - group: built-ins/Number
+    key: "28"
+    path: results/built-ins/Number/28.yaml
+  - group: built-ins/Number
+    key: 2a
+    path: results/built-ins/Number/2a.yaml
+  - group: built-ins/Number
+    key: 2b
+    path: results/built-ins/Number/2b.yaml
+  - group: built-ins/Number
+    key: 2d
+    path: results/built-ins/Number/2d.yaml
+  - group: built-ins/Number
+    key: 2e
+    path: results/built-ins/Number/2e.yaml
+  - group: built-ins/Number
+    key: "30"
+    path: results/built-ins/Number/30.yaml
+  - group: built-ins/Number
+    key: "31"
+    path: results/built-ins/Number/31.yaml
+  - group: built-ins/Number
+    key: "32"
+    path: results/built-ins/Number/32.yaml
+  - group: built-ins/Number
+    key: "33"
+    path: results/built-ins/Number/33.yaml
+  - group: built-ins/Number
+    key: "37"
+    path: results/built-ins/Number/37.yaml
+  - group: built-ins/Number
+    key: 3a
+    path: results/built-ins/Number/3a.yaml
+  - group: built-ins/Number
+    key: 3f
+    path: results/built-ins/Number/3f.yaml
+  - group: built-ins/Number
+    key: "44"
+    path: results/built-ins/Number/44.yaml
+  - group: built-ins/Number
+    key: 4b
+    path: results/built-ins/Number/4b.yaml
+  - group: built-ins/Number
+    key: 4d
+    path: results/built-ins/Number/4d.yaml
+  - group: built-ins/Number
+    key: 4e
+    path: results/built-ins/Number/4e.yaml
+  - group: built-ins/Number
+    key: "50"
+    path: results/built-ins/Number/50.yaml
+  - group: built-ins/Number
+    key: "51"
+    path: results/built-ins/Number/51.yaml
+  - group: built-ins/Number
+    key: 5a
+    path: results/built-ins/Number/5a.yaml
+  - group: built-ins/Number
+    key: 5b
+    path: results/built-ins/Number/5b.yaml
+  - group: built-ins/Number
+    key: 5f
+    path: results/built-ins/Number/5f.yaml
+  - group: built-ins/Number
+    key: "61"
+    path: results/built-ins/Number/61.yaml
+  - group: built-ins/Number
+    key: "62"
+    path: results/built-ins/Number/62.yaml
+  - group: built-ins/Number
+    key: "63"
+    path: results/built-ins/Number/63.yaml
+  - group: built-ins/Number
+    key: "64"
+    path: results/built-ins/Number/64.yaml
+  - group: built-ins/Number
+    key: "67"
+    path: results/built-ins/Number/67.yaml
+  - group: built-ins/Number
+    key: 6d
+    path: results/built-ins/Number/6d.yaml
+  - group: built-ins/Number
+    key: 6e
+    path: results/built-ins/Number/6e.yaml
+  - group: built-ins/Number
+    key: "70"
+    path: results/built-ins/Number/70.yaml
+  - group: built-ins/Number
+    key: "71"
+    path: results/built-ins/Number/71.yaml
+  - group: built-ins/Number
+    key: "73"
+    path: results/built-ins/Number/73.yaml
+  - group: built-ins/Number
+    key: "74"
+    path: results/built-ins/Number/74.yaml
+  - group: built-ins/Number
+    key: "75"
+    path: results/built-ins/Number/75.yaml
+  - group: built-ins/Number
+    key: "76"
+    path: results/built-ins/Number/76.yaml
+  - group: built-ins/Number
+    key: "79"
+    path: results/built-ins/Number/79.yaml
+  - group: built-ins/Number
+    key: 7a
+    path: results/built-ins/Number/7a.yaml
+  - group: built-ins/Number
+    key: 7b
+    path: results/built-ins/Number/7b.yaml
+  - group: built-ins/Number
+    key: 7c
+    path: results/built-ins/Number/7c.yaml
+  - group: built-ins/Number
+    key: 7f
+    path: results/built-ins/Number/7f.yaml
+  - group: built-ins/Number
+    key: "80"
+    path: results/built-ins/Number/80.yaml
+  - group: built-ins/Number
+    key: "81"
+    path: results/built-ins/Number/81.yaml
+  - group: built-ins/Number
+    key: "84"
+    path: results/built-ins/Number/84.yaml
+  - group: built-ins/Number
+    key: "85"
+    path: results/built-ins/Number/85.yaml
+  - group: built-ins/Number
+    key: "87"
+    path: results/built-ins/Number/87.yaml
+  - group: built-ins/Number
+    key: 8c
+    path: results/built-ins/Number/8c.yaml
+  - group: built-ins/Number
+    key: 8f
+    path: results/built-ins/Number/8f.yaml
+  - group: built-ins/Number
+    key: "90"
+    path: results/built-ins/Number/90.yaml
+  - group: built-ins/Number
+    key: "92"
+    path: results/built-ins/Number/92.yaml
+  - group: built-ins/Number
+    key: "93"
+    path: results/built-ins/Number/93.yaml
+  - group: built-ins/Number
+    key: "95"
+    path: results/built-ins/Number/95.yaml
+  - group: built-ins/Number
+    key: "96"
+    path: results/built-ins/Number/96.yaml
+  - group: built-ins/Number
+    key: "99"
+    path: results/built-ins/Number/99.yaml
+  - group: built-ins/Number
+    key: 9b
+    path: results/built-ins/Number/9b.yaml
+  - group: built-ins/Number
+    key: a2
+    path: results/built-ins/Number/a2.yaml
+  - group: built-ins/Number
+    key: a3
+    path: results/built-ins/Number/a3.yaml
+  - group: built-ins/Number
+    key: a4
+    path: results/built-ins/Number/a4.yaml
+  - group: built-ins/Number
+    key: a9
+    path: results/built-ins/Number/a9.yaml
+  - group: built-ins/Number
+    key: aa
+    path: results/built-ins/Number/aa.yaml
+  - group: built-ins/Number
+    key: ab
+    path: results/built-ins/Number/ab.yaml
+  - group: built-ins/Number
+    key: ad
+    path: results/built-ins/Number/ad.yaml
+  - group: built-ins/Number
+    key: af
+    path: results/built-ins/Number/af.yaml
+  - group: built-ins/Number
+    key: b1
+    path: results/built-ins/Number/b1.yaml
+  - group: built-ins/Number
+    key: b2
+    path: results/built-ins/Number/b2.yaml
+  - group: built-ins/Number
+    key: b4
+    path: results/built-ins/Number/b4.yaml
+  - group: built-ins/Number
+    key: b5
+    path: results/built-ins/Number/b5.yaml
+  - group: built-ins/Number
+    key: b8
+    path: results/built-ins/Number/b8.yaml
+  - group: built-ins/Number
+    key: b9
+    path: results/built-ins/Number/b9.yaml
+  - group: built-ins/Number
+    key: bb
+    path: results/built-ins/Number/bb.yaml
+  - group: built-ins/Number
+    key: bd
+    path: results/built-ins/Number/bd.yaml
+  - group: built-ins/Number
+    key: be
+    path: results/built-ins/Number/be.yaml
+  - group: built-ins/Number
+    key: c0
+    path: results/built-ins/Number/c0.yaml
+  - group: built-ins/Number
+    key: c2
+    path: results/built-ins/Number/c2.yaml
+  - group: built-ins/Number
+    key: c3
+    path: results/built-ins/Number/c3.yaml
+  - group: built-ins/Number
+    key: c4
+    path: results/built-ins/Number/c4.yaml
+  - group: built-ins/Number
+    key: c5
+    path: results/built-ins/Number/c5.yaml
+  - group: built-ins/Number
+    key: cb
+    path: results/built-ins/Number/cb.yaml
+  - group: built-ins/Number
+    key: ce
+    path: results/built-ins/Number/ce.yaml
+  - group: built-ins/Number
+    key: d2
+    path: results/built-ins/Number/d2.yaml
+  - group: built-ins/Number
+    key: d3
+    path: results/built-ins/Number/d3.yaml
+  - group: built-ins/Number
+    key: d4
+    path: results/built-ins/Number/d4.yaml
+  - group: built-ins/Number
+    key: d6
+    path: results/built-ins/Number/d6.yaml
+  - group: built-ins/Number
+    key: d8
+    path: results/built-ins/Number/d8.yaml
+  - group: built-ins/Number
+    key: d9
+    path: results/built-ins/Number/d9.yaml
+  - group: built-ins/Number
+    key: da
+    path: results/built-ins/Number/da.yaml
+  - group: built-ins/Number
+    key: dc
+    path: results/built-ins/Number/dc.yaml
+  - group: built-ins/Number
+    key: dd
+    path: results/built-ins/Number/dd.yaml
+  - group: built-ins/Number
+    key: e3
+    path: results/built-ins/Number/e3.yaml
+  - group: built-ins/Number
+    key: e7
+    path: results/built-ins/Number/e7.yaml
+  - group: built-ins/Number
+    key: e8
+    path: results/built-ins/Number/e8.yaml
+  - group: built-ins/Number
+    key: eb
+    path: results/built-ins/Number/eb.yaml
+  - group: built-ins/Number
+    key: ec
+    path: results/built-ins/Number/ec.yaml
+  - group: built-ins/Number
+    key: ed
+    path: results/built-ins/Number/ed.yaml
+  - group: built-ins/Number
+    key: ee
+    path: results/built-ins/Number/ee.yaml
+  - group: built-ins/Number
+    key: ef
+    path: results/built-ins/Number/ef.yaml
+  - group: built-ins/Number
+    key: f1
+    path: results/built-ins/Number/f1.yaml
+  - group: built-ins/Number
+    key: f2
+    path: results/built-ins/Number/f2.yaml
+  - group: built-ins/Number
+    key: f3
+    path: results/built-ins/Number/f3.yaml
+  - group: built-ins/Number
+    key: f4
+    path: results/built-ins/Number/f4.yaml
+  - group: built-ins/Number
+    key: f7
+    path: results/built-ins/Number/f7.yaml
+  - group: built-ins/Number
+    key: f9
+    path: results/built-ins/Number/f9.yaml
+  - group: built-ins/Number
+    key: fa
+    path: results/built-ins/Number/fa.yaml
+  - group: built-ins/Number
+    key: fb
+    path: results/built-ins/Number/fb.yaml
+  - group: built-ins/Number
+    key: fc
+    path: results/built-ins/Number/fc.yaml
+  - group: built-ins/Number
+    key: fe
+    path: results/built-ins/Number/fe.yaml
+  - group: built-ins/Number
+    key: ff
+    path: results/built-ins/Number/ff.yaml
   - group: built-ins/Object
     key: "04"
     path: results/built-ins/Object/04.yaml
@@ -4663,9 +5053,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 3141
+  passes: 3300
   semanticFailures: 0
-  unsupportedProfileFeatures: 963
+  unsupportedProfileFeatures: 976
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -4685,16 +5075,16 @@ summary:
       expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1073
+      passes: 1076
       semanticFailures: 0
-      unsupportedProfileFeatures: 215
+      unsupportedProfileFeatures: 212
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 89
+      passes: 105
       semanticFailures: 0
-      unsupportedProfileFeatures: 40
+      unsupportedProfileFeatures: 24
     - dependency: classes
       expectedNegatives: 575
       harnessFailures: 0
@@ -4741,16 +5131,16 @@ summary:
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 224
+      passes: 240
       semanticFailures: 0
-      unsupportedProfileFeatures: 71
+      unsupportedProfileFeatures: 55
     - dependency: functions
       expectedNegatives: 122
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 564
+      passes: 568
       semanticFailures: 0
-      unsupportedProfileFeatures: 243
+      unsupportedProfileFeatures: 239
     - dependency: generators
       expectedNegatives: 82
       harnessFailures: 0
@@ -4762,9 +5152,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 789
+      passes: 792
       semanticFailures: 0
-      unsupportedProfileFeatures: 54
+      unsupportedProfileFeatures: 51
     - dependency: lexical-bindings
       expectedNegatives: 147
       harnessFailures: 0
@@ -4790,9 +5180,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1064
+      passes: 1200
       semanticFailures: 0
-      unsupportedProfileFeatures: 253
+      unsupportedProfileFeatures: 289
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -4882,9 +5272,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 116
+      passes: 120
       semanticFailures: 0
-      unsupportedProfileFeatures: 214
+      unsupportedProfileFeatures: 210
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -4913,13 +5303,20 @@ summary:
       passes: 25
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/Number
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 135
+      semanticFailures: 0
+      unsupportedProfileFeatures: 37
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 65
+      passes: 66
       semanticFailures: 0
-      unsupportedProfileFeatures: 121
+      unsupportedProfileFeatures: 120
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -4980,9 +5377,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1329
+      passes: 1347
       semanticFailures: 0
-      unsupportedProfileFeatures: 262
+      unsupportedProfileFeatures: 244
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -5050,6 +5447,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1141
+      passes: 1142
       semanticFailures: 0
-      unsupportedProfileFeatures: 155
+      unsupportedProfileFeatures: 154

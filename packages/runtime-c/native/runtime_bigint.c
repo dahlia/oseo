@@ -708,6 +708,107 @@ bool oseo_internal_bigint_is_zero(OseoValue value) {
     return integer->length == 1u && integer->limbs[0] == 0u;
 }
 
+static double magnitude_to_number(
+    const uint32_t *limbs,
+    size_t length,
+    bool negative
+) {
+    size_t bit_length = magnitude_bits(limbs, length);
+    if (bit_length == 0u) return 0.0;
+
+    size_t kept_bits = bit_length < DBL_MANT_DIG
+        ? bit_length
+        : DBL_MANT_DIG;
+    uint64_t significant = 0u;
+    for (size_t offset = 0u; offset < kept_bits; offset += 1u) {
+        size_t bit = bit_length - offset - 1u;
+        size_t limb = bit / BIGINT_BITS;
+        size_t shift = bit % BIGINT_BITS;
+        significant = (significant << 1u) |
+            ((limbs[limb] >> shift) & 1u);
+    }
+
+    size_t discarded = bit_length - kept_bits;
+    if (discarded > 0u) {
+        size_t round_index = discarded - 1u;
+        size_t round_limb = round_index / BIGINT_BITS;
+        size_t round_shift = round_index % BIGINT_BITS;
+        bool round_bit =
+            ((limbs[round_limb] >> round_shift) & 1u) != 0u;
+        bool sticky = false;
+        for (size_t bit = 0u; bit < round_index; bit += 1u) {
+            size_t limb = bit / BIGINT_BITS;
+            size_t shift = bit % BIGINT_BITS;
+            if (((limbs[limb] >> shift) & 1u) != 0u) {
+                sticky = true;
+                break;
+            }
+        }
+        if (round_bit && (sticky || (significant & 1u) != 0u)) {
+            significant += 1u;
+            if (significant == (UINT64_C(1) << DBL_MANT_DIG)) {
+                significant >>= 1u;
+                discarded += 1u;
+            }
+        }
+    }
+    double number = discarded > (size_t)(DBL_MAX_EXP - DBL_MANT_DIG)
+        ? INFINITY
+        : ldexp((double)significant, (int)discarded);
+    return negative ? -number : number;
+}
+
+double oseo_internal_bigint_to_number(OseoValue value) {
+    const OseoBigInt *integer = bigint_object(value);
+    return magnitude_to_number(
+        integer->limbs,
+        integer->length,
+        integer->negative
+    );
+}
+
+double oseo_internal_integer_digits_to_number(
+    const uint16_t *units,
+    size_t length,
+    uint32_t radix
+) {
+    enum {
+        NUMBER_LIMBS =
+            (DBL_MAX_EXP + (int)BIGINT_BITS) / (int)BIGINT_BITS,
+    };
+    uint32_t limbs[NUMBER_LIMBS] = {0u};
+    size_t limb_count = 1u;
+    for (size_t index = 0u; index < length; index += 1u) {
+        uint16_t unit = units[index];
+        uint32_t digit;
+        if (unit >= UINT16_C('0') && unit <= UINT16_C('9')) {
+            digit = (uint32_t)(unit - UINT16_C('0'));
+        } else if (unit >= UINT16_C('a') && unit <= UINT16_C('z')) {
+            digit = (uint32_t)(unit - UINT16_C('a')) + 10u;
+        } else if (unit >= UINT16_C('A') && unit <= UINT16_C('Z')) {
+            digit = (uint32_t)(unit - UINT16_C('A')) + 10u;
+        } else {
+            return NAN;
+        }
+        if (digit >= radix) return NAN;
+        uint64_t carry = digit;
+        for (size_t limb = 0u; limb < limb_count; limb += 1u) {
+            uint64_t next = (uint64_t)limbs[limb] * radix + carry;
+            limbs[limb] = (uint32_t)(next & BIGINT_MASK);
+            carry = next >> BIGINT_BITS;
+        }
+        if (carry != 0u) {
+            if (limb_count >= NUMBER_LIMBS) return INFINITY;
+            limbs[limb_count] = (uint32_t)carry;
+            limb_count += 1u;
+        }
+        if (magnitude_bits(limbs, limb_count) > DBL_MAX_EXP) {
+            return INFINITY;
+        }
+    }
+    return magnitude_to_number(limbs, limb_count, false);
+}
+
 bool oseo_internal_bigint_equal(OseoValue left, OseoValue right) {
     OseoBigInt *left_integer = bigint_object(left);
     OseoBigInt *right_integer = bigint_object(right);

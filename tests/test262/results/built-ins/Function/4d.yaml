@@ -16,10 +16,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7\
-        .js:81:15: error[OSEO1001]: Unknown binding 'Number'.\\n\""
+      detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js:83:1:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

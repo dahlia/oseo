@@ -350,6 +350,7 @@ export function intrinsicGlobalKind(
   if (
     name === "Function" ||
     name === "Iterator" ||
+    name === "Number" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
   ) {
@@ -743,6 +744,9 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "iterator-intrinsic";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "number-intrinsic";
     })
   | (LocatedSyntax & {
       readonly kind: "symbol-intrinsic";

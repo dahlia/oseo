@@ -322,6 +322,13 @@ method, accessors, and wrap-for-valid-iterator prototype and methods. Ordinary
 objects also gain traced state for the wrapped iterator and its captured
 `next` method.
 
+The `m5-50` ABI adds the *runtime\_number.c* component and materializes the
+`Number` constructor, its branded wrapper objects, numeric constants, and
+static predicate and parser methods. Ordinary objects gain Number data,
+the intrinsic table gains stable Number slots, and the global object installs
+the writable, non-enumerable, configurable constructor property. The Number
+prototype formatting methods remain owned by their later M5b node.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

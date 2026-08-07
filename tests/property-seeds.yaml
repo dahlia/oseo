@@ -212,3 +212,7 @@ families:
     owner: tests/property/m5-iterator-intrinsic.property.test.ts
     start: 0x60003400
     end: 0x600034ff
+  - family: m5-number-intrinsic
+    owner: tests/property/m5-number-intrinsic.property.test.ts
+    start: 0x60003500
+    end: 0x600035ff

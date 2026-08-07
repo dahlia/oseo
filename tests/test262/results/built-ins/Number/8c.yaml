@@ -1,0 +1,24 @@
+group: built-ins/Number
+key: 8c
+results:
+  - case:
+      async: false
+      features:
+        - u180e
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Number/S9.3.1_A2_U180E.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - u180e
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

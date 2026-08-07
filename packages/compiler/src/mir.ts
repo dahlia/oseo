@@ -156,6 +156,7 @@ export interface MirOperation {
     | "symbol-intrinsic"
     | "function-intrinsic"
     | "iterator-intrinsic"
+    | "number-intrinsic"
     | "template-object"
     | "count-guard-hit"
     | "count-guard-miss"

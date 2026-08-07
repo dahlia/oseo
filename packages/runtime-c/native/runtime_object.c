@@ -88,6 +88,8 @@ static OseoResult object_create(
     object->module_namespace = false;
     object->global_object = false;
     object->error_data = false;
+    object->number_data = false;
+    object->number_value = oseo_undefined();
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;

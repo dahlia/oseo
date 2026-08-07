@@ -788,7 +788,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-4.js
     expectedClassification: unsupported-profile-feature
@@ -1007,10 +1007,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/instance-length-default-value.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/instance-length-exceeds-int32.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/instance-length-prop-desc.js
     expectedClassification: pass
@@ -1049,7 +1049,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/call/15.3.4.4-2-s.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/call/15.3.4.4-3-s.js
     expectedClassification: unsupported-profile-feature
@@ -1783,6 +1783,522 @@ tests:
   - path: test/built-ins/NativeErrors/cause_property_native_error.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/Number/15.7.3-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/15.7.3-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/15.7.4-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/EPSILON.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MAX_SAFE_INTEGER.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MAX_VALUE/S15.7.3.2_A2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MAX_VALUE/S15.7.3.2_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MAX_VALUE/S15.7.3.2_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MAX_VALUE/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MIN_SAFE_INTEGER.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MIN_VALUE/S15.7.3.3_A2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MIN_VALUE/S15.7.3.3_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MIN_VALUE/S15.7.3.3_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/MIN_VALUE/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/NEGATIVE_INFINITY/S15.7.3.5_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/NEGATIVE_INFINITY/S15.7.3.5_A2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/NEGATIVE_INFINITY/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/NEGATIVE_INFINITY/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/NaN.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/POSITIVE_INFINITY/S15.7.3.6_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/POSITIVE_INFINITY/S15.7.3.6_A2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/POSITIVE_INFINITY/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/POSITIVE_INFINITY/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.1.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.1.1_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.2.1_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.2.1_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.2.1_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.2.1_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.3_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T01.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T02.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T03.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T04.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T05.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T06.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S15.7.5_A1_T07.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S8.12.8_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S8.12.8_A4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.1_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A23.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A24.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A25.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A26.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A27.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A2_U180E.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A30.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A31.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A3_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A3_T1_U180E.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A3_T2_U180E.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A4_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A5_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A5_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A5_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A6_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A6_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3.1_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A3_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A4.1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A4.2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/S9.3_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/bigint-conversion.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/arg-is-not-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/finite-numbers.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isFinite/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/arg-is-not-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/integers.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/non-integers.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isInteger/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/arg-is-not-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/not-nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isNaN/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/arg-is-not-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/not-integer.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/not-safe-integer.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/isSafeInteger/safe-integers.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/parseFloat.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/parseFloat/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/parseInt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/parseInt/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/return-abrupt-tonumber-value-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/return-abrupt-tonumber-value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-binary-literal-invalid.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-binary-literal.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-hex-literal-invalid.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-bil-bd-nsl-bd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-bil-bd-nsl-bds.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-bil-bds-nsl-bd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-bil-bds-nsl-bds.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dd-dot-dd-ep-sign-minus-dd-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dd-dot-dd-ep-sign-minus-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dd-dot-dd-ep-sign-plus-dd-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dd-dot-dd-ep-sign-plus-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dd-nsl-dd-one-of.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dds-dot-dd-nsl-dd-ep-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dot-dd-nsl-dd-ep.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dot-dd-nsl-dds-ep.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dot-dds-nsl-dd-ep.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-dot-dds-nsl-dds-ep.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-hil-hd-nsl-hd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-hil-hd-nsl-hds.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-hil-hds-nsl-hd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-hil-hds-nsl-hds.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-hil-od-nsl-od-one-of.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-nzd-nsl-dd-one-of.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-nzd-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-nzd-nsl-dds.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-oil-od-nsl-od-one-of.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-oil-od-nsl-od.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-oil-od-nsl-ods.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-oil-ods-nsl-od.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-oil-ods-nsl-ods.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-sign-minus-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-numeric-separator-literal-sign-plus-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-octal-literal-invald.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Number/string-octal-literal.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-1-2.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -2051,7 +2567,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/isPrototypeOf/this-value-is-in-prototype-chain-of-arg.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/isPrototypeOf/undefined-this-and-object-arg-throws.js
     expectedClassification: unsupported-profile-feature
@@ -5642,7 +6158,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-next-non-object-ignores-then.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-next-not-callable-boolean-throw.js
     expectedClassification: pass
@@ -5894,7 +6410,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-next-non-object-ignores-then.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-next-not-callable-boolean-throw.js
     expectedClassification: pass
@@ -7943,10 +8459,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/does-not-equals/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/does-not-equals/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/does-not-equals/bigint-and-string.js
     expectedClassification: pass
@@ -7977,10 +8493,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/equals/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/equals/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/equals/bigint-and-string.js
     expectedClassification: pass
@@ -8285,10 +8801,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than-or-equal/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than-or-equal/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than-or-equal/bigint-and-string.js
     expectedClassification: pass
@@ -8306,10 +8822,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/greater-than/bigint-and-string.js
     expectedClassification: pass
@@ -8420,10 +8936,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than-or-equal/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than-or-equal/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than-or-equal/bigint-and-string.js
     expectedClassification: pass
@@ -8441,10 +8957,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/less-than/bigint-and-string.js
     expectedClassification: pass
@@ -9817,10 +10333,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-does-not-equals/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-does-not-equals/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-does-not-equals/bigint-and-string.js
     expectedClassification: pass
@@ -9839,10 +10355,10 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-equals/bigint-and-number-extremes.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-equals/bigint-and-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/strict-equals/bigint-and-string.js
     expectedClassification: pass
@@ -12214,7 +12730,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-next-non-object-ignores-then.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-next-not-callable-boolean-throw.js
     expectedClassification: pass

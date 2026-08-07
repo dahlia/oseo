@@ -25,6 +25,8 @@ const components = [
   "ARRAY",
   "ARGUMENTS",
   "FUNCTION",
+  "OBJECT",
+  "NUMBER",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {
