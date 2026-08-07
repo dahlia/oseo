@@ -486,18 +486,17 @@ static bool conversion_property_exists(
 
 /*
  * Number.prototype.toString belongs to a later formatting node. Until it
- * lands, preserve the wrapper's admitted string conversion without exposing
- * that deferred method. A nearer user property still owns the conversion,
- * and changing the wrapper's prototype chain removes this narrow fallback.
+ * lands, select that deferred method by prototype-chain position without
+ * exposing it as a property. A nearer user property still owns the conversion,
+ * changing the receiver's prototype chain removes this narrow fallback, and
+ * the selected method enforces the [[NumberData]] receiver brand.
  */
-static bool number_wrapper_uses_deferred_to_string(
+static bool uses_deferred_number_to_string(
     OseoContext *context,
     OseoValue value,
     OseoValue key
 ) {
-    if (!is_object(value) || !ordinary_object(value)->number_data) {
-        return false;
-    }
+    if (!is_object(value)) return false;
     bool reached_number_prototype = false;
     OseoValue current = value;
     while (is_object(current)) {
@@ -957,14 +956,23 @@ static OseoResult to_primitive_value(
         }
         if (
             trying_to_string &&
-            number_wrapper_uses_deferred_to_string(
+            uses_deferred_number_to_string(
                 context,
                 frame.slots[0],
                 frame.slots[1]
             )
         ) {
-            result = normal(ordinary_object(frame.slots[0])->number_value);
-            converted = true;
+            OseoOrdinaryObject *receiver = ordinary_object(frame.slots[0]);
+            if (!receiver->number_data) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Number.prototype.toString requires a number receiver."
+                );
+            } else {
+                result = normal(receiver->number_value);
+                converted = true;
+            }
             break;
         }
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);

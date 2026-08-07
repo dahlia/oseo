@@ -76,6 +76,9 @@ console.log(
 const parsingWrapper = new Number(12);
 parsingWrapper.toString = function () { return "13.5tail"; };
 console.log("wrapper toString override", Number.parseFloat(parsingWrapper));
+try { Number.parseFloat(Object.create(Number.prototype)); } catch (error) {
+  console.log("unbranded Number receiver", error instanceof TypeError);
+}
 const detachedWrapper = new Number(9);
 console.log(
   "wrapper object tag",
