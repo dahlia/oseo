@@ -382,12 +382,41 @@ export function callTarget(
       method === "create" ||
       method === "defineProperty" ||
       method === "getOwnPropertyDescriptor" ||
-      method === "keys" ||
-      method === "setPrototypeOf"
+      method === "keys"
     ) {
       return {
         ...location(context, value),
         kind: "object-intrinsic",
+        method,
+      };
+    }
+  }
+  if (
+    identifierName(object) === "Object" &&
+    (value.computed !== true || property.type === "StringLiteral")
+  ) {
+    const method = moduleName(property);
+    if (
+      method === "assign" ||
+      method === "defineProperties" ||
+      method === "entries" ||
+      method === "freeze" ||
+      method === "fromEntries" ||
+      method === "getOwnPropertyDescriptors" ||
+      method === "getOwnPropertyNames" ||
+      method === "getOwnPropertySymbols" ||
+      method === "groupBy" ||
+      method === "hasOwn" ||
+      method === "isExtensible" ||
+      method === "isFrozen" ||
+      method === "isSealed" ||
+      method === "preventExtensions" ||
+      method === "seal" ||
+      method === "values"
+    ) {
+      return {
+        ...location(context, value),
+        kind: "unsupported-object-intrinsic",
         method,
       };
     }

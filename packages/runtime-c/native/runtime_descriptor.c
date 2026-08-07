@@ -12,7 +12,7 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
-static bool same_property_value(OseoValue left, OseoValue right) {
+bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
         double right_number = number_value(right);
@@ -111,7 +111,7 @@ OseoResult oseo_object_define(
         OseoFunction *function = function_object(object_value);
         if (!function->prototype_writable &&
             (attributes.writable ||
-             !same_property_value(function->prototype_object, value))) {
+             !oseo_internal_same_value(function->prototype_object, value))) {
             return type_error(
                 context,
                 "Cannot redefine the prototype property."
@@ -185,7 +185,7 @@ OseoResult oseo_object_define(
              attributes.enumerable != property->attributes.enumerable ||
              (!property->attributes.writable && attributes.writable) ||
              (!property->attributes.writable &&
-              !same_property_value(current_value, value)))) {
+              !oseo_internal_same_value(current_value, value)))) {
             return type_error(
                 context,
                 "Cannot redefine a non-configurable property."
@@ -315,9 +315,9 @@ OseoResult oseo_object_define_accessor(
              attributes.configurable ||
              attributes.enumerable != property->attributes.enumerable ||
              (has_getter &&
-              !same_property_value(existing_getter, new_getter)) ||
+              !oseo_internal_same_value(existing_getter, new_getter)) ||
              (has_setter &&
-              !same_property_value(existing_setter, new_setter)))) {
+              !oseo_internal_same_value(existing_setter, new_setter)))) {
             return type_error(
                 context,
                 "Cannot redefine a non-configurable property."

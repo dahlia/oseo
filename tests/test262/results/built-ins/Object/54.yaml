@@ -1,0 +1,28 @@
+group: built-ins/Object
+key: "54"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/internals/DefineOwnProperty/consistent-writable-regexp-dollar1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/internals/DefineOwnProperty/consistent-w\
+        ritable-regexp-dollar1.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/Object/internals/DefineOwnProperty/cons\
+        istent-writable-regexp-dollar1.js:87:28: error[OSEO1001]:
+        Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

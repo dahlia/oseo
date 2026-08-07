@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 5,078
-reviewed cases: 3,016 passes, 1,355 expected negatives, and 707 unsupported
+honest unsupported classifications. The current reviewed manifest records 5,770
+reviewed cases: 3,570 passes, 1,355 expected negatives, and 845 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 65 indexed records in the normative
+M5a is complete. The 69 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 3,016
-passes across 5,078 paths, and the property inventory records 61 domains,
-61 seeds, and an ordinary case budget of 2,738.
+the M5b and M5c dependency order below. The reviewed manifest now records 3,570
+passes across 5,770 paths, and the property inventory records 65 domains,
+65 seeds, and an ordinary case budget of 2,786.
 
 
 M5a implementation history
@@ -3672,6 +3672,23 @@ prerequisite boundaries. Twenty-four existing cross-family cases also become
 passes once their Number prerequisites are present, so the manifest moves to
 5,631 paths with 3,300 passes and 976 unsupported profile features. The runtime
 ABI moves to `oseo-runtime-m5-50` without changing the graph's orchestration
+state.
+
+Implemented M5b node `object-constructor` makes `Object` a callable and
+constructible global intrinsic, adds collector-traced primitive wrappers and
+String wrapper properties, and implements `Object.is`,
+`Object.getPrototypeOf`, and `Object.setPrototypeOf`. Fixed native and
+generated differential evidence at seed `0x60003600` covers both
+specialization policies, forced collection at every safepoint, false hints,
+guard hits and misses, generic fallback, derived construction, primitive
+wrapping, prototype mutation, and global `Object` replacement. All 139 paths
+under the node's five inventory roots are reviewed: 75 pass and 64 retain
+explicit prerequisite boundaries. A further 195 previously reviewed cases
+move from unsupported to pass because the real `Object` value and its
+prototype operations satisfy their prerequisites. The manifest moves to 5,770
+paths with 3,570 passes, 1,355 expected negatives, and 845 unsupported profile
+features. The public intrinsic table and primitive wrapper state move the
+runtime ABI to `oseo-runtime-m5-51` without changing the graph's orchestration
 state.
 
 

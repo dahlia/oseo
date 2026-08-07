@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Number/POSITIVE_INFINITY/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Number/POSITIVE_INFINITY/prop-desc.js:1\
-        44:1: error[OSEO1001]: Unknown binding
+        50:1: error[OSEO1001]: Unknown binding
         'verifyNotEnumerable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

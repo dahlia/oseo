@@ -18,10 +18,11 @@ results:
       - dynamic-source
       - generators
     observation:
-      detail: "test/built-ins/GeneratorFunction/prototype/extensibility.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/GeneratorFunction/prototype/extensibili\
-        ty.js:81:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      detail: 'test/built-ins/GeneratorFunction/prototype/extensibility.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/GeneratorFunction/prototype/extensibility.js:83:8:
+        error[OSEO1001]: Object.isExtensible is not admitted in this M5b
+        node.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

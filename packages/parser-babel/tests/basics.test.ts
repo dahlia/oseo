@@ -163,6 +163,26 @@ test("reads the replaceable Number value through its global property", () => {
   );
 });
 
+test("reads the replaceable Object value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof Object, Object.is(NaN, NaN), " +
+      "Object.getPrototypeOf({}) === Object.prototype);",
+    sourceId: "object-constructor.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Object" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Object"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /binary in/u);
+  assert.match(mir, /read \*missing intrinsic:Object\*/u);
+});
+
 test("writes the replaceable Number value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -1403,7 +1423,7 @@ test("retains closed-world and early-error delete boundaries", () => {
   }
 });
 
-test("lowers the admitted Object reflection intrinsics", () => {
+test("keeps legacy Object helpers direct and reads real statics", () => {
   const result = compileSource(babelFrontend, {
     source:
       "const value = Object.create(null);\n" +
@@ -1419,8 +1439,41 @@ test("lowers the admitted Object reflection intrinsics", () => {
   assert.match(printHir(result.hir), /intrinsic Object\.create/u);
   assert.match(printHir(result.hir), /intrinsic Object\.defineProperty/u);
   assert.match(printMir(result.mir), /Object\.getOwnPropertyDescriptor/u);
-  assert.match(printMir(result.mir), /Object\.setPrototypeOf/u);
+  assert.match(printMir(result.mir), /"setPrototypeOf"/u);
+  assert.match(printMir(result.mir), /property-get method lookup/u);
+  assert.match(printMir(result.mir), /call dynamic function value/u);
   assert.match(printMir(result.mir), /Object\.keys/u);
+});
+
+test("rejects Object statics owned by later M5b nodes", () => {
+  const result = compileSource(babelFrontend, {
+    source: "Object.getOwnPropertyNames(Object);",
+    sourceId: "later-object-static.ts",
+  });
+  assert.equal(result.hir, undefined);
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "Object.getOwnPropertyNames is not admitted in this M5b node.",
+  );
+  assert.deepEqual(result.diagnostics[0]?.byteRange, { end: 26, start: 0 });
+});
+
+test("defers Object helper recognition to with environments", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "with ({ Object: { assign() {}, create() {} } }) {\n" +
+      "  Object.assign(); Object.create();\n" +
+      "}",
+    sourceId: "with-object-helpers.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /with\[%b\d+\] Object fallback/u);
+  assert.doesNotMatch(hir, /intrinsic Object\.create/u);
 });
 
 test("preserves array elements and holes in owned syntax", () => {

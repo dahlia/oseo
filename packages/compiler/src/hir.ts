@@ -365,6 +365,7 @@ export function intrinsicGlobalKind(
     name === "Function" ||
     name === "Iterator" ||
     name === "Number" ||
+    name === "Object" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
   ) {
@@ -399,8 +400,7 @@ export type HirCallTarget =
         | "create"
         | "defineProperty"
         | "getOwnPropertyDescriptor"
-        | "keys"
-        | "setPrototypeOf";
+        | "keys";
     }
   | {
       readonly kind: "promise-intrinsic";

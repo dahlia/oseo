@@ -20,8 +20,8 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-bigint.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-bigint.js:80:18: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
+        ype.toString.call-bigint.js:82:49: error[OSEO1001]: Unknown
+        binding 'BigInt'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

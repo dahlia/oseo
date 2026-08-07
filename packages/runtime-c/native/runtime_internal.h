@@ -215,6 +215,22 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 5u)
 #define OSEO_OBJECT_VALUE_OF_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_OBJECT_GET_PROTOTYPE_OF_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_OBJECT_IS_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_OBJECT_SET_PROTOTYPE_OF_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_OBJECT_PRIMITIVE_WRAPPER_METHOD_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_OBJECT_CREATE_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_OBJECT_DEFINE_PROPERTY_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTOR_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_OBJECT_KEYS_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 14u)
 
 #define OSEO_NUMBER_CODE_ID_RANGE_INDEX ((size_t)10u)
 #define OSEO_NUMBER_CODE_ID_RANGE_FIRST \
@@ -540,6 +556,10 @@ typedef struct {
      * always contains an immediate Number value. */
     bool number_data;
     OseoValue number_value;
+    /* [[BooleanData]], [[StringData]], [[SymbolData]], or [[BigIntData]].
+     * Number wrappers retain their existing dedicated brand above. */
+    bool primitive_data;
+    OseoValue primitive_value;
     /* Array iterator state: a flagged object backs a default array's
      * values iterator, tracing the array and stepping the index. */
     bool array_iterator;
@@ -1261,6 +1281,20 @@ OseoResult oseo_internal_intrinsic(
 );
 /* Completes the realm root object with the Object.prototype methods. */
 OseoResult oseo_internal_object_prototype(OseoContext *context);
+OseoResult oseo_internal_to_object(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_to_object_for_property(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_internal_install_primitive_wrapper_methods(
+    OseoContext *context,
+    OseoValue prototype,
+    bool include_index_of
+);
+OseoResult oseo_internal_install_object_global(
+    OseoContext *context,
+    OseoValue global
+);
 OseoResult oseo_internal_number_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_number_global(
     OseoContext *context,
@@ -1272,6 +1306,7 @@ OseoResult oseo_internal_to_primitive(
     OseoValue value,
     OseoToPrimitiveHint hint
 );
+bool oseo_internal_same_value(OseoValue left, OseoValue right);
 OseoResult oseo_internal_symbol_create(
     OseoContext *context,
     OseoValue description

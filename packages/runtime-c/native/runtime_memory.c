@@ -58,6 +58,9 @@ static void trace_object(
                object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
+        if (ordinary->primitive_data) {
+            mark_value(ordinary->primitive_value, worklist);
+        }
         if (ordinary->array_iterator) {
             mark_value(ordinary->iterator_array, worklist);
         }

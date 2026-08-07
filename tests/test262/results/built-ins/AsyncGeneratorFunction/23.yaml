@@ -19,13 +19,21 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/AsyncGeneratorFunction/prototype/Symbol.toStrin\
-        gTag.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/AsyncGeneratorFunction/prototype/Symbol\
-        .toStringTag.js:146:39: error[OSEO1001]: Unknown binding
-        'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/AsyncGeneratorFunction/prototype/Symbol.toStringTag.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/AsyncGeneratorFunction/prototype/Symbol.toStringTag.js:152:39:
+        error[OSEO2001]: Generator intrinsic reflection is not admitted
+        yet.\n"'
+      unsupportedCapability: generator-intrinsics
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

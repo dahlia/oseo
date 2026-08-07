@@ -3,6 +3,36 @@ key: "48"
 results:
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/S15.2.1.1_A2_T5.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - Symbol.toPrimitive
       flags: []
@@ -46,11 +76,41 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T1.js
+      detail: 'test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T1.js:87:18:
+        error[OSEO2001]: Number prototype methods are not admitted
+        yet.\n"'
+      unsupportedCapability: number-prototype
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/setPrototypeOf/set-failure-cycle.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/setPrototypeOf/set-failure-cycle.js
         non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T\
-        1.js:79:10: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        stderr=\"test/built-ins/Object/setPrototypeOf/set-failure-cycle\
+        .js:89:43: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

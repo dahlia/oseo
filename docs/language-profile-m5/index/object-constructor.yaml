@@ -1,0 +1,3 @@
+version: 1
+id: object-constructor
+record: docs/language-profile-m5/families/object-constructor.yaml

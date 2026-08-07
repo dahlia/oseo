@@ -17,13 +17,20 @@ results:
     dependencies:
       - dynamic-source
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/GeneratorFunction/invoked-as-function-single-ar\
-        gument.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/GeneratorFunction/invoked-as-function-s\
-        ingle-argument.js:81:25: error[OSEO1001]: Unknown binding
-        'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js:81:25:
+        error[OSEO2001]: Generator intrinsic reflection is not admitted
+        yet.\n"'
+      unsupportedCapability: generator-intrinsics
       passed: false
     unsupportedFeatures: []
   - case:

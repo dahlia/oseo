@@ -1650,6 +1650,9 @@ partitions:
     key: "04"
     path: results/built-ins/Object/04.yaml
   - group: built-ins/Object
+    key: "05"
+    path: results/built-ins/Object/05.yaml
+  - group: built-ins/Object
     key: "07"
     path: results/built-ins/Object/07.yaml
   - group: built-ins/Object
@@ -1668,8 +1671,26 @@ partitions:
     key: 0c
     path: results/built-ins/Object/0c.yaml
   - group: built-ins/Object
+    key: 0d
+    path: results/built-ins/Object/0d.yaml
+  - group: built-ins/Object
+    key: 0e
+    path: results/built-ins/Object/0e.yaml
+  - group: built-ins/Object
+    key: "10"
+    path: results/built-ins/Object/10.yaml
+  - group: built-ins/Object
+    key: "11"
+    path: results/built-ins/Object/11.yaml
+  - group: built-ins/Object
     key: "12"
     path: results/built-ins/Object/12.yaml
+  - group: built-ins/Object
+    key: "13"
+    path: results/built-ins/Object/13.yaml
+  - group: built-ins/Object
+    key: "14"
+    path: results/built-ins/Object/14.yaml
   - group: built-ins/Object
     key: "16"
     path: results/built-ins/Object/16.yaml
@@ -1698,6 +1719,9 @@ partitions:
     key: 1f
     path: results/built-ins/Object/1f.yaml
   - group: built-ins/Object
+    key: "21"
+    path: results/built-ins/Object/21.yaml
+  - group: built-ins/Object
     key: "22"
     path: results/built-ins/Object/22.yaml
   - group: built-ins/Object
@@ -1719,6 +1743,9 @@ partitions:
     key: 2a
     path: results/built-ins/Object/2a.yaml
   - group: built-ins/Object
+    key: 2b
+    path: results/built-ins/Object/2b.yaml
+  - group: built-ins/Object
     key: 2d
     path: results/built-ins/Object/2d.yaml
   - group: built-ins/Object
@@ -1733,6 +1760,9 @@ partitions:
   - group: built-ins/Object
     key: "32"
     path: results/built-ins/Object/32.yaml
+  - group: built-ins/Object
+    key: "36"
+    path: results/built-ins/Object/36.yaml
   - group: built-ins/Object
     key: "38"
     path: results/built-ins/Object/38.yaml
@@ -1758,6 +1788,9 @@ partitions:
     key: "42"
     path: results/built-ins/Object/42.yaml
   - group: built-ins/Object
+    key: "43"
+    path: results/built-ins/Object/43.yaml
+  - group: built-ins/Object
     key: "45"
     path: results/built-ins/Object/45.yaml
   - group: built-ins/Object
@@ -1769,6 +1802,12 @@ partitions:
   - group: built-ins/Object
     key: "48"
     path: results/built-ins/Object/48.yaml
+  - group: built-ins/Object
+    key: "49"
+    path: results/built-ins/Object/49.yaml
+  - group: built-ins/Object
+    key: 4a
+    path: results/built-ins/Object/4a.yaml
   - group: built-ins/Object
     key: 4b
     path: results/built-ins/Object/4b.yaml
@@ -1794,6 +1833,9 @@ partitions:
     key: "53"
     path: results/built-ins/Object/53.yaml
   - group: built-ins/Object
+    key: "54"
+    path: results/built-ins/Object/54.yaml
+  - group: built-ins/Object
     key: "55"
     path: results/built-ins/Object/55.yaml
   - group: built-ins/Object
@@ -1802,6 +1844,9 @@ partitions:
   - group: built-ins/Object
     key: "57"
     path: results/built-ins/Object/57.yaml
+  - group: built-ins/Object
+    key: "59"
+    path: results/built-ins/Object/59.yaml
   - group: built-ins/Object
     key: 5b
     path: results/built-ins/Object/5b.yaml
@@ -1812,8 +1857,23 @@ partitions:
     key: 5e
     path: results/built-ins/Object/5e.yaml
   - group: built-ins/Object
+    key: 5f
+    path: results/built-ins/Object/5f.yaml
+  - group: built-ins/Object
     key: "61"
     path: results/built-ins/Object/61.yaml
+  - group: built-ins/Object
+    key: "62"
+    path: results/built-ins/Object/62.yaml
+  - group: built-ins/Object
+    key: "63"
+    path: results/built-ins/Object/63.yaml
+  - group: built-ins/Object
+    key: "65"
+    path: results/built-ins/Object/65.yaml
+  - group: built-ins/Object
+    key: "66"
+    path: results/built-ins/Object/66.yaml
   - group: built-ins/Object
     key: "68"
     path: results/built-ins/Object/68.yaml
@@ -1826,6 +1886,9 @@ partitions:
   - group: built-ins/Object
     key: 6b
     path: results/built-ins/Object/6b.yaml
+  - group: built-ins/Object
+    key: 6c
+    path: results/built-ins/Object/6c.yaml
   - group: built-ins/Object
     key: 6e
     path: results/built-ins/Object/6e.yaml
@@ -1842,6 +1905,9 @@ partitions:
     key: "73"
     path: results/built-ins/Object/73.yaml
   - group: built-ins/Object
+    key: "74"
+    path: results/built-ins/Object/74.yaml
+  - group: built-ins/Object
     key: "75"
     path: results/built-ins/Object/75.yaml
   - group: built-ins/Object
@@ -1851,11 +1917,20 @@ partitions:
     key: "78"
     path: results/built-ins/Object/78.yaml
   - group: built-ins/Object
+    key: "79"
+    path: results/built-ins/Object/79.yaml
+  - group: built-ins/Object
+    key: 7a
+    path: results/built-ins/Object/7a.yaml
+  - group: built-ins/Object
     key: 7c
     path: results/built-ins/Object/7c.yaml
   - group: built-ins/Object
     key: 7d
     path: results/built-ins/Object/7d.yaml
+  - group: built-ins/Object
+    key: 7e
+    path: results/built-ins/Object/7e.yaml
   - group: built-ins/Object
     key: 7f
     path: results/built-ins/Object/7f.yaml
@@ -1863,8 +1938,17 @@ partitions:
     key: "80"
     path: results/built-ins/Object/80.yaml
   - group: built-ins/Object
+    key: "81"
+    path: results/built-ins/Object/81.yaml
+  - group: built-ins/Object
     key: "82"
     path: results/built-ins/Object/82.yaml
+  - group: built-ins/Object
+    key: "83"
+    path: results/built-ins/Object/83.yaml
+  - group: built-ins/Object
+    key: "85"
+    path: results/built-ins/Object/85.yaml
   - group: built-ins/Object
     key: "86"
     path: results/built-ins/Object/86.yaml
@@ -1881,11 +1965,20 @@ partitions:
     key: 8a
     path: results/built-ins/Object/8a.yaml
   - group: built-ins/Object
+    key: 8b
+    path: results/built-ins/Object/8b.yaml
+  - group: built-ins/Object
+    key: 8c
+    path: results/built-ins/Object/8c.yaml
+  - group: built-ins/Object
     key: 8e
     path: results/built-ins/Object/8e.yaml
   - group: built-ins/Object
     key: 8f
     path: results/built-ins/Object/8f.yaml
+  - group: built-ins/Object
+    key: "90"
+    path: results/built-ins/Object/90.yaml
   - group: built-ins/Object
     key: "91"
     path: results/built-ins/Object/91.yaml
@@ -1893,8 +1986,23 @@ partitions:
     key: "93"
     path: results/built-ins/Object/93.yaml
   - group: built-ins/Object
+    key: "94"
+    path: results/built-ins/Object/94.yaml
+  - group: built-ins/Object
+    key: "96"
+    path: results/built-ins/Object/96.yaml
+  - group: built-ins/Object
+    key: "97"
+    path: results/built-ins/Object/97.yaml
+  - group: built-ins/Object
+    key: "98"
+    path: results/built-ins/Object/98.yaml
+  - group: built-ins/Object
     key: "99"
     path: results/built-ins/Object/99.yaml
+  - group: built-ins/Object
+    key: 9a
+    path: results/built-ins/Object/9a.yaml
   - group: built-ins/Object
     key: 9b
     path: results/built-ins/Object/9b.yaml
@@ -1914,8 +2022,14 @@ partitions:
     key: a4
     path: results/built-ins/Object/a4.yaml
   - group: built-ins/Object
+    key: a6
+    path: results/built-ins/Object/a6.yaml
+  - group: built-ins/Object
     key: a7
     path: results/built-ins/Object/a7.yaml
+  - group: built-ins/Object
+    key: a8
+    path: results/built-ins/Object/a8.yaml
   - group: built-ins/Object
     key: a9
     path: results/built-ins/Object/a9.yaml
@@ -1932,8 +2046,17 @@ partitions:
     key: ae
     path: results/built-ins/Object/ae.yaml
   - group: built-ins/Object
+    key: af
+    path: results/built-ins/Object/af.yaml
+  - group: built-ins/Object
     key: b0
     path: results/built-ins/Object/b0.yaml
+  - group: built-ins/Object
+    key: b3
+    path: results/built-ins/Object/b3.yaml
+  - group: built-ins/Object
+    key: b5
+    path: results/built-ins/Object/b5.yaml
   - group: built-ins/Object
     key: b6
     path: results/built-ins/Object/b6.yaml
@@ -1971,8 +2094,29 @@ partitions:
     key: c7
     path: results/built-ins/Object/c7.yaml
   - group: built-ins/Object
+    key: c9
+    path: results/built-ins/Object/c9.yaml
+  - group: built-ins/Object
+    key: ca
+    path: results/built-ins/Object/ca.yaml
+  - group: built-ins/Object
+    key: cc
+    path: results/built-ins/Object/cc.yaml
+  - group: built-ins/Object
+    key: cd
+    path: results/built-ins/Object/cd.yaml
+  - group: built-ins/Object
+    key: ce
+    path: results/built-ins/Object/ce.yaml
+  - group: built-ins/Object
+    key: cf
+    path: results/built-ins/Object/cf.yaml
+  - group: built-ins/Object
     key: d1
     path: results/built-ins/Object/d1.yaml
+  - group: built-ins/Object
+    key: d2
+    path: results/built-ins/Object/d2.yaml
   - group: built-ins/Object
     key: d5
     path: results/built-ins/Object/d5.yaml
@@ -1986,8 +2130,14 @@ partitions:
     key: da
     path: results/built-ins/Object/da.yaml
   - group: built-ins/Object
+    key: db
+    path: results/built-ins/Object/db.yaml
+  - group: built-ins/Object
     key: dc
     path: results/built-ins/Object/dc.yaml
+  - group: built-ins/Object
+    key: dd
+    path: results/built-ins/Object/dd.yaml
   - group: built-ins/Object
     key: de
     path: results/built-ins/Object/de.yaml
@@ -2001,8 +2151,17 @@ partitions:
     key: e3
     path: results/built-ins/Object/e3.yaml
   - group: built-ins/Object
+    key: e4
+    path: results/built-ins/Object/e4.yaml
+  - group: built-ins/Object
+    key: e5
+    path: results/built-ins/Object/e5.yaml
+  - group: built-ins/Object
     key: e6
     path: results/built-ins/Object/e6.yaml
+  - group: built-ins/Object
+    key: e7
+    path: results/built-ins/Object/e7.yaml
   - group: built-ins/Object
     key: e9
     path: results/built-ins/Object/e9.yaml
@@ -2030,6 +2189,18 @@ partitions:
   - group: built-ins/Object
     key: f4
     path: results/built-ins/Object/f4.yaml
+  - group: built-ins/Object
+    key: f5
+    path: results/built-ins/Object/f5.yaml
+  - group: built-ins/Object
+    key: f6
+    path: results/built-ins/Object/f6.yaml
+  - group: built-ins/Object
+    key: f9
+    path: results/built-ins/Object/f9.yaml
+  - group: built-ins/Object
+    key: fc
+    path: results/built-ins/Object/fc.yaml
   - group: built-ins/Object
     key: fd
     path: results/built-ins/Object/fd.yaml
@@ -5053,9 +5224,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 3300
+  passes: 3570
   semanticFailures: 0
-  unsupportedProfileFeatures: 976
+  unsupportedProfileFeatures: 845
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -5075,23 +5246,23 @@ summary:
       expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1076
+      passes: 1087
       semanticFailures: 0
-      unsupportedProfileFeatures: 212
+      unsupportedProfileFeatures: 201
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 105
+      passes: 117
       semanticFailures: 0
-      unsupportedProfileFeatures: 24
+      unsupportedProfileFeatures: 12
     - dependency: classes
       expectedNegatives: 575
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 773
+      passes: 850
       semanticFailures: 0
-      unsupportedProfileFeatures: 150
+      unsupportedProfileFeatures: 73
     - dependency: control-flow
       expectedNegatives: 224
       harnessFailures: 0
@@ -5124,23 +5295,23 @@ summary:
       expectedNegatives: 4
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 97
+      passes: 110
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 22
     - dependency: expression-operators
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 240
+      passes: 258
       semanticFailures: 0
-      unsupportedProfileFeatures: 55
+      unsupportedProfileFeatures: 37
     - dependency: functions
       expectedNegatives: 122
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 568
+      passes: 585
       semanticFailures: 0
-      unsupportedProfileFeatures: 239
+      unsupportedProfileFeatures: 222
     - dependency: generators
       expectedNegatives: 82
       harnessFailures: 0
@@ -5152,9 +5323,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 792
+      passes: 803
       semanticFailures: 0
-      unsupportedProfileFeatures: 51
+      unsupportedProfileFeatures: 40
     - dependency: lexical-bindings
       expectedNegatives: 147
       harnessFailures: 0
@@ -5180,9 +5351,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1200
+      passes: 1430
       semanticFailures: 0
-      unsupportedProfileFeatures: 289
+      unsupportedProfileFeatures: 198
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -5208,9 +5379,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 50
+      passes: 62
       semanticFailures: 0
-      unsupportedProfileFeatures: 39
+      unsupportedProfileFeatures: 27
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -5237,9 +5408,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 33
+      passes: 34
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 1
     - group: built-ins/AsyncGeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -5251,16 +5422,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 23
+      passes: 25
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 20
     - group: built-ins/AsyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 4
       semanticFailures: 0
-      unsupportedProfileFeatures: 4
+      unsupportedProfileFeatures: 0
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -5272,9 +5443,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 120
+      passes: 130
       semanticFailures: 0
-      unsupportedProfileFeatures: 210
+      unsupportedProfileFeatures: 200
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -5293,9 +5464,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 5
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 32
     - group: built-ins/NativeErrors
       expectedNegatives: 0
       harnessFailures: 0
@@ -5307,16 +5478,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 135
+      passes: 139
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 33
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 66
+      passes: 210
       semanticFailures: 0
-      unsupportedProfileFeatures: 120
+      unsupportedProfileFeatures: 115
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -5335,9 +5506,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7
+      passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 4
     - group: language/arguments-object
       expectedNegatives: 1
       harnessFailures: 0
@@ -5377,9 +5548,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1347
+      passes: 1402
       semanticFailures: 0
-      unsupportedProfileFeatures: 244
+      unsupportedProfileFeatures: 189
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -5447,6 +5618,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1142
+      passes: 1184
       semanticFailures: 0
-      unsupportedProfileFeatures: 154
+      unsupportedProfileFeatures: 112

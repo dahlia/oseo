@@ -57,8 +57,27 @@ export type SyntaxCallTarget =
         | "create"
         | "defineProperty"
         | "getOwnPropertyDescriptor"
-        | "keys"
-        | "setPrototypeOf";
+        | "keys";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "unsupported-object-intrinsic";
+      readonly method:
+        | "assign"
+        | "defineProperties"
+        | "entries"
+        | "freeze"
+        | "fromEntries"
+        | "getOwnPropertyDescriptors"
+        | "getOwnPropertyNames"
+        | "getOwnPropertySymbols"
+        | "groupBy"
+        | "hasOwn"
+        | "isExtensible"
+        | "isFrozen"
+        | "isSealed"
+        | "preventExtensions"
+        | "seal"
+        | "values";
     })
   | (LocatedSyntax & {
       readonly kind: "promise-intrinsic";

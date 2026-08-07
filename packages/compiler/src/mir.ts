@@ -31,8 +31,7 @@ export type MirCallTarget =
         | "create"
         | "defineProperty"
         | "getOwnPropertyDescriptor"
-        | "keys"
-        | "setPrototypeOf";
+        | "keys";
     }
   | { readonly kind: "promise-constructor" }
   | { readonly kind: "super" }

@@ -15,12 +15,20 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Function/prototype/bind/15.3.4.5-2-6.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5-2-6.js\
-        :81:11: error[OSEO1001]: Unknown binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/Function/prototype/bind/15.3.4.5-2-6.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/prototype/bind/15.3.4.5-2-6.js:84:9:
+        error[OSEO2001]: Number prototype methods are not admitted
+        yet.\n"'
+      unsupportedCapability: number-prototype
       passed: false
     unsupportedFeatures: []
   - case:

@@ -42,7 +42,7 @@ results:
       detail: "test/built-ins/Function/prototype/toString/S15.3.4.2_A10.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/toString/S15.3.4.2_A\
-        10.js:147:1: error[OSEO1001]: Unknown binding
+        10.js:153:1: error[OSEO1001]: Unknown binding
         'verifyNotWritable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

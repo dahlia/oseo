@@ -562,7 +562,7 @@ throw boom;
         return source;
       }
       const injected = source.replace(
-        "result = oseo_roots_allocate(context, &frame, 2u);\n" +
+        "result = oseo_roots_allocate(context, &frame, 3u);\n" +
           "        if (result.status == OSEO_STATUS_NORMAL) {\n" +
           "            frame.slots[0] = prototype;",
         'result = failure(context, "OSEO2001", ' +

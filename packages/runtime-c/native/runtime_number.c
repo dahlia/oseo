@@ -68,6 +68,8 @@ static OseoResult number_construct(
     OseoOrdinaryObject *object = ordinary_object(receiver);
     object->number_data = true;
     object->number_value = result.value;
+    object->primitive_data = true;
+    object->primitive_value = result.value;
     return normal(receiver);
 }
 
@@ -426,6 +428,8 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
         OseoOrdinaryObject *prototype = ordinary_object(frame.slots[0]);
         prototype->number_data = true;
         prototype->number_value = oseo_number(0.0);
+        prototype->primitive_data = true;
+        prototype->primitive_value = oseo_number(0.0);
         context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] = frame.slots[0];
         *marker = frame.slots[0];
         result = create_number_function(

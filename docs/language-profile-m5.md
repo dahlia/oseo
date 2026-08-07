@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 63
+M5a is complete. The normative family records described below inventory 69
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 5,078 reviewed cases: 3,016 passes, 1,355
-expected negatives, and 707 unsupported profile features. It records no
+The current manifest contains 5,770 reviewed cases: 3,570 passes, 1,355
+expected negatives, and 845 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3076,6 +3076,24 @@ zero-override policy are unchanged. The expanded intrinsic table, branded
 wrapper state, and Number component move the runtime ABI to
 `oseo-runtime-m5-50` without changing the graph's orchestration state.
 
+M5b node `object-constructor` makes `Object` a callable and constructible
+global intrinsic, adds collector-traced primitive wrappers and String wrapper
+properties, and implements `Object.is`, `Object.getPrototypeOf`, and
+`Object.setPrototypeOf`. Fixed native and generated differential evidence at
+seed `0x60003600` covers both specialization policies, collection forced at
+every safepoint, false hints, guard hits and misses, generic fallback, derived
+construction, primitive wrapping, prototype mutation, and global `Object`
+replacement. All 139 paths under the node's five inventory roots are reviewed:
+75 pass and 64 retain explicit prerequisite boundaries. A further 195
+previously reviewed cases move from unsupported to pass because the real
+`Object` value and its prototype operations satisfy their prerequisites. The
+manifest reaches 5,770 cases: 3,570 passes, 1,355 expected negatives, and 845
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, and zero-override policy are unchanged. The public intrinsic table
+and collector-traced wrapper state move the runtime ABI to
+`oseo-runtime-m5-51` without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3090,8 +3108,9 @@ complete. The remaining gaps retain their existing owners.
 
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
     assignment, and update are admitted by M5a Unit 8.1a as recorded above.
-    The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
-    behavior, and fixed-width conversions remain M5b work owned by the
+    `Object` now supplies collector-traced BigInt wrappers and a stable internal
+    prototype. The callable `BigInt` intrinsic, the prototype's standard
+    methods, and fixed-width conversions remain M5b work owned by the
     intrinsics and built-in objects stream. Reviewed cases that also require
     those facilities or another unimplemented intrinsic remain
     `unsupported-profile-feature` instead of borrowing a partial M5a result.
@@ -3114,28 +3133,28 @@ complete. The remaining gaps retain their existing owners.
     graph node lands. The object prototype root is now populated, but that
     does not admit the separate language surface. Owner: the intrinsics and
     built-in objects stream.
- -  The realm root now owns one collector-traced intrinsic graph and the
-    `Object` constructor identity, but that constructor's callable behavior
-    and primitive wrappers and the remaining standard constructors stay
-    assigned to their dependency-ordered M5b nodes. No built-in dispatches
-    through `Symbol.hasInstance` yet. test262 runtime
+ -  The realm root now owns one collector-traced intrinsic graph, a callable
+    and constructible `Object` value, and primitive wrappers. The remaining
+    standard constructors stay assigned to their dependency-ordered M5b nodes.
+    No built-in dispatches through `Symbol.hasInstance` yet. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
     `Test262Error`, classify as unsupported with the
     `runtime-error-observation` capability named. Owner: the intrinsics
     and built-in objects stream.
- -  `globalThis` and the global object do not exist. M5a Unit 8.1d gives
-    Script top-level `this` and every non-strict nullish receiver one
-    realm-wide global this value whose own properties are the Script's
-    statically known var-scoped top-level bindings, as recorded above,
-    but that object is not the global object. Because this realm binds
-    none of the unadmitted clause 19 standard globals, a Script
+ -  The `globalThis` binding and a complete Global Environment Record do not
+    exist. M5a Unit 8.1d gives Script top-level `this` and every non-strict
+    nullish receiver one realm-wide global object whose own properties are the
+    Script's statically known var-scoped top-level bindings. M5b now installs
+    the admitted `Object` and `Number` identities there. Because this realm
+    still binds none of the other unadmitted clause 19 standard globals, a
+    Script
     top-level `var` declaration of such a name creates the fresh
     undefined-initialized property GlobalDeclarationInstantiation
     prescribes for an absent name, exactly as reviewed passes such as
     *for-of/dstr/obj-id-init-simple-no-strict.js* rely on; the window
-    before its first assignment, where a conforming realm would still
-    expose the intrinsic value, is part of this gap, and a case that
+    before its first assignment, where a conforming realm would still expose
+    another standard intrinsic value, is part of this gap, and a case that
     observes it surfaces as a semantic failure at manifest review rather
     than entering silently. Admitting the global object still requires the
     remaining standard constructors to become real values, the
@@ -3205,21 +3224,22 @@ complete. The remaining gaps retain their existing owners.
     it needs `Promise` as a materialized intrinsic value to compare against.
     Owner: the intrinsics and built-in objects stream.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
-    materialized. Reaching either needs `Object.getPrototypeOf`, and
-    creating a generator function from one needs the dynamic-source
-    boundary of [ADR 0016](./adr/0016-dynamic-source-boundary.md), so the
-    reviewed *test/built-ins/GeneratorFunction/* cases carry the
-    `dynamic-source` tag. There is no `GeneratorFunction` global binding in
+    materialized. `Object.getPrototypeOf` is admitted, but reflecting a
+    generator function or generator object reports the explicit
+    `generator-intrinsics` boundary until their graph nodes land. Creating a
+    generator function dynamically also remains behind
+    [ADR 0016](./adr/0016-dynamic-source-boundary.md), so the reviewed
+    *test/built-ins/GeneratorFunction/* cases retain their owned unsupported
+    classifications. There is no `GeneratorFunction` global binding in
     ECMAScript, so this profile does not add one. Owner: the intrinsics and
     built-in objects stream.
- -  `Object.getPrototypeOf` is not admitted, and neither `Object` nor
-    `Promise` is admitted as a value. Every reviewed
-    *test/built-ins/AsyncGeneratorPrototype/* and
-    *test/built-ins/AsyncIteratorPrototype/* case reaches the intrinsics it
-    checks through one of the three, so the cluster this profile now
-    materializes promotes none of them and they keep the
-    `unsupported-profile-feature` classification their compile-stage
-    `OSEO1001` produces. Owner: the intrinsics and built-in objects stream.
+ -  `Object` and `Object.getPrototypeOf` are admitted, but `Promise` is not yet
+    a materialized global value and generator intrinsic reflection retains the
+    explicit boundary above. Reviewed *test/built-ins/AsyncGeneratorPrototype/*
+    and *test/built-ins/AsyncIteratorPrototype/* cases that require those
+    routes remain `unsupported-profile-feature` under the matching
+    `generator-intrinsics`, `dynamic-source`, or Promise prerequisite. Owner:
+    the intrinsics and built-in objects stream.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
@@ -3235,7 +3255,9 @@ complete. The remaining gaps retain their existing owners.
     include has a reviewed implementation. Cases in the reviewed function
     inventory that need *nativeFunctionMatcher.js* or
     *wellKnownIntrinsicObjects.js* classify as unsupported until those
-    includes have reviewed implementations. The reviewed
+    includes have reviewed implementations. Cases that need *nans.js* also
+    remain unsupported because that include depends on the unadmitted
+    `Math.pow` intrinsic. The reviewed
     *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
     `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and its
     `assert.throwsAsync` reports a constructor mismatch without composing a

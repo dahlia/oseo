@@ -216,3 +216,7 @@ families:
     owner: tests/property/m5-number-intrinsic.property.test.ts
     start: 0x60003500
     end: 0x600035ff
+  - family: m5-object-constructor
+    owner: tests/property/m5-object-constructor.property.test.ts
+    start: 0x60003600
+    end: 0x600036ff

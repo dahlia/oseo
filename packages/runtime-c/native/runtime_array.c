@@ -151,6 +151,8 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->error_data = false;
     array->number_data = false;
     array->number_value = oseo_undefined();
+    array->primitive_data = false;
+    array->primitive_value = oseo_undefined();
     array->array_iterator = false;
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;

@@ -954,7 +954,7 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     OseoResult materialized = normal(oseo_undefined());
     if (intrinsic == OSEO_INTRINSIC_OBJECT_PROTOTYPE ||
         (intrinsic >= OSEO_INTRINSIC_OBJECT &&
-         intrinsic <= OSEO_INTRINSIC_OBJECT_VALUE_OF)) {
+         intrinsic <= OSEO_INTRINSIC_OBJECT_SET_PROTOTYPE_OF)) {
         materialized = intrinsic_graph_root(context);
         if (materialized.status == OSEO_STATUS_NORMAL) {
             materialized = oseo_internal_object_prototype(context);
@@ -973,6 +973,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
         materialized = oseo_internal_number_intrinsic(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_BIGINT_PROTOTYPE) {
+        materialized = normal(context->intrinsics[intrinsic]);
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
         materialized = oseo_internal_promise_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
@@ -1025,7 +1028,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
             context,
             names[index]
         );
-    } else {
+    } else if (intrinsic >= OSEO_INTRINSIC_ASYNC_GENERATOR_NEXT &&
+               intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF) {
         static const size_t codes[] = {
             OSEO_ASYNC_GENERATOR_NEXT_CODE_ID,
             OSEO_ASYNC_GENERATOR_RETURN_CODE_ID,
@@ -1038,6 +1042,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
             context,
             codes[index]
         );
+    } else {
+        return failure(context, "OSEO2001", "Unknown realm intrinsic.");
     }
     if (materialized.status != OSEO_STATUS_NORMAL) return materialized;
     OseoValue value = context->intrinsics[intrinsic];
@@ -1195,6 +1201,8 @@ OseoResult oseo_function_create(
     function->ordinary.error_data = false;
     function->ordinary.number_data = false;
     function->ordinary.number_value = oseo_undefined();
+    function->ordinary.primitive_data = false;
+    function->ordinary.primitive_value = oseo_undefined();
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;

@@ -2,6 +2,182 @@ import type { Fixture } from "../fixture.ts";
 
 export const objectFixtures: readonly Fixture[] = [
   {
+    globalScriptReference: true,
+    name: "object-constructor",
+    source: `
+const objectDescriptor = Object.getOwnPropertyDescriptor(this, "Object");
+const prototypeDescriptor = Object.getOwnPropertyDescriptor(
+  Object,
+  "prototype",
+);
+console.log(
+  "metadata",
+  typeof Object,
+  Object.name,
+  Object.length,
+  objectDescriptor.writable,
+  objectDescriptor.enumerable,
+  objectDescriptor.configurable,
+  prototypeDescriptor.writable,
+  prototypeDescriptor.enumerable,
+  prototypeDescriptor.configurable,
+);
+for (const name of [
+  "create",
+  "defineProperty",
+  "getOwnPropertyDescriptor",
+  "getPrototypeOf",
+  "is",
+  "keys",
+  "setPrototypeOf",
+]) {
+  const method = Object[name];
+  const descriptor = Object.getOwnPropertyDescriptor(Object, name);
+  console.log(
+    "static",
+    name,
+    method.name,
+    method.length,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+  try { new method(); } catch (error) {
+    console.log("not constructor", name, error instanceof TypeError);
+  }
+}
+const extractedCreate = Object.create;
+const extractedDefine = Object.defineProperty;
+const computedDescriptor = Object["getOwnPropertyDescriptor"];
+const extractedKeys = Object.keys;
+const extractedObject = extractedCreate(null);
+extractedDefine(extractedObject, "visible", {
+  enumerable: true,
+  value: 9,
+});
+console.log(
+  "extracted statics",
+  Object.getPrototypeOf(extractedObject),
+  computedDescriptor(extractedObject, "visible").value,
+  extractedKeys(extractedObject)[0],
+);
+const emptyCall = Object();
+const emptyConstruct = new Object();
+console.log(
+  "empty",
+  typeof emptyCall,
+  emptyCall !== emptyConstruct,
+  Object.getPrototypeOf(emptyCall) === Object.prototype,
+  Object.getPrototypeOf(emptyConstruct) === Object.prototype,
+);
+const original = { marker: 1 };
+console.log(
+  "identity",
+  Object(original) === original,
+  new Object(original) === original,
+);
+const numberWrapper = Object(-7);
+console.log(
+  "number wrapper",
+  typeof numberWrapper,
+  numberWrapper instanceof Number,
+  Object.getPrototypeOf(numberWrapper) === Number.prototype,
+  Object.prototype.toString.call(numberWrapper),
+);
+const firstStringWrapper = Object("ab");
+const secondStringWrapper = Object("cd");
+console.log(
+  "string wrapper",
+  firstStringWrapper[0],
+  firstStringWrapper[1],
+  firstStringWrapper.length,
+  firstStringWrapper.propertyIsEnumerable("0"),
+  Object.getPrototypeOf(firstStringWrapper) ===
+    Object.getPrototypeOf(secondStringWrapper),
+  Object.prototype.toString.call(firstStringWrapper),
+);
+const symbol = Symbol("wrapped");
+const symbolWrapper = Object(symbol);
+console.log(
+  "other wrappers",
+  Object.prototype.toString.call(Object(true)),
+  Object.prototype.toString.call(symbolWrapper),
+  Object.prototype.toString.call(Object(9n)),
+  Object(symbol) !== symbolWrapper,
+);
+class DerivedObject extends Object {}
+const derived = new DerivedObject(original);
+console.log(
+  "derived",
+  derived instanceof DerivedObject,
+  derived !== original,
+  Object.getPrototypeOf(derived) === DerivedObject.prototype,
+);
+const shared = {};
+console.log(
+  "same value",
+  Object.is(NaN, NaN),
+  Object.is(-0, -0),
+  Object.is(-0, 0),
+  Object.is("same", "same"),
+  Object.is(12n, 12n),
+  Object.is(symbol, symbol),
+  Object.is(shared, shared),
+  Object.is({}, {}),
+  Object.is(),
+);
+const firstPrototype = { first: 1 };
+const reflected = { own: 2 };
+Object.setPrototypeOf(reflected, firstPrototype);
+console.log(
+  "prototype",
+  Object.getPrototypeOf(reflected) === firstPrototype,
+  reflected.first,
+  Object.setPrototypeOf(reflected, null) === reflected,
+  Object.getPrototypeOf(reflected),
+  Object.setPrototypeOf(3, null),
+);
+try { Object.getPrototypeOf(null); } catch (error) {
+  console.log("null prototype", error instanceof TypeError);
+}
+try { Object.setPrototypeOf(3, 3); } catch (error) {
+  console.log("invalid prototype", error instanceof TypeError);
+}
+const cycleA = {};
+const cycleB = {};
+Object.setPrototypeOf(cycleA, cycleB);
+try { Object.setPrototypeOf(cycleB, cycleA); } catch (error) {
+  console.log("cycle", error instanceof TypeError);
+}
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+console.log("hint", hinted(2), hinted("2"));
+const originalObject = Object;
+let turn = 0;
+while (turn < 3) {
+  console.log("guard", Object.is === Object.is);
+  if (turn === 1) Object.marker = 1;
+  turn = turn + 1;
+}
+Object = 41;
+console.log("replace", Object, this.Object === Object);
+Object = originalObject;
+console.log("restore", Object === originalObject, this.Object === Object);
+let collected = [];
+for (let index = 0; index < 24; index = index + 1) {
+  collected.push(Object("value" + index));
+}
+console.log(
+  "collection",
+  collected.length,
+  collected[0][0],
+  collected[23][6],
+  Object.getPrototypeOf(collected[0]) ===
+    Object.getPrototypeOf(collected[23]),
+);
+`,
+  },
+  {
     name: "object-prototype",
     source: `
 const parent = { inherited: 3 };

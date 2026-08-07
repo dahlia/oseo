@@ -5,10 +5,9 @@ results:
       async: false
       features: []
       flags: []
-      includes:
-        - propertyHelper.js
+      includes: []
       mode: script
-      path: test/built-ins/Object/prototype/toString/length.js
+      path: test/built-ins/Object/S15.2.2.1_A3_T2.js
       strictness:
         - non-strict
         - strict
@@ -17,11 +16,43 @@ results:
     dependencies:
       - object-properties
     observation:
-      detail: "test/built-ins/Object/prototype/toString/length.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/prototype/toString/length.js:153\
-        :16: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      detail: "test/built-ins/Object/S15.2.2.1_A3_T2.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/S15.2.2.1_A3_T2.js:87:37:
+        error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Object/prototype/toString/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

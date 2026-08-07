@@ -35,12 +35,18 @@ function verifyProperty(object, name, descriptor) {
   }
 
   if ("enumerable" in descriptor) {
-    const keys = Object.keys(object);
-    let index = 0;
-    let enumerable = false;
-    while (index < keys.length) {
-      if (keys[index] === name) enumerable = true;
-      index = index + 1;
+    let enumerable;
+    if (typeof name === "symbol") {
+      enumerable = Object.prototype.propertyIsEnumerable.call(object, name);
+    } else {
+      const key = "" + name;
+      const keys = Object.keys(object);
+      let index = 0;
+      enumerable = false;
+      while (index < keys.length) {
+        if (keys[index] === key) enumerable = true;
+        index = index + 1;
+      }
     }
     assert.sameValue(enumerable, descriptor.enumerable);
   }

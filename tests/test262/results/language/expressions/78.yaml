@@ -50,17 +50,22 @@ results:
       strictness:
         - non-strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-iteration
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/async-generator/yield-identifier-spr\
-        ead-non-strict.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/async-generator/yield-identi\
-        fier-spread-non-strict.js:143:10: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -188,18 +193,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/class/elements/computed-name-toprimi\
-        tive.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/computed-name\
-        -toprimitive.js:201:4: error[OSEO1001]: Unknown binding
-        'Object'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

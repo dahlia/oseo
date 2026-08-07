@@ -1309,7 +1309,6 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         emittedC.call.oseoObjectBuiltinGetOwnPropertyDescriptor,
       ),
       keys: renderC(emittedC.call.oseoObjectBuiltinKeys),
-      setPrototypeOf: renderC(emittedC.call.oseoObjectBuiltinSetPrototypeOf),
     } as const;
     line(
       state,

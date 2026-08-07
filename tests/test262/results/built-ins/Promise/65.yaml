@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Promise/prototype/catch/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:14\
-        1:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
+        7:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

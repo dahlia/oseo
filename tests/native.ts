@@ -213,6 +213,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "object-constructor" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
@@ -282,6 +283,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
+    fixture.name === "object-constructor" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -443,6 +445,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "object-constructor" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
@@ -450,6 +453,9 @@ for (const fixture of selectedFixtures) {
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
+              if (fixture.name === "object-constructor") {
+                assert.ok(native.counters.guardHits > 0);
+              }
               assert.ok(native.counters.guardMisses > 0);
             }
           }

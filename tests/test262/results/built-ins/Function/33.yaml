@@ -19,7 +19,7 @@ results:
     observation:
       detail: "test/built-ins/Function/prototype/S15.3.3.1_A1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Function/prototype/S15.3.3.1_A1.js:141:\
+        stderr=\"test/built-ins/Function/prototype/S15.3.3.1_A1.js:147:\
         1: error[OSEO1001]: Unknown binding 'verifyNotWritable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

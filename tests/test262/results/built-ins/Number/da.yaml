@@ -19,7 +19,7 @@ results:
     observation:
       detail: "test/built-ins/Number/MAX_VALUE/S15.7.3.2_A3.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/MAX_VALUE/S15.7.3.2_A3.js:139:1:
+        stderr=\"test/built-ins/Number/MAX_VALUE/S15.7.3.2_A3.js:145:1:
         error[OSEO1001]: Unknown binding 'verifyNotConfigurable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

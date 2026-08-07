@@ -19,8 +19,8 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-string.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-string.js:78:3: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
+        ype.toString.call-string.js:88:34: error[OSEO1001]: Unknown
+        binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -19,7 +19,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/length.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/length.js:149:16:
+        stderr=\"test/built-ins/Promise/length.js:155:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

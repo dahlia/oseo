@@ -283,10 +283,20 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
             function_object(frame.slots[1])->prototype_object;
         context->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[1];
+        result = oseo_internal_install_primitive_wrapper_methods(
+            context,
+            context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE],
+            false
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result.value = frame.slots[1];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
         }
+    } else {
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = oseo_undefined();
     }
     oseo_roots_release(context, &frame);
     return result;
