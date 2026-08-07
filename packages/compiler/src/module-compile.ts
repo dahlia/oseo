@@ -1215,6 +1215,7 @@ export function compileModuleGraph(
   const functionInitializers: HirStatement[] = [];
   const functions: HirFunction[] = [];
   const globalBindings: HirGlobalBinding[] = [];
+  const intrinsicInitializers: HirStatement[] = [];
   const moduleBodies = new Map<string, readonly HirStatement[]>();
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
@@ -1322,10 +1323,16 @@ export function compileModuleGraph(
       return { diagnostics: result.diagnostics, graph: linked.graph };
     }
     const moduleBody = retainModuleSource(result.program.body, moduleId);
+    globalBindings.push(...(result.program.globalBindings ?? []));
     globalBindings.push(...collectHirBindings(moduleBody));
     const evaluationBody: HirStatement[] = [];
     for (const statement of moduleBody) {
-      if (statement.kind === "function-init") {
+      if (
+        statement.kind === "const" &&
+        statement.bindingId === result.program.intrinsicGlobalObjectBindingId
+      ) {
+        intrinsicInitializers.push(statement);
+      } else if (statement.kind === "function-init") {
         functionInitializers.push(statement);
       } else {
         evaluationBody.push(statement);
@@ -1558,6 +1565,7 @@ export function compileModuleGraph(
   const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
   const hir: HirProgram = {
     body: [
+      ...intrinsicInitializers,
       ...namespaceInitializers,
       ...functionInitializers,
       ...moduleInitializers,

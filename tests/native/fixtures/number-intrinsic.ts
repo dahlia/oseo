@@ -2,6 +2,7 @@ import type { Fixture } from "../fixture.ts";
 
 export const numberIntrinsicFixtures: readonly Fixture[] = [
   {
+    globalScriptReference: true,
     name: "number-intrinsic",
     source: `
 console.log("metadata", typeof Number, Number.name, Number.length);
@@ -110,6 +111,21 @@ while (turn < 2) {
   console.log("guard", Number.isFinite === Number.isFinite);
   if (turn === 0) Number.marker = 1;
   turn = turn + 1;
+}
+function strictNumberRead() { "use strict"; return this instanceof Number; }
+console.log("strict receiver", strictNumberRead.call(-12));
+const originalNumber = Number;
+this.Number = 123;
+console.log("global write", this.Number === Number, Number);
+this.Number = originalNumber;
+console.log("global restore", this.Number === Number);
+console.log(
+  "global delete",
+  delete this.Number,
+  typeof Number,
+);
+try { Number; } catch (error) {
+  console.log("global deleted read", error instanceof ReferenceError);
 }
 `,
   },

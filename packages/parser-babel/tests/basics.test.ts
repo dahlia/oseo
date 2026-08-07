@@ -124,7 +124,7 @@ test("lowers the Iterator intrinsic as a replaceable global value", () => {
   );
 });
 
-test("lowers the Number intrinsic as a replaceable global value", () => {
+test("reads the replaceable Number value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source: "console.log(typeof Number, Number.isFinite(1));",
     sourceId: "number-intrinsic.ts",
@@ -132,8 +132,15 @@ test("lowers the Number intrinsic as a replaceable global value", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
-  assert.match(printHir(result.hir), /intrinsic Number/u);
-  assert.match(printMir(result.mir), /number-intrinsic intrinsic Number/u);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Number" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Number"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /binary in/u);
+  assert.match(mir, /read \*missing intrinsic:Number\*/u);
+  assert.doesNotMatch(mir, /number-intrinsic intrinsic Number/u);
 
   const deleted = compileSource(babelFrontend, {
     source: "delete Number;",
@@ -143,6 +150,16 @@ test("lowers the Number intrinsic as a replaceable global value", () => {
   assert.match(
     deleted.diagnostics[0]?.message ?? "",
     /Deleting runtime intrinsic binding 'Number'/u,
+  );
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { Number = 1; }",
+    sourceId: "with-number-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'Number' through a with fallback/u,
   );
 });
 

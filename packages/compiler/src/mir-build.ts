@@ -3797,32 +3797,6 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
-  if (expression.kind === "number-intrinsic") {
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "number intrinsic allocation",
-      [],
-      expression.range,
-    );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [],
-      detail: "intrinsic Number",
-      id,
-      kind: "number-intrinsic",
-      range: expression.range,
-    });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
-    );
-    return recordRoot(builder, id, expression.range);
-  }
   if (expression.kind === "binding") {
     return lowerBindingRead(
       expression.bindingId,

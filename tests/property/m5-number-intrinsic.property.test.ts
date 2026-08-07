@@ -106,6 +106,19 @@ while (turn < 2) {
   if (turn === 0) Number.marker = converted;
   turn = turn + 1;
 }
+const originalNumber = Number;
+this.Number = converted;
+console.log("global write", this.Number === Number, Number === converted);
+this.Number = originalNumber;
+console.log("global restore", this.Number === Number);
+console.log(
+  "global delete",
+  delete this.Number,
+  typeof Number,
+);
+try { Number; } catch (error) {
+  console.log("global deleted read", error instanceof ReferenceError);
+}
 `;
 }
 
@@ -119,6 +132,10 @@ function expected(testCase: NumberIntrinsicCase): string {
     `hint ${value + 1} ${value}1`,
     "guard true",
     "guard true",
+    "global write true true",
+    "global restore true",
+    "global delete true undefined",
+    "global deleted read true",
     "",
   ].join("\n");
 }
@@ -143,7 +160,10 @@ async function references(source: string): Promise<
   const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
-    await host.writeTextFile(sourcePath, source);
+    await host.writeTextFile(
+      sourcePath,
+      `(0, eval)(${JSON.stringify(source)});\n`,
+    );
     const observations = [
       await host.run({
         args: [sourcePath],
@@ -164,7 +184,7 @@ async function references(source: string): Promise<
 }
 
 test(
-  "generated Number conversions and predicates match the M5 model",
+  "generated Number operations and global identity match the M5 model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
@@ -237,14 +257,15 @@ test(
           "one signed integer from 1 to 10000, one radix from 2, 8, 10, " +
           "16, or 36, one parser suffix, one wide rounding offset from " +
           "2049 to 8191, one exact wide radix from 2, 8, 10, or 16, a " +
-          "false number hint, and one constructor shape guard miss",
+          "false number hint, one constructor shape guard miss, and one " +
+          "global Number write, restore, and delete sequence",
         numRuns: 12,
         profile: "M5 Number intrinsic",
         seed: 0x6000_3500,
         sizeLimit:
           "one bounded integer, one bounded wide offset, two radices, one " +
-          "parser suffix, one wrapper, and two repeated intrinsic property " +
-          "observations",
+          "parser suffix, one wrapper, two repeated intrinsic property " +
+          "observations, and one global mutation sequence",
         timeLimitMilliseconds: 180_000,
       },
     );

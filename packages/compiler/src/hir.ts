@@ -746,9 +746,6 @@ export type HirExpression =
       readonly kind: "iterator-intrinsic";
     })
   | (LocatedSyntax & {
-      readonly kind: "number-intrinsic";
-    })
-  | (LocatedSyntax & {
       readonly kind: "symbol-intrinsic";
     })
   | (LocatedSyntax & {
@@ -1186,6 +1183,11 @@ export interface HirProgram {
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
   /**
+   * The hidden global-object capture initialized before any module function
+   * initializer can expose a closure that reads it.
+   */
+  readonly intrinsicGlobalObjectBindingId?: number;
+  /**
    * The resolved var-scoped top-level bindings a Script's global object
    * binds as properties, in GlobalDeclarationInstantiation order. Each
    * entry names the same binding the script statement list writes, so a
@@ -1243,6 +1245,13 @@ export interface ResolveState {
     }
   >;
   readonly hirFunctions: HirFunction[];
+  /** The hidden realm global-object cell used by mutable intrinsic reads. */
+  intrinsicGlobalObjectBinding?: Binding | undefined;
+  /**
+   * Uninitialized cells used only when a mutable intrinsic global no longer
+   * exists. Reading one preserves the ReferenceError of an unresolvable name.
+   */
+  readonly intrinsicReadFallbacks: Map<string, Binding>;
   /** Active labels of the function being resolved; loops accept continue. */
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;
