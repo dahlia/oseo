@@ -485,6 +485,49 @@ static bool conversion_property_exists(
 }
 
 /*
+ * Number.prototype.toString belongs to a later formatting node. Until it
+ * lands, select that deferred method by prototype-chain position without
+ * exposing it as a property. A nearer user property still owns the conversion,
+ * changing the receiver's prototype chain removes this narrow fallback, and
+ * the selected method enforces the [[NumberData]] receiver brand.
+ */
+static bool uses_deferred_number_to_string(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue key
+) {
+    if (!is_object(value)) return false;
+    bool reached_number_prototype = false;
+    OseoValue current = value;
+    while (is_object(current)) {
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
+            return reached_number_prototype;
+        }
+        OseoValue property_value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        if (oseo_internal_own_descriptor(
+                current,
+                key,
+                &property_value,
+                &attributes,
+                &getter,
+                &setter
+            )) {
+            return false;
+        }
+        if (current ==
+            context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE]) {
+            reached_number_prototype = true;
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
+}
+
+/*
  * The deferred default toString is selected by the first materialized
  * intrinsic prototype on the chain.
  */
@@ -549,6 +592,10 @@ static OseoResult default_object_tag_text(
         '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
         'E', 'r', 'r', 'o', 'r', ']'
     };
+    static const uint16_t number_tag_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'N', 'u', 'm', 'b', 'e', 'r', ']'
+    };
     if (is_array(value)) {
         return oseo_string_from_units(context, array_tag_units, 14u);
     }
@@ -557,6 +604,9 @@ static OseoResult default_object_tag_text(
     }
     if (ordinary_object(value)->error_data) {
         return oseo_string_from_units(context, error_tag_units, 14u);
+    }
+    if (ordinary_object(value)->number_data) {
+        return oseo_string_from_units(context, number_tag_units, 15u);
     }
     return oseo_string_from_units(context, object_units, 15u);
 }
@@ -754,10 +804,10 @@ static OseoResult default_array_text(
 /*
  * The generic ToPrimitive over OrdinaryToPrimitive: user-reachable
  * valueOf and toString run in hint order, and objects on a
- * intrinsic-prototype chain fall back to the deferred
- * Object.prototype and Array.prototype conversions. Function and
- * promise text needs Function.prototype.toString or well-known
- * symbols, so it stays an owned unsupported boundary.
+ * intrinsic-prototype chain fall back to the deferred Object.prototype,
+ * Array.prototype, and wrapper conversions. Function and promise text needs
+ * Function.prototype.toString or well-known symbols, so it stays an owned
+ * unsupported boundary.
  */
 static OseoResult to_primitive_value(
     OseoContext *context,
@@ -902,6 +952,27 @@ static OseoResult to_primitive_value(
             result = default_object_tag_text(context, frame.slots[0]);
             if (result.status != OSEO_STATUS_NORMAL) break;
             converted = true;
+            break;
+        }
+        if (
+            trying_to_string &&
+            uses_deferred_number_to_string(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            )
+        ) {
+            OseoOrdinaryObject *receiver = ordinary_object(frame.slots[0]);
+            if (!receiver->number_data) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Number.prototype.toString requires a number receiver."
+                );
+            } else {
+                result = normal(receiver->number_value);
+                converted = true;
+            }
             break;
         }
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);

@@ -115,6 +115,9 @@ static const char *object_builtin_tag(OseoValue receiver) {
     if (is_object(receiver) && ordinary_object(receiver)->error_data) {
         return "Error";
     }
+    if (is_object(receiver) && ordinary_object(receiver)->number_data) {
+        return "Number";
+    }
     if (is_string(receiver)) return "String";
     if (is_symbol(receiver)) return "Symbol";
     if (is_bigint(receiver)) return "BigInt";

@@ -18,6 +18,7 @@ import type {
   HirClassNameBinding,
   HirClassThisBinding,
   HirArrayBindingPattern,
+  HirAssignmentMemberTarget,
   HirExpression,
   HirForDeclaration,
   HirForInTarget,
@@ -33,6 +34,7 @@ import type {
   HirPrivateNameKey,
   HirResult,
   HirStatement,
+  HirStrictGlobalFallback,
   HirSwitchCase,
   IntrinsicGlobalKind,
   ResolveState,
@@ -163,6 +165,28 @@ function rejectStrictWithFallbackWrite(
   );
 }
 
+/**
+ * Reject a `with` fallback write that would bypass a mutable intrinsic's
+ * global property. Object-environment hits remain admitted, but the compiler
+ * cannot let an all-miss path create a separate hidden cell for the same name.
+ */
+function rejectPropertyOwnedIntrinsicWithFallbackWrite(
+  name: string,
+  located: LocatedSyntax,
+  state: ResolveState,
+): boolean {
+  if (name !== "Number") return false;
+  state.diagnostics.push(
+    sourceDiagnostic(
+      state.sourceId,
+      located,
+      `Assigning property-owned intrinsic '${name}' through a with ` +
+        "fallback is outside the admitted global-object profile.",
+    ),
+  );
+  return true;
+}
+
 function bindingExpression(
   binding: Binding,
   range: SourceRange,
@@ -172,6 +196,143 @@ function bindingExpression(
     kind: "binding",
     name: binding.name,
     range,
+  };
+}
+
+/** Read the realm global object captured before the source body executes. */
+function intrinsicGlobalObjectRead(
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  let binding = state.intrinsicGlobalObjectBinding;
+  if (binding == null) {
+    binding = {
+      id: state.nextBindingId,
+      mutable: false,
+      name: "*intrinsic global object*",
+    };
+    state.nextBindingId += 1;
+    state.intrinsicGlobalObjectBinding = binding;
+  }
+  return bindingExpression(binding, range);
+}
+
+/** Read one mutable intrinsic through the realm's global object property. */
+function intrinsicGlobalPropertyRead(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): Extract<HirExpression, { readonly kind: "property-get" }> {
+  return {
+    key: { kind: "string", range, value: name },
+    kind: "property-get",
+    object: intrinsicGlobalObjectRead(range, state),
+    range,
+  };
+}
+
+/** Test whether one mutable intrinsic still exists on the global object. */
+function intrinsicGlobalPropertyExists(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return {
+    kind: "binary",
+    left: { kind: "string", range, value: name },
+    operator: "in",
+    range,
+    right: intrinsicGlobalObjectRead(range, state),
+  };
+}
+
+/** Return the uninitialized fallback for one absent mutable intrinsic. */
+function missingIntrinsicBinding(name: string, state: ResolveState): Binding {
+  let fallback = state.intrinsicReadFallbacks.get(name);
+  if (fallback == null) {
+    fallback = {
+      id: state.nextBindingId,
+      mutable: false,
+      name: `*missing intrinsic:${name}*`,
+    };
+    state.nextBindingId += 1;
+    state.intrinsicReadFallbacks.set(name, fallback);
+  }
+  return fallback;
+}
+
+/** Read the uninitialized fallback for one absent mutable intrinsic. */
+function missingIntrinsicRead(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return bindingExpression(missingIntrinsicBinding(name, state), range);
+}
+
+/** Return the missing-binding check required by a strict global write. */
+function strictIntrinsicGlobalFallback(
+  name: string,
+  state: ResolveState,
+): HirStrictGlobalFallback | undefined {
+  if (!state.strict) return undefined;
+  const fallback = missingIntrinsicBinding(name, state);
+  return { bindingId: fallback.id, name: fallback.name };
+}
+
+/** Resolve one assignment-pattern leaf to a mutable intrinsic property. */
+function intrinsicGlobalPatternTarget(
+  name: string,
+  located: LocatedSyntax,
+  state: ResolveState,
+): HirAssignmentMemberTarget {
+  const reference = intrinsicGlobalPropertyRead(name, located.range, state);
+  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
+  return {
+    ...(located.byteRange == null ? {} : { byteRange: located.byteRange }),
+    inferredName: name,
+    key: reference.key,
+    kind: "assignment-member",
+    object: reference.object,
+    range: located.range,
+    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+  };
+}
+
+/** Resolve one direct loop target to a mutable intrinsic property. */
+function intrinsicGlobalLoopTarget(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): Extract<HirForOfTarget, { readonly kind: "property" }> {
+  const reference = intrinsicGlobalPropertyRead(name, range, state);
+  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
+  return {
+    key: reference.key,
+    kind: "property",
+    object: reference.object,
+    range,
+    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+  };
+}
+
+/**
+ * Read a mutable intrinsic global with ordinary identifier semantics.
+ * The property owns the value, while an absent property reaches one hidden
+ * uninitialized cell so GetValue throws ReferenceError instead of returning
+ * the `undefined` that an ordinary property read would produce.
+ */
+function intrinsicGlobalIdentifierRead(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return {
+    alternate: missingIntrinsicRead(name, range, state),
+    consequent: intrinsicGlobalPropertyRead(name, range, state),
+    kind: "conditional",
+    range,
+    test: intrinsicGlobalPropertyExists(name, range, state),
   };
 }
 
@@ -200,6 +361,9 @@ function identifierFallback(
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
   if (name === "Function") return { kind: "function-intrinsic", range };
   if (name === "Iterator") return { kind: "iterator-intrinsic", range };
+  if (name === "Number") {
+    return intrinsicGlobalIdentifierRead(name, range, state);
+  }
   return bindingExpression(withFallbackBinding(name, state, false), range);
 }
 
@@ -349,12 +513,13 @@ function resolveOptionalChain(
   return { ...expression, base, links };
 }
 
-/** Whether a global name is implemented without a deletable global object. */
+/** Whether identifier deletion needs an owned intrinsic diagnostic. */
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
     name === "Function" ||
     name === "Iterator" ||
+    name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
     name === "Symbol" ||
@@ -445,6 +610,24 @@ function resolveTypeofIdentifier(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
+  if (argument.name === "Number" && resolution.binding == null) {
+    const fallback = intrinsicGlobalPropertyRead(
+      "Number",
+      argument.range,
+      state,
+    );
+    const resolved =
+      resolution.objectBindingIds.length === 0
+        ? fallback
+        : {
+            fallback,
+            kind: "with-get" as const,
+            name: "Number",
+            objectBindingIds: resolution.objectBindingIds,
+            range: argument.range,
+          };
+    return { ...expression, argument: resolved };
+  }
   const resolvesValue =
     resolution.binding != null ||
     argument.name === "undefined" ||
@@ -452,6 +635,7 @@ function resolveTypeofIdentifier(
     argument.name === "Infinity" ||
     argument.name === "Function" ||
     argument.name === "Iterator" ||
+    argument.name === "Number" ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
   if (resolvesValue) {
@@ -543,6 +727,77 @@ function resolveExpression(
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
+      expression.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      if (value == null) return undefined;
+      const inferred =
+        expression.kind === "binding-set" ||
+        expression.operator === "&&" ||
+        expression.operator === "??" ||
+        expression.operator === "||"
+          ? inferFunctionName(value, expression.name)
+          : value;
+      const reference = intrinsicGlobalPropertyRead(
+        expression.name,
+        expression.range,
+        state,
+      );
+      const strictGlobalFallback = state.strict
+        ? missingIntrinsicBinding(expression.name, state)
+        : undefined;
+      const write: HirExpression =
+        expression.kind === "binding-set"
+          ? {
+              ...locatedOf(expression),
+              key: reference.key,
+              kind: "property-set",
+              object: reference.object,
+              ...(strictGlobalFallback == null
+                ? {}
+                : {
+                    strictGlobalFallback: {
+                      bindingId: strictGlobalFallback.id,
+                      name: strictGlobalFallback.name,
+                    },
+                  }),
+              value: inferred,
+            }
+          : {
+              ...locatedOf(expression),
+              key: reference.key,
+              kind: "property-update",
+              object: reference.object,
+              operator: expression.operator,
+              ...(strictGlobalFallback == null
+                ? {}
+                : {
+                    strictGlobalFallback: {
+                      bindingId: strictGlobalFallback.id,
+                      name: strictGlobalFallback.name,
+                    },
+                  }),
+              value: inferred,
+            };
+      if (expression.kind === "binding-set") return write;
+      return {
+        alternate: missingIntrinsicRead(
+          expression.name,
+          expression.range,
+          state,
+        ),
+        consequent: write,
+        kind: "conditional",
+        range: expression.range,
+        test: intrinsicGlobalPropertyExists(
+          expression.name,
+          expression.range,
+          state,
+        ),
+      };
+    }
+    if (
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -556,6 +811,17 @@ function resolveExpression(
       return undefined;
     }
     if (value == null) return undefined;
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectPropertyOwnedIntrinsicWithFallbackWrite(
+        expression.name,
+        expression,
+        state,
+      )
+    ) {
+      return undefined;
+    }
     if (
       resolution.binding == null &&
       state.strict &&
@@ -626,6 +892,51 @@ function resolveExpression(
   if (expression.kind === "binding-step") {
     const resolution = resolveName(scopes, state, expression.name);
     if (
+      expression.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      const reference = intrinsicGlobalPropertyRead(
+        expression.name,
+        expression.range,
+        state,
+      );
+      const strictGlobalFallback = state.strict
+        ? missingIntrinsicBinding(expression.name, state)
+        : undefined;
+      const step: HirExpression = {
+        ...locatedOf(expression),
+        key: reference.key,
+        kind: "property-step",
+        object: reference.object,
+        operator: expression.operator,
+        prefix: expression.prefix,
+        ...(strictGlobalFallback == null
+          ? {}
+          : {
+              strictGlobalFallback: {
+                bindingId: strictGlobalFallback.id,
+                name: strictGlobalFallback.name,
+              },
+            }),
+      };
+      return {
+        alternate: missingIntrinsicRead(
+          expression.name,
+          expression.range,
+          state,
+        ),
+        consequent: step,
+        kind: "conditional",
+        range: expression.range,
+        test: intrinsicGlobalPropertyExists(
+          expression.name,
+          expression.range,
+          state,
+        ),
+      };
+    }
+    if (
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -636,6 +947,17 @@ function resolveExpression(
           `Unknown binding '${expression.name}'.`,
         ),
       );
+      return undefined;
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectPropertyOwnedIntrinsicWithFallbackWrite(
+        expression.name,
+        expression,
+        state,
+      )
+    ) {
       return undefined;
     }
     // An update expression performs GetValue before its write, so an
@@ -808,6 +1130,13 @@ function resolveExpression(
       }
       if (expression.name === "Iterator") {
         return { kind: "iterator-intrinsic", range: expression.range };
+      }
+      if (expression.name === "Number") {
+        return intrinsicGlobalIdentifierRead(
+          expression.name,
+          expression.range,
+          state,
+        );
       }
       state.diagnostics.push(
         sourceDiagnostic(
@@ -2405,6 +2734,25 @@ function resolveBindingPattern(
           }
         : resolveName(scopes, state, pattern.name);
     if (
+      mode === "write" &&
+      pattern.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      return intrinsicGlobalPatternTarget(pattern.name, pattern, state);
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectPropertyOwnedIntrinsicWithFallbackWrite(
+        pattern.name,
+        pattern,
+        state,
+      )
+    ) {
+      return undefined;
+    }
+    if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       state.strict
@@ -2457,11 +2805,14 @@ function resolveBindingPattern(
         property.initializer == null
           ? undefined
           : resolveExpression(property.initializer, scopes, state);
-      if (
-        initializer != null &&
+      const inferredName =
         resolvedPattern?.kind === "binding-identifier"
-      ) {
-        initializer = inferFunctionName(initializer, resolvedPattern.name);
+          ? resolvedPattern.name
+          : resolvedPattern?.kind === "assignment-member"
+            ? resolvedPattern.inferredName
+            : undefined;
+      if (initializer != null && inferredName != null) {
+        initializer = inferFunctionName(initializer, inferredName);
       }
       if (
         key == null ||
@@ -2523,8 +2874,14 @@ function resolveBindingPattern(
       element.initializer == null
         ? undefined
         : resolveExpression(element.initializer, scopes, state);
-    if (initializer != null && resolvedPattern?.kind === "binding-identifier") {
-      initializer = inferFunctionName(initializer, resolvedPattern.name);
+    const inferredName =
+      resolvedPattern?.kind === "binding-identifier"
+        ? resolvedPattern.name
+        : resolvedPattern?.kind === "assignment-member"
+          ? resolvedPattern.inferredName
+          : undefined;
+    if (initializer != null && inferredName != null) {
+      initializer = inferFunctionName(initializer, inferredName);
     }
     if (
       resolvedPattern == null ||
@@ -2681,6 +3038,20 @@ function resolveForInTarget(
   }
   if (target.kind === "binding") {
     const resolution = resolveName(scopes, state, target.name);
+    if (
+      target.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      return intrinsicGlobalLoopTarget(target.name, target.range, state);
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectPropertyOwnedIntrinsicWithFallbackWrite(target.name, target, state)
+    ) {
+      return undefined;
+    }
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
@@ -3284,6 +3655,26 @@ function resolveStatement(
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
       if (
+        statement.target.name === "Number" &&
+        resolution.binding == null &&
+        resolution.objectBindingIds.length === 0
+      ) {
+        target = intrinsicGlobalLoopTarget(
+          statement.target.name,
+          statement.target.range,
+          state,
+        );
+      } else if (
+        resolution.binding == null &&
+        resolution.objectBindingIds.length > 0 &&
+        rejectPropertyOwnedIntrinsicWithFallbackWrite(
+          statement.target.name,
+          statement.target,
+          state,
+        )
+      ) {
+        return undefined;
+      } else if (
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
         state.strict
@@ -3294,35 +3685,36 @@ function resolveStatement(
           state,
         );
         return undefined;
-      }
-      const binding =
-        resolution.binding ??
-        (resolution.objectBindingIds.length === 0
-          ? undefined
-          : withFallbackBinding(statement.target.name, state, true));
-      if (binding == null) {
-        state.diagnostics.push(
-          sourceDiagnostic(
-            state.sourceId,
-            statement.target,
-            `Unknown binding '${statement.target.name}'.`,
-          ),
-        );
       } else {
-        target = {
-          ...statement.target,
-          bindingId: binding.id,
-          ...(binding.functionNameBinding === true
-            ? { functionNameBinding: true as const }
-            : {}),
-          ...(binding.importedBinding === true
-            ? { importedBinding: true as const }
-            : {}),
-          mutable: binding.mutable,
-          ...(resolution.objectBindingIds.length === 0
-            ? {}
-            : { withObjectBindingIds: resolution.objectBindingIds }),
-        };
+        const binding =
+          resolution.binding ??
+          (resolution.objectBindingIds.length === 0
+            ? undefined
+            : withFallbackBinding(statement.target.name, state, true));
+        if (binding == null) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement.target,
+              `Unknown binding '${statement.target.name}'.`,
+            ),
+          );
+        } else {
+          target = {
+            ...statement.target,
+            bindingId: binding.id,
+            ...(binding.functionNameBinding === true
+              ? { functionNameBinding: true as const }
+              : {}),
+            ...(binding.importedBinding === true
+              ? { importedBinding: true as const }
+              : {}),
+            mutable: binding.mutable,
+            ...(resolution.objectBindingIds.length === 0
+              ? {}
+              : { withObjectBindingIds: resolution.objectBindingIds }),
+          };
+        }
       }
     } else if (statement.target.kind === "property") {
       const object = resolveExpression(statement.target.object, scopes, state);
@@ -3554,6 +3946,8 @@ export function buildSeededHir(
     foldedTypeofReferences: [],
     functionInfo: new Map(),
     hirFunctions: [],
+    intrinsicGlobalObjectBinding: undefined,
+    intrinsicReadFallbacks: new Map(),
     labels: [],
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
@@ -3643,9 +4037,38 @@ export function buildSeededHir(
     nextBindingId: state.nextBindingId,
     nextFunctionId: state.nextFunctionId,
     program: {
-      body,
+      body:
+        state.intrinsicGlobalObjectBinding == null
+          ? body
+          : [
+              {
+                bindingId: state.intrinsicGlobalObjectBinding.id,
+                hint: undefined,
+                initializer: {
+                  kind: "this",
+                  range: program.range,
+                  thisMode: "global",
+                },
+                kind: "const",
+                name: state.intrinsicGlobalObjectBinding.name,
+                range: program.range,
+              },
+              ...body,
+            ],
       functions: state.hirFunctions,
+      globalBindings: [
+        ...(state.intrinsicGlobalObjectBinding == null
+          ? []
+          : [state.intrinsicGlobalObjectBinding]),
+        ...state.intrinsicReadFallbacks.values(),
+      ],
       globalObjectBindings,
+      ...(state.intrinsicGlobalObjectBinding == null
+        ? {}
+        : {
+            intrinsicGlobalObjectBindingId:
+              state.intrinsicGlobalObjectBinding.id,
+          }),
       kind: "hir-program",
       range: program.range,
       sourceId: program.sourceId,

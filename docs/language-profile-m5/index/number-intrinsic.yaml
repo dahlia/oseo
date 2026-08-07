@@ -1,0 +1,3 @@
+version: 1
+id: number-intrinsic
+record: docs/language-profile-m5/families/number-intrinsic.yaml

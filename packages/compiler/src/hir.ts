@@ -37,6 +37,15 @@ export interface HirWithBindingReference {
   readonly name: string;
 }
 
+/**
+ * The uninitialized cell used when a strict global identifier write loses
+ * its object property before PutValue.
+ */
+export interface HirStrictGlobalFallback {
+  readonly bindingId: number;
+  readonly name: string;
+}
+
 /** One resolved identifier read through active `with` environments. */
 export interface HirWithReference extends LocatedSyntax {
   readonly fallback: HirExpression;
@@ -58,6 +67,10 @@ export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly key: HirExpression;
   readonly kind: "assignment-member";
   readonly object: HirExpression;
+  /** Name used by named evaluation for a synthetic global target. */
+  readonly inferredName?: string;
+  /** Missing-binding fallback for a strict global property reference. */
+  readonly strictGlobalFallback?: HirStrictGlobalFallback;
 }
 
 /** One resolved private reference used as an assignment-pattern leaf. */
@@ -173,6 +186,7 @@ export type HirForOfTarget =
       readonly kind: "property";
       readonly object: HirExpression;
       readonly range: SourceRange;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     }
   | {
       readonly kind: "private";
@@ -350,6 +364,7 @@ export function intrinsicGlobalKind(
   if (
     name === "Function" ||
     name === "Iterator" ||
+    name === "Number" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
   ) {
@@ -826,6 +841,7 @@ export type HirExpression =
       readonly key: HirExpression;
       readonly kind: "property-set";
       readonly object: HirExpression;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -833,6 +849,7 @@ export type HirExpression =
       readonly kind: "property-update";
       readonly object: HirExpression;
       readonly operator: AssignmentOperator;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -841,6 +858,7 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: "++" | "--";
       readonly prefix: boolean;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     })
   | (LocatedSyntax & {
       /**
@@ -1182,6 +1200,11 @@ export interface HirProgram {
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
   /**
+   * The hidden global-object capture initialized before any module function
+   * initializer can expose a closure that reads it.
+   */
+  readonly intrinsicGlobalObjectBindingId?: number;
+  /**
    * The resolved var-scoped top-level bindings a Script's global object
    * binds as properties, in GlobalDeclarationInstantiation order. Each
    * entry names the same binding the script statement list writes, so a
@@ -1239,6 +1262,13 @@ export interface ResolveState {
     }
   >;
   readonly hirFunctions: HirFunction[];
+  /** The hidden realm global-object cell used by mutable intrinsic reads. */
+  intrinsicGlobalObjectBinding?: Binding | undefined;
+  /**
+   * Uninitialized cells used only when a mutable intrinsic global no longer
+   * exists. Reading one preserves the ReferenceError of an unresolvable name.
+   */
+  readonly intrinsicReadFallbacks: Map<string, Binding>;
   /** Active labels of the function being resolved; loops accept continue. */
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;

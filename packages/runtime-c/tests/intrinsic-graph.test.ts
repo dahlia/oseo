@@ -128,3 +128,40 @@ test("populates the realm-owned Iterator intrinsic cluster", () => {
   assert.match(iteratorSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
   assert.match(iteratorSource, /wrap_for_valid_iterator/u);
 });
+
+test("populates the realm-owned Number intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const numberSource = sources.get("runtime_number.c") ?? "";
+
+  for (const intrinsic of [
+    "NUMBER_PROTOTYPE",
+    "NUMBER",
+    "NUMBER_IS_FINITE",
+    "NUMBER_IS_INTEGER",
+    "NUMBER_IS_NAN",
+    "NUMBER_IS_SAFE_INTEGER",
+    "NUMBER_PARSE_FLOAT",
+    "NUMBER_PARSE_INT",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "EPSILON",
+    "MAX_SAFE_INTEGER",
+    "MAX_VALUE",
+    "MIN_SAFE_INTEGER",
+    "MIN_VALUE",
+    "NaN",
+    "NEGATIVE_INFINITY",
+    "POSITIVE_INFINITY",
+    "isFinite",
+    "isInteger",
+    "isNaN",
+    "isSafeInteger",
+    "parseFloat",
+    "parseInt",
+  ]) {
+    assert.match(numberSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(numberSource, /number_data/u);
+});

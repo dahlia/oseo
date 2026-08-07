@@ -124,6 +124,98 @@ test("lowers the Iterator intrinsic as a replaceable global value", () => {
   );
 });
 
+test("reads the replaceable Number value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof Number, Number.isFinite(1));",
+    sourceId: "number-intrinsic.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Number" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Number"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /binary in/u);
+  assert.match(mir, /read \*missing intrinsic:Number\*/u);
+  assert.doesNotMatch(mir, /number-intrinsic intrinsic Number/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete Number;",
+    sourceId: "delete-number.ts",
+  });
+  assert.equal(deleted.mir, undefined);
+  assert.match(
+    deleted.diagnostics[0]?.message ?? "",
+    /Deleting runtime intrinsic binding 'Number'/u,
+  );
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { Number = 1; }",
+    sourceId: "with-number-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'Number' through a with fallback/u,
+  );
+});
+
+test("writes the replaceable Number value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const original = Number; Number = 40; Number += 2; " +
+      "console.log(Number++, ++Number); Number = original;",
+    sourceId: "number-global-write.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(
+    hir,
+    /set %b\d+\(\*intrinsic global object\*\)\["Number"\] = 40/u,
+  );
+  assert.match(
+    hir,
+    /update %b\d+\(\*intrinsic global object\*\)\["Number"\] \+= 2/u,
+  );
+  assert.match(
+    hir,
+    /update %b\d+\(\*intrinsic global object\*\)\["Number"\]\+\+/u,
+  );
+  assert.match(
+    hir,
+    /\+\+update %b\d+\(\*intrinsic global object\*\)\["Number"\]/u,
+  );
+  const mir = printMir(result.mir);
+  assert.equal(mir.match(/property-set property-set/gu)?.length, 5);
+  assert.equal(mir.match(/property-get property-get/gu)?.length, 3);
+});
+
+test("writes Number assignment targets through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "({ value: Number } = { value: 1 }); [Number] = [2];\n" +
+      "for (Number of [3]) {}\n" +
+      "for ({ value: Number } of [{ value: 4 }]) {}\n" +
+      "for (Number in { key: true }) {}\n" +
+      "for ({ 0: Number } in { key: true }) {}",
+    sourceId: "number-global-targets.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /%b\d+ Number/u);
+  assert.equal(
+    hir.match(/\*intrinsic global object\*\)\["Number"\]/gu)?.length,
+    6,
+  );
+});
+
 test("starts static class method source at the method definition", () => {
   const source = `class C {
   static /* omitted */ plain() {}

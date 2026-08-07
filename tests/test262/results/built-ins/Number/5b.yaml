@@ -1,0 +1,49 @@
+group: built-ins/Number
+key: 5b
+results:
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+        - arrow-function
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/Number/isNaN/not-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Number/parseInt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Number/parseInt.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/built-ins/Number/parseInt.js:151:35:
+        error[OSEO1001]: Unknown binding 'parseInt'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

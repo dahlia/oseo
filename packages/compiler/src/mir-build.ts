@@ -853,6 +853,62 @@ function lowerPropertyWrite(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * Preserve strict global-environment PutValue semantics around an evaluated
+ * write value. The binding must exist both when the reference is formed and
+ * when the property write occurs.
+ */
+function lowerStrictGlobalPropertyWrite(
+  initialExists: number,
+  object: number,
+  key: number,
+  value: number,
+  fallback: { readonly bindingId: number; readonly name: string },
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const exists = lowerLogicalValue(
+    initialExists,
+    "&&",
+    () => lowerBinaryValues(key, "in", object, range, builder),
+    range,
+    builder,
+  );
+  const writeBlock = createMirBlock(builder);
+  const missingBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: exists,
+    whenFalse: missingBlock.id,
+    whenTrue: writeBlock.id,
+  };
+  builder.current = writeBlock;
+  const written = lowerPropertyWrite(object, key, value, range, builder);
+  writeBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [written],
+  };
+  builder.current = missingBlock;
+  const missing = lowerBindingRead(
+    fallback.bindingId,
+    fallback.name,
+    range,
+    builder,
+  );
+  missingBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [missing],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, range);
+}
+
 interface LoweredWithReference {
   readonly key: number;
   readonly object: number;
@@ -4233,10 +4289,25 @@ function lowerExpression(
       operand,
       builder,
     );
+    const initialExists =
+      expression.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(keyInput, "in", object, expression.range, builder);
     // PutValue converts the key, so an assignment holds the key
     // expression's raw value until the right side has been evaluated.
     const value = lowerExpression(expression.value, builder);
     const key = convertPropertyKey(keyInput, expression.key.range, builder);
+    if (initialExists != null && expression.strictGlobalFallback != null) {
+      return lowerStrictGlobalPropertyWrite(
+        initialExists,
+        object,
+        key,
+        value,
+        expression.strictGlobalFallback,
+        expression.range,
+        builder,
+      );
+    }
     appendMirMetadata(
       builder,
       "safepoint",
@@ -4277,6 +4348,10 @@ function lowerExpression(
       operand,
       builder,
     );
+    const initialExists =
+      expression.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(keyInput, "in", object, expression.range, builder);
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current = lowerPropertyRead(
       object,
@@ -4295,14 +4370,24 @@ function lowerExpression(
           expression.key.range,
           builder,
         );
-        return lowerPropertyWrite(
-          object,
-          writeKey,
-          value,
-          expression.range,
-          builder,
-          superReceiver,
-        );
+        return initialExists != null && expression.strictGlobalFallback != null
+          ? lowerStrictGlobalPropertyWrite(
+              initialExists,
+              object,
+              writeKey,
+              value,
+              expression.strictGlobalFallback,
+              expression.range,
+              builder,
+            )
+          : lowerPropertyWrite(
+              object,
+              writeKey,
+              value,
+              expression.range,
+              builder,
+              superReceiver,
+            );
       },
       expression.range,
       builder,
@@ -4318,6 +4403,16 @@ function lowerExpression(
       operand,
       builder,
     );
+    const initialExists =
+      expression.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(
+            keyInput,
+            "in",
+            objectInput,
+            expression.range,
+            builder,
+          );
     // A `super` operand is the home object's prototype, which needs no
     // RequireObjectCoercible: a nullish one reports its own TypeError
     // from the read that follows, as the specified GetValue does.
@@ -4343,14 +4438,24 @@ function lowerExpression(
           expression.key.range,
           builder,
         );
-        return lowerPropertyWrite(
-          object,
-          writeKey,
-          value,
-          expression.range,
-          builder,
-          superReceiver,
-        );
+        return initialExists != null && expression.strictGlobalFallback != null
+          ? lowerStrictGlobalPropertyWrite(
+              initialExists,
+              object,
+              writeKey,
+              value,
+              expression.strictGlobalFallback,
+              expression.range,
+              builder,
+            )
+          : lowerPropertyWrite(
+              object,
+              writeKey,
+              value,
+              expression.range,
+              builder,
+              superReceiver,
+            );
       },
       expression.range,
       builder,
@@ -5204,7 +5309,23 @@ function lowerForHeadTarget(
     operand,
     builder,
   );
+  const initialExists =
+    target.strictGlobalFallback == null
+      ? undefined
+      : lowerBinaryValues(keyInput, "in", object, target.range, builder);
   const key = convertPropertyKey(keyInput, target.key.range, builder);
+  if (initialExists != null && target.strictGlobalFallback != null) {
+    lowerStrictGlobalPropertyWrite(
+      initialExists,
+      object,
+      key,
+      value,
+      target.strictGlobalFallback,
+      target.range,
+      builder,
+    );
+    return;
+  }
   appendMirMetadata(
     builder,
     "safepoint",
@@ -5688,6 +5809,21 @@ function lowerBindingTarget(
         ? lowerObjectCoercible(prepared.object, pattern.object.range, builder)
         : prepared.object;
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
+    if (
+      prepared.initialExists != null &&
+      prepared.strictGlobalFallback != null
+    ) {
+      lowerStrictGlobalPropertyWrite(
+        prepared.initialExists,
+        object,
+        key,
+        value,
+        prepared.strictGlobalFallback,
+        pattern.range,
+        builder,
+      );
+      return;
+    }
     appendMirMetadata(
       builder,
       "safepoint",
@@ -5806,6 +5942,11 @@ type LoweredAssignmentReference =
       readonly kind: "property";
       readonly object: number;
       readonly superReceiver?: number;
+      readonly initialExists?: number;
+      readonly strictGlobalFallback?: {
+        readonly bindingId: number;
+        readonly name: string;
+      };
     }
   | {
       readonly kind: "private";
@@ -5829,11 +5970,19 @@ function lowerAssignmentReference(
       operand,
       builder,
     );
+    const initialExists =
+      pattern.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(keyInput, "in", object, pattern.range, builder);
     return {
       key: keyInput,
       kind: "property",
       object,
       ...(superReceiver == null ? {} : { superReceiver }),
+      ...(initialExists == null ? {} : { initialExists }),
+      ...(pattern.strictGlobalFallback == null
+        ? {}
+        : { strictGlobalFallback: pattern.strictGlobalFallback }),
     };
   }
   if (pattern.kind === "assignment-private") {

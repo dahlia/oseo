@@ -212,6 +212,8 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
     promise->ordinary.module_namespace = false;
     promise->ordinary.global_object = false;
     promise->ordinary.error_data = false;
+    promise->ordinary.number_data = false;
+    promise->ordinary.number_value = oseo_undefined();
     promise->ordinary.array_iterator = false;
     promise->ordinary.iterator_array = oseo_undefined();
     promise->ordinary.iterator_index = 0u;

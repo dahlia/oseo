@@ -215,7 +215,7 @@ static OseoResult global_this_object(OseoContext *context) {
     if (result.status != OSEO_STATUS_NORMAL) return result;
     ordinary_object(result.value)->global_object = true;
     context->global_this = result.value;
-    return result;
+    return oseo_internal_install_number_global(context, result.value);
 }
 
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {

@@ -486,8 +486,11 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   const diagnostic = /^.+?:\d+:\d+: error\[OSEO2001\]: (.+)$/mu.exec(
     stderr,
   )?.[1];
-  return diagnostic === "Primitive wrapper objects are not admitted yet."
-    ? "primitive-wrapper"
+  if (diagnostic === "Primitive wrapper objects are not admitted yet.") {
+    return "primitive-wrapper";
+  }
+  return diagnostic === "Number prototype methods are not admitted yet."
+    ? "number-prototype"
     : undefined;
 }
 

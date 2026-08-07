@@ -2,7 +2,7 @@ import "./cycle-b.js";
 import "./cycle-c.js";
 
 export function fromA() {
-  return "ready";
+  return Number === Number ? "ready" : "broken";
 }
 
 export default function () {

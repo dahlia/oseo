@@ -3661,6 +3661,19 @@ method nodes complete that upstream feature tag, so the manifest moves to
 runtime ABI moves to `oseo-runtime-m5-49` without changing the graph's
 orchestration state.
 
+Implemented M5b node `number-intrinsic` materializes the `Number` constructor,
+its branded wrapper objects, numeric constants, predicate statics, parser
+statics, and standard global-object property. Fixed native and generated
+differential evidence at seed `0x60003500` covers both specialization policies,
+forced collection, string and BigInt conversion, parser prefixes, false
+numeric hints, and deliberate shape-guard misses. All 172 paths under the
+node's eleven inventory roots are reviewed: 135 pass and 37 retain explicit
+prerequisite boundaries. Twenty-four existing cross-family cases also become
+passes once their Number prerequisites are present, so the manifest moves to
+5,631 paths with 3,300 passes and 976 unsupported profile features. The runtime
+ABI moves to `oseo-runtime-m5-50` without changing the graph's orchestration
+state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

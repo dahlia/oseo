@@ -215,6 +215,27 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 5u)
 #define OSEO_OBJECT_VALUE_OF_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 6u)
+
+#define OSEO_NUMBER_CODE_ID_RANGE_INDEX ((size_t)10u)
+#define OSEO_NUMBER_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_NUMBER_CODE_ID_RANGE_INDEX)
+#define OSEO_NUMBER_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_NUMBER_CODE_ID_RANGE_INDEX)
+#define OSEO_NUMBER_CONSTRUCTOR_CODE_ID OSEO_NUMBER_CODE_ID_RANGE_LAST
+#define OSEO_NUMBER_IS_FINITE_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_NUMBER_IS_INTEGER_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_NUMBER_IS_NAN_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_NUMBER_IS_SAFE_INTEGER_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_NUMBER_PARSE_FLOAT_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_NUMBER_PARSE_INT_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_NUMBER_VALUE_OF_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 7u)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -515,6 +536,10 @@ typedef struct {
     bool global_object;
     /* The [[ErrorData]] brand Object.prototype.toString observes. */
     bool error_data;
+    /* [[NumberData]] exists exactly when number_data is true, and this slot
+     * always contains an immediate Number value. */
+    bool number_data;
+    OseoValue number_value;
     /* Array iterator state: a flagged object backs a default array's
      * values iterator, tracing the array and stepping the index. */
     bool array_iterator;
@@ -1008,6 +1033,15 @@ OseoResult oseo_internal_object_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_number_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
@@ -1104,6 +1138,12 @@ int oseo_internal_bigint_compare(OseoValue left, OseoValue right);
 int oseo_internal_bigint_compare_number(OseoValue integer, double number);
 bool oseo_internal_bigint_equal(OseoValue left, OseoValue right);
 bool oseo_internal_bigint_is_zero(OseoValue value);
+double oseo_internal_bigint_to_number(OseoValue value);
+double oseo_internal_integer_digits_to_number(
+    const uint16_t *units,
+    size_t length,
+    uint32_t radix
+);
 /*
  * Reads the own property descriptor named by key, including the
  * synthetic `prototype`, array `length`, and module namespace cell
@@ -1221,6 +1261,11 @@ OseoResult oseo_internal_intrinsic(
 );
 /* Completes the realm root object with the Object.prototype methods. */
 OseoResult oseo_internal_object_prototype(OseoContext *context);
+OseoResult oseo_internal_number_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_number_global(
+    OseoContext *context,
+    OseoValue global
+);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_to_primitive(
     OseoContext *context,

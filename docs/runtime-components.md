@@ -17,11 +17,12 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-three reviewed assets in this order:
+The runtime input now lists twenty-four reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_object.c*, *runtime\_property.c*, *runtime\_descriptor.c*,
-*runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_arguments.c*,
+*runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_number.c*,
+*runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
@@ -78,6 +79,9 @@ Ownership follows the plan's target layout:
     ordering, and the `Object.create`, `Object.defineProperty`,
     `Object.getOwnPropertyDescriptor`, `Object.keys`, and
     `Object.setPrototypeOf` entry points;
+ -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
+    numeric constants, predicate statics, parser statics, and the standard
+    global constructor property;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -171,7 +175,7 @@ its read and write.
 
 ### Internal helpers
 
-Seventy-five helpers cross a translation-unit boundary. Each uses the
+Eighty helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -186,6 +190,9 @@ Seventy-five helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_array_builtin_dispatch`              | *runtime\_array.c*            |
 | `oseo_internal_arguments_builtin_dispatch`          | *runtime\_arguments.c*        |
 | `oseo_internal_object_builtin_dispatch`             | *runtime\_object\_builtin.c*  |
+| `oseo_internal_number_builtin_dispatch`             | *runtime\_number.c*           |
+| `oseo_internal_number_intrinsic`                    | *runtime\_number.c*           |
+| `oseo_internal_install_number_global`               | *runtime\_number.c*           |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
@@ -207,6 +214,8 @@ Seventy-five helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_bigint_compare_number`               | *runtime\_bigint.c*           |
 | `oseo_internal_bigint_equal`                        | *runtime\_bigint.c*           |
 | `oseo_internal_bigint_is_zero`                      | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_to_number`                    | *runtime\_bigint.c*           |
+| `oseo_internal_integer_digits_to_number`            | *runtime\_bigint.c*           |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |
 | `oseo_internal_remove_property`                     | *runtime\_object.c*           |
