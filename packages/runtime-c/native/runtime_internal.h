@@ -560,6 +560,8 @@ typedef struct {
      * Number wrappers retain their existing dedicated brand above. */
     bool primitive_data;
     OseoValue primitive_value;
+    /* Internal installation state independent of mutable own properties. */
+    bool primitive_wrapper_methods_initialized;
     /* Array iterator state: a flagged object backs a default array's
      * values iterator, tracing the array and stepping the index. */
     bool array_iterator;

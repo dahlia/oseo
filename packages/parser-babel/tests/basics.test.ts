@@ -1423,7 +1423,7 @@ test("retains closed-world and early-error delete boundaries", () => {
   }
 });
 
-test("keeps legacy Object helpers direct and reads real statics", () => {
+test("reads legacy Object helpers through mutable properties", () => {
   const result = compileSource(babelFrontend, {
     source:
       "const value = Object.create(null);\n" +
@@ -1436,13 +1436,16 @@ test("keeps legacy Object helpers direct and reads real statics", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
-  assert.match(printHir(result.hir), /intrinsic Object\.create/u);
-  assert.match(printHir(result.hir), /intrinsic Object\.defineProperty/u);
-  assert.match(printMir(result.mir), /Object\.getOwnPropertyDescriptor/u);
-  assert.match(printMir(result.mir), /"setPrototypeOf"/u);
-  assert.match(printMir(result.mir), /property-get method lookup/u);
-  assert.match(printMir(result.mir), /call dynamic function value/u);
-  assert.match(printMir(result.mir), /Object\.keys/u);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.doesNotMatch(hir, /intrinsic Object\./u);
+  assert.match(hir, /call .*\["create"\]/u);
+  assert.match(hir, /call .*\["defineProperty"\]/u);
+  assert.match(hir, /call .*\["getOwnPropertyDescriptor"\]/u);
+  assert.match(hir, /call .*\["keys"\]/u);
+  assert.match(mir, /"setPrototypeOf"/u);
+  assert.match(mir, /property-get method lookup/u);
+  assert.match(mir, /call dynamic function value/u);
 });
 
 test("rejects Object statics owned by later M5b nodes", () => {
@@ -1458,6 +1461,42 @@ test("rejects Object statics owned by later M5b nodes", () => {
     "Object.getOwnPropertyNames is not admitted in this M5b node.",
   );
   assert.deepEqual(result.diagnostics[0]?.byteRange, { end: 26, start: 0 });
+});
+
+test("calls user-defined later Object statics through ordinary lookup", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "Object.assign = () => 7; Object.assign(); " +
+      "Object = { assign() { return 8; } }; Object.assign();",
+    sourceId: "mutable-later-object-static.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /call .*\["assign"\]/u);
+  assert.doesNotMatch(hir, /intrinsic Object\.assign/u);
+  assert.match(printMir(result.mir), /property-get method lookup/u);
+});
+
+test("prescans Object mutations before hoisted function bodies", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "Object.assign ||= () => 7;\n" +
+      "function assigned() { return Object.assign(); }\n" +
+      "assigned();\n" +
+      "Object = { fromEntries() { return 8; } };\n" +
+      "function replaced() { return Object.fromEntries(); }\n" +
+      "replaced();\n",
+    sourceId: "hoisted-mutable-object-static.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /call .*\["assign"\]/u);
+  assert.match(hir, /call .*\["fromEntries"\]/u);
+  assert.doesNotMatch(hir, /intrinsic Object\./u);
 });
 
 test("defers Object helper recognition to with environments", () => {

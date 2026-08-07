@@ -358,21 +358,19 @@ function printHirExpression(expression: HirExpression): string {
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"
-      : expression.target.kind === "object-intrinsic"
-        ? `intrinsic Object.${expression.target.method}`
-        : expression.target.kind === "promise-intrinsic"
-          ? `intrinsic Promise.${expression.target.method}`
-          : expression.target.kind === "timer-intrinsic"
-            ? `intrinsic ${expression.target.method}`
-            : expression.target.kind === "dynamic"
-              ? printHirExpression(expression.target.callee)
-              : expression.target.kind === "super"
-                ? `super -> %b${expression.target.thisBinding.bindingId} this`
-                : expression.target.kind === "private-method"
-                  ? `${printHirExpression(expression.target.object)}.` +
-                    printHirPrivateName(expression.target.privateName)
-                  : `${printHirExpression(expression.target.object)}[` +
-                    `${printHirExpression(expression.target.key)}]`;
+      : expression.target.kind === "promise-intrinsic"
+        ? `intrinsic Promise.${expression.target.method}`
+        : expression.target.kind === "timer-intrinsic"
+          ? `intrinsic ${expression.target.method}`
+          : expression.target.kind === "dynamic"
+            ? printHirExpression(expression.target.callee)
+            : expression.target.kind === "super"
+              ? `super -> %b${expression.target.thisBinding.bindingId} this`
+              : expression.target.kind === "private-method"
+                ? `${printHirExpression(expression.target.object)}.` +
+                  printHirPrivateName(expression.target.privateName)
+                : `${printHirExpression(expression.target.object)}[` +
+                  `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirCallArgument).join(", ") +

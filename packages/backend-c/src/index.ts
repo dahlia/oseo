@@ -1301,24 +1301,6 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         argumentsValue.count,
       ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
     );
-  } else if (target.kind === "object-intrinsic") {
-    const names = {
-      create: renderC(emittedC.call.oseoObjectBuiltinCreate),
-      defineProperty: renderC(emittedC.call.oseoObjectBuiltinDefineProperty),
-      getOwnPropertyDescriptor: renderC(
-        emittedC.call.oseoObjectBuiltinGetOwnPropertyDescriptor,
-      ),
-      keys: renderC(emittedC.call.oseoObjectBuiltinKeys),
-    } as const;
-    line(
-      state,
-      renderC(emittedC.common.resultAssignContext, names[target.method]) +
-        renderC(
-          emittedC.common.twoValuesCallSuffix,
-          argumentsValue.count,
-          argumentsValue.name,
-        ),
-    );
   } else if (target.kind === "promise-constructor") {
     const executor = emittedArgument(callArguments, argumentsValue, 0);
     line(

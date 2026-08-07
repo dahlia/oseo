@@ -395,14 +395,6 @@ export type HirCallTarget =
       readonly kind: "console-log";
     }
   | {
-      readonly kind: "object-intrinsic";
-      readonly method:
-        | "create"
-        | "defineProperty"
-        | "getOwnPropertyDescriptor"
-        | "keys";
-    }
-  | {
       readonly kind: "promise-intrinsic";
       readonly method:
         | "all"
@@ -1269,6 +1261,10 @@ export interface ResolveState {
    * exists. Reading one preserves the ReferenceError of an unresolvable name.
    */
   readonly intrinsicReadFallbacks: Map<string, Binding>;
+  /** True when this syntax program writes the global Object binding. */
+  objectGlobalMutated: boolean;
+  /** Object statics assigned through the original global in this program. */
+  readonly objectStaticMutations: Set<string>;
   /** Active labels of the function being resolved; loops accept continue. */
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;

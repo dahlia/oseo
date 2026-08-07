@@ -210,28 +210,36 @@ static OseoResult object_prototype_to_string(
         );
     }
     const char *fallback = object_builtin_tag(receiver);
-    if (!is_object(receiver)) {
-        return object_tag_text(context, oseo_undefined(), fallback);
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = receiver;
-    result = oseo_internal_well_known_symbol(
-        context,
-        OSEO_WELL_KNOWN_TO_STRING_TAG
-    );
-    frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(
+    if (is_object(frame.slots[0])) {
+        frame.slots[1] = frame.slots[0];
+    } else {
+        result = oseo_internal_to_object_for_property(
             context,
-            frame.slots[0],
-            frame.slots[1]
+            frame.slots[0]
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
         );
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = object_tag_text(context, frame.slots[2], fallback);
+        result = oseo_object_get(
+            context,
+            frame.slots[1],
+            frame.slots[2]
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = object_tag_text(context, frame.slots[3], fallback);
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -288,10 +296,7 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
     OseoValue prototype,
     bool include_index_of
 ) {
-    if (own_ascii_property_index(
-        ordinary_object(prototype),
-        "valueOf"
-    ) != SIZE_MAX) {
+    if (ordinary_object(prototype)->primitive_wrapper_methods_initialized) {
         return normal(prototype);
     }
     static const char *const method_names[] = {
@@ -331,7 +336,11 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
         }
         if (result.status != OSEO_STATUS_NORMAL) break;
     }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(slots[0])->primitive_wrapper_methods_initialized =
+            true;
+        result.value = slots[0];
+    }
     oseo_roots_pop(context, &frame);
     return result;
 }

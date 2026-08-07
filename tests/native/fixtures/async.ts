@@ -267,7 +267,7 @@ arrow(3).then(function (value) {
       genericCallsDisabled: 10,
       genericCallsEnabled: 10,
       hits: 0,
-      misses: 11,
+      misses: 12,
       overflowMisses: 0,
     },
   },

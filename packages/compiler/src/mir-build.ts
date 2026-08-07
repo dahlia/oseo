@@ -4668,19 +4668,6 @@ function lowerExpression(
     argumentListId = lowered.list;
     callTarget = { kind: "console-log" };
     detail = "console_log";
-  } else if (expression.target.kind === "object-intrinsic") {
-    const lowered = lowerCallArguments(
-      expression.arguments,
-      expression.range,
-      builder,
-    );
-    callArguments = [...lowered.ids];
-    argumentListId = lowered.list;
-    callTarget = {
-      kind: "object-intrinsic",
-      method: expression.target.method,
-    };
-    detail = `Object.${expression.target.method}`;
   } else if (expression.target.kind === "promise-intrinsic") {
     const lowered = lowerCallArguments(
       expression.arguments,

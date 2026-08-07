@@ -86,6 +86,7 @@ console.log(
 );
 const firstStringWrapper = Object("ab");
 const secondStringWrapper = Object("cd");
+const stringWrapperPrototype = Object.getPrototypeOf(firstStringWrapper);
 console.log(
   "string wrapper",
   firstStringWrapper[0],
@@ -98,6 +99,8 @@ console.log(
 );
 const symbol = Symbol("wrapped");
 const symbolWrapper = Object(symbol);
+const booleanWrapperPrototype = Object.getPrototypeOf(Object(true));
+const bigintWrapperPrototype = Object.getPrototypeOf(Object(9n));
 console.log(
   "other wrappers",
   Object.prototype.toString.call(Object(true)),
@@ -153,6 +156,93 @@ try { Object.setPrototypeOf(cycleB, cycleA); } catch (error) {
 function hinted(value) { return value + 1; }
 console.log("hint", hinted(2), hinted("2"));
 const originalObject = Object;
+const originalCreate = Object.create;
+const originalDefineProperty = Object.defineProperty;
+const originalGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const originalKeys = Object.keys;
+Object.create = function () {
+  return this === Object ? "patched create" : "wrong receiver";
+};
+Object.defineProperty = function () {
+  return this === Object ? "patched define" : "wrong receiver";
+};
+Object.getOwnPropertyDescriptor = function () {
+  return this === Object ? "patched descriptor" : "wrong receiver";
+};
+Object.keys = function () {
+  return this === Object ? "patched keys" : "wrong receiver";
+};
+Object.assign = function () { return this === Object ? 7 : -1; };
+function callPatchedAssign() { return Object.assign(); }
+console.log(
+  "patched statics",
+  Object.create(null),
+  Object.defineProperty(),
+  Object.getOwnPropertyDescriptor(),
+  Object.keys(),
+  callPatchedAssign(),
+);
+Object.create = originalCreate;
+Object.defineProperty = originalDefineProperty;
+Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;
+Object.keys = originalKeys;
+delete Object.assign;
+const replacementLog = [];
+const replacementObject = {};
+replacementObject.create = function () { return "replacement create"; };
+replacementObject.defineProperty = function () { return "replacement define"; };
+replacementObject.getOwnPropertyDescriptor = function () {
+  return "replacement descriptor";
+};
+replacementObject.keys = function () { return "replacement keys"; };
+originalDefineProperty(replacementObject, "assign", {
+  configurable: true,
+  get: function () {
+    replacementLog.push("get");
+    return function (value) {
+      replacementLog.push(this === replacementObject ? "receiver" : "bad");
+      replacementLog.push(value);
+      return 8;
+    };
+  },
+});
+function replacementArgument() {
+  replacementLog.push("argument");
+  return "value";
+}
+function callReplacementAssign() {
+  return Object.assign(replacementArgument());
+}
+Object = replacementObject;
+console.log(
+  "replacement static",
+  Object.create(null),
+  Object.defineProperty(),
+  Object.getOwnPropertyDescriptor(),
+  Object.keys(),
+  callReplacementAssign(),
+  replacementLog[0],
+  replacementLog[1],
+  replacementLog[2],
+  replacementLog[3],
+);
+Object = originalObject;
+const replacementStringToString = function () { return "string"; };
+const replacementBooleanValueOf = function () { return false; };
+const replacementBigIntToString = function () { return "bigint"; };
+delete stringWrapperPrototype.valueOf;
+stringWrapperPrototype.toString = replacementStringToString;
+delete booleanWrapperPrototype.toString;
+booleanWrapperPrototype.valueOf = replacementBooleanValueOf;
+delete bigintWrapperPrototype.valueOf;
+bigintWrapperPrototype.toString = replacementBigIntToString;
+stringWrapperPrototype[Symbol.toStringTag] = "Custom";
+console.log(
+  "primitive tag",
+  Object.prototype.toString.call("x"),
+  Object.prototype.toString.call(true),
+  Object.prototype.toString.call(1n),
+);
 let turn = 0;
 while (turn < 3) {
   console.log("guard", Object.is === Object.is);
@@ -175,6 +265,22 @@ console.log(
   Object.getPrototypeOf(collected[0]) ===
     Object.getPrototypeOf(collected[23]),
 );
+console.log(
+  "wrapper mutations",
+  stringWrapperPrototype.hasOwnProperty("valueOf"),
+  stringWrapperPrototype.toString === replacementStringToString,
+  booleanWrapperPrototype.hasOwnProperty("toString"),
+  booleanWrapperPrototype.valueOf === replacementBooleanValueOf,
+  bigintWrapperPrototype.hasOwnProperty("valueOf"),
+  bigintWrapperPrototype.toString === replacementBigIntToString,
+);
+Object.defineProperty(booleanWrapperPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get: function () { throw new RangeError("tag getter"); },
+});
+try { Object.prototype.toString.call(true); } catch (error) {
+  console.log("tag getter abrupt", error.name, error.message);
+}
 `,
   },
   {

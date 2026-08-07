@@ -705,6 +705,28 @@ function resolveTypeofIdentifier(
   return { kind: "string", range: expression.range, value: "undefined" };
 }
 
+/** Record a statically named write through this program's global Object. */
+function recordObjectStaticMutation(
+  expression: Extract<
+    SyntaxExpression,
+    { readonly kind: "property-set" | "property-update" }
+  >,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): void {
+  if (
+    expression.object.kind !== "identifier" ||
+    expression.object.name !== "Object" ||
+    expression.key.kind !== "string"
+  ) {
+    return;
+  }
+  const resolution = resolveName(scopes, state, "Object");
+  if (resolution.binding == null && resolution.objectBindingIds.length === 0) {
+    state.objectStaticMutations.add(expression.key.value);
+  }
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -739,6 +761,7 @@ function resolveExpression(
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
+      if (expression.name === "Object") state.objectGlobalMutated = true;
       if (value == null) return undefined;
       const inferred =
         expression.kind === "binding-set" ||
@@ -1279,17 +1302,17 @@ function resolveExpression(
     const object = resolveExpression(expression.object, scopes, state);
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
-    return object == null || key == null || value == null
-      ? undefined
-      : { ...expression, key, object, value };
+    if (object == null || key == null || value == null) return undefined;
+    recordObjectStaticMutation(expression, scopes, state);
+    return { ...expression, key, object, value };
   }
   if (expression.kind === "property-update") {
     const object = resolveExpression(expression.object, scopes, state);
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
-    return object == null || key == null || value == null
-      ? undefined
-      : { ...expression, key, object, value };
+    if (object == null || key == null || value == null) return undefined;
+    recordObjectStaticMutation(expression, scopes, state);
+    return { ...expression, key, object, value };
   }
   if (expression.kind === "property-step") {
     const object = resolveExpression(expression.object, scopes, state);
@@ -1422,7 +1445,12 @@ function resolveExpression(
         : shadowedMethodTarget(binding, "log", expression.target.range);
   } else if (expression.target.kind === "unsupported-object-intrinsic") {
     const resolution = resolveName(scopes, state, "Object");
-    if (resolution.binding != null || resolution.objectBindingIds.length > 0) {
+    if (
+      resolution.binding != null ||
+      resolution.objectBindingIds.length > 0 ||
+      state.objectGlobalMutated ||
+      state.objectStaticMutations.has(expression.target.method)
+    ) {
       const object = resolveExpression(
         {
           kind: "identifier",
@@ -1455,30 +1483,14 @@ function resolveExpression(
     }
   } else if (expression.target.kind === "object-intrinsic") {
     const resolution = resolveName(scopes, state, "Object");
-    if (resolution.binding != null || resolution.objectBindingIds.length > 0) {
-      const object = resolveExpression(
-        {
-          kind: "identifier",
-          name: "Object",
-          range: expression.target.range,
-        },
-        scopes,
-        state,
-      );
-      if (object == null) return undefined;
-      target = {
-        key: {
-          kind: "string",
-          range: expression.target.range,
-          value: expression.target.method,
-        },
-        kind: "method",
-        object,
-      };
-    } else if (
+    if (
       expression.target.method === "create" &&
       expression.arguments.length > 1 &&
-      !expression.arguments.some((argument) => argument.kind === "spread")
+      !expression.arguments.some((argument) => argument.kind === "spread") &&
+      !state.objectGlobalMutated &&
+      !state.objectStaticMutations.has("create") &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
     ) {
       const descriptorMap = expression.arguments[1];
       if (descriptorMap == null) {
@@ -1492,12 +1504,26 @@ function resolveExpression(
         ),
       );
       return undefined;
-    } else {
-      target = {
-        kind: "object-intrinsic",
-        method: expression.target.method,
-      };
     }
+    const object = resolveExpression(
+      {
+        kind: "identifier",
+        name: "Object",
+        range: expression.target.range,
+      },
+      scopes,
+      state,
+    );
+    if (object == null) return undefined;
+    target = {
+      key: {
+        kind: "string",
+        range: expression.target.range,
+        value: expression.target.method,
+      },
+      kind: "method",
+      object,
+    };
   } else if (expression.target.kind === "promise-intrinsic-direct") {
     target = {
       kind: "promise-intrinsic",
@@ -3991,10 +4017,27 @@ interface SeededHirResult extends HirResult {
   readonly nextFunctionId: number;
 }
 
-export function buildSeededHir(
+/**
+ * Object mutations found in one complete resolution pass.
+ *
+ * The mutations only widen admission. A successful first pass is final; a
+ * failed pass needs at most one retry seeded with every mutation it found.
+ */
+interface ObjectMutationSummary {
+  readonly global: boolean;
+  readonly statics: ReadonlySet<string>;
+}
+
+interface SeededHirPass {
+  readonly mutations: ObjectMutationSummary;
+  readonly result: SeededHirResult;
+}
+
+function buildSeededHirPass(
   program: SyntaxProgram,
-  seed: HirSeed = {},
-): SeededHirResult {
+  seed: HirSeed,
+  knownMutations: ObjectMutationSummary,
+): SeededHirPass {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
     diagnostics,
@@ -4006,6 +4049,8 @@ export function buildSeededHir(
     labels: [],
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
+    objectGlobalMutated: knownMutations.global,
+    objectStaticMutations: new Set(knownMutations.statics),
     sourceId: program.sourceId,
     strict: program.strict === true,
     withFallbacks: [],
@@ -4045,9 +4090,15 @@ export function buildSeededHir(
   }
   if (diagnostics.length > 0) {
     return {
-      diagnostics,
-      nextBindingId: state.nextBindingId,
-      nextFunctionId: state.nextFunctionId,
+      mutations: {
+        global: state.objectGlobalMutated,
+        statics: state.objectStaticMutations,
+      },
+      result: {
+        diagnostics,
+        nextBindingId: state.nextBindingId,
+        nextFunctionId: state.nextFunctionId,
+      },
     };
   }
   // A var-scoped top-level name reaches its global-object property
@@ -4082,54 +4133,84 @@ export function buildSeededHir(
   }
   if (diagnostics.length > 0) {
     return {
-      diagnostics,
-      nextBindingId: state.nextBindingId,
-      nextFunctionId: state.nextFunctionId,
+      mutations: {
+        global: state.objectGlobalMutated,
+        statics: state.objectStaticMutations,
+      },
+      result: {
+        diagnostics,
+        nextBindingId: state.nextBindingId,
+        nextFunctionId: state.nextFunctionId,
+      },
     };
   }
   return {
-    diagnostics,
-    nextBindingId: state.nextBindingId,
-    nextFunctionId: state.nextFunctionId,
-    program: {
-      body:
-        state.intrinsicGlobalObjectBinding == null
-          ? body
-          : [
-              {
-                bindingId: state.intrinsicGlobalObjectBinding.id,
-                hint: undefined,
-                initializer: {
-                  kind: "this",
+    mutations: {
+      global: state.objectGlobalMutated,
+      statics: state.objectStaticMutations,
+    },
+    result: {
+      diagnostics,
+      nextBindingId: state.nextBindingId,
+      nextFunctionId: state.nextFunctionId,
+      program: {
+        body:
+          state.intrinsicGlobalObjectBinding == null
+            ? body
+            : [
+                {
+                  bindingId: state.intrinsicGlobalObjectBinding.id,
+                  hint: undefined,
+                  initializer: {
+                    kind: "this",
+                    range: program.range,
+                    thisMode: "global",
+                  },
+                  kind: "const",
+                  name: state.intrinsicGlobalObjectBinding.name,
                   range: program.range,
-                  thisMode: "global",
                 },
-                kind: "const",
-                name: state.intrinsicGlobalObjectBinding.name,
-                range: program.range,
-              },
-              ...body,
-            ],
-      functions: state.hirFunctions,
-      globalBindings: [
+                ...body,
+              ],
+        functions: state.hirFunctions,
+        globalBindings: [
+          ...(state.intrinsicGlobalObjectBinding == null
+            ? []
+            : [state.intrinsicGlobalObjectBinding]),
+          ...state.intrinsicReadFallbacks.values(),
+        ],
+        globalObjectBindings,
         ...(state.intrinsicGlobalObjectBinding == null
-          ? []
-          : [state.intrinsicGlobalObjectBinding]),
-        ...state.intrinsicReadFallbacks.values(),
-      ],
-      globalObjectBindings,
-      ...(state.intrinsicGlobalObjectBinding == null
-        ? {}
-        : {
-            intrinsicGlobalObjectBindingId:
-              state.intrinsicGlobalObjectBinding.id,
-          }),
-      kind: "hir-program",
-      range: program.range,
-      sourceId: program.sourceId,
-      strict: program.strict === true,
+          ? {}
+          : {
+              intrinsicGlobalObjectBindingId:
+                state.intrinsicGlobalObjectBinding.id,
+            }),
+        kind: "hir-program",
+        range: program.range,
+        sourceId: program.sourceId,
+        strict: program.strict === true,
+      },
     },
   };
+}
+
+export function buildSeededHir(
+  program: SyntaxProgram,
+  seed: HirSeed = {},
+): SeededHirResult {
+  const emptyMutations: ObjectMutationSummary = {
+    global: false,
+    statics: new Set(),
+  };
+  const first = buildSeededHirPass(program, seed, emptyMutations);
+  if (
+    first.result.diagnostics.length === 0 ||
+    (!first.mutations.global && first.mutations.statics.size === 0)
+  ) {
+    return first.result;
+  }
+  return buildSeededHirPass(program, seed, first.mutations).result;
 }
 
 /** Validate owned syntax and resolve all lexical and function identities. */

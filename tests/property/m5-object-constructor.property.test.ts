@@ -59,6 +59,9 @@ const numberWrapper = Object(${testCase.integer});
 const stringWrapper = Object(${JSON.stringify(testCase.text)});
 const secondStringWrapper = Object(${JSON.stringify(testCase.text)});
 const booleanWrapper = new Object(${testCase.flag});
+const stringPrototype = Object.getPrototypeOf(stringWrapper);
+const booleanPrototype = Object.getPrototypeOf(booleanWrapper);
+const bigintPrototype = Object.getPrototypeOf(Object(1n));
 console.log(
   "identity",
   Object(target) === target,
@@ -118,6 +121,107 @@ while (turn < 3) {
   turn = turn + 1;
 }
 const originalObject = Object;
+const originalCreate = Object.create;
+const originalDefineProperty = Object.defineProperty;
+const originalGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const originalKeys = Object.keys;
+Object.create = function () {
+  return this === Object ? ${testCase.integer} : 0;
+};
+Object.defineProperty = function () { return this === Object ? 2 : 0; };
+Object.getOwnPropertyDescriptor = function () {
+  return this === Object ? 3 : 0;
+};
+Object.keys = function () { return this === Object ? 4 : 0; };
+Object.assign = function () { return this === Object ? 7 : 0; };
+function callPatchedAssign() { return Object.assign(); }
+console.log(
+  "patched statics",
+  Object.create(null),
+  Object.defineProperty(),
+  Object.getOwnPropertyDescriptor(),
+  Object.keys(),
+  callPatchedAssign(),
+);
+Object.create = originalCreate;
+Object.defineProperty = originalDefineProperty;
+Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;
+Object.keys = originalKeys;
+delete Object.assign;
+const replacementLog = [];
+const replacementObject = {};
+replacementObject.create = function () { return 9; };
+replacementObject.defineProperty = function () { return 10; };
+replacementObject.getOwnPropertyDescriptor = function () { return 11; };
+replacementObject.keys = function () { return 12; };
+originalDefineProperty(replacementObject, "assign", {
+  get() {
+    replacementLog.push("get");
+    return function (value) {
+      replacementLog.push(this === replacementObject ? "receiver" : "bad");
+      replacementLog.push(value);
+      return 8;
+    };
+  },
+});
+function replacementArgument() {
+  replacementLog.push("argument");
+  return ${JSON.stringify(testCase.text)};
+}
+function callReplacementAssign() {
+  return Object.assign(replacementArgument());
+}
+Object = replacementObject;
+console.log(
+  "replacement static",
+  Object.create(null),
+  Object.defineProperty(),
+  Object.getOwnPropertyDescriptor(),
+  Object.keys(),
+  callReplacementAssign(),
+  replacementLog[0],
+  replacementLog[1],
+  replacementLog[2],
+  replacementLog[3],
+);
+Object = originalObject;
+const stringToString = function () { return "string"; };
+const booleanValueOf = function () { return false; };
+const bigintToString = function () { return "bigint"; };
+delete stringPrototype.valueOf;
+stringPrototype.toString = stringToString;
+delete booleanPrototype.toString;
+booleanPrototype.valueOf = booleanValueOf;
+delete bigintPrototype.valueOf;
+bigintPrototype.toString = bigintToString;
+stringPrototype[Symbol.toStringTag] = "Custom";
+console.log(
+  "primitive tag",
+  Object.prototype.toString.call(${JSON.stringify(testCase.text)}),
+  Object.prototype.toString.call(${testCase.flag}),
+  Object.prototype.toString.call(1n),
+);
+for (let index = 0; index < 8; index = index + 1) {
+  Object(${JSON.stringify(testCase.text)});
+  Object(${testCase.flag});
+  Object(1n);
+}
+console.log(
+  "wrapper mutations",
+  stringPrototype.hasOwnProperty("valueOf"),
+  stringPrototype.toString === stringToString,
+  booleanPrototype.hasOwnProperty("toString"),
+  booleanPrototype.valueOf === booleanValueOf,
+  bigintPrototype.hasOwnProperty("valueOf"),
+  bigintPrototype.toString === bigintToString,
+);
+Object.defineProperty(booleanPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get() { throw new RangeError("tag getter"); },
+});
+try { Object.prototype.toString.call(${testCase.flag}); } catch (error) {
+  console.log("tag getter abrupt", error.name, error.message);
+}
 Object = ${testCase.integer};
 console.log("global write", Object, this.Object === Object);
 Object = originalObject;
@@ -140,6 +244,11 @@ function expected(testCase: ObjectConstructorCase): string {
     "guard true",
     "guard true",
     "guard true",
+    `patched statics ${testCase.integer} 2 3 4 7`,
+    `replacement static 9 10 11 12 8 get argument receiver ${testCase.text}`,
+    "primitive tag [object Custom] [object Boolean] [object BigInt]",
+    "wrapper mutations false true false true false true",
+    "tag getter abrupt RangeError tag getter",
     `global write ${testCase.integer} true`,
     "global restore true",
     "",
@@ -265,14 +374,15 @@ test(
           "strings, one of two prototype objects, primitive and object " +
           "construction, SameValue pairs, prototype reads and writes, a " +
           "false number hint, one constructor shape miss, and one global " +
-          "Object write and restore",
+          "Object write and restore, mutable legacy and later statics, " +
+          "stable wrapper mutations, and primitive toStringTag lookup",
         numRuns: 12,
         profile: "M5 Object constructor",
         seed: 0x6000_3600,
         sizeLimit:
           "one bounded integer, one boolean, one short string, two prototype " +
           "objects, four wrappers, two repeated intrinsic observations, and " +
-          "one global mutation sequence",
+          "one global mutation sequence with wrapper and static mutations",
         timeLimitMilliseconds: 180_000,
       },
     );

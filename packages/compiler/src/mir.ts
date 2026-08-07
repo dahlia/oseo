@@ -25,14 +25,6 @@ export type MirConstant =
 export type MirCallTarget =
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
-  | {
-      readonly kind: "object-intrinsic";
-      readonly method:
-        | "create"
-        | "defineProperty"
-        | "getOwnPropertyDescriptor"
-        | "keys";
-    }
   | { readonly kind: "promise-constructor" }
   | { readonly kind: "super" }
   | {
