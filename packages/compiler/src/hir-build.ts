@@ -220,13 +220,52 @@ function intrinsicGlobalPropertyRead(
   name: string,
   range: SourceRange,
   state: ResolveState,
-): HirExpression {
+): Extract<HirExpression, { readonly kind: "property-get" }> {
   return {
     key: { kind: "string", range, value: name },
     kind: "property-get",
     object: intrinsicGlobalObjectRead(range, state),
     range,
   };
+}
+
+/** Test whether one mutable intrinsic still exists on the global object. */
+function intrinsicGlobalPropertyExists(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return {
+    kind: "binary",
+    left: { kind: "string", range, value: name },
+    operator: "in",
+    range,
+    right: intrinsicGlobalObjectRead(range, state),
+  };
+}
+
+/** Return the uninitialized fallback for one absent mutable intrinsic. */
+function missingIntrinsicBinding(name: string, state: ResolveState): Binding {
+  let fallback = state.intrinsicReadFallbacks.get(name);
+  if (fallback == null) {
+    fallback = {
+      id: state.nextBindingId,
+      mutable: false,
+      name: `*missing intrinsic:${name}*`,
+    };
+    state.nextBindingId += 1;
+    state.intrinsicReadFallbacks.set(name, fallback);
+  }
+  return fallback;
+}
+
+/** Read the uninitialized fallback for one absent mutable intrinsic. */
+function missingIntrinsicRead(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return bindingExpression(missingIntrinsicBinding(name, state), range);
 }
 
 /**
@@ -240,28 +279,12 @@ function intrinsicGlobalIdentifierRead(
   range: SourceRange,
   state: ResolveState,
 ): HirExpression {
-  let fallback = state.intrinsicReadFallbacks.get(name);
-  if (fallback == null) {
-    fallback = {
-      id: state.nextBindingId,
-      mutable: false,
-      name: `*missing intrinsic:${name}*`,
-    };
-    state.nextBindingId += 1;
-    state.intrinsicReadFallbacks.set(name, fallback);
-  }
   return {
-    alternate: bindingExpression(fallback, range),
+    alternate: missingIntrinsicRead(name, range, state),
     consequent: intrinsicGlobalPropertyRead(name, range, state),
     kind: "conditional",
     range,
-    test: {
-      kind: "binary",
-      left: { kind: "string", range, value: name },
-      operator: "in",
-      range,
-      right: intrinsicGlobalObjectRead(range, state),
-    },
+    test: intrinsicGlobalPropertyExists(name, range, state),
   };
 }
 
@@ -656,6 +679,77 @@ function resolveExpression(
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
+      expression.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      if (value == null) return undefined;
+      const inferred =
+        expression.kind === "binding-set" ||
+        expression.operator === "&&" ||
+        expression.operator === "??" ||
+        expression.operator === "||"
+          ? inferFunctionName(value, expression.name)
+          : value;
+      const reference = intrinsicGlobalPropertyRead(
+        expression.name,
+        expression.range,
+        state,
+      );
+      const strictGlobalFallback = state.strict
+        ? missingIntrinsicBinding(expression.name, state)
+        : undefined;
+      const write: HirExpression =
+        expression.kind === "binding-set"
+          ? {
+              ...locatedOf(expression),
+              key: reference.key,
+              kind: "property-set",
+              object: reference.object,
+              ...(strictGlobalFallback == null
+                ? {}
+                : {
+                    strictGlobalFallback: {
+                      bindingId: strictGlobalFallback.id,
+                      name: strictGlobalFallback.name,
+                    },
+                  }),
+              value: inferred,
+            }
+          : {
+              ...locatedOf(expression),
+              key: reference.key,
+              kind: "property-update",
+              object: reference.object,
+              operator: expression.operator,
+              ...(strictGlobalFallback == null
+                ? {}
+                : {
+                    strictGlobalFallback: {
+                      bindingId: strictGlobalFallback.id,
+                      name: strictGlobalFallback.name,
+                    },
+                  }),
+              value: inferred,
+            };
+      if (expression.kind === "binding-set") return write;
+      return {
+        alternate: missingIntrinsicRead(
+          expression.name,
+          expression.range,
+          state,
+        ),
+        consequent: write,
+        kind: "conditional",
+        range: expression.range,
+        test: intrinsicGlobalPropertyExists(
+          expression.name,
+          expression.range,
+          state,
+        ),
+      };
+    }
+    if (
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -749,6 +843,51 @@ function resolveExpression(
   }
   if (expression.kind === "binding-step") {
     const resolution = resolveName(scopes, state, expression.name);
+    if (
+      expression.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      const reference = intrinsicGlobalPropertyRead(
+        expression.name,
+        expression.range,
+        state,
+      );
+      const strictGlobalFallback = state.strict
+        ? missingIntrinsicBinding(expression.name, state)
+        : undefined;
+      const step: HirExpression = {
+        ...locatedOf(expression),
+        key: reference.key,
+        kind: "property-step",
+        object: reference.object,
+        operator: expression.operator,
+        prefix: expression.prefix,
+        ...(strictGlobalFallback == null
+          ? {}
+          : {
+              strictGlobalFallback: {
+                bindingId: strictGlobalFallback.id,
+                name: strictGlobalFallback.name,
+              },
+            }),
+      };
+      return {
+        alternate: missingIntrinsicRead(
+          expression.name,
+          expression.range,
+          state,
+        ),
+        consequent: step,
+        kind: "conditional",
+        range: expression.range,
+        test: intrinsicGlobalPropertyExists(
+          expression.name,
+          expression.range,
+          state,
+        ),
+      };
+    }
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0

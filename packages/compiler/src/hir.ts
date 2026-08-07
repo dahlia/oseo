@@ -37,6 +37,15 @@ export interface HirWithBindingReference {
   readonly name: string;
 }
 
+/**
+ * The uninitialized cell used when a strict global identifier write loses
+ * its object property before PutValue.
+ */
+export interface HirStrictGlobalFallback {
+  readonly bindingId: number;
+  readonly name: string;
+}
+
 /** One resolved identifier read through active `with` environments. */
 export interface HirWithReference extends LocatedSyntax {
   readonly fallback: HirExpression;
@@ -827,6 +836,7 @@ export type HirExpression =
       readonly key: HirExpression;
       readonly kind: "property-set";
       readonly object: HirExpression;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -834,6 +844,7 @@ export type HirExpression =
       readonly kind: "property-update";
       readonly object: HirExpression;
       readonly operator: AssignmentOperator;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -842,6 +853,7 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: "++" | "--";
       readonly prefix: boolean;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     })
   | (LocatedSyntax & {
       /**

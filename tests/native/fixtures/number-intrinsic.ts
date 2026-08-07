@@ -67,6 +67,13 @@ console.log(
   boxed instanceof Number,
   boxed.hasOwnProperty("value"),
 );
+const valueOfWrapper = new Number(1);
+console.log(
+  "object valueOf wrapper",
+  ({}).valueOf.call(valueOfWrapper) === valueOfWrapper,
+);
+valueOfWrapper.valueOf = function () { return 5; };
+console.log("custom wrapper conversion", valueOfWrapper + 1);
 class DerivedNumber extends Number {}
 const derived = new DerivedNumber(-7);
 console.log(
@@ -115,6 +122,19 @@ while (turn < 2) {
 function strictNumberRead() { "use strict"; return this instanceof Number; }
 console.log("strict receiver", strictNumberRead.call(-12));
 const originalNumber = Number;
+const numberGlobalObject = this;
+Number = 40;
+console.log("identifier replace", Number, this.Number === Number);
+Number += 2;
+console.log(
+  "identifier update",
+  Number++,
+  ++Number,
+  Number,
+  this.Number,
+);
+Number = originalNumber;
+console.log("identifier restore", Number === originalNumber);
 this.Number = 123;
 console.log("global write", this.Number === Number, Number);
 this.Number = originalNumber;
@@ -127,6 +147,37 @@ console.log(
 try { Number; } catch (error) {
   console.log("global deleted read", error instanceof ReferenceError);
 }
+try { Number += 1; } catch (error) {
+  console.log("global deleted update", error instanceof ReferenceError);
+}
+try { Number++; } catch (error) {
+  console.log("global deleted step", error instanceof ReferenceError);
+}
+function strictDeletedNumberSet() { "use strict"; Number = 1; }
+try { strictDeletedNumberSet(); } catch (error) {
+  console.log("global deleted strict set", error instanceof ReferenceError);
+}
+Number = originalNumber;
+console.log("global deleted restore", this.Number === Number);
+function strictDeleteDuringNumberSet() {
+  "use strict";
+  Number = (delete numberGlobalObject.Number, 5);
+}
+try { strictDeleteDuringNumberSet(); } catch (error) {
+  console.log("global strict set race", error instanceof ReferenceError);
+}
+Number = {
+  valueOf() {
+    delete numberGlobalObject.Number;
+    return 1;
+  },
+};
+function strictDeleteDuringNumberStep() { "use strict"; Number++; }
+try { strictDeleteDuringNumberStep(); } catch (error) {
+  console.log("global strict step race", error instanceof ReferenceError);
+}
+Number = originalNumber;
+console.log("global race restore", this.Number === Number);
 `,
   },
 ];

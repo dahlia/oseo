@@ -234,6 +234,8 @@
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 5u)
 #define OSEO_NUMBER_PARSE_INT_CODE_ID \
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_NUMBER_VALUE_OF_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 7u)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)

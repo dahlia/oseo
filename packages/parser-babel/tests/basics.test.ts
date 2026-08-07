@@ -163,6 +163,38 @@ test("reads the replaceable Number value through its global property", () => {
   );
 });
 
+test("writes the replaceable Number value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const original = Number; Number = 40; Number += 2; " +
+      "console.log(Number++, ++Number); Number = original;",
+    sourceId: "number-global-write.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(
+    hir,
+    /set %b\d+\(\*intrinsic global object\*\)\["Number"\] = 40/u,
+  );
+  assert.match(
+    hir,
+    /update %b\d+\(\*intrinsic global object\*\)\["Number"\] \+= 2/u,
+  );
+  assert.match(
+    hir,
+    /update %b\d+\(\*intrinsic global object\*\)\["Number"\]\+\+/u,
+  );
+  assert.match(
+    hir,
+    /\+\+update %b\d+\(\*intrinsic global object\*\)\["Number"\]/u,
+  );
+  const mir = printMir(result.mir);
+  assert.equal(mir.match(/property-set property-set/gu)?.length, 5);
+  assert.equal(mir.match(/property-get property-get/gu)?.length, 3);
+});
+
 test("starts static class method source at the method definition", () => {
   const source = `class C {
   static /* omitted */ plain() {}

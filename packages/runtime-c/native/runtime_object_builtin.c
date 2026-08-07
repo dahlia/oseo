@@ -259,13 +259,6 @@ static OseoResult object_prototype_value_of(
             "Primitive wrapper objects are not admitted yet."
         );
     }
-    if (ordinary_object(receiver)->number_data) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Number prototype methods are not admitted yet."
-        );
-    }
     return normal(receiver);
 }
 

@@ -107,6 +107,20 @@ while (turn < 2) {
   turn = turn + 1;
 }
 const originalNumber = Number;
+const numberGlobalObject = this;
+Number = converted;
+Number += 2;
+const postNumber = Number++;
+const preNumber = ++Number;
+console.log(
+  "identifier mutation",
+  postNumber,
+  preNumber,
+  Number,
+  this.Number === Number,
+);
+Number = originalNumber;
+console.log("identifier restore", Number === originalNumber);
 this.Number = converted;
 console.log("global write", this.Number === Number, Number === converted);
 this.Number = originalNumber;
@@ -119,6 +133,37 @@ console.log(
 try { Number; } catch (error) {
   console.log("global deleted read", error instanceof ReferenceError);
 }
+try { Number += 1; } catch (error) {
+  console.log("global deleted update", error instanceof ReferenceError);
+}
+try { Number++; } catch (error) {
+  console.log("global deleted step", error instanceof ReferenceError);
+}
+function strictDeletedNumberSet() { "use strict"; Number = converted; }
+try { strictDeletedNumberSet(); } catch (error) {
+  console.log("global deleted strict set", error instanceof ReferenceError);
+}
+Number = originalNumber;
+console.log("global deleted restore", this.Number === Number);
+function strictDeleteDuringNumberSet() {
+  "use strict";
+  Number = (delete numberGlobalObject.Number, converted);
+}
+try { strictDeleteDuringNumberSet(); } catch (error) {
+  console.log("global strict set race", error instanceof ReferenceError);
+}
+Number = {
+  valueOf() {
+    delete numberGlobalObject.Number;
+    return converted;
+  },
+};
+function strictDeleteDuringNumberStep() { "use strict"; Number++; }
+try { strictDeleteDuringNumberStep(); } catch (error) {
+  console.log("global strict step race", error instanceof ReferenceError);
+}
+Number = originalNumber;
+console.log("global race restore", this.Number === Number);
 `;
 }
 
@@ -132,10 +177,19 @@ function expected(testCase: NumberIntrinsicCase): string {
     `hint ${value + 1} ${value}1`,
     "guard true",
     "guard true",
+    `identifier mutation ${value + 2} ${value + 4} ${value + 4} true`,
+    "identifier restore true",
     "global write true true",
     "global restore true",
     "global delete true undefined",
     "global deleted read true",
+    "global deleted update true",
+    "global deleted step true",
+    "global deleted strict set true",
+    "global deleted restore true",
+    "global strict set race true",
+    "global strict step race true",
+    "global race restore true",
     "",
   ].join("\n");
 }
@@ -265,7 +319,7 @@ test(
         sizeLimit:
           "one bounded integer, one bounded wide offset, two radices, one " +
           "parser suffix, one wrapper, two repeated intrinsic property " +
-          "observations, and one global mutation sequence",
+          "observations, and one identifier and global mutation sequence",
         timeLimitMilliseconds: 180_000,
       },
     );

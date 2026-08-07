@@ -302,6 +302,13 @@ OseoResult oseo_internal_number_builtin_dispatch(
             tag_of(new_target) != OSEO_TAG_UNDEFINED
         );
     }
+    if (code_id == OSEO_NUMBER_VALUE_OF_CODE_ID) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Number prototype methods are not admitted yet."
+        );
+    }
     if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
         return oseo_internal_throw_error(
             context,
@@ -404,7 +411,7 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_internal_intrinsic(
         context,
@@ -440,6 +447,25 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
             frame.slots[0],
             "constructor",
             frame.slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_number_function(
+            context,
+            OSEO_NUMBER_VALUE_OF_CODE_ID,
+            "valueOf",
+            0u,
+            OSEO_FUNCTION_INTERNAL
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_number_property(
+            context,
+            frame.slots[0],
+            "valueOf",
+            frame.slots[2],
             (OseoPropertyAttributes){true, false, true, false}
         );
     }
