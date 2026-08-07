@@ -92,6 +92,15 @@ console.log(
   Number.prototype.isPrototypeOf(boxed),
   boxed.hasOwnProperty("value"),
 );
+console.log(
+  "wrapper conversion",
+  Number.parseFloat(boxed),
+  Number.parseInt(boxed, 10),
+);
+boxed.toString = function () { return "${signedValue(testCase)}.5tail"; };
+console.log("wrapper toString override", Number.parseFloat(boxed));
+const detachedWrapper = new Number(converted);
+console.log("wrapper object tag", ({}).toString.call(detachedWrapper));
 /** @param {number} left @param {number} right */
 function hinted(left, right) { return left + right; }
 console.log(
@@ -108,6 +117,22 @@ while (turn < 2) {
 }
 const originalNumber = Number;
 const numberGlobalObject = this;
+({ value: Number } = { value: converted });
+console.log("object target", Number, this.Number === Number);
+[Number] = [converted + 1];
+console.log("array target", Number, this.Number === Number);
+for (Number of [converted + 2]) {}
+console.log("for-of target", Number, this.Number === Number);
+for ({ value: Number } of [{ value: converted + 3 }]) {}
+console.log("for-of object target", Number, this.Number === Number);
+for ([Number] of [[converted + 4]]) {}
+console.log("for-of array target", Number, this.Number === Number);
+for (Number in { loopKey: true }) {}
+console.log("for-in target", Number, this.Number === Number);
+for ({ 0: Number } in { patternKey: true }) {}
+console.log("for-in object target", Number, this.Number === Number);
+Number = originalNumber;
+console.log("target restore", Number === originalNumber);
 Number = converted;
 Number += 2;
 const postNumber = Number++;
@@ -143,8 +168,36 @@ function strictDeletedNumberSet() { "use strict"; Number = converted; }
 try { strictDeletedNumberSet(); } catch (error) {
   console.log("global deleted strict set", error instanceof ReferenceError);
 }
+function strictDeletedNumberPattern() {
+  "use strict";
+  ({ value: Number } = { value: converted });
+}
+try { strictDeletedNumberPattern(); } catch (error) {
+  console.log(
+    "global deleted strict pattern",
+    error instanceof ReferenceError,
+  );
+}
+function strictDeletedNumberLoop() {
+  "use strict";
+  for (Number of [converted]) {}
+}
+try { strictDeletedNumberLoop(); } catch (error) {
+  console.log("global deleted strict loop", error instanceof ReferenceError);
+}
+({ value: Number } = { value: originalNumber });
+console.log("global deleted pattern restore", this.Number === Number);
+function strictDeleteDuringNumberPattern() {
+  "use strict";
+  ({
+    value: Number = (delete numberGlobalObject.Number, converted),
+  } = {});
+}
+try { strictDeleteDuringNumberPattern(); } catch (error) {
+  console.log("global strict pattern race", error instanceof ReferenceError);
+}
 Number = originalNumber;
-console.log("global deleted restore", this.Number === Number);
+console.log("global pattern race restore", this.Number === Number);
 function strictDeleteDuringNumberSet() {
   "use strict";
   Number = (delete numberGlobalObject.Number, converted);
@@ -174,9 +227,20 @@ function expected(testCase: NumberIntrinsicCase): string {
     "wide true",
     "predicates true true true true false",
     "wrapper true true false",
+    `wrapper conversion ${value} ${value}`,
+    `wrapper toString override ${value}.5`,
+    "wrapper object tag [object Number]",
     `hint ${value + 1} ${value}1`,
     "guard true",
     "guard true",
+    `object target ${value} true`,
+    `array target ${value + 1} true`,
+    `for-of target ${value + 2} true`,
+    `for-of object target ${value + 3} true`,
+    `for-of array target ${value + 4} true`,
+    "for-in target loopKey true",
+    "for-in object target p true",
+    "target restore true",
     `identifier mutation ${value + 2} ${value + 4} ${value + 4} true`,
     "identifier restore true",
     "global write true true",
@@ -186,7 +250,11 @@ function expected(testCase: NumberIntrinsicCase): string {
     "global deleted update true",
     "global deleted step true",
     "global deleted strict set true",
-    "global deleted restore true",
+    "global deleted strict pattern true",
+    "global deleted strict loop true",
+    "global deleted pattern restore true",
+    "global strict pattern race true",
+    "global pattern race restore true",
     "global strict set race true",
     "global strict step race true",
     "global race restore true",
@@ -312,14 +380,16 @@ test(
           "16, or 36, one parser suffix, one wide rounding offset from " +
           "2049 to 8191, one exact wide radix from 2, 8, 10, or 16, a " +
           "false number hint, one constructor shape guard miss, and one " +
-          "global Number write, restore, and delete sequence",
+          "global Number write, restore, delete, assignment-target, and " +
+          "strict missing-property sequence",
         numRuns: 12,
         profile: "M5 Number intrinsic",
         seed: 0x6000_3500,
         sizeLimit:
           "one bounded integer, one bounded wide offset, two radices, one " +
           "parser suffix, one wrapper, two repeated intrinsic property " +
-          "observations, and one identifier and global mutation sequence",
+          "observations, and one identifier, assignment-target, and global " +
+          "mutation sequence",
         timeLimitMilliseconds: 180_000,
       },
     );

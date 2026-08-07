@@ -67,6 +67,10 @@ export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly key: HirExpression;
   readonly kind: "assignment-member";
   readonly object: HirExpression;
+  /** Name used by named evaluation for a synthetic global target. */
+  readonly inferredName?: string;
+  /** Missing-binding fallback for a strict global property reference. */
+  readonly strictGlobalFallback?: HirStrictGlobalFallback;
 }
 
 /** One resolved private reference used as an assignment-pattern leaf. */
@@ -182,6 +186,7 @@ export type HirForOfTarget =
       readonly kind: "property";
       readonly object: HirExpression;
       readonly range: SourceRange;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     }
   | {
       readonly kind: "private";

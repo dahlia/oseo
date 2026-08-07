@@ -67,6 +67,20 @@ console.log(
   boxed instanceof Number,
   boxed.hasOwnProperty("value"),
 );
+console.log(
+  "wrapper conversion",
+  new Number(7),
+  Number.parseFloat(new Number(12)),
+  Number.parseInt(new Number(12), 10),
+);
+const parsingWrapper = new Number(12);
+parsingWrapper.toString = function () { return "13.5tail"; };
+console.log("wrapper toString override", Number.parseFloat(parsingWrapper));
+const detachedWrapper = new Number(9);
+console.log(
+  "wrapper object tag",
+  ({}).toString.call(detachedWrapper),
+);
 const valueOfWrapper = new Number(1);
 console.log(
   "object valueOf wrapper",
@@ -123,6 +137,22 @@ function strictNumberRead() { "use strict"; return this instanceof Number; }
 console.log("strict receiver", strictNumberRead.call(-12));
 const originalNumber = Number;
 const numberGlobalObject = this;
+({ value: Number } = { value: 31 });
+console.log("object target", Number, this.Number === Number);
+[Number] = [32];
+console.log("array target", Number, this.Number === Number);
+for (Number of [33]) {}
+console.log("for-of target", Number, this.Number === Number);
+for ({ value: Number } of [{ value: 34 }]) {}
+console.log("for-of object target", Number, this.Number === Number);
+for ([Number] of [[35]]) {}
+console.log("for-of array target", Number, this.Number === Number);
+for (Number in { loopKey: true }) {}
+console.log("for-in target", Number, this.Number === Number);
+for ({ 0: Number } in { patternKey: true }) {}
+console.log("for-in object target", Number, this.Number === Number);
+Number = originalNumber;
+console.log("target restore", Number === originalNumber);
 Number = 40;
 console.log("identifier replace", Number, this.Number === Number);
 Number += 2;
@@ -157,8 +187,34 @@ function strictDeletedNumberSet() { "use strict"; Number = 1; }
 try { strictDeletedNumberSet(); } catch (error) {
   console.log("global deleted strict set", error instanceof ReferenceError);
 }
+function strictDeletedNumberPattern() {
+  "use strict";
+  ({ value: Number } = { value: 1 });
+}
+try { strictDeletedNumberPattern(); } catch (error) {
+  console.log(
+    "global deleted strict pattern",
+    error instanceof ReferenceError,
+  );
+}
+function strictDeletedNumberLoop() {
+  "use strict";
+  for (Number of [1]) {}
+}
+try { strictDeletedNumberLoop(); } catch (error) {
+  console.log("global deleted strict loop", error instanceof ReferenceError);
+}
+({ value: Number } = { value: originalNumber });
+console.log("global deleted pattern restore", this.Number === Number);
+function strictDeleteDuringNumberPattern() {
+  "use strict";
+  ({ value: Number = (delete numberGlobalObject.Number, 5) } = {});
+}
+try { strictDeleteDuringNumberPattern(); } catch (error) {
+  console.log("global strict pattern race", error instanceof ReferenceError);
+}
 Number = originalNumber;
-console.log("global deleted restore", this.Number === Number);
+console.log("global pattern race restore", this.Number === Number);
 function strictDeleteDuringNumberSet() {
   "use strict";
   Number = (delete numberGlobalObject.Number, 5);

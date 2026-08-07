@@ -18,6 +18,7 @@ import type {
   HirClassNameBinding,
   HirClassThisBinding,
   HirArrayBindingPattern,
+  HirAssignmentMemberTarget,
   HirExpression,
   HirForDeclaration,
   HirForInTarget,
@@ -33,6 +34,7 @@ import type {
   HirPrivateNameKey,
   HirResult,
   HirStatement,
+  HirStrictGlobalFallback,
   HirSwitchCase,
   IntrinsicGlobalKind,
   ResolveState,
@@ -266,6 +268,52 @@ function missingIntrinsicRead(
   state: ResolveState,
 ): HirExpression {
   return bindingExpression(missingIntrinsicBinding(name, state), range);
+}
+
+/** Return the missing-binding check required by a strict global write. */
+function strictIntrinsicGlobalFallback(
+  name: string,
+  state: ResolveState,
+): HirStrictGlobalFallback | undefined {
+  if (!state.strict) return undefined;
+  const fallback = missingIntrinsicBinding(name, state);
+  return { bindingId: fallback.id, name: fallback.name };
+}
+
+/** Resolve one assignment-pattern leaf to a mutable intrinsic property. */
+function intrinsicGlobalPatternTarget(
+  name: string,
+  located: LocatedSyntax,
+  state: ResolveState,
+): HirAssignmentMemberTarget {
+  const reference = intrinsicGlobalPropertyRead(name, located.range, state);
+  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
+  return {
+    ...(located.byteRange == null ? {} : { byteRange: located.byteRange }),
+    inferredName: name,
+    key: reference.key,
+    kind: "assignment-member",
+    object: reference.object,
+    range: located.range,
+    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+  };
+}
+
+/** Resolve one direct loop target to a mutable intrinsic property. */
+function intrinsicGlobalLoopTarget(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): Extract<HirForOfTarget, { readonly kind: "property" }> {
+  const reference = intrinsicGlobalPropertyRead(name, range, state);
+  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
+  return {
+    key: reference.key,
+    kind: "property",
+    object: reference.object,
+    range,
+    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+  };
 }
 
 /**
@@ -2686,6 +2734,14 @@ function resolveBindingPattern(
           }
         : resolveName(scopes, state, pattern.name);
     if (
+      mode === "write" &&
+      pattern.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      return intrinsicGlobalPatternTarget(pattern.name, pattern, state);
+    }
+    if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       rejectPropertyOwnedIntrinsicWithFallbackWrite(
@@ -2749,11 +2805,14 @@ function resolveBindingPattern(
         property.initializer == null
           ? undefined
           : resolveExpression(property.initializer, scopes, state);
-      if (
-        initializer != null &&
+      const inferredName =
         resolvedPattern?.kind === "binding-identifier"
-      ) {
-        initializer = inferFunctionName(initializer, resolvedPattern.name);
+          ? resolvedPattern.name
+          : resolvedPattern?.kind === "assignment-member"
+            ? resolvedPattern.inferredName
+            : undefined;
+      if (initializer != null && inferredName != null) {
+        initializer = inferFunctionName(initializer, inferredName);
       }
       if (
         key == null ||
@@ -2815,8 +2874,14 @@ function resolveBindingPattern(
       element.initializer == null
         ? undefined
         : resolveExpression(element.initializer, scopes, state);
-    if (initializer != null && resolvedPattern?.kind === "binding-identifier") {
-      initializer = inferFunctionName(initializer, resolvedPattern.name);
+    const inferredName =
+      resolvedPattern?.kind === "binding-identifier"
+        ? resolvedPattern.name
+        : resolvedPattern?.kind === "assignment-member"
+          ? resolvedPattern.inferredName
+          : undefined;
+    if (initializer != null && inferredName != null) {
+      initializer = inferFunctionName(initializer, inferredName);
     }
     if (
       resolvedPattern == null ||
@@ -2973,6 +3038,13 @@ function resolveForInTarget(
   }
   if (target.kind === "binding") {
     const resolution = resolveName(scopes, state, target.name);
+    if (
+      target.name === "Number" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
+      return intrinsicGlobalLoopTarget(target.name, target.range, state);
+    }
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
@@ -3583,6 +3655,16 @@ function resolveStatement(
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
       if (
+        statement.target.name === "Number" &&
+        resolution.binding == null &&
+        resolution.objectBindingIds.length === 0
+      ) {
+        target = intrinsicGlobalLoopTarget(
+          statement.target.name,
+          statement.target.range,
+          state,
+        );
+      } else if (
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
         rejectPropertyOwnedIntrinsicWithFallbackWrite(
@@ -3592,8 +3674,7 @@ function resolveStatement(
         )
       ) {
         return undefined;
-      }
-      if (
+      } else if (
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
         state.strict
@@ -3604,35 +3685,36 @@ function resolveStatement(
           state,
         );
         return undefined;
-      }
-      const binding =
-        resolution.binding ??
-        (resolution.objectBindingIds.length === 0
-          ? undefined
-          : withFallbackBinding(statement.target.name, state, true));
-      if (binding == null) {
-        state.diagnostics.push(
-          sourceDiagnostic(
-            state.sourceId,
-            statement.target,
-            `Unknown binding '${statement.target.name}'.`,
-          ),
-        );
       } else {
-        target = {
-          ...statement.target,
-          bindingId: binding.id,
-          ...(binding.functionNameBinding === true
-            ? { functionNameBinding: true as const }
-            : {}),
-          ...(binding.importedBinding === true
-            ? { importedBinding: true as const }
-            : {}),
-          mutable: binding.mutable,
-          ...(resolution.objectBindingIds.length === 0
-            ? {}
-            : { withObjectBindingIds: resolution.objectBindingIds }),
-        };
+        const binding =
+          resolution.binding ??
+          (resolution.objectBindingIds.length === 0
+            ? undefined
+            : withFallbackBinding(statement.target.name, state, true));
+        if (binding == null) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement.target,
+              `Unknown binding '${statement.target.name}'.`,
+            ),
+          );
+        } else {
+          target = {
+            ...statement.target,
+            bindingId: binding.id,
+            ...(binding.functionNameBinding === true
+              ? { functionNameBinding: true as const }
+              : {}),
+            ...(binding.importedBinding === true
+              ? { importedBinding: true as const }
+              : {}),
+            mutable: binding.mutable,
+            ...(resolution.objectBindingIds.length === 0
+              ? {}
+              : { withObjectBindingIds: resolution.objectBindingIds }),
+          };
+        }
       }
     } else if (statement.target.kind === "property") {
       const object = resolveExpression(statement.target.object, scopes, state);

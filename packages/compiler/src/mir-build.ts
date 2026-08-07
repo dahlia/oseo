@@ -5309,7 +5309,23 @@ function lowerForHeadTarget(
     operand,
     builder,
   );
+  const initialExists =
+    target.strictGlobalFallback == null
+      ? undefined
+      : lowerBinaryValues(keyInput, "in", object, target.range, builder);
   const key = convertPropertyKey(keyInput, target.key.range, builder);
+  if (initialExists != null && target.strictGlobalFallback != null) {
+    lowerStrictGlobalPropertyWrite(
+      initialExists,
+      object,
+      key,
+      value,
+      target.strictGlobalFallback,
+      target.range,
+      builder,
+    );
+    return;
+  }
   appendMirMetadata(
     builder,
     "safepoint",
@@ -5793,6 +5809,21 @@ function lowerBindingTarget(
         ? lowerObjectCoercible(prepared.object, pattern.object.range, builder)
         : prepared.object;
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
+    if (
+      prepared.initialExists != null &&
+      prepared.strictGlobalFallback != null
+    ) {
+      lowerStrictGlobalPropertyWrite(
+        prepared.initialExists,
+        object,
+        key,
+        value,
+        prepared.strictGlobalFallback,
+        pattern.range,
+        builder,
+      );
+      return;
+    }
     appendMirMetadata(
       builder,
       "safepoint",
@@ -5911,6 +5942,11 @@ type LoweredAssignmentReference =
       readonly kind: "property";
       readonly object: number;
       readonly superReceiver?: number;
+      readonly initialExists?: number;
+      readonly strictGlobalFallback?: {
+        readonly bindingId: number;
+        readonly name: string;
+      };
     }
   | {
       readonly kind: "private";
@@ -5934,11 +5970,19 @@ function lowerAssignmentReference(
       operand,
       builder,
     );
+    const initialExists =
+      pattern.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(keyInput, "in", object, pattern.range, builder);
     return {
       key: keyInput,
       kind: "property",
       object,
       ...(superReceiver == null ? {} : { superReceiver }),
+      ...(initialExists == null ? {} : { initialExists }),
+      ...(pattern.strictGlobalFallback == null
+        ? {}
+        : { strictGlobalFallback: pattern.strictGlobalFallback }),
     };
   }
   if (pattern.kind === "assignment-private") {
