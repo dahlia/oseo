@@ -20,5 +20,5 @@ inventory:
     - test/built-ins/Number/parseInt/
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready
