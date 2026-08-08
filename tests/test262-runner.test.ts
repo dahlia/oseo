@@ -779,6 +779,41 @@ null.item;
     "primitive-wrapper",
   );
   assert.equal(primitiveWrapper.classification, "unsupported-profile-feature");
+
+  const deferredObjectStatic = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "Object static method is not admitted in this M5b node.\n",
+    ),
+  );
+  assert.equal(
+    deferredObjectStatic.observation.unsupportedCapability,
+    "object-static-method",
+  );
+  assert.equal(
+    deferredObjectStatic.classification,
+    "unsupported-profile-feature",
+  );
+
+  const descriptorMap = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "Object.create descriptor maps are unsupported in M3.\n",
+    ),
+  );
+  assert.equal(
+    descriptorMap.observation.unsupportedCapability,
+    "object-create-descriptor-map",
+  );
+  assert.equal(descriptorMap.classification, "unsupported-profile-feature");
 });
 
 test("keeps user-thrown runtime-boundary text as a failure", async () => {

@@ -21,8 +21,8 @@ results:
     observation:
       detail: "test/built-ins/GeneratorFunction/instance-name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/GeneratorFunction/instance-name.js:148:\
-        25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        stderr=\"test/built-ins/GeneratorFunction/instance-name.js:157:\
+        1: error[OSEO1001]: Unknown binding 'verifyNotEnumerable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

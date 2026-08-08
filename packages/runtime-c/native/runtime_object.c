@@ -90,6 +90,9 @@ static OseoResult object_create(
     object->error_data = false;
     object->number_data = false;
     object->number_value = oseo_undefined();
+    object->primitive_data = false;
+    object->primitive_value = oseo_undefined();
+    object->primitive_wrapper_methods_initialized = false;
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;

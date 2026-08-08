@@ -43,7 +43,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/instance-name-non-strin\
         g.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/instance-name-n\
-        on-string.js:152:1: error[OSEO1001]: Unknown binding
+        on-string.js:158:1: error[OSEO1001]: Unknown binding
         'verifyNotEnumerable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

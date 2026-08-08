@@ -53,7 +53,19 @@ static OseoResult object_get(
             uint16_t unit = string_object(object_value)->units[index];
             return oseo_internal_allocate_string(context, &unit, 1u);
         }
-        return normal(oseo_undefined());
+        OseoValue slots[3] = {object_value, key, receiver};
+        OseoRootFrame frame = {NULL, slots, 3u};
+        oseo_roots_push(context, &frame);
+        OseoResult boxed = oseo_internal_to_object_for_property(
+            context,
+            slots[0]
+        );
+        slots[0] = boxed.value;
+        if (boxed.status == OSEO_STATUS_NORMAL) {
+            boxed = object_get(context, slots[0], slots[1], slots[2]);
+        }
+        oseo_roots_pop(context, &frame);
+        return boxed;
     }
     OseoValue current = object_value;
     while (is_object(current)) {

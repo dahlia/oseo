@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars -- Harness globals are used after assembly. */
 
 function verifyProperty(object, name, descriptor) {
-  const actual = Object.getOwnPropertyDescriptor(object, name);
+  const O = Object; // Preserve statics while verifying the global binding.
+  const actual = O.getOwnPropertyDescriptor(object, name);
   if (descriptor === undefined) {
     assert.sameValue(actual, undefined);
     return true;
@@ -35,12 +36,18 @@ function verifyProperty(object, name, descriptor) {
   }
 
   if ("enumerable" in descriptor) {
-    const keys = Object.keys(object);
-    let index = 0;
-    let enumerable = false;
-    while (index < keys.length) {
-      if (keys[index] === name) enumerable = true;
-      index = index + 1;
+    let enumerable;
+    if (typeof name === "symbol") {
+      enumerable = Object.prototype.propertyIsEnumerable.call(object, name);
+    } else {
+      const key = "" + name;
+      const enumerableKeys = O.keys(object);
+      let index = 0;
+      enumerable = false;
+      while (index < enumerableKeys.length) {
+        if (enumerableKeys[index] === key) enumerable = true;
+        index = index + 1;
+      }
     }
     assert.sameValue(enumerable, descriptor.enumerable);
   }
@@ -49,10 +56,9 @@ function verifyProperty(object, name, descriptor) {
     try {
       delete object[name];
     } catch (error) {}
-    const configurable =
-      Object.getOwnPropertyDescriptor(object, name) === undefined;
+    const configurable = O.getOwnPropertyDescriptor(object, name) === undefined;
     assert.sameValue(configurable, descriptor.configurable);
-    if (configurable) Object.defineProperty(object, name, actual);
+    if (configurable) O.defineProperty(object, name, actual);
   }
   return true;
 }

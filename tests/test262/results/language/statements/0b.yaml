@@ -86,8 +86,8 @@ results:
         rivate-async-method.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/class/elements/private-method\
-        s/prod-private-async-method.js:163:24: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
+        s/prod-private-async-method.js:166:21: error[OSEO1001]: Unknown
+        binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -305,13 +305,22 @@ results:
       - iterator-protocol
       - lexical-bindings
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/for-await-of/async-gen-decl-dstr-obj-\
-        rest-same-name.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-await-of/async-gen-decl-d\
-        str-obj-rest-same-name.js:126:16: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/statements/for-await-of/async-gen-decl-dstr-obj-rest-same-name.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/for-await-of/async-gen-decl-dstr-obj-rest-same-name.js:126:16:
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
       passed: false
     unsupportedFeatures: []
   - case:

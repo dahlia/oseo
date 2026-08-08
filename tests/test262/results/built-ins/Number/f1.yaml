@@ -49,7 +49,7 @@ results:
     observation:
       detail: "test/built-ins/Number/parseFloat.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/parseFloat.js:151:37:
+        stderr=\"test/built-ins/Number/parseFloat.js:157:37:
         error[OSEO1001]: Unknown binding 'parseFloat'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

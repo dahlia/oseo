@@ -149,12 +149,20 @@ results:
       - expression-operators
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/subtraction/bigint-errors.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/subtraction/bigint-errors.js\
-        :86:3: error[OSEO1001]: Unknown binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/expressions/subtraction/bigint-errors.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/subtraction/bigint-errors.js:86:3:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
       passed: false
     unsupportedFeatures: []
   - case:

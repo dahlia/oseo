@@ -1,0 +1,52 @@
+version: 1
+id: object-constructor
+title: "Object constructor and prototype operations"
+scope:
+  - "The realm-owned Object constructor's call and construct behavior and
+    collector-traced primitive wrappers."
+  - "Object.is, Object.getPrototypeOf, Object.setPrototypeOf, and their
+    ToObject, SameValue, and prototype-mutation semantics."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-constructor.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-constructor.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-object-constructor.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-constructor.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-constructor.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

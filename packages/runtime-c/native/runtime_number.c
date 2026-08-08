@@ -68,6 +68,8 @@ static OseoResult number_construct(
     OseoOrdinaryObject *object = ordinary_object(receiver);
     object->number_data = true;
     object->number_value = result.value;
+    object->primitive_data = true;
+    object->primitive_value = result.value;
     return normal(receiver);
 }
 
@@ -302,7 +304,8 @@ OseoResult oseo_internal_number_builtin_dispatch(
             tag_of(new_target) != OSEO_TAG_UNDEFINED
         );
     }
-    if (code_id == OSEO_NUMBER_VALUE_OF_CODE_ID) {
+    if (code_id == OSEO_NUMBER_VALUE_OF_CODE_ID ||
+        code_id == OSEO_NUMBER_TO_STRING_CODE_ID) {
         return failure(
             context,
             "OSEO2001",
@@ -426,6 +429,8 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
         OseoOrdinaryObject *prototype = ordinary_object(frame.slots[0]);
         prototype->number_data = true;
         prototype->number_value = oseo_number(0.0);
+        prototype->primitive_data = true;
+        prototype->primitive_value = oseo_number(0.0);
         context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] = frame.slots[0];
         *marker = frame.slots[0];
         result = create_number_function(
@@ -465,6 +470,25 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
             context,
             frame.slots[0],
             "valueOf",
+            frame.slots[2],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_number_function(
+            context,
+            OSEO_NUMBER_TO_STRING_CODE_ID,
+            "toString",
+            1u,
+            OSEO_FUNCTION_INTERNAL
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_number_property(
+            context,
+            frame.slots[0],
+            "toString",
             frame.slots[2],
             (OseoPropertyAttributes){true, false, true, false}
         );

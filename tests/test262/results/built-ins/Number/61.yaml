@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Number/NEGATIVE_INFINITY/S15.7.3.5_A2.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Number/NEGATIVE_INFINITY/S15.7.3.5_A2.j\
-        s:140:1: error[OSEO1001]: Unknown binding
+        s:146:1: error[OSEO1001]: Unknown binding
         'verifyNotWritable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

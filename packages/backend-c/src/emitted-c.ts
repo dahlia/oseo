@@ -504,13 +504,6 @@ export const emittedC = {
       ["result = oseo_console_log(context, "],
       [", "],
     ],
-    oseoObjectBuiltinCreate: [["oseo_object_builtin_create"]],
-    oseoObjectBuiltinDefineProperty: [["oseo_object_builtin_define_property"]],
-    oseoObjectBuiltinGetOwnPropertyDescriptor: [
-      ["oseo_object_builtin_get_own_property_descriptor"],
-    ],
-    oseoObjectBuiltinKeys: [["oseo_object_builtin_keys"]],
-    oseoObjectBuiltinSetPrototypeOf: [["oseo_object_builtin_set_prototype_of"]],
     resultAssignOseoPromiseConstructContext: [
       ["result = oseo_promise_construct(context, "],
       [");"],

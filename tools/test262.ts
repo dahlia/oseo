@@ -124,6 +124,7 @@ const reviewedExecutionPoolLimit = Math.min(
 );
 const reviewedExecutionRetryLimit = 1;
 const unavailableHarnessIncludes = new Set([
+  "nans.js",
   "nativeFunctionMatcher.js",
   "wellKnownIntrinsicObjects.js",
 ]);
@@ -488,6 +489,20 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   )?.[1];
   if (diagnostic === "Primitive wrapper objects are not admitted yet.") {
     return "primitive-wrapper";
+  }
+  if (
+    diagnostic === "Primitive wrapper prototype methods are not admitted yet."
+  ) {
+    return "primitive-wrapper-prototype";
+  }
+  if (diagnostic === "Generator intrinsic reflection is not admitted yet.") {
+    return "generator-intrinsics";
+  }
+  if (diagnostic === "Object static method is not admitted in this M5b node.") {
+    return "object-static-method";
+  }
+  if (diagnostic === "Object.create descriptor maps are unsupported in M3.") {
+    return "object-create-descriptor-map";
   }
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"

@@ -382,8 +382,7 @@ export function callTarget(
       method === "create" ||
       method === "defineProperty" ||
       method === "getOwnPropertyDescriptor" ||
-      method === "keys" ||
-      method === "setPrototypeOf"
+      method === "keys"
     ) {
       return {
         ...location(context, value),

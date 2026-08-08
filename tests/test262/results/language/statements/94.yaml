@@ -152,8 +152,8 @@ results:
         rivate-method-initialize-order.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/private-method\
-        s/prod-private-method-initialize-order.js:162:24:
-        error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        s/prod-private-method-initialize-order.js:165:21:
+        error[OSEO1001]: Unknown binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -168,18 +168,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/statements/class/subclass/default-constructor-2.\
-        js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/subclass/default-constr\
-        uctor-2.js:87:3: error[OSEO1001]: Unknown binding
-        'Object'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true

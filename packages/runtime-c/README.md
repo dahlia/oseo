@@ -329,6 +329,19 @@ the intrinsic table gains stable Number slots, and the global object installs
 the writable, non-enumerable, configurable constructor property. The Number
 prototype formatting methods remain owned by their later M5b node.
 
+The `m5-51` ABI makes the realm-owned `Object` constructor callable and
+constructible and installs it on the global object. `Object` returns existing
+objects unchanged, creates ordinary objects for nullish inputs, and wraps
+primitives in collector-traced objects with stable intrinsic prototypes.
+`Object.is`, `Object.getPrototypeOf`, and `Object.setPrototypeOf` are ordinary
+static properties. Ordinary objects gain traced primitive wrapper state, and
+the intrinsic table gains the three static functions plus Boolean, String,
+and BigInt wrapper prototype slots. The previously admitted `create`,
+`defineProperty`, `getOwnPropertyDescriptor`, and `keys` helpers are also real
+function properties of `Object`. Transient primitive property lookup boxes
+without materializing String index properties that the lookup has already
+handled directly.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

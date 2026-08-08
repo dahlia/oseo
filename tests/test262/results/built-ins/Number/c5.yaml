@@ -19,7 +19,7 @@ results:
     observation:
       detail: "test/built-ins/Number/MAX_SAFE_INTEGER.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/MAX_SAFE_INTEGER.js:148:1:
+        stderr=\"test/built-ins/Number/MAX_SAFE_INTEGER.js:154:1:
         error[OSEO1001]: Unknown binding 'verifyNotEnumerable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

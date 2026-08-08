@@ -57,8 +57,7 @@ export type SyntaxCallTarget =
         | "create"
         | "defineProperty"
         | "getOwnPropertyDescriptor"
-        | "keys"
-        | "setPrototypeOf";
+        | "keys";
     })
   | (LocatedSyntax & {
       readonly kind: "promise-intrinsic";

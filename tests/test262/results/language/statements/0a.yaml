@@ -119,13 +119,20 @@ results:
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/statements/class/elements/class-field-on-frozen-\
-        objects.js strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/elements/class-field-on\
-        -frozen-objects.js:91:7: error[OSEO1001]: Unknown binding
-        'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/statements/class/elements/class-field-on-frozen-objects.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/class-field-on-frozen-objects.js:91:7:
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
       passed: false
     unsupportedFeatures: []
   - case:

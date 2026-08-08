@@ -77,6 +77,32 @@ test("populates the realm-owned Object prototype", () => {
   );
 });
 
+test("populates the realm-owned Object constructor cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const functions = sources.get("runtime_function.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const intrinsic of [
+    "OBJECT",
+    "OBJECT_GET_PROTOTYPE_OF",
+    "OBJECT_IS",
+    "OBJECT_SET_PROTOTYPE_OF",
+    "BOOLEAN_PROTOTYPE",
+    "STRING_PROTOTYPE",
+    "BIGINT_PROTOTYPE",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of ["getPrototypeOf", "is", "setPrototypeOf"]) {
+    assert.match(objectBuiltins, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(objectBuiltins, /oseo_internal_to_object/u);
+  assert.match(objectBuiltins, /primitive_value/u);
+  assert.match(objectBuiltins, /oseo_internal_same_value/u);
+  assert.match(functions, /intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE/u);
+  assert.match(functions, /intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF/u);
+});
+
 test("populates the realm-owned Function prototype", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const functionSource = sources.get("runtime_function.c") ?? "";

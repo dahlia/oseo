@@ -257,6 +257,52 @@ export async function runNativeScenario2(
     }
   }
 
+  const objectStaticMutationEntry = [
+    root,
+    "tests/fixtures/object-static-mutation/entry.mjs",
+  ].join("/");
+  const objectStaticMutationReferences = [
+    await host.run({
+      args: [objectStaticMutationEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", objectStaticMutationEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of objectStaticMutationReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeObjectStaticMutation = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            objectStaticMutationEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(
+        nativeObjectStaticMutation.exitStatus,
+        0,
+        nativeObjectStaticMutation.stderr,
+      );
+      assert.equal(nativeObjectStaticMutation.stderr, "");
+      for (const reference of objectStaticMutationReferences) {
+        assert.equal(nativeObjectStaticMutation.stdout, reference.stdout);
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const importWriteEntry = [
     root,
     "tests/fixtures/modules/import-write-entry.js",

@@ -486,10 +486,10 @@ static bool conversion_property_exists(
 
 /*
  * Number.prototype.toString belongs to a later formatting node. Until it
- * lands, select that deferred method by prototype-chain position without
- * exposing it as a property. A nearer user property still owns the conversion,
- * changing the receiver's prototype chain removes this narrow fallback, and
- * the selected method enforces the [[NumberData]] receiver brand.
+ * lands, select its owned placeholder by prototype-chain position. A nearer
+ * user property still owns the conversion, changing the receiver's prototype
+ * chain removes this narrow fallback, and the selected method enforces the
+ * [[NumberData]] receiver brand.
  */
 static bool uses_deferred_number_to_string(
     OseoContext *context,
@@ -516,6 +516,14 @@ static bool uses_deferred_number_to_string(
                 &getter,
                 &setter
             )) {
+            if (current ==
+                    context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] &&
+                !attributes.accessor &&
+                is_function(property_value) &&
+                function_object(property_value)->code_id ==
+                    OSEO_NUMBER_TO_STRING_CODE_ID) {
+                return true;
+            }
             return false;
         }
         if (current ==

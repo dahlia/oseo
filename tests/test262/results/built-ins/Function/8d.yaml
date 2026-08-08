@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/instance-name-chained.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/instance-name-c\
-        hained.js:149:1: error[OSEO1001]: Unknown binding
+        hained.js:155:1: error[OSEO1001]: Unknown binding
         'verifyNotEnumerable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

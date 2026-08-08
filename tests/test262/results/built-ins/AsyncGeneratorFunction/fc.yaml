@@ -17,12 +17,20 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/AsyncGeneratorFunction/has-instance.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/AsyncGeneratorFunction/has-instance.js:\
-        80:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/AsyncGeneratorFunction/has-instance.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/AsyncGeneratorFunction/has-instance.js:80:30:
+        error[OSEO2001]: Generator intrinsic reflection is not admitted
+        yet.\n"'
+      unsupportedCapability: generator-intrinsics
       passed: false
     unsupportedFeatures: []
   - case:
@@ -42,12 +50,21 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/AsyncGeneratorFunction/instance-prototype.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/AsyncGeneratorFunction/instance-prototy\
-        pe.js:151:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/AsyncGeneratorFunction/instance-prototype.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/AsyncGeneratorFunction/instance-prototype.js:157:30:
+        error[OSEO2001]: Generator intrinsic reflection is not admitted
+        yet.\n"'
+      unsupportedCapability: generator-intrinsics
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

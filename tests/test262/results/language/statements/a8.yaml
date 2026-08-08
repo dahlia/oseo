@@ -88,13 +88,21 @@ results:
       - classes
       - functions
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/definition/fn-length-static-pre\
-        cedence-order.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/definition/fn-length-st\
-        atic-precedence-order.js:113:21: error[OSEO1001]: Unknown
-        binding 'Object'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/statements/class/definition/fn-length-static-precedence-order.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/definition/fn-length-static-precedence-order.js:113:21:
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
       passed: false
     unsupportedFeatures: []
   - case:

@@ -175,7 +175,7 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
   located: LocatedSyntax,
   state: ResolveState,
 ): boolean {
-  if (name !== "Number") return false;
+  if (!isPropertyOwnedIntrinsicName(name)) return false;
   state.diagnostics.push(
     sourceDiagnostic(
       state.sourceId,
@@ -185,6 +185,11 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
     ),
   );
   return true;
+}
+
+/** Whether the mutable global object property owns this intrinsic value. */
+function isPropertyOwnedIntrinsicName(name: string): boolean {
+  return name === "Number" || name === "Object";
 }
 
 function bindingExpression(
@@ -361,7 +366,7 @@ function identifierFallback(
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
   if (name === "Function") return { kind: "function-intrinsic", range };
   if (name === "Iterator") return { kind: "iterator-intrinsic", range };
-  if (name === "Number") {
+  if (isPropertyOwnedIntrinsicName(name)) {
     return intrinsicGlobalIdentifierRead(name, range, state);
   }
   return bindingExpression(withFallbackBinding(name, state, false), range);
@@ -610,9 +615,12 @@ function resolveTypeofIdentifier(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
-  if (argument.name === "Number" && resolution.binding == null) {
+  if (
+    isPropertyOwnedIntrinsicName(argument.name) &&
+    resolution.binding == null
+  ) {
     const fallback = intrinsicGlobalPropertyRead(
-      "Number",
+      argument.name,
       argument.range,
       state,
     );
@@ -622,7 +630,7 @@ function resolveTypeofIdentifier(
         : {
             fallback,
             kind: "with-get" as const,
-            name: "Number",
+            name: argument.name,
             objectBindingIds: resolution.objectBindingIds,
             range: argument.range,
           };
@@ -635,7 +643,7 @@ function resolveTypeofIdentifier(
     argument.name === "Infinity" ||
     argument.name === "Function" ||
     argument.name === "Iterator" ||
-    argument.name === "Number" ||
+    isPropertyOwnedIntrinsicName(argument.name) ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
   if (resolvesValue) {
@@ -727,7 +735,7 @@ function resolveExpression(
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
-      expression.name === "Number" &&
+      isPropertyOwnedIntrinsicName(expression.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -892,7 +900,7 @@ function resolveExpression(
   if (expression.kind === "binding-step") {
     const resolution = resolveName(scopes, state, expression.name);
     if (
-      expression.name === "Number" &&
+      isPropertyOwnedIntrinsicName(expression.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -1131,7 +1139,7 @@ function resolveExpression(
       if (expression.name === "Iterator") {
         return { kind: "iterator-intrinsic", range: expression.range };
       }
-      if (expression.name === "Number") {
+      if (isPropertyOwnedIntrinsicName(expression.name)) {
         return intrinsicGlobalIdentifierRead(
           expression.name,
           expression.range,
@@ -1271,17 +1279,15 @@ function resolveExpression(
     const object = resolveExpression(expression.object, scopes, state);
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
-    return object == null || key == null || value == null
-      ? undefined
-      : { ...expression, key, object, value };
+    if (object == null || key == null || value == null) return undefined;
+    return { ...expression, key, object, value };
   }
   if (expression.kind === "property-update") {
     const object = resolveExpression(expression.object, scopes, state);
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
-    return object == null || key == null || value == null
-      ? undefined
-      : { ...expression, key, object, value };
+    if (object == null || key == null || value == null) return undefined;
+    return { ...expression, key, object, value };
   }
   if (expression.kind === "property-step") {
     const object = resolveExpression(expression.object, scopes, state);
@@ -1413,36 +1419,25 @@ function resolveExpression(
         ? { kind: "console-log" }
         : shadowedMethodTarget(binding, "log", expression.target.range);
   } else if (expression.target.kind === "object-intrinsic") {
-    const binding = findBinding(scopes, "Object");
-    if (binding != null) {
-      target = shadowedMethodTarget(
-        binding,
-        expression.target.method,
-        expression.target.range,
-      );
-    } else if (
-      expression.target.method === "create" &&
-      expression.arguments.length > 1 &&
-      !expression.arguments.some((argument) => argument.kind === "spread")
-    ) {
-      const descriptorMap = expression.arguments[1];
-      if (descriptorMap == null) {
-        throw new Error("Object.create has no second argument.");
-      }
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          descriptorMap,
-          "Object.create descriptor maps are unsupported in M3.",
-        ),
-      );
-      return undefined;
-    } else {
-      target = {
-        kind: "object-intrinsic",
-        method: expression.target.method,
-      };
-    }
+    const object = resolveExpression(
+      {
+        kind: "identifier",
+        name: "Object",
+        range: expression.target.range,
+      },
+      scopes,
+      state,
+    );
+    if (object == null) return undefined;
+    target = {
+      key: {
+        kind: "string",
+        range: expression.target.range,
+        value: expression.target.method,
+      },
+      kind: "method",
+      object,
+    };
   } else if (expression.target.kind === "promise-intrinsic-direct") {
     target = {
       kind: "promise-intrinsic",
@@ -2735,7 +2730,7 @@ function resolveBindingPattern(
         : resolveName(scopes, state, pattern.name);
     if (
       mode === "write" &&
-      pattern.name === "Number" &&
+      isPropertyOwnedIntrinsicName(pattern.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -3039,7 +3034,7 @@ function resolveForInTarget(
   if (target.kind === "binding") {
     const resolution = resolveName(scopes, state, target.name);
     if (
-      target.name === "Number" &&
+      isPropertyOwnedIntrinsicName(target.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -3655,7 +3650,7 @@ function resolveStatement(
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
       if (
-        statement.target.name === "Number" &&
+        isPropertyOwnedIntrinsicName(statement.target.name) &&
         resolution.binding == null &&
         resolution.objectBindingIds.length === 0
       ) {

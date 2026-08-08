@@ -365,6 +365,7 @@ export function intrinsicGlobalKind(
     name === "Function" ||
     name === "Iterator" ||
     name === "Number" ||
+    name === "Object" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
   ) {
@@ -392,15 +393,6 @@ export function anonymousDefinition(expression: HirExpression): boolean {
 export type HirCallTarget =
   | {
       readonly kind: "console-log";
-    }
-  | {
-      readonly kind: "object-intrinsic";
-      readonly method:
-        | "create"
-        | "defineProperty"
-        | "getOwnPropertyDescriptor"
-        | "keys"
-        | "setPrototypeOf";
     }
   | {
       readonly kind: "promise-intrinsic";

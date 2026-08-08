@@ -11,6 +11,23 @@ static OseoValue require_normal(OseoResult result) {
 
 static OseoValue make_text(OseoContext *context, const char *text);
 
+static void test_primitive_prototype_intrinsics(OseoContext *context) {
+    static const OseoIntrinsic intrinsics[] = {
+        OSEO_INTRINSIC_BOOLEAN_PROTOTYPE,
+        OSEO_INTRINSIC_STRING_PROTOTYPE,
+        OSEO_INTRINSIC_BIGINT_PROTOTYPE,
+    };
+    for (size_t index = 0u;
+         index < sizeof(intrinsics) / sizeof(intrinsics[0]);
+         index += 1u) {
+        OseoIntrinsic intrinsic = intrinsics[index];
+        assert(context->intrinsics[intrinsic] == oseo_undefined());
+        OseoValue first = require_normal(oseo_intrinsic(context, intrinsic));
+        assert(first != oseo_undefined());
+        assert(require_normal(oseo_intrinsic(context, intrinsic)) == first);
+    }
+}
+
 static void test_deep_graph(OseoContext *context, OseoValue *roots) {
     const size_t depth = 4096u;
     roots[0] = require_normal(oseo_environment_create(context, 1u));
@@ -1187,6 +1204,7 @@ int main(void) {
     OseoContext context;
     OseoRootFrame frame;
     oseo_context_init(&context, "runtime-heap.c", 14u);
+    test_primitive_prototype_intrinsics(&context);
     (void)require_normal(oseo_roots_allocate(&context, &frame, 8u));
     test_deep_graph(&context, frame.slots);
     test_forward_graph(&context, frame.slots);

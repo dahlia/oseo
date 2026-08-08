@@ -175,7 +175,7 @@ its read and write.
 
 ### Internal helpers
 
-Eighty helpers cross a translation-unit boundary. Each uses the
+Eighty-eight helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -190,9 +190,11 @@ Eighty helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_array_builtin_dispatch`              | *runtime\_array.c*            |
 | `oseo_internal_arguments_builtin_dispatch`          | *runtime\_arguments.c*        |
 | `oseo_internal_object_builtin_dispatch`             | *runtime\_object\_builtin.c*  |
+| `oseo_internal_function_builtin_dispatch`           | *runtime\_function.c*         |
 | `oseo_internal_number_builtin_dispatch`             | *runtime\_number.c*           |
 | `oseo_internal_number_intrinsic`                    | *runtime\_number.c*           |
 | `oseo_internal_install_number_global`               | *runtime\_number.c*           |
+| `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
@@ -232,10 +234,11 @@ Eighty helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_generator_complete`                  | *runtime\_generator.c*        |
 | `oseo_internal_promise_method_function`             | *runtime\_promise.c*          |
 | `oseo_internal_string_is_ascii`                     | *runtime\_string.c*           |
-| `oseo_internal_classify_virtual_property`           | *runtime\_property.c*         |
-| `oseo_internal_virtual_property`                    | *runtime\_property.c*         |
 | `oseo_internal_to_number`                           | *runtime\_primitive.c*        |
 | `oseo_internal_to_primitive`                        | *runtime\_primitive.c*        |
+| `oseo_internal_to_object`                           | *runtime\_object\_builtin.c*  |
+| `oseo_internal_to_object_for_property`              | *runtime\_object\_builtin.c*  |
+| `oseo_internal_install_primitive_wrapper_methods`   | *runtime\_object\_builtin.c*  |
 | `oseo_internal_symbol_create`                       | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_text`                         | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*           |
@@ -253,6 +256,11 @@ Eighty helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_async_from_sync_rejected`            | *runtime\_iterator.c*         |
 | `oseo_internal_throw_type_error_function`           | *runtime\_arguments.c*        |
 | `oseo_internal_object_prototype`                    | *runtime\_object\_builtin.c*  |
+| `oseo_internal_intrinsic`                           | *runtime\_function.c*         |
+| `oseo_internal_promise_prototype`                   | *runtime\_promise.c*          |
+| `oseo_internal_array_prototype`                     | *runtime\_array.c*            |
+| `oseo_internal_array_iterator_prototype`            | *runtime\_iterator.c*         |
+| `oseo_internal_same_value`                          | *runtime\_descriptor.c*       |
 | `oseo_internal_ordinary_has_instance`               | *runtime\_function.c*         |
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
@@ -339,14 +347,29 @@ M5b node `object-prototype` populates the existing realm-owned
 `propertyIsEnumerable`, `toString`, `toLocaleString`, `valueOf`, and its
 `constructor` link. *runtime\_object\_builtin.c* owns the methods and its
 reserved built-in code range; ordinary lookup continues to use the shared
-object and property components. The later `object-constructor-and-wrappers`
-node still owns callable constructor behavior and primitive wrapper objects.
+object and property components. The later `object-constructor` node still owns
+callable constructor behavior and primitive wrapper objects.
 
 The public intrinsic table expands for the constructor and methods, moving
 `abiVersion` to `m5-47`. Fixed and generated native differential evidence
 covers descriptors, prototype identity, both specialization policies,
 deliberate shape-guard misses, and forced collection. The node reviews only
 its declared `%Object.prototype%` test262 inventory root.
+
+### Object constructor evidence
+
+M5b node `object-constructor` makes the realm-owned `Object` identity callable
+and constructible in *runtime\_object\_builtin.c*. The same component owns
+`ToObject`, primitive wrapper state and String wrapper properties,
+`Object.is`, `Object.getPrototypeOf`, and `Object.setPrototypeOf`. Wrapper
+objects retain their primitive values in traced ordinary-object fields and
+reach stable realm-owned primitive prototypes.
+
+The public intrinsic table and ordinary-object layout expand, moving
+`abiVersion` to `m5-51`. Fixed and generated native differential evidence
+covers both specialization policies, false hints, deliberate guard misses,
+generic fallback, global `Object` replacement, and collection forced at every
+safepoint. The node reviews all five declared test262 inventory roots.
 
 ### Function prototype evidence
 
