@@ -705,28 +705,6 @@ function resolveTypeofIdentifier(
   return { kind: "string", range: expression.range, value: "undefined" };
 }
 
-/** Record a statically named write through this program's global Object. */
-function recordObjectStaticMutation(
-  expression: Extract<
-    SyntaxExpression,
-    { readonly kind: "property-set" | "property-update" }
-  >,
-  scopes: readonly Map<string, Binding>[],
-  state: ResolveState,
-): void {
-  if (
-    expression.object.kind !== "identifier" ||
-    expression.object.name !== "Object" ||
-    expression.key.kind !== "string"
-  ) {
-    return;
-  }
-  const resolution = resolveName(scopes, state, "Object");
-  if (resolution.binding == null && resolution.objectBindingIds.length === 0) {
-    state.objectStaticMutations.add(expression.key.value);
-  }
-}
-
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -761,7 +739,6 @@ function resolveExpression(
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
-      if (expression.name === "Object") state.objectGlobalMutated = true;
       if (value == null) return undefined;
       const inferred =
         expression.kind === "binding-set" ||
@@ -1303,7 +1280,6 @@ function resolveExpression(
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
     if (object == null || key == null || value == null) return undefined;
-    recordObjectStaticMutation(expression, scopes, state);
     return { ...expression, key, object, value };
   }
   if (expression.kind === "property-update") {
@@ -1311,7 +1287,6 @@ function resolveExpression(
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
     if (object == null || key == null || value == null) return undefined;
-    recordObjectStaticMutation(expression, scopes, state);
     return { ...expression, key, object, value };
   }
   if (expression.kind === "property-step") {
@@ -1443,68 +1418,7 @@ function resolveExpression(
       binding == null
         ? { kind: "console-log" }
         : shadowedMethodTarget(binding, "log", expression.target.range);
-  } else if (expression.target.kind === "unsupported-object-intrinsic") {
-    const resolution = resolveName(scopes, state, "Object");
-    if (
-      resolution.binding != null ||
-      resolution.objectBindingIds.length > 0 ||
-      state.objectGlobalMutated ||
-      state.objectStaticMutations.has(expression.target.method)
-    ) {
-      const object = resolveExpression(
-        {
-          kind: "identifier",
-          name: "Object",
-          range: expression.target.range,
-        },
-        scopes,
-        state,
-      );
-      if (object == null) return undefined;
-      target = {
-        key: {
-          kind: "string",
-          range: expression.target.range,
-          value: expression.target.method,
-        },
-        kind: "method",
-        object,
-      };
-    } else {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          `Object.${expression.target.method} is not admitted in this M5b ` +
-            "node.",
-        ),
-      );
-      return undefined;
-    }
   } else if (expression.target.kind === "object-intrinsic") {
-    const resolution = resolveName(scopes, state, "Object");
-    if (
-      expression.target.method === "create" &&
-      expression.arguments.length > 1 &&
-      !expression.arguments.some((argument) => argument.kind === "spread") &&
-      !state.objectGlobalMutated &&
-      !state.objectStaticMutations.has("create") &&
-      resolution.binding == null &&
-      resolution.objectBindingIds.length === 0
-    ) {
-      const descriptorMap = expression.arguments[1];
-      if (descriptorMap == null) {
-        throw new Error("Object.create has no second argument.");
-      }
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          descriptorMap,
-          "Object.create descriptor maps are unsupported in M3.",
-        ),
-      );
-      return undefined;
-    }
     const object = resolveExpression(
       {
         kind: "identifier",
@@ -4017,27 +3931,10 @@ interface SeededHirResult extends HirResult {
   readonly nextFunctionId: number;
 }
 
-/**
- * Object mutations found in one complete resolution pass.
- *
- * The mutations only widen admission. A successful first pass is final; a
- * failed pass needs at most one retry seeded with every mutation it found.
- */
-interface ObjectMutationSummary {
-  readonly global: boolean;
-  readonly statics: ReadonlySet<string>;
-}
-
-interface SeededHirPass {
-  readonly mutations: ObjectMutationSummary;
-  readonly result: SeededHirResult;
-}
-
-function buildSeededHirPass(
+export function buildSeededHir(
   program: SyntaxProgram,
-  seed: HirSeed,
-  knownMutations: ObjectMutationSummary,
-): SeededHirPass {
+  seed: HirSeed = {},
+): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
     diagnostics,
@@ -4049,8 +3946,6 @@ function buildSeededHirPass(
     labels: [],
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
-    objectGlobalMutated: knownMutations.global,
-    objectStaticMutations: new Set(knownMutations.statics),
     sourceId: program.sourceId,
     strict: program.strict === true,
     withFallbacks: [],
@@ -4090,15 +3985,9 @@ function buildSeededHirPass(
   }
   if (diagnostics.length > 0) {
     return {
-      mutations: {
-        global: state.objectGlobalMutated,
-        statics: state.objectStaticMutations,
-      },
-      result: {
-        diagnostics,
-        nextBindingId: state.nextBindingId,
-        nextFunctionId: state.nextFunctionId,
-      },
+      diagnostics,
+      nextBindingId: state.nextBindingId,
+      nextFunctionId: state.nextFunctionId,
     };
   }
   // A var-scoped top-level name reaches its global-object property
@@ -4133,84 +4022,54 @@ function buildSeededHirPass(
   }
   if (diagnostics.length > 0) {
     return {
-      mutations: {
-        global: state.objectGlobalMutated,
-        statics: state.objectStaticMutations,
-      },
-      result: {
-        diagnostics,
-        nextBindingId: state.nextBindingId,
-        nextFunctionId: state.nextFunctionId,
-      },
-    };
-  }
-  return {
-    mutations: {
-      global: state.objectGlobalMutated,
-      statics: state.objectStaticMutations,
-    },
-    result: {
       diagnostics,
       nextBindingId: state.nextBindingId,
       nextFunctionId: state.nextFunctionId,
-      program: {
-        body:
-          state.intrinsicGlobalObjectBinding == null
-            ? body
-            : [
-                {
-                  bindingId: state.intrinsicGlobalObjectBinding.id,
-                  hint: undefined,
-                  initializer: {
-                    kind: "this",
-                    range: program.range,
-                    thisMode: "global",
-                  },
-                  kind: "const",
-                  name: state.intrinsicGlobalObjectBinding.name,
+    };
+  }
+  return {
+    diagnostics,
+    nextBindingId: state.nextBindingId,
+    nextFunctionId: state.nextFunctionId,
+    program: {
+      body:
+        state.intrinsicGlobalObjectBinding == null
+          ? body
+          : [
+              {
+                bindingId: state.intrinsicGlobalObjectBinding.id,
+                hint: undefined,
+                initializer: {
+                  kind: "this",
                   range: program.range,
+                  thisMode: "global",
                 },
-                ...body,
-              ],
-        functions: state.hirFunctions,
-        globalBindings: [
-          ...(state.intrinsicGlobalObjectBinding == null
-            ? []
-            : [state.intrinsicGlobalObjectBinding]),
-          ...state.intrinsicReadFallbacks.values(),
-        ],
-        globalObjectBindings,
+                kind: "const",
+                name: state.intrinsicGlobalObjectBinding.name,
+                range: program.range,
+              },
+              ...body,
+            ],
+      functions: state.hirFunctions,
+      globalBindings: [
         ...(state.intrinsicGlobalObjectBinding == null
-          ? {}
-          : {
-              intrinsicGlobalObjectBindingId:
-                state.intrinsicGlobalObjectBinding.id,
-            }),
-        kind: "hir-program",
-        range: program.range,
-        sourceId: program.sourceId,
-        strict: program.strict === true,
-      },
+          ? []
+          : [state.intrinsicGlobalObjectBinding]),
+        ...state.intrinsicReadFallbacks.values(),
+      ],
+      globalObjectBindings,
+      ...(state.intrinsicGlobalObjectBinding == null
+        ? {}
+        : {
+            intrinsicGlobalObjectBindingId:
+              state.intrinsicGlobalObjectBinding.id,
+          }),
+      kind: "hir-program",
+      range: program.range,
+      sourceId: program.sourceId,
+      strict: program.strict === true,
     },
   };
-}
-
-export function buildSeededHir(
-  program: SyntaxProgram,
-  seed: HirSeed = {},
-): SeededHirResult {
-  const emptyMutations: ObjectMutationSummary = {
-    global: false,
-    statics: new Set(),
-  };
-  const first = buildSeededHirPass(program, seed, emptyMutations);
-  if (
-    first.result.diagnostics.length === 0 ||
-    (!first.mutations.global && first.mutations.statics.size === 0)
-  ) {
-    return first.result;
-  }
-  return buildSeededHirPass(program, seed, first.mutations).result;
 }
 
 /** Validate owned syntax and resolve all lexical and function identities. */

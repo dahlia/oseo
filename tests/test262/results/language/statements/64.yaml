@@ -202,13 +202,21 @@ results:
     dependencies:
       - control-flow
       - property-enumeration
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/language/statements/for-in/order-enumerable-shadowed.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/order-enumerable-shadowed.js:92:30:
-        error[OSEO1001]: Object.create descriptor maps are unsupported
+        stderr="test/language/statements/for-in/order-enumerable-shadowed.js:92:9:
+        error[OSEO2001]: Object.create descriptor maps are unsupported
         in M3.\n"'
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: object-create-descriptor-map
       passed: false
     unsupportedFeatures: []
   - case:

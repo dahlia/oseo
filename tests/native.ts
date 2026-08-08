@@ -99,11 +99,8 @@ const descriptorMapCompilation = compileSource(babelFrontend, {
   source: "Object.create(null, { item: { value: 3 } });",
   sourceId: "object-create-descriptor-map.ts",
 });
-assert.equal(descriptorMapCompilation.mir, undefined);
-assert.match(
-  descriptorMapCompilation.diagnostics[0]?.message ?? "",
-  /descriptor maps are unsupported/u,
-);
+assert.deepEqual(descriptorMapCompilation.diagnostics, []);
+assert(descriptorMapCompilation.mir != null, "descriptor map MIR");
 
 const spreadDescriptorMap = await runNativeCli(
   {
@@ -119,6 +116,47 @@ assert.equal(spreadDescriptorMap.stdout, "");
 assert.match(
   spreadDescriptorMap.stderr,
   /error\[OSEO2001\].*descriptor maps are unsupported/u,
+);
+
+for (const [name, source] of [
+  ["number-primitive-to-string", "console.log((1).toString());"],
+  ["number-wrapper-to-string", "console.log(Object(1).toString());"],
+] as const) {
+  const deferredNumberText = await runNativeCli(
+    {
+      args: [`${name}.ts`],
+      source,
+      sourceId: `${name}.ts`,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferredNumberText.exitStatus, 1);
+  assert.equal(deferredNumberText.stdout, "");
+  assert.match(
+    deferredNumberText.stderr,
+    new RegExp(
+      `^${name}\\.ts:1:\\d+: error\\[OSEO2001\\]: ` +
+        "Number prototype methods are not admitted yet\\.",
+      "u",
+    ),
+  );
+}
+
+const deferredObjectAssign = await runNativeCli(
+  {
+    args: ["deferred-object-assign.ts"],
+    source: "Object.assign({}, {});",
+    sourceId: "deferred-object-assign.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(deferredObjectAssign.exitStatus, 1);
+assert.equal(deferredObjectAssign.stdout, "");
+assert.match(
+  deferredObjectAssign.stderr,
+  /^deferred-object-assign\.ts:1:\d+: error\[OSEO2001\]: Object static/u,
 );
 
 async function requireSuccess(

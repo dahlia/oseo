@@ -1448,19 +1448,16 @@ test("reads legacy Object helpers through mutable properties", () => {
   assert.match(mir, /call dynamic function value/u);
 });
 
-test("rejects Object statics owned by later M5b nodes", () => {
+test("lowers later Object statics through ordinary lookup", () => {
   const result = compileSource(babelFrontend, {
     source: "Object.getOwnPropertyNames(Object);",
     sourceId: "later-object-static.ts",
   });
-  assert.equal(result.hir, undefined);
-  assert.equal(result.diagnostics.length, 1);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    result.diagnostics[0]?.message,
-    "Object.getOwnPropertyNames is not admitted in this M5b node.",
-  );
-  assert.deepEqual(result.diagnostics[0]?.byteRange, { end: 26, start: 0 });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /call .*\["getOwnPropertyNames"\]/u);
+  assert.match(printMir(result.mir), /property-get method lookup/u);
 });
 
 test("calls user-defined later Object statics through ordinary lookup", () => {

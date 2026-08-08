@@ -108,6 +108,69 @@ console.log(
   Object.prototype.toString.call(Object(9n)),
   Object(symbol) !== symbolWrapper,
 );
+console.log(
+  "prototype brands",
+  Object.prototype.toString.call(booleanWrapperPrototype),
+  Object.prototype.toString.call(stringWrapperPrototype),
+  Object.prototype.toString.call(bigintWrapperPrototype),
+);
+const stringTagLog = [];
+Object.defineProperty(stringWrapperPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get: function () {
+    stringTagLog.push(this.length);
+    return this[0];
+  },
+});
+console.log(
+  "string tag wrapper",
+  Object.prototype.toString.call("ab"),
+  stringTagLog[0],
+);
+delete stringWrapperPrototype[Symbol.toStringTag];
+Object.defineProperty(stringWrapperPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get: function () { throw new RangeError("string tag getter"); },
+});
+try { Object.prototype.toString.call("ab"); } catch (error) {
+  console.log("string tag abrupt", error.name, error.message);
+}
+delete stringWrapperPrototype[Symbol.toStringTag];
+const localeLog = [];
+Object.defineProperty(booleanWrapperPrototype, "toString", {
+  configurable: true,
+  get: function () {
+    localeLog.push(Object.getPrototypeOf(this) === booleanWrapperPrototype);
+    return function () {
+      localeLog.push(
+        Object.getPrototypeOf(this) === booleanWrapperPrototype,
+      );
+      return "localized boolean";
+    };
+  },
+});
+console.log(
+  "primitive locale",
+  Object.prototype.toLocaleString.call(true),
+  localeLog[0],
+  localeLog[1],
+);
+Object.defineProperty(booleanWrapperPrototype, "toString", {
+  configurable: true,
+  get: function () { throw new RangeError("locale getter"); },
+});
+try { Object.prototype.toLocaleString.call(true); } catch (error) {
+  console.log("locale getter abrupt", error.name, error.message);
+}
+Object.defineProperty(booleanWrapperPrototype, "toString", {
+  configurable: true,
+  get: function () {
+    return function () { throw new SyntaxError("locale call"); };
+  },
+});
+try { Object.prototype.toLocaleString.call(true); } catch (error) {
+  console.log("locale call abrupt", error.name, error.message);
+}
 class DerivedObject extends Object {}
 const derived = new DerivedObject(original);
 console.log(
@@ -182,6 +245,19 @@ console.log(
   Object.keys(),
   callPatchedAssign(),
 );
+const objectAlias = Object;
+objectAlias.assign = function () {
+  return this === Object ? "alias assign" : "wrong alias receiver";
+};
+console.log("alias static", Object.assign());
+originalDefineProperty(objectAlias, "assign", {
+  configurable: true,
+  value: function () {
+    return this === Object ? "defined assign" : "wrong defined receiver";
+  },
+  writable: true,
+});
+console.log("defined static", Object.assign());
 Object.create = originalCreate;
 Object.defineProperty = originalDefineProperty;
 Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;

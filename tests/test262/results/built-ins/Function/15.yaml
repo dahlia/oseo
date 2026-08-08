@@ -59,13 +59,20 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/Function/prototype/property-order.js non-strict
         disabled failed (1): stdout=""
         stderr="test/built-ins/Function/prototype/property-order.js:79:17:
-        error[OSEO1001]: Object.getOwnPropertyNames is not admitted in
-        this M5b node.\n"'
-      unsupportedCapability: profile-syntax
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

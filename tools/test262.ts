@@ -498,6 +498,12 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   if (diagnostic === "Generator intrinsic reflection is not admitted yet.") {
     return "generator-intrinsics";
   }
+  if (diagnostic === "Object static method is not admitted in this M5b node.") {
+    return "object-static-method";
+  }
+  if (diagnostic === "Object.create descriptor maps are unsupported in M3.") {
+    return "object-create-descriptor-map";
+  }
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"
     : undefined;

@@ -60,26 +60,6 @@ export type SyntaxCallTarget =
         | "keys";
     })
   | (LocatedSyntax & {
-      readonly kind: "unsupported-object-intrinsic";
-      readonly method:
-        | "assign"
-        | "defineProperties"
-        | "entries"
-        | "freeze"
-        | "fromEntries"
-        | "getOwnPropertyDescriptors"
-        | "getOwnPropertyNames"
-        | "getOwnPropertySymbols"
-        | "groupBy"
-        | "hasOwn"
-        | "isExtensible"
-        | "isFrozen"
-        | "isSealed"
-        | "preventExtensions"
-        | "seal"
-        | "values";
-    })
-  | (LocatedSyntax & {
       readonly kind: "promise-intrinsic";
       readonly method: "all" | "race" | "reject" | "resolve";
     })

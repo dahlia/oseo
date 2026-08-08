@@ -219,13 +219,22 @@ results:
       - iterator-protocol
       - lexical-bindings
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js:126:16:
-        error[OSEO1001]: Object.getOwnPropertyNames is not admitted in
-        this M5b node.\n"'
-      unsupportedCapability: profile-syntax
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
       passed: false
     unsupportedFeatures: []
   - case:

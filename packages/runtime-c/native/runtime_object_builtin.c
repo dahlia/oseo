@@ -217,10 +217,7 @@ static OseoResult object_prototype_to_string(
     if (is_object(frame.slots[0])) {
         frame.slots[1] = frame.slots[0];
     } else {
-        result = oseo_internal_to_object_for_property(
-            context,
-            frame.slots[0]
-        );
+        result = oseo_internal_to_object(context, frame.slots[0]);
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -252,16 +249,15 @@ static OseoResult object_prototype_to_locale_string(
     if (is_nullish(receiver)) {
         return type_error(context, "Cannot convert a nullish value to object.");
     }
-    if (!is_object(receiver)) {
-        return is_symbol(receiver)
-            ? oseo_internal_symbol_text(context, receiver)
-            : oseo_internal_value_string(context, receiver);
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = receiver;
-    result = oseo_internal_ascii_string(context, "toString");
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "toString");
+    }
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
@@ -386,11 +382,32 @@ static OseoResult primitive_wrapper_prototype(
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         return result;
     }
-    result = oseo_internal_install_primitive_wrapper_methods(
-        context,
-        result.value,
-        intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE
-    );
+    if (created) {
+        OseoOrdinaryObject *prototype = ordinary_object(result.value);
+        prototype->primitive_data = true;
+        if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE) {
+            prototype->primitive_value = oseo_boolean(false);
+        } else if (intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE) {
+            result = oseo_internal_allocate_string(context, NULL, 0u);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                prototype = ordinary_object(context->intrinsics[intrinsic]);
+                prototype->primitive_value = result.value;
+            }
+        } else {
+            result = oseo_bigint_literal(context, "0", 10u);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                prototype = ordinary_object(context->intrinsics[intrinsic]);
+                prototype->primitive_value = result.value;
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_primitive_wrapper_methods(
+            context,
+            context->intrinsics[intrinsic],
+            intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE
+        );
+    }
     if (result.status != OSEO_STATUS_NORMAL && created) {
         context->intrinsics[intrinsic] = oseo_undefined();
     }
@@ -563,6 +580,13 @@ OseoResult oseo_internal_object_builtin_dispatch(
             context,
             "OSEO2001",
             "Primitive wrapper prototype methods are not admitted yet."
+        );
+    }
+    if (code_id == OSEO_OBJECT_DEFERRED_STATIC_CODE_ID) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Object static method is not admitted in this M5b node."
         );
     }
     if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
@@ -898,6 +922,55 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
             result = oseo_internal_ascii_string(
                 context,
                 legacy_static_names[index]
+            );
+            frame.slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                context->intrinsics[OSEO_INTRINSIC_OBJECT],
+                frame.slots[1],
+                frame.slots[2],
+                attributes
+            );
+        }
+    }
+    static const char *const deferred_static_names[] = {
+        "assign",
+        "defineProperties",
+        "entries",
+        "freeze",
+        "fromEntries",
+        "getOwnPropertyDescriptors",
+        "getOwnPropertyNames",
+        "getOwnPropertySymbols",
+        "groupBy",
+        "hasOwn",
+        "isExtensible",
+        "isFrozen",
+        "isSealed",
+        "preventExtensions",
+        "seal",
+        "values",
+    };
+    static const size_t deferred_static_lengths[] = {
+        2u, 2u, 1u, 1u, 1u, 1u, 1u, 1u,
+        2u, 2u, 1u, 1u, 1u, 1u, 1u, 1u,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 16u;
+         index += 1u) {
+        result = create_object_prototype_function(
+            context,
+            OSEO_OBJECT_DEFERRED_STATIC_CODE_ID,
+            deferred_static_names[index],
+            deferred_static_lengths[index]
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                deferred_static_names[index]
             );
             frame.slots[1] = result.value;
         }

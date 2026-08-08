@@ -77,12 +77,49 @@ console.log(
   Object.prototype.toString.call(booleanWrapper),
 );
 console.log(
+  "prototype brands",
+  Object.prototype.toString.call(booleanPrototype),
+  Object.prototype.toString.call(stringPrototype),
+  Object.prototype.toString.call(bigintPrototype),
+);
+console.log(
   "string wrapper",
   stringWrapper[0],
   stringWrapper.length,
   Object.getPrototypeOf(stringWrapper) ===
     Object.getPrototypeOf(secondStringWrapper),
   Object.prototype.toString.call(stringWrapper),
+);
+const stringTagLog = [];
+Object.defineProperty(stringPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get() {
+    stringTagLog.push(this.length);
+    return this[0];
+  },
+});
+console.log(
+  "string tag wrapper",
+  Object.prototype.toString.call(${JSON.stringify(testCase.text)}),
+  stringTagLog[0],
+);
+delete stringPrototype[Symbol.toStringTag];
+const localeLog = [];
+Object.defineProperty(booleanPrototype, "toString", {
+  configurable: true,
+  get() {
+    localeLog.push(Object.getPrototypeOf(this) === booleanPrototype);
+    return function () {
+      localeLog.push(Object.getPrototypeOf(this) === booleanPrototype);
+      return ${JSON.stringify(testCase.text)};
+    };
+  },
+});
+console.log(
+  "primitive locale",
+  Object.prototype.toLocaleString.call(${testCase.flag}),
+  localeLog[0],
+  localeLog[1],
 );
 console.log(
   "same value",
@@ -143,6 +180,19 @@ console.log(
   Object.keys(),
   callPatchedAssign(),
 );
+const objectAlias = Object;
+objectAlias.assign = function () {
+  return this === Object ? ${testCase.integer} : 0;
+};
+console.log("alias static", Object.assign());
+originalDefineProperty(objectAlias, "assign", {
+  configurable: true,
+  value: function () {
+    return this === Object ? ${JSON.stringify(testCase.text)} : "wrong";
+  },
+  writable: true,
+});
+console.log("defined static", Object.assign());
 Object.create = originalCreate;
 Object.defineProperty = originalDefineProperty;
 Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;
@@ -234,8 +284,12 @@ function expected(testCase: ObjectConstructorCase): string {
   return [
     "identity true true true true",
     `wrappers object true [object Number] [object Boolean]`,
+    "prototype brands [object Boolean] [object String] [object BigInt]",
     `string wrapper ${testCase.text[0]} ${testCase.text.length} true ` +
       "[object String]",
+    `string tag wrapper [object ${testCase.text[0]}] ` +
+      `${testCase.text.length}`,
+    `primitive locale ${testCase.text} true true`,
     "same value true false true true true false",
     `prototype true true ${selected} ${testCase.integer}`,
     "null prototype read true",
@@ -245,6 +299,8 @@ function expected(testCase: ObjectConstructorCase): string {
     "guard true",
     "guard true",
     `patched statics ${testCase.integer} 2 3 4 7`,
+    `alias static ${testCase.integer}`,
+    `defined static ${testCase.text}`,
     `replacement static 9 10 11 12 8 get argument receiver ${testCase.text}`,
     "primitive tag [object Custom] [object Boolean] [object BigInt]",
     "wrapper mutations false true false true false true",
@@ -375,14 +431,17 @@ test(
           "construction, SameValue pairs, prototype reads and writes, a " +
           "false number hint, one constructor shape miss, and one global " +
           "Object write and restore, mutable legacy and later statics, " +
-          "stable wrapper mutations, and primitive toStringTag lookup",
+          "alias and descriptor static replacement, default wrapper " +
+          "prototype brands, stable wrapper mutations, primitive " +
+          "toStringTag lookup, and primitive locale receiver lookup",
         numRuns: 12,
         profile: "M5 Object constructor",
         seed: 0x6000_3600,
         sizeLimit:
           "one bounded integer, one boolean, one short string, two prototype " +
-          "objects, four wrappers, two repeated intrinsic observations, and " +
-          "one global mutation sequence with wrapper and static mutations",
+          "objects, seven wrappers, two repeated intrinsic observations, " +
+          "and one global mutation sequence with wrapper and static " +
+          "mutations",
         timeLimitMilliseconds: 180_000,
       },
     );
