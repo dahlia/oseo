@@ -228,10 +228,11 @@ static OseoResult object_prototype_to_string(
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(
+        result = oseo_super_get(
             context,
             frame.slots[1],
-            frame.slots[2]
+            frame.slots[2],
+            frame.slots[0]
         );
         frame.slots[3] = result.value;
     }
@@ -300,10 +301,13 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
     if (ordinary_object(prototype)->primitive_wrapper_methods_initialized) {
         return normal(prototype);
     }
-    static const char *const method_names[] = {
-        "toString",
-        "valueOf",
-        "indexOf",
+    static const struct {
+        const char *name;
+        size_t length;
+    } methods[] = {
+        {"toString", 0u},
+        {"valueOf", 0u},
+        {"indexOf", 1u},
     };
     size_t method_count = include_index_of ? 3u : 2u;
     OseoValue slots[3] = {
@@ -318,12 +322,15 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
         result = create_object_prototype_function(
             context,
             OSEO_OBJECT_PRIMITIVE_WRAPPER_METHOD_CODE_ID,
-            method_names[index],
-            0u
+            methods[index].name,
+            methods[index].length
         );
         slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_ascii_string(context, method_names[index]);
+            result = oseo_internal_ascii_string(
+                context,
+                methods[index].name
+            );
             slots[2] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {

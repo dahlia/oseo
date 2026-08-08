@@ -97,6 +97,11 @@ console.log(
     Object.getPrototypeOf(secondStringWrapper),
   Object.prototype.toString.call(firstStringWrapper),
 );
+console.log(
+  "string method metadata",
+  firstStringWrapper.indexOf.name,
+  firstStringWrapper.indexOf.length,
+);
 const symbol = Symbol("wrapped");
 const symbolWrapper = Object(symbol);
 const booleanWrapperPrototype = Object.getPrototypeOf(Object(true));
@@ -118,6 +123,7 @@ const stringTagLog = [];
 Object.defineProperty(stringWrapperPrototype, Symbol.toStringTag, {
   configurable: true,
   get: function () {
+    "use strict";
     stringTagLog.push(this.length);
     return this[0];
   },
@@ -136,6 +142,21 @@ try { Object.prototype.toString.call("ab"); } catch (error) {
   console.log("string tag abrupt", error.name, error.message);
 }
 delete stringWrapperPrototype[Symbol.toStringTag];
+const booleanTagReceivers = [];
+Object.defineProperty(booleanWrapperPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get: function () {
+    "use strict";
+    booleanTagReceivers.push(typeof this);
+    return "Boolean";
+  },
+});
+console.log(
+  "primitive tag receiver",
+  Object.prototype.toString.call(true),
+  booleanTagReceivers[0],
+);
+delete booleanWrapperPrototype[Symbol.toStringTag];
 const localeLog = [];
 Object.defineProperty(booleanWrapperPrototype, "toString", {
   configurable: true,

@@ -90,10 +90,16 @@ console.log(
     Object.getPrototypeOf(secondStringWrapper),
   Object.prototype.toString.call(stringWrapper),
 );
+console.log(
+  "string method metadata",
+  stringWrapper.indexOf.name,
+  stringWrapper.indexOf.length,
+);
 const stringTagLog = [];
 Object.defineProperty(stringPrototype, Symbol.toStringTag, {
   configurable: true,
   get() {
+    "use strict";
     stringTagLog.push(this.length);
     return this[0];
   },
@@ -104,6 +110,21 @@ console.log(
   stringTagLog[0],
 );
 delete stringPrototype[Symbol.toStringTag];
+const booleanTagReceivers = [];
+Object.defineProperty(booleanPrototype, Symbol.toStringTag, {
+  configurable: true,
+  get() {
+    "use strict";
+    booleanTagReceivers.push(typeof this);
+    return "Boolean";
+  },
+});
+console.log(
+  "primitive tag receiver",
+  Object.prototype.toString.call(true),
+  booleanTagReceivers[0],
+);
+delete booleanPrototype[Symbol.toStringTag];
 const localeLog = [];
 Object.defineProperty(booleanPrototype, "toString", {
   configurable: true,
@@ -289,8 +310,10 @@ function expected(testCase: ObjectConstructorCase): string {
     "prototype brands [object Boolean] [object String] [object BigInt]",
     `string wrapper ${testCase.text[0]} ${testCase.text.length} true ` +
       "[object String]",
+    "string method metadata indexOf 1",
     `string tag wrapper [object ${testCase.text[0]}] ` +
       `${testCase.text.length}`,
+    "primitive tag receiver [object Boolean] boolean",
     `primitive locale ${testCase.text} true true`,
     "same value true false true true true false",
     `prototype true true ${selected} ${testCase.integer}`,
@@ -435,7 +458,8 @@ test(
           "Object write and restore, mutable legacy and later statics, " +
           "alias and descriptor static replacement, default wrapper " +
           "prototype brands, stable wrapper mutations, primitive " +
-          "toStringTag lookup, and primitive locale receiver lookup",
+          "toStringTag lookup and receiver, wrapper method metadata, and " +
+          "primitive locale receiver lookup",
         numRuns: 12,
         profile: "M5 Object constructor",
         seed: 0x6000_3600,

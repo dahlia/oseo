@@ -504,7 +504,6 @@ export const emittedC = {
       ["result = oseo_console_log(context, "],
       [", "],
     ],
-    oseoObjectBuiltinSetPrototypeOf: [["oseo_object_builtin_set_prototype_of"]],
     resultAssignOseoPromiseConstructContext: [
       ["result = oseo_promise_construct(context, "],
       [");"],
