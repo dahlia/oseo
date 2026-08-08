@@ -14,5 +14,5 @@ inventory:
     - test/built-ins/Object/setPrototypeOf/
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready

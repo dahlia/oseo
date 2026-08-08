@@ -11,4 +11,4 @@ inventory:
 dependencies:
   - object-constructor
 landed: false
-status: blocked
+status: ready
