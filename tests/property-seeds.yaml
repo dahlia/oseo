@@ -220,3 +220,7 @@ families:
     owner: tests/property/m5-object-constructor.property.test.ts
     start: 0x60003600
     end: 0x600036ff
+  - family: m5-object-define-property
+    owner: tests/property/m5-object-define-property.property.test.ts
+    start: 0x60003700
+    end: 0x600037ff

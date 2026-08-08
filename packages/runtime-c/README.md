@@ -342,6 +342,13 @@ function properties of `Object`. Transient primitive property lookup boxes
 without materializing String index properties that the lookup has already
 handled directly.
 
+The `m5-52` ABI admits `Object.defineProperty` as a complete descriptor
+operation. Property-key coercion precedes descriptor conversion, descriptor
+fields retain their specified observation order and defaults, and abrupt
+completion stops before later observations or mutation. The shared descriptor
+component applies ordinary, array, function, arguments, String-wrapper, and
+module-namespace compatibility rules without changing public runtime layout.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

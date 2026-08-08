@@ -1326,10 +1326,10 @@ OseoResult oseo_object_builtin_define_property(
     OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
     OseoValue descriptor_value =
         builtin_argument(argument_count, arguments, 2u);
-    if (!is_object(object_value) || !is_object(descriptor_value)) {
+    if (!is_object(object_value)) {
         return type_error(
             context,
-            "Object.defineProperty requires an object descriptor."
+            "Object.defineProperty requires an object target."
         );
     }
     /* Slots: 0 key, 1 enumerable, 2 configurable, 3 value, 4 writable,
@@ -1350,6 +1350,13 @@ OseoResult oseo_object_builtin_define_property(
     if (result.status != OSEO_STATUS_NORMAL) {
         oseo_roots_release(context, &frame);
         return result;
+    }
+    if (!is_object(descriptor_value)) {
+        oseo_roots_release(context, &frame);
+        return type_error(
+            context,
+            "Object.defineProperty requires an object descriptor."
+        );
     }
     bool has_enumerable = false;
     result = descriptor_field(

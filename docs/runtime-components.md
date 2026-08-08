@@ -371,6 +371,20 @@ covers both specialization policies, false hints, deliberate guard misses,
 generic fallback, global `Object` replacement, and collection forced at every
 safepoint. The node reviews all five declared test262 inventory roots.
 
+### Object define-property evidence
+
+M5b node `object-define-property` admits `Object.defineProperty` over the
+shared property-key and descriptor components. The Object built-in component
+orders target validation, property-key coercion, and descriptor conversion.
+The descriptor component owns attribute defaults, data and accessor
+compatibility, mutation, aliases, and module-namespace restrictions.
+
+The completed semantic checkpoint moves `abiVersion` to `m5-52` without a
+public layout change. Fixed and generated native differential evidence covers
+both specialization policies, false hints, generic fallback, deliberate
+invalid and abrupt descriptors, and collection forced at every safepoint. The
+node reviews only its declared `Object.defineProperty` test262 inventory root.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

@@ -94,12 +94,6 @@ OseoResult oseo_object_define(
             "Object.defineProperty requires an object."
         );
     }
-    if (ordinary_object(object_value)->module_namespace) {
-        return type_error(
-            context,
-            "Cannot define a module namespace property."
-        );
-    }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
@@ -165,6 +159,28 @@ OseoResult oseo_object_define(
         );
     }
     size_t index = oseo_internal_own_property_index(object, key);
+    if (object->module_namespace) {
+        if (index == SIZE_MAX || attributes.accessor ||
+            attributes.configurable || !attributes.enumerable ||
+            !attributes.writable) {
+            return type_error(
+                context,
+                "Cannot define a module namespace property."
+            );
+        }
+        OseoResult current = oseo_cell_get(
+            context,
+            object->properties[index].value
+        );
+        if (current.status != OSEO_STATUS_NORMAL) return current;
+        if (!oseo_internal_same_value(current.value, value)) {
+            return type_error(
+                context,
+                "Cannot define a module namespace property."
+            );
+        }
+        return normal(object_value);
+    }
     if (index != SIZE_MAX) {
         OseoProperty *property = &object->properties[index];
         /* ValidateAndApplyPropertyDescriptor compares the property's

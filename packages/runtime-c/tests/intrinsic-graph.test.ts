@@ -103,6 +103,24 @@ test("populates the realm-owned Object constructor cluster", () => {
   assert.match(functions, /intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF/u);
 });
 
+test("orders Object.defineProperty conversion before descriptors", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      "oseo_object_builtin_define_property[\\s\\S]*" +
+        "oseo_property_key[\\s\\S]*" +
+        "Object\\.defineProperty requires an object descriptor",
+      "u",
+    ),
+  );
+  assert.match(
+    objectBuiltins,
+    /OSEO_OBJECT_DEFINE_PROPERTY_CODE_ID[\s\S]*"defineProperty"/u,
+  );
+});
+
 test("populates the realm-owned Function prototype", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const functionSource = sources.get("runtime_function.c") ?? "";

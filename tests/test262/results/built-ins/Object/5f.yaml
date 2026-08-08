@@ -7,6 +7,51 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Object/defineProperty/15.2.3.6-3-93-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-93-1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-93-1.j\
+        s:83:1: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Object/defineProperty/15.2.3.6-4-213.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-213.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-213.js\
+        :172:1: error[OSEO1001]: Unknown binding 'verifyEqualTo'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-30.js
       strictness:
         - non-strict

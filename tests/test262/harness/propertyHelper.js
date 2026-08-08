@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars -- Harness globals are used after assembly. */
 
 function verifyProperty(object, name, descriptor) {
-  const O = Object; // Preserve statics while verifying the global binding.
-  const actual = O.getOwnPropertyDescriptor(object, name);
+  // Preserve statics while verifying the global binding or a static itself.
+  const { defineProperty, getOwnPropertyDescriptor, keys } = Object;
+  const actual = getOwnPropertyDescriptor(object, name);
   if (descriptor === undefined) {
     assert.sameValue(actual, undefined);
     return true;
@@ -22,11 +23,10 @@ function verifyProperty(object, name, descriptor) {
   if ("configurable" in descriptor) {
     assert.sameValue(actual.configurable, descriptor.configurable);
   }
-
   if ("writable" in descriptor) {
     const originalValue = actual.value;
-    let writeValue = "unlikelyValue";
-    if (originalValue === writeValue) writeValue = "unlikelyValue2";
+    let writeValue = name === "length" ? 0xffffffff : "unlikelyValue";
+    if (originalValue === writeValue) writeValue = 0xfffffffe;
     try {
       object[name] = writeValue;
     } catch (error) {}
@@ -41,7 +41,7 @@ function verifyProperty(object, name, descriptor) {
       enumerable = Object.prototype.propertyIsEnumerable.call(object, name);
     } else {
       const key = "" + name;
-      const enumerableKeys = O.keys(object);
+      const enumerableKeys = keys(object);
       let index = 0;
       enumerable = false;
       while (index < enumerableKeys.length) {
@@ -56,9 +56,9 @@ function verifyProperty(object, name, descriptor) {
     try {
       delete object[name];
     } catch (error) {}
-    const configurable = O.getOwnPropertyDescriptor(object, name) === undefined;
+    const configurable = getOwnPropertyDescriptor(object, name) === undefined;
     assert.sameValue(configurable, descriptor.configurable);
-    if (configurable) O.defineProperty(object, name, actual);
+    if (configurable) defineProperty(object, name, actual);
   }
   return true;
 }

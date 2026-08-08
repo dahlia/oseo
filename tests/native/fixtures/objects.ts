@@ -381,6 +381,246 @@ try { Object.prototype.toString.call(true); } catch (error) {
 `,
   },
   {
+    name: "object-define-property",
+    nonStrictScript: true,
+    source: `
+const metadata = Object.getOwnPropertyDescriptor(
+  Object,
+  "defineProperty",
+);
+console.log(
+  "metadata",
+  Object.defineProperty.name,
+  Object.defineProperty.length,
+  metadata.writable,
+  metadata.enumerable,
+  metadata.configurable,
+);
+const order = [];
+const key = {
+  toString: function () {
+    order.push("key");
+    return "item";
+  },
+};
+const inherited = {
+  get enumerable() { order.push("enumerable"); return true; },
+  get configurable() { order.push("configurable"); return true; },
+  get value() { order.push("value"); return 1; },
+  get writable() { order.push("writable"); return true; },
+  get get() { order.push("get"); return undefined; },
+  get set() { order.push("set"); return undefined; },
+};
+try {
+  Object.defineProperty({}, key, Object.create(inherited));
+} catch (error) {
+  console.log("mixed", error instanceof TypeError);
+}
+console.log(
+  "order",
+  order[0],
+  order[1],
+  order[2],
+  order[3],
+  order[4],
+  order[5],
+  order[6],
+);
+const keyLog = [];
+const abruptKey = {
+  toString: function () {
+    keyLog.push("key");
+    throw new RangeError("key");
+  },
+};
+try {
+  Object.defineProperty({}, abruptKey, null);
+} catch (error) {
+  console.log("key first", error.name, error.message, keyLog[0]);
+}
+const skippedKeyLog = [];
+const skippedKey = {
+  toString: function () {
+    skippedKeyLog.push("key");
+    return "skipped";
+  },
+};
+try {
+  Object.defineProperty(1, skippedKey, {});
+} catch (error) {
+  console.log(
+    "target first",
+    error instanceof TypeError,
+    skippedKeyLog.length,
+  );
+}
+const abruptLog = [];
+const abruptDescriptor = {
+  get enumerable() { abruptLog.push("enumerable"); return true; },
+  get configurable() {
+    abruptLog.push("configurable");
+    throw new SyntaxError("descriptor");
+  },
+  get value() { abruptLog.push("value"); return 1; },
+};
+try {
+  Object.defineProperty({}, "abrupt", abruptDescriptor);
+} catch (error) {
+  console.log(
+    "descriptor abrupt",
+    error.name,
+    error.message,
+    abruptLog[0],
+    abruptLog[1],
+  );
+}
+const invalidLog = [];
+const invalidDescriptor = {
+  get get() { invalidLog.push("get"); return null; },
+  get set() {
+    invalidLog.push("set");
+    return function () {};
+  },
+};
+try {
+  Object.defineProperty({}, "invalid", invalidDescriptor);
+} catch (error) {
+  console.log("invalid getter", error instanceof TypeError, invalidLog[0]);
+}
+const target = {};
+Object.defineProperty(target, "defaults", {});
+const defaults = Object.getOwnPropertyDescriptor(target, "defaults");
+console.log(
+  "defaults",
+  defaults.value,
+  defaults.writable,
+  defaults.enumerable,
+  defaults.configurable,
+);
+Object.defineProperty(target, "data", {
+  configurable: true,
+  enumerable: true,
+  value: 1,
+  writable: true,
+});
+Object.defineProperty(target, "data", { value: 2 });
+const preserved = Object.getOwnPropertyDescriptor(target, "data");
+console.log(
+  "preserved",
+  preserved.value,
+  preserved.writable,
+  preserved.enumerable,
+  preserved.configurable,
+);
+let alias = 3;
+Object.defineProperty(target, "alias", {
+  configurable: true,
+  enumerable: true,
+  get: function () { return alias; },
+  set: function (value) { alias = value; },
+});
+target.alias = 4;
+Object.defineProperty(target, "alias", { value: 5 });
+console.log("alias", target.alias, alias);
+const fixed = {};
+Object.defineProperty(fixed, "item", { value: 1 });
+Object.defineProperty(fixed, "item", { value: 1 });
+for (const incompatible of [
+  { configurable: true },
+  { enumerable: true },
+  { value: 2 },
+  { writable: true },
+  { get: function () { return 1; } },
+]) {
+  try {
+    Object.defineProperty(fixed, "item", incompatible);
+  } catch (error) {
+    console.log("incompatible", error instanceof TypeError);
+  }
+}
+const symbol = Symbol("key");
+Object.defineProperty(target, symbol, { value: "symbol" });
+console.log("symbol", target[symbol]);
+for (const primitive of [
+  undefined,
+  null,
+  true,
+  1,
+  "text",
+  Symbol("target"),
+  1n,
+]) {
+  try {
+    Object.defineProperty(primitive, "item", {});
+  } catch (error) {
+    console.log("primitive", typeof primitive, error instanceof TypeError);
+  }
+}
+const array = [1, 2];
+Object.defineProperty(array, "4", { value: 5 });
+console.log("array growth", array.length, array[4]);
+Object.defineProperty(array, "length", { writable: false });
+try {
+  Object.defineProperty(array, "5", { value: 6 });
+} catch (error) {
+  console.log("array fixed", array.length, error instanceof TypeError);
+}
+function Constructor() {}
+const prototype = Constructor.prototype;
+Object.defineProperty(Constructor, "prototype", { writable: false });
+Object.defineProperty(Constructor, "prototype", { value: prototype });
+try {
+  Object.defineProperty(Constructor, "prototype", { value: {} });
+} catch (error) {
+  console.log("function prototype", error instanceof TypeError);
+}
+function mapped(value) {
+  Object.defineProperty(arguments, "0", { value: 7 });
+  const throughDescriptor = value;
+  Object.defineProperty(arguments, "0", { writable: false });
+  value = 8;
+  return [throughDescriptor, value, arguments[0]];
+}
+console.log("mapped", ...mapped(6));
+const stringWrapper = Object("ab");
+Object.defineProperty(stringWrapper, "0", { value: "a" });
+try {
+  Object.defineProperty(stringWrapper, "0", { value: "z" });
+} catch (error) {
+  console.log("string index", stringWrapper[0], error instanceof TypeError);
+}
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+const original = Object.defineProperty;
+let turn = 0;
+while (turn < 3) {
+  const guarded = {};
+  Object.defineProperty(guarded, "value", {
+    value: hinted(turn === 1 ? "x" : turn),
+  });
+  console.log("guard", guarded.value);
+  if (turn === 0) Object.marker = true;
+  turn = turn + 1;
+}
+console.log("identity", Object.defineProperty === original);
+const collected = {};
+for (let index = 0; index < 24; index = index + 1) {
+  Object.defineProperty(collected, "item" + index, {
+    configurable: true,
+    enumerable: index % 2 === 0,
+    value: { index },
+    writable: true,
+  });
+}
+console.log(
+  "collection",
+  collected.item0.index,
+  collected.item23.index,
+  Object.keys(collected).length,
+);
+`,
+  },
+  {
     name: "object-prototype",
     source: `
 const parent = { inherited: 3 };
