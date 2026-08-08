@@ -2,6 +2,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - AggregateError
   - BigInt
+  - Object.is
   - arrow-function
   - async-functions
   - async-iteration
@@ -2675,7 +2676,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/is/symbol-object-is-same-value.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/keys/15.2.3.14-1-1.js
     expectedClassification: pass

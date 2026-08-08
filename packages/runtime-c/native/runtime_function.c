@@ -975,7 +975,10 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         materialized = oseo_internal_number_intrinsic(context);
     } else if (intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_BIGINT_PROTOTYPE) {
-        materialized = normal(context->intrinsics[intrinsic]);
+        materialized = oseo_internal_primitive_wrapper_prototype(
+            context,
+            intrinsic
+        );
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
         materialized = oseo_internal_promise_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||

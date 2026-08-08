@@ -1297,6 +1297,11 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
     OseoValue prototype,
     bool include_index_of
 );
+/* Materializes one realm-owned primitive wrapper prototype. */
+OseoResult oseo_internal_primitive_wrapper_prototype(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+);
 OseoResult oseo_internal_install_object_global(
     OseoContext *context,
     OseoValue global

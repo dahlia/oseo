@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records 5,770
-reviewed cases: 3,570 passes, 1,355 expected negatives, and 845 unsupported
+reviewed cases: 3,571 passes, 1,355 expected negatives, and 844 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -29,7 +29,7 @@ separate from the result manifest.
 M5a is complete. The 69 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 3,570
+the M5b and M5c dependency order below. The reviewed manifest now records 3,571
 passes across 5,770 paths, and the property inventory records 65 domains,
 65 seeds, and an ordinary case budget of 2,786.
 
@@ -3682,11 +3682,11 @@ generated differential evidence at seed `0x60003600` covers both
 specialization policies, forced collection at every safepoint, false hints,
 guard hits and misses, generic fallback, derived construction, primitive
 wrapping, prototype mutation, and global `Object` replacement. All 139 paths
-under the node's five inventory roots are reviewed: 75 pass and 64 retain
+under the node's five inventory roots are reviewed: 76 pass and 63 retain
 explicit prerequisite boundaries. A further 195 previously reviewed cases
 move from unsupported to pass because the real `Object` value and its
 prototype operations satisfy their prerequisites. The manifest moves to 5,770
-paths with 3,570 passes, 1,355 expected negatives, and 845 unsupported profile
+paths with 3,571 passes, 1,355 expected negatives, and 844 unsupported profile
 features. The public intrinsic table and primitive wrapper state move the
 runtime ABI to `oseo-runtime-m5-51` without changing the graph's orchestration
 state.

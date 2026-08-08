@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 5,770 reviewed cases: 3,570 passes, 1,355
-expected negatives, and 845 unsupported profile features. It records no
+The current manifest contains 5,770 reviewed cases: 3,571 passes, 1,355
+expected negatives, and 844 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3084,10 +3084,10 @@ seed `0x60003600` covers both specialization policies, collection forced at
 every safepoint, false hints, guard hits and misses, generic fallback, derived
 construction, primitive wrapping, prototype mutation, and global `Object`
 replacement. All 139 paths under the node's five inventory roots are reviewed:
-75 pass and 64 retain explicit prerequisite boundaries. A further 195
+76 pass and 63 retain explicit prerequisite boundaries. A further 195
 previously reviewed cases move from unsupported to pass because the real
 `Object` value and its prototype operations satisfy their prerequisites. The
-manifest reaches 5,770 cases: 3,570 passes, 1,355 expected negatives, and 845
+manifest reaches 5,770 cases: 3,571 passes, 1,355 expected negatives, and 844
 unsupported profile features with no semantic, harness, or infrastructure
 failures. The suite revision, 41,091-path inventory, manifest schema and
 vocabulary, and zero-override policy are unchanged. The public intrinsic table

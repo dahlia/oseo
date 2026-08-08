@@ -108,9 +108,11 @@ const localeLog = [];
 Object.defineProperty(booleanPrototype, "toString", {
   configurable: true,
   get() {
-    localeLog.push(Object.getPrototypeOf(this) === booleanPrototype);
+    "use strict";
+    localeLog.push(typeof this === "boolean");
     return function () {
-      localeLog.push(Object.getPrototypeOf(this) === booleanPrototype);
+      "use strict";
+      localeLog.push(typeof this === "boolean");
       return ${JSON.stringify(testCase.text)};
     };
   },

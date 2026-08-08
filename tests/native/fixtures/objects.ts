@@ -140,11 +140,11 @@ const localeLog = [];
 Object.defineProperty(booleanWrapperPrototype, "toString", {
   configurable: true,
   get: function () {
-    localeLog.push(Object.getPrototypeOf(this) === booleanWrapperPrototype);
+    "use strict";
+    localeLog.push(typeof this === "boolean");
     return function () {
-      localeLog.push(
-        Object.getPrototypeOf(this) === booleanWrapperPrototype,
-      );
+      "use strict";
+      localeLog.push(typeof this === "boolean");
       return "localized boolean";
     };
   },

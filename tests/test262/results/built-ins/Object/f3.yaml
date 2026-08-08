@@ -54,7 +54,6 @@ results:
       passed: false
     unsupportedFeatures:
       - Reflect.construct
-      - Object.is
   - case:
       async: false
       features: []

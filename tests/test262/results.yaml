@@ -5224,9 +5224,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 3570
+  passes: 3571
   semanticFailures: 0
-  unsupportedProfileFeatures: 845
+  unsupportedProfileFeatures: 844
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -5351,9 +5351,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1430
+      passes: 1431
       semanticFailures: 0
-      unsupportedProfileFeatures: 198
+      unsupportedProfileFeatures: 197
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -5485,9 +5485,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 210
+      passes: 211
       semanticFailures: 0
-      unsupportedProfileFeatures: 115
+      unsupportedProfileFeatures: 114
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0

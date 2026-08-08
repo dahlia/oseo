@@ -250,26 +250,31 @@ static OseoResult object_prototype_to_locale_string(
         return type_error(context, "Cannot convert a nullish value to object.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = receiver;
     result = oseo_internal_to_object(context, frame.slots[0]);
-    frame.slots[0] = result.value;
+    frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_ascii_string(context, "toString");
     }
-    frame.slots[1] = result.value;
+    frame.slots[2] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
-        frame.slots[1] = result.value;
+        result = oseo_super_get(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[0]
+        );
+        frame.slots[2] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[1])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[2])) {
         result = type_error(context, "The toString property is not callable.");
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_call_function(
             context,
-            frame.slots[1],
+            frame.slots[2],
             frame.slots[0],
             0u,
             NULL,
@@ -341,22 +346,10 @@ OseoResult oseo_internal_install_primitive_wrapper_methods(
     return result;
 }
 
-static OseoResult primitive_wrapper_prototype(
+OseoResult oseo_internal_primitive_wrapper_prototype(
     OseoContext *context,
-    OseoValue value
+    OseoIntrinsic intrinsic
 ) {
-    OseoIntrinsic intrinsic;
-    if (is_number(value)) {
-        intrinsic = OSEO_INTRINSIC_NUMBER_PROTOTYPE;
-    } else if (is_symbol(value)) {
-        intrinsic = OSEO_INTRINSIC_SYMBOL_PROTOTYPE;
-    } else if (is_string(value)) {
-        intrinsic = OSEO_INTRINSIC_STRING_PROTOTYPE;
-    } else if (is_bigint(value)) {
-        intrinsic = OSEO_INTRINSIC_BIGINT_PROTOTYPE;
-    } else {
-        intrinsic = OSEO_INTRINSIC_BOOLEAN_PROTOTYPE;
-    }
     OseoResult result;
     bool created = false;
     if (intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
@@ -412,6 +405,25 @@ static OseoResult primitive_wrapper_prototype(
         context->intrinsics[intrinsic] = oseo_undefined();
     }
     return result;
+}
+
+static OseoResult primitive_wrapper_prototype(
+    OseoContext *context,
+    OseoValue value
+) {
+    OseoIntrinsic intrinsic;
+    if (is_number(value)) {
+        intrinsic = OSEO_INTRINSIC_NUMBER_PROTOTYPE;
+    } else if (is_symbol(value)) {
+        intrinsic = OSEO_INTRINSIC_SYMBOL_PROTOTYPE;
+    } else if (is_string(value)) {
+        intrinsic = OSEO_INTRINSIC_STRING_PROTOTYPE;
+    } else if (is_bigint(value)) {
+        intrinsic = OSEO_INTRINSIC_BIGINT_PROTOTYPE;
+    } else {
+        intrinsic = OSEO_INTRINSIC_BOOLEAN_PROTOTYPE;
+    }
+    return oseo_internal_primitive_wrapper_prototype(context, intrinsic);
 }
 
 static OseoResult define_string_wrapper_properties(
