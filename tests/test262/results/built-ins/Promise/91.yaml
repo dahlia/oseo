@@ -12,15 +12,23 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_\
-        T1.js:81:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

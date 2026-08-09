@@ -94,7 +94,7 @@ results:
         rop-id-trailing-comma.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-prop-id-trailing-comma.js:117:5: error[OSEO1001]: Unknown
+        j-ptrn-prop-id-trailing-comma.js:123:5: error[OSEO1001]: Unknown
         binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -239,7 +239,7 @@ results:
     observation:
       detail: 'test/language/expressions/bitwise-and/bigint-errors.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/bitwise-and/bigint-errors.js:86:3:
+        stderr="test/language/expressions/bitwise-and/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype
@@ -332,7 +332,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/syntax.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/syntax.js:83:3:
+        stderr=\"test/language/expressions/typeof/syntax.js:89:3:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

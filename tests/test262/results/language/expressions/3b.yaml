@@ -53,7 +53,7 @@ results:
       detail: "test/language/expressions/conditional/S11.12_A2.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/conditional/S11.12_A2.1_T1.j\
-        s:90:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        s:96:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

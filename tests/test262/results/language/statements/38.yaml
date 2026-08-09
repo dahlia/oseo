@@ -279,7 +279,7 @@ results:
         -ary-ptrn-elem-ary-rest-iter.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/for-await-of/async-gen-dstr-v\
-        ar-async-ary-ptrn-elem-ary-rest-iter.js:144:12: error[OSEO1001]:
+        ar-async-ary-ptrn-elem-ary-rest-iter.js:150:12: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

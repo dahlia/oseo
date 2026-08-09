@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -method-gen-static.js:84:30: error[OSEO0001]: Source could not
+        -method-gen-static.js:90:30: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

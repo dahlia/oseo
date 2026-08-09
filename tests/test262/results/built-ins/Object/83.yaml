@@ -79,7 +79,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-191.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-191.js\
-        :82:25: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :88:25: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -102,7 +102,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-41.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-41.js:\
-        313:23: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        338:23: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

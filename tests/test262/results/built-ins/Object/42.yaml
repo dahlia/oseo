@@ -79,7 +79,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-39.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-39.js:\
-        84:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        90:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -193,7 +193,7 @@ results:
       detail: "test/built-ins/Object/prototype/toLocaleString/primitive_this_\
         value.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toLocaleString/primiti\
-        ve_this_value.js:85:1: error[OSEO1001]: Unknown binding
+        ve_this_value.js:91:1: error[OSEO1001]: Unknown binding
         'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

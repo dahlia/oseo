@@ -53,7 +53,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/obj-ptrn-prop-o\
         bj-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-obj-init.js:122:5: error[OSEO1001]: Unknown binding
+        n-prop-obj-init.js:128:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -180,7 +180,7 @@ results:
       detail: "test/language/expressions/optional-chaining/optional-chain-pro\
         d-arguments.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/optional-chaining/optional-c\
-        hain-prod-arguments.js:87:18: error[OSEO1001]: Unknown binding
+        hain-prod-arguments.js:93:18: error[OSEO1001]: Unknown binding
         'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

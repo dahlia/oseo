@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/ary-ptrn-rest-a\
         ry-rest.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ptr\
-        n-rest-ary-rest.js:121:10: error[OSEO1001]: Unknown binding
+        n-rest-ary-rest.js:127:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -88,7 +88,7 @@ results:
         elem-obj-prop-id-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-elem-obj-prop-id-init.js:124:5: error[OSEO1001]: Unknown
+        ry-ptrn-elem-obj-prop-id-init.js:130:5: error[OSEO1001]: Unknown
         binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

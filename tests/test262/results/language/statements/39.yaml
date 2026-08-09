@@ -22,8 +22,8 @@ results:
       detail: "test/language/statements/class/accessor-name-inst/computed-err\
         -unresolvable.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/accessor-name-inst/comp\
-        uted-err-unresolvable.js:98:10: error[OSEO1001]: Unknown binding
-        'test262unresolvable'.\\n\""
+        uted-err-unresolvable.js:104:10: error[OSEO1001]: Unknown
+        binding 'test262unresolvable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

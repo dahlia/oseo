@@ -24,7 +24,7 @@ results:
         op-id-init-skipped.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-id-init-skipped.js:125:5: error[OSEO1001]: Unknown
+        -ptrn-prop-id-init-skipped.js:131:5: error[OSEO1001]: Unknown
         binding 's'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

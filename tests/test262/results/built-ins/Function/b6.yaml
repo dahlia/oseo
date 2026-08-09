@@ -49,7 +49,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/S15.3.4.5_A5.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/S15.3.4.5_A5.js\
-        :84:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        :90:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

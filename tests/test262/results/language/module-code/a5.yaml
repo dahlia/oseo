@@ -20,7 +20,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-lex.js:87:7:
+      detail: "test/language/module-code/early-dup-lex.js:93:7:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

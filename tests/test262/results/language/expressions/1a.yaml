@@ -48,7 +48,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-dflt-obj-\
         ptrn-prop-ary.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-prop-ary.js:120:5: error[OSEO1001]: Unknown binding
+        flt-obj-ptrn-prop-ary.js:126:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -156,8 +156,8 @@ results:
     observation:
       detail: "test/language/expressions/yield/star-in-rltn-expr.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/yield/star-in-rltn-expr.js:8\
-        7:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        stderr=\"test/language/expressions/yield/star-in-rltn-expr.js:9\
+        3:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

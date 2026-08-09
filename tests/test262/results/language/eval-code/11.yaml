@@ -22,7 +22,7 @@ results:
       detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
         t-nostrict.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
-        is-strict-nostrict.js:88:1: error[OSEO1001]: Unknown binding
+        is-strict-nostrict.js:94:1: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

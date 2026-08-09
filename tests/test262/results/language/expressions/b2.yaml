@@ -57,7 +57,7 @@ results:
     observation:
       detail: 'test/language/expressions/exponentiation/bigint-errors.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/exponentiation/bigint-errors.js:86:3:
+        stderr="test/language/expressions/exponentiation/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype
@@ -180,7 +180,7 @@ results:
       detail: "test/language/expressions/yield/star-rhs-unresolvable.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/yield/star-rhs-unresolvable.\
-        js:87:13: error[OSEO1001]: Unknown binding
+        js:93:13: error[OSEO1001]: Unknown binding
         'test262unresolvable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

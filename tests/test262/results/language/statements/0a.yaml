@@ -59,7 +59,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-ary-ptrn-re\
         st-id-elision.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-rest-id-elision.js:117:10: error[OSEO1001]: Unknown
+        -ptrn-rest-id-elision.js:123:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -129,7 +129,7 @@ results:
     observation:
       detail: 'test/language/statements/class/elements/class-field-on-frozen-objects.js
         strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/class-field-on-frozen-objects.js:91:7:
+        stderr="test/language/statements/class/elements/class-field-on-frozen-objects.js:97:7:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method
@@ -159,7 +159,7 @@ results:
         ted-name-referenceerror.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/class/elements/evaluation-err\
-        or/computed-name-referenceerror.js:121:6: error[OSEO1001]:
+        or/computed-name-referenceerror.js:127:6: error[OSEO1001]:
         Unknown binding 'noRef'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

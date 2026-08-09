@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-block-stmt\
-        -list.js:83:11: error[OSEO0001]: Source could not be parsed."
+        -list.js:89:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

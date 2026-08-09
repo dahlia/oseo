@@ -25,7 +25,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A5_T3.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A5_T3.js:85:3:
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A5_T3.js:91:3:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
       unsupportedCapability: primitive-wrapper

@@ -42,7 +42,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-fun.js
           id: test/language/module-code/instn-named-bndng-fun.js
-          sourceHash: fnv1a64:4ef8a2236c33ab5e
+          sourceHash: fnv1a64:a4572fdc946d0554
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

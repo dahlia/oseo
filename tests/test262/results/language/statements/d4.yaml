@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/ary-ptrn-elem-ar\
         y-rest-iter.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/ary-ptrn\
-        -elem-ary-rest-iter.js:121:10: error[OSEO1001]: Unknown binding
+        -elem-ary-rest-iter.js:127:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

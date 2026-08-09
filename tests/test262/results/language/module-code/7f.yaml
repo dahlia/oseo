@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-cls-anon.js
           id: test/language/module-code/eval-export-dflt-cls-anon.js
-          sourceHash: fnv1a64:a9e60c92ee99670f
+          sourceHash: fnv1a64:0c16e1113f2f20a5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

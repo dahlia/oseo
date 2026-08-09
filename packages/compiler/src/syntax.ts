@@ -425,10 +425,6 @@ export type SyntaxExpression =
       readonly kind: "new";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxCallArgument[];
-      readonly kind: "promise-construct";
-    })
-  | (LocatedSyntax & {
       /**
        * The class constructor, synthesized with an empty body when the
        * class body omits one. Its function value carries the class name

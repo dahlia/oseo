@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-arguments.js:104:10:
+      detail: "test/language/module-code/early-import-arguments.js:110:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-met\
-        hod.js:83:10: error[OSEO0001]: Source could not be parsed."
+        hod.js:89:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

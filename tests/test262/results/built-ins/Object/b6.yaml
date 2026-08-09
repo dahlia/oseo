@@ -141,7 +141,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-585.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-585.js\
-        :80:23: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        :86:23: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -162,7 +162,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/internals/DefineOwnProperty/consistent-value-regexp-dollar1.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/internals/DefineOwnProperty/consistent-value-regexp-dollar1.js:96:3:
+        stderr="test/built-ins/Object/internals/DefineOwnProperty/consistent-value-regexp-dollar1.js:102:3:
         error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false

@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-new-target.js:85:1:
+      detail: "test/language/module-code/early-new-target.js:91:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-do-while.j\
-        s:83:4: error[OSEO0001]: Source could not be parsed."
+        s:89:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

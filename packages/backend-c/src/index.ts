@@ -1301,12 +1301,6 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         argumentsValue.count,
       ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
     );
-  } else if (target.kind === "promise-constructor") {
-    const executor = emittedArgument(callArguments, argumentsValue, 0);
-    line(
-      state,
-      renderC(emittedC.call.resultAssignOseoPromiseConstructContext, executor),
-    );
   } else if (target.kind === "promise-intrinsic") {
     if (target.method === "asyncCall") {
       const execution = emittedArgument(callArguments, argumentsValue, 0);
@@ -1342,8 +1336,6 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     } else {
       const names = {
         all: renderC(emittedC.call.oseoPromiseAll),
-        race: renderC(emittedC.call.oseoPromiseRace),
-        reject: renderC(emittedC.call.oseoPromiseReject),
         resolve: renderC(emittedC.call.oseoPromiseResolve),
       } as const;
       const value = emittedArgument(callArguments, argumentsValue, 0);

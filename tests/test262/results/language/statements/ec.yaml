@@ -60,7 +60,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/ary-ptrn-rest-id\
         -elision.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/ary-ptrn\
-        -rest-id-elision.js:117:10: error[OSEO1001]: Unknown binding
+        -rest-id-elision.js:123:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

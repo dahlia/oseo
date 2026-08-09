@@ -25,7 +25,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/S15.2.1.1_A2_T2.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Object/S15.2.1.1_A2_T2.js:90:8:
+        stderr="test/built-ins/Object/S15.2.1.1_A2_T2.js:96:8:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype
@@ -142,7 +142,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-195.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-195.js\
-        :321:25: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :346:25: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -227,7 +227,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-618.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-618.js\
-        :311:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :336:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -342,7 +342,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/symbol-tag-non-str.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-no\
-        n-str.js:100:34: error[OSEO1001]: Unknown binding
+        n-str.js:106:34: error[OSEO1001]: Unknown binding
         'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

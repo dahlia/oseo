@@ -21,7 +21,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/for-in-await-\
-        expr-regexp.js:129:24: error[OSEO1001]: RegExpLiteral is outside
+        expr-regexp.js:135:24: error[OSEO1001]: RegExpLiteral is outside
         the M1 profile."
       unsupportedCapability: profile-syntax
       passed: false

@@ -21,7 +21,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-this.js
-          sourceHash: fnv1a64:29c3303ecc97755c
+          sourceHash: fnv1a64:80f0bb59c762bbbe
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -50,7 +50,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-hoist-lex-gen.js:96:11:
+      detail: "test/language/module-code/parse-err-hoist-lex-gen.js:102:11:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -73,7 +73,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-syntax-2.js:90:1:
+      detail: "test/language/module-code/parse-err-syntax-2.js:96:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

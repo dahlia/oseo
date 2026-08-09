@@ -243,7 +243,7 @@ results:
       detail: "test/language/expressions/class/elements/private-methods/prod-\
         private-generator.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/private-metho\
-        ds/prod-private-generator.js:151:21: error[OSEO1001]: Unknown
+        ds/prod-private-generator.js:157:21: error[OSEO1001]: Unknown
         binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -444,7 +444,7 @@ results:
       detail: "test/language/expressions/super/call-proto-not-ctor.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/super/call-proto-not-ctor.js\
-        :98:26: error[OSEO1001]: Unknown binding 'parseInt'.\\n\""
+        :104:26: error[OSEO1001]: Unknown binding 'parseInt'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

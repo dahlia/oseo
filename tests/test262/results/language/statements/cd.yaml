@@ -22,7 +22,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-id-init\
         -unresolvable.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -id-init-unresolvable.js:106:25: error[OSEO1001]: Unknown
+        -id-init-unresolvable.js:112:25: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

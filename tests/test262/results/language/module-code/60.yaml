@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-named-export.js:96:10:
-        error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-semi-named-export.js:102:1\
+        0: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

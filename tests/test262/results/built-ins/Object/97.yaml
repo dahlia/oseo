@@ -79,7 +79,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-94-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-94-1.j\
-        s:85:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        s:91:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

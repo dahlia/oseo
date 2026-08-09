@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-cls.js
           id: test/language/module-code/instn-named-bndng-dflt-cls.js
-          sourceHash: fnv1a64:b116c9e17d434082
+          sourceHash: fnv1a64:25653431cfb8866c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -52,7 +52,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-set\
-        ter.js:83:15: error[OSEO0001]: Source could not be parsed."
+        ter.js:89:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -75,7 +75,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-lhs\
-        .js:84:3: error[OSEO0001]: Source could not be parsed."
+        .js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

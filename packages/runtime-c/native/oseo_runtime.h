@@ -192,7 +192,17 @@ typedef enum {
     OSEO_INTRINSIC_NUMBER_IS_SAFE_INTEGER = 77,
     OSEO_INTRINSIC_NUMBER_PARSE_FLOAT = 78,
     OSEO_INTRINSIC_NUMBER_PARSE_INT = 79,
-    OSEO_INTRINSIC_COUNT = 80,
+    OSEO_INTRINSIC_PROMISE = 80,
+    OSEO_INTRINSIC_PROMISE_ALL = 81,
+    OSEO_INTRINSIC_PROMISE_ALL_SETTLED = 82,
+    OSEO_INTRINSIC_PROMISE_ANY = 83,
+    OSEO_INTRINSIC_PROMISE_RACE = 84,
+    OSEO_INTRINSIC_PROMISE_REJECT = 85,
+    OSEO_INTRINSIC_PROMISE_RESOLVE = 86,
+    OSEO_INTRINSIC_PROMISE_TRY = 87,
+    OSEO_INTRINSIC_PROMISE_WITH_RESOLVERS = 88,
+    OSEO_INTRINSIC_PROMISE_SPECIES = 89,
+    OSEO_INTRINSIC_COUNT = 90,
 } OseoIntrinsic;
 
 typedef struct {
@@ -1437,23 +1447,11 @@ OseoResult oseo_console_log(
     const OseoValue *arguments
 );
 
-OseoResult oseo_promise_construct(
-    OseoContext *context,
-    OseoValue executor
-);
 OseoResult oseo_promise_resolve(
     OseoContext *context,
     OseoValue value
 );
-OseoResult oseo_promise_reject(
-    OseoContext *context,
-    OseoValue reason
-);
 OseoResult oseo_promise_all(
-    OseoContext *context,
-    OseoValue iterable
-);
-OseoResult oseo_promise_race(
     OseoContext *context,
     OseoValue iterable
 );

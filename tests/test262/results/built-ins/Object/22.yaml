@@ -49,7 +49,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-116.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-116.js\
-        :83:17: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        :89:17: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -131,7 +131,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-256.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-256.js\
-        :84:1: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        :90:1: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -253,7 +253,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/setPrototypeOf/set-failure-non-extensible.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/setPrototypeOf/set-failure-non-extensible.js:87:1:
+        stderr="test/built-ins/Object/setPrototypeOf/set-failure-non-extensible.js:93:1:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

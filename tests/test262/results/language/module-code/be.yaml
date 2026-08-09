@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-top-function.js:89:10:
+      detail: "test/language/module-code/early-dup-top-function.js:95:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -45,7 +45,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-let.js
-          sourceHash: fnv1a64:b04c43d8f92ff73a
+          sourceHash: fnv1a64:21a2c3220cc7b90c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -74,7 +74,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth-static.js:83:28: error[OSEO0001]: Source could not be
+        -meth-static.js:89:28: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse

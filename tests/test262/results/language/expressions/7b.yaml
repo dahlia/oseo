@@ -56,7 +56,7 @@ results:
       detail: "test/language/expressions/async-generator/eval-var-scope-synta\
         x-err.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/eval-var-sco\
-        pe-syntax-err.js:99:25: error[OSEO1001]: Unknown binding
+        pe-syntax-err.js:105:25: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -156,7 +156,7 @@ results:
       detail: "test/language/expressions/class/elements/private-methods/prod-\
         private-method.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/private-metho\
-        ds/prod-private-method.js:151:21: error[OSEO1001]: Unknown
+        ds/prod-private-method.js:157:21: error[OSEO1001]: Unknown
         binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

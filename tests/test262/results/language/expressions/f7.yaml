@@ -59,7 +59,7 @@ results:
         lem-id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-elem-id-init-unresolvable.js:106:31: error[OSEO1001]:
+        y-ptrn-elem-id-init-unresolvable.js:112:31: error[OSEO1001]:
         Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -86,7 +86,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-r\
         est-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-rest-id.js:115:10: error[OSEO1001]: Unknown binding
+        y-ptrn-rest-id.js:121:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -311,7 +311,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-obj-null-proto.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-obj-null-proto.js:97:7:
+        stderr="test/language/expressions/super/prop-expr-obj-null-proto.js:103:7:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

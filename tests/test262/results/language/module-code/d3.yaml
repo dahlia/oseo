@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-top-function-async.js:89:1\
+      detail: "test/language/module-code/early-dup-top-function-async.js:95:1\
         6: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

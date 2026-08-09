@@ -172,8 +172,8 @@ results:
     observation:
       detail: "test/built-ins/Object/is/same-value-x-y-string.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/is/same-value-x-y-string.js:94:1\
-        3: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        stderr=\"test/built-ins/Object/is/same-value-x-y-string.js:100:\
+        13: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

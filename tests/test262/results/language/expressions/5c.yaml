@@ -97,7 +97,7 @@ results:
         ptrn-rest-id-exhausted.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-rest-id-exhausted.js:118:10: error[OSEO1001]:
+        flt-ary-ptrn-rest-id-exhausted.js:124:10: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

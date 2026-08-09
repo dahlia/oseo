@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth.js:83:22: error[OSEO0001]: Source could not be parsed."
+        -meth.js:89:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-1.js:90:10: error[OSEO0001]: Source could not be parsed."
+        e-1.js:96:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

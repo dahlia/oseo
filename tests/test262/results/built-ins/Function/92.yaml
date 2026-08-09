@@ -50,7 +50,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/15.3.4.5-2-7.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5-2-7.js\
-        :85:3: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        :91:3: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

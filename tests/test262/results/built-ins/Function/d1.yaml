@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Function/prototype/toString/S15.3.4.2_A16.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/toString/S15.3.4.2_A\
-        16.js:87:3: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        16.js:93:3: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

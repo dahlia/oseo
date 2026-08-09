@@ -215,7 +215,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/number.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/number.js:115:10:
+        stderr=\"test/language/expressions/typeof/number.js:121:10:
         error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

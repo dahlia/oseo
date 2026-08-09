@@ -340,7 +340,7 @@ results:
     observation:
       detail: "test/language/statements/with/12.10-2-4.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/statements/with/12.10-2-4.js:82:96:
+        stderr=\"test/language/statements/with/12.10-2-4.js:88:96:
         error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

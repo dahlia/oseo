@@ -2421,29 +2421,134 @@ partitions:
     key: "01"
     path: results/built-ins/Promise/01.yaml
   - group: built-ins/Promise
+    key: "02"
+    path: results/built-ins/Promise/02.yaml
+  - group: built-ins/Promise
+    key: "03"
+    path: results/built-ins/Promise/03.yaml
+  - group: built-ins/Promise
+    key: "04"
+    path: results/built-ins/Promise/04.yaml
+  - group: built-ins/Promise
     key: "05"
     path: results/built-ins/Promise/05.yaml
+  - group: built-ins/Promise
+    key: "09"
+    path: results/built-ins/Promise/09.yaml
   - group: built-ins/Promise
     key: 0c
     path: results/built-ins/Promise/0c.yaml
   - group: built-ins/Promise
+    key: 0d
+    path: results/built-ins/Promise/0d.yaml
+  - group: built-ins/Promise
+    key: 0f
+    path: results/built-ins/Promise/0f.yaml
+  - group: built-ins/Promise
     key: "12"
     path: results/built-ins/Promise/12.yaml
+  - group: built-ins/Promise
+    key: "15"
+    path: results/built-ins/Promise/15.yaml
+  - group: built-ins/Promise
+    key: "18"
+    path: results/built-ins/Promise/18.yaml
+  - group: built-ins/Promise
+    key: 1a
+    path: results/built-ins/Promise/1a.yaml
+  - group: built-ins/Promise
+    key: 1b
+    path: results/built-ins/Promise/1b.yaml
+  - group: built-ins/Promise
+    key: 1d
+    path: results/built-ins/Promise/1d.yaml
   - group: built-ins/Promise
     key: 1f
     path: results/built-ins/Promise/1f.yaml
   - group: built-ins/Promise
+    key: "20"
+    path: results/built-ins/Promise/20.yaml
+  - group: built-ins/Promise
+    key: "21"
+    path: results/built-ins/Promise/21.yaml
+  - group: built-ins/Promise
+    key: "22"
+    path: results/built-ins/Promise/22.yaml
+  - group: built-ins/Promise
+    key: "25"
+    path: results/built-ins/Promise/25.yaml
+  - group: built-ins/Promise
+    key: "26"
+    path: results/built-ins/Promise/26.yaml
+  - group: built-ins/Promise
+    key: 2a
+    path: results/built-ins/Promise/2a.yaml
+  - group: built-ins/Promise
+    key: 2d
+    path: results/built-ins/Promise/2d.yaml
+  - group: built-ins/Promise
+    key: 2f
+    path: results/built-ins/Promise/2f.yaml
+  - group: built-ins/Promise
     key: "30"
     path: results/built-ins/Promise/30.yaml
+  - group: built-ins/Promise
+    key: "31"
+    path: results/built-ins/Promise/31.yaml
+  - group: built-ins/Promise
+    key: "32"
+    path: results/built-ins/Promise/32.yaml
   - group: built-ins/Promise
     key: "33"
     path: results/built-ins/Promise/33.yaml
   - group: built-ins/Promise
+    key: "35"
+    path: results/built-ins/Promise/35.yaml
+  - group: built-ins/Promise
+    key: "36"
+    path: results/built-ins/Promise/36.yaml
+  - group: built-ins/Promise
+    key: "38"
+    path: results/built-ins/Promise/38.yaml
+  - group: built-ins/Promise
+    key: "39"
+    path: results/built-ins/Promise/39.yaml
+  - group: built-ins/Promise
+    key: 3a
+    path: results/built-ins/Promise/3a.yaml
+  - group: built-ins/Promise
+    key: 3c
+    path: results/built-ins/Promise/3c.yaml
+  - group: built-ins/Promise
+    key: 3d
+    path: results/built-ins/Promise/3d.yaml
+  - group: built-ins/Promise
+    key: 3f
+    path: results/built-ins/Promise/3f.yaml
+  - group: built-ins/Promise
     key: "40"
     path: results/built-ins/Promise/40.yaml
   - group: built-ins/Promise
+    key: "41"
+    path: results/built-ins/Promise/41.yaml
+  - group: built-ins/Promise
+    key: "43"
+    path: results/built-ins/Promise/43.yaml
+  - group: built-ins/Promise
+    key: "46"
+    path: results/built-ins/Promise/46.yaml
+  - group: built-ins/Promise
     key: "47"
     path: results/built-ins/Promise/47.yaml
+  - group: built-ins/Promise
+    key: "48"
+    path: results/built-ins/Promise/48.yaml
+  - group: built-ins/Promise
+    key: "49"
+    path: results/built-ins/Promise/49.yaml
+  - group: built-ins/Promise
+    key: 4c
+    path: results/built-ins/Promise/4c.yaml
   - group: built-ins/Promise
     key: 4e
     path: results/built-ins/Promise/4e.yaml
@@ -2451,26 +2556,116 @@ partitions:
     key: "51"
     path: results/built-ins/Promise/51.yaml
   - group: built-ins/Promise
+    key: "53"
+    path: results/built-ins/Promise/53.yaml
+  - group: built-ins/Promise
+    key: "54"
+    path: results/built-ins/Promise/54.yaml
+  - group: built-ins/Promise
+    key: 5b
+    path: results/built-ins/Promise/5b.yaml
+  - group: built-ins/Promise
+    key: 5c
+    path: results/built-ins/Promise/5c.yaml
+  - group: built-ins/Promise
+    key: 5d
+    path: results/built-ins/Promise/5d.yaml
+  - group: built-ins/Promise
+    key: 5e
+    path: results/built-ins/Promise/5e.yaml
+  - group: built-ins/Promise
+    key: 5f
+    path: results/built-ins/Promise/5f.yaml
+  - group: built-ins/Promise
     key: "60"
     path: results/built-ins/Promise/60.yaml
+  - group: built-ins/Promise
+    key: "62"
+    path: results/built-ins/Promise/62.yaml
+  - group: built-ins/Promise
+    key: "64"
+    path: results/built-ins/Promise/64.yaml
   - group: built-ins/Promise
     key: "65"
     path: results/built-ins/Promise/65.yaml
   - group: built-ins/Promise
+    key: "66"
+    path: results/built-ins/Promise/66.yaml
+  - group: built-ins/Promise
+    key: "67"
+    path: results/built-ins/Promise/67.yaml
+  - group: built-ins/Promise
     key: "69"
     path: results/built-ins/Promise/69.yaml
+  - group: built-ins/Promise
+    key: 6a
+    path: results/built-ins/Promise/6a.yaml
+  - group: built-ins/Promise
+    key: 6b
+    path: results/built-ins/Promise/6b.yaml
+  - group: built-ins/Promise
+    key: 6f
+    path: results/built-ins/Promise/6f.yaml
+  - group: built-ins/Promise
+    key: "70"
+    path: results/built-ins/Promise/70.yaml
   - group: built-ins/Promise
     key: "71"
     path: results/built-ins/Promise/71.yaml
   - group: built-ins/Promise
+    key: "72"
+    path: results/built-ins/Promise/72.yaml
+  - group: built-ins/Promise
+    key: "73"
+    path: results/built-ins/Promise/73.yaml
+  - group: built-ins/Promise
     key: "75"
     path: results/built-ins/Promise/75.yaml
+  - group: built-ins/Promise
+    key: "76"
+    path: results/built-ins/Promise/76.yaml
+  - group: built-ins/Promise
+    key: "77"
+    path: results/built-ins/Promise/77.yaml
+  - group: built-ins/Promise
+    key: 7a
+    path: results/built-ins/Promise/7a.yaml
+  - group: built-ins/Promise
+    key: 7d
+    path: results/built-ins/Promise/7d.yaml
+  - group: built-ins/Promise
+    key: "80"
+    path: results/built-ins/Promise/80.yaml
   - group: built-ins/Promise
     key: "82"
     path: results/built-ins/Promise/82.yaml
   - group: built-ins/Promise
+    key: "83"
+    path: results/built-ins/Promise/83.yaml
+  - group: built-ins/Promise
+    key: "86"
+    path: results/built-ins/Promise/86.yaml
+  - group: built-ins/Promise
+    key: "87"
+    path: results/built-ins/Promise/87.yaml
+  - group: built-ins/Promise
+    key: "88"
+    path: results/built-ins/Promise/88.yaml
+  - group: built-ins/Promise
+    key: 8a
+    path: results/built-ins/Promise/8a.yaml
+  - group: built-ins/Promise
+    key: 8b
+    path: results/built-ins/Promise/8b.yaml
+  - group: built-ins/Promise
     key: 8c
     path: results/built-ins/Promise/8c.yaml
+  - group: built-ins/Promise
+    key: 8e
+    path: results/built-ins/Promise/8e.yaml
+  - group: built-ins/Promise
+    key: 8f
+    path: results/built-ins/Promise/8f.yaml
   - group: built-ins/Promise
     key: "90"
     path: results/built-ins/Promise/90.yaml
@@ -2478,8 +2673,32 @@ partitions:
     key: "91"
     path: results/built-ins/Promise/91.yaml
   - group: built-ins/Promise
+    key: "92"
+    path: results/built-ins/Promise/92.yaml
+  - group: built-ins/Promise
+    key: "96"
+    path: results/built-ins/Promise/96.yaml
+  - group: built-ins/Promise
     key: "97"
     path: results/built-ins/Promise/97.yaml
+  - group: built-ins/Promise
+    key: "98"
+    path: results/built-ins/Promise/98.yaml
+  - group: built-ins/Promise
+    key: "99"
+    path: results/built-ins/Promise/99.yaml
+  - group: built-ins/Promise
+    key: 9a
+    path: results/built-ins/Promise/9a.yaml
+  - group: built-ins/Promise
+    key: 9c
+    path: results/built-ins/Promise/9c.yaml
+  - group: built-ins/Promise
+    key: 9e
+    path: results/built-ins/Promise/9e.yaml
+  - group: built-ins/Promise
+    key: 9f
+    path: results/built-ins/Promise/9f.yaml
   - group: built-ins/Promise
     key: a4
     path: results/built-ins/Promise/a4.yaml
@@ -2487,29 +2706,176 @@ partitions:
     key: a5
     path: results/built-ins/Promise/a5.yaml
   - group: built-ins/Promise
+    key: a7
+    path: results/built-ins/Promise/a7.yaml
+  - group: built-ins/Promise
+    key: a8
+    path: results/built-ins/Promise/a8.yaml
+  - group: built-ins/Promise
+    key: a9
+    path: results/built-ins/Promise/a9.yaml
+  - group: built-ins/Promise
+    key: aa
+    path: results/built-ins/Promise/aa.yaml
+  - group: built-ins/Promise
+    key: ac
+    path: results/built-ins/Promise/ac.yaml
+  - group: built-ins/Promise
+    key: ad
+    path: results/built-ins/Promise/ad.yaml
+  - group: built-ins/Promise
+    key: ae
+    path: results/built-ins/Promise/ae.yaml
+  - group: built-ins/Promise
+    key: af
+    path: results/built-ins/Promise/af.yaml
+  - group: built-ins/Promise
+    key: b1
+    path: results/built-ins/Promise/b1.yaml
+  - group: built-ins/Promise
     key: b2
     path: results/built-ins/Promise/b2.yaml
   - group: built-ins/Promise
     key: b3
     path: results/built-ins/Promise/b3.yaml
   - group: built-ins/Promise
+    key: b4
+    path: results/built-ins/Promise/b4.yaml
+  - group: built-ins/Promise
     key: b6
     path: results/built-ins/Promise/b6.yaml
+  - group: built-ins/Promise
+    key: b8
+    path: results/built-ins/Promise/b8.yaml
+  - group: built-ins/Promise
+    key: b9
+    path: results/built-ins/Promise/b9.yaml
+  - group: built-ins/Promise
+    key: ba
+    path: results/built-ins/Promise/ba.yaml
+  - group: built-ins/Promise
+    key: bb
+    path: results/built-ins/Promise/bb.yaml
+  - group: built-ins/Promise
+    key: bc
+    path: results/built-ins/Promise/bc.yaml
+  - group: built-ins/Promise
+    key: be
+    path: results/built-ins/Promise/be.yaml
+  - group: built-ins/Promise
+    key: c0
+    path: results/built-ins/Promise/c0.yaml
   - group: built-ins/Promise
     key: c1
     path: results/built-ins/Promise/c1.yaml
   - group: built-ins/Promise
+    key: c2
+    path: results/built-ins/Promise/c2.yaml
+  - group: built-ins/Promise
+    key: c3
+    path: results/built-ins/Promise/c3.yaml
+  - group: built-ins/Promise
     key: c4
     path: results/built-ins/Promise/c4.yaml
+  - group: built-ins/Promise
+    key: c5
+    path: results/built-ins/Promise/c5.yaml
+  - group: built-ins/Promise
+    key: c6
+    path: results/built-ins/Promise/c6.yaml
+  - group: built-ins/Promise
+    key: c7
+    path: results/built-ins/Promise/c7.yaml
+  - group: built-ins/Promise
+    key: c9
+    path: results/built-ins/Promise/c9.yaml
+  - group: built-ins/Promise
+    key: cb
+    path: results/built-ins/Promise/cb.yaml
+  - group: built-ins/Promise
+    key: cd
+    path: results/built-ins/Promise/cd.yaml
+  - group: built-ins/Promise
+    key: ce
+    path: results/built-ins/Promise/ce.yaml
+  - group: built-ins/Promise
+    key: cf
+    path: results/built-ins/Promise/cf.yaml
+  - group: built-ins/Promise
+    key: d2
+    path: results/built-ins/Promise/d2.yaml
+  - group: built-ins/Promise
+    key: d4
+    path: results/built-ins/Promise/d4.yaml
+  - group: built-ins/Promise
+    key: d5
+    path: results/built-ins/Promise/d5.yaml
   - group: built-ins/Promise
     key: d6
     path: results/built-ins/Promise/d6.yaml
   - group: built-ins/Promise
+    key: d7
+    path: results/built-ins/Promise/d7.yaml
+  - group: built-ins/Promise
+    key: d8
+    path: results/built-ins/Promise/d8.yaml
+  - group: built-ins/Promise
+    key: d9
+    path: results/built-ins/Promise/d9.yaml
+  - group: built-ins/Promise
+    key: da
+    path: results/built-ins/Promise/da.yaml
+  - group: built-ins/Promise
+    key: dd
+    path: results/built-ins/Promise/dd.yaml
+  - group: built-ins/Promise
+    key: de
+    path: results/built-ins/Promise/de.yaml
+  - group: built-ins/Promise
+    key: df
+    path: results/built-ins/Promise/df.yaml
+  - group: built-ins/Promise
+    key: e2
+    path: results/built-ins/Promise/e2.yaml
+  - group: built-ins/Promise
+    key: e4
+    path: results/built-ins/Promise/e4.yaml
+  - group: built-ins/Promise
+    key: e6
+    path: results/built-ins/Promise/e6.yaml
+  - group: built-ins/Promise
+    key: e7
+    path: results/built-ins/Promise/e7.yaml
+  - group: built-ins/Promise
     key: e8
     path: results/built-ins/Promise/e8.yaml
   - group: built-ins/Promise
+    key: ea
+    path: results/built-ins/Promise/ea.yaml
+  - group: built-ins/Promise
+    key: eb
+    path: results/built-ins/Promise/eb.yaml
+  - group: built-ins/Promise
+    key: ec
+    path: results/built-ins/Promise/ec.yaml
+  - group: built-ins/Promise
+    key: ed
+    path: results/built-ins/Promise/ed.yaml
+  - group: built-ins/Promise
+    key: ee
+    path: results/built-ins/Promise/ee.yaml
+  - group: built-ins/Promise
+    key: ef
+    path: results/built-ins/Promise/ef.yaml
+  - group: built-ins/Promise
     key: f1
     path: results/built-ins/Promise/f1.yaml
+  - group: built-ins/Promise
+    key: f2
+    path: results/built-ins/Promise/f2.yaml
+  - group: built-ins/Promise
+    key: f3
+    path: results/built-ins/Promise/f3.yaml
   - group: built-ins/Promise
     key: f5
     path: results/built-ins/Promise/f5.yaml
@@ -2517,8 +2883,23 @@ partitions:
     key: f6
     path: results/built-ins/Promise/f6.yaml
   - group: built-ins/Promise
+    key: f7
+    path: results/built-ins/Promise/f7.yaml
+  - group: built-ins/Promise
+    key: f9
+    path: results/built-ins/Promise/f9.yaml
+  - group: built-ins/Promise
+    key: fa
+    path: results/built-ins/Promise/fa.yaml
+  - group: built-ins/Promise
+    key: fb
+    path: results/built-ins/Promise/fb.yaml
+  - group: built-ins/Promise
     key: fd
     path: results/built-ins/Promise/fd.yaml
+  - group: built-ins/Promise
+    key: fe
+    path: results/built-ins/Promise/fe.yaml
   - group: built-ins/Promise
     key: ff
     path: results/built-ins/Promise/ff.yaml
@@ -5431,9 +5812,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 4556
+  passes: 4750
   semanticFailures: 0
-  unsupportedProfileFeatures: 990
+  unsupportedProfileFeatures: 1006
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -5453,9 +5834,9 @@ summary:
       expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1087
+      passes: 1091
       semanticFailures: 0
-      unsupportedProfileFeatures: 201
+      unsupportedProfileFeatures: 197
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
@@ -5530,9 +5911,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 803
+      passes: 804
       semanticFailures: 0
-      unsupportedProfileFeatures: 40
+      unsupportedProfileFeatures: 39
     - dependency: lexical-bindings
       expectedNegatives: 147
       harnessFailures: 0
@@ -5565,9 +5946,9 @@ summary:
       expectedNegatives: 90
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 355
+      passes: 545
       semanticFailures: 0
-      unsupportedProfileFeatures: 40
+      unsupportedProfileFeatures: 60
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0
@@ -5615,9 +5996,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 34
+      passes: 35
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/AsyncGeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -5629,9 +6010,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 25
+      passes: 28
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 17
     - group: built-ins/AsyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -5699,9 +6080,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2
+      passes: 192
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 55
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0

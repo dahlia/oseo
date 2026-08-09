@@ -48,7 +48,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-func-expression.js
-          sourceHash: fnv1a64:389c9a0d0584453a
+          sourceHash: fnv1a64:20fe2ac478e2c12c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

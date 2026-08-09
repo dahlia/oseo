@@ -49,7 +49,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-204.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-204.js\
-        :83:17: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :89:17: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -256,7 +256,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-612.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-612.js\
-        :311:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :336:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -309,8 +309,8 @@ results:
     observation:
       detail: "test/built-ins/Object/defineProperty/S15.2.3.6_A1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/defineProperty/S15.2.3.6_A1.js:8\
-        9:10: error[OSEO1001]: Unknown binding 'document'.\\n\""
+        stderr=\"test/built-ins/Object/defineProperty/S15.2.3.6_A1.js:9\
+        5:10: error[OSEO1001]: Unknown binding 'document'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

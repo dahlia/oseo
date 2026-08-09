@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Function/prototype/apply/15.3.4.3-3-s.js strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/apply/15.3.4.3-3-s.j\
-        s:84:27: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        s:90:27: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Function/prototype/call/15.3.4.4-3-s.js strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/call/15.3.4.4-3-s.js\
-        :84:27: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :90:27: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

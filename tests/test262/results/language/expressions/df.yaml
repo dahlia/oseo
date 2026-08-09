@@ -59,7 +59,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-obj-ptrn-\
         prop-id-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id-init.js:116:5: error[OSEO1001]: Unknown binding
+        bj-ptrn-prop-id-init.js:122:5: error[OSEO1001]: Unknown binding
         'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -109,7 +109,7 @@ results:
       detail: "test/language/expressions/class/elements/direct-eval-err-conta\
         ins-arguments.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/direct-eval-e\
-        rr-contains-arguments.js:98:7: error[OSEO1001]: Unknown binding
+        rr-contains-arguments.js:104:7: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

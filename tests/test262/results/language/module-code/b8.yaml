@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-circular-as.js:99:10:
+      detail: "test/language/module-code/instn-iee-err-circular-as.js:105:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-let\
-        .js:84:3: error[OSEO0001]: Source could not be parsed."
+        .js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -70,7 +70,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
-          sourceHash: fnv1a64:febb40a19109cf64
+          sourceHash: fnv1a64:f6ecc3a3ddc51ece
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

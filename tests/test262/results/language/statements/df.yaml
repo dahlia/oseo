@@ -26,7 +26,7 @@ results:
         -iter-val-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/ary-ptrn\
-        -elem-id-iter-val-array-prototype.js:121:1: error[OSEO1001]:
+        -elem-id-iter-val-array-prototype.js:127:1: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -52,7 +52,7 @@ results:
       detail: "test/language/statements/async-generator/yield-spread-arr-sing\
         le.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-spread-\
-        arr-single.js:123:10: error[OSEO1001]: Unknown binding
+        arr-single.js:129:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -229,7 +229,7 @@ results:
         handside-expression-not-strict.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/identifier-let-allowed\
-        -as-lefthandside-expression-not-strict.js:81:6: error[OSEO1001]:
+        -as-lefthandside-expression-not-strict.js:87:6: error[OSEO1001]:
         Unknown binding 'let'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

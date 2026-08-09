@@ -81,7 +81,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-ary-ptrn-el\
         em-ary-rest-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-elem-ary-rest-init.js:119:10: error[OSEO1001]: Unknown
+        -ptrn-elem-ary-rest-init.js:125:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

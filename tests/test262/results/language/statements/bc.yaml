@@ -44,7 +44,7 @@ results:
       detail: "test/language/statements/class/elements/direct-eval-err-contai\
         ns-arguments.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/direct-eval-er\
-        r-contains-arguments.js:98:7: error[OSEO1001]: Unknown binding
+        r-contains-arguments.js:104:7: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/class/elements/private-methods/prod-p\
         rivate-method.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/private-method\
-        s/prod-private-method.js:150:21: error[OSEO1001]: Unknown
+        s/prod-private-method.js:156:21: error[OSEO1001]: Unknown
         binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -504,10 +504,6 @@ export const emittedC = {
       ["result = oseo_console_log(context, "],
       [", "],
     ],
-    resultAssignOseoPromiseConstructContext: [
-      ["result = oseo_promise_construct(context, "],
-      [");"],
-    ],
     resultAssignOseoPromiseAsyncCallContext: [
       ["result = oseo_promise_async_call(context, "],
       [");"],
@@ -520,8 +516,6 @@ export const emittedC = {
     ],
     threeValuesCallSuffix: [[""], [", "], [", "], [");"]],
     oseoPromiseAll: [["oseo_promise_all"]],
-    oseoPromiseRace: [["oseo_promise_race"]],
-    oseoPromiseReject: [["oseo_promise_reject"]],
     oseoPromiseResolve: [["oseo_promise_resolve"]],
     resultAssignContextStatement: [["result = "], ["(context, "], [");"]],
     resultAssignOseoSetTimeoutContext: [

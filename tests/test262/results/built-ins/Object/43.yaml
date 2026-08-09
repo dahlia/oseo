@@ -25,7 +25,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/S15.2.2.1_A1_T3.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Object/S15.2.2.1_A1_T3.js:101:3:
+        stderr="test/built-ins/Object/S15.2.2.1_A1_T3.js:107:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype
@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-411.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-411.js\
-        :88:15: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        :94:15: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

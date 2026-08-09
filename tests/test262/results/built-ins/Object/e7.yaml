@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Object/S15.2.1.1_A2_T7.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/S15.2.1.1_A2_T7.js:87:35:
+        stderr=\"test/built-ins/Object/S15.2.1.1_A2_T7.js:93:35:
         error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -47,7 +47,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/S15.2.2.1_A5_T1.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Object/S15.2.2.1_A5_T1.js:89:8:
+        stderr="test/built-ins/Object/S15.2.2.1_A5_T1.js:95:8:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype
@@ -71,7 +71,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-60.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-60.js:\
-        84:19: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        90:19: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

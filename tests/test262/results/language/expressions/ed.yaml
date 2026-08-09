@@ -96,7 +96,7 @@ results:
         private-method-initialize-order.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/private-metho\
-        ds/prod-private-method-initialize-order.js:166:21:
+        ds/prod-private-method-initialize-order.js:172:21:
         error[OSEO1001]: Unknown binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -121,7 +121,7 @@ results:
     observation:
       detail: 'test/language/expressions/delete/super-property-null-base.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/delete/super-property-null-base.js:97:12:
+        stderr="test/language/expressions/delete/super-property-null-base.js:103:12:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

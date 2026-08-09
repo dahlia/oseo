@@ -138,8 +138,8 @@ results:
     observation:
       detail: "test/built-ins/Object/getPrototypeOf/15.2.3.2-1-4.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-1-4.js:7\
-        8:48: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-1-4.js:8\
+        4:48: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

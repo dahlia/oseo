@@ -1,0 +1,80 @@
+group: built-ins/Promise
+key: "99"
+results:
+  - case:
+      async: false
+      features:
+        - Promise.prototype.finally
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Promise/prototype/finally/this-value-then-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - promise-settlement
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Promise.prototype.finally
+  - case:
+      async: true
+      features: []
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/Promise/prototype/then/rxn-handler-identity.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - promise-with-resolvers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Promise/withResolvers/ctx-non-ctor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - promise-settlement
+    observation:
+      detail: "test/built-ins/Promise/withResolvers/ctx-non-ctor.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/withResolvers/ctx-non-ctor.js:8\
+        6:30: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

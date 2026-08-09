@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-dflt-thru-star-as.js\
-        :103:10: error[OSEO2001]: Module has no export 'default'."
+        :109:10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false

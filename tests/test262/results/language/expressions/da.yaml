@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-r\
         est-id-elision.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-rest-id-elision.js:118:10: error[OSEO1001]: Unknown
+        y-ptrn-rest-id-elision.js:124:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -50,7 +50,7 @@ results:
         ptrn-id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-id-init-unresolvable.js:107:29: error[OSEO1001]:
+        flt-obj-ptrn-id-init-unresolvable.js:113:29: error[OSEO1001]:
         Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -303,7 +303,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-obj-val-from-arrow.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-obj-val-from-arrow.js:105:29:
+        stderr="test/language/expressions/super/prop-expr-obj-val-from-arrow.js:111:29:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

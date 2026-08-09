@@ -24,7 +24,7 @@ results:
         elem-ary-rest-iter.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-elem-ary-rest-iter.js:122:10: error[OSEO1001]: Unknown
+        ry-ptrn-elem-ary-rest-iter.js:128:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

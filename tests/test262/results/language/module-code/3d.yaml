@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-arrow-func\
-        tion.js:83:9: error[OSEO0001]: Source could not be parsed."
+        tion.js:89:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

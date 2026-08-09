@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-super.js:84:1: error[OSEO0001]:
+      detail: "test/language/module-code/early-super.js:90:1: error[OSEO0001]:
         Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth.js:83:21: error[OSEO0001]: Source could not be parsed."
+        -meth.js:89:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -65,7 +65,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth-static.js:83:29: error[OSEO0001]: Source could not be
+        -meth-static.js:89:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -90,7 +90,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-gen\
-        -method.js:84:11: error[OSEO0001]: Source could not be parsed."
+        -method.js:90:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -116,7 +116,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-3.js:89:12: error[OSEO0001]: Source could not be parsed."
+        e-3.js:95:12: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

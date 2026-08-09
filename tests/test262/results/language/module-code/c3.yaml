@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-as.js:103:\
+      detail: "test/language/module-code/instn-named-err-not-found-as.js:109:\
         10: error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution

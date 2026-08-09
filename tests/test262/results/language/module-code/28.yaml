@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-indirect.js
-          sourceHash: fnv1a64:09657aac44986b34
+          sourceHash: fnv1a64:965c44af5b51bdea
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-keep-indirect-def_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js

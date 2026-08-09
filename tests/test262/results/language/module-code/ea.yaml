@@ -21,7 +21,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/early-does-no\
-        t-propagate-to-fn-expr-params.js:97:18: error[OSEO0001]: Source
+        t-propagate-to-fn-expr-params.js:103:18: error[OSEO0001]: Source
         could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

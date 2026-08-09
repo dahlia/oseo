@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-function-declaration-\
-        binding-exists.js:92:25: error[OSEO0001]: Source could not be
+        binding-exists.js:98:25: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-decl\
-        -meth-static.js:83:29: error[OSEO0001]: Source could not be
+        -meth-static.js:89:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse

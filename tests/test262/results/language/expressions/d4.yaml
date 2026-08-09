@@ -26,7 +26,7 @@ results:
     observation:
       detail: 'test/language/expressions/async-generator/generator-created-after-decl-inst.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/async-generator/generator-created-after-decl-inst.js:93:21:
+        stderr="test/language/expressions/async-generator/generator-created-after-decl-inst.js:99:21:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics
@@ -154,7 +154,7 @@ results:
       detail: "test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/logical-and/S11.11.1_A2.1_T1\
-        .js:96:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        .js:102:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

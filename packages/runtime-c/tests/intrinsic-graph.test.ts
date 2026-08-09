@@ -219,3 +219,59 @@ test("populates the realm-owned Number intrinsic cluster", () => {
   }
   assert.match(numberSource, /number_data/u);
 });
+
+test("populates the realm-owned Promise intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const promiseSource = sources.get("runtime_promise.c") ?? "";
+
+  for (const intrinsic of [
+    "PROMISE_PROTOTYPE",
+    "PROMISE",
+    "PROMISE_ALL",
+    "PROMISE_ALL_SETTLED",
+    "PROMISE_ANY",
+    "PROMISE_RACE",
+    "PROMISE_REJECT",
+    "PROMISE_RESOLVE",
+    "PROMISE_TRY",
+    "PROMISE_WITH_RESOLVERS",
+    "PROMISE_SPECIES",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "all",
+    "allSettled",
+    "any",
+    "race",
+    "reject",
+    "resolve",
+    "try",
+    "withResolvers",
+    "constructor",
+    "then",
+    "catch",
+    "finally",
+    "promise",
+    "Promise",
+  ]) {
+    assert.match(promiseSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The constructor is an ordinary constructible function reached through
+  // the realm's own global property, and the species accessor is a
+  // getter-only symbol-keyed property on it.
+  assert.match(promiseSource, /OSEO_PROMISE_CONSTRUCTOR_CODE_ID/u);
+  assert.match(promiseSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(promiseSource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(promiseSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(promiseSource, /oseo_object_define_accessor/u);
+  assert.match(internalHeader, /oseo_internal_install_promise_global/u);
+  assert.match(bindingSource, /oseo_internal_install_promise_global/u);
+  // The retired M4 fast paths no longer exist as generated-code entry
+  // points, so no program can bypass the materialized properties.
+  assert.doesNotMatch(header, /oseo_promise_construct/u);
+  assert.doesNotMatch(header, /oseo_promise_race/u);
+  assert.doesNotMatch(header, /oseo_promise_reject\(/u);
+});

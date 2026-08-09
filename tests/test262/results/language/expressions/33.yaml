@@ -222,7 +222,7 @@ results:
     observation:
       detail: 'test/language/expressions/modulus/bigint-errors.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/language/expressions/modulus/bigint-errors.js:86:3:
+        stderr="test/language/expressions/modulus/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype
@@ -246,13 +246,23 @@ results:
     dependencies:
       - async-functions
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/optional-chaining/member-expression-\
-        async-identifier.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/optional-chaining/member-exp\
-        ression-async-identifier.js:195:3: error[OSEO1001]: Unknown
-        binding 'Promise'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/expressions/optional-chaining/member-expression-async-identifier.js
+        non-strict disabled failed (1):
+        stdout="Test262:AsyncTestComplete\n"
+        stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:206:19:
+        error[OSEO2001]: Unhandled promise rejection.\n"'
+      unsupportedCapability: unhandled-rejection-policy
       passed: false
     unsupportedFeatures: []
   - case:
@@ -274,7 +284,7 @@ results:
       detail: "test/language/expressions/super/prop-expr-cls-val-from-eval.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/super/prop-expr-cls-val-from\
-        -eval.js:101:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        -eval.js:107:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id.js:87:10:
+      detail: "test/language/module-code/early-dup-export-id.js:93:10:
         error[OSEO0001]: Duplicate export 'x'."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-generator-\
-        expr.js:83:16: error[OSEO0001]: Source could not be parsed."
+        expr.js:89:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

@@ -79,7 +79,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-172.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-172.js\
-        :91:3: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :97:3: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -164,7 +164,7 @@ results:
       detail: "test/built-ins/Object/getPrototypeOf/15.2.3.2-2-26.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-2-26.js:\
-        80:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        86:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

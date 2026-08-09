@@ -236,7 +236,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-591.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-591.js\
-        :353:21: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        :378:21: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -311,7 +311,7 @@ results:
     observation:
       detail: "test/built-ins/Object/is/same-value-x-y-object.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/is/same-value-x-y-object.js:85:9:
+        stderr=\"test/built-ins/Object/is/same-value-x-y-object.js:91:9:
         error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

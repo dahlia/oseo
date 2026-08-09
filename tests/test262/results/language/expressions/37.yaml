@@ -249,7 +249,7 @@ results:
       detail: "test/language/expressions/optional-chaining/eval-optional-call\
         .js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/optional-chaining/eval-optio\
-        nal-call.js:101:10: error[OSEO1001]: Unknown binding
+        nal-call.js:107:10: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

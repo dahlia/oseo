@@ -179,7 +179,7 @@ results:
       detail: "test/language/statements/try/optional-catch-binding-lexical.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/try/optional-catch-binding-le\
-        xical.js:106:5: error[OSEO1001]: Unknown binding 'y'.\\n\""
+        xical.js:112:5: error[OSEO1001]: Unknown binding 'y'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

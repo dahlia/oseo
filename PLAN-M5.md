@@ -3709,6 +3709,40 @@ prerequisite boundaries. The manifest moves to 6,901 paths with 4,556 passes,
 descriptor checkpoint moves the runtime ABI to `oseo-runtime-m5-52` without
 changing the graph's orchestration state.
 
+Implemented M5b node `promise-intrinsic` makes `Promise` a materialized
+realm value. The constructor is an ordinary constructible function the
+global object binds as a writable, non-enumerable, configurable property,
+so `new Promise`, `Promise.resolve`, and every other static now run as
+ordinary construction and method calls instead of the M4 fast paths the
+frontend recognized by name. A promise takes its `[[Prototype]]` from the
+new target, `Promise.prototype` carries `constructor`, `Symbol.toStringTag`,
+`then`, `catch`, and `finally`, and `%Promise%` carries the
+`Symbol.species` accessor together with `resolve`, `reject`,
+`withResolvers`, `try`, `all`, `race`, `allSettled`, and `any`. A capability
+over any constructor other than `%Promise%` is a three-slot record built by
+NewPromiseCapability, which `then` and `finally` reach through
+SpeciesConstructor, so a subclass observes its own executor and resolving
+functions. Fixed native and generated differential evidence at seed
+`0x60003800` covers both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, generic fallback,
+subclass and foreign capabilities, throwing and non-constructor species,
+and global `Promise` replacement and deletion. `Promise.all` and
+`Promise.race` now build their capability from the `this` value; the
+remaining combinator work stays with its own graph node. The reviewed subset
+admits the `promise-try` and `promise-with-resolvers` feature tags, so both
+statics execute their upstream cases rather than reporting an unadmitted
+feature. Of the 250 paths under the node's seven inventory roots, 238 are
+reviewed: 183 pass and 55 retain explicit prerequisite boundaries. The
+remaining twelve name the
+*promiseHelper.js* include, the unhandled-rejection host policy, and the
+`PromiseResolve` constructor read. Thirteen previously reviewed cases also move
+from unsupported to pass because a real `Promise` value satisfies their
+prerequisites. The manifest moves to 7,111 paths with 4,750 passes, 1,355
+expected negatives, and 1,006 unsupported profile features. Materializing the
+intrinsic retires the `oseo_promise_construct`, `oseo_promise_race`, and
+`oseo_promise_reject` generated-code entry points and moves the runtime ABI to
+`oseo-runtime-m5-53` without changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

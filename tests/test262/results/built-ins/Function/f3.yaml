@@ -50,7 +50,7 @@ results:
       detail: "test/built-ins/Function/prototype/call/S15.3.4.4_A5_T6.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/call/S15.3.4.4_A5_T6\
-        .js:81:15: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        .js:87:15: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

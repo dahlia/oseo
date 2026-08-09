@@ -218,7 +218,7 @@ results:
       detail: "test/language/statements/try/scope-catch-param-var-none.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/try/scope-catch-param-var-non\
-        e.js:86:16: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        e.js:92:16: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

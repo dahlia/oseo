@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-ary-ptrn-\
         rest-ary-rest.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-rest-ary-rest.js:121:10: error[OSEO1001]: Unknown
+        ry-ptrn-rest-ary-rest.js:127:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -84,7 +84,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-ary-ptrn-\
         rest-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-rest-id.js:115:10: error[OSEO1001]: Unknown binding
+        ry-ptrn-rest-id.js:121:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -112,7 +112,7 @@ results:
         ptrn-prop-id-init-skipped.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-prop-id-init-skipped.js:126:5: error[OSEO1001]:
+        flt-obj-ptrn-prop-id-init-skipped.js:132:5: error[OSEO1001]:
         Unknown binding 's'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

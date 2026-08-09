@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-var\
-        .js:84:3: error[OSEO0001]: Source could not be parsed."
+        .js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -41,7 +41,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-let.js:84:16:
+      detail: "test/language/module-code/parse-err-export-dflt-let.js:90:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

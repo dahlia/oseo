@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/ary-ptrn-elem-a\
         ry-rest-iter.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ptr\
-        n-elem-ary-rest-iter.js:122:10: error[OSEO1001]: Unknown binding
+        n-elem-ary-rest-iter.js:128:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -50,7 +50,7 @@ results:
         elem-id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-elem-id-init-unresolvable.js:107:29: error[OSEO1001]:
+        ry-ptrn-elem-id-init-unresolvable.js:113:29: error[OSEO1001]:
         Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

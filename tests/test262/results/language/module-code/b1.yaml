@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star.js:98:1\
-        0: error[OSEO2001]: Module has no export 'default'."
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star.js:104:\
+        10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false

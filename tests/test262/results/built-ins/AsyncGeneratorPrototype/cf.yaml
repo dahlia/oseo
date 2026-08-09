@@ -29,7 +29,7 @@ results:
     observation:
       detail: 'test/built-ins/AsyncGeneratorPrototype/next/this-val-not-object.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorPrototype/next/this-val-not-object.js:108:31:
+        stderr="test/built-ins/AsyncGeneratorPrototype/next/this-val-not-object.js:114:31:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

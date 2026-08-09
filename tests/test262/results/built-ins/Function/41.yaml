@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Function/prototype/call/15.3.4.4-1-s.js strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/call/15.3.4.4-1-s.js\
-        :84:27: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        :90:27: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

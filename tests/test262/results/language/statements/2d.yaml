@@ -59,7 +59,7 @@ results:
       detail: "test/language/statements/class/accessor-name-static/computed-e\
         rr-unresolvable.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/accessor-name-static/co\
-        mputed-err-unresolvable.js:100:17: error[OSEO1001]: Unknown
+        mputed-err-unresolvable.js:106:17: error[OSEO1001]: Unknown
         binding 'test262unresolvable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

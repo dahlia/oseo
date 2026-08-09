@@ -112,7 +112,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/null.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/null.js:97:10:
+        stderr=\"test/language/expressions/typeof/null.js:103:10:
         error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

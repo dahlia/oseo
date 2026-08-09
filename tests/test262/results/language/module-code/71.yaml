@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-let\
-        .js:84:3: error[OSEO0001]: Source could not be parsed."
+        .js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -48,7 +48,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-null.js
-          sourceHash: fnv1a64:6062ddf7ba737fe1
+          sourceHash: fnv1a64:9e7340636d8193e7
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

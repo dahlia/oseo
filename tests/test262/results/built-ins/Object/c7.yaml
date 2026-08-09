@@ -87,7 +87,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/defineProperty/8.12.9-9-c-i_2.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/defineProperty/8.12.9-9-c-i_2.js:88:1:
+        stderr="test/built-ins/Object/defineProperty/8.12.9-9-c-i_2.js:94:1:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

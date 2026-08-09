@@ -133,7 +133,7 @@ results:
         ted-name-toprimitive-returns-nonobject.js non-strict disabled
         failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/evaluation-err\
-        or/computed-name-toprimitive-returns-nonobject.js:121:13:
+        or/computed-name-toprimitive-returns-nonobject.js:127:13:
         error[OSEO1001]: Unknown binding 'refErrorIfEvaluated'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

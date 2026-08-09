@@ -27,7 +27,7 @@ results:
     observation:
       detail: 'test/language/expressions/async-generator/default-proto.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/async-generator/default-proto.js:105:18:
+        stderr="test/language/expressions/async-generator/default-proto.js:111:18:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

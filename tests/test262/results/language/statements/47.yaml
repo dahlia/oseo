@@ -109,7 +109,7 @@ results:
       detail: "test/language/statements/class/definition/invalid-extends.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/definition/invalid-exte\
-        nds.js:83:19: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        nds.js:89:19: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -393,7 +393,7 @@ results:
     observation:
       detail: "test/language/statements/with/12.10-2-5.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/statements/with/12.10-2-5.js:82:101:
+        stderr=\"test/language/statements/with/12.10-2-5.js:88:101:
         error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

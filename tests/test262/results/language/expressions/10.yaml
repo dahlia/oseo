@@ -187,7 +187,7 @@ results:
       detail: "test/language/expressions/logical-or/S11.11.2_A3_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/logical-or/S11.11.2_A3_T1.js\
-        :92:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :98:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

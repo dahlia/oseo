@@ -61,7 +61,7 @@ results:
         er-get-err-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -init-iter-get-err-array-prototype.js:104:8: error[OSEO1001]:
+        -init-iter-get-err-array-prototype.js:110:8: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth-gen-static.js:84:29: error[OSEO0001]: Source could not be
+        -meth-gen-static.js:90:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse

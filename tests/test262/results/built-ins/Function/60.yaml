@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T4.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T\
-        4.js:82:1: error[OSEO1001]: Unknown binding 'f'.\\n\""
+        4.js:88:1: error[OSEO1001]: Unknown binding 'f'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

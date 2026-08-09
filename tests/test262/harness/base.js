@@ -4,6 +4,12 @@ function Test262Error(message) {
   this.message = message;
 }
 
+/* The upstream sta.js throwing callback. A reviewed case hands it to an
+ * API that must invoke a callable and reports the resulting throw. */
+Test262Error.thrower = function (message) {
+  throw new Test262Error(message);
+};
+
 function test262SameValue(actual, expected) {
   if (actual === expected) {
     if (actual === 0) return 1 / actual === 1 / expected;

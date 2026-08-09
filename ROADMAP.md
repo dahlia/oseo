@@ -1088,9 +1088,11 @@ The remaining queue is:
     unresolvable miss answers `"undefined"` instead of an
     uninitialized-cell error, while a resolved lexical fallback keeps
     its ordinary read and temporal dead zone. An unshadowed
-    runtime-owned intrinsic name such as `Object` or `Promise` stays a
+    runtime-owned intrinsic name such as `console` stays a
     source-located rejection because ECMA-262 resolves it to a real
-    global value this profile admits only as a call target. Unit 8.5j
+    global value this profile admits only as a call target; a name the
+    profile has since materialized, such as `Object` or `Promise`,
+    reads the realm global object's property instead. Unit 8.5j
     admits `delete super.property` and `delete super[expression]`,
     which ECMA-262 rejects with a `ReferenceError` only after the whole
     reference has been evaluated. The receiver is read first, so a

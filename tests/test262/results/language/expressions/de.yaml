@@ -85,7 +85,7 @@ results:
         ptrn-prop-id-trailing-comma.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-prop-id-trailing-comma.js:117:5: error[OSEO1001]:
+        flt-obj-ptrn-prop-id-trailing-comma.js:123:5: error[OSEO1001]:
         Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -112,7 +112,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-obj-ptrn-\
         prop-ary.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-ary.js:120:5: error[OSEO1001]: Unknown binding
+        bj-ptrn-prop-ary.js:126:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

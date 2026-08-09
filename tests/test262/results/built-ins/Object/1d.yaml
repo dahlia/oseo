@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-114.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-114.js\
-        :83:21: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :89:21: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-36.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-36.js:\
-        84:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        90:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -399,7 +399,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/prototype/propertyIsEnumerable/S15.2.4.7_A2_T2.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/propertyIsEnumerable/S15.2.4.7_A2_T2.js:111:18:
+        stderr="test/built-ins/Object/prototype/propertyIsEnumerable/S15.2.4.7_A2_T2.js:117:18:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype

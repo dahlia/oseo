@@ -219,7 +219,7 @@ results:
     observation:
       detail: "test/language/statements/for-in/head-lhs-let.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/head-lhs-let.js:100:23:
+        stderr=\"test/language/statements/for-in/head-lhs-let.js:106:23:
         error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

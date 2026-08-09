@@ -25,18 +25,10 @@ export type MirConstant =
 export type MirCallTarget =
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
-  | { readonly kind: "promise-constructor" }
   | { readonly kind: "super" }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method:
-        | "all"
-        | "asyncCall"
-        | "awaitThen"
-        | "race"
-        | "reject"
-        | "resolve"
-        | "then";
+      readonly method: "all" | "asyncCall" | "awaitThen" | "resolve" | "then";
     }
   | {
       readonly kind: "timer-intrinsic";

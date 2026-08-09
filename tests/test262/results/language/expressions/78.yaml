@@ -406,7 +406,7 @@ results:
       detail: "test/language/expressions/tagged-template/cache-identical-sour\
         ce-eval.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/cache-identi\
-        cal-source-eval.js:92:1: error[OSEO1001]: Unknown binding
+        cal-source-eval.js:98:1: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

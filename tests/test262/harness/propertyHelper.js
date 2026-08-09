@@ -5,6 +5,17 @@ const __oseoGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const __oseoKeys = Object.keys;
 const __oseoPropertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 
+/*
+ * A displayable label for one property key. A symbol key cannot reach
+ * string concatenation, which throws a TypeError, and symbol
+ * description reflection is outside the admitted profile, so a symbol
+ * key reports a fixed label instead. No reviewed case asserts on these
+ * message texts; they exist so a failure names the property.
+ */
+function __oseoKeyLabel(name) {
+  return typeof name === "symbol" ? "[symbol]" : "" + name;
+}
+
 function __oseoSameValue(left, right) {
   if (left === 0 && right === 0) return 1 / left === 1 / right;
   if (left !== left && right !== right) return true;
@@ -143,7 +154,7 @@ function verifyEqualTo(object, name, value) {
   if (!__oseoSameValue(object[name], value)) {
     throw new Test262Error(
       "Expected obj[" +
-        name +
+        __oseoKeyLabel(name) +
         "] to equal " +
         value +
         ", actually " +
@@ -156,12 +167,12 @@ function verifyWritable(object, name, verifyName, value) {
   if (!verifyName) {
     assert(
       __oseoGetOwnPropertyDescriptor(object, name).writable,
-      "Expected obj[" + name + "] to have writable:true.",
+      "Expected obj[" + __oseoKeyLabel(name) + "] to have writable:true.",
     );
   }
   if (!__oseoIsWritable(object, name, verifyName, value)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] to be writable, but was not.",
+      "Expected obj[" + __oseoKeyLabel(name) + "] to be writable, but was not.",
     );
   }
 }
@@ -170,12 +181,12 @@ function verifyNotWritable(object, name, verifyName, value) {
   if (!verifyName) {
     assert(
       !__oseoGetOwnPropertyDescriptor(object, name).writable,
-      "Expected obj[" + name + "] to have writable:false.",
+      "Expected obj[" + __oseoKeyLabel(name) + "] to have writable:false.",
     );
   }
   if (__oseoIsWritable(object, name, verifyName)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] NOT to be writable, but was.",
+      "Expected obj[" + __oseoKeyLabel(name) + "] NOT to be writable, but was.",
     );
   }
 }
@@ -183,11 +194,13 @@ function verifyNotWritable(object, name, verifyName, value) {
 function verifyEnumerable(object, name) {
   assert(
     __oseoGetOwnPropertyDescriptor(object, name).enumerable,
-    "Expected obj[" + name + "] to have enumerable:true.",
+    "Expected obj[" + __oseoKeyLabel(name) + "] to have enumerable:true.",
   );
   if (!__oseoIsEnumerable(object, name)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] to be enumerable, but was not.",
+      "Expected obj[" +
+        __oseoKeyLabel(name) +
+        "] to be enumerable, but was not.",
     );
   }
 }
@@ -195,11 +208,13 @@ function verifyEnumerable(object, name) {
 function verifyNotEnumerable(object, name) {
   assert(
     !__oseoGetOwnPropertyDescriptor(object, name).enumerable,
-    "Expected obj[" + name + "] to have enumerable:false.",
+    "Expected obj[" + __oseoKeyLabel(name) + "] to have enumerable:false.",
   );
   if (__oseoIsEnumerable(object, name)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] NOT to be enumerable, but was.",
+      "Expected obj[" +
+        __oseoKeyLabel(name) +
+        "] NOT to be enumerable, but was.",
     );
   }
 }
@@ -207,11 +222,13 @@ function verifyNotEnumerable(object, name) {
 function verifyConfigurable(object, name) {
   assert(
     __oseoGetOwnPropertyDescriptor(object, name).configurable,
-    "Expected obj[" + name + "] to have configurable:true.",
+    "Expected obj[" + __oseoKeyLabel(name) + "] to have configurable:true.",
   );
   if (!__oseoIsConfigurable(object, name)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] to be configurable, but was not.",
+      "Expected obj[" +
+        __oseoKeyLabel(name) +
+        "] to be configurable, but was not.",
     );
   }
 }
@@ -219,11 +236,13 @@ function verifyConfigurable(object, name) {
 function verifyNotConfigurable(object, name) {
   assert(
     !__oseoGetOwnPropertyDescriptor(object, name).configurable,
-    "Expected obj[" + name + "] to have configurable:false.",
+    "Expected obj[" + __oseoKeyLabel(name) + "] to have configurable:false.",
   );
   if (__oseoIsConfigurable(object, name)) {
     throw new Test262Error(
-      "Expected obj[" + name + "] NOT to be configurable, but was.",
+      "Expected obj[" +
+        __oseoKeyLabel(name) +
+        "] NOT to be configurable, but was.",
     );
   }
 }

@@ -24,7 +24,7 @@ results:
           strictness: non-strict
     observation:
       detail: 'test/built-ins/Object/S9.9_A4.js non-strict disabled failed
-        (1): stdout="" stderr="test/built-ins/Object/S9.9_A4.js:80:18:
+        (1): stdout="" stderr="test/built-ins/Object/S9.9_A4.js:86:18:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype
@@ -80,7 +80,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-225.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-225.js\
-        :83:18: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        :89:18: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

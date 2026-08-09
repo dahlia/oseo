@@ -63,6 +63,32 @@
     (OSEO_PROMISE_CODE_ID_RANGE_LAST - 8u)
 #define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID \
     (OSEO_PROMISE_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_PROMISE_CONSTRUCTOR_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_PROMISE_STATIC_RESOLVE_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_PROMISE_STATIC_REJECT_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_PROMISE_WITH_RESOLVERS_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_PROMISE_TRY_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_PROMISE_SPECIES_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 15u)
+/* GetCapabilitiesExecutor: the anonymous executor NewPromiseCapability
+ * hands to an arbitrary constructor so it can capture that
+ * constructor's resolving functions. */
+#define OSEO_PROMISE_CAPABILITY_EXECUTOR_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_PROMISE_ALL_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_PROMISE_RACE_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 18u)
+/* The combinators whose graph node has not landed. They exist as
+ * function objects so %Promise% carries every own property ECMA-262
+ * requires, and calling one reports the owned unadmitted diagnostic. */
+#define OSEO_PROMISE_DEFERRED_STATIC_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 19u)
 
 #define OSEO_ERROR_CODE_ID_RANGE_INDEX ((size_t)1u)
 #define OSEO_ERROR_CODE_ID_RANGE_FIRST \
@@ -1273,6 +1299,13 @@ OseoResult oseo_internal_promise_invoke_then(
  * reports through. */
 OseoResult oseo_internal_promise_create(OseoContext *context);
 OseoResult oseo_internal_promise_prototype(OseoContext *context);
+/* Materializes %Promise% together with its prototype, statics, and
+ * species accessor, and returns the constructor. */
+OseoResult oseo_internal_promise_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_promise_global(
+    OseoContext *context,
+    OseoValue global
+);
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%
  * methods and its `Symbol.asyncIterator`, selected by code id. */
 OseoResult oseo_internal_async_generator_method(

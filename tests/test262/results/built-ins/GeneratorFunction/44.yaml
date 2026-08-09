@@ -29,7 +29,7 @@ results:
     observation:
       detail: 'test/built-ins/GeneratorFunction/instance-name.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/GeneratorFunction/instance-name.js:319:25:
+        stderr="test/built-ins/GeneratorFunction/instance-name.js:344:25:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

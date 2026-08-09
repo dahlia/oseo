@@ -48,7 +48,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-ary-ptrn-\
         rest-id-exhausted.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-rest-id-exhausted.js:118:10: error[OSEO1001]: Unknown
+        ry-ptrn-rest-id-exhausted.js:124:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -177,7 +177,7 @@ results:
         default-handler-throws.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/class/elements/private-field\
-        s-proxy-default-handler-throws.js:94:13: error[OSEO1001]:
+        s-proxy-default-handler-throws.js:100:13: error[OSEO1001]:
         Unknown binding 'Proxy'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

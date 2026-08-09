@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/ary-ptrn-elem-o\
         bj-prop-id-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ptr\
-        n-elem-obj-prop-id-init.js:124:5: error[OSEO1001]: Unknown
+        n-elem-obj-prop-id-init.js:130:5: error[OSEO1001]: Unknown
         binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -50,7 +50,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-obj-ptrn-\
         prop-ary-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-ary-init.js:122:5: error[OSEO1001]: Unknown binding
+        bj-ptrn-prop-ary-init.js:128:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -238,7 +238,7 @@ results:
       detail: "test/language/expressions/tagged-template/template-object.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/template-obj\
-        ect.js:318:8: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        ect.js:343:8: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

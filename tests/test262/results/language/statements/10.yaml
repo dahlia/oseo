@@ -50,8 +50,8 @@ results:
     observation:
       detail: "test/language/statements/for-in/cptn-decl-itr.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/cptn-decl-itr.js:99:18:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        stderr=\"test/language/statements/for-in/cptn-decl-itr.js:105:1\
+        8: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

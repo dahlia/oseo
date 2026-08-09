@@ -112,8 +112,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_primitive.c*: coercions including the generic
     `ToPrimitive`, arithmetic, comparison, string
     conversion, and console output;
- -  *runtime\_promise.c*: promises, capabilities, reactions, thenable
-    jobs, combinators, rejection tracking, and job draining;
+ -  *runtime\_promise.c*: the `%Promise%` intrinsic and its statics,
+    promises, capabilities, reactions, thenable jobs, combinators,
+    rejection tracking, and job draining;
  -  *runtime\_event\_loop.c*: timer queues, task
     checkpoints, top-level await progress, and shutdown; timer delay
     coercion goes through the shared primitive conversions.
@@ -175,7 +176,7 @@ its read and write.
 
 ### Internal helpers
 
-Eighty-eight helpers cross a translation-unit boundary. Each uses the
+Ninety helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -258,6 +259,8 @@ Eighty-eight helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_object_prototype`                    | *runtime\_object\_builtin.c*  |
 | `oseo_internal_intrinsic`                           | *runtime\_function.c*         |
 | `oseo_internal_promise_prototype`                   | *runtime\_promise.c*          |
+| `oseo_internal_promise_intrinsic`                   | *runtime\_promise.c*          |
+| `oseo_internal_install_promise_global`              | *runtime\_promise.c*          |
 | `oseo_internal_array_prototype`                     | *runtime\_array.c*            |
 | `oseo_internal_array_iterator_prototype`            | *runtime\_iterator.c*         |
 | `oseo_internal_same_value`                          | *runtime\_descriptor.c*       |
@@ -384,6 +387,26 @@ public layout change. Fixed and generated native differential evidence covers
 both specialization policies, false hints, generic fallback, deliberate
 invalid and abrupt descriptors, and collection forced at every safepoint. The
 node reviews only its declared `Object.defineProperty` test262 inventory root.
+
+### Promise intrinsic evidence
+
+M5b node `promise-intrinsic` materializes `%Promise%` in *runtime\_promise.c*.
+The component keeps its existing ownership of promises, reactions, thenable
+jobs, and job draining, and gains the constructor, the prototype links, the
+`Symbol.species` accessor, the `resolve`, `reject`, `withResolvers`, and `try`
+statics, and the PromiseCapability record that `then`, `finally`, and the two
+existing combinators build from SpeciesConstructor or their `this` value. The
+binding component installs the global property beside the `Object` and `Number`
+ones through `oseo_internal_install_promise_global`.
+
+The materialized value replaces three generated-code entry points, so
+`abiVersion` moves to `m5-53` and `oseo_promise_construct`,
+`oseo_promise_race`, and `oseo_promise_reject` leave the public header. Fixed
+and generated native differential evidence covers both specialization
+policies, false hints, deliberate guard misses, generic fallback, subclass
+capabilities, foreign capability constructors, and collection forced at every
+safepoint. The node reviews the seven declared `Promise` inventory roots and
+promotes no path outside them.
 
 ### Function prototype evidence
 

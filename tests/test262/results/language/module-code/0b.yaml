@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-asyncfunction-declaration-binding.js
-          sourceHash: fnv1a64:30abacfffc34127c
+          sourceHash: fnv1a64:72f8994c69a56eee
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

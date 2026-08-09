@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-223-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-223-1.\
-        js:87:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        js:93:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -161,7 +161,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-584.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-584.js\
-        :80:23: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        :86:23: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

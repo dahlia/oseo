@@ -18,7 +18,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A16.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A16.js:82:11:
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A16.js:88:11:
         error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false

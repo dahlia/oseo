@@ -21,7 +21,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/parse-export-empty.js
-          sourceHash: fnv1a64:4e98631d596ca52c
+          sourceHash: fnv1a64:f5a1aa3115938426
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -56,7 +56,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-identifier.js
-          sourceHash: fnv1a64:1108427fed56b261
+          sourceHash: fnv1a64:cb36b5c38bd76b1f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

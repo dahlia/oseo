@@ -152,7 +152,7 @@ results:
         rivate-method-initialize-order.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/private-method\
-        s/prod-private-method-initialize-order.js:165:21:
+        s/prod-private-method-initialize-order.js:171:21:
         error[OSEO1001]: Unknown binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

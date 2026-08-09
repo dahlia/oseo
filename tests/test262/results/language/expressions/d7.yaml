@@ -52,7 +52,7 @@ results:
       - lexical-bindings
     observation:
       detail: "test/language/expressions/class/class-name-ident-await-escaped\
-        -module.js:92:15: error[OSEO0001]: Source could not be parsed."
+        -module.js:98:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

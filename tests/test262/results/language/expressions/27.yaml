@@ -60,7 +60,7 @@ results:
         d-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-id-init-unresolvable.js:107:30: error[OSEO1001]: Unknown
+        n-prop-id-init-unresolvable.js:113:30: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -119,7 +119,7 @@ results:
       detail: "test/language/expressions/async-generator/yield-spread-arr-sin\
         gle.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-spread\
-        -arr-single.js:123:10: error[OSEO1001]: Unknown binding
+        -arr-single.js:129:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

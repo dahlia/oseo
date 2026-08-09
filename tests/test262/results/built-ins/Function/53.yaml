@@ -19,7 +19,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/length/S15.3.5.1_A3_T1.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/length/S15.3.5.1_A3_T1.js:312:9:
+        stderr="test/built-ins/Function/length/S15.3.5.1_A3_T1.js:337:9:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
@@ -43,7 +43,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.\
-        js:81:14: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        js:87:14: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

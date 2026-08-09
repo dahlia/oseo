@@ -20,7 +20,7 @@ results:
     observation:
       detail: "test/language/global-code/block-decl-strict.js strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/global-code/block-decl-strict.js:86:3:
+        stderr=\"test/language/global-code/block-decl-strict.js:92:3:
         error[OSEO1001]: Unknown binding 'f'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

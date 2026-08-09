@@ -235,7 +235,7 @@ results:
       detail: "test/built-ins/Object/getPrototypeOf/15.2.3.2-2-1.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-2-1.js:8\
-        0:40: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        6:40: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

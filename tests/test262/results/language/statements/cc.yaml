@@ -24,7 +24,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-ary-ptrn-re\
         st-id-direct.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-rest-id-direct.js:128:10: error[OSEO1001]: Unknown binding
+        -ptrn-rest-id-direct.js:134:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -51,7 +51,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-prop-ob\
         j.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-obj.js:119:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
+        -prop-obj.js:125:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -179,7 +179,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/scope-head-lex-close.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/scope-head-lex-close.js:105:9:
+        stderr="test/language/statements/for-in/scope-head-lex-close.js:111:9:
         error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax

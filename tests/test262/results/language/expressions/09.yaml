@@ -68,7 +68,7 @@ results:
         ter-get-err-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-init-iter-get-err-array-prototype.js:104:8: error[OSEO1001]:
+        y-init-iter-get-err-array-prototype.js:110:8: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -96,7 +96,7 @@ results:
         ptrn-elem-ary-rest-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-elem-ary-rest-init.js:120:10: error[OSEO1001]:
+        flt-ary-ptrn-elem-ary-rest-init.js:126:10: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

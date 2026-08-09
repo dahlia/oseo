@@ -1,0 +1,58 @@
+version: 1
+id: promise-intrinsic
+title: "%Promise% as a materialized intrinsic value"
+scope:
+  - "The realm-owned Promise constructor, its global object property, its
+    call and construct behavior, and the prototype it takes from a new
+    target."
+  - "Promise.prototype's constructor link, Symbol.toStringTag, then, catch,
+    and finally, including SpeciesConstructor and the PromiseCapability
+    record a foreign constructor produces."
+  - "The Symbol.species accessor and the resolve, reject, withResolvers, and
+    try statics with their receiver and capability semantics."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/fixtures/runtime-promises.c
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/parser-babel/tests/modules.test.ts
+      - packages/runtime-c/native/runtime_promise.c

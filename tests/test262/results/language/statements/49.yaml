@@ -156,7 +156,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/scope-body-var-none.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/scope-body-var-none.js:106:9:
+        stderr="test/language/statements/for-in/scope-body-var-none.js:112:9:
         error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax

@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/early-dup-top-function-async-generat\
-        or.js:89:17: error[OSEO0001]: Source could not be parsed."
+        or.js:95:17: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

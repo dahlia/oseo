@@ -237,7 +237,7 @@ results:
       detail: "test/language/expressions/object/identifier-shorthand-static-i\
         nit-await-valid.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/object/identifier-shorthand-\
-        static-init-await-valid.js:85:15: error[OSEO1001]: Unknown
+        static-init-await-valid.js:91:15: error[OSEO1001]: Unknown
         binding 'await'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
