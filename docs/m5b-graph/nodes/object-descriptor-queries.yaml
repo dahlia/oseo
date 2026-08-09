@@ -10,5 +10,5 @@ inventory:
     - test/built-ins/Object/getOwnPropertyDescriptors/
 dependencies:
   - object-constructor
-landed: false
+landed: true
 status: ready

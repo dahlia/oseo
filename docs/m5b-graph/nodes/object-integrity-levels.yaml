@@ -17,4 +17,4 @@ dependencies:
   - object-define-property
   - object-descriptor-queries
 landed: false
-status: blocked
+status: ready
