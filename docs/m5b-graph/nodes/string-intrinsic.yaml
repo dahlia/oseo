@@ -13,4 +13,8 @@ inventory:
 dependencies:
   - object-prototype
 landed: false
-status: ready
+status: parked
+reason: "The implementation removed the previously reviewed
+  test/built-ins/Object/defineProperty/15.2.3.6-4-621.js subset path and used a
+  present-to-absent ratchet override. Work can resume only when String lands
+  without weakening reviewed evidence."

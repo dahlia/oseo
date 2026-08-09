@@ -19,4 +19,7 @@ dependencies:
   - string-prototype-access
   - unicode-tables
 landed: false
-status: blocked
+status: parked
+reason: "Its string-intrinsic prerequisite is parked because that implementation
+  removed previously reviewed subset evidence and required a ratchet override.
+  Work can resume after String lands without weakening reviewed evidence."
