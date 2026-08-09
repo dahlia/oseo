@@ -297,6 +297,12 @@ static OseoResult global_this_object(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_string_global(
+            context,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_install_promise_global(
             context,
             frame.slots[0]
@@ -399,7 +405,6 @@ static OseoResult global_this_object(OseoContext *context) {
     }
     oseo_roots_pop(context, &frame);
     return result;
-}
 
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {
     if (is_nullish(receiver)) return global_this_object(context);

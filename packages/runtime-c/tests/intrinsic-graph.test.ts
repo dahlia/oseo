@@ -486,3 +486,47 @@ test("populates the realm-owned Promise intrinsic cluster", () => {
   assert.doesNotMatch(header, /oseo_promise_race/u);
   assert.doesNotMatch(header, /oseo_promise_reject\(/u);
 });
+
+test("populates the realm-owned String intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const stringSource = sources.get("runtime_string.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+  const primitiveSource = sources.get("runtime_primitive.c") ?? "";
+
+  for (const intrinsic of [
+    "STRING_PROTOTYPE",
+    "STRING",
+    "STRING_FROM_CHAR_CODE",
+    "STRING_FROM_CODE_POINT",
+    "STRING_RAW",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "constructor",
+    "fromCharCode",
+    "fromCodePoint",
+    "length",
+    "raw",
+    "String",
+  ]) {
+    assert.match(stringSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The constructor is an ordinary constructible function reached through
+  // the realm's own global property.
+  assert.match(stringSource, /OSEO_STRING_CONSTRUCTOR_CODE_ID/u);
+  assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(internalHeader, /oseo_internal_install_string_global/u);
+  assert.match(bindingSource, /oseo_internal_install_string_global/u);
+  // %String.prototype% and every String exotic object take their own
+  // properties from one owner rather than from a second definition
+  // beside ToObject.
+  assert.match(stringSource, /oseo_internal_string_wrapper_properties/u);
+  assert.match(objectBuiltins, /oseo_internal_string_wrapper_properties/u);
+  assert.doesNotMatch(objectBuiltins, /define_string_wrapper_properties/u);
+  // Object.prototype.toString reads the [[StringData]] brand instead of
+  // reporting a plain object.
+  assert.match(primitiveSource, /oseo_internal_string_data/u);
+});

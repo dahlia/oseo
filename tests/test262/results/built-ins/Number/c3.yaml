@@ -15,12 +15,20 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Number/S15.7.1.1_A1.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/S15.7.1.1_A1.js:90:21:
-        error[OSEO1001]: Unknown binding 'String'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/Number/S15.7.1.1_A1.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/Number/S15.7.1.1_A1.js:90:10:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
       passed: false
     unsupportedFeatures: []
   - case:

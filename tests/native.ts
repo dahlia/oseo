@@ -44,6 +44,7 @@ import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
+import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
@@ -74,12 +75,15 @@ const zigNativeTarget =
       ? "x86_64-linux-gnu"
       : assert.fail(`unsupported execution target: ${nativeTarget.name}`);
 
+// The captured `String` keeps the reference console working while a
+// fixture replaces or deletes the realm's own global binding.
 const referencePrelude = `
 const oseoReferenceConsole = console;
+const oseoReferenceString = String;
 Object.defineProperty(globalThis, "console", {
   value: {
     log(...values: unknown[]) {
-      oseoReferenceConsole.log(values.map(String).join(" "));
+      oseoReferenceConsole.log(values.map(oseoReferenceString).join(" "));
     },
   },
 });
@@ -100,6 +104,7 @@ const fixtures: readonly Fixture[] = [
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
+  ...stringFixtures.stringIntrinsicFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -272,7 +277,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
-    fixture.name === "promise-intrinsic"
+    fixture.name === "promise-intrinsic" ||
+    fixture.name === "string-intrinsic"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -340,6 +346,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-intrinsic" ||
+    fixture.name === "string-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -522,7 +529,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "number-intrinsic" ||
-            fixture.name === "promise-intrinsic"
+            fixture.name === "promise-intrinsic" ||
+            fixture.name === "string-intrinsic"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

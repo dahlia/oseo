@@ -254,16 +254,24 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/built-ins/Object/getPrototypeOf/15.2.3.2-2-22.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-2-22.js:\
-        86:15: error[OSEO1001]: Unknown binding 'String'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

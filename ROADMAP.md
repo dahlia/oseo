@@ -1091,7 +1091,7 @@ The remaining queue is:
     runtime-owned intrinsic name such as `console` stays a
     source-located rejection because ECMA-262 resolves it to a real
     global value this profile admits only as a call target; a name the
-    profile has since materialized, such as `Object` or `Promise`,
+    profile has since materialized, such as `Object`, `Promise`, or `String`,
     reads the realm global object's property instead. Unit 8.5j
     admits `delete super.property` and `delete super[expression]`,
     which ECMA-262 rejects with a `ReferenceError` only after the whole

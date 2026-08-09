@@ -57,7 +57,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_string.c*: string values and the string half of a property
     key, meaning allocation, content equality, ASCII name matching,
     canonical array-index recognition, and the own properties a String
-    exotic object exposes;
+    exotic object exposes, together with the `String` constructor,
+    %String.prototype%, and the `fromCharCode`, `fromCodePoint`, and
+    `raw` statics;
  -  *runtime\_object.c*: ordinary object creation and layout, the
     property vector and its growth, own-property lookup and removal,
     cell-backed property recognition, shape identifiers and the
@@ -67,8 +69,10 @@ Ownership follows the plan's target layout:
     `[[Get]]` and `[[Set]]` with their `super` forms and `HasOwnProperty`;
  -  *runtime\_descriptor.c*: `[[GetOwnProperty]]`,
     `[[DefineOwnProperty]]` for data and accessor descriptors,
-    `[[Delete]]`, and the `SameValue` comparison
-    `ValidateAndApplyPropertyDescriptor` performs;
+    `[[Delete]]`, the `SameValue` comparison
+    `ValidateAndApplyPropertyDescriptor` performs, and the scan-free
+    append an exotic object filling a freshly created, empty receiver
+    with pairwise distinct keys uses in its place;
  -  *runtime\_array.c*: array exotic behavior, meaning array creation,
     the `length` own property and its truncation rules, canonical index
     keys, monotonic literal and spread accumulation, frozen template
@@ -180,7 +184,7 @@ its read and write.
 
 ### Internal helpers
 
-Ninety helpers cross a translation-unit boundary. Each uses the
+Ninety-six helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -212,6 +216,11 @@ Ninety helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_property_key_equal`                  | *runtime\_string.c*           |
 | `oseo_internal_array_index`                         | *runtime\_string.c*           |
 | `oseo_internal_string_own_property`                 | *runtime\_string.c*           |
+| `oseo_internal_string_data`                         | *runtime\_string.c*           |
+| `oseo_internal_string_wrapper_properties`           | *runtime\_string.c*           |
+| `oseo_internal_string_builtin_dispatch`             | *runtime\_string.c*           |
+| `oseo_internal_string_intrinsic`                    | *runtime\_string.c*           |
+| `oseo_internal_install_string_global`               | *runtime\_string.c*           |
 | `oseo_internal_bigint_binary`                       | *runtime\_bigint.c*           |
 | `oseo_internal_bigint_negate`                       | *runtime\_bigint.c*           |
 | `oseo_internal_bigint_not`                          | *runtime\_bigint.c*           |
@@ -224,6 +233,7 @@ Ninety helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_bigint_to_number`                    | *runtime\_bigint.c*           |
 | `oseo_internal_integer_digits_to_number`            | *runtime\_bigint.c*           |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
+| `oseo_internal_append_own_property`                 | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |
 | `oseo_internal_remove_property`                     | *runtime\_object.c*           |
 | `oseo_internal_grow_properties`                     | *runtime\_object.c*           |
@@ -506,6 +516,27 @@ misses, generic fallback, abrupt collection and definition orders,
 namespace sources and targets, and collection forced at every safepoint.
 The node reviews only its declared `Object.defineProperties` test262
 inventory root.
+
+### String intrinsic evidence
+
+M5b node `string-intrinsic` materializes `%String%` in *runtime\_string.c*.
+The component keeps its existing ownership of string values and property-key
+comparison, and gains the constructor, %String.prototype%, the exotic own
+properties every String wrapper exposes, and the `fromCharCode`,
+`fromCodePoint`, and `raw` statics. The definition of those own properties
+moves here from *runtime\_object\_builtin.c*, so ToObject and `new String`
+build one shape from one owner. The binding component installs the global
+property beside the `Object`, `Number`, and `Promise` ones through
+`oseo_internal_install_string_global`.
+
+The materialized value adds no generated-code entry point; `abiVersion` moves
+to `m5-61` for the expanded intrinsic table. The shared primitive component
+reads the `[[StringData]]` brand through `oseo_internal_string_data`, so
+`Object.prototype.toString` reports `[object String]` for a wrapper. Fixed and
+generated native differential evidence covers both specialization policies,
+false hints, deliberate guard misses, generic fallback, lone surrogates,
+astral code points, coercion order, and collection forced at every safepoint.
+The node reviews 145 of the 150 paths under its four declared inventory roots.
 
 ### Function prototype evidence
 
