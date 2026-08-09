@@ -7,9 +7,11 @@
 /*
  * The `Object` built-ins, the `Object.prototype` methods, and the own-key
  * operations they share with object rest and spread: ToPropertyDescriptor,
- * CopyDataProperties, own-key ordering, and the `Object.create`,
- * `Object.defineProperty`, `Object.getOwnPropertyDescriptor`,
- * `Object.keys`, and `Object.setPrototypeOf` entry points.
+ * FromPropertyDescriptor, CopyDataProperties, own-key ordering, and the
+ * `Object.create`, `Object.defineProperty`,
+ * `Object.getOwnPropertyDescriptor`,
+ * `Object.getOwnPropertyDescriptors`, `Object.keys`, and
+ * `Object.setPrototypeOf` entry points.
  */
 
 static OseoResult type_error(OseoContext *context, const char *message) {
@@ -29,6 +31,11 @@ static OseoResult create_object_prototype_function(
     size_t code_id,
     const char *name,
     size_t length
+);
+static OseoResult object_get_own_property_descriptors(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
 );
 static OseoResult object_prototype_has_own_property(
     OseoContext *context,
@@ -643,6 +650,13 @@ OseoResult oseo_internal_object_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID) {
+        return object_get_own_property_descriptors(
+            context,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_OBJECT_KEYS_CODE_ID) {
         return oseo_object_builtin_keys(context, argument_count, arguments);
     }
@@ -909,33 +923,36 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
             );
         }
     }
-    static const size_t legacy_static_codes[] = {
+    static const size_t owned_static_codes[] = {
         OSEO_OBJECT_CREATE_CODE_ID,
         OSEO_OBJECT_DEFINE_PROPERTY_CODE_ID,
         OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTOR_CODE_ID,
+        OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID,
         OSEO_OBJECT_KEYS_CODE_ID,
     };
-    static const char *const legacy_static_names[] = {
+    static const char *const owned_static_names[] = {
         "create",
         "defineProperty",
         "getOwnPropertyDescriptor",
+        "getOwnPropertyDescriptors",
         "keys",
     };
-    static const size_t legacy_static_lengths[] = {2u, 3u, 2u, 1u};
+    static const size_t owned_static_lengths[] = {2u, 3u, 2u, 1u, 1u};
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 4u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < sizeof(owned_static_codes) / sizeof(*owned_static_codes);
          index += 1u) {
         result = create_object_prototype_function(
             context,
-            legacy_static_codes[index],
-            legacy_static_names[index],
-            legacy_static_lengths[index]
+            owned_static_codes[index],
+            owned_static_names[index],
+            owned_static_lengths[index]
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_internal_ascii_string(
                 context,
-                legacy_static_names[index]
+                owned_static_names[index]
             );
             frame.slots[1] = result.value;
         }
@@ -955,7 +972,6 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         "entries",
         "freeze",
         "fromEntries",
-        "getOwnPropertyDescriptors",
         "getOwnPropertyNames",
         "getOwnPropertySymbols",
         "groupBy",
@@ -968,11 +984,14 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         "values",
     };
     static const size_t deferred_static_lengths[] = {
-        2u, 2u, 1u, 1u, 1u, 1u, 1u, 1u,
+        2u, 2u, 1u, 1u, 1u, 1u, 1u,
         2u, 2u, 1u, 1u, 1u, 1u, 1u, 1u,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 16u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index <
+                 sizeof(deferred_static_names) /
+                     sizeof(*deferred_static_names);
          index += 1u) {
         result = create_object_prototype_function(
             context,
@@ -1482,6 +1501,54 @@ OseoResult oseo_object_builtin_define_property(
     return result;
 }
 
+/*
+ * FromPropertyDescriptor (6.2.6.4). The caller owns a root frame of at
+ * least four slots and stores the described property's data value or
+ * getter in slot 2 and its setter in slot 3 before calling. The created
+ * object lands in slot 0, slot 1 is the field-name scratch every
+ * define_ascii_value call uses, and the fields are defined in the order
+ * the abstract operation specifies, so an own-key walk of the result
+ * reports `value, writable, enumerable, configurable` for a data
+ * property and `get, set, enumerable, configurable` for an accessor.
+ */
+static OseoResult from_property_descriptor(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    OseoPropertyAttributes attributes
+) {
+    OseoResult result = oseo_object_literal_create(context);
+    frame->slots[0] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = attributes.accessor
+        ? define_ascii_value(context, frame, "get", frame->slots[2])
+        : define_ascii_value(context, frame, "value", frame->slots[2]);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = attributes.accessor
+        ? define_ascii_value(context, frame, "set", frame->slots[3])
+        : define_ascii_value(
+            context,
+            frame,
+            "writable",
+            oseo_boolean(attributes.writable)
+        );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = define_ascii_value(
+        context,
+        frame,
+        "enumerable",
+        oseo_boolean(attributes.enumerable)
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = define_ascii_value(
+        context,
+        frame,
+        "configurable",
+        oseo_boolean(attributes.configurable)
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(frame->slots[0]);
+}
+
 OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoContext *context,
     size_t argument_count,
@@ -1545,41 +1612,189 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         return normal(oseo_undefined());
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = from_property_descriptor(context, &frame, attributes);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * OrdinaryOwnPropertyKeys (10.1.11.1) over the representations this
+ * profile stores. Integer-index keys come first in ascending numeric
+ * order, then the remaining string keys in creation order, then the
+ * symbol keys in creation order.
+ *
+ * Two own properties are not in the property vector: an array's
+ * `length` and a function's `prototype`. An array's `length` is created
+ * before any property a program can add, so it leads the array's string
+ * keys. A function's `prototype` follows the leading string keys its
+ * `prototype_key_position` still counts. Slot 0 of `frame` holds the
+ * object, slot 2 holds whichever of those two key strings this object
+ * needs, and the keys fill the `key_count` slots from index 3.
+ */
+static OseoResult snapshot_own_keys(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    size_t key_count
+) {
+    bool virtual_length = is_array(frame->slots[0]);
+    bool virtual_prototype =
+        function_has_prototype_property(frame->slots[0]);
+    size_t output = 0u;
+    uint64_t previous = UINT64_MAX;
+    while (output < key_count) {
+        OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
+        size_t selected = SIZE_MAX;
+        uint32_t selected_number = 0u;
+        for (size_t index = 0u; index < object->property_count; index += 1u) {
+            uint32_t number = 0u;
+            if (!oseo_internal_array_index(
+                    object->properties[index].key, &number) ||
+                (previous != UINT64_MAX && number <= previous)) continue;
+            if (selected == SIZE_MAX || number < selected_number) {
+                selected = index;
+                selected_number = number;
+            }
+        }
+        if (selected == SIZE_MAX) break;
+        frame->slots[3u + output] = object->properties[selected].key;
+        output += 1u;
+        previous = selected_number;
+    }
+    if (virtual_length || virtual_prototype) {
+        OseoResult key = oseo_internal_ascii_string(
+            context,
+            virtual_length ? "length" : "prototype"
+        );
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        frame->slots[2] = key.value;
+    }
+    if (virtual_length) {
+        frame->slots[3u + output] = frame->slots[2];
+        output += 1u;
+    }
+    /* No allocation happens from here to the end of the symbol pass, so
+     * the property vector cannot move under these two loops. */
+    bool pending_prototype = virtual_prototype;
+    size_t prototype_position = virtual_prototype
+        ? function_object(frame->slots[0])->prototype_key_position
+        : 0u;
+    size_t string_rank = 0u;
+    OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        uint32_t ignored = 0u;
+        OseoValue key = object->properties[index].key;
+        if (is_symbol(key) ||
+            oseo_internal_array_index(key, &ignored)) continue;
+        if (pending_prototype && string_rank == prototype_position) {
+            frame->slots[3u + output] = frame->slots[2];
+            output += 1u;
+            pending_prototype = false;
+        }
+        frame->slots[3u + output] = key;
+        output += 1u;
+        string_rank += 1u;
+    }
+    if (pending_prototype) {
+        frame->slots[3u + output] = frame->slots[2];
+        output += 1u;
+    }
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        OseoValue key = object->properties[index].key;
+        if (!is_symbol(key)) continue;
+        frame->slots[3u + output] = key;
+        output += 1u;
+    }
+    if (output != key_count) {
+        return failure(context, "OSEO2001", "Own-key snapshot changed.");
+    }
+    return normal(oseo_undefined());
+}
+
+/*
+ * Object.getOwnPropertyDescriptors (20.1.2.9). ToObject runs before
+ * anything else, so a nullish argument throws and a primitive is
+ * reported through the wrapper object it converts to, including a
+ * String wrapper's index and `length` properties. Every own key the
+ * conversion result reports contributes one FromPropertyDescriptor
+ * object, created as a writable, enumerable, configurable data property
+ * of an ordinary object.
+ */
+static OseoResult object_get_own_property_descriptors(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    if (is_nullish(value)) {
+        return type_error(
+            context,
+            "Cannot convert a nullish value to an object."
+        );
+    }
+    OseoResult converted = oseo_internal_to_object(context, value);
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    size_t virtual_count = is_array(converted.value) ||
+        function_has_prototype_property(converted.value) ? 1u : 0u;
+    size_t property_count = ordinary_object(converted.value)->property_count;
+    if (property_count > SIZE_MAX - 3u - virtual_count) {
+        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
+    }
+    size_t key_count = property_count + virtual_count;
+    /* The key frame roots the conversion result, the reported object,
+     * the one synthesized key string, and the whole key snapshot. The
+     * descriptor frame is the four-slot scratch every
+     * FromPropertyDescriptor call reuses. */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = converted.value;
+    OseoRootFrame descriptor = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &descriptor, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = snapshot_own_keys(context, &frame, key_count);
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_literal_create(context);
-        frame.slots[0] = result.value;
+        frame.slots[1] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = attributes.accessor
-            ? define_ascii_value(context, &frame, "get", frame.slots[2])
-            : define_ascii_value(context, &frame, "value", frame.slots[2]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = attributes.accessor
-            ? define_ascii_value(context, &frame, "set", frame.slots[3])
-            : define_ascii_value(
-                context,
-                &frame,
-                "writable",
-                oseo_boolean(attributes.writable)
-            );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_ascii_value(
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < key_count;
+         index += 1u) {
+        OseoValue key = frame.slots[3u + index];
+        OseoValue own = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        if (!oseo_internal_own_descriptor(
+                frame.slots[0],
+                key,
+                &own,
+                &attributes,
+                &getter,
+                &setter
+            )) continue;
+        descriptor.slots[2] = attributes.accessor ? getter : own;
+        descriptor.slots[3] = setter;
+        if (oseo_internal_cell_backed_property(frame.slots[0], own)) {
+            result = oseo_cell_get(context, own);
+            descriptor.slots[2] = result.value;
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
+        result = from_property_descriptor(context, &descriptor, attributes);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
             context,
-            &frame,
-            "enumerable",
-            oseo_boolean(attributes.enumerable)
+            frame.slots[1],
+            key,
+            descriptor.slots[0],
+            (OseoPropertyAttributes){true, true, true, false}
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_ascii_value(
-            context,
-            &frame,
-            "configurable",
-            oseo_boolean(attributes.configurable)
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &descriptor);
     oseo_roots_release(context, &frame);
     return result;
 }

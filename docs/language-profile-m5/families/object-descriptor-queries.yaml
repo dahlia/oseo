@@ -1,0 +1,57 @@
+version: 1
+id: object-descriptor-queries
+title: "Object descriptor queries"
+scope:
+  - "Object.getOwnPropertyDescriptor and Object.getOwnPropertyDescriptors
+    target conversion, property-key conversion order, absent descriptors,
+    and abrupt completion."
+  - "FromPropertyDescriptor data and accessor object shapes, field order,
+    and reported attributes over ordinary objects, arrays, functions,
+    classes, arguments objects, String wrappers, primitives, and symbol
+    keys."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-descriptor-queries.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-object-descriptor-queries.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-object-descriptor-queries.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-descriptor-queries.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-descriptor-queries.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/runtime-c/native/runtime_object_builtin.c
+      - packages/runtime-c/native/runtime_descriptor.c

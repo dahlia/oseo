@@ -1238,6 +1238,9 @@ OseoResult oseo_function_create(
     /* A class's `prototype` is non-writable, non-enumerable, and
      * non-configurable, unlike an ordinary function's writable one. */
     function->prototype_writable = function_kind != OSEO_FUNCTION_CLASS;
+    /* MakeConstructor runs after SetFunctionLength and SetFunctionName,
+     * so `prototype` follows the two properties defined just below. */
+    function->prototype_key_position = 2u;
     result = oseo_internal_publish_heap(
         context,
         &function->ordinary.header,

@@ -408,6 +408,32 @@ capabilities, foreign capability constructors, and collection forced at every
 safepoint. The node reviews the seven declared `Promise` inventory roots and
 promotes no path outside them.
 
+### Object descriptor query evidence
+
+M5b node `object-descriptor-queries` completes the reporting half of the
+descriptor checkpoint in *runtime\_object\_builtin.c*. One
+FromPropertyDescriptor body now serves both
+`Object.getOwnPropertyDescriptor` and the new
+`Object.getOwnPropertyDescriptors`, and the same component owns the ordinary
+own-key walk the plural query needs, including the array `length` and
+function `prototype` the property vector does not store. The descriptor
+component keeps its ownership of `[[GetOwnProperty]]`, so neither query adds
+a second reading path.
+
+Reporting the unstored `prototype` in creation order needs one shared
+`OseoFunction` field rather than a new call between components, the way
+`prototype_writable` already works. *runtime\_function.c* records the
+position MakeConstructor gives it, *runtime\_descriptor.c* moves that
+position when `[[Delete]]` removes one of the properties created ahead of
+it, and *runtime\_object\_builtin.c* only reads it.
+
+The completed semantic checkpoint moves `abiVersion` to `m5-54` without a
+public layout change. Fixed and generated native differential evidence covers
+both specialization policies, false hints, deliberate guard misses, generic
+fallback, primitive conversion targets, symbol keys, and collection forced at
+every safepoint. The node reviews its two declared test262 inventory roots
+and promotes no path outside them.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in
