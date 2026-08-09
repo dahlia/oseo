@@ -28,7 +28,7 @@ results:
     observation:
       detail: 'test/built-ins/AsyncGeneratorPrototype/return/name.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorPrototype/return/name.js:158:31:
+        stderr="test/built-ins/AsyncGeneratorPrototype/return/name.js:323:31:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

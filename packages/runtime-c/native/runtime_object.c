@@ -15,15 +15,13 @@ static OseoResult type_error(OseoContext *context, const char *message) {
 
 /*
  * True when one own property of `object_value` keeps its value in the
- * binding cell `stored` instead of the property slot. A module
- * namespace, the realm's global this value, and a mapped arguments
- * object are the objects whose properties are views of a binding: the
- * namespace exposes an imported binding, the global object exposes a
- * var-scoped Script binding, and a mapped arguments object exposes a
- * formal parameter. Every read of such a property dereferences the
- * cell, and every write that ECMA-262 admits goes through it, so a
- * property and its binding are one storage location rather than two
- * copies.
+ * binding cell `stored` instead of the property slot. A namespace
+ * export, a realm global binding, and a mapped arguments index are
+ * views of a binding. Namespace metadata such as Symbol.toStringTag is
+ * a plain property and therefore does not satisfy the stored-cell
+ * check. Every read of a cell-backed property dereferences the cell,
+ * and every admitted write goes through it, so the property and its
+ * binding remain one storage location rather than two copies.
  */
 bool oseo_internal_cell_backed_property(
     OseoValue object_value,

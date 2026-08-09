@@ -1172,10 +1172,11 @@ double oseo_internal_integer_digits_to_number(
 );
 /*
  * Reads the own property descriptor named by key, including the
- * synthetic `prototype`, array `length`, and module namespace cell
- * descriptors. *value is the data value, or undefined for an accessor
- * property; *getter and *setter are each undefined unless the
- * property is an accessor with that slot present.
+ * synthetic `prototype` and array `length` descriptors. A module
+ * namespace export returns its stored cell, while namespace metadata
+ * returns its plain value. *value is the data value, or undefined for
+ * an accessor property; *getter and *setter are each undefined unless
+ * the property is an accessor with that slot present.
  */
 bool oseo_internal_own_descriptor(
     OseoValue object_value,
@@ -1207,9 +1208,9 @@ OseoResult oseo_internal_grow_properties(
 );
 /*
  * True when one own property of object_value keeps its value in the
- * binding cell `stored` instead of the property slot, which a module
- * namespace, the realm's global this value, and a mapped arguments
- * object each do.
+ * binding cell `stored` instead of the property slot. Namespace
+ * exports, realm global bindings, and mapped arguments indices use
+ * this representation; namespace metadata does not.
  */
 bool oseo_internal_cell_backed_property(
     OseoValue object_value,
@@ -1238,6 +1239,12 @@ OseoResult oseo_internal_set_array_length(
     bool strict,
     bool allow_same_value,
     bool *valid_length
+);
+/* Runs ArraySetLength's separate ToUint32 and ToNumber observations. */
+OseoResult oseo_internal_to_array_length(
+    OseoContext *context,
+    OseoValue value,
+    uint32_t *requested
 );
 OseoResult oseo_internal_promise_aggregate_settle(
     OseoContext *context,
@@ -1318,6 +1325,14 @@ OseoResult oseo_internal_to_primitive(
     OseoToPrimitiveHint hint
 );
 bool oseo_internal_same_value(OseoValue left, OseoValue right);
+OseoResult oseo_internal_object_define_data(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes,
+    bool has_value
+);
 OseoResult oseo_internal_symbol_create(
     OseoContext *context,
     OseoValue description

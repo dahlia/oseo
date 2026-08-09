@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 5,770
-reviewed cases: 3,571 passes, 1,355 expected negatives, and 844 unsupported
+honest unsupported classifications. The current reviewed manifest records 6,901
+reviewed cases: 4,556 passes, 1,355 expected negatives, and 990 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 69 indexed records in the normative
+M5a is complete. The 70 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 3,571
-passes across 5,770 paths, and the property inventory records 65 domains,
-65 seeds, and an ordinary case budget of 2,786.
+the M5b and M5c dependency order below. The reviewed manifest now records 4,556
+passes across 6,901 paths, and the property inventory records 66 domains,
+66 seeds, and an ordinary case budget of 2,798.
 
 
 M5a implementation history
@@ -3690,6 +3690,24 @@ paths with 3,571 passes, 1,355 expected negatives, and 844 unsupported profile
 features. The public intrinsic table and primitive wrapper state move the
 runtime ABI to `oseo-runtime-m5-51` without changing the graph's orchestration
 state.
+
+Implemented M5b node `object-define-property` admits
+`Object.defineProperty` over the existing property-key and descriptor
+components. Target validation precedes property-key coercion, which precedes
+descriptor conversion in the specified field order. Attribute defaults,
+data/accessor exclusivity, incompatible changes, abrupt completion, and
+ordinary and exotic mutation preserve their existing generic behavior. Fixed
+native and generated differential evidence at seed `0x60003700` covers both
+specialization policies, forced collection at every safepoint, false hints,
+generic fallback, primitive targets, arrays, functions, arguments aliases,
+String wrappers, symbols, and module namespace descriptor compatibility. The
+reviewed property helper provides the admitted legacy descriptor verifiers, so
+missing harness bindings do not count as profile gaps. All 1,131 paths under
+the node's inventory root are reviewed: 965 pass and 166 retain explicit
+prerequisite boundaries. The manifest moves to 6,901 paths with 4,556 passes,
+1,355 expected negatives, and 990 unsupported profile features. The completed
+descriptor checkpoint moves the runtime ABI to `oseo-runtime-m5-52` without
+changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

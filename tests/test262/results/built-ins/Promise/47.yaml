@@ -19,7 +19,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/promise.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/promise.js:155:10:
+        stderr=\"test/built-ins/Promise/promise.js:320:10:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

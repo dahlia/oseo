@@ -184,6 +184,26 @@ OseoResult oseo_module_namespace_create(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "Module");
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            (OseoPropertyAttributes){false, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
         object->dictionary = true;
         object->extensible = false;
