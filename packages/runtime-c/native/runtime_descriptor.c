@@ -286,6 +286,31 @@ static OseoResult define_data_property(
     return normal(object_value);
 }
 
+OseoResult oseo_internal_append_own_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    /* The growth step is a safepoint, so key and value must already be
+     * rooted by the caller, exactly as they must be for a definition
+     * that reaches the same step through define_data_property. */
+    OseoResult grown = oseo_internal_grow_properties(context, object_value);
+    if (grown.status != OSEO_STATUS_NORMAL) return grown;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    OseoProperty *property = &object->properties[object->property_count];
+    property->attributes = attributes;
+    property->key = key;
+    property->value = value;
+    property->getter = oseo_undefined();
+    property->setter = oseo_undefined();
+    object->property_count += 1u;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(object_value);
+}
+
 OseoResult oseo_object_define(
     OseoContext *context,
     OseoValue object_value,

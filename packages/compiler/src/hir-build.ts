@@ -200,6 +200,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Promise" ||
     name === "RangeError" ||
     name === "ReferenceError" ||
+    name === "String" ||
     name === "Symbol" ||
     name === "SyntaxError" ||
     name === "TypeError" ||
@@ -539,6 +540,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "String" ||
     name === "Symbol" ||
     name === "setTimeout" ||
     name === "clearTimeout" ||

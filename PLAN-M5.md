@@ -3881,6 +3881,41 @@ negatives, and 1,425 unsupported profile features. The completed collection
 checkpoint moves the runtime ABI to `oseo-runtime-m5-60` without changing
 the graph's orchestration state.
 
+Implemented M5b node `string-intrinsic` makes `String` a materialized realm
+value. The constructor is an ordinary constructible function the global
+object binds as a writable, non-enumerable, configurable property, so
+`new String` and every static run as ordinary construction and method calls.
+Calling `String` converts through the shared `ToString`, except that a Symbol
+argument renders SymbolDescriptiveString rather than throwing; constructing
+it brands the receiver the new target produced with `[[StringData]]` and
+gives it the exotic own properties, meaning one non-writable,
+non-configurable, enumerable property per UTF-16 code unit and a
+non-writable, non-enumerable, non-configurable `length`.
+`%String.prototype%` is itself such an object over the empty String, so
+`Object.prototype.toString` reports `[object String]` for either.
+`String.fromCharCode` applies `ToUint16` in argument order,
+`String.fromCodePoint` validates each code point and encodes an astral one as
+a surrogate pair while preserving a lone surrogate, and `String.raw` follows
+the specified `ToObject`, `raw`, LengthOfArrayLike, and alternating
+conversion order. Fixed native and generated differential evidence at seed
+`0x60003900` covers both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, generic fallback, lone
+surrogates, astral code points, coercion order, and global `String`
+replacement and deletion. The reviewed subset admits the
+`String.fromCodePoint` feature tag, so that static executes its upstream
+cases rather than reporting an unadmitted feature. Of the 150 paths under the
+node's four inventory roots, 145 are reviewed: 114 pass and 31 retain
+explicit prerequisite boundaries; the remaining five call
+`String.prototype.charCodeAt`, which no admitted node defines yet.
+Thirty-five previously reviewed cases also move from unsupported to pass
+because a real `String` value satisfies their prerequisites, and one
+`String.prototype.trim` attribute case leaves the subset under a recorded
+compatibility-ratchet override for the same reason. The manifest moves to
+7,255 paths with 4,899 passes, 1,355 expected negatives, and 1,001
+unsupported profile features. Materializing the intrinsic adds no
+generated-code entry point and moves the runtime ABI to `oseo-runtime-m5-54`
+without changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

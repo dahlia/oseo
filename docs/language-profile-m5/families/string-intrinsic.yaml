@@ -1,0 +1,55 @@
+version: 1
+id: string-intrinsic
+title: "String intrinsic"
+scope:
+  - "The realm-owned String constructor, %String.prototype% identity, and the
+    String exotic objects new String creates, including their code-unit index
+    properties and non-writable length."
+  - "The String.fromCharCode, String.fromCodePoint, and String.raw statics,
+    with UTF-16 code-unit truncation, code-point validation, and the specified
+    coercion order."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-intrinsic.ts
+      - tests/property/m5-string-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-intrinsic.ts
+      - tests/property/m5-string-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-string-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-intrinsic.ts
+      - tests/property/m5-string-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-intrinsic.ts
+      - tests/property/m5-string-intrinsic.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

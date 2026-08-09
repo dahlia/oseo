@@ -604,6 +604,10 @@ static OseoResult default_object_tag_text(
         '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
         'N', 'u', 'm', 'b', 'e', 'r', ']'
     };
+    static const uint16_t string_tag_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'S', 't', 'r', 'i', 'n', 'g', ']'
+    };
     if (is_array(value)) {
         return oseo_string_from_units(context, array_tag_units, 14u);
     }
@@ -615,6 +619,9 @@ static OseoResult default_object_tag_text(
     }
     if (ordinary_object(value)->number_data) {
         return oseo_string_from_units(context, number_tag_units, 15u);
+    }
+    if (oseo_internal_string_data(value)) {
+        return oseo_string_from_units(context, string_tag_units, 15u);
     }
     return oseo_string_from_units(context, object_units, 15u);
 }

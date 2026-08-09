@@ -182,6 +182,44 @@ test("reads the replaceable Object value through its global property", () => {
   assert.match(mir, /read \*missing intrinsic:Object\*/u);
 });
 
+test("reads the replaceable String value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof String, String.fromCharCode(65));",
+    sourceId: "string-intrinsic.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"String" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["String"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /binary in/u);
+  assert.match(mir, /read \*missing intrinsic:String\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete String;",
+    sourceId: "delete-string.ts",
+  });
+  assert.equal(deleted.mir, undefined);
+  assert.match(
+    deleted.diagnostics[0]?.message ?? "",
+    /Deleting runtime intrinsic binding 'String'/u,
+  );
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { String = 1; }",
+    sourceId: "with-string-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'String' through a with fallback/u,
+  );
+});
+
 test("writes the replaceable Number value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source:

@@ -1,0 +1,25 @@
+group: built-ins/String
+key: d3
+results:
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/String/is-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

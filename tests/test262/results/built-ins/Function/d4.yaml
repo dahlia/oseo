@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Function/prototype/apply/15.3.4.3-1-s.js strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/apply/15.3.4.3-1-s.j\
-        s:90:27: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        s:93:32: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

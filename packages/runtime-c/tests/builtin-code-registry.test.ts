@@ -28,6 +28,7 @@ const components = [
   "OBJECT",
   "NUMBER",
   "ARRAY_BUFFER",
+  "STRING",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {
