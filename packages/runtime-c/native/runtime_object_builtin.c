@@ -30,11 +30,6 @@ static OseoResult create_object_prototype_function(
     const char *name,
     size_t length
 );
-static size_t own_ascii_property_index(
-    const OseoOrdinaryObject *object,
-    const char *name
-);
-
 static OseoResult object_prototype_has_own_property(
     OseoContext *context,
     OseoValue receiver,
@@ -1041,17 +1036,6 @@ OseoResult oseo_internal_install_object_global(
     return result.status == OSEO_STATUS_NORMAL ? normal(slots[0]) : result;
 }
 
-static size_t own_ascii_property_index(
-    const OseoOrdinaryObject *object,
-    const char *name
-) {
-    for (size_t index = 0u; index < object->property_count; index += 1u) {
-        if (oseo_internal_string_is_ascii(
-            object->properties[index].key, name)) return index;
-    }
-    return SIZE_MAX;
-}
-
 /* Mirrors HasProperty followed by Get for one ToPropertyDescriptor field:
  * an accessor field on the descriptor argument must be invoked with the
  * original descriptor object as the receiver, and a thrown exception must
@@ -1065,39 +1049,31 @@ static OseoResult descriptor_field(
 ) {
     *has_field = false;
     *value = oseo_undefined();
-    OseoValue current = descriptor_value;
-    while (is_object(current)) {
-        OseoOrdinaryObject *descriptor = ordinary_object(current);
-        size_t index = own_ascii_property_index(descriptor, name);
-        if (index != SIZE_MAX) {
-            *has_field = true;
-            OseoProperty *property = &descriptor->properties[index];
-            if (!property->attributes.accessor) {
-                *value = property->value;
-                return normal(*value);
-            }
-            OseoValue getter = property->getter;
-            if (!is_function(getter)) return normal(*value);
-            OseoRootFrame frame = {NULL, NULL, 0u};
-            OseoResult allocated = oseo_roots_allocate(context, &frame, 1u);
-            if (allocated.status != OSEO_STATUS_NORMAL) return allocated;
-            frame.slots[0] = getter;
-            OseoResult result = oseo_call_function(
-                context,
-                frame.slots[0],
-                descriptor_value,
-                0u,
-                NULL,
-                oseo_undefined()
-            );
-            oseo_roots_release(context, &frame);
-            if (result.status != OSEO_STATUS_NORMAL) return result;
-            *value = result.value;
-            return normal(*value);
-        }
-        current = descriptor->prototype;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = descriptor_value;
+    result = oseo_internal_ascii_string(context, name);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_has_property(
+            context,
+            frame.slots[1],
+            frame.slots[0]
+        );
+        *has_field = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
     }
-    return normal(*value);
+    if (result.status == OSEO_STATUS_NORMAL && *has_field) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        *value = result.value;
+    }
+    oseo_roots_release(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL ? normal(*value) : result;
 }
 
 static bool rest_key_is_excluded(
@@ -1291,12 +1267,12 @@ static OseoResult define_ascii_value(
     OseoResult result = oseo_internal_ascii_string(context, name);
     frame->slots[1] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return oseo_object_set(
+    return oseo_object_define(
         context,
         frame->slots[0],
         frame->slots[1],
         value,
-        false
+        (OseoPropertyAttributes){true, true, true, false}
     );
 }
 
@@ -1493,12 +1469,13 @@ OseoResult oseo_object_builtin_define_property(
             : oseo_to_boolean(writable),
         false,
     };
-    result = oseo_object_define(
+    result = oseo_internal_object_define_data(
         context,
         object_value,
         frame.slots[0],
         value,
-        attributes
+        attributes,
+        has_value
     );
     if (result.status == OSEO_STATUS_NORMAL) result.value = object_value;
     oseo_roots_release(context, &frame);
@@ -1619,12 +1596,12 @@ static OseoResult append_key(
     frame->slots[1] = result.value;
     frame->slots[2] = key;
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return oseo_object_set(
+    return oseo_object_define(
         context,
         frame->slots[0],
         frame->slots[1],
         frame->slots[2],
-        false
+        (OseoPropertyAttributes){true, true, true, false}
     );
 }
 

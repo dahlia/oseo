@@ -559,6 +559,63 @@ for (const primitive of [
 const array = [1, 2];
 Object.defineProperty(array, "4", { value: 5 });
 console.log("array growth", array.length, array[4]);
+let lengthCoercions = 0;
+try {
+  Object.defineProperty([], "length", {
+    enumerable: true,
+    value: {
+      valueOf: function () {
+        lengthCoercions = lengthCoercions + 1;
+        return lengthCoercions === 1 ? 0 : 1;
+      },
+    },
+  });
+} catch (error) {
+  console.log("array length range", error.name, lengthCoercions);
+}
+lengthCoercions = 0;
+try {
+  Object.defineProperty([], "length", {
+    configurable: true,
+    value: {
+      valueOf: function () {
+        lengthCoercions = lengthCoercions + 1;
+        return 0;
+      },
+    },
+  });
+} catch (error) {
+  console.log("array length attributes", error.name, lengthCoercions);
+}
+lengthCoercions = 0;
+const assignedLength = [];
+assignedLength.length = {
+  valueOf: function () {
+    lengthCoercions = lengthCoercions + 1;
+    return 0;
+  },
+};
+console.log("array length assignment", assignedLength.length, lengthCoercions);
+lengthCoercions = 0;
+const fixedLength = [];
+Object.defineProperty(fixedLength, "length", { writable: false });
+let fixedLengthAssignmentFailed = false;
+try {
+  fixedLength.length = {
+    valueOf: function () {
+      lengthCoercions = lengthCoercions + 1;
+      return 0;
+    },
+  };
+} catch (error) {
+  fixedLengthAssignmentFailed = error instanceof TypeError;
+}
+console.log(
+  "fixed array length assignment",
+  fixedLength.length,
+  lengthCoercions,
+  fixedLengthAssignmentFailed,
+);
 Object.defineProperty(array, "length", { writable: false });
 try {
   Object.defineProperty(array, "5", { value: 6 });
@@ -589,6 +646,36 @@ try {
 } catch (error) {
   console.log("string index", stringWrapper[0], error instanceof TypeError);
 }
+let descriptorSetterCalls = 0;
+Object.defineProperty(Object.prototype, "writable", {
+  configurable: true,
+  set: function () { descriptorSetterCalls = descriptorSetterCalls + 1; },
+});
+const unpoisonedDescriptor = Object.getOwnPropertyDescriptor(
+  { item: 1 },
+  "item",
+);
+console.log(
+  "descriptor prototype poison",
+  descriptorSetterCalls,
+  unpoisonedDescriptor.value,
+  unpoisonedDescriptor.writable,
+);
+delete Object.prototype.writable;
+let keySetterCalls = 0;
+const arrayPrototype = Object.getPrototypeOf([]);
+Object.defineProperty(arrayPrototype, "0", {
+  configurable: true,
+  set: function () { keySetterCalls = keySetterCalls + 1; },
+});
+const unpoisonedKeys = Object.keys({ item: 1 });
+console.log(
+  "keys prototype poison",
+  keySetterCalls,
+  unpoisonedKeys.length,
+  unpoisonedKeys[0],
+);
+delete arrayPrototype[0];
 /** @param {number} value */
 function hinted(value) { return value + 1; }
 const original = Object.defineProperty;

@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 6,901 reviewed cases: 4,406 passes, 1,355
-expected negatives, and 1,140 unsupported profile features. It records no
+The current manifest contains 6,901 reviewed cases: 4,556 passes, 1,355
+expected negatives, and 990 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3102,14 +3102,16 @@ abrupt completion; and ordinary and exotic mutation. Fixed native and
 generated differential evidence at seed `0x60003700` covers both
 specialization policies, collection forced at every safepoint, false hints,
 generic fallback, primitive targets, arrays, functions, arguments aliases,
-String wrappers, symbols, and module namespace non-extensibility. All 1,131
-paths under the node's inventory root are reviewed: 835 pass and 296 retain
-explicit prerequisite boundaries. The manifest reaches 6,901 cases: 4,406
-passes, 1,355 expected negatives, and 1,140 unsupported profile features with
-no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The completed descriptor checkpoint moves the runtime
-ABI to `oseo-runtime-m5-52` without changing the graph's orchestration state.
+String wrappers, symbols, and module namespace descriptor compatibility. The
+reviewed property helper provides the admitted legacy descriptor verifiers, so
+missing harness bindings do not count as profile gaps. All 1,131 paths under
+the node's inventory root are reviewed: 965 pass and 166 retain explicit
+prerequisite boundaries. The manifest reaches 6,901 cases: 4,556 passes, 1,355
+expected negatives, and 990 unsupported profile features with no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The completed descriptor checkpoint moves the runtime ABI to
+`oseo-runtime-m5-52` without changing the graph's orchestration state.
 
 
 Known gaps inside the claim

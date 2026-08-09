@@ -51,6 +51,10 @@ function successfulResult(): CliResult {
   return { exitStatus: 0, stderr: "", stdout: "" };
 }
 
+function propertyHelperGetter(): number {
+  return 1;
+}
+
 test("parses test262 frontmatter and derives strictness", () => {
   const parsed = parseTest262Case(
     `/*---
@@ -515,6 +519,98 @@ test("property helper checks behavior beyond reported flags", async () => {
   );
   assert.throws(() =>
     verify({ configurable: false, enumerable: true, writable: true }),
+  );
+});
+
+test("property helper exposes legacy verification APIs", async () => {
+  const helper = await readFile(
+    new URL("test262/harness/propertyHelper.js", import.meta.url),
+    "utf8",
+  );
+  const target: Record<string, number | string> = { writable: 1 };
+  Object.defineProperty(target, "fixed", {
+    configurable: false,
+    enumerable: false,
+    value: "unlikelyValue",
+    writable: false,
+  });
+  Object.defineProperty(target, "removable", {
+    configurable: true,
+    enumerable: true,
+    value: 2,
+  });
+  const harnessAssert = Object.assign(
+    (value: unknown) => assert.equal(value, true),
+    {
+      sameValue(actual: unknown, expected: unknown): void {
+        assert.ok(Object.is(actual, expected));
+      },
+    },
+  );
+  runInNewContext(
+    `${helper}\n` +
+      'verifyEqualTo(target, "writable", 1);\n' +
+      'verifyWritable(target, "writable");\n' +
+      'verifyNotWritable(target, "fixed");\n' +
+      'verifyEnumerable(target, "removable");\n' +
+      'verifyNotEnumerable(target, "fixed");\n' +
+      'verifyConfigurable(target, "removable");\n' +
+      'verifyNotConfigurable(target, "fixed");',
+    {
+      assert: harnessAssert,
+      Object,
+      target,
+      Test262Error: Error,
+    },
+  );
+  assert.equal(target.writable, 1);
+  assert.equal(target.fixed, "unlikelyValue");
+  assert.equal("removable" in target, false);
+});
+
+test("property helper verifies accessors and rejects extra keys", async () => {
+  const helper = await readFile(
+    new URL("test262/harness/propertyHelper.js", import.meta.url),
+    "utf8",
+  );
+  const target = {};
+  Object.defineProperty(target, "accessor", {
+    configurable: true,
+    get: propertyHelperGetter,
+  });
+  const harnessAssert = Object.assign(
+    (value: unknown) => assert.equal(value, true),
+    {
+      sameValue(actual: unknown, expected: unknown): void {
+        assert.ok(Object.is(actual, expected));
+      },
+    },
+  );
+  const context = {
+    assert: harnessAssert,
+    getter: propertyHelperGetter,
+    Object,
+    target,
+    Test262Error: Error,
+  };
+  runInNewContext(
+    `${helper}\n` +
+      'verifyProperty(target, "accessor", { get: getter, set: undefined });',
+    context,
+  );
+  assert.throws(() =>
+    runInNewContext(
+      `${helper}\n` +
+        'verifyProperty(target, "accessor", { unexpected: true });',
+      context,
+    ),
+  );
+  assert.throws(() =>
+    runInNewContext(
+      `${helper}\n` +
+        'verifyProperty(target, "accessor", { get: function () {} });',
+      context,
+    ),
   );
 });
 

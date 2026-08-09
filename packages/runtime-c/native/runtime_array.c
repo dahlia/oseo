@@ -36,6 +36,44 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+static uint32_t uint32_length(double number) {
+    if (!isfinite(number) || number == 0.0) return 0u;
+    double modulo = fmod(trunc(number), 4294967296.0);
+    if (modulo < 0.0) modulo += 4294967296.0;
+    return (uint32_t)modulo;
+}
+
+OseoResult oseo_internal_to_array_length(
+    OseoContext *context,
+    OseoValue value,
+    uint32_t *requested
+) {
+    OseoValue slots[1] = {value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult uint32_result = oseo_internal_to_number(
+        context,
+        slots[0]
+    );
+    if (uint32_result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return uint32_result;
+    }
+    uint32_t converted = uint32_length(number_value(uint32_result.value));
+    OseoResult number_result = oseo_internal_to_number(context, slots[0]);
+    oseo_roots_pop(context, &frame);
+    if (number_result.status != OSEO_STATUS_NORMAL) return number_result;
+    if ((double)converted != number_value(number_result.value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid array length."
+        );
+    }
+    *requested = converted;
+    return normal(oseo_number(converted));
+}
+
 OseoResult oseo_internal_set_array_length(
     OseoContext *context,
     OseoOrdinaryObject *array,
@@ -45,18 +83,22 @@ OseoResult oseo_internal_set_array_length(
     bool *valid_length
 ) {
     if (valid_length != NULL) *valid_length = false;
-    OseoResult converted = oseo_internal_to_number(context, value);
-    if (converted.status != OSEO_STATUS_NORMAL) return converted;
-    double number = number_value(converted.value);
-    if (!isfinite(number) || number < 0.0 ||
-        number > 4294967295.0 || floor(number) != number) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_RANGE,
-            "Invalid array length."
-        );
+    if (!allow_same_value && !array->length_writable) {
+        if (strict) {
+            return type_error(
+                context,
+                "Cannot assign to the read-only array length."
+            );
+        }
+        return normal(value);
     }
-    uint32_t requested = (uint32_t)number;
+    uint32_t requested = 0u;
+    OseoResult converted = oseo_internal_to_array_length(
+        context,
+        value,
+        &requested
+    );
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
     if (valid_length != NULL) *valid_length = true;
     if (!array->length_writable) {
         if (allow_same_value && requested == array->array_length) {

@@ -79,12 +79,13 @@ bool oseo_internal_own_descriptor(
     return true;
 }
 
-OseoResult oseo_object_define(
+static OseoResult define_data_property(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
     OseoValue value,
-    OseoPropertyAttributes attributes
+    OseoPropertyAttributes attributes,
+    bool has_value
 ) {
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
@@ -118,6 +119,15 @@ OseoResult oseo_object_define(
     OseoOrdinaryObject *object = ordinary_object(object_value);
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
+        uint32_t requested = object->array_length;
+        if (has_value) {
+            OseoResult converted = oseo_internal_to_array_length(
+                context,
+                value,
+                &requested
+            );
+            if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        }
         if (attributes.configurable || attributes.enumerable) {
             return type_error(
                 context,
@@ -130,11 +140,15 @@ OseoResult oseo_object_define(
                 "Cannot redefine the array length property."
             );
         }
+        if (!has_value) {
+            object->length_writable = attributes.writable;
+            return normal(object_value);
+        }
         bool valid_length = false;
         OseoResult changed = oseo_internal_set_array_length(
             context,
             object,
-            value,
+            oseo_number(requested),
             true,
             true,
             &valid_length
@@ -160,20 +174,26 @@ OseoResult oseo_object_define(
     }
     size_t index = oseo_internal_own_property_index(object, key);
     if (object->module_namespace) {
-        if (index == SIZE_MAX || attributes.accessor ||
-            attributes.configurable || !attributes.enumerable ||
-            !attributes.writable) {
+        if (index == SIZE_MAX) {
             return type_error(
                 context,
                 "Cannot define a module namespace property."
             );
         }
-        OseoResult current = oseo_cell_get(
-            context,
-            object->properties[index].value
-        );
-        if (current.status != OSEO_STATUS_NORMAL) return current;
-        if (!oseo_internal_same_value(current.value, value)) {
+        OseoProperty *property = &object->properties[index];
+        OseoValue current_value = property->value;
+        if (oseo_internal_cell_backed_property(
+            object_value,
+            current_value
+        )) {
+            OseoResult current = oseo_cell_get(context, current_value);
+            if (current.status != OSEO_STATUS_NORMAL) return current;
+            current_value = current.value;
+        }
+        if (attributes.accessor || attributes.configurable ||
+            attributes.enumerable != property->attributes.enumerable ||
+            attributes.writable != property->attributes.writable ||
+            !oseo_internal_same_value(current_value, value)) {
             return type_error(
                 context,
                 "Cannot define a module namespace property."
@@ -264,6 +284,41 @@ OseoResult oseo_object_define(
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;
     return normal(object_value);
+}
+
+OseoResult oseo_object_define(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    return define_data_property(
+        context,
+        object_value,
+        key,
+        value,
+        attributes,
+        true
+    );
+}
+
+OseoResult oseo_internal_object_define_data(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes,
+    bool has_value
+) {
+    return define_data_property(
+        context,
+        object_value,
+        key,
+        value,
+        attributes,
+        has_value
+    );
 }
 
 OseoResult oseo_object_define_accessor(

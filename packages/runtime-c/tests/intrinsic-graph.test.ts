@@ -121,6 +121,16 @@ test("orders Object.defineProperty conversion before descriptors", () => {
   );
 });
 
+test("installs the module namespace toStringTag descriptor", () => {
+  const bindings = sources.get("runtime_binding.c") ?? "";
+
+  assert.match(
+    bindings,
+    /oseo_module_namespace_create[\s\S]*OSEO_WELL_KNOWN_TO_STRING_TAG/u,
+  );
+  assert.match(bindings, /oseo_module_namespace_create[\s\S]*"Module"/u);
+});
+
 test("populates the realm-owned Function prototype", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const functionSource = sources.get("runtime_function.c") ?? "";
