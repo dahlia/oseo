@@ -25,4 +25,4 @@ dependencies:
   - object-constructor
   - promise-intrinsic
 landed: false
-status: blocked
+status: ready

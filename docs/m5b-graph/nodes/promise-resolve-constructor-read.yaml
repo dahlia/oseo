@@ -6,4 +6,4 @@ delivers: "Makes PromiseResolve read the value's constructor and compare it
 dependencies:
   - promise-intrinsic
 landed: false
-status: blocked
+status: ready

@@ -17,5 +17,5 @@ inventory:
 dependencies:
   - function-prototype
   - object-prototype
-landed: false
+landed: true
 status: ready
