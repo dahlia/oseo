@@ -363,6 +363,17 @@ from their `this` value rather than from `%Promise%`. The retired
 points leave the generated-code ABI, because generated code now reads the
 properties instead.
 
+The `m5-54` ABI completes the descriptor checkpoint with the two query
+statics. `Object.getOwnPropertyDescriptor` and the new
+`Object.getOwnPropertyDescriptors` convert their target before their property
+key, report an absent property as `undefined` and an absent target property
+set as an empty object, and build every reported descriptor through one
+FromPropertyDescriptor body whose fields keep their specified order. The
+plural query walks ordinary own keys, so integer indices lead in ascending
+order, the array `length` and function `prototype` this runtime keeps outside
+the property vector hold their creation positions, and symbol keys trail
+every string key. Public runtime layout is unchanged.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

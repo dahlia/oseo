@@ -255,6 +255,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
+    fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
@@ -328,6 +329,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
+    fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -414,6 +416,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "script-this-hints" ||
     fixture.name === "script-global-bindings" ||
     fixture.name === "object-define-property" ||
+    fixture.name === "object-descriptor-queries" ||
     fixture.name === "symbols" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
@@ -492,6 +495,7 @@ for (const fixture of selectedFixtures) {
           if (
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
+            fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||

@@ -121,6 +121,46 @@ test("orders Object.defineProperty conversion before descriptors", () => {
   );
 });
 
+test("reports descriptors through one FromPropertyDescriptor body", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  // Both queries report one property through the same field order, and
+  // the plural one owns the ordinary own-key walk rather than repeating
+  // the singular entry point per key.
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      "from_property_descriptor[\\s\\S]*" +
+        '"get"[\\s\\S]*"value"[\\s\\S]*"set"[\\s\\S]*"writable"[\\s\\S]*' +
+        '"enumerable"[\\s\\S]*"configurable"',
+      "u",
+    ),
+  );
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      String.raw`oseo_internal_to_object\(context, value\)[\s\S]*` +
+        String.raw`snapshot_own_keys\(context, &frame, key_count\)[\s\S]*` +
+        String.raw`oseo_internal_own_descriptor\([\s\S]*` +
+        String.raw`from_property_descriptor\(context, &descriptor`,
+      "u",
+    ),
+  );
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      "OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID[\\s\\S]*" +
+        '"getOwnPropertyDescriptors"',
+      "u",
+    ),
+  );
+  const deferred = objectBuiltins.match(
+    /deferred_static_names\[\] = \{([^}]*)\}/u,
+  );
+  assert.ok(deferred != null, "deferred Object statics");
+  assert.doesNotMatch(deferred[1] ?? "", /getOwnPropertyDescriptors/u);
+});
+
 test("installs the module namespace toStringTag descriptor", () => {
   const bindings = sources.get("runtime_binding.c") ?? "";
 

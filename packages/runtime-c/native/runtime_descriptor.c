@@ -468,6 +468,27 @@ OseoResult oseo_object_delete(
             ? type_error(context, "Cannot delete a non-configurable property.")
             : normal(oseo_boolean(false));
     }
+    /* Removing one of the properties a function was created with moves
+     * the synthetic `prototype` one place earlier in own-key order, and
+     * removal alone can tell the original from a property later
+     * recreated under the same name: only an original still sits inside
+     * the leading run the position counts. */
+    if (function_has_prototype_property(object_value)) {
+        OseoFunction *function = function_object(object_value);
+        size_t rank = 0u;
+        for (size_t scan = 0u; scan < index; scan += 1u) {
+            uint32_t ignored = 0u;
+            OseoValue scanned = object->properties[scan].key;
+            if (is_symbol(scanned) ||
+                oseo_internal_array_index(scanned, &ignored)) continue;
+            rank += 1u;
+        }
+        uint32_t ignored = 0u;
+        if (!is_symbol(key) && !oseo_internal_array_index(key, &ignored) &&
+            rank < function->prototype_key_position) {
+            function->prototype_key_position -= 1u;
+        }
+    }
     (void)oseo_internal_remove_property(object, index);
     object->dictionary = true;
     object->shape_id = context->next_shape_id;

@@ -228,3 +228,7 @@ families:
     owner: tests/property/m5-promise-intrinsic.property.test.ts
     start: 0x60003800
     end: 0x600038ff
+  - family: m5-object-descriptor-queries
+    owner: tests/property/m5-object-descriptor-queries.property.test.ts
+    start: 0x60003900
+    end: 0x600039ff

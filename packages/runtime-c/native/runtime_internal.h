@@ -259,6 +259,8 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 14u)
 #define OSEO_OBJECT_DEFERRED_STATIC_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 16u)
 
 #define OSEO_NUMBER_CODE_ID_RANGE_INDEX ((size_t)10u)
 #define OSEO_NUMBER_CODE_ID_RANGE_FIRST \
@@ -699,6 +701,18 @@ typedef struct {
     size_t code_id;
     OseoFunctionKind function_kind;
     bool prototype_writable;
+    /*
+     * Where the synthetic `prototype` sits in OrdinaryOwnPropertyKeys
+     * order: it is created after `length` and `name`, so it follows
+     * exactly this many of the object's leading non-index string keys.
+     * The property vector does not store `prototype`, and removal keeps
+     * the surviving properties in creation order, so the count is two
+     * at creation and drops by one whenever one of those two original
+     * properties is deleted. A property later recreated under the same
+     * name is appended instead, and the unchanged count keeps it after
+     * `prototype` the way its later creation requires.
+     */
+    size_t prototype_key_position;
 } OseoFunction;
 
 typedef struct {

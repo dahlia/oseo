@@ -125,6 +125,29 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-69.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-69.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.\
+        3-4-69.js:86:44: error[OSEO1001]: Unknown binding
+        'String'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - Symbol
       flags: []

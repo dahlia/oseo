@@ -708,6 +708,338 @@ console.log(
 `,
   },
   {
+    name: "object-descriptor-queries",
+    nonStrictScript: true,
+    source: `
+const single = Object.getOwnPropertyDescriptor(
+  Object,
+  "getOwnPropertyDescriptor",
+);
+const plural = Object.getOwnPropertyDescriptor(
+  Object,
+  "getOwnPropertyDescriptors",
+);
+console.log(
+  "metadata",
+  Object.getOwnPropertyDescriptor.name,
+  Object.getOwnPropertyDescriptor.length,
+  Object.getOwnPropertyDescriptors.name,
+  Object.getOwnPropertyDescriptors.length,
+  single.writable,
+  single.enumerable,
+  single.configurable,
+  plural.writable,
+  plural.enumerable,
+  plural.configurable,
+);
+function fields(descriptor) {
+  if (descriptor === undefined) return "absent";
+  let text = "";
+  for (const field in descriptor) text = text + field + ":";
+  return text;
+}
+const data = { item: 1 };
+const dataDescriptor = Object.getOwnPropertyDescriptor(data, "item");
+console.log(
+  "data",
+  fields(dataDescriptor),
+  dataDescriptor.value,
+  dataDescriptor.writable,
+  dataDescriptor.enumerable,
+  dataDescriptor.configurable,
+);
+let stored = 2;
+const accessor = {
+  get item() { return stored; },
+  set item(value) { stored = value; },
+};
+const accessorDescriptor = Object.getOwnPropertyDescriptor(accessor, "item");
+console.log(
+  "accessor",
+  fields(accessorDescriptor),
+  accessorDescriptor.get(),
+  accessorDescriptor.value,
+  accessorDescriptor.writable,
+  accessorDescriptor.enumerable,
+  accessorDescriptor.configurable,
+);
+const getterOnly = {};
+Object.defineProperty(getterOnly, "item", {
+  configurable: false,
+  enumerable: false,
+  get: function () { return 3; },
+});
+const getterDescriptor = Object.getOwnPropertyDescriptor(getterOnly, "item");
+console.log(
+  "getter only",
+  fields(getterDescriptor),
+  getterDescriptor.set,
+  getterDescriptor.enumerable,
+  getterDescriptor.configurable,
+);
+console.log(
+  "absent",
+  fields(Object.getOwnPropertyDescriptor(data, "missing")),
+  fields(Object.getOwnPropertyDescriptor(Object.create(data), "item")),
+);
+const keyLog = [];
+const abruptKey = {
+  toString: function () {
+    keyLog.push("key");
+    throw new RangeError("key");
+  },
+};
+for (const nullish of [undefined, null]) {
+  try {
+    Object.getOwnPropertyDescriptor(nullish, abruptKey);
+  } catch (error) {
+    console.log("target first", error instanceof TypeError, keyLog.length);
+  }
+  try {
+    Object.getOwnPropertyDescriptors(nullish);
+  } catch (error) {
+    console.log("plural target", error instanceof TypeError);
+  }
+}
+try {
+  Object.getOwnPropertyDescriptor({}, abruptKey);
+} catch (error) {
+  console.log("key abrupt", error.name, error.message, keyLog[0]);
+}
+const symbol = Symbol("item");
+const symbolHolder = {};
+symbolHolder[symbol] = 4;
+const symbolDescriptor = Object.getOwnPropertyDescriptor(symbolHolder, symbol);
+console.log(
+  "symbol",
+  symbolDescriptor.value,
+  symbolDescriptor.writable,
+  symbolDescriptor.enumerable,
+  symbolDescriptor.configurable,
+);
+const numericKey = { 3: "three" };
+const numericDescriptor = Object.getOwnPropertyDescriptor(numericKey, 3);
+console.log("numeric key", numericDescriptor.value);
+for (const primitive of [true, 5, Symbol("primitive"), 6n]) {
+  console.log(
+    "primitive",
+    typeof primitive,
+    fields(Object.getOwnPropertyDescriptor(primitive, "item")),
+  );
+}
+const text = "ab";
+const index = Object.getOwnPropertyDescriptor(text, 1);
+const length = Object.getOwnPropertyDescriptor(text, "length");
+console.log(
+  "string primitive",
+  index.value,
+  index.writable,
+  index.enumerable,
+  index.configurable,
+  length.value,
+  length.writable,
+  length.enumerable,
+  length.configurable,
+  fields(Object.getOwnPropertyDescriptor(text, 4)),
+);
+const wrapper = Object("cd");
+const wrapperIndex = Object.getOwnPropertyDescriptor(wrapper, "0");
+console.log(
+  "string wrapper",
+  wrapperIndex.value,
+  wrapperIndex.enumerable,
+  wrapperIndex.configurable,
+);
+const array = [7, 8];
+const arrayLength = Object.getOwnPropertyDescriptor(array, "length");
+console.log(
+  "array length",
+  arrayLength.value,
+  arrayLength.writable,
+  arrayLength.enumerable,
+  arrayLength.configurable,
+);
+function declared(first, second) { return first + second; }
+const prototypeDescriptor = Object.getOwnPropertyDescriptor(
+  declared,
+  "prototype",
+);
+console.log(
+  "function prototype",
+  prototypeDescriptor.value === declared.prototype,
+  prototypeDescriptor.writable,
+  prototypeDescriptor.enumerable,
+  prototypeDescriptor.configurable,
+);
+function keys(object) {
+  let text = "";
+  for (const key in object) text = text + key + ",";
+  return text;
+}
+console.log("plural plain", keys(Object.getOwnPropertyDescriptors(data)));
+const plainDescriptors = Object.getOwnPropertyDescriptors({ a: 1, b: 2 });
+console.log(
+  "plural values",
+  plainDescriptors.a.value,
+  plainDescriptors.a.writable,
+  plainDescriptors.a.enumerable,
+  plainDescriptors.a.configurable,
+  plainDescriptors.b.value,
+);
+console.log(
+  "plural prototype",
+  Object.getPrototypeOf(Object.getOwnPropertyDescriptors({})) ===
+    Object.prototype,
+);
+const reported = Object.getOwnPropertyDescriptors({ only: 1 });
+const reportedDescriptor = Object.getOwnPropertyDescriptor(reported, "only");
+console.log(
+  "plural entries",
+  reportedDescriptor.writable,
+  reportedDescriptor.enumerable,
+  reportedDescriptor.configurable,
+);
+const ordered = {};
+ordered[2] = "two";
+ordered.later = "later";
+ordered[0] = "zero";
+ordered[symbol] = "symbol";
+console.log("plural order", keys(Object.getOwnPropertyDescriptors(ordered)));
+console.log(
+  "plural string",
+  keys(Object.getOwnPropertyDescriptors("ef")),
+  Object.getOwnPropertyDescriptors("ef").length.value,
+  Object.getOwnPropertyDescriptors("ef")[1].value,
+);
+console.log(
+  "plural primitives",
+  keys(Object.getOwnPropertyDescriptors(9)),
+  keys(Object.getOwnPropertyDescriptors(false)),
+  keys(Object.getOwnPropertyDescriptors(Symbol("plural"))),
+  keys(Object.getOwnPropertyDescriptors(10n)),
+);
+const grown = [11, 12];
+grown.extra = "extra";
+console.log("plural array", keys(Object.getOwnPropertyDescriptors(grown)));
+let strictDeclared;
+class Strict {
+  static {
+    function inner(first, second) { return first + second; }
+    inner.extra = "extra";
+    strictDeclared = inner;
+  }
+}
+console.log(
+  "plural function",
+  keys(Object.getOwnPropertyDescriptors(strictDeclared)),
+  Object.getOwnPropertyDescriptor(strictDeclared, "name").value,
+);
+let recreated;
+let emptied;
+class Recreated {
+  static {
+    function first(value) { return value; }
+    delete first.name;
+    first.later = "later";
+    Object.defineProperty(first, "name", { value: "renamed" });
+    recreated = first;
+    function second() {}
+    delete second.length;
+    delete second.name;
+    second.only = "only";
+    emptied = second;
+  }
+}
+console.log(
+  "plural recreated",
+  keys(Object.getOwnPropertyDescriptors(recreated)),
+  Object.getOwnPropertyDescriptor(recreated, "name").value,
+);
+console.log(
+  "plural emptied",
+  keys(Object.getOwnPropertyDescriptors(emptied)),
+);
+const arrow = (value) => value;
+console.log("plural arrow", keys(Object.getOwnPropertyDescriptors(arrow)));
+class Declared { static member() {} }
+console.log(
+  "plural class",
+  keys(Object.getOwnPropertyDescriptors(Declared)),
+);
+const symbolPlural = Object.getOwnPropertyDescriptors(symbolHolder);
+console.log(
+  "plural symbol",
+  keys(symbolPlural),
+  symbolPlural[symbol].value,
+  symbolPlural[symbol].enumerable,
+);
+let calls = 0;
+const observed = {
+  get item() { calls = calls + 1; return 13; },
+};
+const observedPlural = Object.getOwnPropertyDescriptors(observed);
+console.log(
+  "plural accessor",
+  calls,
+  typeof observedPlural.item.get,
+  observedPlural.item.set,
+  observedPlural.item.value,
+);
+function mapped(value) {
+  const single = Object.getOwnPropertyDescriptor(arguments, "0");
+  value = 14;
+  const plural = Object.getOwnPropertyDescriptors(arguments);
+  return [single.value, plural[0].value, plural.length.value];
+}
+console.log("arguments", ...mapped(15));
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+const originalSingle = Object.getOwnPropertyDescriptor;
+const originalPlural = Object.getOwnPropertyDescriptors;
+let turn = 0;
+while (turn < 3) {
+  const guarded = {};
+  guarded["item" + hinted(turn === 1 ? "x" : turn)] = turn;
+  console.log(
+    "guard",
+    keys(Object.getOwnPropertyDescriptors(guarded)),
+    Object.getOwnPropertyDescriptor(guarded, "missing"),
+  );
+  if (turn === 0) Object.marker = true;
+  turn = turn + 1;
+}
+console.log(
+  "identity",
+  Object.getOwnPropertyDescriptor === originalSingle,
+  Object.getOwnPropertyDescriptors === originalPlural,
+);
+const collected = {};
+for (let index = 0; index < 24; index = index + 1) {
+  Object.defineProperty(collected, "item" + index, {
+    configurable: true,
+    enumerable: index % 2 === 0,
+    value: { index },
+    writable: index % 2 === 1,
+  });
+}
+const collectedDescriptors = Object.getOwnPropertyDescriptors(collected);
+let enumerableCount = 0;
+let writableCount = 0;
+for (let index = 0; index < 24; index = index + 1) {
+  const descriptor = collectedDescriptors["item" + index];
+  if (descriptor.enumerable) enumerableCount = enumerableCount + 1;
+  if (descriptor.writable) writableCount = writableCount + 1;
+}
+console.log(
+  "collection",
+  enumerableCount,
+  writableCount,
+  collectedDescriptors.item23.value.index,
+  Object.getOwnPropertyDescriptor(collected, "item0").value.index,
+);
+`,
+  },
+  {
     name: "object-prototype",
     source: `
 const parent = { inherited: 3 };

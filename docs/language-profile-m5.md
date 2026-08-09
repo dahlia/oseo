@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 6,901 reviewed cases: 4,556 passes, 1,355
-expected negatives, and 990 unsupported profile features. It records no
+The current manifest contains 7,421 reviewed cases: 4,910 passes, 1,355
+expected negatives, and 1,156 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3150,6 +3150,42 @@ revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged. The materialized constructor and its
 retired fast-path entry points move the runtime ABI to `oseo-runtime-m5-53`
 without changing the graph's orchestration state.
+
+M5b node `object-descriptor-queries` completes the descriptor checkpoint's
+reporting half. `Object.getOwnPropertyDescriptor` and the new
+`Object.getOwnPropertyDescriptors` convert their target before their property
+key, so a nullish target throws before an abrupt key conversion runs, and a
+primitive target reports the wrapper object it converts to, including a
+String wrapper's index and `length` properties. An absent property reports
+`undefined` and a target with no own property reports an empty ordinary
+object whose `[[Prototype]]` is `Object.prototype`. Both statics build every
+reported descriptor through one FromPropertyDescriptor body, so a data
+property reports `value`, `writable`, `enumerable`, and `configurable` and an
+accessor property reports `get`, `set`, `enumerable`, and `configurable`, each
+in that order and as writable, enumerable, configurable data properties.
+`Object.getOwnPropertyDescriptors` walks ordinary own keys: integer indices
+lead in ascending numeric order, the array `length` and function `prototype`
+this runtime keeps outside the property vector hold their creation positions,
+and symbol keys trail every string key. Neither static invokes a getter, so a
+reported accessor descriptor carries the functions themselves. A mapped
+arguments index reports its parameter's current value. Fixed native and
+generated differential evidence at seed `0x60003900` covers both
+specialization policies, collection forced at every safepoint, false hints,
+deliberate shape-guard misses, generic fallback, primitive and wrapper
+targets, arrays, functions, classes, arrows, arguments objects, symbol keys,
+and abrupt key conversion. Of the 328 paths under the node's two inventory
+roots, 313 are reviewed: 163 pass and 150 retain explicit prerequisite
+boundaries for the unadmitted `Array`, `Boolean`, `Date`, `JSON`, `Math`,
+`RegExp`, and `String` globals, the `Function` constructor, `Proxy` and
+`Reflect`, and `Object.getOwnPropertySymbols`. The remaining fifteen observe
+the standard function and value properties of the global object and the
+`Number` prototype's formatting methods, which no admitted node supplies yet.
+The manifest reaches 7,421 cases: 4,910 passes, 1,355 expected negatives, and
+1,156 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. Completing the
+descriptor checkpoint's reporting half moves the runtime ABI to
+`oseo-runtime-m5-54` without changing the graph's orchestration state.
 
 
 Known gaps inside the claim

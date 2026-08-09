@@ -1,0 +1,3 @@
+version: 1
+id: object-descriptor-queries
+record: docs/language-profile-m5/families/object-descriptor-queries.yaml

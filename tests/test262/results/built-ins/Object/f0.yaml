@@ -95,6 +95,27 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Proxy
+      flags: []
+      includes:
+        - proxyTrapsHelper.js
+      mode: script
+      path: test/built-ins/Object/getOwnPropertyDescriptors/observable-operations.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Proxy
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
