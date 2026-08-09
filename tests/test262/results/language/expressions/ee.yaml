@@ -96,7 +96,7 @@ results:
         prop-id-init-skipped.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id-init-skipped.js:126:5: error[OSEO1001]: Unknown
+        bj-ptrn-prop-id-init-skipped.js:132:5: error[OSEO1001]: Unknown
         binding 's'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -123,7 +123,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/obj-ptrn-prop-a\
         ry-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-ary-init.js:122:5: error[OSEO1001]: Unknown binding
+        n-prop-ary-init.js:128:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

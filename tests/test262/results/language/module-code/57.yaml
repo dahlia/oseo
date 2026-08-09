@@ -41,7 +41,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/early-errors-await-n\
-        ot-simple-assignment-target.js:86:1: error[OSEO0001]: Source
+        ot-simple-assignment-target.js:92:1: error[OSEO0001]: Source
         could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

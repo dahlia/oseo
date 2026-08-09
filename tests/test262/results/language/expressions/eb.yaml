@@ -60,7 +60,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-obj-ptrn-\
         prop-obj-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-obj-init.js:122:5: error[OSEO1001]: Unknown binding
+        bj-ptrn-prop-obj-init.js:128:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

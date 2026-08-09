@@ -97,7 +97,7 @@ results:
         uted-name-toprimitive-returns-noncallable.js non-strict disabled
         failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/evaluation-er\
-        ror/computed-name-toprimitive-returns-noncallable.js:121:13:
+        ror/computed-name-toprimitive-returns-noncallable.js:127:13:
         error[OSEO1001]: Unknown binding 'refErrorIfEvaluated'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

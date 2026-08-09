@@ -563,7 +563,7 @@ test("does not impose the former continuation count limit", () => {
   assert.ok(compiled.mir != null);
 });
 
-test("lowers M4 promise construction and static methods", () => {
+test("lowers promise construction and statics over the intrinsic", () => {
   const result = compileSource(babelFrontend, {
     source: [
       "function settle(resolve) { resolve(1); }",
@@ -579,43 +579,47 @@ test("lowers M4 promise construction and static methods", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  const targets = result.mir.script.blocks
-    .flatMap((block) => block.operations)
-    .flatMap((operation) =>
-      operation.target == null ? [] : [operation.target],
-    );
-  assert.ok(targets.some((target) => target.kind === "promise-constructor"));
-  assert.ok(
-    result.mir.script.blocks
-      .flatMap((block) => block.operations)
-      .some(
-        (operation) =>
-          operation.target?.kind === "promise-constructor" &&
-          operation.argumentListId != null,
-      ),
+  const operations = result.mir.script.blocks.flatMap(
+    (block) => block.operations,
   );
+  // %Promise% is a value, so construction is an ordinary constructor
+  // call whose receiver came from the constructor's own `prototype`,
+  // including the spread form that carries an argument list.
   assert.ok(
-    targets.some(
-      (target) =>
-        target.kind === "promise-intrinsic" && target.method === "resolve",
+    operations.some(
+      (operation) =>
+        operation.kind === "construct" && operation.target?.kind === "dynamic",
     ),
   );
   assert.ok(
-    targets.some(
-      (target) =>
-        target.kind === "promise-intrinsic" && target.method === "reject",
+    operations.some(
+      (operation) =>
+        operation.kind === "construct" &&
+        operation.target?.kind === "dynamic" &&
+        operation.argumentListId != null,
     ),
   );
   assert.ok(
-    targets.some(
-      (target) =>
-        target.kind === "promise-intrinsic" && target.method === "all",
-    ),
+    operations.some((operation) => operation.kind === "construct-receiver"),
   );
+  // Every static is a property read of the global `Promise` property
+  // followed by an ordinary call, so no owned promise call target
+  // survives in user source.
+  assert.equal(
+    operations.filter(
+      (operation) => operation.target?.kind === "promise-intrinsic",
+    ).length,
+    0,
+  );
+  const text = printMir(result.mir);
+  for (const method of ["resolve", "reject", "all", "race"]) {
+    assert.match(text, new RegExp(`constant "${method}"`, "u"));
+  }
+  assert.match(text, /constant "Promise"/u);
   assert.ok(
-    targets.some(
-      (target) =>
-        target.kind === "promise-intrinsic" && target.method === "race",
+    operations.some(
+      (operation) =>
+        operation.kind === "call" && operation.target?.kind === "dynamic",
     ),
   );
 });

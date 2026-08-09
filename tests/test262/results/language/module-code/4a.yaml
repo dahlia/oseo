@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-as.js:9\
-        8:10: error[OSEO2001]: Module has no export 'default'."
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-as.js:1\
+        04:10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-function-d\
-        ecl.js:83:16: error[OSEO0001]: Source could not be parsed."
+        ecl.js:89:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

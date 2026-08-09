@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-export-unresolvable.js:86:10:
+      detail: "test/language/module-code/early-export-unresolvable.js:92:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

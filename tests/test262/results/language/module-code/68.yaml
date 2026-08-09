@@ -68,7 +68,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-array-literal.js
-          sourceHash: fnv1a64:b0839a55062b2575
+          sourceHash: fnv1a64:5507cc8d770803af
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

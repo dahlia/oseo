@@ -228,7 +228,7 @@ results:
       detail: "test/language/statements/switch/scope-lex-async-function.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/switch/scope-lex-async-functi\
-        on.js:91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+        on.js:97:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Number/S9.3.1_A5_T3.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/S9.3.1_A5_T3.js:82:10:
+        stderr=\"test/built-ins/Number/S9.3.1_A5_T3.js:88:10:
         error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

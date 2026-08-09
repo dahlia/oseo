@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/invalid-private-names-member-express\
-        ion-bad-reference.js:109:11: error[OSEO0001]: Source could not
+        ion-bad-reference.js:115:11: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

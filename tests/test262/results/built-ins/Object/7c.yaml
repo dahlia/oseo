@@ -293,7 +293,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/prototype/extensibility.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/extensibility.js:84:3:
+        stderr="test/built-ins/Object/prototype/extensibility.js:90:3:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

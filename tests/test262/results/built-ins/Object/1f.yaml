@@ -25,7 +25,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/S15.2.1.1_A2_T6.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Object/S15.2.1.1_A2_T6.js:89:8:
+        stderr="test/built-ins/Object/S15.2.1.1_A2_T6.js:95:8:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype
@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-91-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-91-1.j\
-        s:85:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        s:91:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -23,7 +23,7 @@ results:
             - test/language/module-code/instn-star-equality.js
             - test/language/module-code/instn-star-equality-other_FIXTURE.js
           id: test/language/module-code/instn-star-equality.js
-          sourceHash: fnv1a64:7603a7601dd53c56
+          sourceHash: fnv1a64:1cb780bf37e28a10
         - dependencies:
             - test/language/module-code/instn-star-equality.js
           id: test/language/module-code/instn-star-equality-other_FIXTURE.js

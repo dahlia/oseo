@@ -231,7 +231,7 @@ results:
     observation:
       detail: 'test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js:126:16:
+        stderr="test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js:132:16:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method
@@ -300,7 +300,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/head-let-destructuring.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/head-let-destructuring.js:95:10:
+        stderr="test/language/statements/for-in/head-let-destructuring.js:101:10:
         error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax

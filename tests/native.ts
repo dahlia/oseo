@@ -40,6 +40,7 @@ import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
+import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
@@ -90,6 +91,7 @@ const fixtures: readonly Fixture[] = [
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
+  ...promiseFixtures.promiseIntrinsicFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -256,7 +258,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
-    fixture.name === "number-intrinsic"
+    fixture.name === "number-intrinsic" ||
+    fixture.name === "promise-intrinsic"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -322,6 +325,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
+    fixture.name === "promise-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-prototype" ||
@@ -491,7 +495,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
-            fixture.name === "number-intrinsic"
+            fixture.name === "number-intrinsic" ||
+            fixture.name === "promise-intrinsic"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

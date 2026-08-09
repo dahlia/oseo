@@ -48,7 +48,7 @@ results:
         -init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/ary-ptrn\
-        -elem-id-init-unresolvable.js:106:25: error[OSEO1001]: Unknown
+        -elem-id-init-unresolvable.js:112:25: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -112,7 +112,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
         op-ary-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-ary-init.js:121:5: error[OSEO1001]: Unknown binding
+        -ptrn-prop-ary-init.js:127:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

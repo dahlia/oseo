@@ -802,14 +802,26 @@ test("keeps every non-typeof unresolved reference rejected", () => {
 
 test("rejects typeof of an unshadowed runtime intrinsic name", () => {
   const result = compileSource(babelFrontend, {
-    source: "console.log(typeof Promise);",
+    source: "console.log(typeof console);",
     sourceId: "typeof-intrinsic.ts",
   });
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /typeof runtime intrinsic binding 'Promise'/u,
+    /typeof runtime intrinsic binding 'console'/u,
   );
+});
+
+test("reads typeof of a materialized intrinsic through its property", () => {
+  // `Promise` is a realm value now, so `typeof` reads the global
+  // object's property rather than rejecting the reference.
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof Promise);",
+    sourceId: "typeof-promise.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /constant "Promise"/u);
 });
 
 test("rejects typeof of an unimplemented standard global name", () => {

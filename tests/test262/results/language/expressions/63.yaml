@@ -214,7 +214,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js:118:12:
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js:124:12:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

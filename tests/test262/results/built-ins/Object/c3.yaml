@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-197.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-197.js\
-        :83:17: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        :89:17: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -102,7 +102,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-bigint.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-bigint.js:82:49: error[OSEO1001]: Unknown
+        ype.toString.call-bigint.js:88:49: error[OSEO1001]: Unknown
         binding 'BigInt'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

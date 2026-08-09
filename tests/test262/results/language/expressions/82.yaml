@@ -185,7 +185,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/obj-ptrn-prop-i\
         d-trailing-comma.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-id-trailing-comma.js:117:5: error[OSEO1001]: Unknown
+        n-prop-id-trailing-comma.js:123:5: error[OSEO1001]: Unknown
         binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -211,7 +211,7 @@ results:
       detail: "test/language/expressions/class/accessor-name-inst/computed-er\
         r-unresolvable.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/accessor-name-inst/com\
-        puted-err-unresolvable.js:98:10: error[OSEO1001]: Unknown
+        puted-err-unresolvable.js:104:10: error[OSEO1001]: Unknown
         binding 'test262unresolvable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

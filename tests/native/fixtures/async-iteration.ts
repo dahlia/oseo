@@ -671,7 +671,7 @@ main();
       genericCallsDisabled: 4,
       genericCallsEnabled: 3,
       hits: 1,
-      misses: 3,
+      misses: 5,
       overflowMisses: 0,
     },
   },

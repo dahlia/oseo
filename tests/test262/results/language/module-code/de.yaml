@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-cas\
-        e.js:83:21: error[OSEO0001]: Source could not be parsed."
+        e.js:89:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -41,7 +41,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-expr.js:95:20:
+      detail: "test/language/module-code/parse-err-export-dflt-expr.js:101:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

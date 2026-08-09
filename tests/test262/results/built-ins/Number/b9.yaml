@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Number/S9.3_A5_T1.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Number/S9.3_A5_T1.js:96:29:
+        stderr=\"test/built-ins/Number/S9.3_A5_T1.js:102:29:
         error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

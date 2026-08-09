@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-38-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-38-1.j\
-        s:86:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        s:92:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

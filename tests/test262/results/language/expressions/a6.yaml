@@ -46,7 +46,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-dflt-ary-\
         ptrn-rest-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-rest-id.js:115:10: error[OSEO1001]: Unknown binding
+        flt-ary-ptrn-rest-id.js:121:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -73,7 +73,7 @@ results:
         id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-id-init-unresolvable.js:107:29: error[OSEO1001]: Unknown
+        bj-ptrn-id-init-unresolvable.js:113:29: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -185,7 +185,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-cls-err.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-cls-err.js:94:7:
+        stderr="test/language/expressions/super/prop-expr-cls-err.js:100:7:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

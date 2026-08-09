@@ -768,15 +768,6 @@ function moduleExpressionParts(
       }),
     };
   }
-  if (expression.kind === "promise-construct") {
-    return {
-      children: hirArgumentExpressions(expression.arguments),
-      rebuild: (argumentsValue) => ({
-        ...expression,
-        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
-      }),
-    };
-  }
   if (expression.kind === "object") {
     const offsets = objectPropertyChildOffsets(expression.properties);
     const children = expression.properties.flatMap((property) =>
@@ -969,9 +960,8 @@ function extractModuleAwait(
       return undefined;
     }
   }
-  if (expression.kind === "new" || expression.kind === "promise-construct") {
-    const targetChildren = expression.kind === "new" ? 1 : 0;
-    const argumentIndex = childIndex - targetChildren;
+  if (expression.kind === "new") {
+    const argumentIndex = childIndex - 1;
     const preceding =
       argumentIndex < 0
         ? undefined

@@ -25,7 +25,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/S15.2.1.1_A2_T12.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Object/S15.2.1.1_A2_T12.js:87:8:
+        stderr="test/built-ins/Object/S15.2.1.1_A2_T12.js:93:8:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype

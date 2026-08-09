@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-generator-\
-        expr.js:83:16: error[OSEO0001]: Source could not be parsed."
+        expr.js:89:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

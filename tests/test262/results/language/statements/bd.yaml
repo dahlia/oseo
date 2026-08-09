@@ -84,7 +84,7 @@ results:
         val-contains-superproperty-1.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/class/elements/derived-cls-in\
-        direct-eval-contains-superproperty-1.js:98:11: error[OSEO1001]:
+        direct-eval-contains-superproperty-1.js:104:11: error[OSEO1001]:
         Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

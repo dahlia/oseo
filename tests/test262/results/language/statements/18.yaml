@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-ary-ptrn-el\
         em-obj-prop-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-elem-obj-prop-id.js:123:5: error[OSEO1001]: Unknown
+        -ptrn-elem-obj-prop-id.js:129:5: error[OSEO1001]: Unknown
         binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -263,7 +263,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/scope-head-var-none.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/scope-head-var-none.js:104:9:
+        stderr="test/language/statements/for-in/scope-head-var-none.js:110:9:
         error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax

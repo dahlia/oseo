@@ -4554,45 +4554,6 @@ function lowerExpression(
       builder,
     );
   }
-  if (expression.kind === "promise-construct") {
-    const lowered = lowerCallArguments(
-      expression.arguments,
-      expression.range,
-      builder,
-    );
-    const argumentIds = [...lowered.ids];
-    if (lowered.list == null && argumentIds.length === 0) {
-      argumentIds.push(lowerSyntheticUndefined(expression.range, builder));
-    }
-    const safepointArguments =
-      lowered.list == null ? argumentIds : [...argumentIds, lowered.list];
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "Promise constructor",
-      safepointArguments,
-      expression.range,
-    );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
-      arguments: argumentIds,
-      detail: "Promise constructor",
-      id,
-      kind: "call",
-      range: expression.range,
-      target: { kind: "promise-constructor" },
-    });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
-    );
-    return recordRoot(builder, id, expression.range);
-  }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
     const lowered = lowerCallArguments(

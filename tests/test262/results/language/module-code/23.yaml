@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-lhs\
-        .js:84:3: error[OSEO0001]: Source could not be parsed."
+        .js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

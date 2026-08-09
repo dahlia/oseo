@@ -20,7 +20,7 @@ results:
     observation:
       detail: "test/built-ins/Symbol/species/subclassing.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Symbol/species/subclassing.js:81:24:
+        stderr=\"test/built-ins/Symbol/species/subclassing.js:87:24:
         error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

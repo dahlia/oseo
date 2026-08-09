@@ -115,7 +115,7 @@ results:
         l-err-contains-supercall.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/class/elements/derived-cls-di\
-        rect-eval-err-contains-supercall.js:98:7: error[OSEO1001]:
+        rect-eval-err-contains-supercall.js:104:7: error[OSEO1001]:
         Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -282,7 +282,7 @@ results:
       detail: "test/language/statements/for-await-of/async-gen-dstr-let-obj-p\
         trn-prop-ary-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-await-of/async-gen-dstr-l\
-        et-obj-ptrn-prop-ary-init.js:140:7: error[OSEO1001]: Unknown
+        et-obj-ptrn-prop-ary-init.js:146:7: error[OSEO1001]: Unknown
         binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

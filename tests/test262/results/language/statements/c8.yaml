@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
         op-id-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-id-init.js:115:5: error[OSEO1001]: Unknown binding
+        -ptrn-prop-id-init.js:121:5: error[OSEO1001]: Unknown binding
         'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -271,7 +271,7 @@ results:
         nc-obj-ptrn-prop-obj-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/for-await-of/async-gen-dstr-c\
-        onst-async-obj-ptrn-prop-obj-init.js:143:7: error[OSEO1001]:
+        onst-async-obj-ptrn-prop-obj-init.js:149:7: error[OSEO1001]:
         Unknown binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

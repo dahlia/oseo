@@ -27,7 +27,7 @@ results:
     observation:
       detail: 'test/built-ins/Number/bigint-conversion.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Number/bigint-conversion.js:80:18:
+        stderr="test/built-ins/Number/bigint-conversion.js:86:18:
         error[OSEO2001]: Number prototype methods are not admitted
         yet.\n"'
       unsupportedCapability: number-prototype

@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Object/S15.2.1.1_A2_T13.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/S15.2.1.1_A2_T13.js:83:35:
+        stderr=\"test/built-ins/Object/S15.2.1.1_A2_T13.js:89:35:
         error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -71,7 +71,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-221-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-221-1.\
-        js:83:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        js:89:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -93,7 +93,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-223.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-223.js\
-        :83:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        :89:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -115,7 +115,7 @@ results:
       detail: "test/language/statements/for-in/let-identifier-with-newline.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/let-identifier-with-ne\
-        wline.js:84:21: error[OSEO1001]: Unknown binding 'let'.\\n\""
+        wline.js:90:21: error[OSEO1001]: Unknown binding 'let'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -189,7 +189,7 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 
 /** Whether the mutable global object property owns this intrinsic value. */
 function isPropertyOwnedIntrinsicName(name: string): boolean {
-  return name === "Number" || name === "Object";
+  return name === "Number" || name === "Object" || name === "Promise";
 }
 
 function bindingExpression(
@@ -1365,34 +1365,10 @@ function resolveExpression(
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
-    if (
-      expression.callee.kind === "identifier" &&
-      expression.callee.name === "Promise" &&
-      findBinding(scopes, "Promise") == null
-    ) {
-      return {
-        arguments: argumentsValue,
-        kind: "promise-construct",
-        range: expression.range,
-      };
-    }
     const callee = resolveExpression(expression.callee, scopes, state);
     return callee == null
       ? undefined
       : { ...expression, arguments: argumentsValue, callee };
-  }
-  if (expression.kind === "promise-construct") {
-    const argumentsValue: HirCallArgument[] = [];
-    for (const argument of expression.arguments) {
-      const resolved = resolveCallArgument(argument, scopes, state);
-      if (resolved == null) return undefined;
-      argumentsValue.push(resolved);
-    }
-    return {
-      arguments: argumentsValue,
-      kind: "promise-construct",
-      range: expression.range,
-    };
   }
   if (callsDynamicFunctionConstructor(expression.target, scopes, state)) {
     state.diagnostics.push(
@@ -1444,18 +1420,28 @@ function resolveExpression(
       method: expression.target.method,
     };
   } else if (expression.target.kind === "promise-intrinsic") {
-    const binding = findBinding(scopes, "Promise");
-    target =
-      binding == null
-        ? {
-            kind: "promise-intrinsic",
-            method: expression.target.method,
-          }
-        : shadowedMethodTarget(
-            binding,
-            expression.target.method,
-            expression.target.range,
-          );
+    // %Promise% is a materialized value, so a static call is an ordinary
+    // method call on whatever `Promise` resolves to, whether that is the
+    // realm's global property or a shadowing binding.
+    const object = resolveExpression(
+      {
+        kind: "identifier",
+        name: "Promise",
+        range: expression.target.range,
+      },
+      scopes,
+      state,
+    );
+    if (object == null) return undefined;
+    target = {
+      key: {
+        kind: "string",
+        range: expression.target.range,
+        value: expression.target.method,
+      },
+      kind: "method",
+      object,
+    };
   } else if (expression.target.kind === "timer-intrinsic") {
     const binding = findBinding(scopes, expression.target.method);
     target =
@@ -2119,9 +2105,6 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
       hirExpressionHasAwait(expression.callee) ||
       expression.arguments.some(hirCallArgumentHasAwait)
     );
-  }
-  if (expression.kind === "promise-construct") {
-    return expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "object") {
     return expression.properties.some((property) =>

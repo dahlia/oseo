@@ -157,11 +157,13 @@ current evidence assessment. Those live only in the indexed records above.
     global, is itself a source-located rejection until that strict
     throw is lowered, so it neither runs with sloppy semantics nor
     poisons the fold.
-    `typeof` of an unshadowed runtime-owned intrinsic name, such
-    as `Object` or `Promise`, stays a source-located rejection: the
-    realm binds those names as call targets the profile does not admit
-    as values, so `"undefined"` would misreport them, the same boundary
-    the Unit 8.1b identifier delete records. The same rule covers every
+    `typeof` of an unshadowed runtime-owned intrinsic name the profile
+    still admits only as a call target, such as `console`, stays a
+    source-located rejection: the realm binds that name to a real
+    value, so `"undefined"` would misreport it, the same boundary
+    the Unit 8.1b identifier delete records. A name the profile has
+    since materialized, such as `Object`, `Number`, or `Promise`,
+    reads the realm global object's property instead. The same rule covers every
     other global name ECMA-262 clause 19 requires of the pinned
     ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
     `globalThis`: an unshadowed `typeof` of one stays a source-located
@@ -916,9 +918,10 @@ current evidence assessment. Those live only in the indexed records above.
     spread iterator values from left to right in a rooted private argument
     list. Iterator acquisition, step, value, and append failures do not call
     `IteratorClose`, and an abrupt spread stops later arguments and invocation.
-    Intrinsic, method, dynamic call, ordinary construction, and `Promise`
-    construction paths share this representation; invocations without spread
-    retain fixed positional arguments. Dynamic arity does not bypass admitted
+    Intrinsic, method, dynamic call, and ordinary construction paths share
+    this representation, and `new Promise` is one of those ordinary
+    constructions; invocations without spread retain fixed positional
+    arguments. Dynamic arity does not bypass admitted
     intrinsic contracts, so `Object.create(...values)` still rejects a
     descriptor-map argument. A spread preceding a later top-level await point
     retains the accumulated argument list in the traced module continuation.
@@ -3113,6 +3116,41 @@ inventory, manifest schema and vocabulary, and zero-override policy are
 unchanged. The completed descriptor checkpoint moves the runtime ABI to
 `oseo-runtime-m5-52` without changing the graph's orchestration state.
 
+M5b node `promise-intrinsic` makes `Promise` a materialized realm value.
+The constructor is an ordinary constructible function bound as the standard
+writable, non-enumerable, configurable property of the global object, so
+`new Promise` is ordinary construction and every static is an ordinary
+method call rather than a frontend fast path recognized by name. A promise
+takes its `[[Prototype]]` from the new target; `Promise.prototype` carries
+`constructor`, `Symbol.toStringTag`, `then`, `catch`, and `finally`; and
+`%Promise%` carries the `Symbol.species` accessor with `resolve`, `reject`,
+`withResolvers`, `try`, `all`, `race`, `allSettled`, and `any`.
+`Promise.prototype.then` and `finally` run SpeciesConstructor, and a
+capability over any constructor other than `%Promise%` is the record
+NewPromiseCapability builds from that constructor's executor and resolving
+functions, so a subclass or foreign capability observes its own settlement.
+Fixed native and generated differential evidence at seed `0x60003800` covers
+both specialization policies, collection forced at every safepoint, false
+hints, deliberate shape-guard misses, generic fallback, subclass and foreign
+capabilities, throwing and non-constructor species, and global `Promise`
+replacement and deletion. `Promise.all` and `Promise.race` now build their
+capability from the `this` value, and the remaining combinator behavior
+stays with its own graph node. The reviewed subset admits the `promise-try`
+and `promise-with-resolvers` feature tags, so both statics execute their
+upstream cases instead of reporting an unadmitted feature. Of the 250 paths
+under the node's seven inventory roots, 238 are reviewed: 183 pass and 55
+retain explicit prerequisite boundaries. The remaining twelve name the
+*promiseHelper.js* include, the
+unhandled-rejection host policy, and the `PromiseResolve` constructor read.
+Thirteen previously reviewed cases also move from unsupported to pass because a
+real `Promise` value satisfies their prerequisites. The manifest reaches 7,111
+cases: 4,750 passes, 1,355 expected negatives, and 1,006 unsupported profile
+features with no semantic, harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The materialized constructor and its
+retired fast-path entry points move the runtime ABI to `oseo-runtime-m5-53`
+without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3239,9 +3277,9 @@ complete. The remaining gaps retain their existing owners.
     Six reviewed-candidate cases turn on the difference and stay outside the
     reviewed subset: three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
     cases and the three *AsyncGeneratorPrototype/return/* broken-promise
-    cases. Closing
-    it needs `Promise` as a materialized intrinsic value to compare against.
-    Owner: the intrinsics and built-in objects stream.
+    cases and *test/built-ins/Promise/resolve/arg-uniq-ctor.js*. `Promise`
+    is now a materialized intrinsic value, so only the `constructor` read
+    itself remains. Owner: the intrinsics and built-in objects stream.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. `Object.getPrototypeOf` is admitted, but reflecting a
     generator function or generator object reports the explicit
@@ -3252,13 +3290,38 @@ complete. The remaining gaps retain their existing owners.
     classifications. There is no `GeneratorFunction` global binding in
     ECMAScript, so this profile does not add one. Owner: the intrinsics and
     built-in objects stream.
- -  `Object` and `Object.getPrototypeOf` are admitted, but `Promise` is not yet
-    a materialized global value and generator intrinsic reflection retains the
-    explicit boundary above. Reviewed *test/built-ins/AsyncGeneratorPrototype/*
-    and *test/built-ins/AsyncIteratorPrototype/* cases that require those
-    routes remain `unsupported-profile-feature` under the matching
-    `generator-intrinsics`, `dynamic-source`, or Promise prerequisite. Owner:
+ -  `Object`, `Object.getPrototypeOf`, and `Promise` are admitted, but
+    generator intrinsic reflection retains the explicit boundary above.
+    Reviewed *test/built-ins/AsyncGeneratorPrototype/* and
+    *test/built-ins/AsyncIteratorPrototype/* cases that require those routes
+    remain `unsupported-profile-feature` under the matching
+    `generator-intrinsics` or `dynamic-source` prerequisite. Owner:
     the intrinsics and built-in objects stream.
+ -  `Promise.allSettled` and `Promise.any` are own properties of `%Promise%`
+    with their specified names and lengths, but calling either reports the
+    owned `promise-static-method` diagnostic instead of combining.
+    `Promise.all` and `Promise.race` build their capability from the `this`
+    value, so a receiver that is not a constructor and a constructor whose
+    executor supplies no resolving functions both throw, but neither reads
+    `resolve` from that constructor; each resolves its elements through the
+    internal `PromiseResolve` instead, and a derived capability settles one
+    job earlier than the specification requires. The reviewed
+    *Promise/all/*, *Promise/allSettled/*, *Promise/any/*, and
+    *Promise/race/* roots stay outside this node. Owner: the
+    `promise-all-and-race` and `promise-allsettled-and-any` graph nodes.
+ -  A rejected promise that no reaction ever handles ends the program at the
+    next rejection checkpoint. A case whose reason is not a typed error
+    names the owned `unhandled-rejection-policy` boundary, but a case whose
+    reason is an error instance is indistinguishable from an unhandled
+    throw, so
+    *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
+    *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* stay
+    outside the reviewed subset. Owner: the modules and asynchronous
+    execution stream.
+ -  The reviewed harness does not provide *promiseHelper.js*, so the seven
+    *Promise/prototype/then/* and two *Promise/resolve/* sequencing cases
+    that include it stay outside the reviewed subset. Owner: the
+    `harness-promise-helper` graph node.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).

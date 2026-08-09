@@ -349,6 +349,20 @@ completion stops before later observations or mutation. The shared descriptor
 component applies ordinary, array, function, arguments, String-wrapper, and
 module-namespace compatibility rules without changing public runtime layout.
 
+The `m5-53` ABI materializes `%Promise%`. The constructor, its prototype
+link, `Symbol.toStringTag`, the `Symbol.species` accessor, and the `resolve`,
+`reject`, `withResolvers`, `try`, `all`, and `race` statics are ordinary
+properties of one realm-owned constructor that the global object binds. A
+promise takes its `[[Prototype]]` from the new target, so a subclass keeps its
+own prototype. `Promise.prototype.then` and `finally` run SpeciesConstructor,
+and a capability over any constructor other than `%Promise%` is a
+three-slot record holding the constructed promise and the resolving functions
+its executor captured. `Promise.all` and `Promise.race` build that record
+from their `this` value rather than from `%Promise%`. The retired
+`oseo_promise_construct`, `oseo_promise_race`, and `oseo_promise_reject` entry
+points leave the generated-code ABI, because generated code now reads the
+properties instead.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

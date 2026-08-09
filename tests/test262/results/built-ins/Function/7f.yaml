@@ -39,7 +39,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js:312:9:
+        stderr="test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js:337:9:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
@@ -62,7 +62,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js:84:3:
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js:90:3:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax

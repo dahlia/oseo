@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-38.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-38.js:\
-        84:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        90:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -139,7 +139,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/symbol-tag-override-b\
         igint.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-ov\
-        erride-bigint.js:83:15: error[OSEO1001]: Unknown binding
+        erride-bigint.js:89:15: error[OSEO1001]: Unknown binding
         'BigInt'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

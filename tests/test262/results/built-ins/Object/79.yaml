@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Object/S15.2.2.1_A4_T1.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/S15.2.2.1_A4_T1.js:89:3:
+        stderr=\"test/built-ins/Object/S15.2.2.1_A4_T1.js:95:3:
         error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-402.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-402.js\
-        :80:23: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        :86:23: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

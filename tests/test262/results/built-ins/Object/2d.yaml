@@ -141,7 +141,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-579.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-579.js\
-        :82:23: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :88:23: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

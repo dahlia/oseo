@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-6.js:90:9: error[OSEO0001]: Source could not be parsed."
+        e-6.js:96:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

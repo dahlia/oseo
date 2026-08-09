@@ -70,7 +70,7 @@ results:
     observation:
       detail: 'test/language/expressions/delete/super-property-topropertykey.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/delete/super-property-topropertykey.js:97:12:
+        stderr="test/language/expressions/delete/super-property-topropertykey.js:103:12:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

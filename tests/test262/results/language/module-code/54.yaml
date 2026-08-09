@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id-as.js:88:10:
+      detail: "test/language/module-code/early-dup-export-id-as.js:94:10:
         error[OSEO0001]: Duplicate export 'z'."
       errorType: SyntaxError
       failedPhase: parse

@@ -183,7 +183,7 @@ results:
     observation:
       detail: 'test/language/expressions/bitwise-or/bigint-errors.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/bitwise-or/bigint-errors.js:86:3:
+        stderr="test/language/expressions/bitwise-or/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype

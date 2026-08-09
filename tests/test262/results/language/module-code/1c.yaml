@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-return.js:101:1:
+      detail: "test/language/module-code/parse-err-return.js:107:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

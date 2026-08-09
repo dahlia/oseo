@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-cls-name-meth.js
           id: test/language/module-code/eval-export-dflt-cls-name-meth.js
-          sourceHash: fnv1a64:56a5c5f49615c3e0
+          sourceHash: fnv1a64:338e6b2c7359c462
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

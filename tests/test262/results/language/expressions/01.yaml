@@ -59,7 +59,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/obj-ptrn-prop-i\
         d-init-skipped.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-id-init-skipped.js:126:5: error[OSEO1001]: Unknown
+        n-prop-id-init-skipped.js:132:5: error[OSEO1001]: Unknown
         binding 's'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

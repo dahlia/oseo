@@ -111,7 +111,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js:122:10:
+        stderr="test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js:128:10:
         error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false

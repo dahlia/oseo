@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           id: test/language/module-code/top-level-await/module-import-resolution.js
-          sourceHash: fnv1a64:b911176686aab5dc
+          sourceHash: fnv1a64:2a12b9dcde0bd856
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           sourceHash: fnv1a64:911c90c83a970ad1

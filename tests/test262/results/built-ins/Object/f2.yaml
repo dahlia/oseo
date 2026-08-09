@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-147-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-147-1.\
-        js:85:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        js:91:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-173-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-173-1.\
-        js:85:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        js:91:40: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -281,7 +281,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-string.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-string.js:88:34: error[OSEO1001]: Unknown
+        ype.toString.call-string.js:94:34: error[OSEO1001]: Unknown
         binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

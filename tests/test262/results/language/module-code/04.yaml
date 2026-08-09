@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-labeled.js\
-        :83:10: error[OSEO0001]: Source could not be parsed."
+        :89:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

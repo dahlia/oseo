@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-circular.js:99:10:
+      detail: "test/language/module-code/instn-iee-err-circular.js:105:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution

@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-asyncgenerator-declar\
-        ation-binding-exists.js:92:33: error[OSEO0001]: Source could not
+        ation-binding-exists.js:98:33: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

@@ -95,6 +95,35 @@ static OseoValue function(
     return result.value;
 }
 
+static OseoValue construct_promise(
+    OseoContext *context,
+    OseoValue executor
+) {
+    OseoResult constructor = oseo_intrinsic(context, OSEO_INTRINSIC_PROMISE);
+    assert(constructor.status == OSEO_STATUS_NORMAL);
+    OseoValue slots[3] = {executor, constructor.value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_function_prototype(context, slots[1]);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    result = oseo_constructor_receiver(context, result.value);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    slots[2] = result.value;
+    result = oseo_call_function(
+        context,
+        slots[1],
+        slots[2],
+        1u,
+        &slots[0],
+        slots[1]
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    result = oseo_constructor_result(context, result.value, slots[2]);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    oseo_roots_pop(context, &frame);
+    return result.value;
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -112,9 +141,7 @@ int main(void) {
     frame.slots[2] = function(&context, 3u, frame.slots[9]);
     frame.slots[10] = function(&context, 4u, frame.slots[9]);
     frame.slots[12] = function(&context, 5u, frame.slots[9]);
-    result = oseo_promise_construct(&context, frame.slots[0]);
-    assert(result.status == OSEO_STATUS_NORMAL);
-    frame.slots[3] = result.value;
+    frame.slots[3] = construct_promise(&context, frame.slots[0]);
     assert(oseo_promise_state(frame.slots[3]) == OSEO_PROMISE_FULFILLED);
     result = oseo_promise_result(&context, frame.slots[3]);
     assert(result.status == OSEO_STATUS_NORMAL);
@@ -147,9 +174,7 @@ int main(void) {
     result = oseo_promise_result(&context, frame.slots[5]);
     expect_number(result.value, 102);
 
-    result = oseo_promise_construct(&context, frame.slots[10]);
-    assert(result.status == OSEO_STATUS_NORMAL);
-    frame.slots[6] = result.value;
+    frame.slots[6] = construct_promise(&context, frame.slots[10]);
     result = oseo_promise_resolve_into(
         &context,
         frame.slots[6],
@@ -168,9 +193,13 @@ int main(void) {
     result = oseo_jobs_drain(&context);
     assert(result.status == OSEO_STATUS_NORMAL);
 
-    result = oseo_promise_reject(&context, oseo_number(7.0));
+    frame.slots[7] = construct_promise(&context, frame.slots[10]);
+    result = oseo_promise_reject_into(
+        &context,
+        frame.slots[7],
+        oseo_number(7.0)
+    );
     assert(result.status == OSEO_STATUS_NORMAL);
-    frame.slots[7] = result.value;
     result = oseo_rejection_checkpoint(&context);
     assert(result.status == OSEO_STATUS_THROW);
     assert(context.unhandled_rejection_count == 1u);
@@ -216,12 +245,8 @@ int main(void) {
     assert(result.status == OSEO_STATUS_NORMAL);
     expect_number(result.value, 55);
 
-    result = oseo_promise_construct(&context, frame.slots[10]);
-    assert(result.status == OSEO_STATUS_NORMAL);
-    frame.slots[16] = result.value;
-    result = oseo_promise_construct(&context, frame.slots[10]);
-    assert(result.status == OSEO_STATUS_NORMAL);
-    frame.slots[17] = result.value;
+    frame.slots[16] = construct_promise(&context, frame.slots[10]);
+    frame.slots[17] = construct_promise(&context, frame.slots[10]);
     result = oseo_promise_resolve_into(
         &context,
         frame.slots[17],

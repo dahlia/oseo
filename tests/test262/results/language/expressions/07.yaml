@@ -24,7 +24,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-ary-ptrn-\
         rest-id-direct.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-rest-id-direct.js:129:10: error[OSEO1001]: Unknown
+        ry-ptrn-rest-id-direct.js:135:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -150,7 +150,7 @@ results:
     observation:
       detail: 'test/language/expressions/division/bigint-errors.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/language/expressions/division/bigint-errors.js:86:3:
+        stderr="test/language/expressions/division/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype

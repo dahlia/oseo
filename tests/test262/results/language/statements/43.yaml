@@ -249,7 +249,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/head-var-bound-names-dup.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/head-var-bound-names-dup.js:81:10:
+        stderr="test/language/statements/for-in/head-var-bound-names-dup.js:87:10:
         error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax

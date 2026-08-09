@@ -41,7 +41,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-do-while.j\
-        s:83:4: error[OSEO0001]: Source could not be parsed."
+        s:89:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -63,8 +63,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:95\
-        :30: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:10\
+        1:30: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

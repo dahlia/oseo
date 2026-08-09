@@ -49,7 +49,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-224.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-224.js\
-        :83:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        :89:19: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

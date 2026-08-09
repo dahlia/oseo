@@ -318,7 +318,7 @@ results:
     observation:
       detail: "test/language/statements/for-in/S12.6.4_A3.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/S12.6.4_A3.js:86:15:
+        stderr=\"test/language/statements/for-in/S12.6.4_A3.js:92:15:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

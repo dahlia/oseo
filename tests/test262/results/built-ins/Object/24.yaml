@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-387.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-387.js\
-        :81:18: error[OSEO1001]: Unknown binding 'String'.\\n\""
+        :87:18: error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

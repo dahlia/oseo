@@ -113,7 +113,7 @@ results:
       detail: "test/language/expressions/class/accessor-name-static/computed-\
         err-unresolvable.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/accessor-name-static/c\
-        omputed-err-unresolvable.js:100:17: error[OSEO1001]: Unknown
+        omputed-err-unresolvable.js:106:17: error[OSEO1001]: Unknown
         binding 'test262unresolvable'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

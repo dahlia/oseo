@@ -249,7 +249,7 @@ results:
       detail: "test/built-ins/Object/prototype/toLocaleString/primitive_this_\
         value_getter.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toLocaleString/primiti\
-        ve_this_value_getter.js:85:23: error[OSEO1001]: Unknown binding
+        ve_this_value_getter.js:91:23: error[OSEO1001]: Unknown binding
         'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

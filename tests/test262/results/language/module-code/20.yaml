@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-function-declaration-binding.js
-          sourceHash: fnv1a64:056129c7bd3ae95e
+          sourceHash: fnv1a64:8573cb5096c26d54
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -52,7 +52,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-generator-\
-        decl.js:84:17: error[OSEO0001]: Source could not be parsed."
+        decl.js:90:17: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -74,7 +74,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-const.js:84:16:
+      detail: "test/language/module-code/parse-err-export-dflt-const.js:90:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

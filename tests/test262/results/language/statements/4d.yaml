@@ -82,7 +82,7 @@ results:
         op-id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-id-init-unresolvable.js:106:28: error[OSEO1001]:
+        -ptrn-prop-id-init-unresolvable.js:112:28: error[OSEO1001]:
         Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -162,7 +162,7 @@ results:
       detail: "test/language/statements/switch/scope-lex-generator.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/switch/scope-lex-generator.js\
-        :91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+        :97:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

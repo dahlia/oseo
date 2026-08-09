@@ -264,7 +264,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/symbol-tag-override-p\
         rimitives.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-ov\
-        erride-primitives.js:94:1: error[OSEO1001]: Unknown binding
+        erride-primitives.js:100:1: error[OSEO1001]: Unknown binding
         'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -47,7 +47,7 @@ results:
         t-err-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/ary-init\
-        -iter-get-err-array-prototype.js:104:8: error[OSEO1001]: Unknown
+        -iter-get-err-array-prototype.js:110:8: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -130,7 +130,7 @@ results:
       detail: "test/language/statements/for-in/let-block-with-newline.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/let-block-with-newline\
-        .js:84:21: error[OSEO1001]: Unknown binding 'let'.\\n\""
+        .js:90:21: error[OSEO1001]: Unknown binding 'let'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

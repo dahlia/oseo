@@ -59,7 +59,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
         op-obj.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-obj.js:119:5: error[OSEO1001]: Unknown binding
+        -ptrn-prop-obj.js:125:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -146,7 +146,7 @@ results:
     observation:
       detail: 'test/language/statements/class/elements/super-access-from-arrow-func-on-field.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/super-access-from-arrow-func-on-field.js:92:7:
+        stderr="test/language/statements/class/elements/super-access-from-arrow-func-on-field.js:98:7:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Object/S15.2.2.1_A4_T2.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/S15.2.2.1_A4_T2.js:89:3:
+        stderr=\"test/built-ins/Object/S15.2.2.1_A4_T2.js:95:3:
         error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -72,7 +72,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-410.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-410.js\
-        :319:9: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+        :344:9: error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -224,7 +224,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T2.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T2.js:87:18:
+        stderr="test/built-ins/Object/prototype/valueOf/S15.2.4.4_A1_T2.js:93:18:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype

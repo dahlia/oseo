@@ -99,7 +99,7 @@ results:
     observation:
       detail: 'test/language/statements/class/definition/fn-length-static-precedence-order.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/fn-length-static-precedence-order.js:113:21:
+        stderr="test/language/statements/class/definition/fn-length-static-precedence-order.js:119:21:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method
@@ -152,7 +152,7 @@ results:
       detail: "test/language/statements/for-in/cptn-expr-zero-itr.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/cptn-expr-zero-itr.js:\
-        95:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        101:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

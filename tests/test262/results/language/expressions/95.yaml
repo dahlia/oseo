@@ -57,7 +57,7 @@ results:
         prop-id-trailing-comma.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id-trailing-comma.js:117:5: error[OSEO1001]:
+        bj-ptrn-prop-id-trailing-comma.js:123:5: error[OSEO1001]:
         Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -221,7 +221,7 @@ results:
     observation:
       detail: 'test/language/expressions/optional-chaining/member-expression.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/member-expression.js:110:24:
+        stderr="test/language/expressions/optional-chaining/member-expression.js:116:24:
         error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
@@ -245,7 +245,7 @@ results:
       detail: "test/language/expressions/tagged-template/cache-eval-inner-fun\
         ction.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/cache-eval-i\
-        nner-function.js:92:3: error[OSEO1001]: Unknown binding
+        nner-function.js:98:3: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

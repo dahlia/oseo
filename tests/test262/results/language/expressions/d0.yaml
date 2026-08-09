@@ -22,7 +22,7 @@ results:
       detail: "test/language/expressions/async-generator/named-yield-spread-a\
         rr-single.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        spread-arr-single.js:123:10: error[OSEO1001]: Unknown binding
+        spread-arr-single.js:129:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

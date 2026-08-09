@@ -105,7 +105,7 @@ results:
     observation:
       detail: 'test/language/expressions/bitwise-xor/bigint-errors.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/bitwise-xor/bigint-errors.js:86:3:
+        stderr="test/language/expressions/bitwise-xor/bigint-errors.js:92:3:
         error[OSEO2001]: Primitive wrapper prototype methods are not
         admitted yet.\n"'
       unsupportedCapability: primitive-wrapper-prototype
@@ -216,7 +216,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/string.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/string.js:121:10:
+        stderr=\"test/language/expressions/typeof/string.js:127:10:
         error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

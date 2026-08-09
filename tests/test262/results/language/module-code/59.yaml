@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-strict-mode.js:84:5:
+      detail: "test/language/module-code/early-strict-mode.js:90:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-5.js:92:9: error[OSEO0001]: Source could not be parsed."
+        e-5.js:98:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

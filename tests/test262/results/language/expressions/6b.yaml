@@ -150,7 +150,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-r\
         est-id-direct.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-rest-id-direct.js:129:10: error[OSEO1001]: Unknown
+        y-ptrn-rest-id-direct.js:135:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -180,7 +180,7 @@ results:
         elem-id-iter-val-array-prototype.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-elem-id-iter-val-array-prototype.js:121:1:
+        ry-ptrn-elem-id-iter-val-array-prototype.js:127:1:
         error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

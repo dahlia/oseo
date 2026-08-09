@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-as-eval.js:104:15:
+      detail: "test/language/module-code/early-import-as-eval.js:110:15:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

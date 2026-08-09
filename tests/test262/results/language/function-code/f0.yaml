@@ -21,7 +21,7 @@ results:
       detail: "test/language/function-code/block-decl-onlystrict.js strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/function-code/block-decl-onlystrict.js:9\
-        1:5: error[OSEO1001]: Unknown binding 'f'.\\n\""
+        7:5: error[OSEO1001]: Unknown binding 'f'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

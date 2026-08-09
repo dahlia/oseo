@@ -59,7 +59,7 @@ results:
       detail: "test/language/statements/class/elements/private-methods/prod-p\
         rivate-generator.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/private-method\
-        s/prod-private-generator.js:150:21: error[OSEO1001]: Unknown
+        s/prod-private-generator.js:156:21: error[OSEO1001]: Unknown
         binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -103,7 +103,7 @@ results:
     observation:
       detail: "test/language/statements/for-in/S12.6.4_A4.1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/S12.6.4_A4.1.js:84:15:
+        stderr=\"test/language/statements/for-in/S12.6.4_A4.1.js:90:15:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

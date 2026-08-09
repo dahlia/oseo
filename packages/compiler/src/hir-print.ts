@@ -348,13 +348,6 @@ function printHirExpression(expression: HirExpression): string {
       ")"
     );
   }
-  if (expression.kind === "promise-construct") {
-    return (
-      "new intrinsic Promise(" +
-      expression.arguments.map(printHirCallArgument).join(", ") +
-      ")"
-    );
-  }
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"

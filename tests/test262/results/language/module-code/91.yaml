@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-lables.js:86:3:
+      detail: "test/language/module-code/early-dup-lables.js:92:3:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -method-gen.js:84:23: error[OSEO0001]: Source could not be
+        -method-gen.js:90:23: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse

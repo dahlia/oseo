@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/ary-ptrn-elem-a\
         ry-rest-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ptr\
-        n-elem-ary-rest-init.js:120:10: error[OSEO1001]: Unknown binding
+        n-elem-ary-rest-init.js:126:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -180,7 +180,7 @@ results:
     observation:
       detail: 'test/language/expressions/tagged-template/cache-identical-source-new-function.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/tagged-template/cache-identical-source-new-function.js:92:2:
+        stderr="test/language/expressions/tagged-template/cache-identical-source-new-function.js:98:2:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax

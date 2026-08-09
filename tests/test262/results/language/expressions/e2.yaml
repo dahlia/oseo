@@ -198,7 +198,7 @@ results:
         uted-name-referenceerror.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/class/elements/evaluation-er\
-        ror/computed-name-referenceerror.js:121:6: error[OSEO1001]:
+        ror/computed-name-referenceerror.js:127:6: error[OSEO1001]:
         Unknown binding 'noRef'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-iee-single-cycle-same-name-a_FIXTURE.js
           id: test/language/module-code/instn-star-iee-single-cycle-same-name.js
-          sourceHash: fnv1a64:c4e98e846bdd1b70
+          sourceHash: fnv1a64:1c54600883669d82
         - dependencies:
             - test/language/module-code/instn-star-iee-single-cycle-same-name-b_FIXTURE.js
             - test/language/module-code/instn-star-iee-single-cycle-same-name-c_FIXTURE.js

@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/eval-var-scope-syntax\
         -err.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/eval-var-scop\
-        e-syntax-err.js:98:23: error[OSEO1001]: Unknown binding
+        e-syntax-err.js:104:23: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

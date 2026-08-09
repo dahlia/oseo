@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/obj-ptrn-prop-a\
         ry.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/obj-ptr\
-        n-prop-ary.js:120:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
+        n-prop-ary.js:126:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -189,7 +189,7 @@ results:
       detail: "test/language/expressions/optional-chaining/new-target-optiona\
         l-call.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/optional-chaining/new-target\
-        -optional-call.js:97:1: error[OSEO1001]: Unknown binding
+        -optional-call.js:103:1: error[OSEO1001]: Unknown binding
         'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -213,7 +213,7 @@ results:
       detail: "test/language/expressions/super/prop-dot-obj-val-from-eval.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/super/prop-dot-obj-val-from-\
-        eval.js:104:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        eval.js:110:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

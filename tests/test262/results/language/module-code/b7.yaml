@@ -20,7 +20,7 @@ results:
       - module-linking
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/no-operand.js:86:6:
+      detail: "test/language/module-code/top-level-await/no-operand.js:92:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

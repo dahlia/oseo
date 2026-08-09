@@ -140,7 +140,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-617.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-617.js\
-        :309:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :334:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -163,7 +163,7 @@ results:
         ritable-regexp-dollar1.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/Object/internals/DefineOwnProperty/cons\
-        istent-writable-regexp-dollar1.js:87:28: error[OSEO1001]:
+        istent-writable-regexp-dollar1.js:93:28: error[OSEO1001]:
         Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

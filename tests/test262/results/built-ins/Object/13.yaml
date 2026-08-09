@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/built-ins/Object/S15.2.2.1_A2_T5.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/S15.2.2.1_A2_T5.js:81:15:
+        stderr=\"test/built-ins/Object/S15.2.2.1_A2_T5.js:87:15:
         error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

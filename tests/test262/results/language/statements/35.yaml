@@ -139,7 +139,7 @@ results:
     observation:
       detail: 'test/language/statements/class/syntax/class-body-method-definition-super-property.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/syntax/class-body-method-definition-super-property.js:79:5:
+        stderr="test/language/statements/class/syntax/class-body-method-definition-super-property.js:85:5:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'
@@ -236,7 +236,7 @@ results:
     observation:
       detail: "test/language/statements/for-in/S12.6.4_A1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/S12.6.4_A1.js:82:6:
+        stderr=\"test/language/statements/for-in/S12.6.4_A1.js:88:6:
         error[OSEO1001]: Unknown binding '__key'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth-gen-static.js:84:29: error[OSEO0001]: Source could not be
+        -meth-gen-static.js:90:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -66,7 +66,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-con\
-        st.js:84:3: error[OSEO0001]: Source could not be parsed."
+        st.js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -89,7 +89,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-con\
-        st.js:84:3: error[OSEO0001]: Source could not be parsed."
+        st.js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -112,7 +112,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-set\
-        ter.js:83:15: error[OSEO0001]: Source could not be parsed."
+        ter.js:89:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -141,7 +141,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-this.js
-          sourceHash: fnv1a64:c5af08644c234420
+          sourceHash: fnv1a64:078c0acb5b1d8ff6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

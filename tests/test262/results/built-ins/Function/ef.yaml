@@ -45,7 +45,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/15.3.4.5-2-5.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5-2-5.js\
-        :81:11: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :87:11: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

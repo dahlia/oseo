@@ -79,7 +79,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-36-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-36-1.j\
-        s:84:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        s:90:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

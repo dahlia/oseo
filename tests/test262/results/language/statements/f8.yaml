@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-prop-ob\
         j-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-obj-init.js:121:5: error[OSEO1001]: Unknown binding
+        -prop-obj-init.js:127:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -53,7 +53,7 @@ results:
     observation:
       detail: 'test/language/statements/async-generator/generator-created-after-decl-inst.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-generator/generator-created-after-decl-inst.js:93:21:
+        stderr="test/language/statements/async-generator/generator-created-after-decl-inst.js:99:21:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

@@ -24,7 +24,7 @@ results:
         rop-id-init-skipped.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-prop-id-init-skipped.js:126:5: error[OSEO1001]: Unknown
+        j-ptrn-prop-id-init-skipped.js:132:5: error[OSEO1001]: Unknown
         binding 's'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -52,7 +52,7 @@ results:
         ptrn-elem-obj-prop-id-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-elem-obj-prop-id-init.js:124:5: error[OSEO1001]:
+        flt-ary-ptrn-elem-obj-prop-id-init.js:130:5: error[OSEO1001]:
         Unknown binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

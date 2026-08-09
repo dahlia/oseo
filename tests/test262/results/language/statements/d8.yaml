@@ -26,7 +26,7 @@ results:
         em-id-iter-val-array-prototype.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-elem-id-iter-val-array-prototype.js:121:1:
+        -ptrn-elem-id-iter-val-array-prototype.js:127:1:
         error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -53,7 +53,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-prop-id\
         -init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-id-init.js:115:5: error[OSEO1001]: Unknown binding
+        -prop-id-init.js:121:5: error[OSEO1001]: Unknown binding
         'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

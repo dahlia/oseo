@@ -24,7 +24,7 @@ results:
             - test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
             - test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-local.js
-          sourceHash: fnv1a64:393da841b28c21e4
+          sourceHash: fnv1a64:13cd476286b1157a
         - dependencies: []
           id: test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
           sourceHash: fnv1a64:08410762af497b31
@@ -59,7 +59,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-let.js\
-        :84:3: error[OSEO0001]: Source could not be parsed."
+        :90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

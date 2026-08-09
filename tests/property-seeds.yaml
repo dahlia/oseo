@@ -224,3 +224,7 @@ families:
     owner: tests/property/m5-object-define-property.property.test.ts
     start: 0x60003700
     end: 0x600037ff
+  - family: m5-promise-intrinsic
+    owner: tests/property/m5-promise-intrinsic.property.test.ts
+    start: 0x60003800
+    end: 0x600038ff

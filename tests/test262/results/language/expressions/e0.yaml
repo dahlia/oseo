@@ -24,7 +24,7 @@ results:
         et-err-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ini\
-        t-iter-get-err-array-prototype.js:104:8: error[OSEO1001]:
+        t-iter-get-err-array-prototype.js:110:8: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

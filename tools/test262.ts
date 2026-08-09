@@ -504,6 +504,18 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   if (diagnostic === "Object.create descriptor maps are unsupported in M3.") {
     return "object-create-descriptor-map";
   }
+  if (
+    diagnostic === "Promise static method is not admitted in this M5b node."
+  ) {
+    return "promise-static-method";
+  }
+  // The runtime ends a program at the first rejection checkpoint that
+  // still holds an unhandled rejection. A case that needs the opposite
+  // host policy names that boundary instead of reporting a semantic
+  // failure, exactly as the unadmitted built-in diagnostics above do.
+  if (diagnostic === "Unhandled promise rejection.") {
+    return "unhandled-rejection-policy";
+  }
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"
     : undefined;

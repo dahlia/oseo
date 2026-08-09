@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-142-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-142-1.\
-        js:83:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        js:89:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -41,7 +41,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-170-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-170-1.\
-        js:85:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        js:91:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -63,7 +63,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-251-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-251-1.\
-        js:84:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        js:90:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -85,7 +85,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-254-1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-254-1.\
-        js:84:1: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        js:90:1: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -107,7 +107,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-3-72.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-3-72.js:\
-        85:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        91:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -285,7 +285,7 @@ results:
         alue-function-arguments.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/Object/internals/DefineOwnProperty/cons\
-        istent-value-function-arguments.js:90:10: error[OSEO1001]:
+        istent-value-function-arguments.js:96:10: error[OSEO1001]:
         Unknown binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

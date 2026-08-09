@@ -443,7 +443,7 @@ results:
       detail: "test/language/statements/switch/scope-lex-async-generator.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/switch/scope-lex-async-genera\
-        tor.js:91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+        tor.js:97:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

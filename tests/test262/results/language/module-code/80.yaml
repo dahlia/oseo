@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-single-line-html-open.js:85:\
+      detail: "test/language/module-code/comment-single-line-html-open.js:91:\
         2: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -41,7 +41,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found-as.js:98:10:
+      detail: "test/language/module-code/instn-iee-err-not-found-as.js:104:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution

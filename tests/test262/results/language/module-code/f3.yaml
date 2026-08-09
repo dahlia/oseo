@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:96:20:
+      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:102:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

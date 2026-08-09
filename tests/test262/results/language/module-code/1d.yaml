@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found.js:98:10:
+      detail: "test/language/module-code/instn-iee-err-not-found.js:104:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution

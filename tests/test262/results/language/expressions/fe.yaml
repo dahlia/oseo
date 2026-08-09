@@ -124,7 +124,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-obj-ptrn-\
         prop-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id.js:116:5: error[OSEO1001]: Unknown binding
+        bj-ptrn-prop-id.js:122:5: error[OSEO1001]: Unknown binding
         'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -313,7 +313,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-dot-obj-ref-this.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-dot-obj-ref-this.js:119:15:
+        stderr="test/language/expressions/super/prop-dot-obj-ref-this.js:125:15:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

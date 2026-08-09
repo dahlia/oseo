@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
         op-ary.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-ary.js:119:5: error[OSEO1001]: Unknown binding
+        -ptrn-prop-ary.js:125:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

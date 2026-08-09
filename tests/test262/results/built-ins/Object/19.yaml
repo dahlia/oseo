@@ -230,7 +230,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/prototype/toString/Object.prototype.toString.call-function.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/toString/Object.prototype.toString.call-function.js:88:34:
+        stderr="test/built-ins/Object/prototype/toString/Object.prototype.toString.call-function.js:94:34:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax

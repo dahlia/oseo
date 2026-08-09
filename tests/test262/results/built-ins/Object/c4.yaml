@@ -50,7 +50,7 @@ results:
       detail: "test/built-ins/Object/defineProperty/15.2.3.6-4-613.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperty/15.2.3.6-4-613.js\
-        :309:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        :334:16: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -102,7 +102,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-boolean.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-boolean.js:88:34: error[OSEO1001]: Unknown
+        ype.toString.call-boolean.js:94:34: error[OSEO1001]: Unknown
         binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

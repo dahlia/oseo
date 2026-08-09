@@ -23,7 +23,7 @@ results:
         -init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-id-init-unresolvable.js:106:28: error[OSEO1001]: Unknown
+        -prop-id-init-unresolvable.js:112:28: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-expr.js
           id: test/language/module-code/instn-named-bndng-dflt-expr.js
-          sourceHash: fnv1a64:89d5c9c52083872c
+          sourceHash: fnv1a64:3073084c1498148e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

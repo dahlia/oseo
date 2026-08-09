@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-r\
         est-ary-rest.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-rest-ary-rest.js:121:10: error[OSEO1001]: Unknown binding
+        y-ptrn-rest-ary-rest.js:127:10: error[OSEO1001]: Unknown binding
         'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

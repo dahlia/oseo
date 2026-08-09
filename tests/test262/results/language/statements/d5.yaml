@@ -94,7 +94,7 @@ results:
         tialization-is-visible-to-proxy.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/public-class-f\
-        ield-initialization-is-visible-to-proxy.js:89:14:
+        ield-initialization-is-visible-to-proxy.js:95:14:
         error[OSEO1001]: Unknown binding 'Proxy'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

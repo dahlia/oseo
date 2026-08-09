@@ -39,7 +39,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js:81:1:
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js:87:1:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
@@ -69,7 +69,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/property-order.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/property-order.js:79:17:
+        stderr="test/built-ins/Function/prototype/property-order.js:85:17:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

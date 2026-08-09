@@ -113,7 +113,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/Object.prototype.toSt\
         ring.call-array.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/Object.protot\
-        ype.toString.call-array.js:88:34: error[OSEO1001]: Unknown
+        ype.toString.call-array.js:94:34: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

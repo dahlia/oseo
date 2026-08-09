@@ -264,7 +264,7 @@ results:
       detail: "test/built-ins/Object/prototype/toString/symbol-tag-non-str-bu\
         iltin.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-no\
-        n-str-builtin.js:91:23: error[OSEO1001]: Unknown binding
+        n-str-builtin.js:97:23: error[OSEO1001]: Unknown binding
         'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -24,7 +24,7 @@ results:
         em-obj-prop-id-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
-        -ptrn-elem-obj-prop-id-init.js:123:5: error[OSEO1001]: Unknown
+        -ptrn-elem-obj-prop-id-init.js:129:5: error[OSEO1001]: Unknown
         binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

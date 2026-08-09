@@ -82,7 +82,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-prop-id\
         .js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-id.js:115:5: error[OSEO1001]: Unknown binding 'x'.\\n\""
+        -prop-id.js:121:5: error[OSEO1001]: Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

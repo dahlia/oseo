@@ -19,7 +19,7 @@ results:
       detail: "test/language/statements/async-function/syntax-declaration-no-\
         line-terminator.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-function/syntax-declara\
-        tion-no-line-terminator.js:80:3: error[OSEO1001]: Unknown
+        tion-no-line-terminator.js:86:3: error[OSEO1001]: Unknown
         binding 'async'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -292,7 +292,7 @@ results:
       - control-flow
       - module-linking
     observation:
-      detail: "test/language/statements/labeled/value-await-module.js:89:6:
+      detail: "test/language/statements/labeled/value-await-module.js:95:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

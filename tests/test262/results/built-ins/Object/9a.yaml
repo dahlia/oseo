@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/Object/getPrototypeOf/15.2.3.2-2-8.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/getPrototypeOf/15.2.3.2-2-8.js:8\
-        0:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        6:40: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

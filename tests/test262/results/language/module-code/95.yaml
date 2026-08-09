@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-cls-anon-semi.js
-          sourceHash: fnv1a64:159c5d33089ac8ad
+          sourceHash: fnv1a64:42b9125d92fa7187
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -51,7 +51,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-finall\
-        y.js:84:3: error[OSEO0001]: Source could not be parsed."
+        y.js:90:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

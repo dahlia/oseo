@@ -42,7 +42,7 @@ results:
     observation:
       detail: "test/language/statements/class/subclass/builtins.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/subclass/builtins.js:77\
+        stderr=\"test/language/statements/class/subclass/builtins.js:83\
         :34: error[OSEO1001]: Unknown binding 'Uint8Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -175,7 +175,7 @@ results:
       detail: "test/language/statements/for/let-identifier-with-newline.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for/let-identifier-with-newli\
-        ne.js:84:17: error[OSEO1001]: Unknown binding 'let'.\\n\""
+        ne.js:90:17: error[OSEO1001]: Unknown binding 'let'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

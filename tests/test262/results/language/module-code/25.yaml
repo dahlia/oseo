@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-asyncfunction-declara\
-        tion-binding-exists.js:92:31: error[OSEO0001]: Source could not
+        tion-binding-exists.js:98:31: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

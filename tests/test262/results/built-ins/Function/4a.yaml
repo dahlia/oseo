@@ -18,7 +18,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js:81:11:
+        stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js:87:11:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
@@ -42,7 +42,7 @@ results:
       detail: "test/built-ins/Function/prototype/bind/15.3.4.5-2-9.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5-2-9.js\
-        :78:11: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+        :84:11: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

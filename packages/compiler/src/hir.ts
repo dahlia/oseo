@@ -366,6 +366,7 @@ export function intrinsicGlobalKind(
     name === "Iterator" ||
     name === "Number" ||
     name === "Object" ||
+    name === "Promise" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null
   ) {
@@ -396,14 +397,7 @@ export type HirCallTarget =
     }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method:
-        | "all"
-        | "asyncCall"
-        | "awaitThen"
-        | "race"
-        | "reject"
-        | "resolve"
-        | "then";
+      readonly method: "all" | "asyncCall" | "awaitThen" | "resolve" | "then";
     }
   | {
       readonly kind: "timer-intrinsic";
@@ -768,10 +762,6 @@ export type HirExpression =
       readonly arguments: readonly HirCallArgument[];
       readonly callee: HirExpression;
       readonly kind: "new";
-    })
-  | (LocatedSyntax & {
-      readonly arguments: readonly HirCallArgument[];
-      readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
       /**

@@ -213,7 +213,7 @@ results:
     observation:
       detail: 'test/language/statements/for-in/order-enumerable-shadowed.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/order-enumerable-shadowed.js:92:9:
+        stderr="test/language/statements/for-in/order-enumerable-shadowed.js:98:9:
         error[OSEO2001]: Object.create descriptor maps are unsupported
         in M3.\n"'
       unsupportedCapability: object-create-descriptor-map

@@ -22,7 +22,7 @@ results:
       detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
         t-onlystrict.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
-        is-strict-onlystrict.js:89:1: error[OSEO1001]: Unknown binding
+        is-strict-onlystrict.js:95:1: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

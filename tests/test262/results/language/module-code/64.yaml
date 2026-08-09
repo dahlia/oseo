@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-lex-and-var.js:87:5:
+      detail: "test/language/module-code/early-lex-and-var.js:93:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found.js:103:10:
+      detail: "test/language/module-code/instn-named-err-not-found.js:109:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -66,7 +66,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/private-identifiers-not-empty.js:87:\
+      detail: "test/language/module-code/private-identifiers-not-empty.js:93:\
         3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -91,7 +91,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-8.js:89:8: error[OSEO0001]: Source could not be parsed."
+        e-8.js:95:8: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

@@ -244,7 +244,7 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-cls-unresolvable.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-cls-unresolvable.js:93:7:
+        stderr="test/language/expressions/super/prop-expr-cls-unresolvable.js:99:7:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'

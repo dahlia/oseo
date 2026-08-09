@@ -23,7 +23,7 @@ results:
         ptrn-elem-id-init-unresolvable.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-elem-id-init-unresolvable.js:107:29:
+        flt-ary-ptrn-elem-id-init-unresolvable.js:113:29:
         error[OSEO1001]: Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

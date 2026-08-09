@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-single-line-html-close.js:85\
+      detail: "test/language/module-code/comment-single-line-html-close.js:91\
         :3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

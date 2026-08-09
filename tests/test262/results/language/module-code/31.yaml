@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-met\
-        hod.js:83:10: error[OSEO0001]: Source could not be parsed."
+        hod.js:89:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -66,7 +66,7 @@ results:
       - module-linking
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/new-await.js:86:5:
+      detail: "test/language/module-code/top-level-await/new-await.js:92:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

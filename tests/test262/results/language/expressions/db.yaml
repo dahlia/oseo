@@ -127,7 +127,7 @@ results:
         ptrn-elem-id-iter-val-array-prototype.js non-strict disabled
         failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-ary-ptrn-elem-id-iter-val-array-prototype.js:121:1:
+        flt-ary-ptrn-elem-id-iter-val-array-prototype.js:127:1:
         error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -155,7 +155,7 @@ results:
         al-err-contains-supercall.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/class/elements/derived-cls-d\
-        irect-eval-err-contains-supercall.js:98:7: error[OSEO1001]:
+        irect-eval-err-contains-supercall.js:104:7: error[OSEO1001]:
         Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

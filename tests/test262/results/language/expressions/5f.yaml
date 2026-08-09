@@ -20,7 +20,7 @@ results:
     observation:
       detail: 'test/language/expressions/assignment/target-super-computed-reference-null.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/assignment/target-super-computed-reference-null.js:96:5:
+        stderr="test/language/expressions/assignment/target-super-computed-reference-null.js:102:5:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'
@@ -49,7 +49,7 @@ results:
         d-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-id-init-unresolvable.js:106:31: error[OSEO1001]: Unknown
+        j-ptrn-id-init-unresolvable.js:112:31: error[OSEO1001]: Unknown
         binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

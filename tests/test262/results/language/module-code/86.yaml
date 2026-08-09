@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-not-found-dflt.js:10\
-        3:8: error[OSEO2001]: Module has no export 'default'."
+        9:8: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false

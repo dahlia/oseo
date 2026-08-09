@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-let.js
           id: test/language/module-code/instn-named-bndng-let.js
-          sourceHash: fnv1a64:59174677e0d06ee1
+          sourceHash: fnv1a64:96d613e0b503ce2f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -51,7 +51,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-while.js:8\
-        3:15: error[OSEO0001]: Source could not be parsed."
+        9:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

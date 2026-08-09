@@ -239,7 +239,7 @@ results:
       detail: "test/language/statements/for-in/cptn-decl-abrupt-empty.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/cptn-decl-abrupt-empty\
-        .js:100:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+        .js:106:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

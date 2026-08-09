@@ -62,7 +62,7 @@ results:
         d-iter-val-array-prototype.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/ary-ptr\
-        n-elem-id-iter-val-array-prototype.js:121:1: error[OSEO1001]:
+        n-elem-id-iter-val-array-prototype.js:127:1: error[OSEO1001]:
         Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

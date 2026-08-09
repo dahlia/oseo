@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-decl.js:87:18:
+      detail: "test/language/module-code/early-dup-export-decl.js:93:18:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

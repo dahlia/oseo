@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/invalid-private-names-call-expressio\
-        n-this.js:109:16: error[OSEO0001]: Source could not be parsed."
+        n-this.js:115:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

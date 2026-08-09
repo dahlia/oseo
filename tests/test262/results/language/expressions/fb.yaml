@@ -164,7 +164,7 @@ results:
         prop-id-init-unresolvable.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id-init-unresolvable.js:107:32: error[OSEO1001]:
+        bj-ptrn-prop-id-init-unresolvable.js:113:32: error[OSEO1001]:
         Unknown binding 'unresolvableReference'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

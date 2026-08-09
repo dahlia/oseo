@@ -17,7 +17,8 @@ results:
       - object-properties
     observation:
       detail: "test/built-ins/Object/S9.9_A5.js non-strict disabled failed
-        (1): stdout=\"\" stderr=\"test/built-ins/Object/S9.9_A5.js:94:3:
+        (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/S9.9_A5.js:100:3:
         error[OSEO1001]: Unknown binding 'String'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -76,7 +77,7 @@ results:
     observation:
       detail: 'test/built-ins/Object/defineProperty/15.2.3.6-4-198.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/defineProperty/15.2.3.6-4-198.js:82:1:
+        stderr="test/built-ins/Object/defineProperty/15.2.3.6-4-198.js:88:1:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

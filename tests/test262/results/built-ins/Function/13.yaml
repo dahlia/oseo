@@ -19,7 +19,7 @@ results:
       detail: "test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T3.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T\
-        3.js:91:57: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        3.js:97:57: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -40,7 +40,7 @@ results:
     observation:
       detail: 'test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js:82:3:
+        stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js:88:3:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax

@@ -58,7 +58,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-r\
         est-id-exhausted.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ar\
-        y-ptrn-rest-id-exhausted.js:118:10: error[OSEO1001]: Unknown
+        y-ptrn-rest-id-exhausted.js:124:10: error[OSEO1001]: Unknown
         binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
