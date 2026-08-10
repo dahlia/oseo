@@ -1,5 +1,6 @@
 #include "runtime_internal.h"
 
+#include <float.h>
 #include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
@@ -275,6 +276,18 @@ static uint8_t clamped_uint8(double number) {
     return (uint8_t)lower;
 }
 
+static float float32_value(double number) {
+    /* C11 leaves an out-of-range double-to-float conversion undefined.
+     * The halfway value is the first finite double that ECMAScript rounds
+     * to signed infinity; the smaller interval rounds to FLT_MAX. */
+    const double overflow = 0x1.ffffffp+127;
+    if (number >= overflow) return INFINITY;
+    if (number <= -overflow) return -INFINITY;
+    if (number > (double)FLT_MAX) return FLT_MAX;
+    if (number < -(double)FLT_MAX) return -FLT_MAX;
+    return (float)number;
+}
+
 static uint64_t integer_bits(double number, unsigned bits) {
     if (!isfinite(number) || number == 0.0) return UINT64_C(0);
     double modulus = ldexp(1.0, (int)bits);
@@ -408,7 +421,7 @@ static OseoResult typed_array_store(
                 break;
             }
             case OSEO_TYPED_ARRAY_FLOAT32: {
-                float stored = (float)number;
+                float stored = float32_value(number);
                 memcpy(target, &stored, sizeof(stored));
                 break;
             }
@@ -1253,6 +1266,19 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
 
 OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context) {
     return typed_array_intrinsic_build(context);
+}
+
+bool oseo_internal_typed_array_deferred_accessor(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+) {
+    return object ==
+            context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] &&
+        (oseo_internal_string_is_ascii(key, "length") ||
+         oseo_internal_string_is_ascii(key, "byteLength") ||
+         oseo_internal_string_is_ascii(key, "byteOffset") ||
+         oseo_internal_string_is_ascii(key, "buffer"));
 }
 
 OseoResult oseo_internal_install_typed_array_globals(

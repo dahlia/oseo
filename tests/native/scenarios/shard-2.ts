@@ -42,6 +42,59 @@ export async function runNativeScenario2(
     );
   }
 
+  for (const property of [
+    "length",
+    "byteLength",
+    "byteOffset",
+    "buffer",
+  ] as const) {
+    const name = `typed-array-in-${property}.ts`;
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source: `console.log("${property}" in new Uint8Array(1));`,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  const inheritedEnumerationName = "typed-array-inherited-enumeration.ts";
+  const inheritedEnumeration = await runNativeCli(
+    {
+      args: [inheritedEnumerationName],
+      source:
+        "const object = {}; " +
+        "Object.setPrototypeOf(object, new Uint8Array([1])); " +
+        "for (const key in object) console.log(key);",
+      sourceId: inheritedEnumerationName,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedEnumeration.exitStatus, 1);
+  assert.equal(inheritedEnumeration.stdout, "");
+  assert.match(
+    inheritedEnumeration.stderr,
+    new RegExp(
+      `^${inheritedEnumerationName.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: TypedArray integer-indexed exotic " +
+        "operations are not admitted yet\\.",
+      "u",
+    ),
+  );
+
   for (const [name, source] of [
     ["typed-array-accessor-set.ts", "new Uint8Array(1).length = 2;"],
     [

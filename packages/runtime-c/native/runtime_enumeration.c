@@ -327,6 +327,15 @@ static OseoResult enumeration_collect(
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            (is_object(frame.slots[0]) || is_string(frame.slots[0]))) {
+        if (is_typed_array(frame.slots[0])) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "TypedArray integer-indexed exotic operations are not "
+                "admitted yet."
+            );
+            break;
+        }
         result = enumeration_keys(context, frame.slots[0]);
         frame.slots[2] = result.value;
         for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {
@@ -409,14 +418,6 @@ OseoResult oseo_enumerate_get(
      * subject, so the whole statement is skipped without an error and
      * without a ToObject conversion. */
     if (is_nullish(subject)) return normal(oseo_undefined());
-    if (is_typed_array(subject)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "TypedArray integer-indexed exotic operations are not "
-            "admitted yet."
-        );
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;

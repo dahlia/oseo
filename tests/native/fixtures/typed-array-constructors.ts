@@ -112,6 +112,23 @@ console.log(
   floating[2],
   Number.isNaN(floating[3]),
 );
+const floatEdges = new Float32Array([
+  3.4028234663852886e38,
+  3.4028235170913126e38,
+  3.4028235677973366e38,
+  -3.4028234663852886e38,
+  -3.4028235170913126e38,
+  -3.4028235677973366e38,
+]);
+console.log(
+  "float edges",
+  floatEdges[0],
+  floatEdges[1],
+  floatEdges[2],
+  floatEdges[3],
+  floatEdges[4],
+  floatEdges[5],
+);
 const bigSigned = new BigInt64Array([-1n, 9223372036854775808n]);
 const bigUnsigned = new BigUint64Array([-1n, 18446744073709551617n]);
 console.log(
@@ -226,6 +243,24 @@ for (const name of ["length", "byteLength", "byteOffset", "buffer"]) {
   });
   shadowedAccessors[name] = "updated " + name;
   console.log("own accessor shadow", name, shadowedAccessors[name]);
+}
+const detachedAccessors = new Uint8Array(0);
+Object.setPrototypeOf(detachedAccessors, null);
+for (const name of ["length", "byteLength", "byteOffset", "buffer"]) {
+  console.log(
+    "null prototype accessor before",
+    name,
+    name in detachedAccessors,
+    detachedAccessors[name],
+  );
+  detachedAccessors[name] = "ordinary " + name;
+  console.log(
+    "null prototype accessor after",
+    name,
+    name in detachedAccessors,
+    detachedAccessors[name],
+    Object.prototype.hasOwnProperty.call(detachedAccessors, name),
+  );
 }
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);

@@ -1843,6 +1843,14 @@ OseoResult oseo_has_property(
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
+        if (oseo_internal_typed_array_deferred_accessor(
+                context, current, property)) {
+            return failure(
+                context,
+                "OSEO2001",
+                "TypedArray prototype accessors are not admitted yet."
+            );
+        }
         OseoResult prototype = oseo_internal_get_prototype(context, current);
         if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
         current = prototype.value;

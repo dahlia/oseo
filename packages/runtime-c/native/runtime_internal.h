@@ -2360,6 +2360,11 @@ OseoResult oseo_internal_install_typed_array_globals(
     OseoContext *context,
     OseoValue global
 );
+bool oseo_internal_typed_array_deferred_accessor(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
 OseoResult oseo_internal_typed_array_get_index(
     OseoContext *context,
     OseoValue view,
