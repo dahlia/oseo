@@ -11,4 +11,8 @@ dependencies:
   - array-buffer
   - iterator-intrinsic
 landed: false
-status: ready
+status: parked
+reason: "Mandatory Codex review still found silently absent deferred
+  TypedArray prototype methods and static APIs after the fifth and final review
+  round. The reviewed implementation remains on branch m5b-typed-array; resume
+  by adding owned boundaries without exceeding this run's review limit."

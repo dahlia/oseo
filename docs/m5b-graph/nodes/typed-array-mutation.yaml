@@ -15,4 +15,7 @@ inventory:
 dependencies:
   - typed-array-core
 landed: false
-status: blocked
+status: parked
+reason: "Its typed-array-core prerequisite is parked behind the constructor
+  branch that reached the five-round mandatory review limit with unresolved
+  deferred API boundaries. Resume after that constructor closure lands."

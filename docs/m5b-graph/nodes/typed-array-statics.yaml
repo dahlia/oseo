@@ -13,4 +13,7 @@ inventory:
 dependencies:
   - typed-array-constructors
 landed: false
-status: blocked
+status: parked
+reason: "Its typed-array-constructors prerequisite is parked after mandatory
+  review round five still found silently absent deferred prototype and static
+  API boundaries. Resume after that branch reaches a clean review."
