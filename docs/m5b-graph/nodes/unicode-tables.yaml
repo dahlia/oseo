@@ -5,5 +5,5 @@ delivers: "Adds reproducible generated code-point property, case-folding, and
   word-character tables from a pinned Unicode version, replacing any host
   locale or C library dependence."
 dependencies: []
-landed: false
+landed: true
 status: ready
