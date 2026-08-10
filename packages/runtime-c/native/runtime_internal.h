@@ -284,6 +284,35 @@
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 7u)
 #define OSEO_NUMBER_TO_STRING_CODE_ID \
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 8u)
+
+#define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_INDEX ((size_t)11u)
+#define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ARRAY_BUFFER_CODE_ID_RANGE_INDEX)
+#define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ARRAY_BUFFER_CODE_ID_RANGE_INDEX)
+#define OSEO_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID \
+    OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST
+#define OSEO_ARRAY_BUFFER_IS_VIEW_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_ARRAY_BUFFER_SPECIES_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_ARRAY_BUFFER_DETACHED_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_ARRAY_BUFFER_MAX_BYTE_LENGTH_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_ARRAY_BUFFER_RESIZABLE_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_ARRAY_BUFFER_RESIZE_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_ARRAY_BUFFER_SLICE_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_ARRAY_BUFFER_TRANSFER_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_ARRAY_BUFFER_TRANSFER_TO_FIXED_LENGTH_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 10u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -331,6 +360,7 @@ typedef enum {
     OSEO_HEAP_ASYNC_GENERATOR_REQUEST = 15,
     OSEO_HEAP_BIGINT = 16,
     OSEO_HEAP_ENUMERATION = 17,
+    OSEO_HEAP_ARRAY_BUFFER = 18,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -731,6 +761,34 @@ typedef struct {
     bool reported;
 } OseoPromise;
 
+/*
+ * One ArrayBuffer. The Data Block lives outside the traced heap because
+ * it holds bytes rather than values, so `data` is plain host memory that
+ * exactly one buffer owns for the whole of its life: nothing else stores
+ * the pointer, `array_buffer_detach` is the only operation that releases
+ * it early, and the collector releases whatever survives when the object
+ * dies. Every operation that hands the block to a copy allocates a
+ * second block instead of sharing this one, which is what keeps transfer
+ * free of both a stale pointer and a second owner.
+ *
+ * `data` is NULL exactly when no block is held, which is the detached
+ * state and also the zero-byte allocation, so `detached` rather than the
+ * pointer decides which of the two an operation observes.
+ * `byte_length` is [[ArrayBufferByteLength]] and is 0 once detached. A
+ * resizable buffer allocates `max_byte_length` bytes up front, as
+ * AllocateArrayBuffer specifies, so `resize` moves `byte_length` inside
+ * one stable block and never reallocates.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    uint8_t *data;
+    size_t byte_length;
+    /* [[ArrayBufferMaxByteLength]], present only when resizable. */
+    size_t max_byte_length;
+    bool resizable;
+    bool detached;
+} OseoArrayBuffer;
+
 typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
@@ -958,11 +1016,19 @@ static inline bool is_promise(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_PROMISE;
 }
+static inline bool is_array_buffer(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_ARRAY_BUFFER;
+}
+static inline OseoArrayBuffer *array_buffer_object(OseoValue value) {
+    return (OseoArrayBuffer *)heap_object(value);
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
-        kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE;
+        kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
+        kind == OSEO_HEAP_ARRAY_BUFFER;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1107,6 +1173,29 @@ OseoResult oseo_internal_number_builtin_dispatch(
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
+);
+OseoResult oseo_internal_array_buffer_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/*
+ * Releases one ArrayBuffer's Data Block. The collector calls it for a
+ * buffer it is about to destroy, and DetachArrayBuffer calls it while
+ * the buffer stays alive; both leave the object in the detached state,
+ * so the block is freed exactly once either way.
+ */
+void oseo_internal_array_buffer_release(OseoHeapObject *object);
+/* Materializes %ArrayBuffer% with its prototype, accessors, prototype
+ * methods, `isView`, and species accessor, and returns the constructor. */
+OseoResult oseo_internal_array_buffer_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_array_buffer_global(
+    OseoContext *context,
+    OseoValue global
 );
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(

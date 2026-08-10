@@ -1,8 +1,11 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - AggregateError
+  - ArrayBuffer
   - BigInt
   - Object.is
+  - align-detached-buffer-semantics-with-web-reality
+  - arraybuffer-transfer
   - arrow-function
   - async-functions
   - async-iteration
@@ -36,6 +39,7 @@ supportedFeatures:
   - optional-chaining
   - promise-try
   - promise-with-resolvers
+  - resizable-arraybuffer
   - rest-parameters
   - Symbol
   - Symbol.asyncIterator
@@ -94,6 +98,582 @@ tests:
   - path: test/built-ins/AggregateError/prototype/prop-desc.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/ArrayBuffer/Symbol.species/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/Symbol.species/return-value.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/Symbol.species/symbol-species-name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/Symbol.species/symbol-species.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/allocation-limit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/data-allocation-after-object-creation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/init-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-has-no-viewedarraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-dataview-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-dataview-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-dataview-subclass-instance.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-dataview.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-subclass-instance.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/invoked-as-a-fn.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/no-arg.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/isView/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/length-is-absent.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/length-is-too-large-throws.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/negative-length-throws.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/newtarget-prototype-is-not-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-allocation-limit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-compared-before-object-creation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-data-allocation-after-object-creation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-diminuitive.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-excessive.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-negative.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-poisoned.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-maxbytelength-undefined.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/options-non-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype-from-newtarget.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/return-bytelength.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/detached-buffer-resizable.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/this-has-no-arraybufferdata-internal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/return-maxbytelength-non-resizable.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/return-maxbytelength-resizable.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-has-no-arraybufferdata-internal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/prop-desc.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/return-resizable.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/this-has-no-arraybufferdata-internal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resizable/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/coerced-new-length-detach.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/descriptor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/new-length-excessive.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/new-length-negative.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/new-length-non-number.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/nonconstructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-grow.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-same-size-zero-explicit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-same-size-zero-implicit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-same-size.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-shrink-zero-explicit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-shrink-zero-implicit.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/resize-shrink.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-detached.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-not-resizable-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/context-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/context-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/descriptor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/end-default-if-absent.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/end-default-if-undefined.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/end-exceeds-length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/negative-end.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/negative-start.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/nonconstructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/number-conversion.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-constructor-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-constructor-is-undefined.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-is-not-constructor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-is-null.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-is-undefined.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-returns-larger-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-returns-not-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-returns-same-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species-returns-smaller-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/species.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/start-default-if-absent.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/start-default-if-undefined.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/start-exceeds-end.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/start-exceeds-length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/tointeger-conversion-end.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/slice/tointeger-conversion-start.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/descriptor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-larger-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-larger.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-same-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-same.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-smaller-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-smaller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-zero-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-fixed-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-resizable-to-larger.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-resizable-to-same.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-resizable-to-smaller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/from-resizable-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/new-length-excessive.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/new-length-non-number.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/nonconstructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/this-is-detached.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/this-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transfer/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/descriptor.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-larger-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-larger.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-same-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-same.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-smaller-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-smaller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-zero-no-resizable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-fixed-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-resizable-to-larger.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-resizable-to-same.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-resizable-to-smaller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/from-resizable-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/name.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/new-length-excessive.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/new-length-non-number.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/nonconstructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/this-is-detached.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/this-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/this-is-sharedarraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/return-abrupt-from-length-symbol.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/return-abrupt-from-length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/toindex-length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
+  - path: test/built-ins/ArrayBuffer/zero-length.js
+    expectedClassification: pass
+    dependencies: [array-buffer]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]

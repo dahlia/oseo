@@ -17,12 +17,12 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-four reviewed assets in this order:
+The runtime input now lists twenty-five reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_object.c*, *runtime\_property.c*, *runtime\_descriptor.c*,
 *runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_number.c*,
-*runtime\_arguments.c*,
+*runtime\_array\_buffer.c*, *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
@@ -82,6 +82,10 @@ Ownership follows the plan's target layout:
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
     numeric constants, predicate statics, parser statics, and the standard
     global constructor property;
+ -  *runtime\_array\_buffer.c*: the `ArrayBuffer` constructor, the Data
+    Block one buffer owns, `isView`, the `Symbol.species` accessor, the
+    `byteLength`, `detached`, `maxByteLength`, and `resizable` accessors,
+    and `resize`, `slice`, `transfer`, and `transferToFixedLength`;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -433,6 +437,37 @@ both specialization policies, false hints, deliberate guard misses, generic
 fallback, primitive conversion targets, symbol keys, and collection forced at
 every safepoint. The node reviews its two declared test262 inventory roots
 and promotes no path outside them.
+
+### ArrayBuffer evidence
+
+M5b node `array-buffer` adds *runtime\_array\_buffer.c* as the runtime's
+twenty-fifth reviewed asset and `OSEO_HEAP_ARRAY_BUFFER` as its eighteenth
+heap kind. The record embeds the ordinary object layout, so property access,
+descriptors, and prototype operations reach it through the paths that already
+exist; only tracing, destruction, and the object predicate learned the new
+kind.
+
+`[[ArrayBufferData]]` is the first runtime state that is host memory rather
+than traced values, so its ownership is stated once and enforced in one
+place. Exactly one buffer owns each Data Block.
+`oseo_internal_array_buffer_release` frees the block and leaves the record
+detached, and it is the only release path: *runtime\_memory.c* calls it when
+the collector destroys a buffer, and the detaching half of
+ArrayBufferCopyAndDetach calls it while the buffer stays alive. Because the
+release detaches, a block a transfer already gave up cannot be freed a second
+time. No operation copies a block pointer between records: a resizable buffer
+reserves its whole maximum at allocation so `resize` never reallocates, and
+both transfers and `slice` allocate a second block and copy into it. Both
+native execution targets build under the address and undefined-behavior
+sanitizers, so the forced-collection fixture and the generated property suite
+execute these rules under them.
+
+The new component moves `abiVersion` to `m5-55` without a public layout
+change. Fixed and generated native differential evidence covers both
+specialization policies, false hints, deliberate guard misses, generic
+fallback, resize, detach, transfer ownership, species allocation, and
+collection forced at every safepoint. The node reviews its one declared
+test262 inventory root and promotes no path outside it.
 
 ### Function prototype evidence
 

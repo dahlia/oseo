@@ -55,7 +55,8 @@ static void trace_object(
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||
-               object->kind == OSEO_HEAP_PROMISE) {
+               object->kind == OSEO_HEAP_PROMISE ||
+               object->kind == OSEO_HEAP_ARRAY_BUFFER) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -169,13 +170,19 @@ static void destroy_heap_object(OseoHeapObject *object) {
     if (object->kind == OSEO_HEAP_OBJECT ||
         object->kind == OSEO_HEAP_ARRAY ||
         object->kind == OSEO_HEAP_FUNCTION ||
-        object->kind == OSEO_HEAP_PROMISE) {
+        object->kind == OSEO_HEAP_PROMISE ||
+        object->kind == OSEO_HEAP_ARRAY_BUFFER) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);
         free(ordinary->generator);
         if (object->kind == OSEO_HEAP_FUNCTION) {
             free(((OseoFunction *)object)->elements);
+        } else if (object->kind == OSEO_HEAP_ARRAY_BUFFER) {
+            /* The Data Block is owned by this buffer alone, and the
+             * release leaves the record detached, so a block already
+             * given up by a transfer is never freed a second time. */
+            oseo_internal_array_buffer_release(object);
         }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);

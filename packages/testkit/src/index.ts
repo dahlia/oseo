@@ -83,6 +83,7 @@ export type Test262FailurePhase = "parse" | "resolution" | "runtime";
  */
 export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "abrupt-completion",
+  "array-buffer",
   "async-functions",
   "async-iteration",
   "bigint-primitive",

@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 7,421
-reviewed cases: 4,910 passes, 1,355 expected negatives, and 1,156 unsupported
+honest unsupported classifications. The current reviewed manifest records 7,613
+reviewed cases: 5,038 passes, 1,355 expected negatives, and 1,220 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -29,9 +29,9 @@ separate from the result manifest.
 M5a is complete. The 72 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 4,910
-passes across 7,421 paths, and the property inventory records 68 domains,
-68 seeds, and an ordinary case budget of 2,822.
+the M5b and M5c dependency order below. The reviewed manifest now records 5,038
+passes across 7,613 paths, and the property inventory records 69 domains,
+69 seeds, and an ordinary case budget of 2,834.
 
 
 M5a implementation history
@@ -3769,6 +3769,37 @@ moves to 7,421 paths with 4,910 passes, 1,355 expected negatives, and 1,156
 unsupported profile features. Completing the descriptor checkpoint's
 reporting half moves the runtime ABI to `oseo-runtime-m5-54` without
 changing the graph's orchestration state.
+
+Implemented M5b node `array-buffer` materializes `%ArrayBuffer%` and adds the
+runtime's first state that is host memory rather than traced values. The
+constructor runs ToIndex over its length, reads `maxByteLength` from an object
+options bag, compares the two before it reads the new target's `prototype`,
+and allocates one zero-initialized Data Block that exactly one buffer owns. A
+resizable buffer reserves its whole maximum up front, so `resize` moves the
+byte length inside a block that never moves and clears the bytes outside it in
+both directions. `transfer` and `transferToFixedLength` allocate a second block
+and copy before detaching the source, so no block is reachable from two
+buffers and a failed allocation leaves the source intact; the single release
+path leaves a record detached, so the collector cannot free a block a transfer
+already gave up. `slice` clamps its bounds, allocates through
+SpeciesConstructor, and re-checks the source after the species ran. The four
+state accessors report the detached state rather than throwing, `isView` is
+`false` for every value this profile can produce, and the constructor carries
+the `Symbol.species` accessor. Fixed native and generated differential
+evidence at seed `0x60003a00` covers both specialization policies, forced
+collection at every safepoint, false hints, deliberate shape-guard misses,
+generic fallback, every ToIndex conversion class, the option bag's abrupt
+orders, brand rejection, resize in both directions, both transfers over eight
+source and target shapes, fifteen slice ranges, ten species outcomes, and a
+collection-pressure loop around a survivor and a transferred store. All 192
+paths under the node's inventory root are reviewed: 128 pass and 64 retain
+explicit prerequisites for `Reflect`, `SharedArrayBuffer`, `DataView`,
+TypedArray constructors, `Object.isExtensible`, and other unadmitted standard
+globals. The manifest moves to 7,613 paths with 5,038 passes, 1,355 expected
+negatives, and 1,220 unsupported profile features. The reviewed harness gains
+`detachArrayBuffer.js` and records `resizableArrayBufferUtils.js` as
+unavailable. The new component and heap kind move the runtime ABI to
+`oseo-runtime-m5-55` without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

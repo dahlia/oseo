@@ -1,0 +1,26 @@
+group: built-ins/ArrayBuffer
+key: f7
+results:
+  - case:
+      async: false
+      features:
+        - SharedArrayBuffer
+        - ArrayBuffer
+        - arraybuffer-transfer
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - SharedArrayBuffer
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -239,7 +239,9 @@ static OseoResult global_this_object(OseoContext *context) {
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_internal_install_number_global(context, result.value);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return oseo_internal_install_promise_global(context, result.value);
+    result = oseo_internal_install_promise_global(context, result.value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return oseo_internal_install_array_buffer_global(context, result.value);
 }
 
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {

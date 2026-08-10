@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 7,421 reviewed cases: 4,910 passes, 1,355
-expected negatives, and 1,156 unsupported profile features. It records no
+The current manifest contains 7,613 reviewed cases: 5,038 passes, 1,355
+expected negatives, and 1,220 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3187,6 +3187,90 @@ schema and vocabulary, and zero-override policy are unchanged. Completing the
 descriptor checkpoint's reporting half moves the runtime ABI to
 `oseo-runtime-m5-54` without changing the graph's orchestration state.
 
+M5b node `array-buffer` materializes `%ArrayBuffer%`. The constructor is an
+ordinary constructible function the global object binds as a writable,
+non-enumerable, configurable property, so calling it without `new` throws a
+`TypeError` and `new ArrayBuffer(length, options)` is ordinary construction.
+The length runs through ToIndex, so a fractional, string, boolean, nullish,
+or `valueOf`-bearing argument becomes its truncated integer and a negative,
+infinite, or beyond-`2^53-1` request throws a `RangeError`. The options bag
+is read only when it is an object, and only its `maxByteLength` property is
+consulted, so a non-object and an absent or `undefined` maximum both produce
+a fixed-length buffer. A present maximum runs through ToIndex as well, its
+getter and its conversion propagate abruptly, and a length above it throws a
+`RangeError` before the new target's `prototype` is read. An instance takes
+its `[[Prototype]]` from that read, so a subclass instance inherits from the
+subclass prototype and a non-object result falls back to
+`%ArrayBuffer.prototype%`.
+
+`[[ArrayBufferData]]` is one zero-initialized Data Block that exactly one
+buffer owns. A resizable buffer reserves its whole maximum up front, as
+AllocateArrayBuffer specifies, so `resize` moves `[[ArrayBufferByteLength]]`
+inside a block that never moves and clears every byte outside the new length
+in both directions; a later grow therefore exposes zeroes rather than what a
+shrink discarded. `resize` requires the resizability brand before it converts
+its argument and the attached state after it, so an argument whose conversion
+detaches the buffer still observes the specified `TypeError`, and a length
+above the maximum throws a `RangeError`. `transfer` and
+`transferToFixedLength` allocate a second block, copy the overlapping bytes,
+and only then detach the source, so no block is ever reachable from two
+buffers and an allocation failure leaves the source intact. `transfer`
+preserves resizability and its maximum while `transferToFixedLength` reports
+the new length as the maximum; both leave the source detached with a zero
+`byteLength` and a retained resizability brand. `byteLength` and
+`maxByteLength` report `0` once detached, `resizable` keeps reporting the
+brand, and `detached` reports the state itself. All four are getter-only
+accessors that reject a receiver without the brand.
+
+`slice` rejects a detached source, clamps both bounds through
+ToIntegerOrInfinity, and allocates through SpeciesConstructor, so an absent
+`constructor`, a nullish species, a non-object `constructor`, a
+non-constructor species, a species that returns a value that is not an
+ArrayBuffer, one that returns the source, one that returns a detached or
+too-small buffer, and one that detaches the source while it runs each reach
+their specified outcome. `ArrayBuffer.isView` is `false` for every value this
+profile can produce, because no admitted value carries
+`[[ViewedArrayBuffer]]` until a view kind lands. `%ArrayBuffer%` carries the
+`Symbol.species` accessor that reports its receiver, and the prototype
+carries `Symbol.toStringTag`, so `Object.prototype.toString` reports
+`[object ArrayBuffer]`.
+
+Fixed native and generated differential evidence at property seed
+`0x60003a00` covers both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard misses, generic fallback,
+fixed and resizable allocation, every ToIndex conversion class, the option
+bag's abrupt orders, brand rejection over five receiver kinds, resize in both
+directions, both transfers over eight source and target shapes, fifteen slice
+ranges, ten species outcomes, and a collection-pressure loop that discards
+sixty-four buffers around a survivor and a transferred store. Both native
+execution targets compile the runtime under the address and undefined-behavior
+sanitizers, so the ownership rules above execute under them. Byte contents
+stay unobservable from ECMAScript until a view kind lands, so the zeroing and
+copying above rest on that structural and sanitizer evidence rather than on a
+value a program can read.
+
+All 192 paths under the node's inventory root are now reviewed: 128 pass and
+64 record explicit prerequisites. Twenty-four reach an unadmitted standard
+global at compile time, twelve need `Reflect.construct`, nine need
+`SharedArrayBuffer`, ten need `DataView`, four need a TypedArray constructor,
+four need `Object.isExtensible`, and one needs `Reflect` with a second realm.
+The reviewed feature list gains `ArrayBuffer`,
+`align-detached-buffer-semantics-with-web-reality`, `arraybuffer-transfer`,
+and `resizable-arraybuffer`, and the reviewed dependency vocabulary gains
+`array-buffer`. The reviewed harness gains `detachArrayBuffer.js`, which
+performs the detach its `$262` hook would through the admitted
+`transferToFixedLength`, and records `resizableArrayBufferUtils.js` as
+unavailable because it builds every TypedArray constructor at load time; the
+five reviewed cases that include it keep their existing
+`unsupported-profile-feature` classification and record that harness reason
+instead of the feature they now share with this node. The manifest reaches
+7,613 cases: 5,038 passes, 1,355 expected negatives, and 1,220 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are otherwise unchanged. The new component and its heap
+kind move the runtime ABI to `oseo-runtime-m5-55` without a public layout
+change and without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3227,8 +3311,12 @@ complete. The remaining gaps retain their existing owners.
     does not admit the separate language surface. Owner: the intrinsics and
     built-in objects stream.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
-    and constructible `Object` value, and primitive wrappers. The remaining
-    standard constructors stay assigned to their dependency-ordered M5b nodes.
+    and constructible `Object` value, primitive wrappers, and the
+    `ArrayBuffer` constructor with its Data Block. The remaining standard
+    constructors stay assigned to their dependency-ordered M5b nodes.
+    `ArrayBuffer.isView` reports `false` for every value this profile can
+    produce, and the node that admits a view kind extends it with that
+    kind's brand.
     No built-in dispatches through `Symbol.hasInstance` yet. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
@@ -3239,7 +3327,8 @@ complete. The remaining gaps retain their existing owners.
     exist. M5a Unit 8.1d gives Script top-level `this` and every non-strict
     nullish receiver one realm-wide global object whose own properties are the
     Script's statically known var-scoped top-level bindings. M5b now installs
-    the admitted `Object` and `Number` identities there. Because this realm
+    the admitted `ArrayBuffer`, `Object`, `Number`, and `Promise` identities
+    there. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

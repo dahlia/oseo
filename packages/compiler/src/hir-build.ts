@@ -189,7 +189,12 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 
 /** Whether the mutable global object property owns this intrinsic value. */
 function isPropertyOwnedIntrinsicName(name: string): boolean {
-  return name === "Number" || name === "Object" || name === "Promise";
+  return (
+    name === "ArrayBuffer" ||
+    name === "Number" ||
+    name === "Object" ||
+    name === "Promise"
+  );
 }
 
 function bindingExpression(
@@ -522,6 +527,7 @@ function resolveOptionalChain(
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
+    name === "ArrayBuffer" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "Number" ||

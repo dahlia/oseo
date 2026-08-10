@@ -260,6 +260,92 @@ test("populates the realm-owned Number intrinsic cluster", () => {
   assert.match(numberSource, /number_data/u);
 });
 
+test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const bufferSource = sources.get("runtime_array_buffer.c") ?? "";
+
+  for (const intrinsic of [
+    "ARRAY_BUFFER_PROTOTYPE",
+    "ARRAY_BUFFER",
+    "ARRAY_BUFFER_IS_VIEW",
+    "ARRAY_BUFFER_BYTE_LENGTH",
+    "ARRAY_BUFFER_DETACHED",
+    "ARRAY_BUFFER_MAX_BYTE_LENGTH",
+    "ARRAY_BUFFER_RESIZABLE",
+    "ARRAY_BUFFER_RESIZE",
+    "ARRAY_BUFFER_SLICE",
+    "ARRAY_BUFFER_TRANSFER",
+    "ARRAY_BUFFER_TRANSFER_TO_FIXED_LENGTH",
+    "ARRAY_BUFFER_SPECIES",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "ArrayBuffer",
+    "byteLength",
+    "constructor",
+    "detached",
+    "isView",
+    "maxByteLength",
+    "prototype",
+    "resizable",
+    "resize",
+    "slice",
+    "transfer",
+    "transferToFixedLength",
+  ]) {
+    assert.match(bufferSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The constructor is an ordinary constructible function reached through
+  // the realm's own global property, the four state queries are
+  // getter-only accessors, and the species accessor is a getter-only
+  // symbol-keyed property on the constructor.
+  assert.match(bufferSource, /OSEO_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID/u);
+  assert.match(bufferSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(bufferSource, /OSEO_FUNCTION_NAME_PREFIX_GET/u);
+  assert.match(bufferSource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(bufferSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(bufferSource, /oseo_object_define_accessor/u);
+  assert.match(internalHeader, /oseo_internal_install_array_buffer_global/u);
+  assert.match(bindingSource, /oseo_internal_install_array_buffer_global/u);
+});
+
+test("owns each ArrayBuffer data block through exactly one buffer", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bufferSource = sources.get("runtime_array_buffer.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+
+  // The Data Block is a separate host allocation, so the heap kind, the
+  // collector's destruction path, and the detaching release all have to
+  // name the same single owner.
+  assert.match(internalHeader, /OSEO_HEAP_ARRAY_BUFFER = 18/u);
+  assert.match(internalHeader, /uint8_t \*data;/u);
+  assert.match(
+    memorySource,
+    new RegExp(
+      String.raw`destroy_heap_object[\s\S]*OSEO_HEAP_ARRAY_BUFFER[\s\S]*` +
+        String.raw`oseo_internal_array_buffer_release`,
+      "u",
+    ),
+  );
+  // Releasing leaves the record detached, so the collector cannot free a
+  // block a transfer already gave up.
+  assert.match(
+    bufferSource,
+    new RegExp(
+      String.raw`oseo_internal_array_buffer_release\([\s\S]*?` +
+        String.raw`buffer->data = NULL;[\s\S]*?buffer->detached = true;`,
+      "u",
+    ),
+  );
+  // Every copy allocates its own block instead of sharing the source's.
+  assert.match(bufferSource, /memcpy\(to->data, from->data/u);
+  assert.doesNotMatch(bufferSource, /->data = [a-z_]*->data/u);
+  assert.doesNotMatch(bufferSource, /realloc/u);
+});
+
 test("populates the realm-owned Promise intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

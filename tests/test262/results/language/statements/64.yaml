@@ -238,10 +238,10 @@ results:
       - object-properties
       - property-enumeration
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
       passed: false
-    unsupportedFeatures:
-      - resizable-arraybuffer
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

@@ -28,6 +28,7 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
@@ -83,6 +84,7 @@ Object.defineProperty(globalThis, "console", {
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...objectFixtures,
+  ...arrayBufferFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -253,6 +255,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "array-buffer" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-descriptor-queries" ||
@@ -322,6 +325,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "array-buffer" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
@@ -493,6 +497,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "array-buffer" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-descriptor-queries" ||
@@ -504,7 +509,10 @@ for (const fixture of selectedFixtures) {
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
-              if (fixture.name === "object-constructor") {
+              if (
+                fixture.name === "array-buffer" ||
+                fixture.name === "object-constructor"
+              ) {
                 assert.ok(native.counters.guardHits > 0);
               }
               assert.ok(native.counters.guardMisses > 0);
