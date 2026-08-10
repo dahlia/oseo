@@ -137,6 +137,17 @@ syntax, resolved HIR, generic MIR, deterministic C11 lowering, static runtime
 linking, and native execution. M2 added guarded specialization to this same
 pipeline without creating a second composition path.
 
+M5b added `@oseo/unicode` as a ninth package. It owns one reviewed copy of the
+Unicode Character Database and the tables generated from it, and nothing else:
+its allowed internal dependency set is empty, so a table lookup cannot pull the
+compiler core, a backend, or the runtime adapter in behind it. Unicode answers
+therefore come from reviewed bytes rather than from a host locale, a `wchar_t`
+classification routine, or a C library regular-expression facility, and a
+cross-compiled target agrees with the host that built it.
+`mise run check:unicode-tables` rebuilds the tables in memory from the pinned
+inputs and fails when the checked-in module differs, so the pinned version, the
+input digests, and the generated data cannot disagree.
+
 The compiler package keeps those stages in package-private source modules.
 *source.ts* and *syntax.ts* own frontend-neutral inputs. *modules.ts* owns graph
 construction and linking. *hir.ts*, *hir-build.ts*, and *hir-print.ts* separate

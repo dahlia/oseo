@@ -28,6 +28,7 @@ const packages = [
   ["runtime-c", "@oseo/runtime-c"],
   ["testkit", "@oseo/testkit"],
   ["toolchain-zig", "@oseo/toolchain-zig"],
+  ["unicode", "@oseo/unicode"],
 ] as const;
 
 async function fixtureWorkspace(): Promise<string> {
@@ -99,7 +100,7 @@ test("updates every package version in one operation", async () => {
   try {
     await setWorkspaceVersion(root, "1.2.3");
     assert.deepEqual(await checkWorkspaceVersions(root), {
-      packageCount: 8,
+      packageCount: 9,
       version: "1.2.3",
     });
   } finally {
@@ -123,7 +124,7 @@ test("discovers newly added workspace packages", async () => {
       );
     }
     assert.deepEqual(await checkWorkspaceVersions(root), {
-      packageCount: 9,
+      packageCount: 10,
       version: "0.0.0",
     });
     await setWorkspaceVersion(root, "1.2.3");

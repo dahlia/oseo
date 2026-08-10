@@ -41,6 +41,10 @@ const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
   ["@oseo/runtime-c", compilerOnly],
   ["@oseo/testkit", compilerOnly],
   ["@oseo/toolchain-zig", compilerOnly],
+  // The pinned Unicode tables are self-contained data. Keeping the set empty
+  // is what stops the compiler core, a backend, or the runtime adapter from
+  // being pulled in behind a table lookup.
+  ["@oseo/unicode", new Set()],
 ]);
 
 interface SyntaxNode {

@@ -361,6 +361,27 @@ patterns need the tables required to resolve arbitrary admitted properties.
 Capability-aware runtime composition records that difference without changing
 semantics.
 
+The pinning half of this now exists. `@oseo/unicode` holds one reviewed copy
+of the Unicode Character Database for Unicode 17.0.0, pinned by URL, byte
+length, and SHA-256 in *packages/unicode/data/manifest.yaml*, and the tables
+generated from it. It covers `General_Category`, `Script`, and
+`Script_Extensions`, every binary property in table 70 of ECMA-262, simple and
+full case folding, the simple and unconditional full case mappings, the
+conditional mappings of *SpecialCasing.txt* recorded but not applied, and both
+ECMAScript word-character sets. Sets are inversion lists, so a matcher may
+lower one into generated C without reshaping it. `mise run unicode:update`
+regenerates the tables and `mise run check:unicode-tables` fails when the
+checked-in module is not what the pinned inputs produce, offline in both
+directions.
+
+Two pieces remain. Properties of strings, which only the `v` flag needs,
+are out of scope for that package: they are sequence rather than code-point
+properties and need emoji sequence files it does not pin, so the unit that
+admits class set notation owns them. The runtime-side representation is also
+still open, because the tables are build-time data today and no matcher reads
+them yet; the probe still owns the comparison of candidate table layouts and
+of what a dynamic pattern must carry into the runtime.
+
 ### Resource behavior
 
 The probe includes patterns known to cause large backtracking trees, large

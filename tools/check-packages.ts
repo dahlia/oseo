@@ -219,6 +219,15 @@ async function stagePackage(
       recursive: true,
     });
   }
+  // The Unicode tables are derived from Unicode Data Files, whose license
+  // requires its notice to travel with every copy, so the artifact carries it
+  // beside the repository license rather than only naming it in prose.
+  if (directory === "unicode") {
+    await copyFile(
+      join(source, "UNICODE-LICENSE.txt"),
+      join(stage, "UNICODE-LICENSE.txt"),
+    );
+  }
   await writeFile(
     join(stage, "package.json"),
     `${JSON.stringify(releaseManifest, null, 2)}\n`,
@@ -263,6 +272,9 @@ async function main(): Promise<void> {
       }
       if (packed.name === "@oseo/runtime-c") {
         requireRuntimeNativeFiles(files, packed.name);
+      }
+      if (packed.name === "@oseo/unicode") {
+        requireFile(files, "UNICODE-LICENSE.txt", packed.name);
       }
       const manifestBytes = await run(
         "tar",

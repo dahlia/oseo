@@ -6,6 +6,7 @@
     "artifacts/**",
     "mise.toml",
     "packages/*/dist/**",
+    "packages/unicode/src/tables.ts",
     "tests/test262/results.yaml",
     "tests/test262/results/**"
   ],

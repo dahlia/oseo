@@ -236,3 +236,7 @@ families:
     owner: tests/property/m5-array-buffer.property.test.ts
     start: 0x60003a00
     end: 0x60003aff
+  - family: unicode-tables
+    owner: tests/property/unicode-tables.property.test.ts
+    start: 0x60003b00
+    end: 0x60003bff
