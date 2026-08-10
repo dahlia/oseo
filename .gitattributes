@@ -1,0 +1,6 @@
+# Byte-pinned Unicode Character Database inputs, and the generated
+# tables module compared against them, are reviewed as LF text. A
+# platform-specific checkout conversion must not change their bytes.
+packages/unicode/UNICODE-LICENSE.txt text eol=lf
+packages/unicode/data/** text eol=lf
+packages/unicode/src/tables.ts text eol=lf
