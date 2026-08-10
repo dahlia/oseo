@@ -52,6 +52,7 @@ import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
+import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -181,6 +182,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeReductionFixtures,
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
+  ...typedArrays.typedArrayConstructorFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -696,6 +698,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-symbol-methods" ||
+    fixture.name === "typed-array-constructors" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -801,6 +804,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "array-buffer" ||
+    fixture.name === "typed-array-constructors" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -1038,6 +1042,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
+            fixture.name === "typed-array-constructors" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

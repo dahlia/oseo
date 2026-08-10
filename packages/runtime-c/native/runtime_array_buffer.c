@@ -201,7 +201,7 @@ static OseoResult array_buffer_allocate(
 /* One fresh %ArrayBuffer%-prototyped buffer, which is what
  * AllocateArrayBuffer(%ArrayBuffer%, ...) produces for transfer and for
  * the default species path. */
-static OseoResult array_buffer_create(
+OseoResult oseo_internal_array_buffer_create(
     OseoContext *context,
     double byte_length,
     double max_byte_length,
@@ -351,16 +351,17 @@ static OseoResult array_buffer_construct(
 }
 
 /*
- * ArrayBuffer.isView(arg). A DataView is the one admitted value that
- * carries [[ViewedArrayBuffer]]; the node that materializes a TypedArray
- * extends this test with its own brand.
+ * ArrayBuffer.isView(arg). DataView and TypedArray are the admitted values
+ * that carry [[ViewedArrayBuffer]].
  */
 static OseoResult array_buffer_is_view(
     size_t argument_count,
     const OseoValue *arguments
 ) {
     if (argument_count == 0u) return normal(oseo_boolean(false));
-    return normal(oseo_boolean(is_data_view(arguments[0])));
+    return normal(oseo_boolean(
+        is_data_view(arguments[0]) || is_typed_array(arguments[0])
+    ));
 }
 
 static OseoResult array_buffer_byte_length(
@@ -512,7 +513,12 @@ static OseoResult array_buffer_copy_and_detach(
     }
     bool resizable = preserve_resizability && source->resizable;
     double maximum = resizable ? (double)source->max_byte_length : 0.0;
-    result = array_buffer_create(context, length, maximum, resizable);
+    result = oseo_internal_array_buffer_create(
+        context,
+        length,
+        maximum,
+        resizable
+    );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         /* Both records are reacquired after the allocation safepoint. */

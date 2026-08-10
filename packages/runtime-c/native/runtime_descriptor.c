@@ -12,6 +12,30 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+static OseoResult typed_array_exotic_error(OseoContext *context) {
+    return failure(
+        context,
+        "OSEO2001",
+        "TypedArray integer-indexed exotic operations are not admitted yet."
+    );
+}
+
+static OseoResult reject_typed_array_numeric_key(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    if (!is_typed_array(object_value)) return normal(oseo_undefined());
+    bool numeric_index = false;
+    OseoResult result = oseo_internal_canonical_numeric_index(
+        context,
+        key,
+        &numeric_index
+    );
+    if (result.status != OSEO_STATUS_NORMAL || !numeric_index) return result;
+    return typed_array_exotic_error(context);
+}
+
 /* A concrete descriptor replacing the virtual String iterator keeps the
  * virtual property's original position before every user-created symbol.
  * The property vector already owns creation order, so inserting the
@@ -40,7 +64,6 @@ static OseoProperty *append_property_slot(
     object->property_count += 1u;
     return &object->properties[insertion];
 }
-
 bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -196,6 +219,12 @@ static OseoResult define_data_property(
             "Object.defineProperty requires an object."
         );
     }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
@@ -568,6 +597,12 @@ static OseoResult define_accessor_property(
             "Cannot define an accessor property on a non-object."
         );
     }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
     if (ordinary_object(object_value)->module_namespace) {
         *refusal =
             "Cannot define a module namespace property.";
@@ -763,6 +798,12 @@ OseoResult oseo_object_delete(
         return oseo_internal_proxy_delete(
             context, object_value, key, strict);
     }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         return strict

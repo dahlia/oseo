@@ -1593,6 +1593,14 @@ static OseoResult copy_data_properties(
     size_t excluded_count,
     const OseoValue *excluded_keys
 ) {
+    if (is_typed_array(source)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     size_t key_count = 0u;
     OseoResult result = normal(oseo_undefined());
@@ -2119,6 +2127,23 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         builtin_argument(argument_count, arguments, 1u)
     );
     frame.slots[1] = result.value;
+    bool numeric_index = false;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_typed_array(object_value)) {
+        result = oseo_internal_canonical_numeric_index(
+            context,
+            frame.slots[1],
+            &numeric_index
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && numeric_index) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     OseoValue value = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
     OseoValue getter = oseo_undefined();
@@ -2207,6 +2232,14 @@ static OseoResult snapshot_own_keys(
     OseoRootFrame *frame,
     size_t key_count
 ) {
+    if (is_typed_array(frame->slots[0])) {
+        return failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     bool virtual_length = is_array(frame->slots[0]);
     bool virtual_prototype =
         function_has_prototype_property(frame->slots[0]);

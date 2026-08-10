@@ -3271,9 +3271,10 @@ ToIntegerOrInfinity, and allocates through SpeciesConstructor, so an absent
 non-constructor species, a species that returns a value that is not an
 ArrayBuffer, one that returns the source, one that returns a detached or
 too-small buffer, and one that detaches the source while it runs each reach
-their specified outcome. `ArrayBuffer.isView` is `false` for every value this
-profile can produce, because no admitted value carries
-`[[ViewedArrayBuffer]]` until a view kind lands. `%ArrayBuffer%` carries the
+their specified outcome. At the `array-buffer` checkpoint,
+`ArrayBuffer.isView` was `false` for every admitted value because no value yet
+carried `[[ViewedArrayBuffer]]`; the TypedArray constructor node below extends
+it with that brand. `%ArrayBuffer%` carries the
 `Symbol.species` accessor that reports its receiver, and the prototype
 carries `Symbol.toStringTag`, so `Object.prototype.toString` reports
 `[object ArrayBuffer]`.
@@ -3288,9 +3289,9 @@ ranges, ten species outcomes, and a collection-pressure loop that discards
 sixty-four buffers around a survivor and a transferred store. Both native
 execution targets compile the runtime under the address and undefined-behavior
 sanitizers, so the ownership rules above execute under them. Byte contents
-stay unobservable from ECMAScript until a view kind lands, so the zeroing and
-copying above rest on that structural and sanitizer evidence rather than on a
-value a program can read.
+were unobservable from ECMAScript at that checkpoint, so its zeroing and
+copying evidence was structural and sanitizer-based. The TypedArray evidence
+below subsequently observes those bytes through a view.
 
 All 192 paths under the node's inventory root are now reviewed: 128 pass and
 64 record explicit prerequisites. Twenty-four reach an unadmitted standard
@@ -5976,6 +5977,63 @@ from 5,466 to 5,478 ordinary cases. The runtime ABI moves to
 `oseo-runtime-m5-97`, adds two internal Array method code IDs and intrinsic
 slots, and adds no generated-code entry point.
 
+M5b node `typed-array-constructors` materializes the abstract `%TypedArray%`
+constructor and the concrete `Int8Array`, `Uint8Array`,
+`Uint8ClampedArray`, `Int16Array`, `Uint16Array`, `Int32Array`,
+`Uint32Array`, `Float32Array`, `Float64Array`, `BigInt64Array`, and
+`BigUint64Array` constructor and prototype pairs. Each global constructor is
+writable and configurable, has length three, inherits from `%TypedArray%`,
+and owns the applicable `BYTES_PER_ELEMENT` constant. Each concrete prototype
+is an ordinary object that inherits from `%TypedArray.prototype%` and owns its
+constructor and element-size properties. `%TypedArray%` itself is abstract,
+so both direct call and construction throw a `TypeError`.
+
+A constructed view records its element kind, backing `ArrayBuffer`, byte
+offset, and fixed or length-tracking element length. A numeric first argument
+runs through ToIndex and allocates a zeroed backing buffer. An `ArrayBuffer`
+argument retains that buffer after alignment, detachment, and bounds checks.
+An iterable is consumed to a rooted list before allocation, an array-like
+source reads its length before copying indexed values, and a typed-array source
+allocates an independent backing buffer before conversion. Number and BigInt
+content types cannot mix. Integer conversions use modulo arithmetic,
+`Uint8ClampedArray` uses ties-to-even rounding, floating arrays retain their
+specified precision, and the BigInt arrays apply signed or unsigned modulo
+`2^64`. `ArrayBuffer.isView` recognizes every resulting view. The complete
+integer-indexed descriptor surface and the standard TypedArray prototype and
+static methods retain their later M5b graph owners.
+
+Fixed native and generated differential evidence at property seed
+`0x60006700` covers all eleven element kinds, length, buffer, iterable,
+array-like, and typed-array construction, shared-buffer observation, cloning,
+content-type rejection, both specialization policies, false hints, deliberate
+shape and small-integer guard misses, generic fallback, and collection forced
+at every safepoint. The generated suite computes element conversion through
+an independent arithmetic oracle and corroborates it with Node.js and Deno.
+The collector traces the backing-buffer reference, while the view never owns
+or caches the buffer's native Data Block; a store reacquires the buffer after
+conversion before touching bytes.
+
+The reviewed test262 subset adds 81 directly applicable paths from the node's
+736-path inventory. Fourteen BigInt constructor and prototype metadata cases
+pass. The other 67 retain an explicit `unsupported-profile-feature` boundary:
+63 otherwise applicable Number constructor metadata cases, two BigInt
+metadata cases, and two BigInt conversion cases carry test262's broad
+`TypedArray` feature tag, which also claims the prototype surface owned by the
+later core node. The remaining 655 paths stay outside the reviewed subset.
+Cases for prototype accessors and methods, static `from` and `of`, species,
+and the complete integer-indexed exotic object have explicit later graph
+owners. Constructor cases that include the upstream
+*testTypedArray.js* harness also require Array statics and TypedArray prototype
+accessors that this node does not admit; the fixed fixture and the independent
+generated oracle replace that harness for every construction path and element
+conversion this node owns. Twenty-four already reviewed ArrayBuffer transfer
+cases also promote because their typed-view inspection dependency is now
+available. The manifest reaches 17,651 cases: 14,057 passes, 1,556 expected
+negatives, and 2,038 unsupported profile features with no semantic, harness,
+or infrastructure failures. The reviewed feature list retains the broader
+`TypedArray` gate for the later core node, and the dependency vocabulary gains
+`typed-array-constructors`. The component and heap kind move the runtime ABI
+to `oseo-runtime-m5-100` without a public layout change or a graph state edit.
 
 Proxy exotic objects
 --------------------
@@ -6635,12 +6693,12 @@ complete. The remaining gaps retain their existing owners.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that
-    block, the `Date` constructor with its statics and prototype, and
-    `Set` with its insertion-ordered element vector. The remaining standard
+    block, the `Date` constructor with its statics and prototype, `Set`
+    with its insertion-ordered element vector, `%TypedArray%`, and the
+    eleven concrete TypedArray constructors. The remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
-    `ArrayBuffer.isView` reports `true` for a `DataView` and `false` for
-    every other value this profile can produce; the node that admits a
-    TypedArray extends it with that kind's brand.
+    `ArrayBuffer.isView` reports `true` for each admitted `DataView` or
+    TypedArray view and `false` for every other value this profile can produce.
     No built-in dispatches through `Symbol.hasInstance` yet. A test262
     runtime negative whose thrown value exposes an identity, including a
     thrown `Test262Error`, is now observable. One whose thrown value is a
@@ -6653,7 +6711,7 @@ complete. The remaining gaps retain their existing owners.
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
     admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
-    `Promise`, `Set`, and `String` identities. The
+    `Promise`, `Set`, `String`, and concrete TypedArray identities. The
     `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
     `encodeURI`, and `encodeURIComponent` as four more replaceable
     properties of the same object, the `global-numeric-functions` node

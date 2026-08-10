@@ -2,6 +2,7 @@ import {
   anonymousDefinition,
   errorIntrinsicName,
   isStandardGlobalName,
+  isTypedArrayIntrinsicName,
 } from "./hir.ts";
 import type {
   Binding,
@@ -229,7 +230,8 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "parseFloat" ||
     name === "parseInt" ||
     name === "Set" ||
-    name === "undefined"
+    name === "undefined" ||
+    isTypedArrayIntrinsicName(name)
   );
 }
 
@@ -594,6 +596,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "String" ||
     name === "Set" ||
     name === "Symbol" ||
+    isTypedArrayIntrinsicName(name) ||
     name === "setTimeout" ||
     name === "clearTimeout" ||
     errorIntrinsicName(name) != null

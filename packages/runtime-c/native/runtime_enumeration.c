@@ -409,6 +409,14 @@ OseoResult oseo_enumerate_get(
      * subject, so the whole statement is skipped without an error and
      * without a ToObject conversion. */
     if (is_nullish(subject)) return normal(oseo_undefined());
+    if (is_typed_array(subject)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;

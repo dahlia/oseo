@@ -10,6 +10,38 @@ export async function runNativeScenario2(
 ): Promise<void> {
   const { host, root } = context;
 
+  for (const [name, source] of [
+    ["typed-array-canonical-index.ts", "console.log(new Uint8Array(1)[-1]);"],
+    [
+      "typed-array-define-index.ts",
+      'Object.defineProperty(new Uint8Array(1), "0", { value: 1 });',
+    ],
+    ["typed-array-in-index.ts", 'console.log("1.5" in new Uint8Array(1));'],
+    ["typed-array-own-keys.ts", "Object.keys(new Uint8Array(1));"],
+    ["typed-array-spread.ts", "console.log({...new Uint8Array(1)});"],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray integer-indexed exotic operations are not " +
+          "admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
   // The switch-tdz fixture explains why this check bypasses the Deno
   // reference: Deno's TypeScript transpile loses the case-level TDZ.
   const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;

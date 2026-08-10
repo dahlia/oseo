@@ -9,6 +9,14 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+static OseoResult typed_array_exotic_error(OseoContext *context) {
+    return failure(
+        context,
+        "OSEO2001",
+        "TypedArray integer-indexed exotic operations are not admitted yet."
+    );
+}
+
 OseoResult oseo_internal_require_property_key(
     OseoContext *context,
     OseoValue key
@@ -72,6 +80,40 @@ static OseoResult object_get(
         if (is_proxy(current)) {
             return oseo_internal_proxy_get(
                 context, current, key, receiver);
+        }
+        uint32_t typed_index = 0u;
+        if (is_typed_array(current) &&
+            oseo_internal_array_index(key, &typed_index)) {
+            bool present = false;
+            return oseo_internal_typed_array_get_index(
+                context,
+                current,
+                typed_index,
+                &present
+            );
+        }
+        bool numeric_index = false;
+        OseoResult classified = normal(oseo_undefined());
+        if (is_typed_array(current)) {
+            classified = oseo_internal_canonical_numeric_index(
+                context,
+                key,
+                &numeric_index
+            );
+        }
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) return typed_array_exotic_error(context);
+        if (current == object_value &&
+            is_typed_array(current) &&
+            (oseo_internal_string_is_ascii(key, "length") ||
+             oseo_internal_string_is_ascii(key, "byteLength") ||
+             oseo_internal_string_is_ascii(key, "byteOffset") ||
+             oseo_internal_string_is_ascii(key, "buffer"))) {
+            return failure(
+                context,
+                "OSEO2001",
+                "TypedArray prototype accessors are not admitted yet."
+            );
         }
         OseoOrdinaryObject *object = ordinary_object(current);
         OseoValue value = oseo_undefined();
@@ -240,6 +282,32 @@ OseoResult oseo_object_set(
             NULL
         );
     }
+    uint32_t typed_index = 0u;
+    if (is_typed_array(object_value) &&
+        oseo_internal_array_index(key, &typed_index)) {
+        bool present = false;
+        OseoResult result = oseo_internal_typed_array_set_index(
+            context,
+            object_value,
+            typed_index,
+            value,
+            &present
+        );
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        (void)present;
+        return normal(value);
+    }
+    bool numeric_index = false;
+    OseoResult classified = normal(oseo_undefined());
+    if (is_typed_array(object_value)) {
+        classified = oseo_internal_canonical_numeric_index(
+            context,
+            key,
+            &numeric_index
+        );
+    }
+    if (classified.status != OSEO_STATUS_NORMAL) return classified;
+    if (numeric_index) return typed_array_exotic_error(context);
     uint32_t receiver_index = 0u;
     bool extends_array = is_array(object_value) &&
         oseo_internal_array_index(key, &receiver_index) &&

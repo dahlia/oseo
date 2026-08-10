@@ -655,6 +655,9 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "regexp-string-dispatch";
   }
+  if (diagnostic === "TypedArray prototype accessors are not admitted yet.") {
+    return "typed-array-core";
+  }
   // The runtime ends a program at the first rejection checkpoint that
   // still holds an unhandled rejection. A case that needs the opposite
   // host policy names that boundary instead of reporting a semantic

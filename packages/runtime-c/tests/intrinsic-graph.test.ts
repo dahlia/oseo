@@ -1221,6 +1221,39 @@ test("populates the realm-owned JSON algorithms", () => {
   );
 });
 
+test("populates the realm-owned TypedArray constructor cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const memory = sources.get("runtime_memory.c") ?? "";
+  const properties = sources.get("runtime_property.c") ?? "";
+  const typedArrays = sources.get("runtime_typed_array.c") ?? "";
+
+  for (const intrinsic of [
+    "TYPED_ARRAY_PROTOTYPE",
+    "TYPED_ARRAY",
+    "INT8_ARRAY",
+    "UINT8_ARRAY",
+    "UINT8_CLAMPED_ARRAY",
+    "INT16_ARRAY",
+    "UINT16_ARRAY",
+    "INT32_ARRAY",
+    "UINT32_ARRAY",
+    "FLOAT32_ARRAY",
+    "FLOAT64_ARRAY",
+    "BIGINT64_ARRAY",
+    "BIGUINT64_ARRAY",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  assert.match(typedArrays, /typed_array_from_buffer/u);
+  assert.match(typedArrays, /typed_array_from_iterable/u);
+  assert.match(typedArrays, /typed_array_from_typed_array/u);
+  assert.match(typedArrays, /typed_array_from_length/u);
+  assert.match(memory, /OSEO_HEAP_TYPED_ARRAY/u);
+  assert.match(memory, /viewed_buffer/u);
+  assert.match(properties, /oseo_internal_typed_array_get_index/u);
+  assert.match(properties, /oseo_internal_typed_array_set_index/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

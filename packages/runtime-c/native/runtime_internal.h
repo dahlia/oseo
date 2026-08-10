@@ -755,6 +755,36 @@
     (OSEO_SET_CODE_ID_RANGE_LAST - 9u)
 #define OSEO_SET_SPECIES_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 10u)
 
+#define OSEO_TYPED_ARRAY_CODE_ID_RANGE_INDEX ((size_t)24u)
+#define OSEO_TYPED_ARRAY_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_TYPED_ARRAY_CODE_ID_RANGE_INDEX)
+#define OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_TYPED_ARRAY_CODE_ID_RANGE_INDEX)
+#define OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID \
+    OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST
+#define OSEO_INT8_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_UINT8_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_UINT8_CLAMPED_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_INT16_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_UINT16_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_INT32_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_UINT32_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_FLOAT32_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_FLOAT64_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_BIGINT64_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_BIGUINT64_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 11u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -811,6 +841,7 @@ typedef enum {
     OSEO_HEAP_DATE = 26,
     OSEO_HEAP_SET = 27,
     OSEO_HEAP_SET_ITERATOR = 28,
+    OSEO_HEAP_TYPED_ARRAY = 29,
 } OseoHeapKind;
 
 typedef struct {
@@ -1379,6 +1410,35 @@ typedef struct {
     size_t byte_length;
     bool track_length;
 } OseoDataView;
+
+/* The eleven element representations admitted by the constructor node. */
+typedef enum {
+    OSEO_TYPED_ARRAY_INT8 = 0,
+    OSEO_TYPED_ARRAY_UINT8 = 1,
+    OSEO_TYPED_ARRAY_UINT8_CLAMPED = 2,
+    OSEO_TYPED_ARRAY_INT16 = 3,
+    OSEO_TYPED_ARRAY_UINT16 = 4,
+    OSEO_TYPED_ARRAY_INT32 = 5,
+    OSEO_TYPED_ARRAY_UINT32 = 6,
+    OSEO_TYPED_ARRAY_FLOAT32 = 7,
+    OSEO_TYPED_ARRAY_FLOAT64 = 8,
+    OSEO_TYPED_ARRAY_BIGINT64 = 9,
+    OSEO_TYPED_ARRAY_BIGUINT64 = 10,
+} OseoTypedArrayKind;
+
+/*
+ * One typed view over an ArrayBuffer-owned Data Block. The view never owns
+ * or caches the byte pointer, so a collection, resize, transfer, or detach
+ * cannot leave a stale pointer. `array_length` is SIZE_MAX for a
+ * length-tracking view over a resizable buffer.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue viewed_buffer;
+    size_t byte_offset;
+    size_t array_length;
+    OseoTypedArrayKind element_kind;
+} OseoTypedArray;
 
 /*
  * One `Date.prototype` method. The enumerator order is the order the
@@ -1968,6 +2028,13 @@ static inline bool is_set_iterator(OseoValue value) {
 static inline OseoSetIterator *set_iterator_object(OseoValue value) {
     return (OseoSetIterator *)heap_object(value);
 }
+static inline bool is_typed_array(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_TYPED_ARRAY;
+}
+static inline OseoTypedArray *typed_array_object(OseoValue value) {
+    return (OseoTypedArray *)heap_object(value);
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
@@ -1977,7 +2044,8 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
         kind == OSEO_HEAP_DATE || kind == OSEO_HEAP_REGEXP ||
         kind == OSEO_HEAP_ITERATOR_HELPER || kind == OSEO_HEAP_PROXY ||
-        kind == OSEO_HEAP_SET || kind == OSEO_HEAP_SET_ITERATOR;
+        kind == OSEO_HEAP_SET || kind == OSEO_HEAP_SET_ITERATOR ||
+        kind == OSEO_HEAP_TYPED_ARRAY;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2251,6 +2319,15 @@ OseoResult oseo_internal_set_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_typed_array_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 /*
  * Releases one ArrayBuffer's Data Block. The collector calls it for a
  * buffer it is about to destroy, and DetachArrayBuffer calls it while
@@ -2261,6 +2338,12 @@ void oseo_internal_array_buffer_release(OseoHeapObject *object);
 /* Materializes %ArrayBuffer% with its prototype, accessors, prototype
  * methods, `isView`, and species accessor, and returns the constructor. */
 OseoResult oseo_internal_array_buffer_intrinsic(OseoContext *context);
+OseoResult oseo_internal_array_buffer_create(
+    OseoContext *context,
+    double byte_length,
+    double max_byte_length,
+    bool resizable
+);
 OseoResult oseo_internal_install_array_buffer_global(
     OseoContext *context,
     OseoValue global
@@ -2270,6 +2353,26 @@ OseoResult oseo_internal_set_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_set_global(
     OseoContext *context,
     OseoValue global
+);
+/* Materializes %TypedArray% and every concrete constructor/prototype pair. */
+OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_typed_array_globals(
+    OseoContext *context,
+    OseoValue global
+);
+OseoResult oseo_internal_typed_array_get_index(
+    OseoContext *context,
+    OseoValue view,
+    uint32_t index,
+    bool *present
+);
+bool oseo_internal_typed_array_has_index(OseoValue view, uint32_t index);
+OseoResult oseo_internal_typed_array_set_index(
+    OseoContext *context,
+    OseoValue view,
+    uint32_t index,
+    OseoValue value,
+    bool *present
 );
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
@@ -3244,6 +3347,11 @@ OseoResult oseo_internal_to_index(
     OseoValue value,
     const char *description,
     double *index
+);
+OseoResult oseo_internal_canonical_numeric_index(
+    OseoContext *context,
+    OseoValue key,
+    bool *result
 );
 OseoResult oseo_internal_to_primitive(
     OseoContext *context,
