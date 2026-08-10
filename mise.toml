@@ -47,6 +47,7 @@ depends = [
   "check:m5b-graph",
   "check:packages",
   "check:types",
+  "check:unicode-tables",
   "check:versions",
 ]
 
@@ -109,6 +110,10 @@ run = '''
 aube exec -- tsc --version
 aube exec -- tsc --project tsconfig.json
 '''
+
+[tasks."check:unicode-tables"]
+description = "Reject Unicode tables the pinned inputs do not produce"
+run = "node tools/unicode-tables.ts"
 
 [tasks."check:versions"]
 run = '''
@@ -248,3 +253,7 @@ run = "node tools/test262.ts --update"
 [tasks."test262:inventory:update"]
 description = "Regenerate the pinned ECMA-262 applicable-test inventory"
 run = "node tools/test262-inventory.ts --update"
+
+[tasks."unicode:update"]
+description = "Regenerate the pinned Unicode tables from the reviewed inputs"
+run = "node tools/unicode-tables.ts --update"

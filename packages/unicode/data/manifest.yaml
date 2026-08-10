@@ -1,0 +1,85 @@
+# Pinned Unicode Character Database inputs for @oseo/unicode.
+#
+# Every path is relative to the package root. Every file is verified by byte
+# length and SHA-256, and header names which structural version marker the
+# file must carry: unicode for a "# <Name>-<version>.txt" first line, emoji
+# for the emoji data header and its "# Version:" line, and none for a file
+# that upstream ships without any header at all.
+#
+# Regenerate the derived tables with mise run unicode:update.
+version: 1
+unicodeVersion: 17.0.0
+emojiVersion: "17.0"
+license:
+  identifier: Unicode-3.0
+  path: UNICODE-LICENSE.txt
+  url: https://www.unicode.org/license.txt
+  bytes: 1995
+  sha256: e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96
+files:
+  - name: CaseFolding.txt
+    path: data/ucd/CaseFolding.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/CaseFolding.txt
+    bytes: 87539
+    sha256: ff8d8fefbf123574205085d6714c36149eb946d717a0c585c27f0f4ef58c4183
+  - name: DerivedCoreProperties.txt
+    path: data/ucd/DerivedCoreProperties.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/DerivedCoreProperties.txt
+    bytes: 1134783
+    sha256: 24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08
+  - name: DerivedNormalizationProps.txt
+    path: data/ucd/DerivedNormalizationProps.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/DerivedNormalizationProps.txt
+    bytes: 1377582
+    sha256: 71fd6a206a2c0cdd41feb6b7f656aa31091db45e9cedc926985d718397f9e488
+  - name: PropList.txt
+    path: data/ucd/PropList.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/PropList.txt
+    bytes: 145465
+    sha256: 130dcddcaadaf071008bdfce1e7743e04fdfbc910886f017d9f9ac931d8c64dd
+  - name: PropertyAliases.txt
+    path: data/ucd/PropertyAliases.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/PropertyAliases.txt
+    bytes: 9619
+    sha256: 4441f573caf952ffece1d7c892e7715bd7136dfc26f96eb6f268bf1e474715fb
+  - name: PropertyValueAliases.txt
+    path: data/ucd/PropertyValueAliases.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/PropertyValueAliases.txt
+    bytes: 81858
+    sha256: 64e9a5f76f7a1e8b5a47d6a1f9a26522a251208f5276bdfa1559dac7cf2e827a
+  - name: ScriptExtensions.txt
+    path: data/ucd/ScriptExtensions.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/ScriptExtensions.txt
+    bytes: 20707
+    sha256: ec2107e58825a1586acee8e0911ce18260394ac8b87e535ca325f1ccbeb06bc6
+  - name: Scripts.txt
+    path: data/ucd/Scripts.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/Scripts.txt
+    bytes: 192460
+    sha256: 9f5e50d3abaee7d6ce09480f325c706f485ae3240912527e651954d2d6b035bf
+  - name: SpecialCasing.txt
+    path: data/ucd/SpecialCasing.txt
+    header: unicode
+    url: https://www.unicode.org/Public/17.0.0/ucd/SpecialCasing.txt
+    bytes: 17049
+    sha256: efc25faf19de21b92c1194c111c932e03d2a5eaf18194e33f1156e96de4c9588
+  - name: UnicodeData.txt
+    path: data/ucd/UnicodeData.txt
+    header: none
+    url: https://www.unicode.org/Public/17.0.0/ucd/UnicodeData.txt
+    bytes: 2198209
+    sha256: 2e1efc1dcb59c575eedf5ccae60f95229f706ee6d031835247d843c11d96470c
+  - name: emoji-data.txt
+    path: data/ucd/emoji-data.txt
+    header: emoji
+    url: https://www.unicode.org/Public/17.0.0/ucd/emoji/emoji-data.txt
+    bytes: 107324
+    sha256: 2cb2bb9455cda83e8481541ecf5b6dfda66a3bb89efa3fa7c5297eccf607b72b
