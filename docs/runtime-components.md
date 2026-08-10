@@ -469,6 +469,23 @@ fallback, resize, detach, transfer ownership, species allocation, and
 collection forced at every safepoint. The node reviews its one declared
 test262 inventory root and promotes no path outside it.
 
+### Object integrity-level evidence
+
+M5b node `object-integrity-levels` exposes the extensibility flag reserved by
+the intrinsic graph root through the six Object integrity statics.
+SetIntegrityLevel applies each stored property transition through the shared
+descriptor component, preserving ordinary and exotic compatibility rules.
+TestIntegrityLevel also inspects array `length` and function `prototype`, the
+two admitted own data properties stored outside the property vector.
+
+The completed operation pair moves `abiVersion` to `m5-56` without a public
+layout change. Fixed and generated native differential evidence covers both
+specialization policies, false hints, deliberate guard hits and misses,
+generic fallback, ordinary and exotic targets, primitives, and collection
+forced at every safepoint. The node reviews its six declared test262 inventory
+roots and promotes only previously reviewed cases whose extensibility
+prerequisite it satisfies.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

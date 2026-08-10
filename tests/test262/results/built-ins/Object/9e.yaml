@@ -243,6 +243,50 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Object/isSealed/15.2.3.11-4-10.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/isSealed/15.2.3.11-4-10.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/isSealed/15.2.3.11-4-10.js:84:25:
+        error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/isSealed/15.2.3.11-4-15.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/isSealed/15.2.3.11-4-15.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/isSealed/15.2.3.11-4-15.js:84:25:
+        error[OSEO1001]: Unknown binding 'Date'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/prototype/hasOwnProperty/8.12.1-1_15.js
       strictness:
         - non-strict
@@ -266,5 +310,28 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/seal/seal-uint8clampedarray.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/seal/seal-uint8clampedarray.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/seal/seal-uint8clampedarray.js:1\
+        11:17: error[OSEO1001]: Unknown binding
+        'Uint8ClampedArray'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

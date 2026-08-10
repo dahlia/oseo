@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 7,613
-reviewed cases: 5,038 passes, 1,355 expected negatives, and 1,220 unsupported
+honest unsupported classifications. The current reviewed manifest records 7,927
+reviewed cases: 5,263 passes, 1,355 expected negatives, and 1,309 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 72 indexed records in the normative
+M5a is complete. The 74 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 5,038
-passes across 7,613 paths, and the property inventory records 69 domains,
-69 seeds, and an ordinary case budget of 2,834.
+the M5b and M5c dependency order below. The reviewed manifest now records 5,263
+passes across 7,927 paths, and the property inventory records 73 domains,
+73 seeds, and an ordinary case budget of 3,366.
 
 
 M5a implementation history
@@ -3800,6 +3800,28 @@ negatives, and 1,220 unsupported profile features. The reviewed harness gains
 `detachArrayBuffer.js` and records `resizableArrayBufferUtils.js` as
 unavailable. The new component and heap kind move the runtime ABI to
 `oseo-runtime-m5-55` without changing the graph's orchestration state.
+
+Implemented M5b node `object-integrity-levels` exposes the extensibility flag
+reserved by the intrinsic graph root and admits `Object.preventExtensions`,
+`Object.seal`, `Object.freeze`, `Object.isExtensible`, `Object.isSealed`, and
+`Object.isFrozen`. SetIntegrityLevel routes stored property transitions
+through the existing descriptor component, so ordinary objects, mapped
+arguments, String wrappers, and module namespaces retain their generic
+compatibility rules. Array `length` and function `prototype` keep their
+specialized storage while participating in TestIntegrityLevel and freezing.
+Fixed native and generated differential evidence at seed `0x60003c00` covers
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard hits and misses, generic fallback, primitive
+arguments, arrays, functions, arguments aliases, String wrappers, and
+collection pressure. Of the 317 paths under the node's six inventory roots,
+314 are reviewed: 206 pass and 108 retain explicit prerequisite boundaries.
+The other three construct source dynamically through a function constructor,
+so ADR 0016 keeps them outside the reviewed subset. Nineteen previously
+reviewed cases also move from unsupported to pass because they now observe
+the admitted extensibility state. The manifest moves to 7,927 paths with
+5,263 passes, 1,355 expected negatives, and 1,309 unsupported profile
+features. The runtime ABI moves to `oseo-runtime-m5-56` without changing the
+graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

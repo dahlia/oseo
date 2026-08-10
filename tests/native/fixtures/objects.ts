@@ -1040,6 +1040,216 @@ console.log(
 `,
   },
   {
+    name: "object-integrity-levels",
+    nonStrictScript: true,
+    source: `
+for (const name of [
+  "freeze",
+  "isExtensible",
+  "isFrozen",
+  "isSealed",
+  "preventExtensions",
+  "seal",
+]) {
+  const method = Object[name];
+  const descriptor = Object.getOwnPropertyDescriptor(Object, name);
+  console.log(
+    "metadata",
+    name,
+    method.name,
+    method.length,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+  try { new method({}); } catch (error) {
+    console.log("not constructor", name, error instanceof TypeError);
+  }
+}
+const extensible = { item: 1 };
+console.log(
+  "prevent before",
+  Object.isExtensible(extensible),
+  Object.isSealed(extensible),
+  Object.isFrozen(extensible),
+);
+console.log(
+  "prevent return",
+  Object.preventExtensions(extensible) === extensible,
+  Object.preventExtensions(extensible) === extensible,
+);
+extensible.item = 2;
+extensible.added = 3;
+let preventedDefinition = "ok";
+try {
+  Object.defineProperty(extensible, "defined", { value: 4 });
+} catch (error) {
+  preventedDefinition = error.name;
+}
+console.log(
+  "prevent after",
+  Object.isExtensible(extensible),
+  Object.isSealed(extensible),
+  Object.isFrozen(extensible),
+  extensible.item,
+  extensible.added,
+  extensible.defined,
+  preventedDefinition,
+);
+const sealed = { item: 5 };
+Object.defineProperty(sealed, "fixed", {
+  configurable: false,
+  value: 6,
+  writable: false,
+});
+console.log("seal return", Object.seal(sealed) === sealed);
+sealed.item = 7;
+const sealedDelete = delete sealed.item;
+const sealedItem = Object.getOwnPropertyDescriptor(sealed, "item");
+console.log(
+  "sealed",
+  Object.isExtensible(sealed),
+  Object.isSealed(sealed),
+  Object.isFrozen(sealed),
+  sealed.item,
+  sealedDelete,
+  sealedItem.writable,
+  sealedItem.configurable,
+);
+const frozen = { item: 8 };
+let stored = 9;
+Object.defineProperty(frozen, "accessor", {
+  configurable: true,
+  enumerable: true,
+  get: function () { return stored; },
+  set: function (value) { stored = value; },
+});
+console.log("freeze return", Object.freeze(frozen) === frozen);
+frozen.item = 10;
+frozen.accessor = 11;
+const frozenItem = Object.getOwnPropertyDescriptor(frozen, "item");
+const frozenAccessor = Object.getOwnPropertyDescriptor(frozen, "accessor");
+console.log(
+  "frozen",
+  Object.isExtensible(frozen),
+  Object.isSealed(frozen),
+  Object.isFrozen(frozen),
+  frozen.item,
+  stored,
+  frozenItem.writable,
+  frozenItem.configurable,
+  frozenAccessor.configurable,
+  typeof frozenAccessor.set,
+);
+const array = [1, 2];
+Object.freeze(array);
+const arrayLength = Object.getOwnPropertyDescriptor(array, "length");
+const arrayIndex = Object.getOwnPropertyDescriptor(array, "0");
+array[0] = 12;
+array[2] = 13;
+console.log(
+  "array",
+  Object.isFrozen(array),
+  array.length,
+  array[0],
+  array[2],
+  arrayLength.writable,
+  arrayIndex.writable,
+  arrayIndex.configurable,
+);
+function Constructor() {}
+const prototype = Constructor.prototype;
+Object.freeze(Constructor);
+Constructor.prototype = {};
+const functionPrototype = Object.getOwnPropertyDescriptor(
+  Constructor,
+  "prototype",
+);
+console.log(
+  "function",
+  Object.isFrozen(Constructor),
+  Constructor.prototype === prototype,
+  functionPrototype.writable,
+  functionPrototype.configurable,
+);
+const parent = {};
+const child = {};
+Object.setPrototypeOf(child, parent);
+Object.preventExtensions(child);
+let prototypeChange = "ok";
+try { Object.setPrototypeOf(child, {}); } catch (error) {
+  prototypeChange = error.name;
+}
+console.log(
+  "prototype",
+  Object.getPrototypeOf(child) === parent,
+  prototypeChange,
+);
+function mappedSeal(value) {
+  Object.seal(arguments);
+  value = 14;
+  return [arguments[0], value, Object.isSealed(arguments)];
+}
+function mappedFreeze(value) {
+  Object.freeze(arguments);
+  value = 15;
+  return [arguments[0], value, Object.isFrozen(arguments)];
+}
+console.log("mapped seal", ...mappedSeal(13));
+console.log("mapped freeze", ...mappedFreeze(13));
+const wrapper = Object("ab");
+Object.freeze(wrapper);
+console.log(
+  "wrapper",
+  Object.isFrozen(wrapper),
+  wrapper[0],
+  Object.getOwnPropertyDescriptor(wrapper, "0").writable,
+  Object.getOwnPropertyDescriptor(wrapper, "length").writable,
+);
+for (const primitive of [undefined, null, true, 1, "x", Symbol("x"), 1n]) {
+  console.log(
+    "primitive",
+    typeof primitive,
+    Object.freeze(primitive) === primitive,
+    Object.seal(primitive) === primitive,
+    Object.preventExtensions(primitive) === primitive,
+    Object.isExtensible(primitive),
+    Object.isSealed(primitive),
+    Object.isFrozen(primitive),
+  );
+}
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+const originalFreeze = Object.freeze;
+let turn = 0;
+while (turn < 3) {
+  const guarded = { value: hinted(turn === 1 ? "x" : turn) };
+  Object.freeze(guarded);
+  console.log("guard", guarded.value, Object.isFrozen(guarded));
+  if (turn === 0) Object.integrityMarker = true;
+  turn = turn + 1;
+}
+console.log("identity", Object.freeze === originalFreeze);
+const collected = [];
+for (let index = 0; index < 24; index = index + 1) {
+  const value = { index, nested: { index } };
+  if (index % 3 === 0) Object.preventExtensions(value);
+  if (index % 3 === 1) Object.seal(value);
+  if (index % 3 === 2) Object.freeze(value);
+  collected.push(value);
+}
+console.log(
+  "collection",
+  collected.length,
+  collected[0].nested.index,
+  collected[23].nested.index,
+  Object.isExtensible(collected[0]),
+  Object.isSealed(collected[1]),
+  Object.isFrozen(collected[2]),
+);
+`,
+  },
+  {
     name: "object-prototype",
     source: `
 const parent = { inherited: 3 };

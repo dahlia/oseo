@@ -161,6 +161,32 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
   assert.doesNotMatch(deferred[1] ?? "", /getOwnPropertyDescriptors/u);
 });
 
+test("owns Object integrity transitions and queries", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const name of [
+    "freeze",
+    "isExtensible",
+    "isFrozen",
+    "isSealed",
+    "preventExtensions",
+    "seal",
+  ]) {
+    assert.match(objectBuiltins, new RegExp(`"${name}"`, "u"));
+  }
+  assert.match(objectBuiltins, /object_set_integrity_level/u);
+  assert.match(objectBuiltins, /object_test_integrity_level/u);
+  assert.match(objectBuiltins, /object->extensible = false/u);
+  const deferred = objectBuiltins.match(
+    /deferred_static_names\[\] = \{([^}]*)\}/u,
+  );
+  assert.ok(deferred != null, "deferred Object statics");
+  assert.doesNotMatch(
+    deferred[1] ?? "",
+    /freeze|isExtensible|isFrozen|isSealed|preventExtensions|seal/u,
+  );
+});
+
 test("installs the module namespace toStringTag descriptor", () => {
   const bindings = sources.get("runtime_binding.c") ?? "";
 
