@@ -42,6 +42,44 @@ export async function runNativeScenario2(
     );
   }
 
+  for (const [name, source] of [
+    [
+      "typed-array-default-for-of.ts",
+      "try { for (const value of new Uint8Array([1])) " +
+        "console.log(value); } catch (error) { console.log(error); }",
+    ],
+    [
+      "typed-array-default-array-spread.ts",
+      "try { console.log(...new Uint8Array([1])); } " +
+        "catch (error) { console.log(error); }",
+    ],
+    [
+      "typed-array-default-destructuring.ts",
+      "try { const [value] = new Uint8Array([1]); console.log(value); } " +
+        "catch (error) { console.log(error); }",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
   for (const property of [
     "length",
     "byteLength",

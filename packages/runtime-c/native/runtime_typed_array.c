@@ -1273,12 +1273,16 @@ bool oseo_internal_typed_array_deferred_accessor(
     OseoValue object,
     OseoValue key
 ) {
+    /* This constructor node defers every standard accessor and symbol-keyed
+     * entry on %TypedArray.prototype%. String-named methods stay with their
+     * later prototype-method nodes. */
     return object ==
             context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] &&
         (oseo_internal_string_is_ascii(key, "length") ||
          oseo_internal_string_is_ascii(key, "byteLength") ||
          oseo_internal_string_is_ascii(key, "byteOffset") ||
          oseo_internal_string_is_ascii(key, "buffer") ||
+         key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR] ||
          key == context->well_known_symbols[
              OSEO_WELL_KNOWN_TO_STRING_TAG
          ]);

@@ -217,6 +217,38 @@ console.log(
   customPrototypeTag[Symbol.toStringTag],
   Object.prototype.toString.call(customPrototypeTag),
 );
+function observeIterator(label, value) {
+  const spread = [...value];
+  const [first, second] = value;
+  let loop = "";
+  for (const item of value) loop = loop + item;
+  console.log(label, spread[0], spread[1], first, second, loop);
+}
+const customPrototypeIterator = new Uint8Array(0);
+Object.setPrototypeOf(customPrototypeIterator, {
+  [Symbol.iterator]: function () {
+    return [4, 6][Symbol.iterator]();
+  },
+});
+observeIterator("custom prototype iterator", customPrototypeIterator);
+const ownIterator = new Uint8Array(0);
+Object.defineProperty(ownIterator, Symbol.iterator, {
+  value: function () { return [5, 7][Symbol.iterator](); },
+});
+observeIterator("own iterator", ownIterator);
+const nullPrototypeIterator = new Uint8Array(0);
+Object.setPrototypeOf(nullPrototypeIterator, null);
+for (const consume of [
+  function () { for (const value of nullPrototypeIterator) void value; },
+  function () { return [...nullPrototypeIterator]; },
+  function () { const [value] = nullPrototypeIterator; return value; },
+]) {
+  try {
+    consume();
+  } catch (error) {
+    console.log("null prototype iterator", error instanceof TypeError);
+  }
+}
 const typedCopy = new Int16Array(iterable);
 iterable[0] = 99;
 console.log(

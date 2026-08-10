@@ -40,6 +40,7 @@ type ConstructorName =
   | "Uint8ClampedArray";
 
 type ConstructionPath = "array-like" | "buffer" | "iterable" | "typed";
+type IteratorMode = "custom" | "null" | "own";
 type OutOfBoundsSource = "fixed" | "tracking";
 type PrototypeMode = "default" | "null";
 type ShadowKey = "buffer" | "byteLength" | "byteOffset" | "length";
@@ -47,6 +48,7 @@ type TagPrototypeMode = "custom" | "null";
 
 interface TypedArrayCase {
   readonly constructorName: ConstructorName;
+  readonly iteratorMode: IteratorMode;
   readonly outOfBoundsSource: OutOfBoundsSource;
   readonly path: ConstructionPath;
   readonly prototypeMode: PrototypeMode;
@@ -74,6 +76,7 @@ const bigintConstructors: readonly ConstructorName[] = [
 
 const numberCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   constructorName: fc.constantFrom(...numberConstructors),
+  iteratorMode: fc.constantFrom("custom", "null", "own"),
   outOfBoundsSource: fc.constantFrom("fixed", "tracking"),
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
   prototypeMode: fc.constantFrom("default", "null"),
@@ -104,6 +107,7 @@ const numberCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
 
 const bigintCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   constructorName: fc.constantFrom(...bigintConstructors),
+  iteratorMode: fc.constantFrom("custom", "null", "own"),
   outOfBoundsSource: fc.constantFrom("fixed", "tracking"),
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
   prototypeMode: fc.constantFrom("default", "null"),
@@ -204,6 +208,44 @@ console.log(
   tagView[Symbol.toStringTag],
   Object.prototype.toString.call(tagView),
 );
+const iteratorView = new Constructor(0);
+${
+  testCase.iteratorMode === "custom"
+    ? `Object.setPrototypeOf(iteratorView, {
+  [Symbol.iterator]: function () { return [4, 6][Symbol.iterator](); },
+});`
+    : testCase.iteratorMode === "own"
+      ? `Object.defineProperty(iteratorView, Symbol.iterator, {
+  value: function () { return [4, 6][Symbol.iterator](); },
+});`
+      : "Object.setPrototypeOf(iteratorView, null);"
+}
+${
+  testCase.iteratorMode === "null"
+    ? `for (const consume of [
+  function () { for (const value of iteratorView) void value; },
+  function () { return [...iteratorView]; },
+  function () { const [value] = iteratorView; return value; },
+]) {
+  try {
+    consume();
+  } catch (error) {
+    console.log("iterator null", error instanceof TypeError);
+  }
+}`
+    : `const iteratorSpread = [...iteratorView];
+const [iteratorFirst, iteratorSecond] = iteratorView;
+let iteratorLoop = "";
+for (const value of iteratorView) iteratorLoop = iteratorLoop + value;
+console.log(
+  "iterator ${testCase.iteratorMode}",
+  iteratorSpread[0],
+  iteratorSpread[1],
+  iteratorFirst,
+  iteratorSecond,
+  iteratorLoop,
+);`
+}
 const copy = new Constructor(view);
 console.log("copy", "" + copy[0], "" + copy[1], "" + copy[2]);
 let outOfBoundsConversions = 0;
@@ -356,6 +398,9 @@ function expected(testCase: TypedArrayCase): string {
     testCase.tagPrototypeMode === "custom"
       ? "tag GeneratedTypedArray [object GeneratedTypedArray]"
       : "tag undefined [object Object]",
+    ...(testCase.iteratorMode === "null"
+      ? ["iterator null true", "iterator null true", "iterator null true"]
+      : [`iterator ${testCase.iteratorMode} 4 6 4 6 46`]),
     `copy ${observed}`,
     testCase.constructorName.startsWith("Big")
       ? "out-of-bounds set bigint true"
@@ -479,6 +524,7 @@ test(
           "default-chain own shadow or null-prototype deferred accessor, " +
           "one custom or null-prototype toStringTag lookup, live and " +
           "out-of-bounds element enumerability, canonical numeric misses, " +
+          "one own, custom, or null-prototype iterator lookup, " +
           "one false numeric hint, and one mutable intrinsic global write " +
           "and restore",
         numRuns: 12,
@@ -489,7 +535,8 @@ test(
           "one typed-array clone, one out-of-bounds set and clone, one " +
           "default or null prototype accessor case, one false hint, and " +
           "one custom or null-prototype tag case, one element enumeration, " +
-          "and one global rebinding",
+          "one own, custom, or null-prototype iterator case, and one " +
+          "global rebinding",
         timeLimitMilliseconds: 180_000,
       },
     );
