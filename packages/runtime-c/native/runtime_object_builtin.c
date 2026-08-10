@@ -121,6 +121,22 @@ static OseoResult object_prototype_property_is_enumerable(
         return normal(oseo_boolean(enumerable));
     }
     if (!is_object(receiver)) return normal(oseo_boolean(false));
+    if (is_typed_array(receiver)) {
+        uint32_t index = 0u;
+        if (oseo_internal_array_index(key.value, &index)) {
+            return normal(oseo_boolean(
+                oseo_internal_typed_array_has_index(receiver, index)
+            ));
+        }
+        bool numeric_index = false;
+        OseoResult classified = oseo_internal_canonical_numeric_index(
+            context,
+            key.value,
+            &numeric_index
+        );
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) return normal(oseo_boolean(false));
+    }
     OseoValue ignored = oseo_undefined();
     OseoValue ignored_getter = oseo_undefined();
     OseoValue ignored_setter = oseo_undefined();

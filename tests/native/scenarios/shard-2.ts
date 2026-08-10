@@ -124,6 +124,37 @@ export async function runNativeScenario2(
     );
   }
 
+  for (const [name, source] of [
+    [
+      "typed-array-to-string-tag.ts",
+      "console.log(new Uint8Array(1)[Symbol.toStringTag]);",
+    ],
+    [
+      "typed-array-object-to-string.ts",
+      "console.log(Object.prototype.toString.call(new Uint8Array(1)));",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
   // The switch-tdz fixture explains why this check bypasses the Deno
   // reference: Deno's TypeScript transpile loses the case-level TDZ.
   const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;

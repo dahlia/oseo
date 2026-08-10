@@ -1278,7 +1278,10 @@ bool oseo_internal_typed_array_deferred_accessor(
         (oseo_internal_string_is_ascii(key, "length") ||
          oseo_internal_string_is_ascii(key, "byteLength") ||
          oseo_internal_string_is_ascii(key, "byteOffset") ||
-         oseo_internal_string_is_ascii(key, "buffer"));
+         oseo_internal_string_is_ascii(key, "buffer") ||
+         key == context->well_known_symbols[
+             OSEO_WELL_KNOWN_TO_STRING_TAG
+         ]);
 }
 
 OseoResult oseo_internal_install_typed_array_globals(

@@ -191,6 +191,32 @@ console.log("array-like path", arrayLike[0], arrayLike[1], arrayLike[2]);
 const iterable = new Uint8Array([3, 5, 8]);
 console.log("iterable path", iterable[0], iterable[1], iterable[2]);
 console.log("index ownership", 0 in iterable, 3 in iterable);
+const propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
+console.log(
+  "index enumerable",
+  propertyIsEnumerable.call(iterable, "0"),
+  propertyIsEnumerable.call(iterable, "2"),
+  propertyIsEnumerable.call(iterable, "3"),
+  propertyIsEnumerable.call(iterable, "-0"),
+  propertyIsEnumerable.call(iterable, "1.5"),
+  propertyIsEnumerable.call(iterable, "4294967295"),
+);
+const nullPrototypeTag = new Uint8Array(0);
+Object.setPrototypeOf(nullPrototypeTag, null);
+console.log(
+  "null prototype tag",
+  nullPrototypeTag[Symbol.toStringTag],
+  Object.prototype.toString.call(nullPrototypeTag),
+);
+const customPrototypeTag = new Uint8Array(0);
+Object.setPrototypeOf(customPrototypeTag, {
+  [Symbol.toStringTag]: "CustomTypedArray",
+});
+console.log(
+  "custom prototype tag",
+  customPrototypeTag[Symbol.toStringTag],
+  Object.prototype.toString.call(customPrototypeTag),
+);
 const typedCopy = new Int16Array(iterable);
 iterable[0] = 99;
 console.log(

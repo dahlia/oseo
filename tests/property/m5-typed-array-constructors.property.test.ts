@@ -43,6 +43,7 @@ type ConstructionPath = "array-like" | "buffer" | "iterable" | "typed";
 type OutOfBoundsSource = "fixed" | "tracking";
 type PrototypeMode = "default" | "null";
 type ShadowKey = "buffer" | "byteLength" | "byteOffset" | "length";
+type TagPrototypeMode = "custom" | "null";
 
 interface TypedArrayCase {
   readonly constructorName: ConstructorName;
@@ -50,6 +51,7 @@ interface TypedArrayCase {
   readonly path: ConstructionPath;
   readonly prototypeMode: PrototypeMode;
   readonly shadowKey: ShadowKey;
+  readonly tagPrototypeMode: TagPrototypeMode;
   readonly values: readonly (bigint | number)[];
 }
 
@@ -76,6 +78,7 @@ const numberCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
   prototypeMode: fc.constantFrom("default", "null"),
   shadowKey: fc.constantFrom("buffer", "byteLength", "byteOffset", "length"),
+  tagPrototypeMode: fc.constantFrom("custom", "null"),
   values: fc.array(
     fc.oneof(
       fc.integer({ max: 0x1_0000_0001, min: -0x1_0000_0001 }),
@@ -105,6 +108,7 @@ const bigintCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
   prototypeMode: fc.constantFrom("default", "null"),
   shadowKey: fc.constantFrom("buffer", "byteLength", "byteOffset", "length"),
+  tagPrototypeMode: fc.constantFrom("custom", "null"),
   values: fc.array(
     fc.bigInt({
       max: (1n << 65n) + 3n,
@@ -177,6 +181,28 @@ console.log(
   "" + view[1],
   "" + view[2],
   "" + view[${testCase.values.length}],
+);
+const propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
+console.log(
+  "enumerable",
+  propertyIsEnumerable.call(view, "0"),
+  propertyIsEnumerable.call(view, "${testCase.values.length}"),
+  propertyIsEnumerable.call(view, "-0"),
+  propertyIsEnumerable.call(view, "1.5"),
+  propertyIsEnumerable.call(view, "4294967295"),
+);
+const tagView = new Constructor(0);
+${
+  testCase.tagPrototypeMode === "custom"
+    ? `Object.setPrototypeOf(tagView, {
+  [Symbol.toStringTag]: "GeneratedTypedArray",
+});`
+    : "Object.setPrototypeOf(tagView, null);"
+}
+console.log(
+  "tag",
+  tagView[Symbol.toStringTag],
+  Object.prototype.toString.call(tagView),
 );
 const copy = new Constructor(view);
 console.log("copy", "" + copy[0], "" + copy[1], "" + copy[2]);
@@ -326,6 +352,10 @@ function expected(testCase: TypedArrayCase): string {
           : 8;
   return [
     `view ${testCase.constructorName} ${bytes} true true ${observed} undefined`,
+    `enumerable ${testCase.values.length > 0} false false false false`,
+    testCase.tagPrototypeMode === "custom"
+      ? "tag GeneratedTypedArray [object GeneratedTypedArray]"
+      : "tag undefined [object Object]",
     `copy ${observed}`,
     testCase.constructorName.startsWith("Big")
       ? "out-of-bounds set bigint true"
@@ -447,6 +477,8 @@ test(
           "construction path, one clone, one out-of-bounds conversion, " +
           "one fixed or offset length-tracking out-of-bounds clone, one " +
           "default-chain own shadow or null-prototype deferred accessor, " +
+          "one custom or null-prototype toStringTag lookup, live and " +
+          "out-of-bounds element enumerability, canonical numeric misses, " +
           "one false numeric hint, and one mutable intrinsic global write " +
           "and restore",
         numRuns: 12,
@@ -456,7 +488,8 @@ test(
           "one constructor, one construction path, at most eight values, " +
           "one typed-array clone, one out-of-bounds set and clone, one " +
           "default or null prototype accessor case, one false hint, and " +
-          "one global rebinding",
+          "one custom or null-prototype tag case, one element enumeration, " +
+          "and one global rebinding",
         timeLimitMilliseconds: 180_000,
       },
     );
