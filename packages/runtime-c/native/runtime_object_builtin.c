@@ -577,6 +577,136 @@ static OseoResult object_is(
     return normal(oseo_boolean(oseo_internal_same_value(left, right)));
 }
 
+/*
+ * SetIntegrityLevel (7.3.15) over the ordinary and currently admitted exotic
+ * object representations. The descriptor component remains authoritative for
+ * applying every stored property change, including mapped arguments aliases
+ * and module namespace compatibility. Array `length` and function `prototype`
+ * are the two own data properties held outside the property vector.
+ */
+static OseoResult object_set_integrity_level(
+    OseoContext *context,
+    OseoValue object_value,
+    bool frozen
+) {
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    object->extensible = false;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = object_value;
+    size_t property_count = object->property_count;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < property_count;
+         index += 1u) {
+        object = ordinary_object(frame.slots[0]);
+        OseoProperty property = object->properties[index];
+        frame.slots[1] = property.key;
+        frame.slots[2] = property.attributes.accessor
+            ? property.getter
+            : property.value;
+        if (!property.attributes.accessor &&
+            oseo_internal_cell_backed_property(
+                frame.slots[0], frame.slots[2])) {
+            result = oseo_cell_get(context, frame.slots[2]);
+            frame.slots[2] = result.value;
+        }
+        OseoPropertyAttributes attributes = property.attributes;
+        attributes.configurable = false;
+        if (frozen && !attributes.accessor) attributes.writable = false;
+        if (result.status == OSEO_STATUS_NORMAL && attributes.accessor) {
+            result = oseo_object_define_accessor(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                property.getter,
+                property.setter,
+                true,
+                true,
+                attributes
+            );
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_object_define_data(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                frame.slots[2],
+                attributes,
+                true
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && frozen) {
+        object = ordinary_object(frame.slots[0]);
+        if (is_array(frame.slots[0])) object->length_writable = false;
+        if (function_has_prototype_property(frame.slots[0])) {
+            function_object(frame.slots[0])->prototype_writable = false;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/* TestIntegrityLevel (7.3.16), including the two virtual own properties. */
+static bool object_test_integrity_level(OseoValue value, bool frozen) {
+    OseoOrdinaryObject *object = ordinary_object(value);
+    if (object->extensible) return false;
+    if (frozen && is_array(value) && object->length_writable) return false;
+    if (frozen && function_has_prototype_property(value) &&
+        function_object(value)->prototype_writable) return false;
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        OseoPropertyAttributes attributes =
+            object->properties[index].attributes;
+        if (attributes.configurable ||
+            (frozen && !attributes.accessor && attributes.writable)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static OseoResult object_integrity_transition(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool frozen
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    if (!is_object(value)) return normal(value);
+    return object_set_integrity_level(context, value, frozen);
+}
+
+static OseoResult object_integrity_query(
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool frozen
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    return normal(oseo_boolean(
+        !is_object(value) || object_test_integrity_level(value, frozen)
+    ));
+}
+
+static OseoResult object_is_extensible(
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    return normal(oseo_boolean(
+        is_object(value) && ordinary_object(value)->extensible
+    ));
+}
+
+static OseoResult object_prevent_extensions(
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    if (is_object(value)) ordinary_object(value)->extensible = false;
+    return normal(value);
+}
+
 OseoResult oseo_internal_object_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -656,6 +786,26 @@ OseoResult oseo_internal_object_builtin_dispatch(
             argument_count,
             arguments
         );
+    }
+    if (code_id == OSEO_OBJECT_FREEZE_CODE_ID) {
+        return object_integrity_transition(
+            context, argument_count, arguments, true);
+    }
+    if (code_id == OSEO_OBJECT_IS_EXTENSIBLE_CODE_ID) {
+        return object_is_extensible(argument_count, arguments);
+    }
+    if (code_id == OSEO_OBJECT_IS_FROZEN_CODE_ID) {
+        return object_integrity_query(argument_count, arguments, true);
+    }
+    if (code_id == OSEO_OBJECT_IS_SEALED_CODE_ID) {
+        return object_integrity_query(argument_count, arguments, false);
+    }
+    if (code_id == OSEO_OBJECT_PREVENT_EXTENSIONS_CODE_ID) {
+        return object_prevent_extensions(argument_count, arguments);
+    }
+    if (code_id == OSEO_OBJECT_SEAL_CODE_ID) {
+        return object_integrity_transition(
+            context, argument_count, arguments, false);
     }
     if (code_id == OSEO_OBJECT_KEYS_CODE_ID) {
         return oseo_object_builtin_keys(context, argument_count, arguments);
@@ -926,18 +1076,32 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     static const size_t owned_static_codes[] = {
         OSEO_OBJECT_CREATE_CODE_ID,
         OSEO_OBJECT_DEFINE_PROPERTY_CODE_ID,
+        OSEO_OBJECT_FREEZE_CODE_ID,
         OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTOR_CODE_ID,
         OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID,
+        OSEO_OBJECT_IS_EXTENSIBLE_CODE_ID,
+        OSEO_OBJECT_IS_FROZEN_CODE_ID,
+        OSEO_OBJECT_IS_SEALED_CODE_ID,
         OSEO_OBJECT_KEYS_CODE_ID,
+        OSEO_OBJECT_PREVENT_EXTENSIONS_CODE_ID,
+        OSEO_OBJECT_SEAL_CODE_ID,
     };
     static const char *const owned_static_names[] = {
         "create",
         "defineProperty",
+        "freeze",
         "getOwnPropertyDescriptor",
         "getOwnPropertyDescriptors",
+        "isExtensible",
+        "isFrozen",
+        "isSealed",
         "keys",
+        "preventExtensions",
+        "seal",
     };
-    static const size_t owned_static_lengths[] = {2u, 3u, 2u, 1u, 1u};
+    static const size_t owned_static_lengths[] = {
+        2u, 3u, 1u, 2u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+    };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
              index < sizeof(owned_static_codes) / sizeof(*owned_static_codes);
@@ -970,22 +1134,15 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         "assign",
         "defineProperties",
         "entries",
-        "freeze",
         "fromEntries",
         "getOwnPropertyNames",
         "getOwnPropertySymbols",
         "groupBy",
         "hasOwn",
-        "isExtensible",
-        "isFrozen",
-        "isSealed",
-        "preventExtensions",
-        "seal",
         "values",
     };
     static const size_t deferred_static_lengths[] = {
-        2u, 2u, 1u, 1u, 1u, 1u, 1u,
-        2u, 2u, 1u, 1u, 1u, 1u, 1u, 1u,
+        2u, 2u, 1u, 1u, 1u, 1u, 2u, 2u, 1u,
     };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&

@@ -115,7 +115,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
@@ -126,14 +126,10 @@ results:
       variants:
         - specialization: disabled
           strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/class-field-on-frozen-objects.js
-        strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/class-field-on-frozen-objects.js:97:7:
-        error[OSEO2001]: Object static method is not admitted in this
-        M5b node.\n"'
-      unsupportedCapability: object-static-method
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

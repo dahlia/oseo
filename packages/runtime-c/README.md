@@ -386,6 +386,17 @@ SpeciesConstructor, and the `byteLength`, `detached`, `maxByteLength`, and
 runtime layout is unchanged; the runtime adds one internal heap kind for the
 buffer record.
 
+The `m5-56` ABI gives every object an observable extensibility state and
+admits the six Object integrity statics. `preventExtensions` clears that
+state, `seal` also makes every own property non-configurable, and `freeze`
+also makes every own data property non-writable. `isExtensible`, `isSealed`,
+and `isFrozen` report the corresponding state without boxing primitives.
+Stored properties still transition through the shared descriptor component,
+including arguments aliases and module namespace restrictions, while array
+`length` and function `prototype` retain their specialized storage. Public
+runtime layout is unchanged because the extensibility flag was reserved by
+the intrinsic graph root.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

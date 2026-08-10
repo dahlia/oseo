@@ -240,3 +240,7 @@ families:
     owner: tests/property/unicode-tables.property.test.ts
     start: 0x60003b00
     end: 0x60003bff
+  - family: m5-object-integrity-levels
+    owner: tests/property/m5-object-integrity-levels.property.test.ts
+    start: 0x60003c00
+    end: 0x60003cff

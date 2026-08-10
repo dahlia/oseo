@@ -1,0 +1,3 @@
+version: 1
+id: object-integrity-levels
+record: docs/language-profile-m5/families/object-integrity-levels.yaml

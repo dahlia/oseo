@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 7,613 reviewed cases: 5,038 passes, 1,355
-expected negatives, and 1,220 unsupported profile features. It records no
+The current manifest contains 7,927 reviewed cases: 5,263 passes, 1,355
+expected negatives, and 1,309 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3270,6 +3270,43 @@ suite revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are otherwise unchanged. The new component and its heap
 kind move the runtime ABI to `oseo-runtime-m5-55` without a public layout
 change and without changing the graph's orchestration state.
+
+M5b node `object-integrity-levels` gives every object an extensibility state
+that the six admitted Object integrity statics expose. `preventExtensions`
+clears that state, `seal` also makes each own property non-configurable, and
+`freeze` also makes each own data property non-writable. `isExtensible`,
+`isSealed`, and `isFrozen` inspect those states directly; primitives are
+already sealed and frozen and are never extensible. All three transitions
+return their input, including primitives, without boxing it.
+
+SetIntegrityLevel applies stored changes through the shared descriptor
+component, so mapped arguments aliases, String wrappers, and module namespace
+restrictions retain their existing generic behavior. Array `length` and
+function `prototype` participate through their specialized storage. A sealed
+mapped arguments object retains its live parameter alias because its data
+properties remain writable, while freezing it severs that alias when the
+descriptor becomes non-writable. Prototype mutation and new own-property
+definition fail once extensibility has been cleared.
+
+Fixed native and generated differential evidence at property seed
+`0x60003c00` covers both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard hits and misses, generic
+fallback, all three transitions and queries, data and accessor descriptors,
+ordinary objects, arrays, functions, arguments aliases, String wrappers,
+primitive inputs, and collection pressure. All 317 paths under the node's six
+inventory roots were reviewed. Of those paths, 314 enter the manifest: 206
+pass and 108 retain explicit prerequisites for unadmitted standard globals,
+`Proxy`, `Reflect`, TypedArrays, SharedArrayBuffer, DataView, host objects,
+private fields, and dynamic source. The remaining three seal function kinds
+by constructing new source through the `Function` constructor and stay
+outside the reviewed subset under ADR 0016. Nineteen previously reviewed
+cross-family cases also become passes because the admitted extensibility state
+satisfies their prerequisite. The manifest reaches 7,927 cases: 5,263 passes,
+1,355 expected negatives, and 1,309 unsupported profile features with no
+semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The runtime ABI moves to `oseo-runtime-m5-56` without
+changing the graph's orchestration state.
 
 
 Known gaps inside the claim

@@ -12,7 +12,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - array-buffer
     execution:
@@ -22,14 +22,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/ArrayBuffer/prototype/slice/extensible.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/ArrayBuffer/prototype/slice/extensible.js:91:8:
-        error[OSEO2001]: Object static method is not admitted in this
-        M5b node.\n"'
-      unsupportedCapability: object-static-method
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

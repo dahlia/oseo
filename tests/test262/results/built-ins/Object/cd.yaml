@@ -104,7 +104,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
     execution:
@@ -114,14 +114,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/Object/defineProperty/15.2.3.6-4-1.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/defineProperty/15.2.3.6-4-1.js:93:1:
-        error[OSEO2001]: Object static method is not admitted in this
-        M5b node.\n"'
-      unsupportedCapability: object-static-method
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -215,4 +215,50 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Object/preventExtensions/15.2.3.10-3-9.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/preventExtensions/15.2.3.10-3-9.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/preventExtensions/15.2.3.10-3-9.\
+        js:336:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+        - Proxy
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/seal/proxy-with-defineProperty-handler.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Proxy
+      - Reflect
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
