@@ -38,6 +38,432 @@ partitions:
   - group: built-ins/AggregateError
     key: e9
     path: results/built-ins/AggregateError/e9.yaml
+  - group: built-ins/ArrayBuffer
+    key: "00"
+    path: results/built-ins/ArrayBuffer/00.yaml
+  - group: built-ins/ArrayBuffer
+    key: "05"
+    path: results/built-ins/ArrayBuffer/05.yaml
+  - group: built-ins/ArrayBuffer
+    key: "06"
+    path: results/built-ins/ArrayBuffer/06.yaml
+  - group: built-ins/ArrayBuffer
+    key: "08"
+    path: results/built-ins/ArrayBuffer/08.yaml
+  - group: built-ins/ArrayBuffer
+    key: "10"
+    path: results/built-ins/ArrayBuffer/10.yaml
+  - group: built-ins/ArrayBuffer
+    key: "13"
+    path: results/built-ins/ArrayBuffer/13.yaml
+  - group: built-ins/ArrayBuffer
+    key: "14"
+    path: results/built-ins/ArrayBuffer/14.yaml
+  - group: built-ins/ArrayBuffer
+    key: "16"
+    path: results/built-ins/ArrayBuffer/16.yaml
+  - group: built-ins/ArrayBuffer
+    key: "17"
+    path: results/built-ins/ArrayBuffer/17.yaml
+  - group: built-ins/ArrayBuffer
+    key: "18"
+    path: results/built-ins/ArrayBuffer/18.yaml
+  - group: built-ins/ArrayBuffer
+    key: "19"
+    path: results/built-ins/ArrayBuffer/19.yaml
+  - group: built-ins/ArrayBuffer
+    key: 1a
+    path: results/built-ins/ArrayBuffer/1a.yaml
+  - group: built-ins/ArrayBuffer
+    key: 1b
+    path: results/built-ins/ArrayBuffer/1b.yaml
+  - group: built-ins/ArrayBuffer
+    key: 1e
+    path: results/built-ins/ArrayBuffer/1e.yaml
+  - group: built-ins/ArrayBuffer
+    key: 1f
+    path: results/built-ins/ArrayBuffer/1f.yaml
+  - group: built-ins/ArrayBuffer
+    key: "22"
+    path: results/built-ins/ArrayBuffer/22.yaml
+  - group: built-ins/ArrayBuffer
+    key: "24"
+    path: results/built-ins/ArrayBuffer/24.yaml
+  - group: built-ins/ArrayBuffer
+    key: "25"
+    path: results/built-ins/ArrayBuffer/25.yaml
+  - group: built-ins/ArrayBuffer
+    key: "26"
+    path: results/built-ins/ArrayBuffer/26.yaml
+  - group: built-ins/ArrayBuffer
+    key: "27"
+    path: results/built-ins/ArrayBuffer/27.yaml
+  - group: built-ins/ArrayBuffer
+    key: "28"
+    path: results/built-ins/ArrayBuffer/28.yaml
+  - group: built-ins/ArrayBuffer
+    key: "29"
+    path: results/built-ins/ArrayBuffer/29.yaml
+  - group: built-ins/ArrayBuffer
+    key: 2b
+    path: results/built-ins/ArrayBuffer/2b.yaml
+  - group: built-ins/ArrayBuffer
+    key: "31"
+    path: results/built-ins/ArrayBuffer/31.yaml
+  - group: built-ins/ArrayBuffer
+    key: "32"
+    path: results/built-ins/ArrayBuffer/32.yaml
+  - group: built-ins/ArrayBuffer
+    key: "33"
+    path: results/built-ins/ArrayBuffer/33.yaml
+  - group: built-ins/ArrayBuffer
+    key: "35"
+    path: results/built-ins/ArrayBuffer/35.yaml
+  - group: built-ins/ArrayBuffer
+    key: "36"
+    path: results/built-ins/ArrayBuffer/36.yaml
+  - group: built-ins/ArrayBuffer
+    key: "38"
+    path: results/built-ins/ArrayBuffer/38.yaml
+  - group: built-ins/ArrayBuffer
+    key: "39"
+    path: results/built-ins/ArrayBuffer/39.yaml
+  - group: built-ins/ArrayBuffer
+    key: 3d
+    path: results/built-ins/ArrayBuffer/3d.yaml
+  - group: built-ins/ArrayBuffer
+    key: 3e
+    path: results/built-ins/ArrayBuffer/3e.yaml
+  - group: built-ins/ArrayBuffer
+    key: 3f
+    path: results/built-ins/ArrayBuffer/3f.yaml
+  - group: built-ins/ArrayBuffer
+    key: "42"
+    path: results/built-ins/ArrayBuffer/42.yaml
+  - group: built-ins/ArrayBuffer
+    key: "44"
+    path: results/built-ins/ArrayBuffer/44.yaml
+  - group: built-ins/ArrayBuffer
+    key: "45"
+    path: results/built-ins/ArrayBuffer/45.yaml
+  - group: built-ins/ArrayBuffer
+    key: "46"
+    path: results/built-ins/ArrayBuffer/46.yaml
+  - group: built-ins/ArrayBuffer
+    key: "49"
+    path: results/built-ins/ArrayBuffer/49.yaml
+  - group: built-ins/ArrayBuffer
+    key: 4c
+    path: results/built-ins/ArrayBuffer/4c.yaml
+  - group: built-ins/ArrayBuffer
+    key: 4d
+    path: results/built-ins/ArrayBuffer/4d.yaml
+  - group: built-ins/ArrayBuffer
+    key: 4f
+    path: results/built-ins/ArrayBuffer/4f.yaml
+  - group: built-ins/ArrayBuffer
+    key: "50"
+    path: results/built-ins/ArrayBuffer/50.yaml
+  - group: built-ins/ArrayBuffer
+    key: "52"
+    path: results/built-ins/ArrayBuffer/52.yaml
+  - group: built-ins/ArrayBuffer
+    key: "53"
+    path: results/built-ins/ArrayBuffer/53.yaml
+  - group: built-ins/ArrayBuffer
+    key: "55"
+    path: results/built-ins/ArrayBuffer/55.yaml
+  - group: built-ins/ArrayBuffer
+    key: "57"
+    path: results/built-ins/ArrayBuffer/57.yaml
+  - group: built-ins/ArrayBuffer
+    key: "58"
+    path: results/built-ins/ArrayBuffer/58.yaml
+  - group: built-ins/ArrayBuffer
+    key: "59"
+    path: results/built-ins/ArrayBuffer/59.yaml
+  - group: built-ins/ArrayBuffer
+    key: 5b
+    path: results/built-ins/ArrayBuffer/5b.yaml
+  - group: built-ins/ArrayBuffer
+    key: 5d
+    path: results/built-ins/ArrayBuffer/5d.yaml
+  - group: built-ins/ArrayBuffer
+    key: "60"
+    path: results/built-ins/ArrayBuffer/60.yaml
+  - group: built-ins/ArrayBuffer
+    key: "61"
+    path: results/built-ins/ArrayBuffer/61.yaml
+  - group: built-ins/ArrayBuffer
+    key: "62"
+    path: results/built-ins/ArrayBuffer/62.yaml
+  - group: built-ins/ArrayBuffer
+    key: "64"
+    path: results/built-ins/ArrayBuffer/64.yaml
+  - group: built-ins/ArrayBuffer
+    key: "67"
+    path: results/built-ins/ArrayBuffer/67.yaml
+  - group: built-ins/ArrayBuffer
+    key: "68"
+    path: results/built-ins/ArrayBuffer/68.yaml
+  - group: built-ins/ArrayBuffer
+    key: "69"
+    path: results/built-ins/ArrayBuffer/69.yaml
+  - group: built-ins/ArrayBuffer
+    key: 6a
+    path: results/built-ins/ArrayBuffer/6a.yaml
+  - group: built-ins/ArrayBuffer
+    key: 6b
+    path: results/built-ins/ArrayBuffer/6b.yaml
+  - group: built-ins/ArrayBuffer
+    key: 6c
+    path: results/built-ins/ArrayBuffer/6c.yaml
+  - group: built-ins/ArrayBuffer
+    key: 6d
+    path: results/built-ins/ArrayBuffer/6d.yaml
+  - group: built-ins/ArrayBuffer
+    key: "70"
+    path: results/built-ins/ArrayBuffer/70.yaml
+  - group: built-ins/ArrayBuffer
+    key: "73"
+    path: results/built-ins/ArrayBuffer/73.yaml
+  - group: built-ins/ArrayBuffer
+    key: "76"
+    path: results/built-ins/ArrayBuffer/76.yaml
+  - group: built-ins/ArrayBuffer
+    key: "77"
+    path: results/built-ins/ArrayBuffer/77.yaml
+  - group: built-ins/ArrayBuffer
+    key: "79"
+    path: results/built-ins/ArrayBuffer/79.yaml
+  - group: built-ins/ArrayBuffer
+    key: 7a
+    path: results/built-ins/ArrayBuffer/7a.yaml
+  - group: built-ins/ArrayBuffer
+    key: 7b
+    path: results/built-ins/ArrayBuffer/7b.yaml
+  - group: built-ins/ArrayBuffer
+    key: 7c
+    path: results/built-ins/ArrayBuffer/7c.yaml
+  - group: built-ins/ArrayBuffer
+    key: 7d
+    path: results/built-ins/ArrayBuffer/7d.yaml
+  - group: built-ins/ArrayBuffer
+    key: 7f
+    path: results/built-ins/ArrayBuffer/7f.yaml
+  - group: built-ins/ArrayBuffer
+    key: "80"
+    path: results/built-ins/ArrayBuffer/80.yaml
+  - group: built-ins/ArrayBuffer
+    key: "81"
+    path: results/built-ins/ArrayBuffer/81.yaml
+  - group: built-ins/ArrayBuffer
+    key: "85"
+    path: results/built-ins/ArrayBuffer/85.yaml
+  - group: built-ins/ArrayBuffer
+    key: "86"
+    path: results/built-ins/ArrayBuffer/86.yaml
+  - group: built-ins/ArrayBuffer
+    key: "87"
+    path: results/built-ins/ArrayBuffer/87.yaml
+  - group: built-ins/ArrayBuffer
+    key: "88"
+    path: results/built-ins/ArrayBuffer/88.yaml
+  - group: built-ins/ArrayBuffer
+    key: 8b
+    path: results/built-ins/ArrayBuffer/8b.yaml
+  - group: built-ins/ArrayBuffer
+    key: 8f
+    path: results/built-ins/ArrayBuffer/8f.yaml
+  - group: built-ins/ArrayBuffer
+    key: "91"
+    path: results/built-ins/ArrayBuffer/91.yaml
+  - group: built-ins/ArrayBuffer
+    key: "92"
+    path: results/built-ins/ArrayBuffer/92.yaml
+  - group: built-ins/ArrayBuffer
+    key: "93"
+    path: results/built-ins/ArrayBuffer/93.yaml
+  - group: built-ins/ArrayBuffer
+    key: "95"
+    path: results/built-ins/ArrayBuffer/95.yaml
+  - group: built-ins/ArrayBuffer
+    key: "96"
+    path: results/built-ins/ArrayBuffer/96.yaml
+  - group: built-ins/ArrayBuffer
+    key: "97"
+    path: results/built-ins/ArrayBuffer/97.yaml
+  - group: built-ins/ArrayBuffer
+    key: 9a
+    path: results/built-ins/ArrayBuffer/9a.yaml
+  - group: built-ins/ArrayBuffer
+    key: 9c
+    path: results/built-ins/ArrayBuffer/9c.yaml
+  - group: built-ins/ArrayBuffer
+    key: 9f
+    path: results/built-ins/ArrayBuffer/9f.yaml
+  - group: built-ins/ArrayBuffer
+    key: a0
+    path: results/built-ins/ArrayBuffer/a0.yaml
+  - group: built-ins/ArrayBuffer
+    key: a4
+    path: results/built-ins/ArrayBuffer/a4.yaml
+  - group: built-ins/ArrayBuffer
+    key: a6
+    path: results/built-ins/ArrayBuffer/a6.yaml
+  - group: built-ins/ArrayBuffer
+    key: a8
+    path: results/built-ins/ArrayBuffer/a8.yaml
+  - group: built-ins/ArrayBuffer
+    key: a9
+    path: results/built-ins/ArrayBuffer/a9.yaml
+  - group: built-ins/ArrayBuffer
+    key: aa
+    path: results/built-ins/ArrayBuffer/aa.yaml
+  - group: built-ins/ArrayBuffer
+    key: ac
+    path: results/built-ins/ArrayBuffer/ac.yaml
+  - group: built-ins/ArrayBuffer
+    key: ad
+    path: results/built-ins/ArrayBuffer/ad.yaml
+  - group: built-ins/ArrayBuffer
+    key: b0
+    path: results/built-ins/ArrayBuffer/b0.yaml
+  - group: built-ins/ArrayBuffer
+    key: b1
+    path: results/built-ins/ArrayBuffer/b1.yaml
+  - group: built-ins/ArrayBuffer
+    key: b2
+    path: results/built-ins/ArrayBuffer/b2.yaml
+  - group: built-ins/ArrayBuffer
+    key: b4
+    path: results/built-ins/ArrayBuffer/b4.yaml
+  - group: built-ins/ArrayBuffer
+    key: b8
+    path: results/built-ins/ArrayBuffer/b8.yaml
+  - group: built-ins/ArrayBuffer
+    key: bc
+    path: results/built-ins/ArrayBuffer/bc.yaml
+  - group: built-ins/ArrayBuffer
+    key: bf
+    path: results/built-ins/ArrayBuffer/bf.yaml
+  - group: built-ins/ArrayBuffer
+    key: c0
+    path: results/built-ins/ArrayBuffer/c0.yaml
+  - group: built-ins/ArrayBuffer
+    key: c1
+    path: results/built-ins/ArrayBuffer/c1.yaml
+  - group: built-ins/ArrayBuffer
+    key: c2
+    path: results/built-ins/ArrayBuffer/c2.yaml
+  - group: built-ins/ArrayBuffer
+    key: c3
+    path: results/built-ins/ArrayBuffer/c3.yaml
+  - group: built-ins/ArrayBuffer
+    key: c4
+    path: results/built-ins/ArrayBuffer/c4.yaml
+  - group: built-ins/ArrayBuffer
+    key: c5
+    path: results/built-ins/ArrayBuffer/c5.yaml
+  - group: built-ins/ArrayBuffer
+    key: c8
+    path: results/built-ins/ArrayBuffer/c8.yaml
+  - group: built-ins/ArrayBuffer
+    key: c9
+    path: results/built-ins/ArrayBuffer/c9.yaml
+  - group: built-ins/ArrayBuffer
+    key: ca
+    path: results/built-ins/ArrayBuffer/ca.yaml
+  - group: built-ins/ArrayBuffer
+    key: cb
+    path: results/built-ins/ArrayBuffer/cb.yaml
+  - group: built-ins/ArrayBuffer
+    key: d0
+    path: results/built-ins/ArrayBuffer/d0.yaml
+  - group: built-ins/ArrayBuffer
+    key: d1
+    path: results/built-ins/ArrayBuffer/d1.yaml
+  - group: built-ins/ArrayBuffer
+    key: d2
+    path: results/built-ins/ArrayBuffer/d2.yaml
+  - group: built-ins/ArrayBuffer
+    key: d5
+    path: results/built-ins/ArrayBuffer/d5.yaml
+  - group: built-ins/ArrayBuffer
+    key: d8
+    path: results/built-ins/ArrayBuffer/d8.yaml
+  - group: built-ins/ArrayBuffer
+    key: d9
+    path: results/built-ins/ArrayBuffer/d9.yaml
+  - group: built-ins/ArrayBuffer
+    key: de
+    path: results/built-ins/ArrayBuffer/de.yaml
+  - group: built-ins/ArrayBuffer
+    key: e2
+    path: results/built-ins/ArrayBuffer/e2.yaml
+  - group: built-ins/ArrayBuffer
+    key: e4
+    path: results/built-ins/ArrayBuffer/e4.yaml
+  - group: built-ins/ArrayBuffer
+    key: e7
+    path: results/built-ins/ArrayBuffer/e7.yaml
+  - group: built-ins/ArrayBuffer
+    key: e9
+    path: results/built-ins/ArrayBuffer/e9.yaml
+  - group: built-ins/ArrayBuffer
+    key: ec
+    path: results/built-ins/ArrayBuffer/ec.yaml
+  - group: built-ins/ArrayBuffer
+    key: ed
+    path: results/built-ins/ArrayBuffer/ed.yaml
+  - group: built-ins/ArrayBuffer
+    key: ee
+    path: results/built-ins/ArrayBuffer/ee.yaml
+  - group: built-ins/ArrayBuffer
+    key: ef
+    path: results/built-ins/ArrayBuffer/ef.yaml
+  - group: built-ins/ArrayBuffer
+    key: f0
+    path: results/built-ins/ArrayBuffer/f0.yaml
+  - group: built-ins/ArrayBuffer
+    key: f1
+    path: results/built-ins/ArrayBuffer/f1.yaml
+  - group: built-ins/ArrayBuffer
+    key: f2
+    path: results/built-ins/ArrayBuffer/f2.yaml
+  - group: built-ins/ArrayBuffer
+    key: f3
+    path: results/built-ins/ArrayBuffer/f3.yaml
+  - group: built-ins/ArrayBuffer
+    key: f5
+    path: results/built-ins/ArrayBuffer/f5.yaml
+  - group: built-ins/ArrayBuffer
+    key: f6
+    path: results/built-ins/ArrayBuffer/f6.yaml
+  - group: built-ins/ArrayBuffer
+    key: f7
+    path: results/built-ins/ArrayBuffer/f7.yaml
+  - group: built-ins/ArrayBuffer
+    key: f8
+    path: results/built-ins/ArrayBuffer/f8.yaml
+  - group: built-ins/ArrayBuffer
+    key: f9
+    path: results/built-ins/ArrayBuffer/f9.yaml
+  - group: built-ins/ArrayBuffer
+    key: fa
+    path: results/built-ins/ArrayBuffer/fa.yaml
+  - group: built-ins/ArrayBuffer
+    key: fb
+    path: results/built-ins/ArrayBuffer/fb.yaml
+  - group: built-ins/ArrayBuffer
+    key: fc
+    path: results/built-ins/ArrayBuffer/fc.yaml
+  - group: built-ins/ArrayBuffer
+    key: fd
+    path: results/built-ins/ArrayBuffer/fd.yaml
+  - group: built-ins/ArrayBuffer
+    key: fe
+    path: results/built-ins/ArrayBuffer/fe.yaml
   - group: built-ins/AsyncFromSyncIteratorPrototype
     key: "02"
     path: results/built-ins/AsyncFromSyncIteratorPrototype/02.yaml
@@ -5812,9 +6238,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 4910
+  passes: 5038
   semanticFailures: 0
-  unsupportedProfileFeatures: 1156
+  unsupportedProfileFeatures: 1220
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -5823,6 +6249,13 @@ summary:
       passes: 28
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - dependency: array-buffer
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 128
+      semanticFailures: 0
+      unsupportedProfileFeatures: 64
     - dependency: async-functions
       expectedNegatives: 161
       harnessFailures: 0
@@ -5992,6 +6425,13 @@ summary:
       passes: 13
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/ArrayBuffer
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 128
+      semanticFailures: 0
+      unsupportedProfileFeatures: 64
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

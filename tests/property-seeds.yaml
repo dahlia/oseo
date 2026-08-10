@@ -232,3 +232,7 @@ families:
     owner: tests/property/m5-object-descriptor-queries.property.test.ts
     start: 0x60003900
     end: 0x600039ff
+  - family: m5-array-buffer
+    owner: tests/property/m5-array-buffer.property.test.ts
+    start: 0x60003a00
+    end: 0x60003aff

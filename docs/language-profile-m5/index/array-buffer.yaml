@@ -1,0 +1,3 @@
+version: 1
+id: array-buffer
+record: docs/language-profile-m5/families/array-buffer.yaml

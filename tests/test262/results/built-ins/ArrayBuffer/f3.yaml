@@ -1,0 +1,27 @@
+group: built-ins/ArrayBuffer
+key: f3
+results:
+  - case:
+      async: false
+      features:
+        - DataView
+        - Int8Array
+        - resizable-arraybuffer
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/ArrayBuffer/prototype/resizable/this-has-no-arraybufferdata-internal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - DataView
+      - Int8Array
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

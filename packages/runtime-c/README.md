@@ -374,6 +374,18 @@ order, the array `length` and function `prototype` this runtime keeps outside
 the property vector hold their creation positions, and symbol keys trail
 every string key. Public runtime layout is unchanged.
 
+The `m5-55` ABI materializes `%ArrayBuffer%`. The constructor takes its
+length through ToIndex and its optional `maxByteLength` from an object
+options bag, and it allocates one zero-initialized Data Block that exactly
+one buffer owns. A resizable buffer reserves its whole maximum at allocation,
+so `resize` moves the byte length inside a block that never moves and clears
+the bytes outside it. `transfer` and `transferToFixedLength` copy into a
+second block before detaching the source, `slice` allocates through
+SpeciesConstructor, and the `byteLength`, `detached`, `maxByteLength`, and
+`resizable` accessors report the detached state rather than throwing. Public
+runtime layout is unchanged; the runtime adds one internal heap kind for the
+buffer record.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
