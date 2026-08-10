@@ -188,6 +188,45 @@ try {
 } catch (error) {
   console.log("typed content mismatch", error instanceof TypeError);
 }
+let outOfBoundsConversions = 0;
+const outOfBoundsNumber = new Uint8Array(0);
+outOfBoundsNumber[1] = {
+  valueOf() {
+    outOfBoundsConversions = outOfBoundsConversions + 1;
+    return 7;
+  },
+};
+console.log("out-of-bounds number set", outOfBoundsConversions);
+try {
+  new BigInt64Array(0)[1] = 1;
+} catch (error) {
+  console.log("out-of-bounds bigint set", error instanceof TypeError);
+}
+const fixedCopyBuffer = new ArrayBuffer(4, { maxByteLength: 8 });
+const fixedCopySource = new Uint8Array(fixedCopyBuffer, 1, 2);
+fixedCopyBuffer.resize(1);
+try {
+  new Uint8Array(fixedCopySource);
+} catch (error) {
+  console.log("out-of-bounds fixed copy", error instanceof TypeError);
+}
+const trackingCopyBuffer = new ArrayBuffer(4, { maxByteLength: 8 });
+const trackingCopySource = new Uint8Array(trackingCopyBuffer, 2);
+trackingCopyBuffer.resize(1);
+try {
+  new Uint8Array(trackingCopySource);
+} catch (error) {
+  console.log("out-of-bounds tracking copy", error instanceof TypeError);
+}
+const shadowedAccessors = new Uint8Array(0);
+for (const name of ["length", "byteLength", "byteOffset", "buffer"]) {
+  Object.defineProperty(shadowedAccessors, name, {
+    value: "own " + name,
+    writable: true,
+  });
+  shadowedAccessors[name] = "updated " + name;
+  console.log("own accessor shadow", name, shadowedAccessors[name]);
+}
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);
 console.log(

@@ -149,19 +149,27 @@ static bool typed_array_size(double length, size_t *size) {
     return true;
 }
 
-static size_t typed_array_length(const OseoTypedArray *view) {
-    if (!is_array_buffer(view->viewed_buffer)) return 0u;
+static bool typed_array_out_of_bounds(const OseoTypedArray *view) {
+    if (!is_array_buffer(view->viewed_buffer)) return true;
     const OseoArrayBuffer *buffer =
         array_buffer_object(view->viewed_buffer);
     if (buffer->detached || view->byte_offset > buffer->byte_length) {
-        return 0u;
+        return true;
     }
-    size_t bytes = typed_array_bytes[view->element_kind];
+    if (view->array_length == SIZE_MAX) return false;
+    return view->array_length >
+        (buffer->byte_length - view->byte_offset) /
+            typed_array_bytes[view->element_kind];
+}
+
+static size_t typed_array_length(const OseoTypedArray *view) {
+    if (typed_array_out_of_bounds(view)) return 0u;
+    const OseoArrayBuffer *buffer =
+        array_buffer_object(view->viewed_buffer);
     if (view->array_length == SIZE_MAX) {
+        size_t bytes = typed_array_bytes[view->element_kind];
         return (buffer->byte_length - view->byte_offset) / bytes;
     }
-    if (view->array_length >
-        (buffer->byte_length - view->byte_offset) / bytes) return 0u;
     return view->array_length;
 }
 
@@ -560,10 +568,11 @@ OseoResult oseo_internal_typed_array_set_index(
     if (!is_typed_array(view)) {
         return failure(context, "OSEO2001", "Value is not a TypedArray.");
     }
-    size_t length = typed_array_length(typed_array_object(view));
-    if ((size_t)index >= length) return normal(value);
-    *present = true;
     OseoResult result = typed_array_store(context, view, index, value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *present = (size_t)index <
+            typed_array_length(typed_array_object(view));
+    }
     return result.status == OSEO_STATUS_NORMAL ? normal(value) : result;
 }
 
@@ -749,6 +758,13 @@ static OseoResult typed_array_from_typed_array(
             context,
             OSEO_ERROR_TYPE,
             "Cannot copy a detached TypedArray."
+        );
+    }
+    if (typed_array_out_of_bounds(source_view)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot copy an out-of-bounds TypedArray."
         );
     }
     size_t length = typed_array_length(source_view);

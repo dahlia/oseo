@@ -40,10 +40,14 @@ type ConstructorName =
   | "Uint8ClampedArray";
 
 type ConstructionPath = "array-like" | "buffer" | "iterable" | "typed";
+type OutOfBoundsSource = "fixed" | "tracking";
+type ShadowKey = "buffer" | "byteLength" | "byteOffset" | "length";
 
 interface TypedArrayCase {
   readonly constructorName: ConstructorName;
+  readonly outOfBoundsSource: OutOfBoundsSource;
   readonly path: ConstructionPath;
+  readonly shadowKey: ShadowKey;
   readonly values: readonly (bigint | number)[];
 }
 
@@ -66,7 +70,9 @@ const bigintConstructors: readonly ConstructorName[] = [
 
 const numberCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   constructorName: fc.constantFrom(...numberConstructors),
+  outOfBoundsSource: fc.constantFrom("fixed", "tracking"),
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
+  shadowKey: fc.constantFrom("buffer", "byteLength", "byteOffset", "length"),
   values: fc.array(
     fc.oneof(
       fc.integer({ max: 0x1_0000_0001, min: -0x1_0000_0001 }),
@@ -78,7 +84,9 @@ const numberCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
 
 const bigintCaseArbitrary: fc.Arbitrary<TypedArrayCase> = fc.record({
   constructorName: fc.constantFrom(...bigintConstructors),
+  outOfBoundsSource: fc.constantFrom("fixed", "tracking"),
   path: fc.constantFrom("array-like", "buffer", "iterable", "typed"),
+  shadowKey: fc.constantFrom("buffer", "byteLength", "byteOffset", "length"),
   values: fc.array(
     fc.bigInt({
       max: (1n << 65n) + 3n,
@@ -154,6 +162,52 @@ console.log(
 );
 const copy = new Constructor(view);
 console.log("copy", "" + copy[0], "" + copy[1], "" + copy[2]);
+let outOfBoundsConversions = 0;
+const outOfBoundsTarget = new Constructor(0);
+try {
+  outOfBoundsTarget[1] = ${
+    testCase.constructorName.startsWith("Big")
+      ? "1"
+      : `{
+    valueOf() {
+      outOfBoundsConversions = outOfBoundsConversions + 1;
+      return 7;
+    },
+  }`
+  };
+  console.log("out-of-bounds set", "number", outOfBoundsConversions);
+} catch (error) {
+  console.log("out-of-bounds set", "bigint", error instanceof TypeError);
+}
+const edgeBytes = Constructor.BYTES_PER_ELEMENT;
+const edgeBuffer = new ArrayBuffer(edgeBytes * 2, {
+  maxByteLength: edgeBytes * 4,
+});
+const edgeSource = ${
+    testCase.outOfBoundsSource === "fixed"
+      ? "new Constructor(edgeBuffer, edgeBytes, 1)"
+      : "new Constructor(edgeBuffer, edgeBytes)"
+  };
+edgeBuffer.resize(0);
+try {
+  new Constructor(edgeSource);
+} catch (error) {
+  console.log(
+    "out-of-bounds copy",
+    "${testCase.outOfBoundsSource}",
+    error instanceof TypeError,
+  );
+}
+Object.defineProperty(outOfBoundsTarget, "${testCase.shadowKey}", {
+  value: "own",
+  writable: true,
+});
+outOfBoundsTarget["${testCase.shadowKey}"] = "updated";
+console.log(
+  "own accessor shadow",
+  "${testCase.shadowKey}",
+  outOfBoundsTarget["${testCase.shadowKey}"],
+);
 /** @param {number} left @param {number} right */
 function hinted(left, right) { return left + right; }
 console.log("hint", hinted(2, 3), hinted("2", 3));
@@ -236,6 +290,11 @@ function expected(testCase: TypedArrayCase): string {
   return [
     `view ${testCase.constructorName} ${bytes} true true ${observed} undefined`,
     `copy ${observed}`,
+    testCase.constructorName.startsWith("Big")
+      ? "out-of-bounds set bigint true"
+      : "out-of-bounds set number 1",
+    `out-of-bounds copy ${testCase.outOfBoundsSource} true`,
+    `own accessor shadow ${testCase.shadowKey} updated`,
     "hint 5 23",
     "global 7 true",
     "",
@@ -342,14 +401,17 @@ test(
         domain:
           "one of eleven constructors, zero to eight bounded Number or " +
           "BigInt inputs, one iterable, array-like, buffer, or typed-array " +
-          "construction path, one clone, one false numeric hint, and one " +
+          "construction path, one clone, one out-of-bounds conversion, " +
+          "one fixed or offset length-tracking out-of-bounds clone, one " +
+          "own deferred-accessor shadow, one false numeric hint, and one " +
           "mutable intrinsic global write and restore",
         numRuns: 12,
         profile: "M5 TypedArray constructors",
         seed: 0x6000_6500,
         sizeLimit:
           "one constructor, one construction path, at most eight values, " +
-          "one typed-array clone, one false hint, and one global rebinding",
+          "one typed-array clone, one out-of-bounds set and clone, one " +
+          "own accessor shadow, one false hint, and one global rebinding",
         timeLimitMilliseconds: 180_000,
       },
     );

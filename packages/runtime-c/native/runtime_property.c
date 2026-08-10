@@ -17,6 +17,27 @@ static OseoResult typed_array_exotic_error(OseoContext *context) {
     );
 }
 
+static bool typed_array_deferred_accessor(
+    OseoValue object_value,
+    OseoValue key
+) {
+    return is_typed_array(object_value) &&
+        (oseo_internal_string_is_ascii(key, "length") ||
+         oseo_internal_string_is_ascii(key, "byteLength") ||
+         oseo_internal_string_is_ascii(key, "byteOffset") ||
+         oseo_internal_string_is_ascii(key, "buffer"));
+}
+
+static OseoResult typed_array_deferred_accessor_error(
+    OseoContext *context
+) {
+    return failure(
+        context,
+        "OSEO2001",
+        "TypedArray prototype accessors are not admitted yet."
+    );
+}
+
 OseoResult oseo_internal_require_property_key(
     OseoContext *context,
     OseoValue key
@@ -103,18 +124,6 @@ static OseoResult object_get(
         }
         if (classified.status != OSEO_STATUS_NORMAL) return classified;
         if (numeric_index) return typed_array_exotic_error(context);
-        if (current == object_value &&
-            is_typed_array(current) &&
-            (oseo_internal_string_is_ascii(key, "length") ||
-             oseo_internal_string_is_ascii(key, "byteLength") ||
-             oseo_internal_string_is_ascii(key, "byteOffset") ||
-             oseo_internal_string_is_ascii(key, "buffer"))) {
-            return failure(
-                context,
-                "OSEO2001",
-                "TypedArray prototype accessors are not admitted yet."
-            );
-        }
         OseoOrdinaryObject *object = ordinary_object(current);
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
@@ -143,6 +152,10 @@ static OseoResult object_get(
                 return oseo_cell_get(context, value);
             }
             return normal(value);
+        }
+        if (current == object_value &&
+            typed_array_deferred_accessor(current, key)) {
+            return typed_array_deferred_accessor_error(context);
         }
         current = object->prototype;
     }
@@ -428,6 +441,10 @@ OseoResult oseo_object_set(
             }
             break;
         }
+        if (current == object_value &&
+            typed_array_deferred_accessor(current, key)) {
+            return typed_array_deferred_accessor_error(context);
+        }
         current = owner->prototype;
     }
     if (!receiver->extensible) {
@@ -593,6 +610,9 @@ OseoResult oseo_internal_set_with_receiver(
         );
         if (assigned.status != OSEO_STATUS_NORMAL) return assigned;
         return normal(value);
+    }
+    if (typed_array_deferred_accessor(receiver, key)) {
+        return typed_array_deferred_accessor_error(context);
     }
     /* CreateDataProperty on the receiver, which reports false rather
      * than throwing when the receiver refuses a new own property. */
