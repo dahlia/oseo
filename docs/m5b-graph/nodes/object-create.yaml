@@ -10,4 +10,4 @@ inventory:
 dependencies:
   - object-define-properties
 landed: false
-status: blocked
+status: ready

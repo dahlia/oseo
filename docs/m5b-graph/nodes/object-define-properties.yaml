@@ -9,5 +9,5 @@ inventory:
     - test/built-ins/Object/defineProperties/
 dependencies:
   - object-define-property
-landed: false
+landed: true
 status: ready
