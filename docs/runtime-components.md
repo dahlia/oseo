@@ -77,8 +77,8 @@ Ownership follows the plan's target layout:
     operations they share with object rest and spread, meaning
     `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key
     ordering, and the `Object.create`, `Object.defineProperty`,
-    `Object.getOwnPropertyDescriptor`, `Object.keys`, and
-    `Object.setPrototypeOf` entry points;
+    `Object.defineProperties`, `Object.getOwnPropertyDescriptor`,
+    `Object.keys`, and `Object.setPrototypeOf` entry points;
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
     numeric constants, predicate statics, parser statics, and the standard
     global constructor property;
@@ -485,6 +485,27 @@ generic fallback, ordinary and exotic targets, primitives, and collection
 forced at every safepoint. The node reviews its six declared test262 inventory
 roots and promotes only previously reviewed cases whose extensibility
 prerequisite it satisfies.
+
+### Object define-properties evidence
+
+M5b node `object-define-properties` adds `Object.defineProperties` to
+*runtime\_object\_builtin.c* over the components it already composes. One
+shared ToPropertyDescriptor body now serves both define entry points, one
+shared DefinePropertyOrThrow body applies every converted descriptor
+through the descriptor component, and the plural entry point reuses the
+ordinary own-key walk the descriptor-reporting query owns. The collection
+pass roots every collected key and descriptor field, completes before the
+first definition, and applies the collected descriptors in own-key order,
+so an abrupt collection leaves the target untouched while an abrupt
+definition keeps its predecessors.
+
+The completed collection checkpoint moves `abiVersion` to `m5-60` without
+a public layout change. Fixed and generated native differential evidence
+covers both specialization policies, false hints, deliberate guard
+misses, generic fallback, abrupt collection and definition orders,
+namespace sources and targets, and collection forced at every safepoint.
+The node reviews only its declared `Object.defineProperties` test262
+inventory root.
 
 ### Function prototype evidence
 

@@ -423,6 +423,17 @@ call validates one independently compiled Script; the ABI does not retain
 `[[VarNames]]` or declarative names across successive Script instantiations in
 one realm, so multi-Script declaration collisions remain outside this unit.
 
+The `m5-60` ABI admits `Object.defineProperties` as a complete collection
+operation. The target check precedes every read of the properties argument,
+ToObject precedes the own-key walk, and the walk keeps the own enumerable
+keys in ordinary own-key order. Every kept descriptor is read with Get and
+converted through the ToPropertyDescriptor body `Object.defineProperty`
+shares before the first definition runs, so an abrupt collection leaves the
+target untouched while an abrupt definition keeps every earlier definition.
+The shared descriptor component applies ordinary, array, function,
+arguments, String-wrapper, and module-namespace compatibility rules without
+changing public runtime layout.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

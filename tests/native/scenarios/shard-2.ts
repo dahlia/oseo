@@ -303,6 +303,52 @@ export async function runNativeScenario2(
     }
   }
 
+  const definePropertiesModuleEntry = [
+    root,
+    "tests/fixtures/object-define-properties-module/entry.mjs",
+  ].join("/");
+  const definePropertiesModuleReferences = [
+    await host.run({
+      args: [definePropertiesModuleEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", definePropertiesModuleEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of definePropertiesModuleReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeDefinePropertiesModule = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            definePropertiesModuleEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(
+        nativeDefinePropertiesModule.exitStatus,
+        0,
+        nativeDefinePropertiesModule.stderr,
+      );
+      assert.equal(nativeDefinePropertiesModule.stderr, "");
+      for (const reference of definePropertiesModuleReferences) {
+        assert.equal(nativeDefinePropertiesModule.stdout, reference.stdout);
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const objectStaticMutationEntry = [
     root,
     "tests/fixtures/object-static-mutation/entry.mjs",

@@ -708,6 +708,342 @@ console.log(
 `,
   },
   {
+    name: "object-define-properties",
+    nonStrictScript: true,
+    source: `
+const metadata = Object.getOwnPropertyDescriptor(
+  Object,
+  "defineProperties",
+);
+console.log(
+  "metadata",
+  Object.defineProperties.name,
+  Object.defineProperties.length,
+  metadata.writable,
+  metadata.enumerable,
+  metadata.configurable,
+);
+for (const primitive of [
+  undefined,
+  null,
+  true,
+  1,
+  "text",
+  Symbol("target"),
+  1n,
+]) {
+  try {
+    Object.defineProperties(primitive, {});
+  } catch (error) {
+    console.log("primitive", typeof primitive, error instanceof TypeError);
+  }
+}
+let targetFirstReads = 0;
+try {
+  Object.defineProperties(1, {
+    get poisoned() {
+      targetFirstReads = targetFirstReads + 1;
+      return {};
+    },
+  });
+} catch (error) {
+  console.log("target first", error instanceof TypeError, targetFirstReads);
+}
+for (const nullish of [undefined, null]) {
+  try {
+    Object.defineProperties({}, nullish);
+  } catch (error) {
+    console.log("nullish props", error instanceof TypeError);
+  }
+}
+const booleanProps = {};
+console.log(
+  "primitive props",
+  Object.defineProperties(booleanProps, true) === booleanProps,
+  Object.defineProperties(booleanProps, 7) === booleanProps,
+  Object.defineProperties(booleanProps, Symbol("props")) === booleanProps,
+  Object.keys(booleanProps).length,
+);
+try {
+  Object.defineProperties({}, "ab");
+} catch (error) {
+  console.log("string props", error instanceof TypeError);
+}
+console.log(
+  "empty string props",
+  Object.keys(Object.defineProperties({}, "")).length,
+);
+const order = [];
+const symbolKey = Symbol("ordered");
+const orderedProps = {
+  beta: {
+    get enumerable() { order.push("beta enumerable"); return true; },
+    get configurable() { order.push("beta configurable"); return true; },
+    get value() { order.push("beta value"); return 1; },
+    get writable() { order.push("beta writable"); return true; },
+  },
+  2: {
+    get value() { order.push("2 value"); return 2; },
+  },
+  alpha: {
+    get get() { order.push("alpha get"); return undefined; },
+    get set() { order.push("alpha set"); return undefined; },
+  },
+  0: {
+    get value() { order.push("0 value"); return 0; },
+  },
+};
+Object.defineProperty(orderedProps, symbolKey, {
+  enumerable: true,
+  value: { get value() { order.push("symbol value"); return 3; } },
+});
+Object.defineProperty(orderedProps, "hidden", {
+  enumerable: false,
+  value: { get value() { order.push("hidden value"); return 4; } },
+});
+const orderedTarget = Object.defineProperties({}, orderedProps);
+console.log("order", order.length);
+for (let index = 0; index < order.length; index = index + 1) {
+  console.log("read", order[index]);
+}
+console.log(
+  "ordered",
+  orderedTarget[0],
+  orderedTarget[2],
+  orderedTarget.beta,
+  orderedTarget.alpha,
+  orderedTarget[symbolKey],
+  "hidden" in orderedTarget,
+);
+const inheritedProps = Object.create({
+  inherited: { value: 5, enumerable: true },
+});
+inheritedProps.own = { value: 6, enumerable: true };
+const inheritedTarget = Object.defineProperties({}, inheritedProps);
+console.log(
+  "inherited skipped",
+  inheritedTarget.own,
+  "inherited" in inheritedTarget,
+);
+const untouched = {};
+const collectLog = [];
+try {
+  Object.defineProperties(untouched, {
+    first: { value: 1 },
+    get second() {
+      collectLog.push("second");
+      throw new RangeError("collection");
+    },
+    third: { value: 3 },
+  });
+} catch (error) {
+  console.log(
+    "collection abrupt",
+    error.name,
+    error.message,
+    collectLog[0],
+    "first" in untouched,
+    "third" in untouched,
+  );
+}
+try {
+  Object.defineProperties(untouched, {
+    first: { value: 1 },
+    second: {
+      get value() { throw new SyntaxError("field"); },
+    },
+  });
+} catch (error) {
+  console.log(
+    "field abrupt",
+    error.name,
+    error.message,
+    "first" in untouched,
+  );
+}
+try {
+  Object.defineProperties(untouched, {
+    first: { value: 1 },
+    second: 2,
+  });
+} catch (error) {
+  console.log("non-object", error instanceof TypeError, "first" in untouched);
+}
+try {
+  Object.defineProperties(untouched, {
+    first: { value: 1 },
+    second: { get: null },
+  });
+} catch (error) {
+  console.log(
+    "invalid getter",
+    error instanceof TypeError,
+    "first" in untouched,
+  );
+}
+try {
+  Object.defineProperties(untouched, {
+    first: { value: 1 },
+    second: { value: 2, set: function () {} },
+  });
+} catch (error) {
+  console.log("mixed", error instanceof TypeError, "first" in untouched);
+}
+const partial = {};
+Object.defineProperty(partial, "fixed", { value: 1 });
+try {
+  Object.defineProperties(partial, {
+    early: { value: 2, enumerable: true },
+    fixed: { value: 3 },
+    late: { value: 4, enumerable: true },
+  });
+} catch (error) {
+  console.log(
+    "definition abrupt",
+    error instanceof TypeError,
+    partial.early,
+    partial.fixed,
+    "late" in partial,
+  );
+}
+const defaults = Object.defineProperties({}, { bare: {} });
+const bare = Object.getOwnPropertyDescriptor(defaults, "bare");
+console.log(
+  "defaults",
+  bare.value,
+  bare.writable,
+  bare.enumerable,
+  bare.configurable,
+);
+let stored = 0;
+const accessorTarget = Object.defineProperties({}, {
+  paired: {
+    get: function () { return stored + 10; },
+    set: function (value) { stored = value; },
+    enumerable: true,
+    configurable: true,
+  },
+  setterOnly: {
+    set: function (value) { stored = value * 2; },
+  },
+});
+accessorTarget.paired = 7;
+console.log("accessor pair", accessorTarget.paired, stored);
+accessorTarget.setterOnly = 4;
+console.log(
+  "setter only",
+  accessorTarget.setterOnly,
+  stored,
+  Object.getOwnPropertyDescriptor(accessorTarget, "setterOnly").get,
+);
+const reconfigured = Object.defineProperties({}, {
+  item: { value: 1, configurable: true, enumerable: true, writable: true },
+});
+Object.defineProperties(reconfigured, { item: { value: 2 } });
+const preserved = Object.getOwnPropertyDescriptor(reconfigured, "item");
+console.log(
+  "preserved",
+  preserved.value,
+  preserved.writable,
+  preserved.enumerable,
+  preserved.configurable,
+);
+const array = [1, 2];
+Object.defineProperties(array, {
+  4: { value: 9, enumerable: true },
+});
+console.log("array growth", array.length, array[4]);
+let truncated = false;
+try {
+  Object.defineProperties(array, {
+    0: { value: 7 },
+    length: { value: 1 },
+  });
+} catch (error) {
+  truncated = error instanceof TypeError;
+}
+console.log("array order", truncated, array.length, array[0]);
+const arrayProps = [
+  { value: 11, enumerable: true },
+  { value: 12, enumerable: true },
+];
+const fromArray = Object.defineProperties({}, arrayProps);
+console.log(
+  "array props",
+  fromArray[0],
+  fromArray[1],
+  "length" in fromArray,
+);
+function mappedProps(first, second) {
+  const out = Object.defineProperties({}, arguments);
+  first = { value: 99 };
+  return out;
+}
+const mapped = mappedProps(
+  { value: 13, enumerable: true },
+  { value: 14 },
+);
+console.log("mapped props", mapped[0], mapped[1]);
+function mappedTarget(value) {
+  Object.defineProperties(arguments, { 0: { value: 15 } });
+  const throughDescriptor = value;
+  Object.defineProperties(arguments, { 0: { writable: false } });
+  value = 16;
+  return [throughDescriptor, value, arguments[0]];
+}
+console.log("mapped target", ...mappedTarget(6));
+const wrapper = Object("ab");
+try {
+  Object.defineProperties({}, wrapper);
+} catch (error) {
+  console.log("wrapper props", error instanceof TypeError);
+}
+Object.defineProperties(wrapper, {
+  named: { value: 17, enumerable: true },
+});
+console.log("wrapper target", wrapper.named, wrapper[0]);
+function FunctionTarget() {}
+Object.defineProperties(FunctionTarget, {
+  extra: { value: 18, enumerable: true },
+});
+console.log(
+  "function target",
+  FunctionTarget.extra,
+  FunctionTarget.length,
+);
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+const original = Object.defineProperties;
+let turn = 0;
+while (turn < 3) {
+  const guarded = Object.defineProperties({}, {
+    value: { value: hinted(turn === 1 ? "x" : turn) },
+  });
+  console.log("guard", guarded.value);
+  if (turn === 0) Object.definePropertiesMarker = true;
+  turn = turn + 1;
+}
+console.log("identity", Object.defineProperties === original);
+const collected = {};
+for (let index = 0; index < 24; index = index + 1) {
+  Object.defineProperties(collected, {
+    ["item" + index]: {
+      configurable: true,
+      enumerable: index % 2 === 0,
+      value: { index },
+      writable: true,
+    },
+  });
+}
+console.log(
+  "collection",
+  collected.item0.index,
+  collected.item23.index,
+  Object.keys(collected).length,
+);
+`,
+  },
+  {
     name: "object-descriptor-queries",
     nonStrictScript: true,
     source: `

@@ -1,0 +1,57 @@
+version: 1
+id: object-define-properties
+title: "Object.defineProperties descriptor collection"
+scope:
+  - "Object.defineProperties target validation, properties conversion, own
+    enumerable key ordering, and the descriptor collection pass that
+    completes before the first definition mutates the target."
+  - "Ordered application over ordinary objects, arrays, functions, arguments
+    objects, String wrappers, symbol keys, and module namespace objects,
+    including abrupt completion during collection and during application."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/native/scenarios/shard-2.ts
+      - tests/property/m5-object-define-properties.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/fixtures/object-define-properties-module/entry.mjs
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/scenarios/shard-2.ts
+      - tests/property/m5-object-define-properties.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-object-define-properties.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-define-properties.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-define-properties.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/runtime-c/native/runtime_object_builtin.c
+      - packages/runtime-c/native/runtime_descriptor.c

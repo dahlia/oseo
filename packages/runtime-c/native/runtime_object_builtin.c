@@ -8,7 +8,7 @@
  * The `Object` built-ins, the `Object.prototype` methods, and the own-key
  * operations they share with object rest and spread: ToPropertyDescriptor,
  * FromPropertyDescriptor, CopyDataProperties, own-key ordering, and the
- * `Object.create`, `Object.defineProperty`,
+ * `Object.create`, `Object.defineProperty`, `Object.defineProperties`,
  * `Object.getOwnPropertyDescriptor`,
  * `Object.getOwnPropertyDescriptors`, `Object.keys`, and
  * `Object.setPrototypeOf` entry points.
@@ -33,6 +33,11 @@ static OseoResult create_object_prototype_function(
     size_t length
 );
 static OseoResult object_get_own_property_descriptors(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult object_define_properties(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
@@ -773,6 +778,13 @@ OseoResult oseo_internal_object_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID) {
+        return object_define_properties(
+            context,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTOR_CODE_ID) {
         return oseo_object_builtin_get_own_property_descriptor(
             context,
@@ -1075,6 +1087,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     }
     static const size_t owned_static_codes[] = {
         OSEO_OBJECT_CREATE_CODE_ID,
+        OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID,
         OSEO_OBJECT_DEFINE_PROPERTY_CODE_ID,
         OSEO_OBJECT_FREEZE_CODE_ID,
         OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTOR_CODE_ID,
@@ -1088,6 +1101,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     };
     static const char *const owned_static_names[] = {
         "create",
+        "defineProperties",
         "defineProperty",
         "freeze",
         "getOwnPropertyDescriptor",
@@ -1100,7 +1114,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         "seal",
     };
     static const size_t owned_static_lengths[] = {
-        2u, 3u, 1u, 2u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+        2u, 2u, 3u, 1u, 2u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
     };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
@@ -1132,7 +1146,6 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     }
     static const char *const deferred_static_names[] = {
         "assign",
-        "defineProperties",
         "entries",
         "fromEntries",
         "getOwnPropertyNames",
@@ -1142,7 +1155,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         "values",
     };
     static const size_t deferred_static_lengths[] = {
-        2u, 2u, 1u, 1u, 1u, 1u, 2u, 2u, 1u,
+        2u, 1u, 1u, 1u, 1u, 2u, 2u, 1u,
     };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
@@ -1470,6 +1483,181 @@ OseoResult oseo_object_builtin_create(
     );
 }
 
+/*
+ * The presence flags and converted attribute fields of one
+ * ToPropertyDescriptor result. The `value`, `get`, and `set` fields are
+ * heap values, so they stay in caller-rooted slots rather than in this
+ * record; ToBoolean runs no user code, so the three attribute fields
+ * hold their converted results directly.
+ */
+typedef struct {
+    bool has_enumerable;
+    bool enumerable;
+    bool has_configurable;
+    bool configurable;
+    bool has_writable;
+    bool writable;
+    bool has_value;
+    bool has_getter;
+    bool has_setter;
+} OseoConvertedDescriptor;
+
+/*
+ * ToPropertyDescriptor (6.2.6.5) over a descriptor object the caller has
+ * already checked and rooted. The fields are read in ECMA-262's fixed
+ * order: enumerable, configurable, value, writable, get, set. Every heap
+ * field is stored into its caller-rooted slot as soon as it is read,
+ * because reading a later field can invoke a descriptor accessor that
+ * allocates and collects; an unrooted C local holding an earlier field's
+ * freshly returned heap value would not survive that collection. An
+ * accessor field that is neither undefined nor callable and a
+ * descriptor mixing accessor and data fields throw the specified
+ * TypeError.
+ */
+static OseoResult to_property_descriptor(
+    OseoContext *context,
+    OseoValue descriptor_value,
+    OseoValue *value_slot,
+    OseoValue *getter_slot,
+    OseoValue *setter_slot,
+    OseoConvertedDescriptor *descriptor
+) {
+    OseoValue attribute = oseo_undefined();
+    OseoResult result = descriptor_field(
+        context, descriptor_value, "enumerable",
+        &descriptor->has_enumerable, &attribute);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    descriptor->enumerable =
+        descriptor->has_enumerable && oseo_to_boolean(attribute);
+    result = descriptor_field(
+        context, descriptor_value, "configurable",
+        &descriptor->has_configurable, &attribute);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    descriptor->configurable =
+        descriptor->has_configurable && oseo_to_boolean(attribute);
+    result = descriptor_field(
+        context, descriptor_value, "value",
+        &descriptor->has_value, value_slot);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = descriptor_field(
+        context, descriptor_value, "writable",
+        &descriptor->has_writable, &attribute);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    descriptor->writable =
+        descriptor->has_writable && oseo_to_boolean(attribute);
+    result = descriptor_field(
+        context, descriptor_value, "get",
+        &descriptor->has_getter, getter_slot);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (descriptor->has_getter &&
+        tag_of(*getter_slot) != OSEO_TAG_UNDEFINED &&
+        !is_function(*getter_slot)) {
+        return type_error(context, "A property descriptor 'get' field must "
+            "be undefined or callable.");
+    }
+    result = descriptor_field(
+        context, descriptor_value, "set",
+        &descriptor->has_setter, setter_slot);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (descriptor->has_setter &&
+        tag_of(*setter_slot) != OSEO_TAG_UNDEFINED &&
+        !is_function(*setter_slot)) {
+        return type_error(context, "A property descriptor 'set' field must "
+            "be undefined or callable.");
+    }
+    if ((descriptor->has_getter || descriptor->has_setter) &&
+        (descriptor->has_value || descriptor->has_writable)) {
+        return type_error(
+            context,
+            "A property descriptor cannot mix accessor and data fields."
+        );
+    }
+    return normal(oseo_undefined());
+}
+
+/*
+ * DefinePropertyOrThrow (7.3.8) over one converted descriptor. The
+ * caller roots the target, the key, and the three heap descriptor
+ * fields. The current property state supplies every absent field, a
+ * cell-backed current value reads through its binding cell, and the
+ * descriptor component stays authoritative for compatibility and
+ * mutation.
+ */
+static OseoResult define_converted_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    const OseoConvertedDescriptor *descriptor,
+    OseoValue value,
+    OseoValue getter,
+    OseoValue setter
+) {
+    OseoValue current_value = oseo_undefined();
+    OseoPropertyAttributes current_attributes = {false, false, false, false};
+    OseoValue current_getter = oseo_undefined();
+    OseoValue current_setter = oseo_undefined();
+    bool exists = oseo_internal_own_descriptor(
+        object_value,
+        key,
+        &current_value,
+        &current_attributes,
+        &current_getter,
+        &current_setter
+    );
+    /* A descriptor with no value field keeps the property's current
+     * value, which a cell-backed property holds in its binding cell. */
+    if (exists &&
+        oseo_internal_cell_backed_property(object_value, current_value)) {
+        OseoResult cell = oseo_cell_get(context, current_value);
+        if (cell.status != OSEO_STATUS_NORMAL) return cell;
+        current_value = cell.value;
+    }
+    if (descriptor->has_getter || descriptor->has_setter ||
+        (!descriptor->has_value && !descriptor->has_writable &&
+         exists && current_attributes.accessor)) {
+        OseoPropertyAttributes attributes = {
+            !descriptor->has_configurable
+                ? exists && current_attributes.configurable
+                : descriptor->configurable,
+            !descriptor->has_enumerable
+                ? exists && current_attributes.enumerable
+                : descriptor->enumerable,
+            false,
+            true,
+        };
+        return oseo_object_define_accessor(
+            context,
+            object_value,
+            key,
+            descriptor->has_getter ? getter : oseo_undefined(),
+            descriptor->has_setter ? setter : oseo_undefined(),
+            descriptor->has_getter,
+            descriptor->has_setter,
+            attributes
+        );
+    }
+    OseoPropertyAttributes attributes = {
+        !descriptor->has_configurable
+            ? exists && current_attributes.configurable
+            : descriptor->configurable,
+        !descriptor->has_enumerable
+            ? exists && current_attributes.enumerable
+            : descriptor->enumerable,
+        !descriptor->has_writable
+            ? exists && current_attributes.writable
+            : descriptor->writable,
+        false,
+    };
+    return oseo_internal_object_define_data(
+        context,
+        object_value,
+        key,
+        descriptor->has_value ? value : current_value,
+        attributes,
+        descriptor->has_value
+    );
+}
+
 OseoResult oseo_object_builtin_define_property(
     OseoContext *context,
     size_t argument_count,
@@ -1484,175 +1672,43 @@ OseoResult oseo_object_builtin_define_property(
             "Object.defineProperty requires an object target."
         );
     }
-    /* Slots: 0 key, 1 enumerable, 2 configurable, 3 value, 4 writable,
-     * 5 get, 6 set. Every ToPropertyDescriptor field is stored directly
-     * into its own rooted slot as soon as it is read, in ECMA-262's
-     * fixed field order, because reading a later field can invoke a
-     * descriptor accessor that allocates and collects; an unrooted C
-     * local holding an earlier field's freshly returned heap value
-     * would not survive that collection. */
+    /* Slots: 0 key, 1 value, 2 get, 3 set. */
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_property_key(
         context,
         builtin_argument(argument_count, arguments, 1u)
     );
     frame.slots[0] = result.value;
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    if (!is_object(descriptor_value)) {
-        oseo_roots_release(context, &frame);
-        return type_error(
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(descriptor_value)) {
+        result = type_error(
             context,
             "Object.defineProperty requires an object descriptor."
         );
     }
-    bool has_enumerable = false;
-    result = descriptor_field(
-        context, descriptor_value, "enumerable", &has_enumerable,
-        &frame.slots[1]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    bool has_configurable = false;
-    result = descriptor_field(
-        context, descriptor_value, "configurable", &has_configurable,
-        &frame.slots[2]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    bool has_value = false;
-    result = descriptor_field(
-        context, descriptor_value, "value", &has_value, &frame.slots[3]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    bool has_writable = false;
-    result = descriptor_field(
-        context, descriptor_value, "writable", &has_writable,
-        &frame.slots[4]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    bool has_getter = false;
-    result = descriptor_field(
-        context, descriptor_value, "get", &has_getter, &frame.slots[5]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    if (has_getter &&
-        tag_of(frame.slots[5]) != OSEO_TAG_UNDEFINED &&
-        !is_function(frame.slots[5])) {
-        oseo_roots_release(context, &frame);
-        return type_error(context, "A property descriptor 'get' field must "
-            "be undefined or callable.");
-    }
-    bool has_setter = false;
-    result = descriptor_field(
-        context, descriptor_value, "set", &has_setter, &frame.slots[6]);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_release(context, &frame);
-        return result;
-    }
-    if (has_setter &&
-        tag_of(frame.slots[6]) != OSEO_TAG_UNDEFINED &&
-        !is_function(frame.slots[6])) {
-        oseo_roots_release(context, &frame);
-        return type_error(context, "A property descriptor 'set' field must "
-            "be undefined or callable.");
-    }
-    if ((has_getter || has_setter) && (has_value || has_writable)) {
-        oseo_roots_release(context, &frame);
-        return type_error(
+    OseoConvertedDescriptor descriptor;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = to_property_descriptor(
             context,
-            "A property descriptor cannot mix accessor and data fields."
+            descriptor_value,
+            &frame.slots[1],
+            &frame.slots[2],
+            &frame.slots[3],
+            &descriptor
         );
     }
-    OseoValue enumerable = frame.slots[1];
-    OseoValue configurable = frame.slots[2];
-    OseoValue descriptor_value_field = frame.slots[3];
-    OseoValue writable = frame.slots[4];
-    OseoValue getter_field = frame.slots[5];
-    OseoValue setter_field = frame.slots[6];
-    OseoValue current_value = oseo_undefined();
-    OseoPropertyAttributes current_attributes = {false, false, false, false};
-    OseoValue current_getter = oseo_undefined();
-    OseoValue current_setter = oseo_undefined();
-    bool exists = oseo_internal_own_descriptor(
-        object_value,
-        frame.slots[0],
-        &current_value,
-        &current_attributes,
-        &current_getter,
-        &current_setter
-    );
-    /* A descriptor with no value field keeps the property's current
-     * value, which a cell-backed property holds in its binding cell. */
-    if (exists &&
-        oseo_internal_cell_backed_property(object_value, current_value)) {
-        result = oseo_cell_get(context, current_value);
-        if (result.status != OSEO_STATUS_NORMAL) {
-            oseo_roots_release(context, &frame);
-            return result;
-        }
-        current_value = result.value;
-    }
-    if (has_getter || has_setter ||
-        (!has_value && !has_writable &&
-         exists && current_attributes.accessor)) {
-        OseoPropertyAttributes attributes = {
-            !has_configurable
-                ? exists && current_attributes.configurable
-                : oseo_to_boolean(configurable),
-            !has_enumerable
-                ? exists && current_attributes.enumerable
-                : oseo_to_boolean(enumerable),
-            false,
-            true,
-        };
-        result = oseo_object_define_accessor(
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_converted_property(
             context,
             object_value,
             frame.slots[0],
-            has_getter ? getter_field : oseo_undefined(),
-            has_setter ? setter_field : oseo_undefined(),
-            has_getter,
-            has_setter,
-            attributes
+            &descriptor,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3]
         );
-        if (result.status == OSEO_STATUS_NORMAL) result.value = object_value;
-        oseo_roots_release(context, &frame);
-        return result;
     }
-    OseoValue value = has_value ? descriptor_value_field : current_value;
-    OseoPropertyAttributes attributes = {
-        !has_configurable
-            ? exists && current_attributes.configurable
-            : oseo_to_boolean(configurable),
-        !has_enumerable
-            ? exists && current_attributes.enumerable
-            : oseo_to_boolean(enumerable),
-        !has_writable
-            ? exists && current_attributes.writable
-            : oseo_to_boolean(writable),
-        false,
-    };
-    result = oseo_internal_object_define_data(
-        context,
-        object_value,
-        frame.slots[0],
-        value,
-        attributes,
-        has_value
-    );
     if (result.status == OSEO_STATUS_NORMAL) result.value = object_value;
     oseo_roots_release(context, &frame);
     return result;
@@ -1952,6 +2008,144 @@ static OseoResult object_get_own_property_descriptors(
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
     oseo_roots_release(context, &descriptor);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Object.defineProperties (20.1.2.3) over ObjectDefineProperties
+ * (20.1.2.3.1). The target check precedes every read of the properties
+ * argument, and ToObject runs before the own-key walk, so a nullish
+ * properties argument throws and a primitive is read through the
+ * wrapper it converts to, including a String wrapper's index
+ * properties. The walk visits ordinary own keys in order and keeps the
+ * own enumerable ones, reading each descriptor with Get so an accessor
+ * runs, and converts every descriptor through one ToPropertyDescriptor
+ * body before the first definition mutates the target. An abrupt
+ * completion while collecting therefore leaves the target untouched,
+ * while an abrupt definition keeps every definition that preceded it.
+ */
+static OseoResult object_define_properties(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
+    if (!is_object(object_value)) {
+        return type_error(
+            context,
+            "Object.defineProperties requires an object target."
+        );
+    }
+    OseoResult converted = oseo_internal_to_object(
+        context,
+        builtin_argument(argument_count, arguments, 1u)
+    );
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    size_t virtual_count = is_array(converted.value) ||
+        function_has_prototype_property(converted.value) ? 1u : 0u;
+    size_t property_count = ordinary_object(converted.value)->property_count;
+    if (property_count > SIZE_MAX - 3u - virtual_count ||
+        property_count + virtual_count > (SIZE_MAX - 1u) / 4u) {
+        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
+    }
+    size_t key_count = property_count + virtual_count;
+    /* The key frame roots the properties object, the target, the one
+     * synthesized key string, and the whole key snapshot. The collected
+     * frame holds four slots per collected descriptor, in the order
+     * key, value, getter, setter, and one final slot that roots each
+     * descriptor object while its fields are read. */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = converted.value;
+    frame.slots[1] = object_value;
+    OseoRootFrame collected_frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(
+        context,
+        &collected_frame,
+        4u * key_count + 1u
+    );
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    OseoConvertedDescriptor *records = NULL;
+    if (key_count > 0u) {
+        records = malloc(key_count * sizeof(*records));
+        if (records == NULL) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "Descriptor collection allocation failed."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = snapshot_own_keys(context, &frame, key_count);
+    }
+    size_t collected = 0u;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < key_count;
+         index += 1u) {
+        OseoValue key = frame.slots[3u + index];
+        OseoValue ignored = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue ignored_getter = oseo_undefined();
+        OseoValue ignored_setter = oseo_undefined();
+        /* A getter an earlier key ran may have removed this key or made
+         * it non-enumerable, so the descriptor is re-read per key. */
+        if (!oseo_internal_own_descriptor(
+                frame.slots[0],
+                key,
+                &ignored,
+                &attributes,
+                &ignored_getter,
+                &ignored_setter
+            ) ||
+            !attributes.enumerable) {
+            continue;
+        }
+        result = oseo_object_get(context, frame.slots[0], key);
+        collected_frame.slots[4u * key_count] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_object(result.value)) {
+            result = type_error(
+                context,
+                "A property descriptor must be an object."
+            );
+            break;
+        }
+        OseoValue *slots = &collected_frame.slots[4u * collected];
+        slots[0] = key;
+        result = to_property_descriptor(
+            context,
+            collected_frame.slots[4u * key_count],
+            &slots[1],
+            &slots[2],
+            &slots[3],
+            &records[collected]
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        collected += 1u;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < collected;
+         index += 1u) {
+        OseoValue *slots = &collected_frame.slots[4u * index];
+        result = define_converted_property(
+            context,
+            frame.slots[1],
+            slots[0],
+            &records[index],
+            slots[1],
+            slots[2],
+            slots[3]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    free(records);
+    oseo_roots_release(context, &collected_frame);
     oseo_roots_release(context, &frame);
     return result;
 }

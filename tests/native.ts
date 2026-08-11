@@ -260,6 +260,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
+    fixture.name === "object-define-properties" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
@@ -337,6 +338,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
+    fixture.name === "object-define-properties" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
@@ -508,6 +510,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-buffer" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
+            fixture.name === "object-define-properties" ||
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||

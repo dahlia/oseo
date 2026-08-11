@@ -3086,6 +3086,1902 @@ tests:
   - path: test/built-ins/Object/create/15.2.3.5-1-2.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-0-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-0-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-1-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-1-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-1-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-1-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-2-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-3-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-100.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-101.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-102.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-103.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-104.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-105.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-106.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-107.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-109.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-110.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-111.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-112.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-113.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-114.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-115.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-116.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-117.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-118.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-119.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-120.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-121.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-122.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-123.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-124.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-125.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-126.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-127.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-128.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-129.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-130.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-131.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-132.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-133.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-134.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-135.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-137.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-138.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-139.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-140.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-141.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-142.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-143.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-144.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-145.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-146.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-147.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-148.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-149.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-150.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-151.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-152.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-153.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-154.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-155.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-156.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-157.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-158.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-159.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-160.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-161.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-163.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-164.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-165.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-166.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-167.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-168.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-169.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-170.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-171.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-172.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-173.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-174.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-175.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-176.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-177.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-178.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-179.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-180.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-181.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-182.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-183.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-184.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-185.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-186.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-188.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-189.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-190.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-191.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-192.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-193.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-194.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-195.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-196.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-197.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-198.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-199.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-200.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-201.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-202.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-203.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-204.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-205.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-206.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-207.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-208.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-209.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-21.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-210.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-211.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-212.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-213.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-214.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-216.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-217.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-218.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-219.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-22.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-220.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-221.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-222.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-223.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-226.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-227.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-228.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-229.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-23.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-230.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-231.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-232.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-233.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-234.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-235.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-236.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-237.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-238.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-239.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-24.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-240.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-241.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-242.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-243.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-244.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-245.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-246.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-247.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-248.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-249.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-25.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-252.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-253.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-254.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-255.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-256.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-257.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-258.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-26.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-261.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-262.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-263.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-264.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-27.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-31.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-33.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-34.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-35.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-36.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-37.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-38.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-39.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-40.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-41.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-42.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-43.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-44.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-45.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-46.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-47.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-48.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-49.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-50.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-51.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-52.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-53.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-54.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-56.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-57.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-58.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-59.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-60.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-61.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-62.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-63.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-64.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-65.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-66.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-67.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-68.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-69.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-70.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-71.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-72.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-73.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-74.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-75.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-76.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-77.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-78.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-79.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-80.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-81.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-82.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-84.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-85.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-86.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-87.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-88.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-89.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-90.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-91.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-92.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-93.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-94.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-95.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-96.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-97.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-98.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-99.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-100.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-101.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-102.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-103.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-104.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-105.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-106.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-107.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-108.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-109.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-110.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-111.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-112.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-113.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-114-b.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-114.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-115.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-116.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-117.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-118.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-119.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-120.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-121.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-122.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-123.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-124.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-125.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-126.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-127.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-128.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-129.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-130.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-131.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-132.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-133.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-134.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-135.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-136.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-137.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-138.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-139.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-140.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-141.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-142.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-143.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-144.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-145.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-146.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-147.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-148.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-149.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-150.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-151.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-152.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-153.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-155.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-156.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-157.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-158.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-159.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-160.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-161.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-162.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-163.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-164.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-165.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-166.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-167.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-168.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-169.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-170.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-171.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-172.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-173.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-174.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-175.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-176.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-177.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-178.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-179.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-18.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-180.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-181.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-182.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-183.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-184.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-185.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-186.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-187.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-188.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-189.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-19.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-190.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-191.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-192.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-193.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-194.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-195.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-196.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-197.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-198.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-199.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-20.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-200.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-201.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-202.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-203.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-204.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-205.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-206.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-207.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-208.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-209.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-210.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-211.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-212.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-213.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-214.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-215.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-216.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-217.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-218.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-219.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-220.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-221.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-222.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-223.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-224.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-225.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-226.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-227.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-228.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-229.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-230.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-231.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-232.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-233.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-234.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-235.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-236.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-237.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-238.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-239.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-24.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-240.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-241.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-242.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-243.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-244.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-245.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-246.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-247.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-248.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-249.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-25.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-250.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-251.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-252.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-253.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-254.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-255.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-256.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-257.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-258.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-259.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-26.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-260.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-261.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-262.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-263.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-264.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-265.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-266.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-267.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-268.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-269.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-27.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-270.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-271.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-272.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-273.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-274.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-275.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-276.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-277.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-278.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-279.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-280.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-281.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-282.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-283.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-284.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-285.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-286.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-287.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-288.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-289.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-290.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-291.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-292.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-293.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-294.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-295.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-296.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-297.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-298.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-299.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-30.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-300.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-301.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-302.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-303.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-304.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-305.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-306.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-307.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-308.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-309.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-31.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-310.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-311.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-312.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-313.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-314.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-33.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-34.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-35.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-36.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-37.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-38-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-38.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-39.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-40.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-41.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-42.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-43.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-44.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-45.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-46.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-47.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-48.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-49.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-50.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-51.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-52.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-53.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-54.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-55.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-56.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-57.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-58.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-59.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-60.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-61.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-62.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-63.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-64.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-65.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-66-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-66.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-67.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-68.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-69.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-70.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-71.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-72.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-73.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-74.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-75.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-76.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-77.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-78.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-79.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-80.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-81.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-82.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-83.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-84-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-84.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-85.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-86-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-86.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-87.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-88.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-89.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-90.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-91.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-92.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-93-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-93-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-93-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-93-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-93.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-94.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-95.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-96.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-97.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-98.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-99.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-bigint.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-false.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-null.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-true.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/property-description-must-be-an-object-not-undefined.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/proxy-no-ownkeys-returned-keys-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/defineProperties/typedarray-backed-by-resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-0-1.js
     expectedClassification: pass
     dependencies: [object-properties]
