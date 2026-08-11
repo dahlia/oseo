@@ -3855,6 +3855,32 @@ expected negatives, and 1,333 unsupported profile features. The follow-up
 runtime ABI moves to `oseo-runtime-m5-59` without changing the graph's
 orchestration state.
 
+Implemented M5b node `object-define-properties` admits
+`Object.defineProperties` over the property-key, descriptor, and own-key
+components the descriptor checkpoint already landed. The target check
+precedes every read of the properties argument, ToObject precedes the own
+enumerable key walk, and each kept key's descriptor is read with Get and
+converted through the one shared ToPropertyDescriptor body before the first
+definition mutates the target. An abrupt collection therefore leaves the
+target untouched, while an abrupt definition keeps every earlier definition
+and stops every later one. The collected descriptors apply in ordinary
+own-key order through the shared DefinePropertyOrThrow body, so ordinary
+objects, arrays, functions, arguments aliases, String wrappers, symbol keys,
+and module namespaces keep their existing generic compatibility rules, and a
+module namespace serves as the properties argument through its binding
+cells. Fixed native and generated differential evidence at seed `0x60003e00`
+covers both specialization policies, forced collection at every safepoint,
+false hints, deliberate shape-guard misses, generic fallback, colliding
+integer and string key orders, every optional descriptor field, abrupt
+getters, mixed and non-object descriptors at each collection position, and
+namespace sources and targets. All 632 paths under the node's inventory root
+are reviewed: 540 pass and 92 retain explicit prerequisite boundaries for
+unadmitted standard globals, `Proxy`, and the `Reflect.construct` harness
+check. The manifest moves to 8,617 paths with 5,828 passes, 1,364 expected
+negatives, and 1,425 unsupported profile features. The completed collection
+checkpoint moves the runtime ABI to `oseo-runtime-m5-60` without changing
+the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

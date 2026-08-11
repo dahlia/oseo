@@ -1,0 +1,3 @@
+version: 1
+id: object-define-properties
+record: docs/language-profile-m5/families/object-define-properties.yaml

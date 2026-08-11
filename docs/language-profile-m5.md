@@ -3347,6 +3347,55 @@ ABI moves to `oseo-runtime-m5-59` without exposing the global object or
 changing the graph's orchestration state. Compatibility classifications and
 counts do not move.
 
+### Object.defineProperties descriptor collection
+
+M5b node `object-define-properties` admits `Object.defineProperties` over
+the property-key, descriptor, and own-key components the descriptor
+checkpoint already landed. The target check precedes every read of the
+properties argument, so a primitive target throws before a poisoned
+properties getter can run. ToObject then precedes the own-key walk, so a
+nullish properties argument throws and a primitive is read through the
+wrapper it converts to, including a String wrapper's index properties. The
+walk keeps the own enumerable keys in ordinary own-key order: integer
+indices lead in ascending numeric order, string keys follow in creation
+order, and symbol keys trail. Each kept key's descriptor is read with Get,
+so an accessor on the properties object runs and a deleted or
+no-longer-enumerable key is skipped, and each read descriptor converts
+through the one ToPropertyDescriptor body `Object.defineProperty` shares,
+observing `enumerable`, `configurable`, `value`, `writable`, `get`, and
+`set` in that order with the specified callable and exclusivity checks.
+
+The whole collection pass completes before the first definition mutates the
+target. An abrupt completion while collecting, including a non-object
+descriptor value, an abrupt field read, an accessor field that is neither
+undefined nor callable, and a descriptor mixing accessor and data fields,
+therefore leaves the target untouched. The collected descriptors then apply
+in own-key order through the shared DefinePropertyOrThrow body, so an
+incompatible redefinition throws a `TypeError` that keeps every earlier
+definition and stops every later one. Ordinary objects, arrays and their
+`length`, functions and their `prototype`, mapped arguments aliases, String
+wrappers, symbol keys, and module namespace compatibility all behave as the
+descriptor component already specifies, and a module namespace works as the
+properties argument with its exports read through their binding cells.
+
+Fixed native and generated differential evidence at property seed
+`0x60003e00` covers both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard misses, generic fallback,
+one to three colliding integer and string keys in every literal order,
+every independently optional descriptor field, abrupt getters, mixed and
+non-object descriptors at each collection position, namespace sources and
+targets, and a collection-pressure loop over twenty-four definitions. All
+632 paths under the node's inventory root are reviewed: 540 pass and 92
+retain explicit prerequisite boundaries for the unadmitted `Array`,
+`Boolean`, `Date`, `JSON`, `Math`, `RegExp`, and `String` globals, `Proxy`,
+and the `Reflect.construct` the constructor-check harness needs. The
+manifest reaches 8,617 cases: 5,828 passes, 1,364 expected negatives, and
+1,425 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory,
+manifest schema and vocabulary, and zero-override policy are unchanged. The
+completed collection checkpoint moves the runtime ABI to `oseo-runtime-m5-60`
+without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

@@ -248,3 +248,7 @@ families:
     owner: tests/property/m5-global-object-record.property.test.ts
     start: 0x60003d00
     end: 0x60003dff
+  - family: m5-object-define-properties
+    owner: tests/property/m5-object-define-properties.property.test.ts
+    start: 0x60003e00
+    end: 0x60003eff

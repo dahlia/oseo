@@ -161,6 +161,45 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
   assert.doesNotMatch(deferred[1] ?? "", /getOwnPropertyDescriptors/u);
 });
 
+test("collects every defineProperties descriptor before mutation", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  // One ToPropertyDescriptor body serves both define entry points, the
+  // plural one reuses the ordinary own-key walk, and its whole
+  // collection loop completes before the first definition runs.
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      "oseo_object_builtin_define_property[\\s\\S]*" +
+        "to_property_descriptor\\([\\s\\S]*" +
+        "define_converted_property\\(",
+      "u",
+    ),
+  );
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      String.raw`static OseoResult object_define_properties\([\s\S]*` +
+        "Object\\.defineProperties requires an object target[\\s\\S]*" +
+        String.raw`snapshot_own_keys\(context, &frame, key_count\)[\s\S]*` +
+        "A property descriptor must be an object[\\s\\S]*" +
+        String.raw`to_property_descriptor\([\s\S]*` +
+        "index < collected[\\s\\S]*" +
+        String.raw`define_converted_property\(`,
+      "u",
+    ),
+  );
+  assert.match(
+    objectBuiltins,
+    /OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID[\s\S]*"defineProperties"/u,
+  );
+  const deferred = objectBuiltins.match(
+    /deferred_static_names\[\] = \{([^}]*)\}/u,
+  );
+  assert.ok(deferred != null, "deferred Object statics");
+  assert.doesNotMatch(deferred[1] ?? "", /defineProperties/u);
+});
+
 test("owns Object integrity transitions and queries", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 
