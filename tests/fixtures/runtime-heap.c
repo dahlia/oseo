@@ -1090,6 +1090,7 @@ static void test_global_object_bindings(
     static const uint16_t *const names[] = {answer_units, frozen_units};
     static const size_t lengths[] = {6u, 6u};
     static const size_t binding_ids[] = {0u, 1u};
+    static const bool functions[] = {false, false};
     roots[0] = require_normal(oseo_environment_create(context, 2u));
     for (size_t index = 0u; index < 2u; index += 1u) {
         roots[1] = require_normal(oseo_cell_create(context, oseo_number(1.0)));
@@ -1098,8 +1099,18 @@ static void test_global_object_bindings(
         );
     }
     roots[2] = require_normal(
-        oseo_global_object_create(context, roots[0], 2u, names, lengths,
-            binding_ids)
+        oseo_global_object_create(
+            context,
+            roots[0],
+            0u,
+            NULL,
+            NULL,
+            2u,
+            names,
+            lengths,
+            binding_ids,
+            functions
+        )
     );
     assert(roots[2] == require_normal(oseo_this_value(context,
         oseo_undefined())));
@@ -1198,6 +1209,170 @@ static void test_global_object_bindings(
         require_normal(oseo_object_get(context, roots[2], roots[3])) ==
         oseo_number(6.0)
     );
+
+    /* The realm's standard value properties retain one read-only,
+     * non-configurable identity through var redeclaration and collection. */
+    static const uint16_t undefined_units[] = {
+        'u', 'n', 'd', 'e', 'f', 'i', 'n', 'e', 'd'
+    };
+    static const uint16_t infinity_units[] = {
+        'I', 'n', 'f', 'i', 'n', 'i', 't', 'y'
+    };
+    static const uint16_t blocked_units[] = {
+        'b', 'l', 'o', 'c', 'k', 'e', 'd'
+    };
+    static const uint16_t object_units[] = {
+        'O', 'b', 'j', 'e', 'c', 't'
+    };
+    static const uint16_t *const undefined_name[] = {undefined_units};
+    static const uint16_t *const infinity_name[] = {infinity_units};
+    static const uint16_t *const blocked_name[] = {blocked_units};
+    static const uint16_t *const object_name[] = {object_units};
+    static const size_t undefined_length[] = {9u};
+    static const size_t infinity_length[] = {8u};
+    static const size_t blocked_length[] = {7u};
+    static const size_t object_length[] = {6u};
+    static const size_t first_binding[] = {0u};
+    static const bool var_declaration[] = {false};
+    static const bool function_declaration[] = {true};
+    roots[3] = make_text(context, "undefined");
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_undefined()
+    );
+    assert(
+        require_normal(oseo_object_set(
+            context, roots[2], roots[3], oseo_number(9.0), false
+        )) == oseo_number(9.0)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_undefined()
+    );
+    assert(
+        oseo_object_set(context, roots[2], roots[3], oseo_number(9.0), true)
+            .status == OSEO_STATUS_THROW
+    );
+    assert(
+        require_normal(oseo_object_delete(context, roots[2], roots[3], false))
+        == oseo_boolean(false)
+    );
+
+    roots[4] = require_normal(oseo_environment_create(context, 1u));
+    roots[5] = require_normal(oseo_cell_create(context, oseo_uninitialized()));
+    (void)require_normal(oseo_environment_set(
+        context, roots[4], 0u, roots[5]
+    ));
+    assert(oseo_global_object_create(
+        context,
+        roots[4],
+        1u,
+        undefined_name,
+        undefined_length,
+        0u,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    ).status == OSEO_STATUS_THROW);
+    assert(oseo_global_object_create(
+        context,
+        roots[4],
+        0u,
+        NULL,
+        NULL,
+        1u,
+        infinity_name,
+        infinity_length,
+        first_binding,
+        function_declaration
+    ).status == OSEO_STATUS_THROW);
+    (void)require_normal(oseo_global_object_create(
+        context,
+        roots[4],
+        0u,
+        NULL,
+        NULL,
+        1u,
+        undefined_name,
+        undefined_length,
+        first_binding,
+        var_declaration
+    ));
+    roots[5] = require_normal(oseo_environment_get(context, roots[4], 0u));
+    (void)require_normal(oseo_global_binding_set(
+        context, roots[5], oseo_number(10.0), false
+    ));
+    assert(require_normal(oseo_cell_get(context, roots[5])) ==
+           oseo_undefined());
+
+    /* A plain-valued global property initializes the fresh Script cell
+     * before the property becomes cell-backed. A var declaration preserves
+     * that value and its descriptor rather than assigning through the
+     * uninitialized cell. */
+    roots[3] = make_text(context, "Object");
+    roots[6] = require_normal(oseo_object_get(context, roots[2], roots[3]));
+    roots[5] = require_normal(oseo_cell_create(context, oseo_uninitialized()));
+    (void)require_normal(oseo_environment_set(
+        context, roots[4], 0u, roots[5]
+    ));
+    (void)require_normal(oseo_global_object_create(
+        context,
+        roots[4],
+        0u,
+        NULL,
+        NULL,
+        1u,
+        object_name,
+        object_length,
+        first_binding,
+        var_declaration
+    ));
+    roots[5] = require_normal(oseo_environment_get(context, roots[4], 0u));
+    assert(require_normal(oseo_cell_get(context, roots[5])) == roots[6]);
+
+    /* A non-extensible global still admits an existing var property but
+     * rejects an absent name before it creates a property. */
+    roots[6] = require_normal(oseo_object_get(context, roots[2], roots[3]));
+    roots[3] = make_text(context, "preventExtensions");
+    roots[7] = require_normal(oseo_object_get(context, roots[6], roots[3]));
+    OseoValue prevent_arguments[1] = {roots[2]};
+    (void)require_normal(oseo_call_function(
+        context,
+        roots[7],
+        roots[6],
+        1u,
+        prevent_arguments,
+        oseo_undefined()
+    ));
+    assert(oseo_global_object_create(
+        context,
+        roots[4],
+        0u,
+        NULL,
+        NULL,
+        1u,
+        blocked_name,
+        blocked_length,
+        first_binding,
+        var_declaration
+    ).status == OSEO_STATUS_THROW);
+    roots[3] = make_text(context, "blocked");
+    assert(require_normal(oseo_object_has_own(
+        context, roots[2], roots[3]
+    )) == oseo_boolean(false));
+    (void)require_normal(oseo_global_object_create(
+        context,
+        roots[4],
+        0u,
+        NULL,
+        NULL,
+        1u,
+        undefined_name,
+        undefined_length,
+        first_binding,
+        var_declaration
+    ));
 }
 
 int main(void) {

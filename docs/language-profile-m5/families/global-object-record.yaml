@@ -1,0 +1,57 @@
+version: 1
+id: global-object-record
+title: "Standard global value properties and declarations"
+scope:
+  - "The Infinity, NaN, and undefined value properties and their
+    non-writable, non-enumerable, non-configurable descriptors."
+  - "Static Script GlobalDeclarationInstantiation checks for restricted
+    lexical names, existing var and function properties, and global object
+    extensibility, without exposing a globalThis binding."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/global-object-record.ts
+      - tests/property/m5-global-object-record.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/global-object-record.ts
+      - tests/native.ts
+      - tests/fixtures/runtime-heap.c
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-global-object-record.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-global-object-record.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/global-object-record.ts
+      - tests/property/m5-global-object-record.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-global-object-record.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/backend-c/tests/index.test.ts
+      - packages/compiler/tests/hir.test.ts
+      - packages/parser-babel/tests/bindings.test.ts
+      - packages/runtime-c/native/runtime_binding.c
+      - tests/fixtures/runtime-heap.c

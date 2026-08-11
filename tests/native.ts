@@ -38,6 +38,7 @@ import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
+import * as globalRecord from "./native/fixtures/global-object-record.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
@@ -83,6 +84,7 @@ Object.defineProperty(globalThis, "console", {
 
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
+  ...globalRecord.globalObjectRecordFixtures,
   ...objectFixtures,
   ...arrayBufferFixtures,
   ...classFixtures,
@@ -260,6 +262,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-define-property" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
@@ -336,6 +339,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-define-property" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -424,6 +428,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-define-property" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
@@ -505,6 +510,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-define-property" ||
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
+            fixture.name === "global-object-record" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
@@ -673,7 +679,10 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
-            assert.equal(native.counters.allocations, 6);
+            // The function and its environment allocate six objects. The
+            // Script global record contributes the ten standard-object and
+            // standard-value-property allocations shared by every Script.
+            assert.equal(native.counters.allocations, 16);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

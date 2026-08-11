@@ -1,0 +1,28 @@
+group: language/global-code
+key: "65"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/global-code/script-decl-func-err-non-extensible.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - object-properties
+    observation:
+      detail: "test/language/global-code/script-decl-func-err-non-extensible.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/global-code/script-decl-func-err-non-ext\
+        ensible.js:113:3: error[OSEO1001]: Unknown binding '$262'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

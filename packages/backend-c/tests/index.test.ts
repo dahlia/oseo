@@ -90,6 +90,7 @@ function globalObjectProgram(observesThis: boolean): MirProgram {
   return {
     functions: [],
     globalBindings: [{ id: 0, name: "answer" }],
+    globalLexicalNames: [],
     globalObjectBindings: [{ declaration: "var", id: 0, name: "answer" }],
     kind: "mir-program",
     observeSpecialization: false,
@@ -163,15 +164,50 @@ test("installs global object properties before the script body", () => {
   assert.doesNotMatch(emitted.source, /oseo_cell_set\(context/u);
 });
 
-test("keeps the plain binding path when no position observes this", () => {
-  // Nothing but a resolved global this value can reach the global
-  // object, so a program that never resolves one installs no property
-  // and writes its bindings through the ordinary declarative path. The
-  // two programs' MIR differs only in the `global-this` operation.
+test("installs global declarations even without a this observation", () => {
+  // GlobalDeclarationInstantiation runs whether or not the statement
+  // list later reads the global object. The declaration must therefore
+  // retain the object-environment assignment path in both programs.
   const emitted = cBackend.emit(globalObjectProgram(false));
-  assert.doesNotMatch(emitted.source, /oseo_global_object_create/u);
-  assert.doesNotMatch(emitted.source, /oseo_global_binding_set/u);
-  assert.match(emitted.source, /oseo_cell_set\(context/u);
+  assert.match(emitted.source, /oseo_global_object_create/u);
+  assert.match(emitted.source, /oseo_global_binding_set/u);
+  assert.doesNotMatch(emitted.source, /oseo_cell_set\(context/u);
+});
+
+test("checks global lexical names before creating object bindings", () => {
+  const program = globalObjectProgram(false);
+  const emitted = cBackend.emit({
+    ...program,
+    globalLexicalNames: ["undefined"],
+  });
+  assert.match(emitted.source, /global_lexical_units_0/u);
+  assert.match(
+    emitted.source,
+    /oseo_global_object_create\(context, .*1u, global_lexical_names,/su,
+  );
+  assert.match(emitted.source, /global_object_functions/u);
+});
+
+test("replaces an existing value for a global function declaration", () => {
+  const program = globalObjectProgram(false);
+  const emitted = cBackend.emit({
+    ...program,
+    globalObjectBindings: [{ declaration: "function", id: 0, name: "Symbol" }],
+    script: {
+      ...program.script,
+      blocks: program.script.blocks.map((block) =>
+        Object.assign({}, block, {
+          operations: block.operations.map((operation) =>
+            operation.kind === "write"
+              ? Object.assign({}, operation, { kind: "initialize" as const })
+              : operation,
+          ),
+        }),
+      ),
+    },
+  });
+  assert.match(emitted.source, /oseo_global_function_initialize/u);
+  assert.doesNotMatch(emitted.source, /oseo_global_binding_initialize/u);
 });
 
 test("rejects invalid exported MIR BigInt digits", () => {

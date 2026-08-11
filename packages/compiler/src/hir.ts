@@ -1182,6 +1182,8 @@ export interface HirProgram {
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
+  /** Script lexical names checked against restricted global properties. */
+  readonly globalLexicalNames?: readonly string[];
   /**
    * The hidden global-object capture initialized before any module function
    * initializer can expose a closure that reads it.

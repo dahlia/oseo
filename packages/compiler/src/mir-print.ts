@@ -147,6 +147,9 @@ export function printMir(program: MirProgram): string {
   for (const binding of program.globalBindings) {
     lines.push(`global %b${binding.id} ${binding.name}`);
   }
+  for (const name of program.globalLexicalNames ?? []) {
+    lines.push(`global-lexical ${name}`);
+  }
   for (const binding of program.globalObjectBindings) {
     lines.push(`global-object %b${binding.id} ${binding.name}`);
   }

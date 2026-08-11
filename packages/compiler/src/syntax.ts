@@ -1085,9 +1085,19 @@ export interface SyntaxGlobalObjectName extends LocatedSyntax {
   readonly name: string;
 }
 
+/** One Script top-level lexical name checked against the global object. */
+export interface SyntaxGlobalLexicalName extends LocatedSyntax {
+  readonly name: string;
+}
+
 /** One owned M1 script, with no parser-specific values. */
 export interface SyntaxProgram extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  /**
+   * Script lexical names that HasRestrictedGlobalProperty checks before
+   * creating any binding. A module frontend leaves this absent.
+   */
+  readonly globalLexicalNames?: readonly SyntaxGlobalLexicalName[];
   /**
    * The var-scoped top-level names a Script's Global Environment Record
    * must also bind as properties of its global object, in the order

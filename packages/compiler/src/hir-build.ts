@@ -1,7 +1,6 @@
 import {
   anonymousDefinition,
   errorIntrinsicName,
-  intrinsicGlobalKind,
   isStandardGlobalName,
 } from "./hir.ts";
 import type {
@@ -36,7 +35,6 @@ import type {
   HirStatement,
   HirStrictGlobalFallback,
   HirSwitchCase,
-  IntrinsicGlobalKind,
   ResolveState,
 } from "./hir.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
@@ -50,7 +48,6 @@ import type {
   SyntaxExpression,
   SyntaxForInTarget,
   SyntaxFunction,
-  SyntaxGlobalObjectName,
   SyntaxLexicalDeclarator,
   SyntaxProgram,
   SyntaxStatement,
@@ -191,9 +188,12 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 function isPropertyOwnedIntrinsicName(name: string): boolean {
   return (
     name === "ArrayBuffer" ||
+    name === "Infinity" ||
+    name === "NaN" ||
     name === "Number" ||
     name === "Object" ||
-    name === "Promise"
+    name === "Promise" ||
+    name === "undefined"
   );
 }
 
@@ -3865,42 +3865,6 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
-/**
- * Whether this profile's uniform global-object property is what
- * ECMA-262 produces for a Script top-level declaration of a name the
- * realm already binds as an intrinsic global.
- *
- * This unit creates every property with the writable, enumerable, and
- * non-configurable attributes GlobalDeclarationInstantiation gives a
- * name the global object does not already have. That is the exact
- * outcome of CreateGlobalFunctionBinding over a replaceable intrinsic,
- * whose property is configurable and is therefore redefined whole.
- *
- * Every other collision needs behavior the realm's global object does
- * not yet carry: CreateGlobalVarBinding must leave the existing
- * property, and its attributes, untouched, and CanDeclareGlobalFunction
- * must reject a restricted global with a TypeError before any statement
- * runs. Creating the uniform property instead would silently answer
- * both differently, so those declarations stay unadmitted.
- */
-function admitsGlobalObjectProperty(
-  intrinsic: IntrinsicGlobalKind,
-  entry: SyntaxGlobalObjectName,
-): boolean {
-  return intrinsic === "replaceable" && entry.declaration === "function";
-}
-
-/** Name the ECMA-262 operation an unadmitted collision would need. */
-function globalObjectCollisionMessage(entry: SyntaxGlobalObjectName): string {
-  return entry.declaration === "var"
-    ? `Declaring the intrinsic global '${entry.name}' with var at Script ` +
-        "top level is outside the admitted global-object profile; " +
-        "CreateGlobalVarBinding keeps the realm's existing property."
-    : `Declaring the intrinsic global '${entry.name}' as a function at ` +
-        "Script top level is outside the admitted global-object profile; " +
-        "CanDeclareGlobalFunction rejects a non-configurable property.";
-}
-
 interface HirSeed {
   readonly bindings?: ReadonlyMap<string, Binding>;
   /**
@@ -3992,17 +3956,6 @@ export function buildSeededHir(
         `Global object name '${entry.name}' has no script binding.`,
       );
     }
-    const intrinsic = intrinsicGlobalKind(entry.name);
-    if (intrinsic != null && !admitsGlobalObjectProperty(intrinsic, entry)) {
-      diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          entry,
-          globalObjectCollisionMessage(entry),
-        ),
-      );
-      continue;
-    }
     globalObjectBindings.push({
       declaration: entry.declaration,
       id: binding.id,
@@ -4040,6 +3993,9 @@ export function buildSeededHir(
               ...body,
             ],
       functions: state.hirFunctions,
+      globalLexicalNames: (program.globalLexicalNames ?? []).map(
+        (entry) => entry.name,
+      ),
       globalBindings: [
         ...(state.intrinsicGlobalObjectBinding == null
           ? []

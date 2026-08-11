@@ -2180,6 +2180,24 @@ tests:
   - path: test/built-ins/GeneratorPrototype/return/try-finally-within-try.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/Infinity/15.1.1.2-0.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Infinity/S15.1.1.2_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/Infinity/S15.1.1.2_A2_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/Infinity/S15.1.1.2_A3_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/Infinity/S15.1.1.2_A4.js
+    expectedClassification: pass
+    dependencies: [control-flow, object-properties, var-bindings]
+  - path: test/built-ins/Infinity/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Iterator/constructor.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
@@ -2291,6 +2309,24 @@ tests:
   - path: test/built-ins/Iterator/subclassable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
+  - path: test/built-ins/NaN/15.1.1.1-0.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/NaN/S15.1.1.1_A1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/NaN/S15.1.1.1_A2_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/NaN/S15.1.1.1_A3_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/NaN/S15.1.1.1_A4.js
+    expectedClassification: pass
+    dependencies: [control-flow, object-properties, var-bindings]
+  - path: test/built-ins/NaN/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/NativeErrors/EvalError/constructor.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
@@ -10010,6 +10046,30 @@ tests:
   - path: test/built-ins/ThrowTypeError/unique-per-realm-unmapped-args.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/built-ins/undefined/15.1.1.3-0.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/undefined/15.1.1.3-1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/built-ins/undefined/15.1.1.3-2.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties]
+  - path: test/built-ins/undefined/15.1.1.3-3.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/built-ins/undefined/S15.1.1.3_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/built-ins/undefined/S15.1.1.3_A3_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/undefined/S15.1.1.3_A4.js
+    expectedClassification: pass
+    dependencies: [control-flow, object-properties, var-bindings]
+  - path: test/built-ins/undefined/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/language/arguments-object/10.5-1gs.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
@@ -17721,9 +17781,123 @@ tests:
   - path: test/language/function-code/block-decl-onlystrict.js
     expectedClassification: unsupported-profile-feature
     dependencies: [error-intrinsics, functions, lexical-bindings]
+  - path: test/language/global-code/S10.1.7_A1_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/global-code/S10.4.1_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/language/global-code/S10.4.1_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators, object-properties]
   - path: test/language/global-code/block-decl-strict.js
     expectedClassification: unsupported-profile-feature
     dependencies: [error-intrinsics, functions, lexical-bindings]
+  - path: test/language/global-code/decl-func-dup.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/global-code/decl-func.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/global-code/decl-lex-deletion.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/global-code/decl-lex-restricted-global.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/global-code/decl-lex.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, lexical-bindings]
+  - path: test/language/global-code/decl-var.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/language/global-code/invalid-private-names-call-expression-bad-reference.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/global-code/invalid-private-names-call-expression-this.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/global-code/invalid-private-names-member-expression-bad-reference.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/global-code/invalid-private-names-member-expression-this.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/global-code/new.target-arrow.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/global-code/new.target.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/global-code/return.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/global-code/script-decl-func-dups.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/language/global-code/script-decl-func-err-non-configurable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/global-code/script-decl-func-err-non-extensible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/global-code/script-decl-func.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/global-code/script-decl-lex-deletion.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings]
+  - path: test/language/global-code/script-decl-lex-lex.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings]
+  - path: test/language/global-code/script-decl-lex-restricted-global.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings, object-properties]
+  - path: test/language/global-code/script-decl-lex-var-declared-via-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings, var-bindings]
+  - path: test/language/global-code/script-decl-lex-var.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings, var-bindings]
+  - path: test/language/global-code/script-decl-lex.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings, object-properties]
+  - path: test/language/global-code/script-decl-var-collision.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-bindings, var-bindings]
+  - path: test/language/global-code/script-decl-var-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, object-properties, var-bindings]
+  - path: test/language/global-code/script-decl-var.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, object-properties, var-bindings]
+  - path: test/language/global-code/super-call-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/global-code/super-call.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/global-code/super-prop-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/global-code/super-prop.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/global-code/switch-case-decl-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, error-intrinsics, functions]
+  - path: test/language/global-code/switch-dflt-decl-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, error-intrinsics, functions]
+  - path: test/language/global-code/unscopables-ignored.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties, symbols, var-bindings]
+  - path: test/language/global-code/yield-non-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/global-code/yield-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]

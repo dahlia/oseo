@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 7,927 reviewed cases: 5,263 passes, 1,355
-expected negatives, and 1,309 unsupported profile features. It records no
+The current manifest contains 7,985 reviewed cases: 5,288 passes, 1,364
+expected negatives, and 1,333 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -2604,35 +2604,23 @@ storage: once a var-scoped property is made non-writable, an assignment
 through the binding fails exactly where a property assignment fails, silently
 outside strict code and with a `TypeError` inside it.
 
-This is still not the global object. `globalThis`, the standard globals, the
-`var` binding model for indirect `eval`, and the restricted-global and
-non-extensible cases that a complete Global Environment Record has to answer
-stay M5b work, and reviewed cases that need them keep their
-`unsupported-profile-feature` classification instead of borrowing this unit's
-receiver.
+The later M5b `global-object-record` node completes this static declaration
+boundary. The realm installs `Infinity`, `NaN`, and `undefined` with
+non-writable, non-enumerable, non-configurable descriptors. Script lexical
+names reach HasRestrictedGlobalProperty before any mutation, and var-scoped
+names reach CanDeclareGlobalFunction or CanDeclareGlobalVar against the
+existing descriptor and the global object's extensibility. A `var`
+redeclaration preserves the existing property cell and value, a restricted
+function or lexical declaration throws before the statement list runs, and a
+missing property on a non-extensible global is rejected before any earlier
+declaration can mutate the object. Function-local and Module declarations
+remain ordinary declarative bindings and do not enter this record.
 
-Because every property this unit creates is writable, enumerable, and
-non-configurable, a Script top-level declaration of a name the realm already
-binds as an intrinsic value is rejected with a source-located diagnostic
-rather than compiled into a property that silently differs. The one admitted
-collision is a function declaration over a replaceable intrinsic, such as
-`function Symbol() {}` or `function TypeError() {}`: its property is
-configurable, so CreateGlobalFunctionBinding redefines it whole and produces
-exactly this unit's property. Every other case needs an answer the global
-object does not carry yet. CreateGlobalVarBinding must leave the existing
-property, and its attributes, untouched, so `var Symbol = 1` may not turn a
-non-enumerable configurable property into an enumerable non-configurable one,
-and `var undefined = 1` may not make a non-writable property writable.
-CanDeclareGlobalFunction must throw a `TypeError` before the first statement
-runs for `function undefined() {}`, `function NaN() {}`, and
-`function Infinity() {}`. The same names stay ordinary bindings inside a
-function and in module code, which add nothing to the global object. A
-Script's lexical top-level declaration of a restricted global, such as
-`let undefined = 1`, is the one collision that is not reported: ECMA-262 makes
-it a `SyntaxError` through HasRestrictedGlobalProperty, but the frontend
-reports only var-scoped names, so the lexical binding shadows the intrinsic
-instead. Carrying the lexical names is M5b work with the rest of the Global
-Environment Record.
+This object is still not exposed by a `globalThis` binding. Indirect `eval`,
+the `Function` constructor, dynamically created global names, and the standard
+global values owned by later intrinsic nodes also remain outside this static
+record. Those boundaries preserve closed-world name resolution rather than
+turning the global object into an implicit runtime name table.
 
 Two further boundaries are worth naming. Annex B's block-level function
 hoisting is not implemented, so a function declared in a block at Script top
@@ -3308,6 +3296,37 @@ semantic, harness, or infrastructure failures. The suite revision,
 policy are unchanged. The runtime ABI moves to `oseo-runtime-m5-56` without
 changing the graph's orchestration state.
 
+### Standard global value properties and declarations
+
+M5b node `global-object-record` installs the standard `Infinity`, `NaN`, and
+`undefined` value properties with non-writable, non-enumerable, and
+non-configurable descriptors. Script GlobalDeclarationInstantiation checks all
+top-level lexical names for restricted properties, validates every function
+and `var` name against the existing descriptor and global object extensibility
+before any mutation, and reuses an existing data property's cell. A `var`
+redeclaration therefore preserves the standard value and exact descriptor,
+while a restricted function or lexical declaration and a missing declaration
+on a non-extensible global fail before the body runs. Module and function-local
+declarations remain declarative bindings.
+
+Fixed native and generated differential evidence at property seed
+`0x60003d00` covers all three values, descriptor identity, strict and
+non-strict writes, deletion, restricted lexical and function declarations,
+non-extensible creation, both specialization policies, forced collection at
+every safepoint, deliberate shape-guard hits and misses, and generic fallback.
+The inventory contains 62 paths under the three value-property roots and
+*test/language/global-code/*. Fifty-nine are reviewed: 25 pass, 9 are expected
+negatives, and 25 retain explicit prerequisite boundaries. One of those paths
+was already reviewed, so this node adds 58 manifest entries. The remaining
+three depend on the separately owned `Array` global or Module import and export
+parsing. Dynamic-source cases retain their explicit boundary, and `globalThis`
+remains parked for the architecture decision that reconciles a mutable global
+object with closed-world name resolution. The manifest reaches 7,985 cases:
+5,288 passes, 1,364 expected negatives, and 1,333 unsupported profile features
+with no semantic, harness, or infrastructure failures. The runtime ABI moves
+to `oseo-runtime-m5-57` without exposing the global object or changing the
+graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3360,12 +3379,12 @@ complete. The remaining gaps retain their existing owners.
     `Test262Error`, classify as unsupported with the
     `runtime-error-observation` capability named. Owner: the intrinsics
     and built-in objects stream.
- -  The `globalThis` binding and a complete Global Environment Record do not
-    exist. M5a Unit 8.1d gives Script top-level `this` and every non-strict
-    nullish receiver one realm-wide global object whose own properties are the
-    Script's statically known var-scoped top-level bindings. M5b now installs
-    the admitted `ArrayBuffer`, `Object`, `Number`, and `Promise` identities
-    there. Because this realm
+ -  The `globalThis` binding does not exist. M5a Unit 8.1d gives Script
+    top-level `this` and every non-strict nullish receiver one realm-wide
+    global object. M5b `global-object-record` completes its static declaration
+    model and installs `Infinity`, `NaN`, and `undefined` alongside the
+    admitted `ArrayBuffer`, `Object`, `Number`, and `Promise` identities.
+    Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh
@@ -3375,14 +3394,11 @@ complete. The remaining gaps retain their existing owners.
     before its first assignment, where a conforming realm would still expose
     another standard intrinsic value, is part of this gap, and a case that
     observes it surfaces as a semantic failure at manifest review rather
-    than entering silently. Admitting the global object still requires the
-    remaining standard constructors to become real values, the
-    restricted-global and non-extensible cases a
-    complete Global Environment Record answers, and an owned architecture
-    decision on how a mutable global object meets closed-world name
-    resolution before any dynamically created global binding is admitted.
-    Two interactions a complete model would also cover sit outside this
-    unit for different reasons. Annex B block-level function hoisting is
+    than entering silently. The remaining standard constructors still need to
+    become real values. Dynamically created global bindings require the owned
+    architecture decision on how a mutable global object meets closed-world
+    name resolution. Two interactions sit outside this unit for different
+    reasons. Annex B block-level function hoisting is
     outside the candidate claim under
     [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Indirect `eval` var
     bindings stay inside that claim and outside this profile, because
@@ -3392,8 +3408,9 @@ complete. The remaining gaps retain their existing owners.
     for M5 completion while leaving the conformance label to its own later
     gate. A case that depends on either classifies unsupported under the
     record that owns it instead of blocking this unit. The reviewed
-    *test/language/global-code/* directory is directly applicable to that model
-    and is not yet in the reviewed subset. The reviewed
+    *test/language/global-code/* directory is now reviewed, with its
+    dynamic-source and unresolved-name cases retaining those explicit
+    boundaries. The reviewed
     *test/language/statements/with/12.10-2-4.js* and
     *test/language/statements/with/12.10-2-5.js* cases each contain a
     failure-only read of the unresolved global `x` outside the `with`
@@ -3406,14 +3423,15 @@ complete. The remaining gaps retain their existing owners.
     `assert.throws(ReferenceError, ...)`, while the optional catch clauses it
     contains are admitted by M5a Unit 8.5b. Strict writes to an unresolved name
     also stop at the source-located boundary recorded above instead of
-    producing the runtime `ReferenceError` that a complete global environment
-    would produce. The reviewed *function-code/block-decl-onlystrict.js* and
+    producing a runtime `ReferenceError`. The reviewed
+    *function-code/block-decl-onlystrict.js* and
     *global-code/block-decl-strict.js* cases and four of the reviewed
     _statements/switch/scope-lex-\*.js_ cases expose the same boundary. Their
     block or switch binding is correctly absent outside its lexical scope, but
     the remaining read receives the compile-stage `Unknown binding` diagnostic
-    instead of the runtime `ReferenceError` a complete global name resolution
-    path produces. Owner: the intrinsics and built-in objects stream; the
+    instead of the runtime `ReferenceError` a dynamic global name-resolution
+    path produces. Owner: `globalthis-binding` and the dynamic-source boundary;
+    the
     surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding
     property name, or an array or object binding default is admitted by M5a

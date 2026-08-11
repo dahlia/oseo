@@ -3823,6 +3823,28 @@ the admitted extensibility state. The manifest moves to 7,927 paths with
 features. The runtime ABI moves to `oseo-runtime-m5-56` without changing the
 graph's orchestration state.
 
+Implemented M5b node `global-object-record` installs `Infinity`, `NaN`, and
+`undefined` as non-writable, non-enumerable, non-configurable properties of
+the realm global object. GlobalDeclarationInstantiation now carries Script
+lexical names to HasRestrictedGlobalProperty, validates every function and
+`var` name against existing descriptors and extensibility before mutation,
+and reuses an existing data property's cell without reinitializing its value.
+Module and function-local declarations remain declarative bindings, and the
+node does not expose the global object through a `globalThis` binding. Fixed
+native and generated differential evidence at seed `0x60003d00` covers both
+specialization policies, forced collection at every safepoint, descriptor
+identity, strict and non-strict writes, deletion, restricted declarations,
+non-extensible creation, deliberate shape-guard hits and misses, and generic
+fallback. Of the 62 paths under the node's four inventory roots, 59 are
+reviewed: 25 pass, 9 are expected negatives, and 25 retain explicit
+prerequisite boundaries. One path was already reviewed, so the node adds 58
+manifest entries. The other three depend on the separately owned `Array`
+global or Module import and export parsing. Dynamic-source and closed-world
+unresolved-name cases keep their explicit boundaries. The manifest moves to
+7,985 paths with 5,288 passes, 1,364 expected negatives, and 1,333 unsupported
+profile features. The runtime ABI moves to `oseo-runtime-m5-57` without
+changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

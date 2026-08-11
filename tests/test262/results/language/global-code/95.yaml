@@ -1,0 +1,26 @@
+group: language/global-code
+key: "95"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/global-code/yield-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/global-code/yield-non-strict.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/global-code/yield-non-strict.js:98:3:
+        error[OSEO1001]: Unknown binding 'yield'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -208,10 +208,11 @@ test("admits a function declaration that replaces a replaceable global", () => {
   }
 });
 
-test("rejects a top-level declaration of an intrinsic global", () => {
-  // Every other collision needs an answer the realm's global object
-  // does not carry yet, so it is reported rather than compiled into a
-  // property that silently differs from ECMA-262's.
+test("carries intrinsic global declarations to the global record", () => {
+  // GlobalDeclarationInstantiation decides each collision before the
+  // statement list runs. HIR retains the declaration kind so the runtime
+  // can preserve an existing property for `var` and reject a restricted
+  // function declaration.
   const cases = [
     { declaration: "var" as const, name: "undefined" },
     { declaration: "var" as const, name: "NaN" },
@@ -224,15 +225,10 @@ test("rejects a top-level declaration of an intrinsic global", () => {
   ];
   for (const { declaration, name } of cases) {
     const result = buildHir(intrinsicGlobalProgram(declaration, name));
-    assert.equal(result.program, undefined);
-    assert.equal(result.diagnostics.length, 1);
-    const diagnostic = result.diagnostics[0];
-    assert.equal(diagnostic?.code, "OSEO1001");
-    assert.match(
-      diagnostic?.message ?? "",
-      new RegExp(`Declaring the intrinsic global '${name}' `, "u"),
-    );
-    assert.equal(diagnostic?.sourceId, "intrinsic-global.js");
+    assert.deepEqual(result.diagnostics, []);
+    assert.deepEqual(result.program?.globalObjectBindings, [
+      { declaration, id: 0, name },
+    ]);
   }
 });
 

@@ -436,6 +436,8 @@ export interface MirFunction extends LocatedSyntax {
 export interface MirProgram {
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
+  /** Script lexical names checked against restricted global properties. */
+  readonly globalLexicalNames?: readonly string[];
   /**
    * The script bindings the global object also binds as properties, in
    * GlobalDeclarationInstantiation order. A backend installs them once,

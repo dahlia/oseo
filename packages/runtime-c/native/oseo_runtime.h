@@ -455,22 +455,27 @@ OseoResult oseo_module_namespace_create(
 );
 /*
  * GlobalDeclarationInstantiation's binding creation for one Script.
- * Every named entry becomes a writable, enumerable, non-configurable
- * own property of the realm's global this value whose stored value is
- * the binding cell in `environment`, so the property and the binding
- * are one storage location: an assignment through either is visible
- * through the other, and no value is ever copied between them. The
- * caller passes the names in ECMA-262's creation order, and the cells
- * must already exist. Module code never calls this; it adds no global
- * object property.
+ * Lexical names are checked for restricted non-configurable global
+ * properties before any mutation. Each var or function entry then
+ * preserves an existing property or creates a writable, enumerable,
+ * non-configurable own property whose storage is the binding cell in
+ * `environment`. The caller passes names in ECMA-262 creation order,
+ * and the cells must already exist. Module code never calls this; it
+ * adds no global object property. The realm also installs the standard
+ * `Infinity`, `NaN`, and `undefined` value properties here, but does not
+ * expose the global object through a `globalThis` binding.
  */
 OseoResult oseo_global_object_create(
     OseoContext *context,
     OseoValue environment,
-    size_t count,
+    size_t lexical_count,
+    const uint16_t *const *lexical_names,
+    const size_t *lexical_name_lengths,
+    size_t binding_count,
     const uint16_t *const *names,
     const size_t *name_lengths,
-    const size_t *binding_ids
+    const size_t *binding_ids,
+    const bool *function_declarations
 );
 /*
  * SetMutableBinding for a binding the global object also exposes as a
@@ -484,6 +489,22 @@ OseoResult oseo_global_binding_set(
     OseoValue cell,
     OseoValue value,
     bool strict
+);
+/*
+ * Initializes a newly created global binding, but preserves the value of an
+ * existing global object property whose cell was reused during declaration
+ * instantiation.
+ */
+OseoResult oseo_global_binding_initialize(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
+/* Initializes or replaces a permitted global function declaration. */
+OseoResult oseo_global_function_initialize(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
 );
 OseoResult oseo_function_create(
     OseoContext *context,
@@ -1325,10 +1346,9 @@ OseoResult oseo_symbol_intrinsic(OseoContext *context);
  * rooted; any other receiver stands unchanged. Script top level reaches
  * the same value through its own undefined receiver, so one entry point
  * serves both positions. The value is an ordinary extensible object
- * whose own properties are the var-scoped bindings
- * `oseo_global_object_create` installed for the running Script. It is
- * not yet the complete global object: the standard globals and
- * `globalThis` remain a later unit.
+ * whose own properties include the standard value properties and the
+ * var-scoped bindings `oseo_global_object_create` installed for the
+ * running Script. `globalThis` remains a later unit.
  */
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);

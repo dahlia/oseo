@@ -596,6 +596,9 @@ function appendHirStatement(
 /** Print deterministic, source-located HIR for review and snapshots. */
 export function printHir(program: HirProgram): string {
   const lines = [`hir ${JSON.stringify(program.sourceId)}`];
+  for (const name of program.globalLexicalNames ?? []) {
+    lines.push(`global-lexical ${name}`);
+  }
   for (const binding of program.globalObjectBindings ?? []) {
     lines.push(`global-object %b${binding.id} ${binding.name}`);
   }

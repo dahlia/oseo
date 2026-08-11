@@ -7068,6 +7068,7 @@ export function buildMir(
         : generic;
     }),
     globalBindings,
+    globalLexicalNames: program.globalLexicalNames ?? [],
     globalObjectBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
