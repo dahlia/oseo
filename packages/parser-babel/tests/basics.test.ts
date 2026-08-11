@@ -15,7 +15,7 @@ test("normalizes Babel parse failures", () => {
   assert.equal(result.diagnostics[0]?.sourceId, "invalid.ts");
 });
 
-test("preserves function source and lowers the Function intrinsic", () => {
+test("preserves function source and reads the Function property", () => {
   const source = `console.log(Function);
 function sample(value) { return value; }
 `;
@@ -36,11 +36,12 @@ function sample(value) { return value; }
   assert.deepEqual(compiled.diagnostics, []);
   assert.ok(compiled.hir != null);
   assert.ok(compiled.mir != null);
-  assert.match(printHir(compiled.hir), /intrinsic Function/u);
-  assert.match(
-    printMir(compiled.mir),
-    /function-intrinsic intrinsic Function/u,
-  );
+  const hir = printHir(compiled.hir);
+  const mir = printMir(compiled.mir);
+  assert.match(hir, /"Function" in %b\d+/u);
+  assert.match(hir, /get %b\d+.*\["Function"\]/u);
+  assert.match(mir, /read \*missing intrinsic:Function\*/u);
+  assert.doesNotMatch(mir, /function-intrinsic intrinsic Function/u);
   const sample = compiled.mir.script.blocks
     .flatMap((block) => block.operations)
     .find(
@@ -63,27 +64,25 @@ function sample(value) { return value; }
   }
 });
 
-test("resolves typeof Function and rejects deleting its binding", () => {
+test("resolves typeof and delete Function through its property", () => {
   const typeofResult = compileSource(babelFrontend, {
     source: "console.log(typeof Function);",
     sourceId: "typeof-function.ts",
   });
   assert.deepEqual(typeofResult.diagnostics, []);
   assert.ok(typeofResult.hir != null);
-  assert.match(printHir(typeofResult.hir), /intrinsic Function/u);
+  assert.match(printHir(typeofResult.hir), /get .*\["Function"\]/u);
 
   const deleteResult = compileSource(babelFrontend, {
     source: "delete Function;",
     sourceId: "delete-function.ts",
   });
-  assert.equal(deleteResult.mir, undefined);
-  assert.match(
-    deleteResult.diagnostics[0]?.message ?? "",
-    /Deleting runtime intrinsic binding 'Function'/u,
-  );
+  assert.deepEqual(deleteResult.diagnostics, []);
+  assert.ok(deleteResult.hir != null);
+  assert.match(printHir(deleteResult.hir), /delete .*\["Function"\]/u);
 });
 
-test("lets with object environments shadow the Function intrinsic", () => {
+test("lets with object environments shadow the Function property", () => {
   const result = compileSource(babelFrontend, {
     source:
       "function custom() { return {}; }\n" +
@@ -94,13 +93,13 @@ test("lets with object environments shadow the Function intrinsic", () => {
   assert.ok(result.hir != null);
   assert.equal(
     printHir(result.hir).match(
-      /with\[%b\d+\] Function fallback intrinsic Function/gu,
+      /with\[%b\d+\] Function fallback \(\("Function" in /gu,
     )?.length,
     2,
   );
 });
 
-test("lowers the Iterator intrinsic as a replaceable global value", () => {
+test("lowers Iterator as a replaceable global property", () => {
   const result = compileSource(babelFrontend, {
     source:
       "console.log(typeof Iterator, Iterator.from);\n" +
@@ -110,18 +109,20 @@ test("lowers the Iterator intrinsic as a replaceable global value", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
-  assert.match(printHir(result.hir), /intrinsic Iterator/u);
-  assert.match(printMir(result.mir), /iterator-intrinsic intrinsic Iterator/u);
+  assert.match(printHir(result.hir), /get .*\["Iterator"\]/u);
+  assert.match(printMir(result.mir), /read \*missing intrinsic:Iterator\*/u);
+  assert.doesNotMatch(
+    printMir(result.mir),
+    /iterator-intrinsic intrinsic Iterator/u,
+  );
 
   const deleted = compileSource(babelFrontend, {
     source: "delete Iterator;",
     sourceId: "delete-iterator.ts",
   });
-  assert.equal(deleted.mir, undefined);
-  assert.match(
-    deleted.diagnostics[0]?.message ?? "",
-    /Deleting runtime intrinsic binding 'Iterator'/u,
-  );
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["Iterator"\]/u);
 });
 
 test("reads the replaceable Number value through its global property", () => {
@@ -146,11 +147,9 @@ test("reads the replaceable Number value through its global property", () => {
     source: "delete Number;",
     sourceId: "delete-number.ts",
   });
-  assert.equal(deleted.mir, undefined);
-  assert.match(
-    deleted.diagnostics[0]?.message ?? "",
-    /Deleting runtime intrinsic binding 'Number'/u,
-  );
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["Number"\]/u);
 
   const withWrite = compileSource(babelFrontend, {
     source: "with ({}) { Number = 1; }",
@@ -1389,11 +1388,6 @@ test("retains closed-world and early-error delete boundaries", () => {
       '"use strict"; delete ((binding));',
       "OSEO0001",
       /identifier cannot be deleted in strict code/u,
-    ],
-    [
-      "delete Error;",
-      "OSEO1001",
-      /outside the admitted global-object profile/u,
     ],
     [
       "delete console;",

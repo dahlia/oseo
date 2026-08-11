@@ -99,13 +99,10 @@ test("replaces a replaceable intrinsic global with a function", () => {
   );
 });
 
-test("rejects a top-level declaration of an intrinsic global", () => {
-  // GlobalDeclarationInstantiation answers each of these with behavior
-  // the realm's global object does not carry yet: CreateGlobalVarBinding
-  // leaves the existing property and its attributes alone, and
-  // CanDeclareGlobalFunction throws a TypeError for a restricted
-  // global. Creating this profile's uniform property instead would
-  // silently differ, so each is reported where it is written.
+test("carries intrinsic declarations to the global record", () => {
+  // GlobalDeclarationInstantiation preserves an existing property for
+  // `var` and rejects a restricted function before the body runs. Both
+  // cases are runtime global-record decisions rather than diagnostics.
   const cases = [
     { column: 5, name: "undefined", source: "var undefined = 1;\n" },
     { column: 5, name: "NaN", source: "var NaN = 1;\n" },
@@ -118,18 +115,49 @@ test("rejects a top-level declaration of an intrinsic global", () => {
       source,
       sourceId: "intrinsic-global.ts",
     });
-    assert.equal(result.hir, undefined);
-    assert.equal(result.diagnostics.length, 1);
-    const diagnostic = result.diagnostics[0];
-    assert.equal(diagnostic?.code, "OSEO1001");
-    assert.match(
-      diagnostic?.message ?? "",
-      new RegExp(`Declaring the intrinsic global '${name}' `, "u"),
+    assert.deepEqual(result.diagnostics, [], `${name}:${column}`);
+    assert.deepEqual(
+      result.mir?.globalObjectBindings.map((binding) => [
+        binding.name,
+        binding.declaration,
+      ]),
+      [[name, source.startsWith("function") ? "function" : "var"]],
     );
-    // The diagnostic names the declaration that would create the
-    // property rather than the whole program.
-    assert.deepEqual(diagnostic?.range.start, { column, line: 1 });
   }
+});
+
+test("carries restricted Script lexical names to the global record", () => {
+  const result = compileSource(babelFrontend, {
+    source: "let undefined; const NaN = 1; class Infinity {}\n",
+    sourceId: "restricted-global-lexical.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  const lexicalNames = result.mir?.globalLexicalNames ?? [];
+  assert.deepEqual(
+    lexicalNames.map((entry) => entry.name),
+    ["undefined", "NaN", "Infinity"],
+  );
+  assert.deepEqual(
+    lexicalNames.map((entry) => entry.range.start),
+    [
+      { column: 5, line: 1 },
+      { column: 22, line: 1 },
+      { column: 31, line: 1 },
+    ],
+  );
+  assert.deepEqual(result.mir?.globalObjectBindings, []);
+});
+
+test("keeps dynamic Function source closed after a property write", () => {
+  const result = compileSource(babelFrontend, {
+    source: "this.Function = function () {}; Function('return 1');\n",
+    sourceId: "dynamic-function-after-global-write.js",
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Function constructor requires dynamic source/u,
+  );
 });
 
 test("keeps an intrinsic global name usable inside module code", () => {
@@ -158,6 +186,7 @@ test("keeps an intrinsic global name usable inside module code", () => {
   assert.deepEqual(compiled.diagnostics, []);
   assert.ok(compiled.mir != null);
   assert.deepEqual(compiled.mir.globalObjectBindings, []);
+  assert.deepEqual(compiled.mir.globalLexicalNames, []);
 });
 
 test("keeps module code clear of global object bindings", () => {

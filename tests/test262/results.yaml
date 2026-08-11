@@ -1508,6 +1508,24 @@ partitions:
   - group: built-ins/GeneratorPrototype
     key: fe
     path: results/built-ins/GeneratorPrototype/fe.yaml
+  - group: built-ins/Infinity
+    key: 0c
+    path: results/built-ins/Infinity/0c.yaml
+  - group: built-ins/Infinity
+    key: "50"
+    path: results/built-ins/Infinity/50.yaml
+  - group: built-ins/Infinity
+    key: 6b
+    path: results/built-ins/Infinity/6b.yaml
+  - group: built-ins/Infinity
+    key: "97"
+    path: results/built-ins/Infinity/97.yaml
+  - group: built-ins/Infinity
+    key: a1
+    path: results/built-ins/Infinity/a1.yaml
+  - group: built-ins/Infinity
+    key: d7
+    path: results/built-ins/Infinity/d7.yaml
   - group: built-ins/Iterator
     key: "05"
     path: results/built-ins/Iterator/05.yaml
@@ -1607,6 +1625,24 @@ partitions:
   - group: built-ins/Iterator
     key: f6
     path: results/built-ins/Iterator/f6.yaml
+  - group: built-ins/NaN
+    key: "41"
+    path: results/built-ins/NaN/41.yaml
+  - group: built-ins/NaN
+    key: "50"
+    path: results/built-ins/NaN/50.yaml
+  - group: built-ins/NaN
+    key: "54"
+    path: results/built-ins/NaN/54.yaml
+  - group: built-ins/NaN
+    key: 7b
+    path: results/built-ins/NaN/7b.yaml
+  - group: built-ins/NaN
+    key: cc
+    path: results/built-ins/NaN/cc.yaml
+  - group: built-ins/NaN
+    key: d9
+    path: results/built-ins/NaN/d9.yaml
   - group: built-ins/NativeErrors
     key: "00"
     path: results/built-ins/NativeErrors/00.yaml
@@ -3473,6 +3509,30 @@ partitions:
   - group: built-ins/ThrowTypeError
     key: f9
     path: results/built-ins/ThrowTypeError/f9.yaml
+  - group: built-ins/undefined
+    key: 2e
+    path: results/built-ins/undefined/2e.yaml
+  - group: built-ins/undefined
+    key: "46"
+    path: results/built-ins/undefined/46.yaml
+  - group: built-ins/undefined
+    key: 5e
+    path: results/built-ins/undefined/5e.yaml
+  - group: built-ins/undefined
+    key: "87"
+    path: results/built-ins/undefined/87.yaml
+  - group: built-ins/undefined
+    key: "98"
+    path: results/built-ins/undefined/98.yaml
+  - group: built-ins/undefined
+    key: 9c
+    path: results/built-ins/undefined/9c.yaml
+  - group: built-ins/undefined
+    key: e5
+    path: results/built-ins/undefined/e5.yaml
+  - group: built-ins/undefined
+    key: e6
+    path: results/built-ins/undefined/e6.yaml
   - group: language/arguments-object
     key: "03"
     path: results/language/arguments-object/03.yaml
@@ -4797,8 +4857,113 @@ partitions:
     key: f0
     path: results/language/function-code/f0.yaml
   - group: language/global-code
+    key: "08"
+    path: results/language/global-code/08.yaml
+  - group: language/global-code
+    key: 0a
+    path: results/language/global-code/0a.yaml
+  - group: language/global-code
+    key: 0b
+    path: results/language/global-code/0b.yaml
+  - group: language/global-code
+    key: "23"
+    path: results/language/global-code/23.yaml
+  - group: language/global-code
+    key: 2e
+    path: results/language/global-code/2e.yaml
+  - group: language/global-code
+    key: "37"
+    path: results/language/global-code/37.yaml
+  - group: language/global-code
+    key: 3b
+    path: results/language/global-code/3b.yaml
+  - group: language/global-code
+    key: 4f
+    path: results/language/global-code/4f.yaml
+  - group: language/global-code
+    key: "62"
+    path: results/language/global-code/62.yaml
+  - group: language/global-code
+    key: "65"
+    path: results/language/global-code/65.yaml
+  - group: language/global-code
+    key: 6b
+    path: results/language/global-code/6b.yaml
+  - group: language/global-code
+    key: 6d
+    path: results/language/global-code/6d.yaml
+  - group: language/global-code
+    key: "79"
+    path: results/language/global-code/79.yaml
+  - group: language/global-code
+    key: 7f
+    path: results/language/global-code/7f.yaml
+  - group: language/global-code
+    key: "80"
+    path: results/language/global-code/80.yaml
+  - group: language/global-code
+    key: "81"
+    path: results/language/global-code/81.yaml
+  - group: language/global-code
+    key: "86"
+    path: results/language/global-code/86.yaml
+  - group: language/global-code
+    key: "89"
+    path: results/language/global-code/89.yaml
+  - group: language/global-code
+    key: "95"
+    path: results/language/global-code/95.yaml
+  - group: language/global-code
+    key: 9c
+    path: results/language/global-code/9c.yaml
+  - group: language/global-code
+    key: a1
+    path: results/language/global-code/a1.yaml
+  - group: language/global-code
+    key: a2
+    path: results/language/global-code/a2.yaml
+  - group: language/global-code
+    key: a8
+    path: results/language/global-code/a8.yaml
+  - group: language/global-code
+    key: ac
+    path: results/language/global-code/ac.yaml
+  - group: language/global-code
+    key: ae
+    path: results/language/global-code/ae.yaml
+  - group: language/global-code
+    key: b8
+    path: results/language/global-code/b8.yaml
+  - group: language/global-code
+    key: c2
+    path: results/language/global-code/c2.yaml
+  - group: language/global-code
+    key: cc
+    path: results/language/global-code/cc.yaml
+  - group: language/global-code
+    key: d6
+    path: results/language/global-code/d6.yaml
+  - group: language/global-code
+    key: d7
+    path: results/language/global-code/d7.yaml
+  - group: language/global-code
+    key: dc
+    path: results/language/global-code/dc.yaml
+  - group: language/global-code
+    key: df
+    path: results/language/global-code/df.yaml
+  - group: language/global-code
     key: e1
     path: results/language/global-code/e1.yaml
+  - group: language/global-code
+    key: e3
+    path: results/language/global-code/e3.yaml
+  - group: language/global-code
+    key: e9
+    path: results/language/global-code/e9.yaml
+  - group: language/global-code
+    key: f1
+    path: results/language/global-code/f1.yaml
   - group: language/identifier-resolution
     key: "39"
     path: results/language/identifier-resolution/39.yaml
@@ -6235,12 +6400,12 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1355
+  expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 5263
+  passes: 5288
   semanticFailures: 0
-  unsupportedProfileFeatures: 1309
+  unsupportedProfileFeatures: 1333
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -6278,19 +6443,19 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 12
     - dependency: classes
-      expectedNegatives: 575
+      expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 851
+      passes: 853
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 76
     - dependency: control-flow
-      expectedNegatives: 224
+      expectedNegatives: 225
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 480
+      passes: 483
       semanticFailures: 0
-      unsupportedProfileFeatures: 41
+      unsupportedProfileFeatures: 43
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -6311,30 +6476,30 @@ summary:
       infrastructureFailures: 0
       passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 75
+      unsupportedProfileFeatures: 89
     - dependency: error-intrinsics
-      expectedNegatives: 4
+      expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 110
+      passes: 112
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 24
     - dependency: expression-operators
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 258
+      passes: 267
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 40
     - dependency: functions
-      expectedNegatives: 122
+      expectedNegatives: 124
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 595
+      passes: 598
       semanticFailures: 0
-      unsupportedProfileFeatures: 212
+      unsupportedProfileFeatures: 220
     - dependency: generators
-      expectedNegatives: 82
+      expectedNegatives: 83
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 285
@@ -6348,12 +6513,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 39
     - dependency: lexical-bindings
-      expectedNegatives: 147
+      expectedNegatives: 148
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 346
+      passes: 348
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 30
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
@@ -6372,9 +6537,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2784
+      passes: 2797
       semanticFailures: 0
-      unsupportedProfileFeatures: 599
+      unsupportedProfileFeatures: 609
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -6402,7 +6567,7 @@ summary:
       infrastructureFailures: 0
       passes: 62
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 28
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -6414,9 +6579,9 @@ summary:
       expectedNegatives: 69
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 192
+      passes: 199
       semanticFailures: 0
-      unsupportedProfileFeatures: 5
+      unsupportedProfileFeatures: 11
   groups:
     - group: built-ins/AggregateError
       expectedNegatives: 0
@@ -6488,6 +6653,13 @@ summary:
       passes: 24
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - group: built-ins/Infinity
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 5
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/Iterator
       expectedNegatives: 0
       harnessFailures: 0
@@ -6495,6 +6667,13 @@ summary:
       passes: 5
       semanticFailures: 0
       unsupportedProfileFeatures: 32
+    - group: built-ins/NaN
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 6
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/NativeErrors
       expectedNegatives: 0
       harnessFailures: 0
@@ -6537,6 +6716,13 @@ summary:
       passes: 12
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - group: built-ins/undefined
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 7
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: language/arguments-object
       expectedNegatives: 1
       harnessFailures: 0
@@ -6587,12 +6773,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - group: language/global-code
-      expectedNegatives: 0
+      expectedNegatives: 9
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 7
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 23
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

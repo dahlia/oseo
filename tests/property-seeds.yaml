@@ -244,3 +244,7 @@ families:
     owner: tests/property/m5-object-integrity-levels.property.test.ts
     start: 0x60003c00
     end: 0x60003cff
+  - family: m5-global-object-record
+    owner: tests/property/m5-global-object-record.property.test.ts
+    start: 0x60003d00
+    end: 0x60003dff

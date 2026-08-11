@@ -1008,7 +1008,7 @@ function lowerWithRead(
     reference.range,
     builder,
   );
-  propertyBlock.terminator = {
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values:
@@ -1020,7 +1020,7 @@ function lowerWithRead(
     receiver == null
       ? undefined
       : lowerSyntheticUndefined(reference.range, builder);
-  fallbackBlock.terminator = {
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values:
@@ -1059,21 +1059,14 @@ function lowerWithDelete(
     reference.range,
     builder,
   );
-  propertyBlock.terminator = {
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [propertyResult],
   };
   builder.current = fallbackBlock;
-  const fallbackResult = lowerExpression(
-    {
-      kind: "boolean",
-      range: reference.range,
-      value: reference.fallbackResult,
-    },
-    builder,
-  );
-  fallbackBlock.terminator = {
+  const fallbackResult = lowerExpression(reference.fallback, builder);
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [fallbackResult],
@@ -7034,6 +7027,7 @@ export function buildMir(
       declaration: binding.declaration,
       id: binding.id,
       name: binding.name,
+      range: binding.range,
     }),
   );
   return {
@@ -7068,6 +7062,7 @@ export function buildMir(
         : generic;
     }),
     globalBindings,
+    globalLexicalNames: program.globalLexicalNames ?? [],
     globalObjectBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,

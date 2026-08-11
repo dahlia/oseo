@@ -55,8 +55,8 @@ export interface HirWithReference extends LocatedSyntax {
 
 /** One identifier deletion resolved through active object environments. */
 export interface HirWithDeleteReference extends LocatedSyntax {
-  /** Result when no active object environment supplies the name. */
-  readonly fallbackResult: boolean;
+  /** Delete operation used when no active object environment supplies name. */
+  readonly fallback: HirExpression;
   readonly kind: "with-delete";
   readonly name: string;
   readonly objectBindingIds: readonly number[];
@@ -1168,6 +1168,12 @@ export interface HirGlobalBinding {
   readonly name: string;
 }
 
+/** One source-located Script lexical name checked against the global object. */
+export interface HirGlobalLexicalName {
+  readonly name: string;
+  readonly range: SourceRange;
+}
+
 /**
  * One resolved global-object property and the declaration that creates
  * it. The declaration kind selects between CreateGlobalVarBinding and
@@ -1175,6 +1181,7 @@ export interface HirGlobalBinding {
  */
 export interface HirGlobalObjectBinding extends HirGlobalBinding {
   readonly declaration: "function" | "var";
+  readonly range: SourceRange;
 }
 
 /** A normalized script and its statically callable functions. */
@@ -1182,6 +1189,8 @@ export interface HirProgram {
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
+  /** Script lexical names checked against restricted global properties. */
+  readonly globalLexicalNames?: readonly HirGlobalLexicalName[];
   /**
    * The hidden global-object capture initialized before any module function
    * initializer can expose a closure that reads it.
@@ -1229,6 +1238,8 @@ export interface Binding {
 export interface ResolveState {
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
+  /** Script bindings whose storage is the realm global object's property. */
+  readonly globalObjectBindingIds: Set<number>;
   readonly functionInfo: Map<
     SyntaxFunction,
     {

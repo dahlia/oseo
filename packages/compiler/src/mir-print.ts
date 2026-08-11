@@ -147,8 +147,14 @@ export function printMir(program: MirProgram): string {
   for (const binding of program.globalBindings) {
     lines.push(`global %b${binding.id} ${binding.name}`);
   }
+  for (const entry of program.globalLexicalNames ?? []) {
+    lines.push(`global-lexical ${entry.name} @${rangeText(entry.range)}`);
+  }
   for (const binding of program.globalObjectBindings) {
-    lines.push(`global-object %b${binding.id} ${binding.name}`);
+    lines.push(
+      `global-object %b${binding.id} ${binding.name} ` +
+        `@${rangeText(binding.range)}`,
+    );
   }
   for (const functionValue of program.functions) {
     appendMirFunction(lines, functionValue);

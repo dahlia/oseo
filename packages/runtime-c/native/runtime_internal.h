@@ -406,6 +406,14 @@ typedef struct {
     OseoHeapObject header;
     OseoValue value;
     /*
+     * An existing global-object property remains the storage selected by
+     * Object Environment Record operations. These two roots make this cell
+     * a live reference to that property instead of a copied value.
+     */
+    OseoValue object;
+    OseoValue key;
+    bool object_environment;
+    /*
      * False only after [[DefineOwnProperty]] made the global-object
      * property this cell backs non-writable. A global var or function
      * binding and its property share this one storage location, so the

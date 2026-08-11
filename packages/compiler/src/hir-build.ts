@@ -1,7 +1,6 @@
 import {
   anonymousDefinition,
   errorIntrinsicName,
-  intrinsicGlobalKind,
   isStandardGlobalName,
 } from "./hir.ts";
 import type {
@@ -36,7 +35,6 @@ import type {
   HirStatement,
   HirStrictGlobalFallback,
   HirSwitchCase,
-  IntrinsicGlobalKind,
   ResolveState,
 } from "./hir.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
@@ -50,7 +48,6 @@ import type {
   SyntaxExpression,
   SyntaxForInTarget,
   SyntaxFunction,
-  SyntaxGlobalObjectName,
   SyntaxLexicalDeclarator,
   SyntaxProgram,
   SyntaxStatement,
@@ -190,10 +187,24 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 /** Whether the mutable global object property owns this intrinsic value. */
 function isPropertyOwnedIntrinsicName(name: string): boolean {
   return (
+    name === "AggregateError" ||
     name === "ArrayBuffer" ||
+    name === "Error" ||
+    name === "EvalError" ||
+    name === "Function" ||
+    name === "Infinity" ||
+    name === "Iterator" ||
+    name === "NaN" ||
     name === "Number" ||
     name === "Object" ||
-    name === "Promise"
+    name === "Promise" ||
+    name === "RangeError" ||
+    name === "ReferenceError" ||
+    name === "Symbol" ||
+    name === "SyntaxError" ||
+    name === "TypeError" ||
+    name === "URIError" ||
+    name === "undefined"
   );
 }
 
@@ -366,11 +377,6 @@ function identifierFallback(
       value: name === "NaN" ? NaN : Infinity,
     };
   }
-  const errorName = errorIntrinsicName(name);
-  if (errorName != null) return { errorName, kind: "error-intrinsic", range };
-  if (name === "Symbol") return { kind: "symbol-intrinsic", range };
-  if (name === "Function") return { kind: "function-intrinsic", range };
-  if (name === "Iterator") return { kind: "iterator-intrinsic", range };
   if (isPropertyOwnedIntrinsicName(name)) {
     return intrinsicGlobalIdentifierRead(name, range, state);
   }
@@ -543,8 +549,8 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
 /**
  * Resolve an identifier delete without reading the selected binding. The
  * closed-world profile can decide declarative and unresolvable references
- * statically. Runtime-owned intrinsic globals stay invalid until deleting a
- * global property can also affect later name resolution.
+ * statically. Property-owned intrinsic globals delete the same configurable
+ * property that their later identifier reads observe.
  */
 function resolveIdentifierDelete(
   expression: Extract<SyntaxExpression, { readonly kind: "delete" }>,
@@ -553,15 +559,40 @@ function resolveIdentifierDelete(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
-  let fallbackResult: boolean;
-  if (resolution.binding != null) {
-    fallbackResult = false;
+  const globalObjectBinding =
+    resolution.binding != null &&
+    state.globalObjectBindingIds.has(resolution.binding.id);
+  let fallback: HirExpression;
+  if (globalObjectBinding) {
+    fallback = {
+      key: { kind: "string", range: argument.range, value: argument.name },
+      kind: "property-delete",
+      object: intrinsicGlobalObjectRead(argument.range, state),
+      range: expression.range,
+    };
+  } else if (resolution.binding != null) {
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: false,
+    };
   } else if (
     argument.name === "undefined" ||
     argument.name === "NaN" ||
     argument.name === "Infinity"
   ) {
-    fallbackResult = false;
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: false,
+    };
+  } else if (isPropertyOwnedIntrinsicName(argument.name)) {
+    fallback = {
+      key: { kind: "string", range: argument.range, value: argument.name },
+      kind: "property-delete",
+      object: intrinsicGlobalObjectRead(argument.range, state),
+      range: expression.range,
+    };
   } else if (isRuntimeOwnedIntrinsicName(argument.name)) {
     state.diagnostics.push(
       sourceDiagnostic(
@@ -573,7 +604,11 @@ function resolveIdentifierDelete(
     );
     return undefined;
   } else {
-    fallbackResult = true;
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: true,
+    };
   }
   if (resolution.objectBindingIds.length > 0) {
     if (state.withFallbacks.some((owner) => owner.has(argument.name))) {
@@ -589,17 +624,13 @@ function resolveIdentifierDelete(
     }
     return {
       ...locatedOf(expression),
-      fallbackResult,
+      fallback,
       kind: "with-delete",
       name: argument.name,
       objectBindingIds: resolution.objectBindingIds,
     };
   }
-  return {
-    kind: "boolean",
-    range: expression.range,
-    value: fallbackResult,
-  };
+  return fallback;
 }
 
 /**
@@ -621,6 +652,30 @@ function resolveTypeofIdentifier(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
+  if (
+    resolution.binding != null &&
+    state.globalObjectBindingIds.has(resolution.binding.id)
+  ) {
+    const fallback = intrinsicGlobalPropertyRead(
+      argument.name,
+      argument.range,
+      state,
+    );
+    const resolved =
+      resolution.objectBindingIds.length === 0
+        ? fallback
+        : {
+            fallback,
+            kind: "with-get" as const,
+            name: argument.name,
+            objectBindingIds: resolution.objectBindingIds,
+            range: argument.range,
+          };
+    return {
+      ...expression,
+      argument: resolved,
+    };
+  }
   if (
     isPropertyOwnedIntrinsicName(argument.name) &&
     resolution.binding == null
@@ -646,12 +701,7 @@ function resolveTypeofIdentifier(
     resolution.binding != null ||
     argument.name === "undefined" ||
     argument.name === "NaN" ||
-    argument.name === "Infinity" ||
-    argument.name === "Function" ||
-    argument.name === "Iterator" ||
-    isPropertyOwnedIntrinsicName(argument.name) ||
-    argument.name === "Symbol" ||
-    errorIntrinsicName(argument.name) != null;
+    argument.name === "Infinity";
   if (resolvesValue) {
     const resolved = resolveExpression(argument, scopes, state);
     return resolved == null ? undefined : { ...expression, argument: resolved };
@@ -1127,23 +1177,6 @@ function resolveExpression(
           range: expression.range,
           value: expression.name === "NaN" ? NaN : Infinity,
         };
-      }
-      const errorName = errorIntrinsicName(expression.name);
-      if (errorName != null) {
-        return {
-          errorName,
-          kind: "error-intrinsic",
-          range: expression.range,
-        };
-      }
-      if (expression.name === "Symbol") {
-        return { kind: "symbol-intrinsic", range: expression.range };
-      }
-      if (expression.name === "Function") {
-        return { kind: "function-intrinsic", range: expression.range };
-      }
-      if (expression.name === "Iterator") {
-        return { kind: "iterator-intrinsic", range: expression.range };
       }
       if (isPropertyOwnedIntrinsicName(expression.name)) {
         return intrinsicGlobalIdentifierRead(
@@ -3865,42 +3898,6 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
-/**
- * Whether this profile's uniform global-object property is what
- * ECMA-262 produces for a Script top-level declaration of a name the
- * realm already binds as an intrinsic global.
- *
- * This unit creates every property with the writable, enumerable, and
- * non-configurable attributes GlobalDeclarationInstantiation gives a
- * name the global object does not already have. That is the exact
- * outcome of CreateGlobalFunctionBinding over a replaceable intrinsic,
- * whose property is configurable and is therefore redefined whole.
- *
- * Every other collision needs behavior the realm's global object does
- * not yet carry: CreateGlobalVarBinding must leave the existing
- * property, and its attributes, untouched, and CanDeclareGlobalFunction
- * must reject a restricted global with a TypeError before any statement
- * runs. Creating the uniform property instead would silently answer
- * both differently, so those declarations stay unadmitted.
- */
-function admitsGlobalObjectProperty(
-  intrinsic: IntrinsicGlobalKind,
-  entry: SyntaxGlobalObjectName,
-): boolean {
-  return intrinsic === "replaceable" && entry.declaration === "function";
-}
-
-/** Name the ECMA-262 operation an unadmitted collision would need. */
-function globalObjectCollisionMessage(entry: SyntaxGlobalObjectName): string {
-  return entry.declaration === "var"
-    ? `Declaring the intrinsic global '${entry.name}' with var at Script ` +
-        "top level is outside the admitted global-object profile; " +
-        "CreateGlobalVarBinding keeps the realm's existing property."
-    : `Declaring the intrinsic global '${entry.name}' as a function at ` +
-        "Script top level is outside the admitted global-object profile; " +
-        "CanDeclareGlobalFunction rejects a non-configurable property.";
-}
-
 interface HirSeed {
   readonly bindings?: ReadonlyMap<string, Binding>;
   /**
@@ -3928,6 +3925,7 @@ export function buildSeededHir(
   const state: ResolveState = {
     diagnostics,
     foldedTypeofReferences: [],
+    globalObjectBindingIds: new Set(),
     functionInfo: new Map(),
     hirFunctions: [],
     intrinsicGlobalObjectBinding: undefined,
@@ -3948,6 +3946,10 @@ export function buildSeededHir(
     state,
     seed.moduleBody === true,
   );
+  for (const entry of program.globalObjectNames ?? []) {
+    const binding = scriptScope.get(entry.name);
+    if (binding != null) state.globalObjectBindingIds.add(binding.id);
+  }
   const body = resolveStatementList(
     program.body,
     [],
@@ -3992,21 +3994,11 @@ export function buildSeededHir(
         `Global object name '${entry.name}' has no script binding.`,
       );
     }
-    const intrinsic = intrinsicGlobalKind(entry.name);
-    if (intrinsic != null && !admitsGlobalObjectProperty(intrinsic, entry)) {
-      diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          entry,
-          globalObjectCollisionMessage(entry),
-        ),
-      );
-      continue;
-    }
     globalObjectBindings.push({
       declaration: entry.declaration,
       id: binding.id,
       name: entry.name,
+      range: entry.range,
     });
   }
   if (diagnostics.length > 0) {
@@ -4040,6 +4032,10 @@ export function buildSeededHir(
               ...body,
             ],
       functions: state.hirFunctions,
+      globalLexicalNames: (program.globalLexicalNames ?? []).map((entry) => ({
+        name: entry.name,
+        range: entry.range,
+      })),
       globalBindings: [
         ...(state.intrinsicGlobalObjectBinding == null
           ? []

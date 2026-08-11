@@ -37,7 +37,12 @@ static void trace_object(
             mark_value(environment->slots[index], worklist);
         }
     } else if (object->kind == OSEO_HEAP_CELL) {
-        mark_value(((OseoCell *)object)->value, worklist);
+        OseoCell *cell = (OseoCell *)object;
+        mark_value(cell->value, worklist);
+        if (cell->object_environment) {
+            mark_value(cell->object, worklist);
+            mark_value(cell->key, worklist);
+        }
     } else if (object->kind == OSEO_HEAP_SYMBOL) {
         mark_value(((OseoSymbol *)object)->description, worklist);
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {

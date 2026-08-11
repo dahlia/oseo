@@ -16,6 +16,9 @@ import type { NativeScenarioContext } from "../scenario.ts";
  */
 const globalDeclarationSource = `
 function first() { return counted; }
+function Promise() { return "replacement"; }
+var Object;
+const ObjectIntrinsic = Object;
 var counted = 1;
 var hoisted;
 function second() { return "second"; }
@@ -62,6 +65,28 @@ console.log(counted, this.counted, first());
 function strictAssign() { "use strict"; counted = 8; }
 try { strictAssign(); } catch (error) { console.log(error.constructor.name); }
 console.log(counted, first());
+console.log(
+  "intrinsic-function-configurable",
+  Object.getOwnPropertyDescriptor(this, "Promise").configurable,
+);
+console.log("delete-intrinsic-var", delete Object, typeof Object);
+const globalPrototype = ObjectIntrinsic.getPrototypeOf(this);
+globalPrototype.Object = 42;
+const inheritedObject = Object;
+function strictInheritedAssignment() {
+  "use strict";
+  Object = 43;
+}
+strictInheritedAssignment();
+console.log(
+  "inherited-global-binding",
+  inheritedObject,
+  Object,
+  this.Object,
+  globalPrototype.Object,
+);
+delete this.Object;
+delete globalPrototype.Object;
 `;
 
 /**
@@ -84,7 +109,10 @@ const globalDeclarationExpectation =
   "true true true true false\n" +
   "5 5 5\n" +
   "TypeError\n" +
-  "5 5\n";
+  "5 5\n" +
+  "intrinsic-function-configurable false\n" +
+  "delete-intrinsic-var true undefined\n" +
+  "inherited-global-binding 42 43 43 42\n";
 
 /**
  * A strict Script keeps the same global bindings, because strictness
@@ -272,6 +300,71 @@ export async function runNativeScenario1(
       }
     }
   }
+
+  for (const [name, source, location, errorName] of [
+    [
+      "restricted-global-lexical-location.js",
+      "\n\nlet undefined;\n",
+      "3:5",
+      "SyntaxError",
+    ],
+    [
+      "restricted-global-function-location.js",
+      "\n\nfunction undefined() {}\n",
+      "3:1",
+      "TypeError",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      { args: [name], source, sourceId: name, version: "0.1.0" },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(`^${name}:${location}: error\\[OSEO2001\\]`, "u"),
+    );
+    assert.match(observed.stderr, new RegExp(`OSEO_THROWN ${errorName}`, "u"));
+  }
+
+  const nonExtensibleGlobalHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_binding.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "frame.slots[0] = result.value;\n" +
+          "    /* HasRestrictedGlobalProperty runs",
+        "frame.slots[0] = result.value;\n" +
+          "    ordinary_object(frame.slots[0])->extensible = false;\n" +
+          "    /* HasRestrictedGlobalProperty runs",
+      );
+      assert.notEqual(injected, source, "non-extensible global injected");
+      return injected;
+    },
+  };
+  const blockedGlobal = await runNativeCli(
+    {
+      args: ["non-extensible-global-var-location.js"],
+      source: "\n\nvar blocked;\n",
+      sourceId: "non-extensible-global-var-location.js",
+      version: "0.1.0",
+    },
+    nonExtensibleGlobalHost,
+  );
+  assert.equal(blockedGlobal.exitStatus, 1);
+  assert.equal(blockedGlobal.stdout, "");
+  assert.match(
+    blockedGlobal.stderr,
+    /^non-extensible-global-var-location\.js:3:5: error\[OSEO2001\]/u,
+  );
+  assert.match(blockedGlobal.stderr, /OSEO_THROWN TypeError/u);
 
   const nulSourceId = "source\0identifier.ts";
   const nulSourceDiagnostic = await runNativeCli(

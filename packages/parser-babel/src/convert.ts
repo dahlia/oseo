@@ -19,6 +19,7 @@ import type {
   SyntaxForInTarget,
   SyntaxForOfTarget,
   SyntaxFunction,
+  SyntaxGlobalLexicalName,
   SyntaxGlobalObjectName,
   SyntaxLexicalDeclarator,
   SyntaxModuleSpecifier,
@@ -4014,6 +4015,35 @@ function globalObjectName(
     : { byteRange, declaration, name, range };
 }
 
+/** Report the Script lexical names GlobalDeclarationInstantiation checks. */
+function globalLexicalNames(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): readonly SyntaxGlobalLexicalName[] {
+  const result: SyntaxGlobalLexicalName[] = [];
+  for (const value of values) {
+    const declaration = unwrapExportDeclaration(value);
+    if (
+      declaration.type === "VariableDeclaration" &&
+      (declaration.kind === "const" || declaration.kind === "let")
+    ) {
+      for (const declarator of nodes(declaration.declarations)) {
+        const pattern = node(declarator.id);
+        if (pattern == null) continue;
+        for (const name of rawPatternNames(pattern)) {
+          result.push({ ...location(context, declarator), name });
+        }
+      }
+      continue;
+    }
+    if (declaration.type !== "ClassDeclaration") continue;
+    const identifier = node(declaration.id);
+    const name = identifier == null ? undefined : identifierName(identifier);
+    if (name != null) result.push({ ...location(context, declaration), name });
+  }
+  return result;
+}
+
 export function program(
   context: ConvertContext,
   file: BabelNode,
@@ -4023,6 +4053,7 @@ export function program(
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
   const items = nodes(programNode.body);
+  const lexicalNames = globalLexicalNames(context, items);
   const functionDeclarations = varScopedFunctionDeclarations(items);
   const functionNames = new Set(functionDeclarations.keys());
   const hoisted = hoistedVarDeclarations(context, items, functionNames);
@@ -4067,6 +4098,7 @@ export function program(
   return {
     ...location(context, programNode),
     body,
+    globalLexicalNames: lexicalNames,
     globalObjectNames,
     kind: "program",
     sourceId: context.input.sourceId,

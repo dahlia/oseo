@@ -1,0 +1,27 @@
+group: built-ins/undefined
+key: 9c
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/undefined/S15.1.1.3_A1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/built-ins/undefined/S15.1.1.3_A1.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/undefined/S15.1.1.3_A1.js:96:19:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

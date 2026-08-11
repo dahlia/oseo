@@ -130,8 +130,9 @@ test("resolves global object properties to script bindings", () => {
   // decides whether the property ECMA-262 creates is this profile's
   // uniform one.
   assert.equal(answer.declaration, "var");
+  assert.deepEqual(answer.range, range);
   assert.deepEqual(buildMir(hirResult.program).globalObjectBindings, [
-    { declaration: "var", id: answer.id, name: "answer" },
+    { declaration: "var", id: answer.id, name: "answer", range },
   ]);
   // The property names the binding the body already declared rather
   // than a second binding created for the global object.
@@ -203,15 +204,16 @@ test("admits a function declaration that replaces a replaceable global", () => {
     const result = buildHir(intrinsicGlobalProgram("function", name));
     assert.deepEqual(result.diagnostics, []);
     assert.deepEqual(result.program?.globalObjectBindings, [
-      { declaration: "function", id: 0, name },
+      { declaration: "function", id: 0, name, range },
     ]);
   }
 });
 
-test("rejects a top-level declaration of an intrinsic global", () => {
-  // Every other collision needs an answer the realm's global object
-  // does not carry yet, so it is reported rather than compiled into a
-  // property that silently differs from ECMA-262's.
+test("carries intrinsic global declarations to the global record", () => {
+  // GlobalDeclarationInstantiation decides each collision before the
+  // statement list runs. HIR retains the declaration kind so the runtime
+  // can preserve an existing property for `var` and reject a restricted
+  // function declaration.
   const cases = [
     { declaration: "var" as const, name: "undefined" },
     { declaration: "var" as const, name: "NaN" },
@@ -224,15 +226,10 @@ test("rejects a top-level declaration of an intrinsic global", () => {
   ];
   for (const { declaration, name } of cases) {
     const result = buildHir(intrinsicGlobalProgram(declaration, name));
-    assert.equal(result.program, undefined);
-    assert.equal(result.diagnostics.length, 1);
-    const diagnostic = result.diagnostics[0];
-    assert.equal(diagnostic?.code, "OSEO1001");
-    assert.match(
-      diagnostic?.message ?? "",
-      new RegExp(`Declaring the intrinsic global '${name}' `, "u"),
-    );
-    assert.equal(diagnostic?.sourceId, "intrinsic-global.js");
+    assert.deepEqual(result.diagnostics, []);
+    assert.deepEqual(result.program?.globalObjectBindings, [
+      { declaration, id: 0, name, range },
+    ]);
   }
 });
 
@@ -240,7 +237,29 @@ test("keeps an ordinary top-level name clear of the collision check", () => {
   const result = buildHir(intrinsicGlobalProgram("var", "Symbolic"));
   assert.deepEqual(result.diagnostics, []);
   assert.deepEqual(result.program?.globalObjectBindings, [
-    { declaration: "var", id: 0, name: "Symbolic" },
+    { declaration: "var", id: 0, name: "Symbolic", range },
+  ]);
+});
+
+test("preserves global lexical declaration ranges through MIR", () => {
+  const declarationRange = {
+    end: { column: 18, line: 4 },
+    start: { column: 5, line: 4 },
+  };
+  const result = buildHir({
+    body: [],
+    globalLexicalNames: [{ name: "undefined", range: declarationRange }],
+    kind: "program",
+    range,
+    sourceId: "global-lexical-range.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.program?.globalLexicalNames, [
+    { name: "undefined", range: declarationRange },
+  ]);
+  assert.ok(result.program != null);
+  assert.deepEqual(buildMir(result.program).globalLexicalNames, [
+    { name: "undefined", range: declarationRange },
   ]);
 });
 

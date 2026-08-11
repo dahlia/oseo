@@ -3,7 +3,8 @@ import type {
   MirBlock,
   MirConstant,
   MirFunction,
-  MirGlobalBinding,
+  MirGlobalLexicalName,
+  MirGlobalObjectBinding,
   MirOperation,
   MirProgram,
   MirTerminator,
@@ -94,6 +95,8 @@ interface EmitState {
    * ordinary declarative binding never can.
    */
   readonly globalObjectBindingIds: ReadonlySet<number>;
+  /** Global bindings initialized from function declaration objects. */
+  readonly globalFunctionBindingIds: ReadonlySet<number>;
   readonly blockParameters: ReadonlyMap<number, readonly number[]>;
   readonly scalarKinds: Map<number, "boolean" | "smi">;
   readonly strict: boolean;
@@ -640,10 +643,20 @@ function emitInitialize(state: EmitState, operation: MirOperation): void {
       ),
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
-  line(
-    state,
-    renderC(emittedC.initialize.resultAssignOseoCellInitializeContext, value),
-  );
+  if (state.globalObjectBindingIds.has(bindingId)) {
+    const initializer = state.globalFunctionBindingIds.has(bindingId)
+      ? "oseo_global_function_initialize"
+      : "oseo_global_binding_initialize";
+    line(
+      state,
+      `result = ${initializer}(context, result.value, roots[${value}]);`,
+    );
+  } else {
+    line(
+      state,
+      renderC(emittedC.initialize.resultAssignOseoCellInitializeContext, value),
+    );
+  }
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
 }
 
@@ -3325,28 +3338,42 @@ function yieldResumePoints(
   return points;
 }
 
-/**
- * GlobalDeclarationInstantiation's global-object bindings, installed
- * once at the start of the script after every binding cell exists and
- * before any statement runs. Each property stores the cell itself, so
- * the property and the binding are one storage location for the whole
- * execution and no initial value is copied between them.
- */
-function emitGlobalObject(
+interface GlobalNameTable {
+  readonly columns: string;
+  readonly lengths: string;
+  readonly lines: string;
+  readonly names: string;
+}
+
+/** Emit one static UTF-16 name table used by the global record prologue. */
+function emitGlobalNameTable(
   state: EmitState,
-  bindings: readonly MirGlobalBinding[],
-): void {
-  if (bindings.length === 0) return;
+  prefix: string,
+  entries: readonly {
+    readonly name: string;
+    readonly range: SourceRange;
+  }[],
+): GlobalNameTable {
+  if (entries.length === 0) {
+    const nullPointer = renderC(emittedC.common.nullPointer);
+    return {
+      columns: nullPointer,
+      lengths: nullPointer,
+      lines: nullPointer,
+      names: nullPointer,
+    };
+  }
   const pointers: string[] = [];
   const lengths: number[] = [];
-  for (const [index, binding] of bindings.entries()) {
-    const units = utf16Units(binding.name);
+  for (const [index, entry] of entries.entries()) {
+    const name = entry.name;
+    const units = utf16Units(name);
     lengths.push(units.length);
     if (units.length === 0) {
       pointers.push(renderC(emittedC.common.nullPointer));
       continue;
     }
-    const constantName = renderC(emittedC.globalObject.units, index);
+    const constantName = `${prefix}_units_${index}`;
     line(
       state,
       renderC(
@@ -3357,7 +3384,6 @@ function emitGlobalObject(
     );
     pointers.push(constantName);
   }
-  const prefix = renderC(emittedC.globalObject.prefix);
   line(
     state,
     renderC(
@@ -3379,24 +3405,76 @@ function emitGlobalObject(
   );
   line(
     state,
-    renderC(emittedC.moduleNamespace.staticConstSizeTBindingsAssign, prefix) +
-      renderC(
-        emittedC.common.bracedInitializer,
-        bindings
-          .map((binding) => binding.id)
-          .join(renderC(emittedC.common.commaSpace)),
-      ),
+    `static const size_t ${prefix}_lines[] = ` +
+      `{${entries.map((entry) => entry.range.start.line).join(", ")}};`,
   );
   line(
     state,
-    renderC(emittedC.globalObject.resultAssignOseoGlobalObjectCreate) +
-      renderC(emittedC.common.rootsU, state.environmentSlot, bindings.length) +
-      renderC(
-        emittedC.moduleNamespace.namesLengthsBindingsStatement,
-        prefix,
-        prefix,
-        prefix,
-      ),
+    `static const size_t ${prefix}_columns[] = ` +
+      `{${entries.map((entry) => entry.range.start.column).join(", ")}};`,
+  );
+  return {
+    columns: `${prefix}_columns`,
+    lengths: `${prefix}_lengths`,
+    lines: `${prefix}_lines`,
+    names: `${prefix}_names`,
+  };
+}
+
+/**
+ * Validate and instantiate one Script's global lexical and var-scoped names.
+ */
+function emitGlobalObject(
+  state: EmitState,
+  lexicalNames: readonly MirGlobalLexicalName[],
+  bindings: readonly MirGlobalObjectBinding[],
+): void {
+  if (lexicalNames.length === 0 && bindings.length === 0) return;
+  const lexical = emitGlobalNameTable(state, "global_lexical", lexicalNames);
+  const bindingNames = emitGlobalNameTable(
+    state,
+    renderC(emittedC.globalObject.prefix),
+    bindings,
+  );
+  const nullPointer = renderC(emittedC.common.nullPointer);
+  let globalBindingIds = nullPointer;
+  let functionDeclarations = nullPointer;
+  if (bindings.length > 0) {
+    const prefix = renderC(emittedC.globalObject.prefix);
+    globalBindingIds = `${prefix}_bindings`;
+    functionDeclarations = `${prefix}_functions`;
+    line(
+      state,
+      renderC(emittedC.moduleNamespace.staticConstSizeTBindingsAssign, prefix) +
+        renderC(
+          emittedC.common.bracedInitializer,
+          bindings
+            .map((binding) => binding.id)
+            .join(renderC(emittedC.common.commaSpace)),
+        ),
+    );
+    line(
+      state,
+      `static const bool ${functionDeclarations}[] = ` +
+        renderC(
+          emittedC.common.bracedInitializer,
+          bindings
+            .map((binding) =>
+              binding.declaration === "function" ? "true" : "false",
+            )
+            .join(renderC(emittedC.common.commaSpace)),
+        ),
+    );
+  }
+  line(
+    state,
+    "result = oseo_global_object_create(context, " +
+      `roots[${state.environmentSlot}], ${lexicalNames.length}u, ` +
+      `${lexical.names}, ${lexical.lengths}, ${lexical.lines}, ` +
+      `${lexical.columns}, ${bindings.length}u, ${bindingNames.names}, ` +
+      `${bindingNames.lengths}, ${bindingNames.lines}, ` +
+      `${bindingNames.columns}, ${globalBindingIds}, ` +
+      `${functionDeclarations});`,
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
 }
@@ -3471,7 +3549,8 @@ function emitPrologue(
   bindingIdValues: readonly number[],
   totalBindingCount: number,
   temporarySlot: number,
-  globalObjectBindings: readonly MirGlobalBinding[],
+  globalLexicalNames: readonly MirGlobalLexicalName[],
+  globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): void {
   const environmentSlot = state.environmentSlot;
   if (functionValue.id < 0) {
@@ -3508,7 +3587,9 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
-  if (functionValue.id < 0) emitGlobalObject(state, globalObjectBindings);
+  if (functionValue.id < 0) {
+    emitGlobalObject(state, globalLexicalNames, globalObjectBindings);
+  }
   if (functionValue.selfBindingId != null) {
     line(
       state,
@@ -3768,7 +3849,8 @@ function emitFunction(
   functionRootCounts: ReadonlyMap<number, number>,
   totalBindingCount: number,
   observeSpecialization: boolean,
-  globalObjectBindings: readonly MirGlobalBinding[],
+  globalLexicalNames: readonly MirGlobalLexicalName[],
+  globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -3817,6 +3899,11 @@ function emitFunction(
     globalObjectBindingIds: new Set(
       globalObjectBindings.map((binding) => binding.id),
     ),
+    globalFunctionBindingIds: new Set(
+      globalObjectBindings
+        .filter((binding) => binding.declaration === "function")
+        .map((binding) => binding.id),
+    ),
     nextRecursiveTarget: 0,
     observeSpecialization,
     scalarKinds: new Map(),
@@ -3864,6 +3951,7 @@ function emitFunction(
     bindingIdValues,
     totalBindingCount,
     temporarySlot,
+    globalLexicalNames,
     globalObjectBindings,
   );
   if (generator) {
@@ -3995,28 +4083,13 @@ function emitFunctionDispatcher(
   return renderC(emittedC.functionDispatcher.source, casesSection);
 }
 
-/**
- * The global this value is reachable only through the operation that
- * resolves it, so a program that never resolves one cannot observe the
- * global object, its properties, or their descriptors. Such a program
- * installs nothing and keeps the ordinary binding assignment path.
- */
-function observesGlobalThis(functions: readonly MirFunction[]): boolean {
-  return functions.some((functionValue) =>
-    functionValue.blocks.some((block) =>
-      block.operations.some((operation) => operation.kind === "global-this"),
-    ),
-  );
-}
-
 /** Deterministic C11 lowering whose only semantic input is MIR. */
 export const cBackend: NativeBackend = {
   emit(input) {
     const declaredFunctions = reachableFunctions(input);
     const functions = [...declaredFunctions, input.script];
-    const globalObjectBindings = observesGlobalThis(functions)
-      ? input.globalObjectBindings
-      : [];
+    const globalLexicalNames = input.globalLexicalNames ?? [];
+    const globalObjectBindings = input.globalObjectBindings;
     const functionRootCounts = new Map(
       functions.map((functionValue) => [
         functionValue.id,
@@ -4077,6 +4150,7 @@ export const cBackend: NativeBackend = {
           functionRootCounts,
           totalBindingCount,
           input.observeSpecialization === true,
+          globalLexicalNames,
           globalObjectBindings,
         ),
       )

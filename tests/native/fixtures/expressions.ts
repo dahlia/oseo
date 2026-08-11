@@ -426,9 +426,6 @@ console.log(Infinity >= 1, -Infinity < 0, NaN >= 0);
     name: "scope-and-branches",
     source: `
 const value = "outer";
-const undefined = "undefined binding";
-const NaN = "NaN binding";
-const Infinity = "Infinity binding";
 function scope() {
   if (false) {
     console.log(later);
@@ -444,6 +441,9 @@ function scope() {
   console.log(later);
 }
 function globals() {
+  const undefined = "undefined binding";
+  const NaN = "NaN binding";
+  const Infinity = "Infinity binding";
   console.log(undefined, NaN, Infinity);
 }
 scope();
