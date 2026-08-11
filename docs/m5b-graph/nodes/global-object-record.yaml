@@ -24,4 +24,4 @@ dependencies:
   - object-descriptor-queries
   - object-integrity-levels
 landed: false
-status: blocked
+status: ready

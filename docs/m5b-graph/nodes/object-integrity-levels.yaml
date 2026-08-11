@@ -16,5 +16,5 @@ inventory:
 dependencies:
   - object-define-property
   - object-descriptor-queries
-landed: false
+landed: true
 status: ready
