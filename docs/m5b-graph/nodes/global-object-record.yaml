@@ -23,5 +23,5 @@ dependencies:
   - object-define-property
   - object-descriptor-queries
   - object-integrity-levels
-landed: false
+landed: true
 status: ready
