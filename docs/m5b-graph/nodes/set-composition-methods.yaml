@@ -17,4 +17,6 @@ dependencies:
   - number-intrinsic
   - set-intrinsic
 landed: false
-status: blocked
+status: parked
+reason: "Its set-intrinsic prerequisite is parked because the mandatory
+  claude-fable-5 review could not authenticate after two attempts."

@@ -27,4 +27,8 @@ dependencies:
   - object-prototype
   - well-known-symbols
 landed: false
-status: ready
+status: parked
+reason: "The mandatory cross-model review could not start: two
+  claude-fable-5 attempts returned 401 because the OAuth token had expired.
+  The fully validated unreviewed implementation is preserved on branch
+  m5b-set in stash 68954b9138ebd20cb931e58dc0cad3d4e6681cce."
