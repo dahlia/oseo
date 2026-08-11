@@ -8,6 +8,7 @@ export const globalObjectRecordFixtures: readonly Fixture[] = [
     source: `
 var Object;
 function Promise() { return "replacement"; }
+const ObjectIntrinsic = Object;
 const objectDescriptor = Object.getOwnPropertyDescriptor(this, "Object");
 const promiseDescriptor = Object.getOwnPropertyDescriptor(this, "Promise");
 console.log(
@@ -73,6 +74,41 @@ for (let index = 0; index < 32; index = index + 1) {
   Object.defineProperty({}, "item", { value: { index } });
 }
 console.log("collection", survivor.value === Infinity);
+var Symbol;
+var Function;
+var Iterator;
+var Error;
+var EvalError;
+var RangeError;
+var ReferenceError;
+var SyntaxError;
+var TypeError;
+var URIError;
+var AggregateError;
+console.log(
+  "intrinsic-vars",
+  Symbol === this.Symbol,
+  Function === this.Function,
+  Iterator === this.Iterator,
+  Error === this.Error,
+  EvalError === this.EvalError,
+  RangeError === this.RangeError,
+  ReferenceError === this.ReferenceError,
+  SyntaxError === this.SyntaxError,
+  TypeError === this.TypeError,
+  URIError === this.URIError,
+  AggregateError === this.AggregateError,
+);
+Object.defineProperty(this, "Object", {
+  configurable: true,
+  get() { return Promise; },
+});
+console.log("accessor-binding", Object === Promise);
+console.log("delete-binding", delete Object, typeof Object);
+this.Object = ObjectIntrinsic;
+with ({}) {
+  console.log("with-delete-binding", delete Object, typeof Object);
+}
 `,
   },
 ];

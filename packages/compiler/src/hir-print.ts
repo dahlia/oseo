@@ -123,7 +123,7 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "with-delete") {
     return (
       `delete with[${withObjectText(expression.objectBindingIds)}] ` +
-      `${expression.name} fallback ${expression.fallbackResult}`
+      `${expression.name} fallback ${printHirExpression(expression.fallback)}`
     );
   }
   if (expression.kind === "error-intrinsic") {

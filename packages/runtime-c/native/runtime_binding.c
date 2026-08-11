@@ -96,15 +96,57 @@ OseoResult oseo_cell_create(OseoContext *context, OseoValue value) {
         return failure(context, "OSEO2001", "Binding cell allocation failed.");
     }
     cell->value = value;
+    cell->object = oseo_undefined();
+    cell->key = oseo_undefined();
+    cell->object_environment = false;
     cell->writable = true;
     return oseo_internal_publish_heap(context, &cell->header, OSEO_HEAP_CELL);
+}
+
+/* Object Environment Record HasBinding uses [[HasProperty]], including
+ * inherited properties. The key is already a property key, so this walk
+ * needs neither coercion nor an allocation safepoint. */
+static bool object_environment_has_property(
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoValue current = object_value;
+    while (is_object(current)) {
+        OseoValue value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        if (oseo_internal_own_descriptor(
+            current,
+            key,
+            &value,
+            &attributes,
+            &getter,
+            &setter
+        )) {
+            return true;
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
 }
 
 OseoResult oseo_cell_get(OseoContext *context, OseoValue cell_value) {
     if (!is_cell(cell_value)) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
-    return oseo_read_binding(context, cell_object(cell_value)->value);
+    OseoCell *cell = cell_object(cell_value);
+    if (cell->object_environment) {
+        if (!object_environment_has_property(cell->object, cell->key)) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_REFERENCE,
+                "Global binding does not exist."
+            );
+        }
+        return oseo_object_get(context, cell->object, cell->key);
+    }
+    return oseo_read_binding(context, cell->value);
 }
 
 OseoResult oseo_cell_set(
@@ -217,10 +259,10 @@ OseoResult oseo_module_namespace_create(
 /*
  * The realm's global this value, created on first use. It is an
  * ordinary extensible object created the way this profile creates an object
- * literal, so it reaches the realm-owned %Object.prototype%. Storing it
- * before returning keeps one identity for the whole
- * realm and permanently roots it, so a collection between two `this`
- * reads cannot replace it.
+ * literal, so it reaches the realm-owned %Object.prototype%. A temporary
+ * root owns it while standard globals are installed. Publishing only the
+ * completed object keeps one permanent realm identity and lets a failed
+ * installation retry instead of exposing a partial global.
  *
  * The object is not put in dictionary mode. A var-scoped Script property
  * stores its binding cell rather than its value, but the property cache
@@ -233,26 +275,82 @@ static OseoResult global_this_object(OseoContext *context) {
     }
     OseoResult result = oseo_object_literal_create(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    ordinary_object(result.value)->global_object = true;
-    context->global_this = result.value;
-    result = oseo_internal_install_object_global(context, result.value);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_internal_install_number_global(context, result.value);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_internal_install_promise_global(context, result.value);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_internal_install_array_buffer_global(context, result.value);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[3] = {
+        result.value,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    ordinary_object(frame.slots[0])->global_object = true;
+    result = oseo_internal_install_object_global(context, frame.slots[0]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_number_global(
+            context,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_promise_global(
+            context,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_array_buffer_global(
+            context,
+            frame.slots[0]
+        );
+    }
+    static const char *const intrinsic_names[] = {
+        "Function",
+        "Symbol",
+        "Error",
+        "EvalError",
+        "RangeError",
+        "ReferenceError",
+        "SyntaxError",
+        "TypeError",
+        "URIError",
+        "AggregateError",
+        "Iterator",
+    };
+    static const OseoIntrinsic intrinsic_values[] = {
+        OSEO_INTRINSIC_FUNCTION,
+        OSEO_INTRINSIC_SYMBOL,
+        OSEO_INTRINSIC_ERROR,
+        OSEO_INTRINSIC_EVAL_ERROR,
+        OSEO_INTRINSIC_RANGE_ERROR,
+        OSEO_INTRINSIC_REFERENCE_ERROR,
+        OSEO_INTRINSIC_SYNTAX_ERROR,
+        OSEO_INTRINSIC_TYPE_ERROR,
+        OSEO_INTRINSIC_URI_ERROR,
+        OSEO_INTRINSIC_AGGREGATE_ERROR,
+        OSEO_INTRINSIC_ITERATOR,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 11u;
+         index += 1u) {
+        result = oseo_internal_intrinsic(context, intrinsic_values[index]);
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_internal_ascii_string(context, intrinsic_names[index]);
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
     static const char *const names[] = {"Infinity", "NaN", "undefined"};
     const OseoValue values[] = {
         oseo_number(INFINITY),
         oseo_number(NAN),
         oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 3u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = context->global_this;
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < 3u;
          index += 1u) {
@@ -271,8 +369,11 @@ static OseoResult global_this_object(OseoContext *context) {
             (OseoPropertyAttributes){false, false, false, false}
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
-    oseo_roots_release(context, &frame);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->global_this = frame.slots[0];
+        result.value = frame.slots[0];
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -428,14 +529,6 @@ OseoResult oseo_global_object_create(
             );
             continue;
         }
-        if (attributes.accessor) {
-            result = failure(
-                context,
-                "OSEO2001",
-                "Accessor-backed global declarations are unavailable."
-            );
-            break;
-        }
         OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
         size_t property_index = oseo_internal_own_property_index(
             object,
@@ -447,14 +540,11 @@ OseoResult oseo_global_object_create(
         }
         OseoValue cell = object->properties[property_index].value;
         if (!oseo_internal_cell_backed_property(frame.slots[0], cell)) {
-            result = oseo_cell_initialize(context, frame.slots[2], current);
-            if (result.status != OSEO_STATUS_NORMAL) break;
+            OseoCell *binding = cell_object(frame.slots[2]);
+            binding->object = frame.slots[0];
+            binding->key = frame.slots[1];
+            binding->object_environment = true;
             cell = frame.slots[2];
-            object = ordinary_object(frame.slots[0]);
-            object->properties[property_index].value = cell;
-            object->dictionary = true;
-            object->shape_id = context->next_shape_id;
-            context->next_shape_id += 1u;
         } else {
             result = oseo_environment_set(
                 context,
@@ -466,14 +556,17 @@ OseoResult oseo_global_object_create(
         }
         object = ordinary_object(frame.slots[0]);
         OseoProperty *property = &object->properties[property_index];
-        if (function_declarations[index]) {
+        if (function_declarations[index] &&
+            !cell_object(cell)->object_environment) {
             property->attributes =
                 (OseoPropertyAttributes){false, true, true, false};
             object->dictionary = true;
             object->shape_id = context->next_shape_id;
             context->next_shape_id += 1u;
         }
-        cell_object(cell)->writable = property->attributes.writable;
+        if (!cell_object(cell)->object_environment) {
+            cell_object(cell)->writable = property->attributes.writable;
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
     oseo_roots_release(context, &frame);
@@ -488,6 +581,25 @@ OseoResult oseo_global_binding_set(
 ) {
     if (!is_cell(cell_value)) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    OseoCell *cell = cell_object(cell_value);
+    if (cell->object_environment) {
+        bool exists =
+            object_environment_has_property(cell->object, cell->key);
+        if (!exists && strict) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_REFERENCE,
+                "Global binding does not exist."
+            );
+        }
+        return oseo_object_set(
+            context,
+            cell->object,
+            cell->key,
+            value,
+            strict
+        );
     }
     /*
      * A global var or function binding is an object environment record
@@ -516,6 +628,7 @@ OseoResult oseo_global_binding_initialize(
     if (!is_cell(cell_value)) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
+    if (cell_object(cell_value)->object_environment) return normal(value);
     if (tag_of(cell_object(cell_value)->value) != OSEO_TAG_UNINITIALIZED) {
         return normal(cell_object(cell_value)->value);
     }
@@ -530,6 +643,16 @@ OseoResult oseo_global_function_initialize(
     if (!is_cell(cell_value)) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
-    cell_object(cell_value)->value = value;
+    OseoCell *cell = cell_object(cell_value);
+    if (cell->object_environment) {
+        return oseo_object_define(
+            context,
+            cell->object,
+            cell->key,
+            value,
+            (OseoPropertyAttributes){false, true, true, false}
+        );
+    }
+    cell->value = value;
     return normal(value);
 }

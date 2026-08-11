@@ -2605,22 +2605,22 @@ through the binding fails exactly where a property assignment fails, silently
 outside strict code and with a `TypeError` inside it.
 
 The later M5b `global-object-record` node completes this static declaration
-boundary. The realm installs `Infinity`, `NaN`, and `undefined` with
-non-writable, non-enumerable, non-configurable descriptors. Script lexical
-names reach HasRestrictedGlobalProperty before any mutation, and var-scoped
-names reach CanDeclareGlobalFunction or CanDeclareGlobalVar against the
-existing descriptor and the global object's extensibility. A `var`
-redeclaration preserves the existing property cell and value, a restricted
-function or lexical declaration throws before the statement list runs, and a
-missing property on a non-extensible global is rejected before any earlier
-declaration can mutate the object. Function-local and Module declarations
-remain ordinary declarative bindings and do not enter this record.
+boundary. The realm installs `Infinity`, `NaN`, `undefined`, and every admitted
+constructor global before declaration instantiation. Script lexical names
+reach HasRestrictedGlobalProperty before any mutation, and var-scoped names
+reach CanDeclareGlobalFunction or CanDeclareGlobalVar against the existing
+descriptor and the global object's extensibility. A `var` redeclaration
+preserves the existing property and value, a restricted function or lexical
+declaration throws before the statement list runs, and a missing property on a
+non-extensible global is rejected before any earlier declaration can mutate
+the object. Function-local and Module declarations remain ordinary
+declarative bindings and do not enter this record.
 
 This object is still not exposed by a `globalThis` binding. Indirect `eval`,
-the `Function` constructor, dynamically created global names, and the standard
-global values owned by later intrinsic nodes also remain outside this static
-record. Those boundaries preserve closed-world name resolution rather than
-turning the global object into an implicit runtime name table.
+dynamic `Function` construction, dynamically created global names, and the
+standard global values owned by later intrinsic nodes remain outside this
+static record. Those boundaries preserve closed-world name resolution rather
+than turning the global object into an implicit runtime name table.
 
 Two further boundaries are worth naming. Annex B's block-level function
 hoisting is not implemented, so a function declared in a block at Script top
@@ -3300,20 +3300,29 @@ changing the graph's orchestration state.
 
 M5b node `global-object-record` installs the standard `Infinity`, `NaN`, and
 `undefined` value properties with non-writable, non-enumerable, and
-non-configurable descriptors. Script GlobalDeclarationInstantiation checks all
-top-level lexical names for restricted properties, validates every function
-and `var` name against the existing descriptor and global object extensibility
-before any mutation, and reuses an existing data property's cell. A `var`
-redeclaration therefore preserves the standard value and exact descriptor,
-while a restricted function or lexical declaration and a missing declaration
-on a non-extensible global fail before the body runs. Module and function-local
-declarations remain declarative bindings.
+non-configurable descriptors and every constructor global the profile admits.
+Script GlobalDeclarationInstantiation checks all top-level lexical names for
+restricted properties and validates every function and `var` name against the
+existing descriptor and global object extensibility before any mutation. A
+new property stores its binding cell. A declaration over an existing
+configurable property retains that property as Object Environment Record
+storage, so deletion, accessor replacement, and later descriptor changes stay
+visible through identifier operations. HasBinding includes inherited
+properties, and identifier deletion and `typeof` keep the same fallback through
+an active `with` environment. A `var` redeclaration therefore preserves the
+standard value and exact descriptor, while a restricted function or lexical
+declaration and a missing declaration on a non-extensible global fail before
+the body runs. Module and function-local declarations remain declarative
+bindings. A failed standard-global installation does not publish its partial
+object, so a later attempt can complete the realm global.
 
 Fixed native and generated differential evidence at property seed
-`0x60003d00` covers all three values, descriptor identity, strict and
-non-strict writes, deletion, restricted lexical and function declarations,
-non-extensible creation, both specialization policies, forced collection at
-every safepoint, deliberate shape-guard hits and misses, and generic fallback.
+`0x60003d00` covers all three values, descriptor identity, admitted intrinsic
+collisions, strict and non-strict writes, deletion, accessor replacement,
+inherited binding lookup, `with` fallback, failed installation retry,
+restricted lexical and function declarations, non-extensible creation, both
+specialization policies, forced collection at every safepoint, deliberate
+shape-guard hits and misses, and generic fallback.
 The inventory contains 62 paths under the three value-property roots and
 *test/language/global-code/*. Fifty-nine are reviewed: 25 pass, 9 are expected
 negatives, and 25 retain explicit prerequisite boundaries. One of those paths
@@ -3323,9 +3332,10 @@ parsing. Dynamic-source cases retain their explicit boundary, and `globalThis`
 remains parked for the architecture decision that reconciles a mutable global
 object with closed-world name resolution. The manifest reaches 7,985 cases:
 5,288 passes, 1,364 expected negatives, and 1,333 unsupported profile features
-with no semantic, harness, or infrastructure failures. The runtime ABI moves
-to `oseo-runtime-m5-57` without exposing the global object or changing the
-graph's orchestration state.
+with no semantic, harness, or infrastructure failures. The follow-up runtime
+ABI moves to `oseo-runtime-m5-58` without exposing the global object or
+changing the graph's orchestration state. Compatibility classifications and
+counts do not move.
 
 
 Known gaps inside the claim

@@ -55,8 +55,8 @@ export interface HirWithReference extends LocatedSyntax {
 
 /** One identifier deletion resolved through active object environments. */
 export interface HirWithDeleteReference extends LocatedSyntax {
-  /** Result when no active object environment supplies the name. */
-  readonly fallbackResult: boolean;
+  /** Delete operation used when no active object environment supplies name. */
+  readonly fallback: HirExpression;
   readonly kind: "with-delete";
   readonly name: string;
   readonly objectBindingIds: readonly number[];
@@ -1231,6 +1231,8 @@ export interface Binding {
 export interface ResolveState {
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
+  /** Script bindings whose storage is the realm global object's property. */
+  readonly globalObjectBindingIds: Set<number>;
   readonly functionInfo: Map<
     SyntaxFunction,
     {

@@ -553,15 +553,33 @@ function resolveIdentifierDelete(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
-  let fallbackResult: boolean;
-  if (resolution.binding != null) {
-    fallbackResult = false;
+  const globalObjectBinding =
+    resolution.binding != null &&
+    state.globalObjectBindingIds.has(resolution.binding.id);
+  let fallback: HirExpression;
+  if (globalObjectBinding) {
+    fallback = {
+      key: { kind: "string", range: argument.range, value: argument.name },
+      kind: "property-delete",
+      object: intrinsicGlobalObjectRead(argument.range, state),
+      range: expression.range,
+    };
+  } else if (resolution.binding != null) {
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: false,
+    };
   } else if (
     argument.name === "undefined" ||
     argument.name === "NaN" ||
     argument.name === "Infinity"
   ) {
-    fallbackResult = false;
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: false,
+    };
   } else if (isRuntimeOwnedIntrinsicName(argument.name)) {
     state.diagnostics.push(
       sourceDiagnostic(
@@ -573,7 +591,11 @@ function resolveIdentifierDelete(
     );
     return undefined;
   } else {
-    fallbackResult = true;
+    fallback = {
+      kind: "boolean",
+      range: expression.range,
+      value: true,
+    };
   }
   if (resolution.objectBindingIds.length > 0) {
     if (state.withFallbacks.some((owner) => owner.has(argument.name))) {
@@ -589,17 +611,13 @@ function resolveIdentifierDelete(
     }
     return {
       ...locatedOf(expression),
-      fallbackResult,
+      fallback,
       kind: "with-delete",
       name: argument.name,
       objectBindingIds: resolution.objectBindingIds,
     };
   }
-  return {
-    kind: "boolean",
-    range: expression.range,
-    value: fallbackResult,
-  };
+  return fallback;
 }
 
 /**
@@ -621,6 +639,30 @@ function resolveTypeofIdentifier(
   state: ResolveState,
 ): HirExpression | undefined {
   const resolution = resolveName(scopes, state, argument.name);
+  if (
+    resolution.binding != null &&
+    state.globalObjectBindingIds.has(resolution.binding.id)
+  ) {
+    const fallback = intrinsicGlobalPropertyRead(
+      argument.name,
+      argument.range,
+      state,
+    );
+    const resolved =
+      resolution.objectBindingIds.length === 0
+        ? fallback
+        : {
+            fallback,
+            kind: "with-get" as const,
+            name: argument.name,
+            objectBindingIds: resolution.objectBindingIds,
+            range: argument.range,
+          };
+    return {
+      ...expression,
+      argument: resolved,
+    };
+  }
   if (
     isPropertyOwnedIntrinsicName(argument.name) &&
     resolution.binding == null
@@ -3892,6 +3934,7 @@ export function buildSeededHir(
   const state: ResolveState = {
     diagnostics,
     foldedTypeofReferences: [],
+    globalObjectBindingIds: new Set(),
     functionInfo: new Map(),
     hirFunctions: [],
     intrinsicGlobalObjectBinding: undefined,
@@ -3912,6 +3955,10 @@ export function buildSeededHir(
     state,
     seed.moduleBody === true,
   );
+  for (const entry of program.globalObjectNames ?? []) {
+    const binding = scriptScope.get(entry.name);
+    if (binding != null) state.globalObjectBindingIds.add(binding.id);
+  }
   const body = resolveStatementList(
     program.body,
     [],

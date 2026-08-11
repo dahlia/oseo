@@ -1075,6 +1075,41 @@ static void test_this_value(OseoContext *context, OseoValue *roots) {
     );
 }
 
+/* A failed standard-global installation must not publish the partial
+ * object. The last deterministic allocation fails after every earlier
+ * install step, then the same context retries and publishes a complete
+ * global object. */
+static void test_global_this_install_failure(void) {
+    OseoContext probe;
+    oseo_context_init(&probe, "runtime-heap.c", 14u);
+    (void)require_normal(oseo_this_value(&probe, oseo_undefined()));
+    size_t final_attempt = probe.allocation_attempts;
+    assert(final_attempt > 0u);
+    oseo_context_destroy(&probe);
+
+    OseoContext injected;
+    oseo_context_init(&injected, "runtime-heap.c", 14u);
+    oseo_context_fail_allocation_at(&injected, final_attempt);
+    assert(
+        oseo_this_value(&injected, oseo_undefined()).status ==
+        OSEO_STATUS_THROW
+    );
+    assert(injected.global_this == oseo_undefined());
+    oseo_context_fail_allocation_at(&injected, 0u);
+    OseoValue global = require_normal(
+        oseo_this_value(&injected, oseo_undefined())
+    );
+    OseoValue object_key = make_text(&injected, "Object");
+    assert(
+        require_normal(oseo_object_has_own(
+            &injected,
+            global,
+            object_key
+        )) == oseo_boolean(true)
+    );
+    oseo_context_destroy(&injected);
+}
+
 /*
  * The var-scoped Script bindings the global object exposes. Each
  * property is a view of the binding cell rather than a copy of its
@@ -1399,6 +1434,7 @@ int main(void) {
     test_symbols(&context, frame.slots);
     test_iterators(&context, frame.slots);
     test_accessor_descriptor_gc_safety(&context, frame.slots);
+    test_global_this_install_failure();
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);
     oseo_roots_release(&context, &frame);

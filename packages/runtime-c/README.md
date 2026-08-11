@@ -397,16 +397,20 @@ including arguments aliases and module namespace restrictions, while array
 runtime layout is unchanged because the extensibility flag was reserved by
 the intrinsic graph root.
 
-The `m5-57` ABI completes the static Global Environment Record boundary.
+The `m5-58` ABI completes the static Global Environment Record boundary.
 The realm global object owns the standard `Infinity`, `NaN`, and `undefined`
 value properties with their specified read-only, non-enumerable, and
-non-configurable descriptors. Global declaration instantiation checks lexical
-declarations against restricted properties, validates function and `var`
-declarations against existing descriptors and extensibility before mutation,
-and preserves one cell for an existing data property. Module declarations do
+non-configurable descriptors and every constructor global the profile admits.
+Global declaration instantiation checks lexical declarations against
+restricted properties and validates function and `var` declarations against
+existing descriptors and extensibility before mutation. A new property stores
+its binding cell. A declaration over an existing configurable property retains
+that property as Object Environment Record storage, so deletion, accessors,
+and later descriptor changes remain visible through the identifier, including
+inherited-property lookup and `with` fallback. A failed standard-global
+installation remains unpublished so it can be retried. Module declarations do
 not enter that record. The global object remains unavailable as a `globalThis`
-binding, which is owned by its later architecture decision. Public runtime
-layout is unchanged.
+binding, which is owned by its later architecture decision.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

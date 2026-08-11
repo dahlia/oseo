@@ -459,11 +459,15 @@ OseoResult oseo_module_namespace_create(
  * properties before any mutation. Each var or function entry then
  * preserves an existing property or creates a writable, enumerable,
  * non-configurable own property whose storage is the binding cell in
- * `environment`. The caller passes names in ECMA-262 creation order,
- * and the cells must already exist. Module code never calls this; it
- * adds no global object property. The realm also installs the standard
- * `Infinity`, `NaN`, and `undefined` value properties here, but does not
- * expose the global object through a `globalThis` binding.
+ * `environment`. A preserved property remains ordinary object storage;
+ * its environment cell retains the object and key so reads and writes
+ * continue to observe inherited properties, deletion, accessors, and
+ * descriptor changes. The caller passes names in ECMA-262 creation order,
+ * and the cells must
+ * already exist. Module code never calls this; it adds no global object
+ * property. The realm also installs every admitted intrinsic global and
+ * the standard `Infinity`, `NaN`, and `undefined` value properties here,
+ * but does not expose the global object through a `globalThis` binding.
  */
 OseoResult oseo_global_object_create(
     OseoContext *context,
