@@ -412,6 +412,17 @@ installation remains unpublished so it can be retried. Module declarations do
 not enter that record. The global object remains unavailable as a `globalThis`
 binding, which is owned by its later architecture decision.
 
+The `m5-59` ABI makes every admitted configurable constructor global use the
+same property-owned identifier path as the other mutable standard globals.
+Property writes and deletes therefore change later bare reads, writes, and
+`typeof` results. Global lexical and object declaration tables also carry each
+declaration's line and column, which the runtime installs before
+HasRestrictedGlobalProperty, CanDeclareGlobalFunction, or CanDeclareGlobalVar
+can fail. Module declarations remain outside the global object record. Each
+call validates one independently compiled Script; the ABI does not retain
+`[[VarNames]]` or declarative names across successive Script instantiations in
+one realm, so multi-Script declaration collisions remain outside this unit.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

@@ -187,12 +187,23 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 /** Whether the mutable global object property owns this intrinsic value. */
 function isPropertyOwnedIntrinsicName(name: string): boolean {
   return (
+    name === "AggregateError" ||
     name === "ArrayBuffer" ||
+    name === "Error" ||
+    name === "EvalError" ||
+    name === "Function" ||
     name === "Infinity" ||
+    name === "Iterator" ||
     name === "NaN" ||
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "RangeError" ||
+    name === "ReferenceError" ||
+    name === "Symbol" ||
+    name === "SyntaxError" ||
+    name === "TypeError" ||
+    name === "URIError" ||
     name === "undefined"
   );
 }
@@ -366,11 +377,6 @@ function identifierFallback(
       value: name === "NaN" ? NaN : Infinity,
     };
   }
-  const errorName = errorIntrinsicName(name);
-  if (errorName != null) return { errorName, kind: "error-intrinsic", range };
-  if (name === "Symbol") return { kind: "symbol-intrinsic", range };
-  if (name === "Function") return { kind: "function-intrinsic", range };
-  if (name === "Iterator") return { kind: "iterator-intrinsic", range };
   if (isPropertyOwnedIntrinsicName(name)) {
     return intrinsicGlobalIdentifierRead(name, range, state);
   }
@@ -543,8 +549,8 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
 /**
  * Resolve an identifier delete without reading the selected binding. The
  * closed-world profile can decide declarative and unresolvable references
- * statically. Runtime-owned intrinsic globals stay invalid until deleting a
- * global property can also affect later name resolution.
+ * statically. Property-owned intrinsic globals delete the same configurable
+ * property that their later identifier reads observe.
  */
 function resolveIdentifierDelete(
   expression: Extract<SyntaxExpression, { readonly kind: "delete" }>,
@@ -579,6 +585,13 @@ function resolveIdentifierDelete(
       kind: "boolean",
       range: expression.range,
       value: false,
+    };
+  } else if (isPropertyOwnedIntrinsicName(argument.name)) {
+    fallback = {
+      key: { kind: "string", range: argument.range, value: argument.name },
+      kind: "property-delete",
+      object: intrinsicGlobalObjectRead(argument.range, state),
+      range: expression.range,
     };
   } else if (isRuntimeOwnedIntrinsicName(argument.name)) {
     state.diagnostics.push(
@@ -688,12 +701,7 @@ function resolveTypeofIdentifier(
     resolution.binding != null ||
     argument.name === "undefined" ||
     argument.name === "NaN" ||
-    argument.name === "Infinity" ||
-    argument.name === "Function" ||
-    argument.name === "Iterator" ||
-    isPropertyOwnedIntrinsicName(argument.name) ||
-    argument.name === "Symbol" ||
-    errorIntrinsicName(argument.name) != null;
+    argument.name === "Infinity";
   if (resolvesValue) {
     const resolved = resolveExpression(argument, scopes, state);
     return resolved == null ? undefined : { ...expression, argument: resolved };
@@ -1169,23 +1177,6 @@ function resolveExpression(
           range: expression.range,
           value: expression.name === "NaN" ? NaN : Infinity,
         };
-      }
-      const errorName = errorIntrinsicName(expression.name);
-      if (errorName != null) {
-        return {
-          errorName,
-          kind: "error-intrinsic",
-          range: expression.range,
-        };
-      }
-      if (expression.name === "Symbol") {
-        return { kind: "symbol-intrinsic", range: expression.range };
-      }
-      if (expression.name === "Function") {
-        return { kind: "function-intrinsic", range: expression.range };
-      }
-      if (expression.name === "Iterator") {
-        return { kind: "iterator-intrinsic", range: expression.range };
       }
       if (isPropertyOwnedIntrinsicName(expression.name)) {
         return intrinsicGlobalIdentifierRead(
@@ -4007,6 +3998,7 @@ export function buildSeededHir(
       declaration: entry.declaration,
       id: binding.id,
       name: entry.name,
+      range: entry.range,
     });
   }
   if (diagnostics.length > 0) {
@@ -4040,9 +4032,10 @@ export function buildSeededHir(
               ...body,
             ],
       functions: state.hirFunctions,
-      globalLexicalNames: (program.globalLexicalNames ?? []).map(
-        (entry) => entry.name,
-      ),
+      globalLexicalNames: (program.globalLexicalNames ?? []).map((entry) => ({
+        name: entry.name,
+        range: entry.range,
+      })),
       globalBindings: [
         ...(state.intrinsicGlobalObjectBinding == null
           ? []

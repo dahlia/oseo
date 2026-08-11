@@ -671,7 +671,8 @@ main();
       genericCallsDisabled: 4,
       genericCallsEnabled: 3,
       hits: 1,
-      misses: 5,
+      // The two Symbol reads each establish a global-property shape cache.
+      misses: 7,
       overflowMisses: 0,
     },
   },

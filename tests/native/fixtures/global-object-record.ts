@@ -99,6 +99,90 @@ console.log(
   URIError === this.URIError,
   AggregateError === this.AggregateError,
 );
+const constructorGlobals = {
+  Function,
+  Symbol,
+  Iterator,
+  Error,
+  EvalError,
+  RangeError,
+  ReferenceError,
+  SyntaxError,
+  TypeError,
+  URIError,
+  AggregateError,
+};
+this.Function = 101;
+this.Symbol = 102;
+this.Iterator = 103;
+this.Error = 104;
+this.EvalError = 105;
+this.RangeError = 106;
+this.ReferenceError = 107;
+this.SyntaxError = 108;
+this.TypeError = 109;
+this.URIError = 110;
+this.AggregateError = 111;
+console.log(
+  "constructor-property-writes",
+  Function,
+  Symbol,
+  Iterator,
+  Error,
+  EvalError,
+  RangeError,
+  ReferenceError,
+  SyntaxError,
+  TypeError,
+  URIError,
+  AggregateError,
+);
+Function = constructorGlobals.Function;
+Symbol = constructorGlobals.Symbol;
+Iterator = constructorGlobals.Iterator;
+Error = constructorGlobals.Error;
+EvalError = constructorGlobals.EvalError;
+RangeError = constructorGlobals.RangeError;
+ReferenceError = constructorGlobals.ReferenceError;
+SyntaxError = constructorGlobals.SyntaxError;
+TypeError = constructorGlobals.TypeError;
+URIError = constructorGlobals.URIError;
+AggregateError = constructorGlobals.AggregateError;
+console.log(
+  "constructor-binding-writes",
+  this.Function === constructorGlobals.Function,
+  this.Symbol === constructorGlobals.Symbol,
+  this.Iterator === constructorGlobals.Iterator,
+  this.Error === constructorGlobals.Error,
+  this.EvalError === constructorGlobals.EvalError,
+  this.RangeError === constructorGlobals.RangeError,
+  this.ReferenceError === constructorGlobals.ReferenceError,
+  this.SyntaxError === constructorGlobals.SyntaxError,
+  this.TypeError === constructorGlobals.TypeError,
+  this.URIError === constructorGlobals.URIError,
+  this.AggregateError === constructorGlobals.AggregateError,
+);
+console.log("delete-Symbol", delete Symbol, typeof Symbol);
+try {
+  Symbol;
+} catch (error) {
+  console.log("missing-Symbol", error.name);
+}
+this.Symbol = constructorGlobals.Symbol;
+console.log("delete-Function", delete Function, typeof Function);
+try {
+  Function;
+} catch (error) {
+  console.log("missing-Function", error.name);
+}
+this.Function = constructorGlobals.Function;
+console.log("delete-Error", delete Error, typeof Error);
+try {
+  Error;
+} catch (error) {
+  console.log("missing-Error", error.name);
+}
+this.Error = constructorGlobals.Error;
 Object.defineProperty(this, "Object", {
   configurable: true,
   get() { return Promise; },

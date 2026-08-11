@@ -301,6 +301,71 @@ export async function runNativeScenario1(
     }
   }
 
+  for (const [name, source, location, errorName] of [
+    [
+      "restricted-global-lexical-location.js",
+      "\n\nlet undefined;\n",
+      "3:5",
+      "SyntaxError",
+    ],
+    [
+      "restricted-global-function-location.js",
+      "\n\nfunction undefined() {}\n",
+      "3:1",
+      "TypeError",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      { args: [name], source, sourceId: name, version: "0.1.0" },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(`^${name}:${location}: error\\[OSEO2001\\]`, "u"),
+    );
+    assert.match(observed.stderr, new RegExp(`OSEO_THROWN ${errorName}`, "u"));
+  }
+
+  const nonExtensibleGlobalHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_binding.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "frame.slots[0] = result.value;\n" +
+          "    /* HasRestrictedGlobalProperty runs",
+        "frame.slots[0] = result.value;\n" +
+          "    ordinary_object(frame.slots[0])->extensible = false;\n" +
+          "    /* HasRestrictedGlobalProperty runs",
+      );
+      assert.notEqual(injected, source, "non-extensible global injected");
+      return injected;
+    },
+  };
+  const blockedGlobal = await runNativeCli(
+    {
+      args: ["non-extensible-global-var-location.js"],
+      source: "\n\nvar blocked;\n",
+      sourceId: "non-extensible-global-var-location.js",
+      version: "0.1.0",
+    },
+    nonExtensibleGlobalHost,
+  );
+  assert.equal(blockedGlobal.exitStatus, 1);
+  assert.equal(blockedGlobal.stdout, "");
+  assert.match(
+    blockedGlobal.stderr,
+    /^non-extensible-global-var-location\.js:3:5: error\[OSEO2001\]/u,
+  );
+  assert.match(blockedGlobal.stderr, /OSEO_THROWN TypeError/u);
+
   const nulSourceId = "source\0identifier.ts";
   const nulSourceDiagnostic = await runNativeCli(
     {

@@ -7027,6 +7027,7 @@ export function buildMir(
       declaration: binding.declaration,
       id: binding.id,
       name: binding.name,
+      range: binding.range,
     }),
   );
   return {

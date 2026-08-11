@@ -91,7 +91,9 @@ function globalObjectProgram(observesThis: boolean): MirProgram {
     functions: [],
     globalBindings: [{ id: 0, name: "answer" }],
     globalLexicalNames: [],
-    globalObjectBindings: [{ declaration: "var", id: 0, name: "answer" }],
+    globalObjectBindings: [
+      { declaration: "var", id: 0, name: "answer", range },
+    ],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -178,7 +180,7 @@ test("checks global lexical names before creating object bindings", () => {
   const program = globalObjectProgram(false);
   const emitted = cBackend.emit({
     ...program,
-    globalLexicalNames: ["undefined"],
+    globalLexicalNames: [{ name: "undefined", range: program.script.range }],
   });
   assert.match(emitted.source, /global_lexical_units_0/u);
   assert.match(
@@ -186,13 +188,22 @@ test("checks global lexical names before creating object bindings", () => {
     /oseo_global_object_create\(context, .*1u, global_lexical_names,/su,
   );
   assert.match(emitted.source, /global_object_functions/u);
+  assert.match(emitted.source, /global_lexical_lines\[\] = \{1\};/u);
+  assert.match(emitted.source, /global_lexical_columns\[\] = \{1\};/u);
 });
 
 test("replaces an existing value for a global function declaration", () => {
   const program = globalObjectProgram(false);
   const emitted = cBackend.emit({
     ...program,
-    globalObjectBindings: [{ declaration: "function", id: 0, name: "Symbol" }],
+    globalObjectBindings: [
+      {
+        declaration: "function",
+        id: 0,
+        name: "Symbol",
+        range: program.script.range,
+      },
+    ],
     script: {
       ...program.script,
       blocks: program.script.blocks.map((block) =>

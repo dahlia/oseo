@@ -463,10 +463,13 @@ OseoResult oseo_module_namespace_create(
  * its environment cell retains the object and key so reads and writes
  * continue to observe inherited properties, deletion, accessors, and
  * descriptor changes. The caller passes names in ECMA-262 creation order,
- * and the cells must
- * already exist. Module code never calls this; it adds no global object
- * property. The realm also installs every admitted intrinsic global and
- * the standard `Infinity`, `NaN`, and `undefined` value properties here,
+ * and the cells must already exist. Module code never calls this; it adds no
+ * global object property. The line and column tables locate the matching
+ * declarations so a failed global-record check reports the declaration it
+ * rejected. Successive calls do not retain the Global Environment Record's
+ * [[VarNames]] or declarative names, so multi-Script realm sequencing remains
+ * outside this ABI. The realm also installs every admitted intrinsic global
+ * and the standard `Infinity`, `NaN`, and `undefined` value properties here,
  * but does not expose the global object through a `globalThis` binding.
  */
 OseoResult oseo_global_object_create(
@@ -475,9 +478,13 @@ OseoResult oseo_global_object_create(
     size_t lexical_count,
     const uint16_t *const *lexical_names,
     const size_t *lexical_name_lengths,
+    const size_t *lexical_lines,
+    const size_t *lexical_columns,
     size_t binding_count,
     const uint16_t *const *names,
     const size_t *name_lengths,
+    const size_t *binding_lines,
+    const size_t *binding_columns,
     const size_t *binding_ids,
     const bool *function_declarations
 );

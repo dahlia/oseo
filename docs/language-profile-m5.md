@@ -2616,6 +2616,12 @@ non-extensible global is rejected before any earlier declaration can mutate
 the object. Function-local and Module declarations remain ordinary
 declarative bindings and do not enter this record.
 
+The record validates one independently compiled Script at a time. It does not
+retain `[[VarNames]]` or global declarative names across successive Script
+instantiations in the same realm, so cross-Script declaration collisions are
+outside this unit even though the runtime entry point can be called more than
+once for storage-level tests.
+
 This object is still not exposed by a `globalThis` binding. Indirect `eval`,
 dynamic `Function` construction, dynamically created global names, and the
 standard global values owned by later intrinsic nodes remain outside this
@@ -3307,14 +3313,18 @@ existing descriptor and global object extensibility before any mutation. A
 new property stores its binding cell. A declaration over an existing
 configurable property retains that property as Object Environment Record
 storage, so deletion, accessor replacement, and later descriptor changes stay
-visible through identifier operations. HasBinding includes inherited
-properties, and identifier deletion and `typeof` keep the same fallback through
-an active `with` environment. A `var` redeclaration therefore preserves the
-standard value and exact descriptor, while a restricted function or lexical
-declaration and a missing declaration on a non-extensible global fail before
-the body runs. Module and function-local declarations remain declarative
-bindings. A failed standard-global installation does not publish its partial
-object, so a later attempt can complete the realm global.
+visible through identifier operations. That property-owned path includes every
+admitted configurable constructor global, so a bare identifier observes an
+object-property write and deletion changes its later read and `typeof`
+behavior. HasBinding includes inherited properties, and identifier deletion
+and `typeof` keep the same fallback through an active `with` environment. A
+`var` redeclaration therefore preserves the standard value and exact
+descriptor, while a restricted function or lexical declaration and a missing
+declaration on a non-extensible global fail before the body runs. Those
+failures use the exact declaration range retained through HIR and MIR. Module
+and function-local declarations remain declarative bindings. A failed
+standard-global installation does not publish its partial object, so a later
+attempt can complete the realm global.
 
 Fixed native and generated differential evidence at property seed
 `0x60003d00` covers all three values, descriptor identity, admitted intrinsic
@@ -3333,7 +3343,7 @@ remains parked for the architecture decision that reconciles a mutable global
 object with closed-world name resolution. The manifest reaches 7,985 cases:
 5,288 passes, 1,364 expected negatives, and 1,333 unsupported profile features
 with no semantic, harness, or infrastructure failures. The follow-up runtime
-ABI moves to `oseo-runtime-m5-58` without exposing the global object or
+ABI moves to `oseo-runtime-m5-59` without exposing the global object or
 changing the graph's orchestration state. Compatibility classifications and
 counts do not move.
 

@@ -130,8 +130,9 @@ test("resolves global object properties to script bindings", () => {
   // decides whether the property ECMA-262 creates is this profile's
   // uniform one.
   assert.equal(answer.declaration, "var");
+  assert.deepEqual(answer.range, range);
   assert.deepEqual(buildMir(hirResult.program).globalObjectBindings, [
-    { declaration: "var", id: answer.id, name: "answer" },
+    { declaration: "var", id: answer.id, name: "answer", range },
   ]);
   // The property names the binding the body already declared rather
   // than a second binding created for the global object.
@@ -203,7 +204,7 @@ test("admits a function declaration that replaces a replaceable global", () => {
     const result = buildHir(intrinsicGlobalProgram("function", name));
     assert.deepEqual(result.diagnostics, []);
     assert.deepEqual(result.program?.globalObjectBindings, [
-      { declaration: "function", id: 0, name },
+      { declaration: "function", id: 0, name, range },
     ]);
   }
 });
@@ -227,7 +228,7 @@ test("carries intrinsic global declarations to the global record", () => {
     const result = buildHir(intrinsicGlobalProgram(declaration, name));
     assert.deepEqual(result.diagnostics, []);
     assert.deepEqual(result.program?.globalObjectBindings, [
-      { declaration, id: 0, name },
+      { declaration, id: 0, name, range },
     ]);
   }
 });
@@ -236,7 +237,29 @@ test("keeps an ordinary top-level name clear of the collision check", () => {
   const result = buildHir(intrinsicGlobalProgram("var", "Symbolic"));
   assert.deepEqual(result.diagnostics, []);
   assert.deepEqual(result.program?.globalObjectBindings, [
-    { declaration: "var", id: 0, name: "Symbolic" },
+    { declaration: "var", id: 0, name: "Symbolic", range },
+  ]);
+});
+
+test("preserves global lexical declaration ranges through MIR", () => {
+  const declarationRange = {
+    end: { column: 18, line: 4 },
+    start: { column: 5, line: 4 },
+  };
+  const result = buildHir({
+    body: [],
+    globalLexicalNames: [{ name: "undefined", range: declarationRange }],
+    kind: "program",
+    range,
+    sourceId: "global-lexical-range.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.program?.globalLexicalNames, [
+    { name: "undefined", range: declarationRange },
+  ]);
+  assert.ok(result.program != null);
+  assert.deepEqual(buildMir(result.program).globalLexicalNames, [
+    { name: "undefined", range: declarationRange },
   ]);
 });
 

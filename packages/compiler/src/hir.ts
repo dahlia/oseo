@@ -1168,6 +1168,12 @@ export interface HirGlobalBinding {
   readonly name: string;
 }
 
+/** One source-located Script lexical name checked against the global object. */
+export interface HirGlobalLexicalName {
+  readonly name: string;
+  readonly range: SourceRange;
+}
+
 /**
  * One resolved global-object property and the declaration that creates
  * it. The declaration kind selects between CreateGlobalVarBinding and
@@ -1175,6 +1181,7 @@ export interface HirGlobalBinding {
  */
 export interface HirGlobalObjectBinding extends HirGlobalBinding {
   readonly declaration: "function" | "var";
+  readonly range: SourceRange;
 }
 
 /** A normalized script and its statically callable functions. */
@@ -1183,7 +1190,7 @@ export interface HirProgram {
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
   /** Script lexical names checked against restricted global properties. */
-  readonly globalLexicalNames?: readonly string[];
+  readonly globalLexicalNames?: readonly HirGlobalLexicalName[];
   /**
    * The hidden global-object capture initialized before any module function
    * initializer can expose a closure that reads it.

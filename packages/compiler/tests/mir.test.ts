@@ -365,7 +365,7 @@ test("marks relational operators as allocation safepoints", () => {
   }
 });
 
-test("resolves unshadowed error names to intrinsic references", () => {
+test("resolves unshadowed error names through global properties", () => {
   const errorNames = [
     "AggregateError",
     "Error",
@@ -402,20 +402,18 @@ test("resolves unshadowed error names to intrinsic references", () => {
     const hirResult = buildHir(syntax);
     assert.deepEqual(hirResult.diagnostics, []);
     assert.ok(hirResult.program != null);
-    assert.match(
-      printHir(hirResult.program),
-      new RegExp(`intrinsic ${name}`, "u"),
-    );
+    assert.match(printHir(hirResult.program), new RegExp(`get .*${name}`, "u"));
     const operations = buildMir(hirResult.program).script.blocks.flatMap(
       (block) => block.operations,
     );
-    const index = operations.findIndex(
-      (operation) =>
-        operation.kind === "error-intrinsic" && operation.errorName === name,
+    const propertyGets = operations.filter(
+      (operation) => operation.kind === "property-get",
     );
-    assert.ok(index >= 0, `${name} lowers to an error-intrinsic operation`);
-    assert.equal(operations[index - 1]?.kind, "safepoint");
-    assert.equal(operations[index + 1]?.kind, "check-status");
+    assert.equal(propertyGets.length, 2);
+    assert.equal(
+      operations.some((operation) => operation.kind === "error-intrinsic"),
+      false,
+    );
   }
 });
 
@@ -447,7 +445,7 @@ test("keeps shadowed error names ordinary bindings", () => {
   assert.match(printed, /%b\d+\(TypeError\)/u);
 });
 
-test("resolves the unshadowed Symbol intrinsic", () => {
+test("resolves unshadowed Symbol through its global property", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -473,16 +471,18 @@ test("resolves the unshadowed Symbol intrinsic", () => {
   const hirResult = buildHir(syntax);
   assert.deepEqual(hirResult.diagnostics, []);
   assert.ok(hirResult.program != null);
-  assert.match(printHir(hirResult.program), /intrinsic Symbol/u);
+  assert.match(printHir(hirResult.program), /get .*\["Symbol"\]/u);
   const operations = buildMir(hirResult.program).script.blocks.flatMap(
     (block) => block.operations,
   );
-  const index = operations.findIndex(
-    (operation) => operation.kind === "symbol-intrinsic",
+  const propertyGets = operations.filter(
+    (operation) => operation.kind === "property-get",
   );
-  assert.ok(index >= 0);
-  assert.equal(operations[index - 1]?.kind, "safepoint");
-  assert.equal(operations[index + 1]?.kind, "check-status");
+  assert.equal(propertyGets.length, 2);
+  assert.equal(
+    operations.some((operation) => operation.kind === "symbol-intrinsic"),
+    false,
+  );
 });
 
 test("keeps a shadowed Symbol an ordinary binding", () => {

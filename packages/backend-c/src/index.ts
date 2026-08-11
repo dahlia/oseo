@@ -3,6 +3,7 @@ import type {
   MirBlock,
   MirConstant,
   MirFunction,
+  MirGlobalLexicalName,
   MirGlobalObjectBinding,
   MirOperation,
   MirProgram,
@@ -3338,7 +3339,9 @@ function yieldResumePoints(
 }
 
 interface GlobalNameTable {
+  readonly columns: string;
   readonly lengths: string;
+  readonly lines: string;
   readonly names: string;
 }
 
@@ -3346,15 +3349,24 @@ interface GlobalNameTable {
 function emitGlobalNameTable(
   state: EmitState,
   prefix: string,
-  names: readonly string[],
+  entries: readonly {
+    readonly name: string;
+    readonly range: SourceRange;
+  }[],
 ): GlobalNameTable {
-  if (names.length === 0) {
+  if (entries.length === 0) {
     const nullPointer = renderC(emittedC.common.nullPointer);
-    return { lengths: nullPointer, names: nullPointer };
+    return {
+      columns: nullPointer,
+      lengths: nullPointer,
+      lines: nullPointer,
+      names: nullPointer,
+    };
   }
   const pointers: string[] = [];
   const lengths: number[] = [];
-  for (const [index, name] of names.entries()) {
+  for (const [index, entry] of entries.entries()) {
+    const name = entry.name;
     const units = utf16Units(name);
     lengths.push(units.length);
     if (units.length === 0) {
@@ -3391,7 +3403,22 @@ function emitGlobalNameTable(
       lengths.join(renderC(emittedC.common.commaSpace)),
     ),
   );
-  return { lengths: `${prefix}_lengths`, names: `${prefix}_names` };
+  line(
+    state,
+    `static const size_t ${prefix}_lines[] = ` +
+      `{${entries.map((entry) => entry.range.start.line).join(", ")}};`,
+  );
+  line(
+    state,
+    `static const size_t ${prefix}_columns[] = ` +
+      `{${entries.map((entry) => entry.range.start.column).join(", ")}};`,
+  );
+  return {
+    columns: `${prefix}_columns`,
+    lengths: `${prefix}_lengths`,
+    lines: `${prefix}_lines`,
+    names: `${prefix}_names`,
+  };
 }
 
 /**
@@ -3399,7 +3426,7 @@ function emitGlobalNameTable(
  */
 function emitGlobalObject(
   state: EmitState,
-  lexicalNames: readonly string[],
+  lexicalNames: readonly MirGlobalLexicalName[],
   bindings: readonly MirGlobalObjectBinding[],
 ): void {
   if (lexicalNames.length === 0 && bindings.length === 0) return;
@@ -3407,7 +3434,7 @@ function emitGlobalObject(
   const bindingNames = emitGlobalNameTable(
     state,
     renderC(emittedC.globalObject.prefix),
-    bindings.map((binding) => binding.name),
+    bindings,
   );
   const nullPointer = renderC(emittedC.common.nullPointer);
   let globalBindingIds = nullPointer;
@@ -3443,8 +3470,10 @@ function emitGlobalObject(
     state,
     "result = oseo_global_object_create(context, " +
       `roots[${state.environmentSlot}], ${lexicalNames.length}u, ` +
-      `${lexical.names}, ${lexical.lengths}, ${bindings.length}u, ` +
-      `${bindingNames.names}, ${bindingNames.lengths}, ${globalBindingIds}, ` +
+      `${lexical.names}, ${lexical.lengths}, ${lexical.lines}, ` +
+      `${lexical.columns}, ${bindings.length}u, ${bindingNames.names}, ` +
+      `${bindingNames.lengths}, ${bindingNames.lines}, ` +
+      `${bindingNames.columns}, ${globalBindingIds}, ` +
       `${functionDeclarations});`,
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
@@ -3520,7 +3549,7 @@ function emitPrologue(
   bindingIdValues: readonly number[],
   totalBindingCount: number,
   temporarySlot: number,
-  globalLexicalNames: readonly string[],
+  globalLexicalNames: readonly MirGlobalLexicalName[],
   globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): void {
   const environmentSlot = state.environmentSlot;
@@ -3820,7 +3849,7 @@ function emitFunction(
   functionRootCounts: ReadonlyMap<number, number>,
   totalBindingCount: number,
   observeSpecialization: boolean,
-  globalLexicalNames: readonly string[],
+  globalLexicalNames: readonly MirGlobalLexicalName[],
   globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): string {
   if (functionValue.blocks.length === 0) {

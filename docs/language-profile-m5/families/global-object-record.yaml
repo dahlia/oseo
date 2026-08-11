@@ -7,6 +7,12 @@ scope:
   - "Static Script GlobalDeclarationInstantiation checks for restricted
     lexical names, existing var and function properties, and global object
     extensibility, without exposing a globalThis binding."
+  - "Bare identifier reads, writes, and deletes for admitted configurable
+    constructor globals observe their global-object properties, while global
+    declaration failures retain their exact declaration locations."
+  - "Each independently compiled Script is validated in isolation; global
+    var and lexical declaration names are not retained across successive
+    Script instantiations in one realm."
 owners:
   - PLAN-M5.md
 evidence:

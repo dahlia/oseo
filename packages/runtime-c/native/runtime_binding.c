@@ -328,8 +328,15 @@ static OseoResult global_this_object(OseoContext *context) {
         OSEO_INTRINSIC_AGGREGATE_ERROR,
         OSEO_INTRINSIC_ITERATOR,
     };
+    _Static_assert(
+        sizeof(intrinsic_names) / sizeof(intrinsic_names[0]) ==
+        sizeof(intrinsic_values) / sizeof(intrinsic_values[0]),
+        "Intrinsic global tables must stay aligned."
+    );
+    const size_t intrinsic_count =
+        sizeof(intrinsic_names) / sizeof(intrinsic_names[0]);
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 11u;
+         result.status == OSEO_STATUS_NORMAL && index < intrinsic_count;
          index += 1u) {
         result = oseo_internal_intrinsic(context, intrinsic_values[index]);
         frame.slots[1] = result.value;
@@ -345,19 +352,30 @@ static OseoResult global_this_object(OseoContext *context) {
             (OseoPropertyAttributes){true, false, true, false}
         );
     }
-    static const char *const names[] = {"Infinity", "NaN", "undefined"};
-    const OseoValue values[] = {
+    static const char *const value_names[] = {
+        "Infinity",
+        "NaN",
+        "undefined",
+    };
+    const OseoValue value_values[] = {
         oseo_number(INFINITY),
         oseo_number(NAN),
         oseo_undefined(),
     };
+    _Static_assert(
+        sizeof(value_names) / sizeof(value_names[0]) ==
+        sizeof(value_values) / sizeof(value_values[0]),
+        "Intrinsic value tables must stay aligned."
+    );
+    const size_t value_count =
+        sizeof(value_names) / sizeof(value_names[0]);
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         result.status == OSEO_STATUS_NORMAL && index < value_count;
          index += 1u) {
-        result = oseo_internal_ascii_string(context, names[index]);
+        result = oseo_internal_ascii_string(context, value_names[index]);
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        result = oseo_cell_create(context, values[index]);
+        result = oseo_cell_create(context, value_values[index]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         cell_object(frame.slots[2])->writable = false;
@@ -395,16 +413,22 @@ OseoResult oseo_global_object_create(
     size_t lexical_count,
     const uint16_t *const *lexical_names,
     const size_t *lexical_name_lengths,
+    const size_t *lexical_lines,
+    const size_t *lexical_columns,
     size_t binding_count,
     const uint16_t *const *names,
     const size_t *name_lengths,
+    const size_t *binding_lines,
+    const size_t *binding_columns,
     const size_t *binding_ids,
     const bool *function_declarations
 ) {
     if ((lexical_count > 0u &&
-         (lexical_names == NULL || lexical_name_lengths == NULL)) ||
+         (lexical_names == NULL || lexical_name_lengths == NULL ||
+          lexical_lines == NULL || lexical_columns == NULL)) ||
         (binding_count > 0u &&
-         (names == NULL || name_lengths == NULL || binding_ids == NULL ||
+         (names == NULL || name_lengths == NULL || binding_lines == NULL ||
+          binding_columns == NULL || binding_ids == NULL ||
           function_declarations == NULL))) {
         return failure(context, "OSEO2001", "Invalid global object.");
     }
@@ -418,6 +442,11 @@ OseoResult oseo_global_object_create(
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < lexical_count;
          index += 1u) {
+        oseo_context_location(
+            context,
+            lexical_lines[index],
+            lexical_columns[index]
+        );
         result = oseo_string_from_units(
             context,
             lexical_names[index],
@@ -450,6 +479,11 @@ OseoResult oseo_global_object_create(
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < binding_count;
          index += 1u) {
+        oseo_context_location(
+            context,
+            binding_lines[index],
+            binding_columns[index]
+        );
         result = oseo_string_from_units(
             context,
             names[index],

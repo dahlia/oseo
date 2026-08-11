@@ -132,12 +132,32 @@ test("carries restricted Script lexical names to the global record", () => {
     sourceId: "restricted-global-lexical.ts",
   });
   assert.deepEqual(result.diagnostics, []);
-  assert.deepEqual(result.mir?.globalLexicalNames, [
-    "undefined",
-    "NaN",
-    "Infinity",
-  ]);
+  const lexicalNames = result.mir?.globalLexicalNames ?? [];
+  assert.deepEqual(
+    lexicalNames.map((entry) => entry.name),
+    ["undefined", "NaN", "Infinity"],
+  );
+  assert.deepEqual(
+    lexicalNames.map((entry) => entry.range.start),
+    [
+      { column: 5, line: 1 },
+      { column: 22, line: 1 },
+      { column: 31, line: 1 },
+    ],
+  );
   assert.deepEqual(result.mir?.globalObjectBindings, []);
+});
+
+test("keeps dynamic Function source closed after a property write", () => {
+  const result = compileSource(babelFrontend, {
+    source: "this.Function = function () {}; Function('return 1');\n",
+    sourceId: "dynamic-function-after-global-write.js",
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Function constructor requires dynamic source/u,
+  );
 });
 
 test("keeps an intrinsic global name usable inside module code", () => {

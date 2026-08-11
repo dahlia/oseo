@@ -3833,7 +3833,12 @@ mutation. A declaration over an existing configurable property retains the
 property as Object Environment Record storage, so deletion, accessors, and
 later descriptor changes remain visible through the identifier. Module and
 function-local declarations remain declarative bindings, and the node does not
-expose the global object through a `globalThis` binding. Fixed native and
+expose the global object through a `globalThis` binding. Every admitted
+configurable constructor global uses that same property-owned identifier path,
+including reads and writes after an object-property change and the
+ReferenceError or `typeof` result after deletion. HIR and MIR retain each
+global declaration's source range, so restricted-property and declaration
+permission failures report the declaration that failed. Fixed native and
 generated differential evidence at seed `0x60003d00` covers both
 specialization policies, forced collection at every safepoint, descriptor
 identity, intrinsic collisions, strict and non-strict writes, deletion,
@@ -3847,7 +3852,7 @@ on the separately owned `Array` global or Module import and export parsing.
 Dynamic-source and closed-world unresolved-name cases keep their explicit
 boundaries. The manifest remains at 7,985 paths with 5,288 passes, 1,364
 expected negatives, and 1,333 unsupported profile features. The follow-up
-runtime ABI moves to `oseo-runtime-m5-58` without changing the graph's
+runtime ABI moves to `oseo-runtime-m5-59` without changing the graph's
 orchestration state.
 
 

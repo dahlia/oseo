@@ -576,8 +576,9 @@ main();
     specialization: {
       genericCallsDisabled: 5,
       genericCallsEnabled: 5,
-      hits: 2,
-      misses: 15,
+      // The shared Symbol read observes one shape miss and two cache hits.
+      hits: 4,
+      misses: 16,
       overflowMisses: 0,
     },
   },

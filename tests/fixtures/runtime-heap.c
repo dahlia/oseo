@@ -1124,8 +1124,11 @@ static void test_global_object_bindings(
     static const uint16_t frozen_units[] = {'f', 'r', 'o', 'z', 'e', 'n'};
     static const uint16_t *const names[] = {answer_units, frozen_units};
     static const size_t lengths[] = {6u, 6u};
+    static const size_t declaration_lines[] = {12u, 13u};
+    static const size_t declaration_columns[] = {5u, 5u};
     static const size_t binding_ids[] = {0u, 1u};
     static const bool functions[] = {false, false};
+    static const bool redeclared_function[] = {true};
     roots[0] = require_normal(oseo_environment_create(context, 2u));
     for (size_t index = 0u; index < 2u; index += 1u) {
         roots[1] = require_normal(oseo_cell_create(context, oseo_number(1.0)));
@@ -1140,9 +1143,13 @@ static void test_global_object_bindings(
             0u,
             NULL,
             NULL,
+            NULL,
+            NULL,
             2u,
             names,
             lengths,
+            declaration_lines,
+            declaration_columns,
             binding_ids,
             functions
         )
@@ -1179,6 +1186,60 @@ static void test_global_object_bindings(
     oseo_property_cache_update(roots[2], roots[4], &cache);
     assert(oseo_property_cache_matches(roots[2], &cache));
     assert(oseo_property_cache_load(roots[2], &cache) == oseo_number(7.0));
+    /* A later Script function declaration reuses the first Script's cell,
+     * restores the global-function descriptor, and invalidates caches for
+     * the changed global-object shape. */
+    roots[5] = require_normal(oseo_environment_create(context, 1u));
+    roots[6] = require_normal(oseo_cell_create(context, oseo_number(8.0)));
+    (void)require_normal(oseo_environment_set(
+        context, roots[5], 0u, roots[6]
+    ));
+    (void)require_normal(oseo_global_object_create(
+        context,
+        roots[5],
+        0u,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        1u,
+        names,
+        lengths,
+        declaration_lines,
+        declaration_columns,
+        binding_ids,
+        redeclared_function
+    ));
+    assert(!oseo_property_cache_matches(roots[2], &cache));
+    roots[6] = require_normal(oseo_environment_get(context, roots[5], 0u));
+    roots[7] = require_normal(oseo_environment_get(context, roots[0], 0u));
+    assert(roots[6] == roots[7]);
+    (void)require_normal(oseo_cell_set(context, roots[6], oseo_number(8.0)));
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(8.0)
+    );
+    OseoValue descriptor_arguments[2] = {roots[2], roots[3]};
+    roots[6] = require_normal(oseo_object_builtin_get_own_property_descriptor(
+        context, 2u, descriptor_arguments
+    ));
+    roots[7] = make_text(context, "configurable");
+    assert(
+        require_normal(oseo_object_get(context, roots[6], roots[7])) ==
+        oseo_boolean(false)
+    );
+    roots[7] = make_text(context, "enumerable");
+    assert(
+        require_normal(oseo_object_get(context, roots[6], roots[7])) ==
+        oseo_boolean(true)
+    );
+    roots[7] = make_text(context, "writable");
+    assert(
+        require_normal(oseo_object_get(context, roots[6], roots[7])) ==
+        oseo_boolean(true)
+    );
+    roots[1] = require_normal(oseo_environment_get(context, roots[0], 0u));
+    (void)require_normal(oseo_cell_set(context, roots[1], oseo_number(3.0)));
     /* The property is writable, enumerable, and non-configurable, so a
      * delete reports failure and changes nothing. */
     assert(
@@ -1267,6 +1328,8 @@ static void test_global_object_bindings(
     static const size_t infinity_length[] = {8u};
     static const size_t blocked_length[] = {7u};
     static const size_t object_length[] = {6u};
+    static const size_t declaration_line[] = {37u};
+    static const size_t declaration_column[] = {5u};
     static const size_t first_binding[] = {0u};
     static const bool var_declaration[] = {false};
     static const bool function_declaration[] = {true};
@@ -1304,7 +1367,11 @@ static void test_global_object_bindings(
         1u,
         undefined_name,
         undefined_length,
+        declaration_line,
+        declaration_column,
         0u,
+        NULL,
+        NULL,
         NULL,
         NULL,
         NULL,
@@ -1316,9 +1383,13 @@ static void test_global_object_bindings(
         0u,
         NULL,
         NULL,
+        NULL,
+        NULL,
         1u,
         infinity_name,
         infinity_length,
+        declaration_line,
+        declaration_column,
         first_binding,
         function_declaration
     ).status == OSEO_STATUS_THROW);
@@ -1328,9 +1399,13 @@ static void test_global_object_bindings(
         0u,
         NULL,
         NULL,
+        NULL,
+        NULL,
         1u,
         undefined_name,
         undefined_length,
+        declaration_line,
+        declaration_column,
         first_binding,
         var_declaration
     ));
@@ -1357,9 +1432,13 @@ static void test_global_object_bindings(
         0u,
         NULL,
         NULL,
+        NULL,
+        NULL,
         1u,
         object_name,
         object_length,
+        declaration_line,
+        declaration_column,
         first_binding,
         var_declaration
     ));
@@ -1386,9 +1465,13 @@ static void test_global_object_bindings(
         0u,
         NULL,
         NULL,
+        NULL,
+        NULL,
         1u,
         blocked_name,
         blocked_length,
+        declaration_line,
+        declaration_column,
         first_binding,
         var_declaration
     ).status == OSEO_STATUS_THROW);
@@ -1402,9 +1485,13 @@ static void test_global_object_bindings(
         0u,
         NULL,
         NULL,
+        NULL,
+        NULL,
         1u,
         undefined_name,
         undefined_length,
+        declaration_line,
+        declaration_column,
         first_binding,
         var_declaration
     ));

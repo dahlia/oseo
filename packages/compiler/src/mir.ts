@@ -68,6 +68,12 @@ export interface MirGlobalBinding {
   readonly name: string;
 }
 
+/** One source-located Script lexical name checked against the global object. */
+export interface MirGlobalLexicalName {
+  readonly name: string;
+  readonly range: SourceRange;
+}
+
 /**
  * One global-object property and the declaration that creates it. A
  * backend passes the declaration kind through so the runtime can apply
@@ -76,6 +82,7 @@ export interface MirGlobalBinding {
  */
 export interface MirGlobalObjectBinding extends MirGlobalBinding {
   readonly declaration: "function" | "var";
+  readonly range: SourceRange;
 }
 
 /** One control destination and the cleanup nesting active at that point. */
@@ -437,7 +444,7 @@ export interface MirProgram {
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
   /** Script lexical names checked against restricted global properties. */
-  readonly globalLexicalNames?: readonly string[];
+  readonly globalLexicalNames?: readonly MirGlobalLexicalName[];
   /**
    * The script bindings the global object also binds as properties, in
    * GlobalDeclarationInstantiation order. A backend installs them once,
