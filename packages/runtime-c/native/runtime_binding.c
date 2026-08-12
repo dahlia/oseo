@@ -399,6 +399,7 @@ static OseoResult global_this_object(OseoContext *context) {
     }
     oseo_roots_pop(context, &frame);
     return result;
+}
 
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {
     if (is_nullish(receiver)) return global_this_object(context);

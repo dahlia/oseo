@@ -692,9 +692,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus eleven admitted constructor
-            // property names shared by every Script.
-            assert.equal(native.counters.allocations, 27);
+            // value-property allocations plus twelve admitted constructor
+            // property names shared by every Script, String being the one
+            // this node admits.
+            assert.equal(native.counters.allocations, 28);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {
