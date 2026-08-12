@@ -34,8 +34,10 @@ interface ArrayConstructorCase {
     | "inherited-null"
     | "inherited-undefined"
     | "ordinary"
+    | "own-callable"
     | "own-null"
     | "own-undefined";
+  readonly iteratorRedefinition: "callable" | "null" | "undefined";
   readonly length: number;
   readonly marker: number;
   readonly offset: number;
@@ -45,12 +47,14 @@ const caseArbitrary: fc.Arbitrary<ArrayConstructorCase> = fc.record({
   items: fc.array(fc.integer({ max: 20, min: -20 }), { maxLength: 4 }),
   iteratorOverride: fc.constantFrom(
     "ordinary",
+    "own-callable",
     "own-undefined",
     "own-null",
     "inherited-undefined",
     "inherited-null",
     "inherited-callable",
   ),
+  iteratorRedefinition: fc.constantFrom("callable", "null", "undefined"),
   length: fc.integer({ max: 8, min: 0 }),
   marker: fc.integer({ max: 20, min: -20 }),
   offset: fc.integer({ max: 20, min: -20 }),
@@ -72,24 +76,28 @@ function argumentsSource(items: readonly number[]): string {
 /** Print one generated program whose expected output is modeled separately. */
 function printCase(testCase: ArrayConstructorCase): string {
   const items = argumentsSource(testCase.items);
-  const iteratorValue =
-    testCase.iteratorOverride === "inherited-callable"
-      ? "function () { return { next: function () { " +
-        "return { done: true }; } }; }"
-      : testCase.iteratorOverride.endsWith("null")
-        ? "null"
-        : "undefined";
+  const iteratorValue = testCase.iteratorOverride.endsWith("callable")
+    ? "function () { return { next: function () { " +
+      "return { done: true }; } }; }"
+    : testCase.iteratorOverride.endsWith("null")
+      ? "null"
+      : "undefined";
   const iteratorOverride =
     testCase.iteratorOverride === "ordinary"
       ? ""
       : `Object.defineProperty(${
           testCase.iteratorOverride.startsWith("own-")
-            ? 'Object.getPrototypeOf(Object(""))'
+            ? "stringPrototype"
             : "Object.prototype"
         },
   Symbol.iterator,
   { configurable: true, value: ${iteratorValue}, writable: true },
 );`;
+  const redefinitionValue =
+    testCase.iteratorRedefinition === "callable"
+      ? "function () { return { next: function () { " +
+        "return { done: true }; } }; }"
+      : testCase.iteratorRedefinition;
   return `
 const sparse = Array(${testCase.length});
 console.log("sparse", sparse.length, 0 in sparse);
@@ -128,16 +136,35 @@ console.log(
   hinted(${testCase.offset}, 1),
   hinted("${testCase.offset}", 1),
 );
+const stringPrototype = Object.getPrototypeOf(Object(""));
 ${iteratorOverride}
-const fromString = Array.from("A💩B");
-console.log(
-  "string",
-  fromString.length,
-  fromString[0] === "A",
-  fromString[1] === "💩",
-  fromString[1] + fromString[2] === "💩",
-  fromString[3] === "B",
-);
+function observeString(label, input) {
+  const result = Array.from(input);
+  console.log(
+    label,
+    result.length,
+    result[0] === "A",
+    result[1] === "💩",
+    result[1] + result[2] === "💩",
+    result[3] === "B",
+  );
+}
+observeString("string primitive", "A💩B");
+observeString("string wrapper", Object("A💩B"));
+delete Object.prototype[Symbol.iterator];
+delete stringPrototype[Symbol.iterator];
+observeString("deleted primitive", "A💩B");
+observeString("deleted wrapper", Object("A💩B"));
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  value: ${redefinitionValue},
+  writable: true,
+});
+observeString("redefined primitive", "A💩B");
+observeString("redefined wrapper", Object("A💩B"));
+delete stringPrototype[Symbol.iterator];
+observeString("deleted again primitive", "A💩B");
+observeString("deleted again wrapper", Object("A💩B"));
 `;
 }
 
@@ -151,9 +178,16 @@ function expected(testCase: ArrayConstructorCase): string {
   const mapped = testCase.items.map(
     (value, index) => value + testCase.offset + index,
   );
-  const stringObservation = testCase.iteratorOverride.startsWith("own-")
-    ? "string 4 true false true true"
-    : "string 3 true true false false";
+  const codePoints = "3 true true false false";
+  const codeUnits = "4 true false true true";
+  const emptyIterator = "0 false false false false";
+  const initial = testCase.iteratorOverride.startsWith("own-")
+    ? testCase.iteratorOverride === "own-callable"
+      ? emptyIterator
+      : codeUnits
+    : codePoints;
+  const redefined =
+    testCase.iteratorRedefinition === "callable" ? emptyIterator : codeUnits;
   return [
     `sparse ${testCase.length} false`,
     `of ${testCase.items.length} ${displayed(testCase.items).join(" ")}`,
@@ -162,7 +196,14 @@ function expected(testCase: ArrayConstructorCase): string {
     `guard ${testCase.marker}`,
     `guard ${testCase.marker}`,
     `hint ${testCase.offset + 1} ${testCase.offset}1`,
-    stringObservation,
+    `string primitive ${initial}`,
+    `string wrapper ${initial}`,
+    `deleted primitive ${codeUnits}`,
+    `deleted wrapper ${codeUnits}`,
+    `redefined primitive ${redefined}`,
+    `redefined wrapper ${redefined}`,
+    `deleted again primitive ${codeUnits}`,
+    `deleted again wrapper ${codeUnits}`,
     "",
   ].join("\n");
 }
@@ -279,15 +320,16 @@ test(
               ],
         domain:
           "zero to four bounded integer elements, a valid array length, " +
-          "a mapper offset, an ordinary, callable inherited, or nullish own " +
-          "or inherited string iterator property, a false numeric hint, " +
-          "and one shape miss",
+          "a mapper offset, primitive and wrapper strings, an ordinary, " +
+          "deleted, callable, or nullish string iterator state, a callable " +
+          "or nullish redefinition, a false numeric hint, and one shape " +
+          "miss",
         numRuns: 12,
         profile: "M5 Array constructor and statics",
         seed: 0x6000_3f00,
         sizeLimit:
           "four elements, length eight, one mapping pass, and two guarded " +
-          "reads, plus one three-code-point string conversion",
+          "reads, plus primitive and wrapper string iterator transitions",
         timeLimitMilliseconds: 180_000,
       },
     );

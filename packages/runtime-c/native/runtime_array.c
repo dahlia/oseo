@@ -257,6 +257,8 @@ static OseoResult array_create_with_prototype(
     array->number_value = oseo_undefined();
     array->primitive_data = false;
     array->primitive_value = oseo_undefined();
+    array->virtual_string_iterator = false;
+    array->virtual_string_iterator_configurable = false;
     array->array_iterator = false;
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;
@@ -703,14 +705,15 @@ static OseoResult array_from_array_like(
 }
 
 /*
- * Primitive strings do not yet expose the separate M5b string iterator.
- * Array.from still consumes one whose own iterator property is absent by
- * Unicode code point rather than by the code-unit indexed properties used by
- * the array-like branch. This virtual default shadows inherited properties.
+ * Strings do not yet expose the separate M5b string iterator. Array.from
+ * still consumes a primitive or wrapper that reaches the untouched virtual
+ * default by Unicode code point rather than by the code-unit indexed
+ * properties used by the array-like branch.
  */
 static OseoResult array_from_string(
     OseoContext *context,
-    OseoRootFrame *frame
+    OseoRootFrame *frame,
+    OseoValue string_value
 ) {
     OseoResult result = function_is_constructible(frame->slots[0])
         ? construct_function(context, frame->slots[0], 0u, NULL)
@@ -719,7 +722,7 @@ static OseoResult array_from_string(
     size_t offset = 0u;
     double index = 0.0;
     while (result.status == OSEO_STATUS_NORMAL) {
-        OseoString *source = string_object(frame->slots[1]);
+        OseoString *source = string_object(string_value);
         if (offset >= source->length) break;
         size_t element_length = 1u;
         uint16_t first = source->units[offset];
@@ -769,6 +772,59 @@ static OseoResult array_from_string(
     return result;
 }
 
+/*
+ * Recover the [[StringData]] used by a primitive string or String wrapper.
+ * Other primitive wrappers also set `primitive_data`, so the stored value's
+ * tag remains the brand check.
+ */
+static bool array_from_string_value(
+    OseoValue source,
+    OseoValue *string_value
+) {
+    if (is_string(source)) {
+        *string_value = source;
+        return true;
+    }
+    if (!is_object(source)) return false;
+    OseoOrdinaryObject *object = ordinary_object(source);
+    if (!object->primitive_data || !is_string(object->primitive_value)) {
+        return false;
+    }
+    *string_value = object->primitive_value;
+    return true;
+}
+
+/*
+ * The virtual default participates in the wrapper's ordinary prototype walk.
+ * A nearer actual property wins, while the untouched default on
+ * %String.prototype% shadows any property inherited from Object.prototype.
+ */
+static bool array_from_uses_virtual_string_iterator(
+    OseoValue source,
+    OseoValue string_prototype,
+    OseoValue iterator_key
+) {
+    OseoOrdinaryObject *prototype = ordinary_object(string_prototype);
+    if (!prototype->virtual_string_iterator) return false;
+    if (is_string(source)) {
+        return oseo_internal_own_property_index(
+            prototype,
+            iterator_key
+        ) == SIZE_MAX;
+    }
+    OseoValue current = source;
+    while (is_object(current)) {
+        OseoOrdinaryObject *object = ordinary_object(current);
+        if (oseo_internal_own_property_index(object, iterator_key) !=
+            SIZE_MAX) {
+            return false;
+        }
+        if (current == string_prototype) return true;
+        current = object->prototype;
+    }
+    return false;
+}
+
 static OseoResult array_from(
     OseoContext *context,
     OseoValue receiver,
@@ -789,7 +845,8 @@ static OseoResult array_from(
     frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
     frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
     frame.slots[3] = builtin_argument(argument_count, arguments, 2u);
-    bool has_string_iterator_property = false;
+    bool has_string_value = false;
+    bool uses_virtual_string_iterator = false;
     if (tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED &&
         !is_function(frame.slots[2])) {
         result = type_error(context, "Array.from mapfn is not callable.");
@@ -801,25 +858,29 @@ static OseoResult array_from(
         );
         frame.slots[4] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && is_string(frame.slots[1])) {
+    if (result.status == OSEO_STATUS_NORMAL) {
+        has_string_value = array_from_string_value(
+            frame.slots[1],
+            &frame.slots[11]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && has_string_value) {
         result = oseo_internal_primitive_wrapper_prototype(
             context,
             OSEO_INTRINSIC_STRING_PROTOTYPE
         );
         frame.slots[10] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_has_own(
-                context,
-                frame.slots[10],
-                frame.slots[4]
-            );
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            has_string_iterator_property = oseo_to_boolean(result.value);
+            uses_virtual_string_iterator =
+                array_from_uses_virtual_string_iterator(
+                    frame.slots[1],
+                    frame.slots[10],
+                    frame.slots[4]
+                );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        (!is_string(frame.slots[1]) || has_string_iterator_property)) {
+        !uses_virtual_string_iterator) {
         result = oseo_object_get(
             context,
             frame.slots[1],
@@ -828,9 +889,8 @@ static OseoResult array_from(
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        if (is_string(frame.slots[1]) &&
-            !has_string_iterator_property) {
-            result = array_from_string(context, &frame);
+        if (uses_virtual_string_iterator) {
+            result = array_from_string(context, &frame, frame.slots[11]);
         } else {
             result = is_nullish(frame.slots[4])
                 ? array_from_array_like(context, &frame)

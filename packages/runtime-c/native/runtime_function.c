@@ -1218,6 +1218,8 @@ OseoResult oseo_function_create(
     function->ordinary.number_value = oseo_undefined();
     function->ordinary.primitive_data = false;
     function->ordinary.primitive_value = oseo_undefined();
+    function->ordinary.virtual_string_iterator = false;
+    function->ordinary.virtual_string_iterator_configurable = false;
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;

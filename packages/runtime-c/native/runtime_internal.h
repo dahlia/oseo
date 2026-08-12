@@ -658,6 +658,10 @@ typedef struct {
     OseoValue primitive_value;
     /* Internal installation state independent of mutable own properties. */
     bool primitive_wrapper_methods_initialized;
+    /* True only while %String.prototype%'s virtual iterator is untouched. */
+    bool virtual_string_iterator;
+    /* The virtual iterator becomes fixed when its prototype is sealed. */
+    bool virtual_string_iterator_configurable;
     /* Array iterator state: a flagged object backs a default array's
      * values iterator, tracing the array and stepping the index. */
     bool array_iterator;

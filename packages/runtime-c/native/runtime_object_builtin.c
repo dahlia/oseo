@@ -399,6 +399,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
             if (result.status == OSEO_STATUS_NORMAL) {
                 prototype = ordinary_object(context->intrinsics[intrinsic]);
                 prototype->primitive_value = result.value;
+                prototype->virtual_string_iterator = true;
+                prototype->virtual_string_iterator_configurable = true;
             }
         } else {
             result = oseo_bigint_literal(context, "0", 10u);
@@ -596,6 +598,9 @@ static OseoResult object_set_integrity_level(
 ) {
     OseoOrdinaryObject *object = ordinary_object(object_value);
     object->extensible = false;
+    if (object->virtual_string_iterator) {
+        object->virtual_string_iterator_configurable = false;
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;

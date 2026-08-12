@@ -174,6 +174,14 @@ while (turn < 2) {
 }
 
 const stringPrototype = Object.getPrototypeOf(Object(""));
+const fromStringWrapper = Array.from(Object("A💩B"));
+console.log(
+  "from string wrapper",
+  fromStringWrapper.length,
+  fromStringWrapper[0] === "A",
+  fromStringWrapper[1] === "💩",
+  fromStringWrapper[2] === "B",
+);
 for (const iteratorValue of [undefined, null]) {
   Object.defineProperty(Object.prototype, Symbol.iterator, {
     configurable: true,
@@ -205,6 +213,51 @@ console.log(
   fromInheritedAccessor[1] === "💩",
   inheritedIteratorReads,
 );
+delete Object.prototype[Symbol.iterator];
+console.log(
+  "delete virtual iterator",
+  delete stringPrototype[Symbol.iterator],
+);
+for (const stringValue of ["A💩B", Object("A💩B")]) {
+  const fromDeletedIterator = Array.from(stringValue);
+  console.log(
+    "from deleted iterator",
+    typeof stringValue,
+    fromDeletedIterator.length,
+    fromDeletedIterator[0] === "A",
+    fromDeletedIterator[1] + fromDeletedIterator[2] === "💩",
+    fromDeletedIterator[3] === "B",
+  );
+}
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  value: function () {
+    let done = false;
+    return {
+      next: function () {
+        if (done) return { done: true };
+        done = true;
+        return { done: false, value: "restored" };
+      },
+    };
+  },
+  writable: true,
+});
+for (const stringValue of ["A💩B", Object("A💩B")]) {
+  const fromRedefinedIterator = Array.from(stringValue);
+  console.log(
+    "from redefined iterator",
+    typeof stringValue,
+    fromRedefinedIterator.length,
+    fromRedefinedIterator[0],
+  );
+}
+console.log(
+  "delete redefined iterator",
+  delete stringPrototype[Symbol.iterator],
+  Array.from("A💩B").length,
+  Array.from(Object("A💩B")).length,
+);
 for (const iteratorValue of [undefined, null]) {
   Object.defineProperty(stringPrototype, Symbol.iterator, {
     configurable: true,
@@ -223,4 +276,21 @@ for (const iteratorValue of [undefined, null]) {
 }
 `,
   },
+  ...["freeze", "seal"].map(
+    (integrity): Fixture => ({
+      globalScriptReference: true,
+      name: `array-constructor-string-${integrity}`,
+      source: `
+const stringPrototype = Object.getPrototypeOf(Object(""));
+Object.${integrity}(stringPrototype);
+console.log(
+  "fixed iterator",
+  "${integrity}",
+  delete stringPrototype[Symbol.iterator],
+  Array.from("A💩B").length,
+  Array.from(Object("A💩B")).length,
+);
+`,
+    }),
+  ),
 ];

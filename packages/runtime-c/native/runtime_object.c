@@ -91,6 +91,8 @@ static OseoResult object_create(
     object->primitive_data = false;
     object->primitive_value = oseo_undefined();
     object->primitive_wrapper_methods_initialized = false;
+    object->virtual_string_iterator = false;
+    object->virtual_string_iterator_configurable = false;
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;

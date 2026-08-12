@@ -461,8 +461,28 @@ OseoResult oseo_object_delete(
             : normal(oseo_boolean(false));
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
+    bool string_iterator =
+        object_value ==
+            context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] &&
+        key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR];
     size_t index = oseo_internal_own_property_index(object, key);
-    if (index == SIZE_MAX) return normal(oseo_boolean(true));
+    if (index == SIZE_MAX) {
+        if (string_iterator && object->virtual_string_iterator) {
+            if (!object->virtual_string_iterator_configurable) {
+                return strict
+                    ? type_error(
+                        context,
+                        "Cannot delete a non-configurable property."
+                    )
+                    : normal(oseo_boolean(false));
+            }
+            object->virtual_string_iterator = false;
+            object->dictionary = true;
+            object->shape_id = context->next_shape_id;
+            context->next_shape_id += 1u;
+        }
+        return normal(oseo_boolean(true));
+    }
     if (!object->properties[index].attributes.configurable) {
         return strict
             ? type_error(context, "Cannot delete a non-configurable property.")
@@ -490,6 +510,7 @@ OseoResult oseo_object_delete(
         }
     }
     (void)oseo_internal_remove_property(object, index);
+    if (string_iterator) object->virtual_string_iterator = false;
     object->dictionary = true;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
