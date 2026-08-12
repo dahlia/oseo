@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 8,791 reviewed cases: 6,113 passes, 1,364
-expected negatives, and 1,314 unsupported profile features. It records no
+The current manifest contains 8,936 reviewed cases: 6,321 passes, 1,364
+expected negatives, and 1,251 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3430,15 +3430,16 @@ object carries one non-writable, non-configurable, enumerable own property
 per UTF-16 code unit and a non-writable, non-enumerable, non-configurable
 `length`, and %String.prototype% is itself such an object over the empty
 String, so `Object.prototype.toString` reports `[object String]` for either.
+Sixteen selected ES5-era methods are materialized as ordinary boundary
+functions with their specified descriptors. Calling one still reports the
+owned unadmitted-method boundary until its String prototype node lands.
 `String.fromCharCode` truncates each converted argument with `ToUint16` in
 argument order; `String.fromCodePoint` rejects a non-integral, negative, or
 above-`0x10FFFF` code point with a `RangeError` at the argument that produced
 it and encodes an astral code point as a surrogate pair, while a lone
 surrogate stays exactly the code unit it names; and `String.raw` follows the
 specified order of `ToObject`, the `raw` read, LengthOfArrayLike, and the
-alternating literal and substitution conversions. `String.prototype` still
-carries only the deferred `toString`, `valueOf`, and `indexOf` placeholders,
-so its methods remain a boundary the String prototype nodes own. Fixed native
+alternating literal and substitution conversions. Fixed native
 and generated differential evidence at seed `0x60004000` covers both
 specialization policies, collection forced at every safepoint, false hints,
 deliberate shape-guard misses, generic fallback, lone surrogates, astral code
@@ -3447,14 +3448,16 @@ reviewed subset admits the `String.fromCodePoint` feature tag so that static
 executes its upstream cases instead of reporting an unadmitted feature. Of
 the 150 paths under the node's four inventory roots, 145 are reviewed: 114
 pass and 31 retain explicit prerequisite boundaries. The remaining five call
-`String.prototype.charCodeAt`, which no admitted node defines yet.
-Thirty-five previously reviewed cases also move from unsupported to pass
-because a real `String` value satisfies their prerequisites. The manifest
-counts are regenerated against the current reviewed subset with no semantic,
-harness, or infrastructure failures. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, and zero-override policy are
-unchanged. The materialized constructor adds no generated-code entry point and
-moves the runtime ABI to `oseo-runtime-m5-62` without changing the graph's
+the materialized `String.prototype.charCodeAt` boundary, whose behavior no
+admitted prototype-method node implements yet.
+Ninety-four previously reviewed cases also move from unsupported to pass
+because a real `String` value and the descriptor-complete boundary for those
+methods satisfy their prerequisites. The manifest reaches 8,936 cases: 6,321
+passes, 1,364 expected negatives, and 1,251 unsupported profile features with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override policy
+are unchanged. The materialized constructor adds no generated-code entry point
+and moves the runtime ABI to `oseo-runtime-m5-62` without changing the graph's
 orchestration state.
 
 

@@ -11,6 +11,10 @@ const prototypeDescriptor = Object.getOwnPropertyDescriptor(
   "prototype",
 );
 const rawDescriptor = Object.getOwnPropertyDescriptor(String, "raw");
+const trimDescriptor = Object.getOwnPropertyDescriptor(
+  String.prototype,
+  "trim",
+);
 console.log(
   "descriptors",
   prototypeDescriptor.writable,
@@ -19,6 +23,9 @@ console.log(
   rawDescriptor.writable,
   rawDescriptor.enumerable,
   rawDescriptor.configurable,
+  trimDescriptor.writable,
+  trimDescriptor.enumerable,
+  trimDescriptor.configurable,
 );
 console.log(
   "statics",

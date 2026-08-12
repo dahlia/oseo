@@ -505,12 +505,15 @@ test("populates the realm-owned String intrinsic cluster", () => {
     assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
   }
   for (const property of [
+    "charAt",
+    "charCodeAt",
     "constructor",
     "fromCharCode",
     "fromCodePoint",
     "length",
     "raw",
     "String",
+    "trim",
   ]) {
     assert.match(stringSource, new RegExp(`"${property}"`, "u"));
   }

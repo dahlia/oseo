@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 8,791
-reviewed cases: 6,113 passes, 1,364 expected negatives, and 1,314 unsupported
+honest unsupported classifications. The current reviewed manifest records 8,936
+reviewed cases: 6,321 passes, 1,364 expected negatives, and 1,251 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 77 indexed records in the normative
+M5a is complete. The 78 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 6,113
-passes across 8,791 paths, and the property inventory records 76 domains,
-76 seeds, and an ordinary case budget of 3,402.
+the M5b and M5c dependency order below. The reviewed manifest now records 6,321
+passes across 8,936 paths, and the property inventory records 77 domains,
+77 seeds, and an ordinary case budget of 3,414.
 
 
 M5a implementation history
@@ -3907,6 +3907,10 @@ non-configurable, enumerable property per UTF-16 code unit and a
 non-writable, non-enumerable, non-configurable `length`.
 `%String.prototype%` is itself such an object over the empty String, so
 `Object.prototype.toString` reports `[object String]` for either.
+Sixteen selected ES5-era methods remain deferred behavior, but their ordinary
+function properties carry the specified descriptors and report the owned M5b
+boundary when called, matching the Array constructor checkpoint's boundary
+functions.
 `String.fromCharCode` applies `ToUint16` in argument order,
 `String.fromCodePoint` validates each code point and encodes an astral one as
 a surrogate pair while preserving a lone surrogate, and `String.raw` follows
@@ -3919,14 +3923,16 @@ replacement and deletion. The reviewed subset admits the
 `String.fromCodePoint` feature tag, so that static executes its upstream
 cases rather than reporting an unadmitted feature. Of the 150 paths under the
 node's four inventory roots, 145 are reviewed: 114 pass and 31 retain
-explicit prerequisite boundaries; the remaining five call
-`String.prototype.charCodeAt`, which no admitted node defines yet.
-Thirty-five previously reviewed cases also move from unsupported to pass
-because a real `String` value satisfies their prerequisites. The manifest
-counts are regenerated against the current reviewed subset. Materializing the
-intrinsic adds no generated-code entry point and moves the runtime ABI to
-`oseo-runtime-m5-62`
-without changing the graph's orchestration state.
+explicit prerequisite boundaries; the remaining five call the materialized
+`String.prototype.charCodeAt` boundary, whose behavior no admitted
+prototype-method node implements yet.
+Ninety-four previously reviewed cases also move from unsupported to pass
+because a real `String` value and the descriptor-complete boundary for those
+methods satisfy their prerequisites. The manifest moves to 8,936 paths with
+6,321 passes, 1,364 expected negatives, and 1,251 unsupported profile features.
+Materializing the intrinsic adds no generated-code entry point and moves the
+runtime ABI to `oseo-runtime-m5-62` without changing the graph's orchestration
+state.
 
 
 Ahead-of-time challenge boundary

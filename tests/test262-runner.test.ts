@@ -895,6 +895,25 @@ null.item;
     "unsupported-profile-feature",
   );
 
+  const deferredStringPrototype = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "String prototype method is not admitted in this M5b node.\n",
+    ),
+  );
+  assert.equal(
+    deferredStringPrototype.observation.unsupportedCapability,
+    "string-prototype-method",
+  );
+  assert.equal(
+    deferredStringPrototype.classification,
+    "unsupported-profile-feature",
+  );
+
   const descriptorMap = await executeTest262Case(
     source,
     parsed,

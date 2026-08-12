@@ -401,16 +401,6 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         prototype->primitive_data = true;
         if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE) {
             prototype->primitive_value = oseo_boolean(false);
-        } else if (intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE) {
-            result = oseo_internal_allocate_string(context, NULL, 0u);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                prototype = ordinary_object(context->intrinsics[intrinsic]);
-                prototype->primitive_value = result.value;
-                prototype->virtual_string_iterator = true;
-                prototype->virtual_string_iterator_configurable = true;
-                prototype->virtual_string_iterator_enumerable = false;
-                prototype->virtual_string_iterator_writable = true;
-            }
         } else {
             result = oseo_bigint_literal(context, "0", 10u);
             if (result.status == OSEO_STATUS_NORMAL) {

@@ -449,6 +449,9 @@ the new target produced with `[[StringData]]` and gives it the exotic own
 properties, meaning one non-writable, non-configurable, enumerable index
 property per code unit and a non-writable, non-enumerable, non-configurable
 `length`. `%String.prototype%` is itself such an object over the empty String.
+Sixteen selected ES5-era methods are ordinary boundary functions with their
+specified descriptors; calls remain unsupported until their String prototype
+nodes land.
 The generated-code ABI gains no entry point; the new code range and intrinsic
 slots are runtime-internal.
 

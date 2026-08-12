@@ -238,11 +238,9 @@ test("reads the replaceable String value through its global property", () => {
     source: "delete String;",
     sourceId: "delete-string.ts",
   });
-  assert.equal(deleted.mir, undefined);
-  assert.match(
-    deleted.diagnostics[0]?.message ?? "",
-    /Deleting runtime intrinsic binding 'String'/u,
-  );
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["String"\]/u);
 
   const withWrite = compileSource(babelFrontend, {
     source: "with ({}) { String = 1; }",

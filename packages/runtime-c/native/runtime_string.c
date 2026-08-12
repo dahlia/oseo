@@ -572,6 +572,13 @@ OseoResult oseo_internal_string_builtin_dispatch(
     if (code_id == OSEO_STRING_RAW_CODE_ID) {
         return string_raw(context, argument_count, arguments);
     }
+    if (code_id == OSEO_STRING_UNADMITTED_METHOD_CODE_ID) {
+        return failure(
+            context,
+            "OSEO2001",
+            "String prototype method is not admitted in this M5b node."
+        );
+    }
     return oseo_unknown_function(context, code_id);
 }
 
@@ -669,6 +676,10 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         OseoOrdinaryObject *prototype = ordinary_object(frame.slots[0]);
         prototype->primitive_data = true;
         prototype->primitive_value = frame.slots[1];
+        prototype->virtual_string_iterator = true;
+        prototype->virtual_string_iterator_configurable = true;
+        prototype->virtual_string_iterator_enumerable = false;
+        prototype->virtual_string_iterator_writable = true;
         context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] = frame.slots[0];
         /*
          * The marker slot is claimed before the remaining allocations so
@@ -688,6 +699,63 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
             frame.slots[0],
             true
         );
+    }
+    static const char *const unadmitted_names[] = {
+        "charAt",
+        "charCodeAt",
+        "concat",
+        "lastIndexOf",
+        "localeCompare",
+        "match",
+        "replace",
+        "search",
+        "slice",
+        "split",
+        "substring",
+        "toLocaleLowerCase",
+        "toLocaleUpperCase",
+        "toLowerCase",
+        "toUpperCase",
+        "trim",
+    };
+    static const size_t unadmitted_lengths[] = {
+        1u,
+        1u,
+        1u,
+        1u,
+        1u,
+        1u,
+        2u,
+        1u,
+        2u,
+        2u,
+        2u,
+        0u,
+        0u,
+        0u,
+        0u,
+        0u,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 16u;
+         index += 1u) {
+        result = create_string_function(
+            context,
+            OSEO_STRING_UNADMITTED_METHOD_CODE_ID,
+            unadmitted_names[index],
+            unadmitted_lengths[index],
+            OSEO_FUNCTION_INTERNAL
+        );
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_string_property(
+                context,
+                frame.slots[0],
+                unadmitted_names[index],
+                frame.slots[1],
+                (OseoPropertyAttributes){true, false, true, false}
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = create_string_function(

@@ -158,6 +158,22 @@ for (const [name, source] of [
   );
 }
 
+const deferredStringTrim = await runNativeCli(
+  {
+    args: ["deferred-string-trim.ts"],
+    source: '"".trim();',
+    sourceId: "deferred-string-trim.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(deferredStringTrim.exitStatus, 1);
+assert.equal(deferredStringTrim.stdout, "");
+assert.match(
+  deferredStringTrim.stderr,
+  /^deferred-string-trim\.ts:1:\d+: error\[OSEO2001\]: String prototype/u,
+);
+
 const deferredObjectAssign = await runNativeCli(
   {
     args: ["deferred-object-assign.ts"],

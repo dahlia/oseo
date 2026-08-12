@@ -335,7 +335,7 @@ test(
           "delete, assignment-target, and strict missing-property sequence",
         numRuns: 12,
         profile: "M5 String intrinsic",
-        seed: 0x6000_3900,
+        seed: 0x6000_4000,
         sizeLimit:
           "one bounded astral code point, two bounded code units, one " +
           "bounded out-of-range code point, at most four raw literal " +

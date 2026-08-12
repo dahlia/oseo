@@ -352,6 +352,8 @@
     (OSEO_STRING_CODE_ID_RANGE_LAST - 2u)
 #define OSEO_STRING_RAW_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_STRING_UNADMITTED_METHOD_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 4u)
 
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)

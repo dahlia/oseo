@@ -530,7 +530,7 @@ property beside the `Object`, `Number`, and `Promise` ones through
 `oseo_internal_install_string_global`.
 
 The materialized value adds no generated-code entry point; `abiVersion` moves
-to `m5-61` for the expanded intrinsic table. The shared primitive component
+to `m5-62` for the expanded intrinsic table. The shared primitive component
 reads the `[[StringData]]` brand through `oseo_internal_string_data`, so
 `Object.prototype.toString` reports `[object String]` for a wrapper. Fixed and
 generated native differential evidence covers both specialization policies,
