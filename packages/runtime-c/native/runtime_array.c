@@ -704,8 +704,9 @@ static OseoResult array_from_array_like(
 
 /*
  * Primitive strings do not yet expose the separate M5b string iterator.
- * Array.from still consumes them by Unicode code point rather than by the
- * code-unit indexed properties used by the array-like branch.
+ * Array.from still consumes one whose own iterator property is absent by
+ * Unicode code point rather than by the code-unit indexed properties used by
+ * the array-like branch. This virtual default shadows inherited properties.
  */
 static OseoResult array_from_string(
     OseoContext *context,
@@ -788,6 +789,7 @@ static OseoResult array_from(
     frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
     frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
     frame.slots[3] = builtin_argument(argument_count, arguments, 2u);
+    bool has_string_iterator_property = false;
     if (tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED &&
         !is_function(frame.slots[2])) {
         result = type_error(context, "Array.from mapfn is not callable.");
@@ -799,7 +801,25 @@ static OseoResult array_from(
         );
         frame.slots[4] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL && is_string(frame.slots[1])) {
+        result = oseo_internal_primitive_wrapper_prototype(
+            context,
+            OSEO_INTRINSIC_STRING_PROTOTYPE
+        );
+        frame.slots[10] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_has_own(
+                context,
+                frame.slots[10],
+                frame.slots[4]
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            has_string_iterator_property = oseo_to_boolean(result.value);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (!is_string(frame.slots[1]) || has_string_iterator_property)) {
         result = oseo_object_get(
             context,
             frame.slots[1],
@@ -808,7 +828,8 @@ static OseoResult array_from(
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        if (is_nullish(frame.slots[4]) && is_string(frame.slots[1])) {
+        if (is_string(frame.slots[1]) &&
+            !has_string_iterator_property) {
             result = array_from_string(context, &frame);
         } else {
             result = is_nullish(frame.slots[4])

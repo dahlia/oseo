@@ -172,6 +172,55 @@ while (turn < 2) {
   if (turn === 0) guarded[0].extra = true;
   turn = turn + 1;
 }
+
+const stringPrototype = Object.getPrototypeOf(Object(""));
+for (const iteratorValue of [undefined, null]) {
+  Object.defineProperty(Object.prototype, Symbol.iterator, {
+    configurable: true,
+    value: iteratorValue,
+    writable: true,
+  });
+  const fromInherited = Array.from("A💩B");
+  console.log(
+    "from inherited iterator",
+    iteratorValue === null ? "null" : "undefined",
+    fromInherited.length,
+    fromInherited[1] === "💩",
+  );
+}
+let inheritedIteratorReads = 0;
+Object.defineProperty(Object.prototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    inheritedIteratorReads = inheritedIteratorReads + 1;
+    return function () {
+      return { next: function () { return { done: true }; } };
+    };
+  },
+});
+const fromInheritedAccessor = Array.from("A💩B");
+console.log(
+  "from inherited accessor",
+  fromInheritedAccessor.length,
+  fromInheritedAccessor[1] === "💩",
+  inheritedIteratorReads,
+);
+for (const iteratorValue of [undefined, null]) {
+  Object.defineProperty(stringPrototype, Symbol.iterator, {
+    configurable: true,
+    value: iteratorValue,
+    writable: true,
+  });
+  const fromCodeUnits = Array.from("A💩B");
+  console.log(
+    "from code units",
+    iteratorValue === null ? "null" : "undefined",
+    fromCodeUnits.length,
+    fromCodeUnits[0] === "A",
+    fromCodeUnits[1] + fromCodeUnits[2] === "💩",
+    fromCodeUnits[3] === "B",
+  );
+}
 `,
   },
 ];

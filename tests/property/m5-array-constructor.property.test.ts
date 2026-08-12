@@ -29,6 +29,13 @@ const { assertAsyncProperty } = await import(
 /** One bounded program covering construction, statics, and a shape miss. */
 interface ArrayConstructorCase {
   readonly items: readonly number[];
+  readonly iteratorOverride:
+    | "inherited-callable"
+    | "inherited-null"
+    | "inherited-undefined"
+    | "ordinary"
+    | "own-null"
+    | "own-undefined";
   readonly length: number;
   readonly marker: number;
   readonly offset: number;
@@ -36,6 +43,14 @@ interface ArrayConstructorCase {
 
 const caseArbitrary: fc.Arbitrary<ArrayConstructorCase> = fc.record({
   items: fc.array(fc.integer({ max: 20, min: -20 }), { maxLength: 4 }),
+  iteratorOverride: fc.constantFrom(
+    "ordinary",
+    "own-undefined",
+    "own-null",
+    "inherited-undefined",
+    "inherited-null",
+    "inherited-callable",
+  ),
   length: fc.integer({ max: 8, min: 0 }),
   marker: fc.integer({ max: 20, min: -20 }),
   offset: fc.integer({ max: 20, min: -20 }),
@@ -57,6 +72,24 @@ function argumentsSource(items: readonly number[]): string {
 /** Print one generated program whose expected output is modeled separately. */
 function printCase(testCase: ArrayConstructorCase): string {
   const items = argumentsSource(testCase.items);
+  const iteratorValue =
+    testCase.iteratorOverride === "inherited-callable"
+      ? "function () { return { next: function () { " +
+        "return { done: true }; } }; }"
+      : testCase.iteratorOverride.endsWith("null")
+        ? "null"
+        : "undefined";
+  const iteratorOverride =
+    testCase.iteratorOverride === "ordinary"
+      ? ""
+      : `Object.defineProperty(${
+          testCase.iteratorOverride.startsWith("own-")
+            ? 'Object.getPrototypeOf(Object(""))'
+            : "Object.prototype"
+        },
+  Symbol.iterator,
+  { configurable: true, value: ${iteratorValue}, writable: true },
+);`;
   return `
 const sparse = Array(${testCase.length});
 console.log("sparse", sparse.length, 0 in sparse);
@@ -95,6 +128,16 @@ console.log(
   hinted(${testCase.offset}, 1),
   hinted("${testCase.offset}", 1),
 );
+${iteratorOverride}
+const fromString = Array.from("A💩B");
+console.log(
+  "string",
+  fromString.length,
+  fromString[0] === "A",
+  fromString[1] === "💩",
+  fromString[1] + fromString[2] === "💩",
+  fromString[3] === "B",
+);
 `;
 }
 
@@ -108,6 +151,9 @@ function expected(testCase: ArrayConstructorCase): string {
   const mapped = testCase.items.map(
     (value, index) => value + testCase.offset + index,
   );
+  const stringObservation = testCase.iteratorOverride.startsWith("own-")
+    ? "string 4 true false true true"
+    : "string 3 true true false false";
   return [
     `sparse ${testCase.length} false`,
     `of ${testCase.items.length} ${displayed(testCase.items).join(" ")}`,
@@ -116,6 +162,7 @@ function expected(testCase: ArrayConstructorCase): string {
     `guard ${testCase.marker}`,
     `guard ${testCase.marker}`,
     `hint ${testCase.offset + 1} ${testCase.offset}1`,
+    stringObservation,
     "",
   ].join("\n");
 }
@@ -232,13 +279,15 @@ test(
               ],
         domain:
           "zero to four bounded integer elements, a valid array length, " +
-          "a mapper offset, a false numeric hint, and one shape miss",
+          "a mapper offset, an ordinary, callable inherited, or nullish own " +
+          "or inherited string iterator property, a false numeric hint, " +
+          "and one shape miss",
         numRuns: 12,
         profile: "M5 Array constructor and statics",
         seed: 0x6000_3f00,
         sizeLimit:
           "four elements, length eight, one mapping pass, and two guarded " +
-          "reads",
+          "reads, plus one three-code-point string conversion",
         timeLimitMilliseconds: 180_000,
       },
     );
