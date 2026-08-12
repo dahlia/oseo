@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 69
+M5a is complete. The normative family records described below inventory 77
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 7,985 reviewed cases: 5,288 passes, 1,364
-expected negatives, and 1,333 unsupported profile features. It records no
+The current manifest contains 8,791 reviewed cases: 6,113 passes, 1,364
+expected negatives, and 1,314 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3395,6 +3395,24 @@ infrastructure failures. The suite revision, 41,091-path inventory,
 manifest schema and vocabulary, and zero-override policy are unchanged. The
 completed collection checkpoint moves the runtime ABI to `oseo-runtime-m5-60`
 without changing the graph's orchestration state.
+
+M5b node `array-constructor` makes `Array` a replaceable intrinsic value and
+completes its realm cluster with length-argument construction,
+`Symbol.species`, `from`, `of`, and `isArray`. Fixed native and generated
+differential evidence at seed `0x60003f00` covers generic constructor
+receivers, iterator closing, descriptors, both specialization policies,
+forced collection, false hints, and a deliberate shape-guard miss. Of the 176
+paths in the node inventory, 174 are reviewed: 145 pass and 29 retain explicit
+prerequisite boundaries. The two omitted paths require later `map` and
+`splice` semantics; the fixed and generated `Array.from` suites replace their
+construction and mutation observations. One hundred forty existing dependency
+cases also move from unsupported to pass. The manifest reaches 8,791 cases:
+6,113 passes, 1,364 expected negatives, and 1,314 unsupported profile features
+with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override policy
+are unchanged. The public intrinsic table moves the runtime ABI to
+`oseo-runtime-m5-61` without changing the graph's orchestration state.
 
 
 Known gaps inside the claim

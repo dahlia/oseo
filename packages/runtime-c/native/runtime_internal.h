@@ -191,6 +191,18 @@
 #define OSEO_ARRAY_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ARRAY_CODE_ID_RANGE_INDEX)
 #define OSEO_ARRAY_PUSH_CODE_ID OSEO_ARRAY_CODE_ID_RANGE_LAST
+#define OSEO_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_ARRAY_FROM_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_ARRAY_IS_ARRAY_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_ARRAY_OF_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_ARRAY_SPECIES_GETTER_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 6u)
 
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
@@ -646,6 +658,12 @@ typedef struct {
     OseoValue primitive_value;
     /* Internal installation state independent of mutable own properties. */
     bool primitive_wrapper_methods_initialized;
+    /* True only while %String.prototype%'s virtual iterator is untouched. */
+    bool virtual_string_iterator;
+    /* Descriptor state retained while the iterator remains virtual. */
+    bool virtual_string_iterator_configurable;
+    bool virtual_string_iterator_enumerable;
+    bool virtual_string_iterator_writable;
     /* Array iterator state: a flagged object backs a default array's
      * values iterator, tracing the array and stepping the index. */
     bool array_iterator;
@@ -1338,6 +1356,17 @@ bool oseo_internal_own_descriptor(
     OseoValue *setter
 );
 /*
+ * Reads the descriptor state of %String.prototype%'s virtual iterator.
+ * Its value remains an Array.from implementation detail until the separate
+ * string-iterator node lands, so ordinary reflective lookup stays unchanged.
+ */
+bool oseo_internal_virtual_string_iterator_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoPropertyAttributes *attributes
+);
+/*
  * Ordinary object layout helpers owned by runtime_object.c. The
  * property vector is the one storage location for an object's own
  * properties, so every component that finds, adds, or removes one goes
@@ -1390,6 +1419,12 @@ OseoResult oseo_internal_set_array_length(
     bool strict,
     bool allow_same_value,
     bool *valid_length
+);
+/* Materializes Array together with its prototype, statics, and species. */
+OseoResult oseo_internal_array_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_array_global(
+    OseoContext *context,
+    OseoValue global
 );
 /* Runs ArraySetLength's separate ToUint32 and ToNumber observations. */
 OseoResult oseo_internal_to_array_length(

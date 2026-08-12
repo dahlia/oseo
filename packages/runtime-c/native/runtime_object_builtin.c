@@ -399,6 +399,10 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
             if (result.status == OSEO_STATUS_NORMAL) {
                 prototype = ordinary_object(context->intrinsics[intrinsic]);
                 prototype->primitive_value = result.value;
+                prototype->virtual_string_iterator = true;
+                prototype->virtual_string_iterator_configurable = true;
+                prototype->virtual_string_iterator_enumerable = false;
+                prototype->virtual_string_iterator_writable = true;
             }
         } else {
             result = oseo_bigint_literal(context, "0", 10u);
@@ -596,6 +600,10 @@ static OseoResult object_set_integrity_level(
 ) {
     OseoOrdinaryObject *object = ordinary_object(object_value);
     object->extensible = false;
+    if (object->virtual_string_iterator) {
+        object->virtual_string_iterator_configurable = false;
+        if (frozen) object->virtual_string_iterator_writable = false;
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -660,6 +668,11 @@ static bool object_test_integrity_level(OseoValue value, bool frozen) {
     if (frozen && is_array(value) && object->length_writable) return false;
     if (frozen && function_has_prototype_property(value) &&
         function_object(value)->prototype_writable) return false;
+    if (object->virtual_string_iterator &&
+        (object->virtual_string_iterator_configurable ||
+         (frozen && object->virtual_string_iterator_writable))) {
+        return false;
+    }
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         OseoPropertyAttributes attributes =
             object->properties[index].attributes;
@@ -1604,6 +1617,14 @@ static OseoResult define_converted_property(
         &current_getter,
         &current_setter
     );
+    if (!exists) {
+        exists = oseo_internal_virtual_string_iterator_descriptor(
+            context,
+            object_value,
+            key,
+            &current_attributes
+        );
+    }
     /* A descriptor with no value field keeps the property's current
      * value, which a cell-backed property holds in its binding cell. */
     if (exists &&

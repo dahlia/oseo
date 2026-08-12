@@ -45,6 +45,9 @@ import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 
+const { arrayConstructorFixtures } =
+  await import("./native/fixtures/array-constructor.ts");
+
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
 import { runNativeScenario2 } from "./native/scenarios/shard-2.ts";
@@ -87,6 +90,7 @@ const fixtures: readonly Fixture[] = [
   ...globalRecord.globalObjectRecordFixtures,
   ...objectFixtures,
   ...arrayBufferFixtures,
+  ...arrayConstructorFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -684,9 +688,9 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus eleven admitted constructor
+            // value-property allocations plus twelve admitted constructor
             // property names shared by every Script.
-            assert.equal(native.counters.allocations, 27);
+            assert.equal(native.counters.allocations, 28);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

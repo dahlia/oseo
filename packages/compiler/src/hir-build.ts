@@ -188,6 +188,7 @@ function rejectPropertyOwnedIntrinsicWithFallbackWrite(
 function isPropertyOwnedIntrinsicName(name: string): boolean {
   return (
     name === "AggregateError" ||
+    name === "Array" ||
     name === "ArrayBuffer" ||
     name === "Error" ||
     name === "EvalError" ||
@@ -533,6 +534,7 @@ function resolveOptionalChain(
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
+    name === "Array" ||
     name === "ArrayBuffer" ||
     name === "Function" ||
     name === "Iterator" ||

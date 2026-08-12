@@ -971,8 +971,12 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         if (materialized.status == OSEO_STATUS_NORMAL) {
             materialized = function_prototype_intrinsic(context);
         }
-    } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
-        materialized = oseo_internal_array_prototype(context);
+    } else if (
+        intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE ||
+        (intrinsic >= OSEO_INTRINSIC_ARRAY &&
+         intrinsic <= OSEO_INTRINSIC_ARRAY_SPECIES_GETTER)
+    ) {
+        materialized = oseo_internal_array_intrinsic(context);
     } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
         materialized = oseo_internal_number_intrinsic(context);
@@ -1214,6 +1218,10 @@ OseoResult oseo_function_create(
     function->ordinary.number_value = oseo_undefined();
     function->ordinary.primitive_data = false;
     function->ordinary.primitive_value = oseo_undefined();
+    function->ordinary.virtual_string_iterator = false;
+    function->ordinary.virtual_string_iterator_configurable = false;
+    function->ordinary.virtual_string_iterator_enumerable = false;
+    function->ordinary.virtual_string_iterator_writable = false;
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;

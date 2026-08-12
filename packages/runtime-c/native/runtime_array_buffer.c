@@ -156,6 +156,10 @@ static OseoResult array_buffer_allocate(
     buffer->ordinary.primitive_data = false;
     buffer->ordinary.primitive_value = oseo_undefined();
     buffer->ordinary.primitive_wrapper_methods_initialized = false;
+    buffer->ordinary.virtual_string_iterator = false;
+    buffer->ordinary.virtual_string_iterator_configurable = false;
+    buffer->ordinary.virtual_string_iterator_enumerable = false;
+    buffer->ordinary.virtual_string_iterator_writable = false;
     buffer->ordinary.array_iterator = false;
     buffer->ordinary.iterator_array = oseo_undefined();
     buffer->ordinary.iterator_index = 0u;

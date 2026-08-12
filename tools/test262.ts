@@ -517,6 +517,11 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "promise-static-method";
   }
+  if (
+    diagnostic === "Array prototype method is not admitted in this M5b node."
+  ) {
+    return "array-prototype-method";
+  }
   // The runtime ends a program at the first rejection checkpoint that
   // still holds an unhandled rejection. A case that needs the opposite
   // host policy names that boundary instead of reporting a semantic

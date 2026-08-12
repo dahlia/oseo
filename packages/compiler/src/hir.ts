@@ -362,6 +362,7 @@ export function intrinsicGlobalKind(
     return "restricted";
   }
   if (
+    name === "Array" ||
     name === "ArrayBuffer" ||
     name === "Function" ||
     name === "Iterator" ||

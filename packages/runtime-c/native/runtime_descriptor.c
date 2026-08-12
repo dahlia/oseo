@@ -31,6 +31,29 @@ bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     return left == right;
 }
 
+bool oseo_internal_virtual_string_iterator_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoPropertyAttributes *attributes
+) {
+    if (!is_object(object_value) ||
+        object_value !=
+            context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] ||
+        key != context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR]) {
+        return false;
+    }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (!object->virtual_string_iterator) return false;
+    *attributes = (OseoPropertyAttributes){
+        object->virtual_string_iterator_configurable,
+        object->virtual_string_iterator_enumerable,
+        object->virtual_string_iterator_writable,
+        false,
+    };
+    return true;
+}
+
 bool oseo_internal_own_descriptor(
     OseoValue object_value,
     OseoValue key,
@@ -117,6 +140,37 @@ static OseoResult define_data_property(
         return normal(object_value);
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
+    OseoPropertyAttributes virtual_attributes = {false, false, false, false};
+    bool replaces_virtual =
+        oseo_internal_virtual_string_iterator_descriptor(
+            context,
+            object_value,
+            key,
+            &virtual_attributes
+        );
+    if (replaces_virtual) {
+        if (!virtual_attributes.configurable &&
+            (attributes.configurable ||
+             attributes.enumerable != virtual_attributes.enumerable ||
+             (!virtual_attributes.writable && attributes.writable) ||
+             (!virtual_attributes.writable && has_value))) {
+            return type_error(
+                context,
+                "Cannot redefine a non-configurable property."
+            );
+        }
+        if (!has_value) {
+            object->virtual_string_iterator_configurable =
+                attributes.configurable;
+            object->virtual_string_iterator_enumerable =
+                attributes.enumerable;
+            object->virtual_string_iterator_writable = attributes.writable;
+            object->dictionary = true;
+            object->shape_id = context->next_shape_id;
+            context->next_shape_id += 1u;
+            return normal(object_value);
+        }
+    }
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
         uint32_t requested = object->array_length;
@@ -264,7 +318,7 @@ static OseoResult define_data_property(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
-    if (!object->extensible) {
+    if (!object->extensible && !replaces_virtual) {
         return type_error(
             context,
             "Cannot define a property on a non-extensible object."
@@ -273,6 +327,7 @@ static OseoResult define_data_property(
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
+    if (replaces_virtual) object->virtual_string_iterator = false;
     OseoProperty *property = &object->properties[object->property_count];
     property->attributes = attributes;
     property->key = key;
@@ -353,6 +408,22 @@ OseoResult oseo_object_define_accessor(
         );
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
+    OseoPropertyAttributes virtual_attributes = {false, false, false, false};
+    bool replaces_virtual =
+        oseo_internal_virtual_string_iterator_descriptor(
+            context,
+            object_value,
+            key,
+            &virtual_attributes
+        );
+    if (replaces_virtual) {
+        if (!virtual_attributes.configurable) {
+            return type_error(
+                context,
+                "Cannot redefine a non-configurable property."
+            );
+        }
+    }
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
         return type_error(
@@ -404,7 +475,7 @@ OseoResult oseo_object_define_accessor(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
-    if (!object->extensible) {
+    if (!object->extensible && !replaces_virtual) {
         return type_error(
             context,
             "Cannot define a property on a non-extensible object."
@@ -413,6 +484,7 @@ OseoResult oseo_object_define_accessor(
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
+    if (replaces_virtual) object->virtual_string_iterator = false;
     OseoProperty *property = &object->properties[object->property_count];
     property->attributes = attributes;
     property->key = key;
@@ -461,8 +533,28 @@ OseoResult oseo_object_delete(
             : normal(oseo_boolean(false));
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
+    bool string_iterator =
+        object_value ==
+            context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] &&
+        key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR];
     size_t index = oseo_internal_own_property_index(object, key);
-    if (index == SIZE_MAX) return normal(oseo_boolean(true));
+    if (index == SIZE_MAX) {
+        if (string_iterator && object->virtual_string_iterator) {
+            if (!object->virtual_string_iterator_configurable) {
+                return strict
+                    ? type_error(
+                        context,
+                        "Cannot delete a non-configurable property."
+                    )
+                    : normal(oseo_boolean(false));
+            }
+            object->virtual_string_iterator = false;
+            object->dictionary = true;
+            object->shape_id = context->next_shape_id;
+            context->next_shape_id += 1u;
+        }
+        return normal(oseo_boolean(true));
+    }
     if (!object->properties[index].attributes.configurable) {
         return strict
             ? type_error(context, "Cannot delete a non-configurable property.")
@@ -490,6 +582,7 @@ OseoResult oseo_object_delete(
         }
     }
     (void)oseo_internal_remove_property(object, index);
+    if (string_iterator) object->virtual_string_iterator = false;
     object->dictionary = true;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
