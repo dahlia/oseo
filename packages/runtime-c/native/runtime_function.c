@@ -971,8 +971,12 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         if (materialized.status == OSEO_STATUS_NORMAL) {
             materialized = function_prototype_intrinsic(context);
         }
-    } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
-        materialized = oseo_internal_array_prototype(context);
+    } else if (
+        intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE ||
+        (intrinsic >= OSEO_INTRINSIC_ARRAY &&
+         intrinsic <= OSEO_INTRINSIC_ARRAY_SPECIES_GETTER)
+    ) {
+        materialized = oseo_internal_array_intrinsic(context);
     } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
         materialized = oseo_internal_number_intrinsic(context);

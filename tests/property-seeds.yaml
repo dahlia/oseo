@@ -252,3 +252,7 @@ families:
     owner: tests/property/m5-object-define-properties.property.test.ts
     start: 0x60003e00
     end: 0x60003eff
+  - family: m5-array-constructor
+    owner: tests/property/m5-array-constructor.property.test.ts
+    start: 0x60003f00
+    end: 0x60003fff

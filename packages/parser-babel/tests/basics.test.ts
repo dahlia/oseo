@@ -162,6 +162,41 @@ test("reads the replaceable Number value through its global property", () => {
   );
 });
 
+test("reads the replaceable Array value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof Array, Array(2), Array.of(4));",
+    sourceId: "array-constructor.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Array" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Array"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /read \*missing intrinsic:Array\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete Array;",
+    sourceId: "delete-array.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["Array"\]/u);
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { Array = 1; }",
+    sourceId: "with-array-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'Array' through a with fallback/u,
+  );
+});
+
 test("reads the replaceable Object value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source:

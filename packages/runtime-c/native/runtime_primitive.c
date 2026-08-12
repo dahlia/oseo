@@ -791,14 +791,27 @@ static OseoResult default_array_text(
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL &&
             is_function(frame.slots[2])) {
-            result = oseo_call_function(
-                context,
-                frame.slots[2],
-                frame.slots[0],
-                0u,
-                NULL,
-                oseo_undefined()
-            );
+            OseoFunction *join = function_object(frame.slots[2]);
+            if (join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+                oseo_internal_string_is_ascii(
+                    join->initial_name,
+                    "join"
+                )) {
+                result = array_join_text(
+                    context,
+                    frame.slots[0],
+                    previous
+                );
+            } else {
+                result = oseo_call_function(
+                    context,
+                    frame.slots[2],
+                    frame.slots[0],
+                    0u,
+                    NULL,
+                    oseo_undefined()
+                );
+            }
         } else if (result.status == OSEO_STATUS_NORMAL) {
             result = default_object_tag_text(context, frame.slots[0]);
         }
@@ -987,6 +1000,25 @@ static OseoResult to_primitive_value(
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         if (!is_function(frame.slots[2])) continue;
+        OseoFunction *method = function_object(frame.slots[2]);
+        if (trying_to_string &&
+            default_conversion_kind(context, frame.slots[0]) ==
+                OSEO_CONVERSION_ARRAY &&
+            method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+            oseo_internal_string_is_ascii(
+                method->initial_name,
+                "toString"
+            )) {
+            result = default_array_text(
+                context,
+                frame.slots[0],
+                previous
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            converted = !is_object(result.value);
+            if (converted) break;
+            continue;
+        }
         /* A later prototype node still owns each nearer default method.
          * Reaching Object.prototype.toString through that empty prototype
          * must not bypass the existing behavior-preserving fallback. */

@@ -423,6 +423,12 @@ call validates one independently compiled Script; the ABI does not retain
 `[[VarNames]]` or declarative names across successive Script instantiations in
 one realm, so multi-Script declaration collisions remain outside this unit.
 
+The `m5-61` ABI makes `Array` a realm-owned intrinsic value and adds stable
+slots for `from`, `of`, `isArray`, and the `Symbol.species` getter. The array
+component owns length-argument construction and the generic constructor paths
+used by the collection statics. Descriptor-complete boundary functions keep
+unadmitted pre-ES2015 Array prototype methods explicitly unsupported.
+
 The `m5-60` ABI admits `Object.defineProperties` as a complete collection
 operation. The target check precedes every read of the properties argument,
 ToObject precedes the own-key walk, and the walk keeps the own enumerable

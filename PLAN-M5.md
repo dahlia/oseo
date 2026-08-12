@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 7,927
-reviewed cases: 5,263 passes, 1,355 expected negatives, and 1,309 unsupported
+honest unsupported classifications. The current reviewed manifest records 8,791
+reviewed cases: 6,113 passes, 1,364 expected negatives, and 1,314 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 74 indexed records in the normative
+M5a is complete. The 77 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 5,263
-passes across 7,927 paths, and the property inventory records 73 domains,
-73 seeds, and an ordinary case budget of 3,366.
+the M5b and M5c dependency order below. The reviewed manifest now records 6,113
+passes across 8,791 paths, and the property inventory records 76 domains,
+76 seeds, and an ordinary case budget of 3,402.
 
 
 M5a implementation history
@@ -3880,6 +3880,20 @@ check. The manifest moves to 8,617 paths with 5,828 passes, 1,364 expected
 negatives, and 1,425 unsupported profile features. The completed collection
 checkpoint moves the runtime ABI to `oseo-runtime-m5-60` without changing
 the graph's orchestration state.
+
+Implemented M5b node `array-constructor` makes `Array` a replaceable intrinsic
+value and completes its realm cluster with length-argument construction,
+`Symbol.species`, `from`, `of`, and `isArray`. `Array.from` constructs a custom
+receiver before iterator acquisition and closes an acquired iterator on abrupt
+mapping or indexed definition. Fixed native and generated differential evidence
+at seed `0x60003f00` covers both specialization policies, forced collection,
+generic constructor receivers, false hints, and deliberate shape-guard misses.
+Of the node's 176 inventory paths, 174 are reviewed: 145 pass and 29 retain
+explicit prerequisite boundaries. Two cases owned by later Array prototype
+methods use the fixed and generated `Array.from` evidence as their replacement.
+One hundred forty existing dependency cases also become passes. The manifest
+moves to 6,113 passes across 8,791 paths, and the runtime ABI moves to
+`oseo-runtime-m5-61`, without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

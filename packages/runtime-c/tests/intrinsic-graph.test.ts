@@ -265,6 +265,26 @@ test("populates the realm-owned Function prototype", () => {
   assert.match(functionSource, /oseo_internal_throw_type_error_function/u);
 });
 
+test("populates the realm-owned Array constructor", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const arraySource = sources.get("runtime_array.c") ?? "";
+
+  for (const intrinsic of [
+    "ARRAY",
+    "ARRAY_FROM",
+    "ARRAY_IS_ARRAY",
+    "ARRAY_OF",
+    "ARRAY_SPECIES_GETTER",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of ["constructor", "from", "isArray", "of", "push"]) {
+    assert.match(arraySource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(arraySource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(arraySource, /array_create_with_prototype\(\s*context,\s*0u,/u);
+});
+
 test("populates the realm-owned Iterator intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const iteratorSource = sources.get("runtime_iterator.c") ?? "";

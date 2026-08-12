@@ -19,12 +19,23 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+        - compareArray.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Promise/try/args.js non-strict disabled failed
-        (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/try/args.js:204:7:
-        error[OSEO1001]: Unknown binding 'Array'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/Promise/try/args.js non-strict disabled failed
+        (1): stdout="" stderr="test/built-ins/Promise/try/args.js:204:7:
+        error[OSEO2001]: Array prototype method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: array-prototype-method
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
