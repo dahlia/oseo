@@ -17,6 +17,4 @@ dependencies:
   - array-prototype-species-mapping
   - string-prototype-access
 landed: false
-status: parked
-reason: "Its array-constructor prerequisite is parked after repeated CI
-  aggregation failures; resume it when that prerequisite returns to ready."
+status: blocked

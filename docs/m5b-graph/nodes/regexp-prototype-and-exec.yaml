@@ -25,6 +25,4 @@ dependencies:
   - object-define-property
   - regexp-intrinsic
 landed: false
-status: parked
-reason: "Its array-constructor prerequisite is parked after repeated CI
-  aggregation failures; resume it when that prerequisite returns to ready."
+status: blocked

@@ -15,7 +15,4 @@ inventory:
 dependencies:
   - object-prototype
 landed: false
-status: parked
-reason: "Four CI attempts completed every check, test, native, test262, and
-  extended-property shard, but the final native aggregation job repeatedly
-  failed without a log after earlier GitHub action-download service outages."
+status: ready
