@@ -13,4 +13,4 @@ dependencies:
   - array-constructor
   - function-prototype
 landed: false
-status: blocked
+status: ready

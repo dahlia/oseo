@@ -13,4 +13,4 @@ inventory:
 dependencies:
   - array-constructor
 landed: false
-status: blocked
+status: ready

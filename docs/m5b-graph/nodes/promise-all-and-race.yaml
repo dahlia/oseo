@@ -13,4 +13,4 @@ dependencies:
   - array-constructor
   - promise-intrinsic
 landed: false
-status: blocked
+status: ready

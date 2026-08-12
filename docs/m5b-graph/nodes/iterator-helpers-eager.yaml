@@ -16,4 +16,4 @@ dependencies:
   - array-constructor
   - iterator-intrinsic
 landed: false
-status: blocked
+status: ready
