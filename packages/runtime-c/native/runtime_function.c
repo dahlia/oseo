@@ -1220,6 +1220,8 @@ OseoResult oseo_function_create(
     function->ordinary.primitive_value = oseo_undefined();
     function->ordinary.virtual_string_iterator = false;
     function->ordinary.virtual_string_iterator_configurable = false;
+    function->ordinary.virtual_string_iterator_enumerable = false;
+    function->ordinary.virtual_string_iterator_writable = false;
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;

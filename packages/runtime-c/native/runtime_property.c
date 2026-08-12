@@ -218,7 +218,14 @@ OseoResult oseo_object_set(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (oseo_internal_own_descriptor(
+        bool virtual_string_iterator =
+            oseo_internal_virtual_string_iterator_descriptor(
+                context,
+                current,
+                key,
+                &attributes
+            );
+        if (virtual_string_iterator || oseo_internal_own_descriptor(
             current, key, &own_value, &attributes, &getter, &setter)) {
             if (attributes.accessor) {
                 if (!is_function(setter)) {
@@ -257,7 +264,22 @@ OseoResult oseo_object_set(
                 return normal(value);
             }
             size_t index = oseo_internal_own_property_index(owner, key);
-            if (index == SIZE_MAX) break;
+            if (index == SIZE_MAX) {
+                if (current == object_value && virtual_string_iterator) {
+                    OseoResult assigned = oseo_object_define(
+                        context,
+                        object_value,
+                        key,
+                        value,
+                        attributes
+                    );
+                    if (assigned.status != OSEO_STATUS_NORMAL) {
+                        return assigned;
+                    }
+                    return normal(value);
+                }
+                break;
+            }
             OseoProperty *property = &owner->properties[index];
             if (current == object_value) {
                 /* A cell-backed property is a view of a binding, so the

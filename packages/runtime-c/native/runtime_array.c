@@ -259,6 +259,8 @@ static OseoResult array_create_with_prototype(
     array->primitive_value = oseo_undefined();
     array->virtual_string_iterator = false;
     array->virtual_string_iterator_configurable = false;
+    array->virtual_string_iterator_enumerable = false;
+    array->virtual_string_iterator_writable = false;
     array->array_iterator = false;
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;

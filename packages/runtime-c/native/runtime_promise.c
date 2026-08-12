@@ -373,6 +373,8 @@ static OseoResult promise_allocate(
     promise->ordinary.primitive_value = oseo_undefined();
     promise->ordinary.virtual_string_iterator = false;
     promise->ordinary.virtual_string_iterator_configurable = false;
+    promise->ordinary.virtual_string_iterator_enumerable = false;
+    promise->ordinary.virtual_string_iterator_writable = false;
     promise->ordinary.array_iterator = false;
     promise->ordinary.iterator_array = oseo_undefined();
     promise->ordinary.iterator_index = 0u;

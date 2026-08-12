@@ -276,21 +276,121 @@ for (const iteratorValue of [undefined, null]) {
 }
 `,
   },
-  ...["freeze", "seal"].map(
-    (integrity): Fixture => ({
-      globalScriptReference: true,
-      name: `array-constructor-string-${integrity}`,
-      source: `
+  {
+    globalScriptReference: true,
+    name: "array-constructor-string-seal-define",
+    source: `
 const stringPrototype = Object.getPrototypeOf(Object(""));
-Object.${integrity}(stringPrototype);
+const emptyIterator = function () {
+  return { next: function () { return { done: true }; } };
+};
+Object.seal(stringPrototype);
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  value: emptyIterator,
+});
+const descriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
 console.log(
-  "fixed iterator",
-  "${integrity}",
+  "sealed iterator definition",
+  descriptor.value === emptyIterator,
+  descriptor.configurable,
+  descriptor.enumerable,
+  descriptor.writable,
   delete stringPrototype[Symbol.iterator],
   Array.from("A💩B").length,
   Array.from(Object("A💩B")).length,
 );
 `,
-    }),
-  ),
+  },
+  {
+    globalScriptReference: true,
+    name: "array-constructor-string-seal-assignment",
+    source: `
+const stringPrototype = Object.getPrototypeOf(Object(""));
+const emptyIterator = function () {
+  return { next: function () { return { done: true }; } };
+};
+Object.seal(stringPrototype);
+stringPrototype[Symbol.iterator] = emptyIterator;
+console.log(
+  "sealed iterator assignment",
+  stringPrototype[Symbol.iterator] === emptyIterator,
+  Array.from("A💩B").length,
+  Array.from(Object("A💩B")).length,
+);
+`,
+  },
+  {
+    globalScriptReference: true,
+    name: "array-constructor-string-freeze",
+    source: `
+const stringPrototype = Object.getPrototypeOf(Object(""));
+const emptyIterator = function () {
+  return { next: function () { return { done: true }; } };
+};
+Object.freeze(stringPrototype);
+let changedValueRejected = false;
+try {
+  Object.defineProperty(stringPrototype, Symbol.iterator, {
+    value: emptyIterator,
+  });
+} catch (error) {
+  changedValueRejected = error instanceof TypeError;
+}
+let strictAssignmentRejected = false;
+try {
+  (function () {
+    "use strict";
+    stringPrototype[Symbol.iterator] = emptyIterator;
+  })();
+} catch (error) {
+  strictAssignmentRejected = error instanceof TypeError;
+}
+const wrapper = Object("A💩B");
+let inheritedAssignmentRejected = false;
+try {
+  (function () {
+    "use strict";
+    wrapper[Symbol.iterator] = emptyIterator;
+  })();
+} catch (error) {
+  inheritedAssignmentRejected = error instanceof TypeError;
+}
+const sameDescriptor = Object.defineProperty(
+  stringPrototype,
+  Symbol.iterator,
+  { configurable: false, enumerable: false, writable: false },
+);
+console.log(
+  "frozen iterator definition",
+  changedValueRejected,
+  strictAssignmentRejected,
+  inheritedAssignmentRejected,
+  Object.getOwnPropertyDescriptor(wrapper, Symbol.iterator) === undefined,
+  sameDescriptor === stringPrototype,
+  Object.isFrozen(stringPrototype),
+  delete stringPrototype[Symbol.iterator],
+  Array.from("A💩B").length,
+  Array.from(Object("A💩B")).length,
+);
+`,
+  },
+  {
+    globalScriptReference: true,
+    name: "array-constructor-string-prevent-extensions",
+    source: `
+const stringPrototype = Object.getPrototypeOf(Object(""));
+Object.preventExtensions(stringPrototype);
+console.log(
+  "extensible iterator integrity",
+  Object.isExtensible(stringPrototype),
+  Object.isSealed(stringPrototype),
+  Object.isFrozen(stringPrototype),
+  delete stringPrototype[Symbol.iterator],
+  Array.from("A💩B").length,
+);
+`,
+  },
 ];
