@@ -29,12 +29,12 @@ results:
       flags: []
       includes: []
       mode: script
-      path: test/built-ins/String/prototype/toString/non-generic.js
+      path: test/built-ins/String/prototype/concat/S15.5.4.6_A1_T5.js
       strictness:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
     execution:
@@ -44,13 +44,73 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/String/prototype/toString/non-generic.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/toString/non-generic.js:129:3:
-        error[OSEO2001]: String prototype method is not admitted in this
-        M5b node.\n"'
-      unsupportedCapability: string-prototype-method
-      passed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/substring/S15.5.4.15_A1_T13.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/toString/non-generic.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

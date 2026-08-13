@@ -572,6 +572,25 @@ and ordinary array-like receivers, abrupt completion, both specialization
 policies, generic fallback, and collection at every safepoint. The node adds no
 generated-code entry point and moves `abiVersion` to `m5-64`.
 
+M5b node `string-prototype-search-and-slice` keeps the same component ownership
+and adds ordinary `concat`, `indexOf`, `lastIndexOf`, `includes`, `startsWith`,
+`endsWith`, `slice`, and `substring` functions. Receiver conversion precedes
+later operands, `concat` converts arguments in order, search-string conversion
+precedes position conversion, and the three predicate methods perform
+`IsRegExp` first. Matching and extraction operate on UTF-16 code units. The
+search methods clamp their converted positions, while `slice` applies relative
+negative indices and `substring` clamps and swaps its endpoints.
+
+The `localeCompare`, `match`, `replace`, `search`, `split`,
+`toLocaleLowerCase`, `toLocaleUpperCase`, `toLowerCase`, `toUpperCase`, and
+`trim` methods remain source-located M5b boundaries. Fixed and generated native
+differential evidence covers generic receivers, `@@match`, conversion order,
+abrupt conversions, UTF-16 edge cases, both specialization policies, generic
+fallback, and collection at every safepoint. The node reviews all 253 paths
+under its declared inventory roots, with 217 passes and 36 explicit
+prerequisite boundaries. It adds no generated-code entry point and moves
+`abiVersion` to `m5-65`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

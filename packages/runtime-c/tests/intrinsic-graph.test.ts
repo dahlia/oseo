@@ -523,12 +523,20 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "charAt",
     "charCodeAt",
     "codePointAt",
+    "concat",
     "constructor",
+    "endsWith",
     "fromCharCode",
     "fromCodePoint",
+    "includes",
+    "indexOf",
+    "lastIndexOf",
     "length",
     "raw",
+    "slice",
+    "startsWith",
     "String",
+    "substring",
     "toString",
     "trim",
     "valueOf",
@@ -544,6 +552,14 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_CODE_POINT_AT_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_TO_STRING_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_VALUE_OF_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_CONCAT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_INDEX_OF_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_LAST_INDEX_OF_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_INCLUDES_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_STARTS_WITH_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_ENDS_WITH_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_SLICE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_SUBSTRING_CODE_ID/u);
   assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(internalHeader, /oseo_internal_install_string_global/u);
   assert.match(bindingSource, /oseo_internal_install_string_global/u);

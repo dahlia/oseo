@@ -52,6 +52,8 @@ const { arrayPrototypeIterativeFixtures } =
   await import("./native/fixtures/array-prototype-iterative.ts");
 const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
+const { stringPrototypeSearchAndSliceFixtures } =
+  await import("./native/fixtures/string-prototype-search-and-slice.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -111,6 +113,7 @@ const fixtures: readonly Fixture[] = [
   ...promiseFixtures.promiseIntrinsicFixtures,
   ...stringFixtures.stringIntrinsicFixtures,
   ...stringPrototypeAccessFixtures,
+  ...stringPrototypeSearchAndSliceFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -302,7 +305,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
-    fixture.name === "string-prototype-access"
+    fixture.name === "string-prototype-access" ||
+    fixture.name === "string-prototype-search-and-slice"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -469,6 +473,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "symbols" ||
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -558,7 +563,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "number-intrinsic" ||
             fixture.name === "promise-intrinsic" ||
             fixture.name === "string-intrinsic" ||
-            fixture.name === "string-prototype-access"
+            fixture.name === "string-prototype-access" ||
+            fixture.name === "string-prototype-search-and-slice"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 9,656
-reviewed cases: 6,983 passes, 1,364 expected negatives, and 1,309 unsupported
+honest unsupported classifications. The current reviewed manifest records 9,909
+reviewed cases: 7,206 passes, 1,364 expected negatives, and 1,339 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 80 indexed records in the normative
+M5a is complete. The 81 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 6,983
-passes across 9,656 paths, and the property inventory records 79 domains,
-79 seeds, and an ordinary case budget of 3,446.
+the M5b and M5c dependency order below. The reviewed manifest now records 7,206
+passes across 9,909 paths, and the property inventory records 80 domains, 80
+seeds, and an ordinary case budget of 3,462.
 
 
 M5a implementation history
@@ -3981,6 +3981,30 @@ it. The manifest moves to 9,656 paths with 6,983 passes, 1,364 expected
 negatives, and 1,309 unsupported profile features. The admitted runtime
 checkpoint moves the runtime ABI to `oseo-runtime-m5-64` without adding a
 generated-code entry point or changing the graph's orchestration state.
+
+Implemented M5b node `string-prototype-search-and-slice` adds ordinary
+`concat`, `indexOf`, `lastIndexOf`, `includes`, `startsWith`, `endsWith`,
+`slice`, and `substring` functions to the existing `%String.prototype%`.
+Every method converts its receiver before later operands. `concat` converts
+arguments in order; the search methods convert the search value before the
+position; the three predicate methods perform `IsRegExp` before converting
+their search value; and the two extraction methods convert their start before
+their end. The implementation matches UTF-16 code units and applies each
+method's specified integer conversion, default, relative-index rule, clamp,
+and `substring` endpoint swap.
+
+Fixed native and generated differential evidence at seed `0x60004300` covers
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard misses, generic fallback, primitive and generic
+receivers, `@@match`, abrupt conversions, empty searches, and UTF-16 edge
+cases. All 253 paths under the node's inventory roots are reviewed: 217 pass
+and 36 retain explicit prerequisite boundaries for dynamic source, realms,
+unadmitted built-in constructors, constructor detection, or RegExp objects.
+Six previously reviewed dependency cases also become passes. The manifest
+moves to 9,909 paths with 7,206 passes, 1,364 expected negatives, and 1,339
+unsupported profile features. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-65` without adding a generated-code entry point
+or changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary
