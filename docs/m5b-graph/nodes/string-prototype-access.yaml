@@ -17,4 +17,4 @@ inventory:
 dependencies:
   - string-intrinsic
 landed: false
-status: blocked
+status: ready

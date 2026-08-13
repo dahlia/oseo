@@ -13,4 +13,4 @@ dependencies:
   - string-intrinsic
   - well-known-symbols
 landed: false
-status: blocked
+status: ready

@@ -12,5 +12,5 @@ inventory:
     - test/built-ins/String/raw/
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready

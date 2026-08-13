@@ -15,4 +15,4 @@ dependencies:
   - intrinsic-graph-root
   - string-intrinsic
 landed: false
-status: blocked
+status: ready
