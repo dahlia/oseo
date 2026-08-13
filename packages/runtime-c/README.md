@@ -440,20 +440,21 @@ The shared descriptor component applies ordinary, array, function,
 arguments, String-wrapper, and module-namespace compatibility rules without
 changing public runtime layout.
 
-The `m5-62` ABI materializes `%String%`. The constructor, its prototype link,
-and the `fromCharCode`, `fromCodePoint`, and `raw` statics are ordinary
-properties of one realm-owned constructor that the global object binds.
-Calling `String` converts through the shared `ToString`, except that a Symbol
-argument renders its descriptive string; constructing it brands the receiver
-the new target produced with `[[StringData]]` and gives it the exotic own
-properties, meaning one non-writable, non-configurable, enumerable index
-property per code unit and a non-writable, non-enumerable, non-configurable
-`length`. `%String.prototype%` is itself such an object over the empty String.
-Sixteen selected ES5-era methods are ordinary boundary functions with their
-specified descriptors; calls remain unsupported until their String prototype
-nodes land.
-The generated-code ABI gains no entry point; the new code range and intrinsic
-slots are runtime-internal.
+The `m5-63` ABI extends the realm-owned `%String%` cluster materialized at
+`m5-62`. The constructor, its prototype link, and the `fromCharCode`,
+`fromCodePoint`, and `raw` statics remain ordinary properties, and
+`%String.prototype%.constructor` links back to the realm-owned constructor.
+The prototype now supplies ordinary `at`, `charAt`, `charCodeAt`,
+`codePointAt`, `toString`, and `valueOf` functions. The four access methods
+are generic: they reject only a nullish receiver before applying `ToString`
+and `ToIntegerOrInfinity`. `toString` and `valueOf` instead require a String
+primitive or an object branded with `[[StringData]]`.
+
+The `concat`, `lastIndexOf`, `localeCompare`, `match`, `replace`, `search`,
+`slice`, `split`, `substring`, `toLocaleLowerCase`, `toLocaleUpperCase`,
+`toLowerCase`, `toUpperCase`, and `trim` methods retain their source-located
+M5b boundary. The generated-code ABI gains no entry point; the expanded
+intrinsic code range remains runtime-internal.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

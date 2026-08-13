@@ -538,6 +538,25 @@ false hints, deliberate guard misses, generic fallback, lone surrogates,
 astral code points, coercion order, and collection forced at every safepoint.
 The node reviews 145 of the 150 paths under its four declared inventory roots.
 
+M5b node `string-prototype-access` keeps ownership in *runtime\_string.c* and
+adds ordinary `at`, `charAt`, `charCodeAt`, `codePointAt`, `toString`, and
+`valueOf` functions to the materialized prototype. Its existing `constructor`
+property continues to link to the realm-owned `String` constructor. The four
+access methods are generic over every non-nullish receiver and preserve
+receiver-before-position coercion, `ToString`, `ToIntegerOrInfinity`, and
+UTF-16 indexing. `toString` and `valueOf` instead accept only String primitives
+and objects branded with `[[StringData]]`, including `%String.prototype%`.
+
+The `concat`, `lastIndexOf`, `localeCompare`, `match`, `replace`, `search`,
+`slice`, `split`, `substring`, `toLocaleLowerCase`, `toLocaleUpperCase`,
+`toLowerCase`, `toUpperCase`, and `trim` methods remain source-located M5b
+boundaries. Fixed and generated native differential evidence covers generic
+and branded receivers, coercion order, abrupt conversions, UTF-16 edge cases,
+both specialization policies, generic fallback, and collection at every
+safepoint. The node reviews all 105 paths under its declared inventory roots,
+with 89 passes and 16 explicit prerequisite boundaries. It adds no
+generated-code entry point and moves `abiVersion` to `m5-63`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in
