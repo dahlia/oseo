@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 8,936
-reviewed cases: 6,321 passes, 1,364 expected negatives, and 1,251 unsupported
+honest unsupported classifications. The current reviewed manifest records 9,656
+reviewed cases: 6,983 passes, 1,364 expected negatives, and 1,309 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 78 indexed records in the normative
+M5a is complete. The 80 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 6,321
-passes across 8,936 paths, and the property inventory records 77 domains,
-77 seeds, and an ordinary case budget of 3,414.
+the M5b and M5c dependency order below. The reviewed manifest now records 6,983
+passes across 9,656 paths, and the property inventory records 79 domains,
+79 seeds, and an ordinary case budget of 3,446.
 
 
 M5a implementation history
@@ -3957,6 +3957,30 @@ manifest moves to 9,041 paths with 6,442 passes, 1,364 expected negatives, and
 1,235 unsupported profile features. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-63` without adding a generated-code entry point
 or changing the graph's orchestration state.
+
+Implemented M5b node `array-prototype-iterative` gives the realm-owned
+`%Array.prototype%` ordinary `every`, `forEach`, and `some` functions. Each
+method converts its receiver, snapshots LengthOfArrayLike, validates the
+callback, and then performs HasProperty and Get for every visited index. The
+callback receives the value, index, and converted receiver with the supplied
+`thisArg`. `every` and `some` preserve their specified early result, while
+`forEach` ignores the callback result and returns `undefined`. A deletion,
+future creation, inherited property, or length change during a callback is
+therefore observed without extending the initial iteration range.
+
+Fixed native and generated differential evidence at seed `0x60004200` covers
+both specialization policies, forced collection at every safepoint, a false
+hint, a deliberate shape-guard miss, generic fallback, sparse and generic
+receivers, callback order, early completion, abrupt completion, and mutation
+during iteration. Of the 627 paths under the node's three inventory roots, 615
+are reviewed: 541 pass and 74 retain explicit prerequisite boundaries. Twelve
+resizable-buffer cases require unreviewed TypedArray or harness support. The
+review also corrects static array elements to use CreateDataProperty, so an own
+element overrides an inherited accessor before an iterative method retrieves
+it. The manifest moves to 9,656 paths with 6,983 passes, 1,364 expected
+negatives, and 1,309 unsupported profile features. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-64` without adding a
+generated-code entry point or changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

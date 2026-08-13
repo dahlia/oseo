@@ -1,0 +1,3 @@
+version: 1
+id: array-prototype-iterative
+record: docs/language-profile-m5/families/array-prototype-iterative.yaml

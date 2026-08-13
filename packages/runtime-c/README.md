@@ -456,6 +456,16 @@ The `concat`, `lastIndexOf`, `localeCompare`, `match`, `replace`, `search`,
 M5b boundary. The generated-code ABI gains no entry point; the expanded
 intrinsic code range remains runtime-internal.
 
+The `m5-64` ABI adds ordinary `every`, `forEach`, and `some` functions to the
+realm-owned `%Array.prototype%`. Each method converts its receiver, snapshots
+LengthOfArrayLike once, and validates the callback before visiting any index.
+It then performs a fresh HasProperty and Get for each index. The callback
+receives the value, index, and converted receiver with the supplied `thisArg`;
+`every` and `some` preserve their specified early completion, while `forEach`
+returns `undefined`. Deleting, creating, or inheriting an indexed property
+during the loop therefore affects a later visit, while appending beyond the
+initial length does not. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

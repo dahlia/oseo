@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 77
+M5a is complete. The normative family records described below inventory 80
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 8,936 reviewed cases: 6,321 passes, 1,364
-expected negatives, and 1,251 unsupported profile features. It records no
+The current manifest contains 9,656 reviewed cases: 6,983 passes, 1,364
+expected negatives, and 1,309 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3488,6 +3488,34 @@ semantic, harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema and vocabulary, and zero-override
 policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-63` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
+M5b node `array-prototype-iterative` implements ordinary `every`, `forEach`,
+and `some` functions on the realm-owned `%Array.prototype%`. Each method first
+converts its receiver and snapshots LengthOfArrayLike, then validates the
+callback before visiting the initial index range. A visit performs HasProperty
+and Get at that moment, so holes are skipped, inherited and newly created
+properties are observed, deleted properties are omitted, and appended indices
+outside the snapshot remain unvisited. The callback receives the value, index,
+and converted receiver with the supplied `thisArg`. `every` and `some` stop at
+the first decisive callback result; `forEach` ignores that result and returns
+`undefined`.
+
+Fixed native and generated differential evidence at seed `0x60004200` covers
+sparse arrays, inherited entries, ordinary array-like and primitive receivers,
+callback order, early and abrupt completion, mutation during iteration, both
+specialization policies, forced collection at every safepoint, false hints,
+deliberate shape-guard misses, and generic fallback. Of the 627 paths under the
+node's inventory roots, 615 are reviewed: 541 pass and 74 retain explicit
+prerequisite boundaries. Twelve resizable-buffer cases remain outside the
+subset for unreviewed TypedArray or harness support. Static array elements now
+use CreateDataProperty, so an own element overrides an inherited accessor
+before an iterative method retrieves it. The manifest reaches 9,656 cases:
+6,983 passes, 1,364 expected negatives, and 1,309 unsupported profile features
+with no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override policy
+are unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-64` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
 

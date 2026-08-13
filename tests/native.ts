@@ -48,6 +48,8 @@ import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
+const { arrayPrototypeIterativeFixtures } =
+  await import("./native/fixtures/array-prototype-iterative.ts");
 const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 
@@ -97,6 +99,7 @@ const fixtures: readonly Fixture[] = [
   ...objectFixtures,
   ...arrayBufferFixtures,
   ...arrayConstructorFixtures,
+  ...arrayPrototypeIterativeFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -286,6 +289,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "array-buffer" ||
+    fixture.name === "array-prototype-iterative" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -464,6 +468,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
     fixture.name === "string-prototype-access" ||
+    fixture.name === "array-prototype-iterative" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -540,6 +545,7 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "array-buffer" ||
+            fixture.name === "array-prototype-iterative" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
