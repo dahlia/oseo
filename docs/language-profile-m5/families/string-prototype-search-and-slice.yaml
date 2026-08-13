@@ -1,0 +1,53 @@
+version: 1
+id: string-prototype-search-and-slice
+title: "String prototype search and slice methods"
+scope:
+  - "String.prototype.concat, indexOf, lastIndexOf, includes, startsWith,
+    endsWith, slice, and substring, including receiver and operand conversion
+    order, RegExp rejection, UTF-16 matching, and index clamping."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-search-and-slice.ts
+      - tests/property/m5-string-prototype-search-and-slice.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-search-and-slice.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-search-and-slice.ts
+      - tests/property/m5-string-prototype-search-and-slice.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-string-prototype-search-and-slice.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-search-and-slice.ts
+      - tests/property/m5-string-prototype-search-and-slice.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-search-and-slice.ts
+      - tests/property/m5-string-prototype-search-and-slice.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_string.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

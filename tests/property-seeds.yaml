@@ -268,3 +268,7 @@ families:
     owner: tests/property/m5-array-prototype-iterative.property.test.ts
     start: 0x60004200
     end: 0x600042ff
+  - family: m5-string-prototype-search-and-slice
+    owner: tests/property/m5-string-prototype-search-and-slice.property.test.ts
+    start: 0x60004300
+    end: 0x600043ff

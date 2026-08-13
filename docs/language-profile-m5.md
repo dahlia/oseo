@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 80
+M5a is complete. The normative family records described below inventory 81
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -3516,6 +3516,38 @@ with no semantic, harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema and vocabulary, and zero-override policy
 are unchanged. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-64` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
+M5b node `string-prototype-search-and-slice` implements the materialized
+prototype's `concat`, `indexOf`, `lastIndexOf`, `includes`, `startsWith`,
+`endsWith`, `slice`, and `substring` functions. All eight first reject a
+nullish receiver and then convert every other receiver through the shared
+`ToString`. `concat` converts each argument in order. The search methods
+convert the search value before the position, while `includes`, `startsWith`,
+and `endsWith` first apply `IsRegExp` and reject a true `@@match` result.
+Matching uses UTF-16 code units. `indexOf`, `includes`, and `startsWith`
+default their position to zero; `lastIndexOf` treats an omitted or `NaN`
+position as positive infinity; and `endsWith` defaults its end position to
+the subject length. Each position is converted and clamped before matching.
+`slice` applies relative negative indices and an empty result for reversed
+bounds, while `substring` clamps negative bounds to zero and swaps reversed
+endpoints. The other ten materialized String prototype methods retain their
+source-located M5b boundary.
+
+Fixed native and generated differential evidence at seed `0x60004300` covers
+primitive and generic receivers, `@@match`, conversion order, abrupt
+conversions, empty searches, UTF-16 edge cases, both specialization policies,
+forced collection at every safepoint, false hints, deliberate shape-guard
+misses, and generic fallback. All 253 paths under the node's inventory roots
+are reviewed: 217 pass and 36 retain explicit prerequisite boundaries for
+dynamic source, realms, unadmitted built-in constructors, constructor
+detection, or RegExp objects. Six previously reviewed dependency cases also
+move from unsupported to pass. The manifest reaches 9,909 cases: 7,206 passes,
+1,364 expected negatives, and 1,339 unsupported profile features with no
+semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
+to `oseo-runtime-m5-65` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
 

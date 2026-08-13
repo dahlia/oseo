@@ -466,6 +466,19 @@ returns `undefined`. Deleting, creating, or inheriting an indexed property
 during the loop therefore affects a later visit, while appending beyond the
 initial length does not. The generated-code ABI gains no entry point.
 
+The `m5-65` ABI implements `concat`, `indexOf`, `lastIndexOf`, `includes`,
+`startsWith`, `endsWith`, `slice`, and `substring` on the same realm-owned
+prototype. Each method converts its receiver before later operands. Search
+methods preserve search-value-before-position conversion, the predicate
+methods reject a true `@@match` result before search-value conversion, and
+matching uses UTF-16 code units. Converted indices use their method-specific
+defaults, clamping, negative-relative behavior, and endpoint swapping.
+
+The `localeCompare`, `match`, `replace`, `search`, `split`,
+`toLocaleLowerCase`, `toLocaleUpperCase`, `toLowerCase`, `toUpperCase`, and
+`trim` methods retain their source-located M5b boundary. The generated-code ABI
+again gains no entry point; the added intrinsic code IDs remain
+runtime-internal.
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

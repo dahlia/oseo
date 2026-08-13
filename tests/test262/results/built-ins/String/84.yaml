@@ -31,4 +31,58 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.match
+        - String.prototype.endsWith
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/endsWith/return-abrupt-from-searchstring-regexp-test.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/String/prototype/endsWith/return-abrupt-from-searchstring-regexp-test.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/endsWith/return-abrupt-from-searchstring-regexp-test.js:108:14:
+        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/slice/S15.5.4.13_A3_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
