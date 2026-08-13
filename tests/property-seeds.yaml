@@ -264,3 +264,7 @@ families:
     owner: tests/property/m5-string-prototype-access.property.test.ts
     start: 0x60004100
     end: 0x600041ff
+  - family: m5-array-prototype-iterative
+    owner: tests/property/m5-array-prototype-iterative.property.test.ts
+    start: 0x60004200
+    end: 0x600042ff

@@ -34,6 +34,30 @@ test("prints distinct non-finite MIR constants", () => {
   assert.doesNotMatch(text, /constant null/u);
 });
 
+test("creates static array elements as own data properties", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          elements: [{ kind: "number", range, value: 1 }],
+          kind: "array",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "array-literal.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const text = printMir(buildMir(hir));
+  assert.match(text, /property-define-data array element 0/u);
+  assert.doesNotMatch(text, /property-set array element 0/u);
+});
+
 test("preserves exact BigInt digits and allocation safepoints", () => {
   const syntax: SyntaxProgram = {
     body: [

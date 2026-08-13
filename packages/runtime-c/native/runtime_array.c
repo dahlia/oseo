@@ -23,6 +23,13 @@ static OseoResult array_of(
     size_t argument_count,
     const OseoValue *arguments
 );
+static OseoResult array_iteration(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+);
 
 OseoResult oseo_internal_array_builtin_dispatch(
     OseoContext *context,
@@ -44,7 +51,7 @@ OseoResult oseo_internal_array_builtin_dispatch(
     if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
         return type_error(
             context,
-            "Array static or accessor is not a constructor."
+            "Array built-in is not a constructor."
         );
     }
     if (code_id == OSEO_ARRAY_FROM_CODE_ID) {
@@ -68,6 +75,17 @@ OseoResult oseo_internal_array_builtin_dispatch(
             receiver,
             argument_count,
             arguments
+        );
+    }
+    if (code_id == OSEO_ARRAY_EVERY_CODE_ID ||
+        code_id == OSEO_ARRAY_FOR_EACH_CODE_ID ||
+        code_id == OSEO_ARRAY_SOME_CODE_ID) {
+        return array_iteration(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
         );
     }
     if (code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID) {
@@ -1355,11 +1373,55 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             method
         );
     }
+    static const size_t iterative_codes[] = {
+        OSEO_ARRAY_EVERY_CODE_ID,
+        OSEO_ARRAY_FOR_EACH_CODE_ID,
+        OSEO_ARRAY_SOME_CODE_ID,
+    };
+    static const char *const iterative_names[] = {
+        "every",
+        "forEach",
+        "some",
+    };
+    _Static_assert(
+        sizeof(iterative_codes) / sizeof(iterative_codes[0]) ==
+            sizeof(iterative_names) / sizeof(iterative_names[0]),
+        "Array iterative method tables must stay aligned."
+    );
+    const size_t iterative_count =
+        sizeof(iterative_names) / sizeof(iterative_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < iterative_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            iterative_codes[index],
+            iterative_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                iterative_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
     static const char *const unadmitted_names[] = {
         "concat",
-        "every",
         "filter",
-        "forEach",
         "indexOf",
         "join",
         "lastIndexOf",
@@ -1370,7 +1432,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         "reverse",
         "shift",
         "slice",
-        "some",
         "sort",
         "splice",
         "toLocaleString",
@@ -1384,23 +1445,27 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         1u,
         1u,
         1u,
-        1u,
-        1u,
         0u,
         1u,
         1u,
         0u,
         0u,
         2u,
-        1u,
         1u,
         2u,
         0u,
         0u,
         1u,
     };
+    _Static_assert(
+        sizeof(unadmitted_names) / sizeof(unadmitted_names[0]) ==
+            sizeof(unadmitted_lengths) / sizeof(unadmitted_lengths[0]),
+        "Array boundary method tables must stay aligned."
+    );
+    const size_t unadmitted_count =
+        sizeof(unadmitted_names) / sizeof(unadmitted_names[0]);
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 20u;
+         result.status == OSEO_STATUS_NORMAL && index < unadmitted_count;
          index += 1u) {
         result = array_builtin_function(
             context,
@@ -1596,6 +1661,93 @@ OseoResult oseo_internal_array_push(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_number(new_length));
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Array.prototype every, forEach, and some share a snapshot-length and
+ * dynamic HasProperty/Get loop. The callback and all
+ * arguments remain rooted across user code and forced collection.
+ */
+static OseoResult array_iteration(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
+    frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_function(frame.slots[1])) {
+        result = type_error(context, "Array callback is not callable.");
+    }
+    bool decided = false;
+    for (double index = 0.0;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1.0) {
+        result = oseo_property_key(context, oseo_number(index));
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_has_property(
+                context,
+                frame.slots[3],
+                frame.slots[0]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!oseo_to_boolean(result.value)) continue;
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[3]
+        );
+        frame.slots[4] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        frame.slots[5] = frame.slots[4];
+        frame.slots[6] = oseo_number(index);
+        frame.slots[7] = frame.slots[0];
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            3u,
+            &frame.slots[5],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        bool selected = oseo_to_boolean(result.value);
+        if (code_id == OSEO_ARRAY_EVERY_CODE_ID && !selected) {
+            result = normal(oseo_boolean(false));
+            decided = true;
+            break;
+        }
+        if (code_id == OSEO_ARRAY_SOME_CODE_ID && selected) {
+            result = normal(oseo_boolean(true));
+            decided = true;
+            break;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !decided) {
+        if (code_id == OSEO_ARRAY_EVERY_CODE_ID) {
+            result = normal(oseo_boolean(true));
+        } else if (code_id == OSEO_ARRAY_SOME_CODE_ID) {
+            result = normal(oseo_boolean(false));
+        } else {
+            result = normal(oseo_undefined());
+        }
     }
     oseo_roots_release(context, &frame);
     return result;

@@ -3632,7 +3632,7 @@ function lowerExpression(
         arguments: [id, key, value],
         detail: `array element ${index}`,
         id: result,
-        kind: "property-set",
+        kind: "property-define-data",
         range: element.range,
       });
       appendMirMetadata(

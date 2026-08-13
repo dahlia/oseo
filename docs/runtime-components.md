@@ -557,6 +557,21 @@ safepoint. The node reviews all 105 paths under its declared inventory roots,
 with 89 passes and 16 explicit prerequisite boundaries. It adds no
 generated-code entry point and moves `abiVersion` to `m5-63`.
 
+M5b node `array-prototype-iterative` keeps ownership in *runtime\_array.c* and
+adds ordinary `every`, `forEach`, and `some` functions to the materialized
+`%Array.prototype%`. The component shares one snapshot-length loop that
+performs HasProperty and Get at each visited index, calls the validated
+callback with the value, index, and converted receiver, and preserves the
+specified early result for `every` and `some`. The loop remains generic over
+ordinary array-like and primitive receivers, so deletion, creation,
+inheritance, and length mutation are observed at the specified step.
+
+Fixed and generated native differential evidence covers callback validation
+and order, sparse and inherited entries, mutation during iteration, primitive
+and ordinary array-like receivers, abrupt completion, both specialization
+policies, generic fallback, and collection at every safepoint. The node adds no
+generated-code entry point and moves `abiVersion` to `m5-64`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in
