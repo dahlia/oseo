@@ -16,5 +16,5 @@ inventory:
     - test/built-ins/String/prototype/valueOf/
 dependencies:
   - string-intrinsic
-landed: false
+landed: true
 status: ready

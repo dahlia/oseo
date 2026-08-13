@@ -13,4 +13,4 @@ dependencies:
   - object-define-property
   - string-prototype-access
 landed: false
-status: blocked
+status: ready
