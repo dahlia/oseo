@@ -260,3 +260,7 @@ families:
     owner: tests/property/m5-string-intrinsic.property.test.ts
     start: 0x60004000
     end: 0x600040ff
+  - family: m5-string-prototype-access
+    owner: tests/property/m5-string-prototype-access.property.test.ts
+    start: 0x60004100
+    end: 0x600041ff

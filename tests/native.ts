@@ -48,6 +48,8 @@ import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
+const { stringPrototypeAccessFixtures } =
+  await import("./native/fixtures/string-prototype-access.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -105,6 +107,7 @@ const fixtures: readonly Fixture[] = [
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
   ...stringFixtures.stringIntrinsicFixtures,
+  ...stringPrototypeAccessFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -294,7 +297,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-intrinsic" ||
-    fixture.name === "string-intrinsic"
+    fixture.name === "string-intrinsic" ||
+    fixture.name === "string-prototype-access"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -459,6 +463,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
+    fixture.name === "string-prototype-access" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -546,7 +551,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "number-intrinsic" ||
             fixture.name === "promise-intrinsic" ||
-            fixture.name === "string-intrinsic"
+            fixture.name === "string-intrinsic" ||
+            fixture.name === "string-prototype-access"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

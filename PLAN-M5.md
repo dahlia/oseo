@@ -3934,6 +3934,30 @@ Materializing the intrinsic adds no generated-code entry point and moves the
 runtime ABI to `oseo-runtime-m5-62` without changing the graph's orchestration
 state.
 
+Implemented M5b node `string-prototype-access` gives the existing
+`%String.prototype%` ordinary `at`, `charAt`, `charCodeAt`, `codePointAt`,
+`toString`, and `valueOf` functions without recreating the realm-owned
+constructor or its existing prototype link. The four access methods preserve
+receiver-before-position coercion, generic receiver conversion,
+`ToIntegerOrInfinity`, UTF-16 code-unit indexing, negative `at` positions,
+the specified out-of-range results, and surrogate-pair decoding for
+`codePointAt`. `toString` and `valueOf` enforce the String primitive or
+`[[StringData]]` brand and reject every other receiver. The other fourteen
+materialized prototype methods keep their source-located M5b boundary.
+
+Fixed native and generated differential evidence at seed `0x60004100` covers
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard misses, generic fallback, primitive and generic
+receivers, branded wrappers, abrupt coercions, and UTF-16 edge cases. All 105
+paths under the node's inventory roots are reviewed: 89 pass and 16 retain
+explicit prerequisite boundaries for dynamic source, realms, unadmitted
+built-in constructors, constructor detection, or later String methods.
+Thirty-two previously reviewed dependency cases also become passes. The
+manifest moves to 9,041 paths with 6,442 passes, 1,364 expected negatives, and
+1,235 unsupported profile features. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-63` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------
