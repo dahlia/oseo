@@ -505,21 +505,31 @@ test("populates the realm-owned String intrinsic cluster", () => {
     assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
   }
   for (const property of [
+    "at",
     "charAt",
     "charCodeAt",
+    "codePointAt",
     "constructor",
     "fromCharCode",
     "fromCodePoint",
     "length",
     "raw",
     "String",
+    "toString",
     "trim",
+    "valueOf",
   ]) {
     assert.match(stringSource, new RegExp(`"${property}"`, "u"));
   }
   // The constructor is an ordinary constructible function reached through
   // the realm's own global property.
   assert.match(stringSource, /OSEO_STRING_CONSTRUCTOR_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_AT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_CHAR_AT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_CHAR_CODE_AT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_CODE_POINT_AT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_TO_STRING_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_VALUE_OF_CODE_ID/u);
   assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(internalHeader, /oseo_internal_install_string_global/u);
   assert.match(bindingSource, /oseo_internal_install_string_global/u);

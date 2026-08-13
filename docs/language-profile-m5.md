@@ -3460,6 +3460,36 @@ are unchanged. The materialized constructor adds no generated-code entry point
 and moves the runtime ABI to `oseo-runtime-m5-62` without changing the graph's
 orchestration state.
 
+M5b node `string-prototype-access` implements the materialized prototype's
+`at`, `charAt`, `charCodeAt`, `codePointAt`, `toString`, and `valueOf`
+functions while preserving its existing `constructor` link. The four access
+methods first reject a nullish receiver, convert every other receiver with
+the shared `ToString`, and then apply `ToIntegerOrInfinity` to the position.
+`at` permits a negative position relative to the UTF-16 code-unit length;
+`charAt` and `charCodeAt` return the specified empty String and `NaN`
+out-of-range results; and `codePointAt` combines only a leading and trailing
+surrogate at the selected position. `toString` and `valueOf` accept only a
+String primitive or an object carrying `[[StringData]]`, including
+`%String.prototype%` itself, and reject every other receiver with a
+`TypeError`. The other fourteen materialized String prototype methods retain
+their source-located M5b boundary.
+
+Fixed native and generated differential evidence at seed `0x60004100` covers
+primitive and generic receivers, branded wrappers, UTF-16 edge cases,
+conversion order, abrupt conversions, both specialization policies, forced
+collection at every safepoint, false hints, deliberate shape-guard misses,
+and generic fallback. All 105 paths under the node's inventory roots are
+reviewed: 89 pass and 16 retain explicit prerequisite boundaries for dynamic
+source, realms, unadmitted built-in constructors, constructor detection, or
+later String methods. Thirty-two previously reviewed dependency cases also
+move from unsupported to pass. The manifest reaches 9,041 cases: 6,442 passes,
+1,364 expected negatives, and 1,235 unsupported profile features with no
+semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
+to `oseo-runtime-m5-63` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

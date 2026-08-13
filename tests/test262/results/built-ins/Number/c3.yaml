@@ -25,10 +25,10 @@ results:
     observation:
       detail: 'test/built-ins/Number/S15.7.1.1_A1.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Number/S15.7.1.1_A1.js:90:10:
-        error[OSEO2001]: Primitive wrapper prototype methods are not
-        admitted yet.\n"'
-      unsupportedCapability: primitive-wrapper-prototype
+        stderr="test/built-ins/Number/S15.7.1.1_A1.js:96:10:
+        error[OSEO2001]: Number prototype methods are not admitted
+        yet.\n"'
+      unsupportedCapability: number-prototype
       passed: false
     unsupportedFeatures: []
   - case:

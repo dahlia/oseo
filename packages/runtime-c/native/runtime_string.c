@@ -290,6 +290,124 @@ static OseoResult string_allocation_failure(OseoContext *context) {
     return failure(context, "OSEO2001", "String allocation failed.");
 }
 
+static OseoValue string_builtin_argument(
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t index
+) {
+    return index < argument_count ? arguments[index] : oseo_undefined();
+}
+
+/* ToIntegerOrInfinity over one already rooted input value. */
+static OseoResult string_integer_or_infinity(
+    OseoContext *context,
+    OseoValue value
+) {
+    OseoResult result = oseo_internal_to_number(context, value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    if (isnan(number) || number == 0.0) number = 0.0;
+    else if (isfinite(number)) number = trunc(number);
+    return normal(oseo_number(number));
+}
+
+static OseoResult string_method_subject(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_nullish(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "String method receiver is nullish."
+        );
+    }
+    return oseo_internal_value_string(context, receiver);
+}
+
+static OseoResult string_at_index(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = string_builtin_argument(
+        argument_count,
+        arguments,
+        0u
+    );
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_integer_or_infinity(context, frame.slots[1]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+
+    double position = number_value(result.value);
+    size_t length = string_object(frame.slots[2])->length;
+    if (code_id == OSEO_STRING_AT_CODE_ID && position < 0.0) {
+        position += (double)length;
+    }
+    if (position < 0.0 || !(position < (double)length)) {
+        if (code_id == OSEO_STRING_CHAR_AT_CODE_ID) {
+            result = oseo_internal_allocate_string(context, NULL, 0u);
+        } else if (code_id == OSEO_STRING_CHAR_CODE_AT_CODE_ID) {
+            result = normal(oseo_number(NAN));
+        } else {
+            result = normal(oseo_undefined());
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+
+    size_t index = (size_t)position;
+    uint16_t first = string_object(frame.slots[2])->units[index];
+    if (code_id == OSEO_STRING_CHAR_CODE_AT_CODE_ID) {
+        result = normal(oseo_number((double)first));
+    } else if (code_id == OSEO_STRING_CODE_POINT_AT_CODE_ID &&
+               first >= UINT16_C(0xd800) &&
+               first <= UINT16_C(0xdbff) && index + 1u < length) {
+        uint16_t second = string_object(frame.slots[2])->units[index + 1u];
+        if (second >= UINT16_C(0xdc00) && second <= UINT16_C(0xdfff)) {
+            uint32_t code_point = UINT32_C(0x10000) +
+                ((uint32_t)(first - UINT16_C(0xd800)) << 10u) +
+                (uint32_t)(second - UINT16_C(0xdc00));
+            result = normal(oseo_number((double)code_point));
+        } else {
+            result = normal(oseo_number((double)first));
+        }
+    } else if (code_id == OSEO_STRING_CODE_POINT_AT_CODE_ID) {
+        result = normal(oseo_number((double)first));
+    } else {
+        result = oseo_internal_allocate_string(context, &first, 1u);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult string_this_value(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_string(receiver)) return normal(receiver);
+    if (oseo_internal_string_data(receiver)) {
+        return normal(ordinary_object(receiver)->primitive_value);
+    }
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "String.prototype method requires a String receiver."
+    );
+}
+
 static OseoResult string_from_char_code(
     OseoContext *context,
     size_t argument_count,
@@ -560,8 +678,24 @@ OseoResult oseo_internal_string_builtin_dispatch(
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "String static method is not a constructor."
+            "String method is not a constructor."
         );
+    }
+    if (code_id == OSEO_STRING_AT_CODE_ID ||
+        code_id == OSEO_STRING_CHAR_AT_CODE_ID ||
+        code_id == OSEO_STRING_CHAR_CODE_AT_CODE_ID ||
+        code_id == OSEO_STRING_CODE_POINT_AT_CODE_ID) {
+        return string_at_index(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_STRING_TO_STRING_CODE_ID ||
+        code_id == OSEO_STRING_VALUE_OF_CODE_ID) {
+        return string_this_value(context, receiver);
     }
     if (code_id == OSEO_STRING_FROM_CHAR_CODE_CODE_ID) {
         return string_from_char_code(context, argument_count, arguments);
@@ -701,8 +835,6 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         );
     }
     static const char *const unadmitted_names[] = {
-        "charAt",
-        "charCodeAt",
         "concat",
         "lastIndexOf",
         "localeCompare",
@@ -723,8 +855,6 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         1u,
         1u,
         1u,
-        1u,
-        1u,
         2u,
         1u,
         2u,
@@ -737,7 +867,7 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         0u,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 16u;
+         result.status == OSEO_STATUS_NORMAL && index < 14u;
          index += 1u) {
         result = create_string_function(
             context,
@@ -752,6 +882,44 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
                 context,
                 frame.slots[0],
                 unadmitted_names[index],
+                frame.slots[1],
+                (OseoPropertyAttributes){true, false, true, false}
+            );
+        }
+    }
+    static const size_t access_codes[] = {
+        OSEO_STRING_AT_CODE_ID,
+        OSEO_STRING_CHAR_AT_CODE_ID,
+        OSEO_STRING_CHAR_CODE_AT_CODE_ID,
+        OSEO_STRING_CODE_POINT_AT_CODE_ID,
+        OSEO_STRING_TO_STRING_CODE_ID,
+        OSEO_STRING_VALUE_OF_CODE_ID,
+    };
+    static const char *const access_names[] = {
+        "at",
+        "charAt",
+        "charCodeAt",
+        "codePointAt",
+        "toString",
+        "valueOf",
+    };
+    static const size_t access_lengths[] = {1u, 1u, 1u, 1u, 0u, 0u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 6u;
+         index += 1u) {
+        result = create_string_function(
+            context,
+            access_codes[index],
+            access_names[index],
+            access_lengths[index],
+            OSEO_FUNCTION_INTERNAL
+        );
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_string_property(
+                context,
+                frame.slots[0],
+                access_names[index],
                 frame.slots[1],
                 (OseoPropertyAttributes){true, false, true, false}
             );
