@@ -12,5 +12,5 @@ inventory:
 dependencies:
   - array-constructor
   - function-prototype
-landed: false
+landed: true
 status: ready

@@ -13,4 +13,4 @@ inventory:
 dependencies:
   - array-prototype-iterative
 landed: false
-status: blocked
+status: ready
