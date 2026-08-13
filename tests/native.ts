@@ -44,6 +44,7 @@ import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
+import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
@@ -74,12 +75,15 @@ const zigNativeTarget =
       ? "x86_64-linux-gnu"
       : assert.fail(`unsupported execution target: ${nativeTarget.name}`);
 
+// The captured `String` keeps the reference console working while a
+// fixture replaces or deletes the realm's own global binding.
 const referencePrelude = `
 const oseoReferenceConsole = console;
+const oseoReferenceString = String;
 Object.defineProperty(globalThis, "console", {
   value: {
     log(...values: unknown[]) {
-      oseoReferenceConsole.log(values.map(String).join(" "));
+      oseoReferenceConsole.log(values.map(oseoReferenceString).join(" "));
     },
   },
 });
@@ -100,6 +104,7 @@ const fixtures: readonly Fixture[] = [
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
+  ...stringFixtures.stringIntrinsicFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -152,6 +157,22 @@ for (const [name, source] of [
     ),
   );
 }
+
+const deferredStringTrim = await runNativeCli(
+  {
+    args: ["deferred-string-trim.ts"],
+    source: '"".trim();',
+    sourceId: "deferred-string-trim.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(deferredStringTrim.exitStatus, 1);
+assert.equal(deferredStringTrim.stdout, "");
+assert.match(
+  deferredStringTrim.stderr,
+  /^deferred-string-trim\.ts:1:\d+: error\[OSEO2001\]: String prototype/u,
+);
 
 const deferredObjectAssign = await runNativeCli(
   {
@@ -272,7 +293,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
-    fixture.name === "promise-intrinsic"
+    fixture.name === "promise-intrinsic" ||
+    fixture.name === "string-intrinsic"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -340,6 +362,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-intrinsic" ||
+    fixture.name === "string-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -522,7 +545,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "number-intrinsic" ||
-            fixture.name === "promise-intrinsic"
+            fixture.name === "promise-intrinsic" ||
+            fixture.name === "string-intrinsic"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -688,9 +712,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus twelve admitted constructor
-            // property names shared by every Script.
-            assert.equal(native.counters.allocations, 28);
+            // value-property allocations plus thirteen admitted constructor
+            // property names shared by every Script, String being the one
+            // this node admits.
+            assert.equal(native.counters.allocations, 29);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

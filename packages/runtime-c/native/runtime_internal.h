@@ -339,6 +339,22 @@
 #define OSEO_ARRAY_BUFFER_TRANSFER_TO_FIXED_LENGTH_CODE_ID \
     (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 10u)
 
+
+#define OSEO_STRING_CODE_ID_RANGE_INDEX ((size_t)12u)
+#define OSEO_STRING_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_STRING_CODE_ID_RANGE_INDEX)
+#define OSEO_STRING_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_STRING_CODE_ID_RANGE_INDEX)
+#define OSEO_STRING_CONSTRUCTOR_CODE_ID OSEO_STRING_CODE_ID_RANGE_LAST
+#define OSEO_STRING_FROM_CHAR_CODE_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_STRING_FROM_CODE_POINT_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_STRING_RAW_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_STRING_UNADMITTED_METHOD_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 4u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1291,6 +1307,43 @@ bool oseo_internal_string_own_property(
     OseoValue key,
     uint32_t *index
 );
+/*
+ * True for a String exotic object, meaning an ordinary object whose
+ * [[StringData]] slot holds a String value. The wrapper brand shares
+ * the primitive slot every non-Number wrapper uses, so the string case
+ * is recognized here rather than by a second dedicated flag.
+ */
+bool oseo_internal_string_data(OseoValue value);
+/*
+ * Defines the own properties StringCreate gives one String exotic
+ * object: one non-writable, non-configurable, enumerable index property
+ * per code unit and a non-writable, non-enumerable, non-configurable
+ * `length`. `wrapper` must already carry the [[StringData]] slot the
+ * properties describe, and both values stay rooted through the caller's
+ * frame slots while the definitions allocate.
+ */
+OseoResult oseo_internal_string_wrapper_properties(
+    OseoContext *context,
+    OseoValue string_value,
+    OseoValue wrapper
+);
+OseoResult oseo_internal_string_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/* Materializes %String% together with %String.prototype% and its
+ * fromCharCode, fromCodePoint, and raw statics, and returns the
+ * constructor. */
+OseoResult oseo_internal_string_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_string_global(
+    OseoContext *context,
+    OseoValue global
+);
 
 typedef enum {
     OSEO_BIGINT_ADD,
@@ -1385,6 +1438,27 @@ bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index);
 OseoResult oseo_internal_grow_properties(
     OseoContext *context,
     OseoValue object_value
+);
+/*
+ * Appends one own data property, skipping the duplicate-key scan
+ * [[DefineOwnProperty]] begins with. It exists for one caller shape:
+ * an object the caller created empty and is filling with keys it knows
+ * are pairwise distinct, where that scan would make defining n
+ * properties quadratic without changing any observable result.
+ *
+ * The caller must have established, for the whole run of appends, that
+ * object_value is an extensible ordinary object with no own property,
+ * no module-namespace or array-exotic behavior, and no synthetic
+ * `prototype`, and that no key repeats. Every other definition,
+ * including one on an object user code has already touched, belongs to
+ * oseo_object_define.
+ */
+OseoResult oseo_internal_append_own_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
 );
 /*
  * True when one own property of object_value keeps its value in the

@@ -1,0 +1,34 @@
+group: built-ins/String
+key: a2
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/S15.5.1.1_A1_T18.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -366,7 +366,13 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
 ) {
     OseoResult result;
     bool created = false;
+    /*
+     * A prototype whose own constructor node materializes it, including
+     * the exotic own properties and the `constructor` property, is
+     * reached through the realm intrinsic table rather than built here.
+     */
     if (intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         result = oseo_internal_intrinsic(context, intrinsic);
     } else if (is_object(context->intrinsics[intrinsic])) {
@@ -386,6 +392,7 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
     }
     if (result.status != OSEO_STATUS_NORMAL) return result;
     if (intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         return result;
     }
@@ -394,16 +401,6 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         prototype->primitive_data = true;
         if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE) {
             prototype->primitive_value = oseo_boolean(false);
-        } else if (intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE) {
-            result = oseo_internal_allocate_string(context, NULL, 0u);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                prototype = ordinary_object(context->intrinsics[intrinsic]);
-                prototype->primitive_value = result.value;
-                prototype->virtual_string_iterator = true;
-                prototype->virtual_string_iterator_configurable = true;
-                prototype->virtual_string_iterator_enumerable = false;
-                prototype->virtual_string_iterator_writable = true;
-            }
         } else {
             result = oseo_bigint_literal(context, "0", 10u);
             if (result.status == OSEO_STATUS_NORMAL) {
@@ -416,7 +413,7 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         result = oseo_internal_install_primitive_wrapper_methods(
             context,
             context->intrinsics[intrinsic],
-            intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE
+            false
         );
     }
     if (result.status != OSEO_STATUS_NORMAL && created) {
@@ -442,43 +439,6 @@ static OseoResult primitive_wrapper_prototype(
         intrinsic = OSEO_INTRINSIC_BOOLEAN_PROTOTYPE;
     }
     return oseo_internal_primitive_wrapper_prototype(context, intrinsic);
-}
-
-static OseoResult define_string_wrapper_properties(
-    OseoContext *context,
-    OseoRootFrame *frame
-) {
-    OseoString *string = string_object(frame->slots[0]);
-    for (size_t index = 0u; index < string->length; index += 1u) {
-        char key_text[24];
-        (void)snprintf(key_text, sizeof(key_text), "%zu", index);
-        OseoResult result = oseo_internal_ascii_string(context, key_text);
-        frame->slots[2] = result.value;
-        if (result.status != OSEO_STATUS_NORMAL) return result;
-        string = string_object(frame->slots[0]);
-        uint16_t unit = string->units[index];
-        result = oseo_internal_allocate_string(context, &unit, 1u);
-        frame->slots[3] = result.value;
-        if (result.status != OSEO_STATUS_NORMAL) return result;
-        result = oseo_object_define(
-            context,
-            frame->slots[1],
-            frame->slots[2],
-            frame->slots[3],
-            (OseoPropertyAttributes){false, true, false, false}
-        );
-        if (result.status != OSEO_STATUS_NORMAL) return result;
-    }
-    OseoResult result = oseo_internal_ascii_string(context, "length");
-    frame->slots[2] = result.value;
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    return oseo_object_define(
-        context,
-        frame->slots[1],
-        frame->slots[2],
-        oseo_number(string_object(frame->slots[0])->length),
-        (OseoPropertyAttributes){false, false, false, false}
-    );
 }
 
 static OseoResult to_object(
@@ -509,7 +469,11 @@ static OseoResult to_object(
             wrapper->number_value = frame.slots[0];
         }
         if (define_string_properties && is_string(frame.slots[0])) {
-            result = define_string_wrapper_properties(context, &frame);
+            result = oseo_internal_string_wrapper_properties(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];

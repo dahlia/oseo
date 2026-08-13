@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 8,791 reviewed cases: 6,113 passes, 1,364
-expected negatives, and 1,314 unsupported profile features. It records no
+The current manifest contains 8,936 reviewed cases: 6,321 passes, 1,364
+expected negatives, and 1,251 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -162,8 +162,9 @@ current evidence assessment. Those live only in the indexed records above.
     source-located rejection: the realm binds that name to a real
     value, so `"undefined"` would misreport it, the same boundary
     the Unit 8.1b identifier delete records. A name the profile has
-    since materialized, such as `Object`, `Number`, or `Promise`,
-    reads the realm global object's property instead. The same rule covers every
+    since materialized, such as `Object`, `Number`, `Promise`, or
+    `String`, reads the realm global object's property instead. The same
+    rule covers every
     other global name ECMA-262 clause 19 requires of the pinned
     ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
     `globalThis`: an unshadowed `typeof` of one stays a source-located
@@ -273,8 +274,10 @@ current evidence assessment. Those live only in the indexed records above.
     ToObject is modeled rather than materialized while primitive
     wrappers remain outside the profile: a string subject reports one
     enumerable own index property per code unit and a non-enumerable
-    `length`, and %String.prototype% is not an object this realm
-    creates; every other primitive wrapper owns no property at all, so
+    `length`, which is the shape the M5b `string-intrinsic` node later
+    gives both the String exotic objects `new String` creates and
+    %String.prototype% itself; every other primitive wrapper owns no
+    property at all, so
     enumerating one is enumerating its prototype, which makes a symbol
     subject enumerate %Symbol.prototype% and a number, boolean, or
     BigInt subject report nothing. An Array's `length` and a function's
@@ -523,11 +526,12 @@ current evidence assessment. Those live only in the indexed records above.
     `0x60002400` covers the same forms across both specialization policies and
     forced collection. Sixteen reviewed test262 cases pass and twelve
     expected negatives retain the tagged-template, assignment-target, update,
-    and invalid `super()` grammar errors. Five unsupported cases record
+    and invalid `super()` grammar errors. Four unsupported cases record
     independent prerequisites including dynamic source, restricted
-    asynchronous `await` positions, `String`, `Reflect`, and
-    regular expressions; the group holds twenty passes since M5a Unit
-    8.5l promoted its `for-in` iteration-statement case. Optional calls through
+    asynchronous `await` positions, `Reflect`, and
+    regular expressions; the group holds twenty-one passes since M5a Unit
+    8.5l promoted its `for-in` iteration-statement case and the M5b
+    `string-intrinsic` node promoted its `String` one. Optional calls through
     `super` properties are admitted by M5a Unit 8.2 as recorded below. The
     remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
@@ -3414,6 +3418,48 @@ no semantic, harness, or infrastructure failures. The suite revision,
 are unchanged. The public intrinsic table moves the runtime ABI to
 `oseo-runtime-m5-61` without changing the graph's orchestration state.
 
+M5b node `string-intrinsic` makes `String` a materialized realm value. The
+constructor is an ordinary constructible function bound as the standard
+writable, non-enumerable, configurable property of the global object, so
+`new String` is ordinary construction and every static is an ordinary method
+call. Calling `String` converts through the shared `ToString`, except that a
+Symbol argument renders SymbolDescriptiveString instead of throwing;
+constructing it brands the receiver the new target produced with
+`[[StringData]]`, so a subclass keeps its own prototype. A String exotic
+object carries one non-writable, non-configurable, enumerable own property
+per UTF-16 code unit and a non-writable, non-enumerable, non-configurable
+`length`, and %String.prototype% is itself such an object over the empty
+String, so `Object.prototype.toString` reports `[object String]` for either.
+Sixteen selected ES5-era methods are materialized as ordinary boundary
+functions with their specified descriptors. Calling one still reports the
+owned unadmitted-method boundary until its String prototype node lands.
+`String.fromCharCode` truncates each converted argument with `ToUint16` in
+argument order; `String.fromCodePoint` rejects a non-integral, negative, or
+above-`0x10FFFF` code point with a `RangeError` at the argument that produced
+it and encodes an astral code point as a surrogate pair, while a lone
+surrogate stays exactly the code unit it names; and `String.raw` follows the
+specified order of `ToObject`, the `raw` read, LengthOfArrayLike, and the
+alternating literal and substitution conversions. Fixed native
+and generated differential evidence at seed `0x60004000` covers both
+specialization policies, collection forced at every safepoint, false hints,
+deliberate shape-guard misses, generic fallback, lone surrogates, astral code
+points, coercion order, and global `String` replacement and deletion. The
+reviewed subset admits the `String.fromCodePoint` feature tag so that static
+executes its upstream cases instead of reporting an unadmitted feature. Of
+the 150 paths under the node's four inventory roots, 145 are reviewed: 114
+pass and 31 retain explicit prerequisite boundaries. The remaining five call
+the materialized `String.prototype.charCodeAt` boundary, whose behavior no
+admitted prototype-method node implements yet.
+Ninety-four previously reviewed cases also move from unsupported to pass
+because a real `String` value and the descriptor-complete boundary for those
+methods satisfy their prerequisites. The manifest reaches 8,936 cases: 6,321
+passes, 1,364 expected negatives, and 1,251 unsupported profile features with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override policy
+are unchanged. The materialized constructor adds no generated-code entry point
+and moves the runtime ABI to `oseo-runtime-m5-62` without changing the graph's
+orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3470,8 +3516,8 @@ complete. The remaining gaps retain their existing owners.
     top-level `this` and every non-strict nullish receiver one realm-wide
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
-    admitted `ArrayBuffer`, `Object`, `Number`, and `Promise` identities.
-    Because this realm
+    admitted `ArrayBuffer`, `Object`, `Number`, `Promise`, and `String`
+    identities. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-61",
+  abiVersion: "m5-62",
   assets: [
     {
       kind: "header",

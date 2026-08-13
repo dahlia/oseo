@@ -256,3 +256,7 @@ families:
     owner: tests/property/m5-array-constructor.property.test.ts
     start: 0x60003f00
     end: 0x60003fff
+  - family: m5-string-intrinsic
+    owner: tests/property/m5-string-intrinsic.property.test.ts
+    start: 0x60004000
+    end: 0x600040ff
