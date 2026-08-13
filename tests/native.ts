@@ -50,6 +50,8 @@ const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
 const { arrayPrototypeIterativeFixtures } =
   await import("./native/fixtures/array-prototype-iterative.ts");
+const { arrayPrototypeSpeciesMappingFixtures } =
+  await import("./native/fixtures/array-prototype-species-mapping.ts");
 const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 const { stringPrototypeSearchAndSliceFixtures } =
@@ -102,6 +104,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayBufferFixtures,
   ...arrayConstructorFixtures,
   ...arrayPrototypeIterativeFixtures,
+  ...arrayPrototypeSpeciesMappingFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -293,6 +296,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "array-buffer" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -474,6 +478,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "string-prototype-search-and-slice" ||
+    fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -551,6 +556,7 @@ for (const fixture of selectedFixtures) {
           if (
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-iterative" ||
+            fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

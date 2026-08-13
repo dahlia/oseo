@@ -38,6 +38,29 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/filter/15.4.4.20-5-12.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/filter/15.4.4.20-5-12.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/filter/15.4.4.20-5-12.j\
+        s:85:22: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-ii-8.js
       strictness:
         - non-strict

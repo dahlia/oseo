@@ -103,18 +103,26 @@ test("populates the realm-owned Object constructor cluster", () => {
   assert.match(functions, /intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF/u);
 });
 
-test("populates Array prototype iteration methods", () => {
+test("populates Array prototype iteration and species methods", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
 
-  for (const method of ["every", "forEach", "some"]) {
+  for (const method of ["every", "filter", "forEach", "map", "some"]) {
     assert.match(arraySource, new RegExp(`"${method}"`, "u"));
   }
-  for (const code of ["EVERY", "FOR_EACH", "SOME"]) {
+  for (const code of ["EVERY", "FILTER", "FOR_EACH", "MAP", "SOME"]) {
     assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
   }
   assert.match(arraySource, /array_iteration[\s\S]*oseo_has_property/u);
   assert.match(arraySource, /array_iteration[\s\S]*oseo_call_function/u);
+  assert.match(
+    arraySource,
+    /array_species_create[\s\S]*OSEO_WELL_KNOWN_SPECIES/u,
+  );
+  assert.match(
+    arraySource,
+    /array_species_mapping[\s\S]*create_index_property/u,
+  );
 });
 
 test("orders Object.defineProperty conversion before descriptors", () => {
