@@ -479,6 +479,7 @@ The `localeCompare`, `match`, `replace`, `search`, `split`,
 `trim` methods retain their source-located M5b boundary. The generated-code ABI
 again gains no entry point; the added intrinsic code IDs remain
 runtime-internal.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

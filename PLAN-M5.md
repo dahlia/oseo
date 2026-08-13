@@ -30,8 +30,8 @@ M5a is complete. The 81 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records 7,206
-passes across 9,909 paths, and the property inventory records 81 domains, 81
-seeds, and an ordinary case budget of 3,478.
+passes across 9,909 paths, and the property inventory records 80 domains, 80
+seeds, and an ordinary case budget of 3,462.
 
 
 M5a implementation history
