@@ -204,6 +204,88 @@ try {
     deletedStringIteratorCalls,
   );
 }
+const numberPrototype = Object.getPrototypeOf(Object(0));
+let numberIteratorReads = 0;
+Object.defineProperty(numberPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    numberIteratorReads = numberIteratorReads + 1;
+    return function () {
+      let index = 0;
+      return {
+        next: function () {
+          index = index + 1;
+          if (index === 1) return { done: false, value: 2 };
+          if (index === 2) return { done: false, value: 3 };
+          return { done: true };
+        },
+      };
+    };
+  },
+});
+const numberGroups = Object.groupBy(7, (value) =>
+  value % 2 === 0 ? "even" : "odd"
+);
+console.log(
+  "grouped number iterator",
+  numberIteratorReads,
+  render(numberGroups.even),
+  render(numberGroups.odd),
+);
+const numberLoopValues = [];
+for (const value of 7) numberLoopValues.push(value);
+console.log(
+  "number for of iterator",
+  numberIteratorReads,
+  render(numberLoopValues),
+);
+delete numberPrototype[Symbol.iterator];
+
+const booleanPrototype = Object.getPrototypeOf(Object(false));
+let booleanIteratorReads = 0;
+Object.defineProperty(booleanPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    booleanIteratorReads = booleanIteratorReads + 1;
+    return function () {
+      let done = false;
+      return {
+        next: function () {
+          if (done) return { done: true };
+          done = true;
+          return { done: false, value: ["boolean", 9] };
+        },
+      };
+    };
+  },
+});
+const booleanEntries = Object.fromEntries(false);
+console.log(
+  "from entries boolean iterator",
+  booleanIteratorReads,
+  booleanEntries.boolean,
+);
+delete booleanPrototype[Symbol.iterator];
+
+for (const nullish of [null, undefined]) {
+  try {
+    Object.groupBy(nullish, () => "unreachable");
+  } catch (error) {
+    console.log("grouped nullish", error instanceof TypeError);
+  }
+  try {
+    Object.fromEntries(nullish);
+  } catch (error) {
+    console.log("from entries nullish", error instanceof TypeError);
+  }
+}
+for (const invalid of [null, undefined, true]) {
+  try {
+    for (const value of invalid) console.log("unreachable", value);
+  } catch (error) {
+    console.log("for of invalid", error instanceof TypeError);
+  }
+}
 
 /** @param {string} value */
 function hinted(value) { return value.charAt(0); }

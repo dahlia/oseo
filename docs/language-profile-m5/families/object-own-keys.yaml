@@ -5,7 +5,8 @@ scope:
   - "Object.keys, values, entries, getOwnPropertyNames,
     getOwnPropertySymbols, assign, fromEntries, hasOwn, and groupBy,
     including ordinary own-key order, descriptor rechecks, symbol keys,
-    iterator closing, null-prototype groups, and default String iteration."
+    iterator closing, null-prototype groups, default String iteration, and
+    inherited primitive iterators."
 owners:
   - PLAN-M5.md
 evidence:

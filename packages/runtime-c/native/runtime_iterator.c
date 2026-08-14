@@ -1846,15 +1846,6 @@ OseoResult oseo_iterator_get(
     OseoResult result =
         oseo_internal_well_known_symbol(context, OSEO_WELL_KNOWN_ITERATOR);
     slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        !is_object(slots[0]) &&
-        !is_string(slots[0])) {
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The value is not iterable."
-        );
-    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, slots[0], slots[1]);
         slots[2] = result.value;
@@ -2300,13 +2291,6 @@ OseoResult oseo_async_iterator_get(
         OSEO_WELL_KNOWN_ASYNC_ITERATOR
     );
     slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[0])) {
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The value is not async iterable."
-        );
-    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, slots[0], slots[1]);
         slots[2] = result.value;

@@ -27,8 +27,10 @@ const { assertAsyncProperty } = await import(
 );
 
 interface PropertyCase {
+  readonly booleanEntryValue: number;
   readonly entries: readonly EntryCase[];
   readonly grouped: readonly number[];
+  readonly numberIteratorValues: readonly number[];
 }
 
 interface EntryCase {
@@ -51,12 +53,17 @@ const entryArbitrary = fc.record({
 });
 
 const caseArbitrary: fc.Arbitrary<PropertyCase> = fc.record({
+  booleanEntryValue: fc.integer({ max: 9, min: -9 }),
   entries: fc.uniqueArray(entryArbitrary, {
     maxLength: 6,
     minLength: 1,
     selector: (entry) => entry.key,
   }),
   grouped: fc.array(fc.integer({ max: 6, min: -6 }), { maxLength: 5 }),
+  numberIteratorValues: fc.array(fc.integer({ max: 6, min: -6 }), {
+    maxLength: 4,
+    minLength: 1,
+  }),
 });
 
 const host = createNodeHost();
@@ -191,6 +198,87 @@ try {
     deletedStringIteratorCalls,
   );
 }
+const numberIteratorValues = ${JSON.stringify(testCase.numberIteratorValues)};
+const numberPrototype = Object.getPrototypeOf(Object(0));
+let numberIteratorReads = 0;
+Object.defineProperty(numberPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    numberIteratorReads = numberIteratorReads + 1;
+    return function () {
+      let index = 0;
+      return {
+        next: function () {
+          if (index >= numberIteratorValues.length) return { done: true };
+          const value = numberIteratorValues[index];
+          index = index + 1;
+          return { done: false, value };
+        },
+      };
+    };
+  },
+});
+const numberGroups = Object.groupBy(7, () => "number");
+console.log(
+  "group primitive number",
+  numberIteratorReads,
+  render(numberGroups.number),
+);
+const numberLoopValues = [];
+for (const value of 7) numberLoopValues.push(value);
+console.log(
+  "for of primitive number",
+  numberIteratorReads,
+  render(numberLoopValues),
+);
+delete numberPrototype[Symbol.iterator];
+const booleanPrototype = Object.getPrototypeOf(Object(false));
+let booleanIteratorReads = 0;
+Object.defineProperty(booleanPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    booleanIteratorReads = booleanIteratorReads + 1;
+    return function () {
+      let done = false;
+      return {
+        next: function () {
+          if (done) return { done: true };
+          done = true;
+          return {
+            done: false,
+            value: ["boolean", ${testCase.booleanEntryValue}],
+          };
+        },
+      };
+    };
+  },
+});
+const booleanEntries = Object.fromEntries(false);
+console.log(
+  "from entries primitive boolean",
+  booleanIteratorReads,
+  booleanEntries.boolean,
+);
+delete booleanPrototype[Symbol.iterator];
+for (const nullish of [null, undefined]) {
+  try {
+    Object.groupBy(nullish, () => "unreachable");
+  } catch (error) {
+    console.log("group nullish", error instanceof TypeError);
+  }
+  try {
+    Object.fromEntries(nullish);
+  } catch (error) {
+    console.log("from entries nullish", error instanceof TypeError);
+  }
+}
+for (const invalid of [null, undefined, true]) {
+  try {
+    for (const value of invalid) console.log("unreachable", value);
+  } catch (error) {
+    console.log("for of invalid", error instanceof TypeError);
+  }
+}
 `;
 }
 
@@ -272,6 +360,16 @@ function expected(testCase: PropertyCase): string {
     "guard g",
     "group replaced string iterator 1 replacement",
     "group deleted string iterator true 0",
+    `group primitive number 1 ${testCase.numberIteratorValues.join(",")}`,
+    `for of primitive number 2 ${testCase.numberIteratorValues.join(",")}`,
+    `from entries primitive boolean 1 ${testCase.booleanEntryValue}`,
+    "group nullish true",
+    "from entries nullish true",
+    "group nullish true",
+    "from entries nullish true",
+    "for of invalid true",
+    "for of invalid true",
+    "for of invalid true",
     "",
   );
   return lines.join("\n");
@@ -393,13 +491,17 @@ test(
           "one to six distinct integer, string, and symbol own properties; " +
           "enumerable and hidden descriptors; bounded integer values; zero " +
           "to five grouped values; replaced and deleted String iterators; " +
-          "a false hint and one shape-guard miss",
+          "inherited Number and Boolean iterators through built-in and " +
+          "generated consumers; nullish and absent-iterator failures; a " +
+          "false hint and one shape-guard miss",
         numRuns: 16,
         profile: "M5 Object own-key statics",
         seed: 0x6000_4500,
         sizeLimit:
           "at most six own properties, five grouped values, nine static " +
-          "observations, two String iterator observations, and four " +
+          "observations, four Number iterator values, two String iterator " +
+          "observations, two Boolean iterator observations, four nullish " +
+          "observations, three invalid for-of observations, and four " +
           "specialization observations",
         timeLimitMilliseconds: 180_000,
       },
