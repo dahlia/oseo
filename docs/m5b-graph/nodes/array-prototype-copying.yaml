@@ -17,4 +17,4 @@ dependencies:
   - array-prototype-species-mapping
   - string-prototype-access
 landed: false
-status: blocked
+status: ready

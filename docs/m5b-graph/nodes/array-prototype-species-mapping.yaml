@@ -11,5 +11,5 @@ inventory:
 dependencies:
   - array-prototype-iterative
   - well-known-symbols
-landed: false
+landed: true
 status: ready
