@@ -726,6 +726,16 @@ reachable, and the current element stays rooted across the predicate call.
 All four code IDs come from the existing Array range, and the generated-code
 ABI gains no entry point.
 
+The `m5-94` ABI completes the realm-owned `Object` constructor's ordinary
+`keys`, `values`, `entries`, `getOwnPropertyNames`,
+`getOwnPropertySymbols`, `assign`, `fromEntries`, `hasOwn`, and `groupBy`
+functions. They share the existing ordinary own-key ordering and preserve
+descriptor rechecks, Get and Set order, iterator closing, symbol identity, and
+null-prototype grouping. The temporary default primitive String path in
+`groupBy` iterates Unicode code points without exposing the separate String
+iterator node. The generated-code ABI gains no entry point; the added
+intrinsic code IDs remain runtime-internal.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

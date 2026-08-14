@@ -445,11 +445,7 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
       "u",
     ),
   );
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(deferred[1] ?? "", /getOwnPropertyDescriptors/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("collects every defineProperties descriptor before mutation", () => {
@@ -484,11 +480,7 @@ test("collects every defineProperties descriptor before mutation", () => {
     objectBuiltins,
     /OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID[\s\S]*"defineProperties"/u,
   );
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(deferred[1] ?? "", /defineProperties/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("creates over the shared defineProperties collection", () => {
@@ -533,14 +525,30 @@ test("owns Object integrity transitions and queries", () => {
   assert.match(objectBuiltins, /object_set_integrity_level/u);
   assert.match(objectBuiltins, /object_test_integrity_level/u);
   assert.match(objectBuiltins, /object->extensible = false/u);
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(
-    deferred[1] ?? "",
-    /freeze|isExtensible|isFrozen|isSealed|preventExtensions|seal/u,
-  );
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
+});
+
+test("owns Object key, entry, assignment, and grouping statics", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const name of [
+    "assign",
+    "entries",
+    "fromEntries",
+    "getOwnPropertyNames",
+    "getOwnPropertySymbols",
+    "groupBy",
+    "hasOwn",
+    "keys",
+    "values",
+  ]) {
+    assert.match(objectBuiltins, new RegExp(`"${name}"`, "u"));
+  }
+  assert.match(objectBuiltins, /snapshot_own_keys/u);
+  assert.match(objectBuiltins, /object_enumerable_own_properties/u);
+  assert.match(objectBuiltins, /object_close_after_abrupt/u);
+  assert.match(objectBuiltins, /object_add_grouped_value/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("installs the module namespace toStringTag descriptor", () => {

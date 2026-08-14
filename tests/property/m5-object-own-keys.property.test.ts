@@ -1,0 +1,366 @@
+/* eslint-disable no-await-in-loop -- Native observations are isolated. */
+
+import assert from "node:assert/strict";
+import process from "node:process";
+import test from "node:test";
+
+import fc from "fast-check";
+
+import { cBackend } from "../../packages/backend-c/src/index.ts";
+import {
+  compileSource,
+  describeTarget,
+  printMir,
+  targetForExecutionHost,
+} from "../../packages/compiler/src/index.ts";
+import { createNodeHost } from "../../packages/host/src/index.ts";
+import { babelFrontend } from "../../packages/parser-babel/src/index.ts";
+import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
+import {
+  assertMatchingObservations,
+  withNativeFixture,
+} from "../../packages/testkit/src/index.ts";
+import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+
+const { assertAsyncProperty } = await import(
+  ["../../packages/testkit/tests/", "property-support.ts"].join("")
+);
+
+interface PropertyCase {
+  readonly entries: readonly EntryCase[];
+  readonly grouped: readonly number[];
+}
+
+interface EntryCase {
+  readonly enumerable: boolean;
+  readonly key: "0" | "2" | "a" | "b" | "symbol-0" | "symbol-1";
+  readonly value: number;
+}
+
+const entryArbitrary = fc.record({
+  enumerable: fc.boolean(),
+  key: fc.constantFrom<EntryCase["key"]>(
+    "0",
+    "2",
+    "a",
+    "b",
+    "symbol-0",
+    "symbol-1",
+  ),
+  value: fc.integer({ max: 9, min: -9 }),
+});
+
+const caseArbitrary: fc.Arbitrary<PropertyCase> = fc.record({
+  entries: fc.uniqueArray(entryArbitrary, {
+    maxLength: 6,
+    minLength: 1,
+    selector: (entry) => entry.key,
+  }),
+  grouped: fc.array(fc.integer({ max: 6, min: -6 }), { maxLength: 5 }),
+});
+
+const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
+
+function sourceKey(entry: EntryCase): string {
+  switch (entry.key) {
+    case "symbol-0":
+      return "symbols[0]";
+    case "symbol-1":
+      return "symbols[1]";
+    default:
+      return JSON.stringify(entry.key);
+  }
+}
+
+function printCase(testCase: PropertyCase): string {
+  const definitions = testCase.entries
+    .map(
+      (entry) => `Object.defineProperty(subject, ${sourceKey(entry)}, {
+  value: ${entry.value},
+  enumerable: ${String(entry.enumerable)},
+  configurable: true,
+  writable: true,
+});`,
+    )
+    .join("\n");
+  return `
+function render(values) {
+  let text = "";
+  for (let index = 0; index < values.length; index = index + 1) {
+    if (index > 0) text = text + ",";
+    text = text + values[index];
+  }
+  return text;
+}
+const symbols = [Symbol("zero"), Symbol("one")];
+const subject = {};
+${definitions}
+console.log("keys", render(Object.keys(subject)));
+console.log("values", render(Object.values(subject)));
+let renderedEntries = "";
+for (const entry of Object.entries(subject)) {
+  if (renderedEntries !== "") renderedEntries = renderedEntries + ",";
+  renderedEntries = renderedEntries + entry[0] + ":" + entry[1];
+}
+console.log("entries", renderedEntries);
+console.log("names", render(Object.getOwnPropertyNames(subject)));
+const ownSymbols = Object.getOwnPropertySymbols(subject);
+let renderedSymbols = "";
+for (let index = 0; index < ownSymbols.length; index = index + 1) {
+  if (index > 0) renderedSymbols = renderedSymbols + ",";
+  renderedSymbols = renderedSymbols +
+    (ownSymbols[index] === symbols[0] ? "zero" : "one");
+}
+console.log("symbols", renderedSymbols);
+const assigned = Object.assign({ base: 10 }, subject);
+console.log("assign keys", render(Object.keys(assigned)));
+console.log("assign values", render(Object.values(assigned)));
+console.log(
+  "assign symbols",
+  Object.hasOwn(assigned, symbols[0]),
+  Object.hasOwn(assigned, symbols[1]),
+);
+const reconstructed = Object.fromEntries(Object.entries(subject));
+console.log("from entries", render(Object.keys(reconstructed)));
+console.log(
+  "has own",
+  Object.hasOwn(subject, "0"),
+  Object.hasOwn(subject, "a"),
+  Object.hasOwn(subject, symbols[0]),
+);
+const grouped = Object.groupBy(
+  ${JSON.stringify(testCase.grouped)},
+  (value) => value % 2 === 0 ? "even" : "odd",
+);
+console.log("group keys", render(Object.keys(grouped)));
+if (Object.hasOwn(grouped, "even")) {
+  console.log("even", render(grouped.even));
+}
+if (Object.hasOwn(grouped, "odd")) {
+  console.log("odd", render(grouped.odd));
+}
+console.log("null prototype", Object.getPrototypeOf(grouped) === null);
+/** @param {string} value */
+function hinted(value) { return value.charAt(0); }
+console.log("hint", hinted("hit"));
+console.log("false hint", hinted(new String("miss")));
+console.log("guard", hinted("guard"));
+String.prototype.objectOwnKeysPropertyMarker = 1;
+console.log("guard", hinted("guard"));
+`;
+}
+
+function orderedEntries(testCase: PropertyCase): readonly EntryCase[] {
+  const indices = testCase.entries
+    .filter((entry) => entry.key === "0" || entry.key === "2")
+    .toSorted((left, right) => Number(left.key) - Number(right.key));
+  const strings = testCase.entries.filter(
+    (entry) => entry.key === "a" || entry.key === "b",
+  );
+  const symbols = testCase.entries.filter((entry) =>
+    entry.key.startsWith("symbol-"),
+  );
+  return [...indices, ...strings, ...symbols];
+}
+
+function stringName(entry: EntryCase): string | undefined {
+  return entry.key.startsWith("symbol-") ? undefined : entry.key;
+}
+
+function expected(testCase: PropertyCase): string {
+  const ordered = orderedEntries(testCase);
+  const enumerableStrings = ordered.filter(
+    (entry) => entry.enumerable && stringName(entry) != null,
+  );
+  const names = ordered
+    .map(stringName)
+    .filter((name): name is string => name != null);
+  const symbols = ordered.filter((entry) => entry.key.startsWith("symbol-"));
+  const assignedSymbols = new Set(
+    symbols.filter((entry) => entry.enumerable).map((entry) => entry.key),
+  );
+  const lines = [
+    `keys ${enumerableStrings.map((entry) => entry.key).join(",")}`,
+    `values ${enumerableStrings.map((entry) => entry.value).join(",")}`,
+    "entries " +
+      enumerableStrings.map((entry) => `${entry.key}:${entry.value}`).join(","),
+    `names ${names.join(",")}`,
+    `symbols ${symbols
+      .map((entry) => (entry.key === "symbol-0" ? "zero" : "one"))
+      .join(",")}`,
+  ];
+  const assignedStrings = [
+    ...enumerableStrings.filter(
+      (entry) => entry.key === "0" || entry.key === "2",
+    ),
+    { enumerable: true, key: "base", value: 10 },
+    ...enumerableStrings.filter(
+      (entry) => entry.key === "a" || entry.key === "b",
+    ),
+  ];
+  lines.push(
+    `assign keys ${assignedStrings.map((entry) => entry.key).join(",")}`,
+    `assign values ${assignedStrings.map((entry) => entry.value).join(",")}`,
+    `assign symbols ${String(assignedSymbols.has("symbol-0"))} ` +
+      String(assignedSymbols.has("symbol-1")),
+    `from entries ${enumerableStrings.map((entry) => entry.key).join(",")}`,
+  );
+  const ownKeys = new Set(testCase.entries.map((entry) => entry.key));
+  lines.push(
+    `has own ${String(ownKeys.has("0"))} ${String(ownKeys.has("a"))} ` +
+      String(ownKeys.has("symbol-0")),
+  );
+  const even = testCase.grouped.filter((value) => value % 2 === 0);
+  const odd = testCase.grouped.filter((value) => value % 2 !== 0);
+  const groupKeys: string[] = [];
+  for (const value of testCase.grouped) {
+    const key = value % 2 === 0 ? "even" : "odd";
+    if (!groupKeys.includes(key)) groupKeys.push(key);
+  }
+  lines.push(`group keys ${groupKeys.join(",")}`);
+  if (even.length > 0) lines.push(`even ${even.join(",")}`);
+  if (odd.length > 0) lines.push(`odd ${odd.join(",")}`);
+  lines.push(
+    "null prototype true",
+    "hint h",
+    "false hint m",
+    "guard g",
+    "guard g",
+    "",
+  );
+  return lines.join("\n");
+}
+
+async function references(source: string): Promise<
+  readonly [
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+  ]
+> {
+  const directory = await host.makeTemporaryDirectory(
+    "oseo-object-own-keys-property-",
+  );
+  const sourcePath = `${directory}/case.ts`;
+  let succeeded = false;
+  try {
+    await host.writeTextFile(
+      sourcePath,
+      `(0, eval)(${JSON.stringify(source)});\n`,
+    );
+    const observations = [
+      await host.run({
+        args: [sourcePath],
+        command: process.execPath,
+        cwd: directory,
+      }),
+      await host.run({
+        args: ["run", "--quiet", sourcePath],
+        command: "deno",
+        cwd: directory,
+      }),
+    ] as const;
+    succeeded = true;
+    return observations;
+  } finally {
+    if (succeeded) await host.remove(directory);
+  }
+}
+
+test(
+  "generated Object own-key statics match the M5 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "Object own-key statics agree",
+      fc.asyncProperty(caseArbitrary, async (testCase) => {
+        const source = printCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-object-own-keys.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-object/u);
+            assert.match(mir, /guard-shape/u);
+            assert.match(mir, /property-get generic/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-(?:object|shape)/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to six distinct integer, string, and symbol own properties; " +
+          "enumerable and hidden descriptors; bounded integer values; zero " +
+          "to five grouped values; a false hint and one shape-guard miss",
+        numRuns: 16,
+        profile: "M5 Object own-key statics",
+        seed: 0x6000_4500,
+        sizeLimit:
+          "at most six own properties, five grouped values, nine static " +
+          "observations, and four specialization observations",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

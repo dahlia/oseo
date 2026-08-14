@@ -5505,6 +5505,39 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-92` without adding a generated-code entry point or
 changing the graph's orchestration state.
 
+M5b node `object-own-keys` completes the realm-owned `Object` constructor's
+key, entry, assignment, and grouping statics. `keys`, `values`, and `entries`
+snapshot ordinary own keys, omit symbols, and recheck each descriptor before
+reading an enumerable value. `getOwnPropertyNames` and
+`getOwnPropertySymbols` filter the same integer-index, String, then Symbol
+ordering without reading values. `assign` converts its target first, skips
+nullish sources, and performs each source Get followed by the target Set.
+`fromEntries` defines each iterated pair with writable, enumerable, and
+configurable attributes and closes the iterator after abrupt entry processing.
+`hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy` converts
+callback results through ToPropertyKey, appends values to arrays on a
+null-prototype result, and closes an acquired iterator after callback or key
+failure. Its default primitive String path consumes Unicode code points while
+the separate String iterator node remains unmaterialized.
+
+Fixed native and generated differential evidence at seed `0x60004500` covers
+integer, string, and symbol key ordering, mutation during enumeration,
+assignment accessors, iterator closing, null-prototype groups, primitive
+Strings, both specialization policies, forced collection at every safepoint,
+false hints, deliberate shape-guard misses, and generic fallback. Of the 296
+paths under the node's inventory roots, 295 are reviewed: 252 pass and 43
+retain explicit prerequisite boundaries. The legacy global-own-name case
+remains outside the subset because its frontmatter has no feature metadata but
+requires unadmitted global constructors and functions. Five previously
+reviewed dependency cases also move from unsupported to pass. The manifest
+reaches 10,659 cases: 7,850 passes, 1,364 expected negatives, and 1,445
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema, and
+zero-override policy are unchanged; the dependency vocabulary adds the
+`object-own-keys` evidence tag. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-94` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

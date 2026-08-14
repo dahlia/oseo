@@ -1,0 +1,3 @@
+version: 1
+id: object-own-keys
+record: docs/language-profile-m5/families/object-own-keys.yaml

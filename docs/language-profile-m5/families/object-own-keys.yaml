@@ -1,0 +1,54 @@
+version: 1
+id: object-own-keys
+title: "Object own-key statics"
+scope:
+  - "Object.keys, values, entries, getOwnPropertyNames,
+    getOwnPropertySymbols, assign, fromEntries, hasOwn, and groupBy,
+    including ordinary own-key order, descriptor rechecks, symbol keys,
+    iterator closing, null-prototype groups, and default String iteration."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/object-own-keys.ts
+      - tests/property/m5-object-own-keys.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/object-own-keys.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/object-own-keys.ts
+      - tests/property/m5-object-own-keys.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-object-own-keys.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/object-own-keys.ts
+      - tests/property/m5-object-own-keys.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/object-own-keys.ts
+      - tests/property/m5-object-own-keys.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_object_builtin.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
