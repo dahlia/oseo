@@ -480,6 +480,16 @@ The `localeCompare`, `match`, `replace`, `search`, `split`,
 again gains no entry point; the added intrinsic code IDs remain
 runtime-internal.
 
+The `m5-66` ABI adds ordinary `filter` and `map` functions to the same
+prototype. Both retain the snapshot-length HasProperty and Get loop, then
+create their result through ArraySpeciesCreate. An actual Array reads its
+`constructor` and then `Symbol.species`; a nullish species selects the realm
+Array, and any other species must be a constructor. `map` defines each visited
+index and preserves holes in its requested-length result, while `filter`
+defines selected values consecutively in its zero-length result. A non-Array
+receiver skips both species reads and uses the realm Array. The generated-code
+ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

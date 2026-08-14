@@ -1,0 +1,54 @@
+version: 1
+id: array-prototype-species-mapping
+title: "Array prototype species mapping"
+scope:
+  - "Array.prototype.filter and map, including generic receivers,
+    callback validation and arguments, snapshot-length sparse iteration,
+    ArraySpeciesCreate constructor and Symbol.species reads, custom and
+    default species results, filter compaction, and map hole preservation."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-species-mapping.ts
+      - tests/property/m5-array-prototype-species-mapping.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-species-mapping.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-species-mapping.ts
+      - tests/property/m5-array-prototype-species-mapping.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-species-mapping.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-species-mapping.ts
+      - tests/property/m5-array-prototype-species-mapping.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-species-mapping.ts
+      - tests/property/m5-array-prototype-species-mapping.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

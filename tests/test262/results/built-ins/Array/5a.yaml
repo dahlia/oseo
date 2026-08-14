@@ -38,6 +38,52 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/filter/15.4.4.20-1-4.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/filter/15.4.4.20-1-4.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/filter/15.4.4.20-1-4.js\
+        :85:25: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-23.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-23.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/filter/15.4.4.20-9-c-ii\
+        i-23.js:87:14: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/some/15.4.4.17-3-21.js
       strictness:
         - non-strict

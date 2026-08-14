@@ -3550,6 +3550,31 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-65` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
+M5b node `array-prototype-species-mapping` implements ordinary `map` and
+`filter` functions on the realm-owned `%Array.prototype%`. Each method first
+converts its receiver, snapshots LengthOfArrayLike, and validates the callback
+before calling ArraySpeciesCreate. For an Array receiver, that operation reads
+`constructor` and, when the result is an object, reads `Symbol.species`.
+Missing, `undefined`, and `null` species use the realm Array; a custom
+constructor receives the requested result length; and a non-constructor or
+abrupt read throws. A non-Array receiver uses the realm Array without either
+observable read. Both methods retain the shared HasProperty and Get visit
+semantics. `map` creates at the snapshot length and preserves holes, while
+`filter` creates at length zero and compacts accepted values in visit order.
+
+Fixed native and generated differential evidence at seed `0x60004400` covers
+sparse and generic receivers, default and custom species, observable and
+abrupt reads, mutation during iteration, both specialization policies, forced
+collection at every safepoint, false hints, deliberate shape-guard misses, and
+generic fallback. All 458 paths under the node's inventory roots are reviewed:
+390 pass and 68 retain explicit prerequisite boundaries. The manifest reaches
+10,367 cases: 7,596 passes, 1,364 expected negatives, and 1,407 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-66` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

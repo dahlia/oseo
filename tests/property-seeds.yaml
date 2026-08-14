@@ -272,3 +272,7 @@ families:
     owner: tests/property/m5-string-prototype-search-and-slice.property.test.ts
     start: 0x60004300
     end: 0x600043ff
+  - family: m5-array-prototype-species-mapping
+    owner: tests/property/m5-array-prototype-species-mapping.property.test.ts
+    start: 0x60004400
+    end: 0x600044ff

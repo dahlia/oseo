@@ -591,6 +591,18 @@ under its declared inventory roots, with 217 passes and 36 explicit
 prerequisite boundaries. It adds no generated-code entry point and moves
 `abiVersion` to `m5-65`.
 
+M5b node `array-prototype-species-mapping` keeps ownership in
+*runtime\_array.c* and adds ordinary `filter` and `map` functions to the
+materialized `%Array.prototype%`. Both methods retain the shared
+snapshot-length HasProperty and Get iteration contract, then create their
+results through ArraySpeciesCreate. Array receivers perform the observable
+`constructor` and `Symbol.species` reads, while generic receivers use the
+realm Array without those reads. Fixed and generated native differential
+evidence covers sparse and generic receivers, default and custom species,
+abrupt reads, mutation, both specialization policies, generic fallback, and
+collection at every safepoint. The node adds no generated-code entry point and
+moves `abiVersion` to `m5-66`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in
