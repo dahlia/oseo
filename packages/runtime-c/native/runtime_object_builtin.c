@@ -1772,6 +1772,39 @@ static OseoResult from_property_descriptor(
     return normal(frame->slots[0]);
 }
 
+/* The virtual String iterator participates in descriptor queries and
+ * rechecks even though the later String iterator node has not
+ * materialized its value. */
+static bool object_own_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+) {
+    if (oseo_internal_own_descriptor(
+            object_value,
+            key,
+            value,
+            attributes,
+            getter,
+            setter
+        )) {
+        return true;
+    }
+    *value = oseo_undefined();
+    *getter = oseo_undefined();
+    *setter = oseo_undefined();
+    return oseo_internal_virtual_string_iterator_descriptor(
+        context,
+        object_value,
+        key,
+        attributes
+    );
+}
+
 OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoContext *context,
     size_t argument_count,
@@ -1798,7 +1831,8 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoValue setter = oseo_undefined();
     bool exists = false;
     if (result.status == OSEO_STATUS_NORMAL && is_object(object_value)) {
-        exists = oseo_internal_own_descriptor(
+        exists = object_own_descriptor(
+            context,
             object_value,
             frame.slots[1],
             &value,
@@ -1847,12 +1881,14 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
  * order, then the remaining string keys in creation order, then the
  * symbol keys in creation order.
  *
- * Two own properties are not in the property vector: an array's
- * `length` and a function's `prototype`. An array's `length` is created
+ * Three own properties are not in the property vector: an array's
+ * `length`, a function's `prototype`, and the untouched virtual
+ * %String.prototype%[Symbol.iterator]. An array's `length` is created
  * before any property a program can add, so it leads the array's string
  * keys. A function's `prototype` follows the leading string keys its
- * `prototype_key_position` still counts. Slot 0 of `frame` holds the
- * object, slot 2 holds whichever of those two key strings this object
+ * `prototype_key_position` still counts. The String iterator follows
+ * every string key with the other symbols. Slot 0 of `frame` holds the
+ * object, slot 2 holds whichever synthesized string key this object
  * needs, and the keys fill the `key_count` slots from index 3.
  */
 static OseoResult snapshot_own_keys(
@@ -1863,6 +1899,8 @@ static OseoResult snapshot_own_keys(
     bool virtual_length = is_array(frame->slots[0]);
     bool virtual_prototype =
         function_has_prototype_property(frame->slots[0]);
+    bool virtual_string_iterator =
+        ordinary_object(frame->slots[0])->virtual_string_iterator;
     size_t output = 0u;
     uint64_t previous = UINT64_MAX;
     while (output < key_count) {
@@ -1928,6 +1966,15 @@ static OseoResult snapshot_own_keys(
         frame->slots[3u + output] = key;
         output += 1u;
     }
+    if (virtual_string_iterator) {
+        OseoResult key = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        frame->slots[3u + output] = key.value;
+        output += 1u;
+    }
     if (output != key_count) {
         return failure(context, "OSEO2001", "Own-key snapshot changed.");
     }
@@ -1937,6 +1984,9 @@ static OseoResult snapshot_own_keys(
 static size_t own_key_count(OseoValue object_value) {
     size_t virtual_count = is_array(object_value) ||
         function_has_prototype_property(object_value) ? 1u : 0u;
+    if (ordinary_object(object_value)->virtual_string_iterator) {
+        virtual_count += 1u;
+    }
     return ordinary_object(object_value)->property_count + virtual_count;
 }
 
@@ -2141,7 +2191,8 @@ static OseoResult object_assign(
             OseoValue ignored_getter = oseo_undefined();
             OseoValue ignored_setter = oseo_undefined();
             OseoPropertyAttributes attributes = {false, false, false, false};
-            if (!oseo_internal_own_descriptor(
+            if (!object_own_descriptor(
+                    context,
                     frame.slots[0],
                     key,
                     &ignored,
@@ -2225,7 +2276,17 @@ static OseoResult object_has_own(
     OseoResult result = oseo_property_key(context, slots[1]);
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_has_own(context, slots[0], slots[1]);
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        if (oseo_internal_virtual_string_iterator_descriptor(
+                context,
+                slots[0],
+                slots[1],
+                &attributes
+            )) {
+            result = normal(oseo_boolean(true));
+        } else {
+            result = oseo_object_has_own(context, slots[0], slots[1]);
+        }
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -2352,12 +2413,26 @@ static OseoResult object_add_grouped_value(
     return result;
 }
 
+/* Recover the String value a primitive or [[StringData]] wrapper stores. */
+static bool object_group_by_string_value(
+    OseoValue source,
+    OseoValue *string_value
+) {
+    if (is_string(source)) {
+        *string_value = source;
+        return true;
+    }
+    if (!oseo_internal_string_data(source)) return false;
+    *string_value = ordinary_object(source)->primitive_value;
+    return true;
+}
+
 static OseoResult object_group_by(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    OseoValue slots[10] = {
+    OseoValue slots[11] = {
         builtin_argument(argument_count, arguments, 0u),
         builtin_argument(argument_count, arguments, 1u),
         oseo_undefined(),
@@ -2368,8 +2443,9 @@ static OseoResult object_group_by(
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
+        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 10u};
+    OseoRootFrame frame = {NULL, slots, 11u};
     oseo_roots_push(context, &frame);
     OseoResult result = normal(oseo_undefined());
     if (is_nullish(slots[0])) {
@@ -2381,14 +2457,16 @@ static OseoResult object_group_by(
         );
     }
     bool direct_string = false;
-    if (result.status == OSEO_STATUS_NORMAL && is_string(slots[0])) {
+    bool has_string_value = result.status == OSEO_STATUS_NORMAL &&
+        object_group_by_string_value(slots[0], &slots[10]);
+    if (result.status == OSEO_STATUS_NORMAL && has_string_value) {
         result = oseo_internal_well_known_symbol(
             context,
             OSEO_WELL_KNOWN_ITERATOR
         );
         slots[8] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && is_string(slots[0])) {
+    if (result.status == OSEO_STATUS_NORMAL && has_string_value) {
         result = oseo_internal_primitive_wrapper_prototype(
             context,
             OSEO_INTRINSIC_STRING_PROTOTYPE
@@ -2417,7 +2495,7 @@ static OseoResult object_group_by(
          */
         size_t offset = 0u;
         while (result.status == OSEO_STATUS_NORMAL) {
-            OseoString *source = string_object(slots[0]);
+            OseoString *source = string_object(slots[10]);
             if (offset >= source->length) break;
             size_t element_length = 1u;
             uint16_t first = source->units[offset];
@@ -2491,13 +2569,10 @@ static OseoResult object_get_own_property_descriptors(
     }
     OseoResult converted = oseo_internal_to_object(context, value);
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
-    size_t virtual_count = is_array(converted.value) ||
-        function_has_prototype_property(converted.value) ? 1u : 0u;
-    size_t property_count = ordinary_object(converted.value)->property_count;
-    if (property_count > SIZE_MAX - 3u - virtual_count) {
+    size_t key_count = own_key_count(converted.value);
+    if (key_count > SIZE_MAX - 3u) {
         return failure(context, "OSEO2001", "Own-key snapshot is too large.");
     }
-    size_t key_count = property_count + virtual_count;
     /* The key frame roots the conversion result, the reported object,
      * the one synthesized key string, and the whole key snapshot. The
      * descriptor frame is the four-slot scratch every
@@ -2525,7 +2600,8 @@ static OseoResult object_get_own_property_descriptors(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (!oseo_internal_own_descriptor(
+        if (!object_own_descriptor(
+                context,
                 frame.slots[0],
                 key,
                 &own,
@@ -2586,14 +2662,11 @@ static OseoResult object_define_properties(
         builtin_argument(argument_count, arguments, 1u)
     );
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
-    size_t virtual_count = is_array(converted.value) ||
-        function_has_prototype_property(converted.value) ? 1u : 0u;
-    size_t property_count = ordinary_object(converted.value)->property_count;
-    if (property_count > SIZE_MAX - 3u - virtual_count ||
-        property_count + virtual_count > (SIZE_MAX - 1u) / 4u) {
+    size_t key_count = own_key_count(converted.value);
+    if (key_count > SIZE_MAX - 3u ||
+        key_count > (SIZE_MAX - 1u) / 4u) {
         return failure(context, "OSEO2001", "Own-key snapshot is too large.");
     }
-    size_t key_count = property_count + virtual_count;
     /* The key frame roots the properties object, the target, the one
      * synthesized key string, and the whole key snapshot. The collected
      * frame holds four slots per collected descriptor, in the order
