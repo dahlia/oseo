@@ -14,4 +14,4 @@ dependencies:
   - string-prototype-search-and-slice
   - well-known-symbols
 landed: false
-status: blocked
+status: ready

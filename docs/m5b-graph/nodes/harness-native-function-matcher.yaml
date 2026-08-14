@@ -7,4 +7,4 @@ dependencies:
   - function-prototype
   - string-prototype-search-and-slice
 landed: false
-status: blocked
+status: ready

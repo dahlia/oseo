@@ -16,5 +16,5 @@ inventory:
     - test/built-ins/String/prototype/substring/
 dependencies:
   - string-prototype-access
-landed: false
+landed: true
 status: ready
