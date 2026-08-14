@@ -2357,7 +2357,7 @@ static OseoResult object_group_by(
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    OseoValue slots[8] = {
+    OseoValue slots[10] = {
         builtin_argument(argument_count, arguments, 0u),
         builtin_argument(argument_count, arguments, 1u),
         oseo_undefined(),
@@ -2366,8 +2366,10 @@ static OseoResult object_group_by(
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 8u};
+    OseoRootFrame frame = {NULL, slots, 10u};
     oseo_roots_push(context, &frame);
     OseoResult result = normal(oseo_undefined());
     if (is_nullish(slots[0])) {
@@ -2378,8 +2380,25 @@ static OseoResult object_group_by(
             "Object.groupBy callback is not callable."
         );
     }
-    bool direct_string = result.status == OSEO_STATUS_NORMAL &&
-        is_string(slots[0]);
+    bool direct_string = false;
+    if (result.status == OSEO_STATUS_NORMAL && is_string(slots[0])) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        slots[8] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_string(slots[0])) {
+        result = oseo_internal_primitive_wrapper_prototype(
+            context,
+            OSEO_INTRINSIC_STRING_PROTOTYPE
+        );
+        slots[9] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            direct_string = oseo_internal_uses_virtual_string_iterator(
+                slots[0], slots[9], slots[8]);
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && !direct_string) {
         result = oseo_iterator_get(context, slots[0], &slots[3]);
         slots[2] = result.value;

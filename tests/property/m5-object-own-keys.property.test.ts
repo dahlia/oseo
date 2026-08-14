@@ -153,6 +153,44 @@ console.log("false hint", hinted(new String("miss")));
 console.log("guard", hinted("guard"));
 String.prototype.objectOwnKeysPropertyMarker = 1;
 console.log("guard", hinted("guard"));
+const stringPrototype = Object.getPrototypeOf(Object(""));
+let stringIteratorReads = 0;
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    stringIteratorReads = stringIteratorReads + 1;
+    return function () {
+      let done = false;
+      return {
+        next: function () {
+          if (done) return { done: true };
+          done = true;
+          return { done: false, value: "replacement" };
+        },
+      };
+    };
+  },
+});
+const replacedStringGroups = Object.groupBy("ignored", (value) => value);
+console.log(
+  "group replaced string iterator",
+  stringIteratorReads,
+  render(replacedStringGroups.replacement),
+);
+delete stringPrototype[Symbol.iterator];
+let deletedStringIteratorCalls = 0;
+try {
+  Object.groupBy("ignored", () => {
+    deletedStringIteratorCalls = deletedStringIteratorCalls + 1;
+    return "unreachable";
+  });
+} catch (error) {
+  console.log(
+    "group deleted string iterator",
+    error instanceof TypeError,
+    deletedStringIteratorCalls,
+  );
+}
 `;
 }
 
@@ -232,6 +270,8 @@ function expected(testCase: PropertyCase): string {
     "false hint m",
     "guard g",
     "guard g",
+    "group replaced string iterator 1 replacement",
+    "group deleted string iterator true 0",
     "",
   );
   return lines.join("\n");
@@ -352,13 +392,15 @@ test(
         domain:
           "one to six distinct integer, string, and symbol own properties; " +
           "enumerable and hidden descriptors; bounded integer values; zero " +
-          "to five grouped values; a false hint and one shape-guard miss",
+          "to five grouped values; replaced and deleted String iterators; " +
+          "a false hint and one shape-guard miss",
         numRuns: 16,
         profile: "M5 Object own-key statics",
         seed: 0x6000_4500,
         sizeLimit:
           "at most six own properties, five grouped values, nine static " +
-          "observations, and four specialization observations",
+          "observations, two String iterator observations, and four " +
+          "specialization observations",
         timeLimitMilliseconds: 180_000,
       },
     );

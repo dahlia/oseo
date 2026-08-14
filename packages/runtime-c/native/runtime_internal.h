@@ -2184,6 +2184,15 @@ bool oseo_internal_virtual_string_iterator_descriptor(
     OseoPropertyAttributes *attributes
 );
 /*
+ * True when a String primitive or wrapper reaches %String.prototype%'s
+ * untouched virtual default iterator without a nearer own replacement.
+ */
+bool oseo_internal_uses_virtual_string_iterator(
+    OseoValue source,
+    OseoValue string_prototype,
+    OseoValue iterator_key
+);
+/*
  * Ordinary object layout helpers owned by runtime_object.c. The
  * property vector is the one storage location for an object's own
  * properties, so every component that finds, adds, or removes one goes

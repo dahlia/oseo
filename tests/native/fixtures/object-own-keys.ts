@@ -163,6 +163,47 @@ console.log(
   render(groupedString.before),
   render(groupedString.after),
 );
+const stringPrototype = Object.getPrototypeOf(Object(""));
+let stringIteratorReads = 0;
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  get: function () {
+    stringIteratorReads = stringIteratorReads + 1;
+    return function () {
+      let done = false;
+      return {
+        next: function () {
+          if (done) return { done: true };
+          done = true;
+          return { done: false, value: "replacement" };
+        },
+      };
+    };
+  },
+});
+const replacedStringGroups = Object.groupBy("ignored", (value) => value);
+console.log(
+  "grouped replaced string iterator",
+  stringIteratorReads,
+  render(replacedStringGroups.replacement),
+);
+console.log(
+  "delete string iterator",
+  delete stringPrototype[Symbol.iterator],
+);
+let deletedStringIteratorCalls = 0;
+try {
+  Object.groupBy("ignored", () => {
+    deletedStringIteratorCalls = deletedStringIteratorCalls + 1;
+    return "unreachable";
+  });
+} catch (error) {
+  console.log(
+    "grouped deleted string iterator",
+    error instanceof TypeError,
+    deletedStringIteratorCalls,
+  );
+}
 
 /** @param {string} value */
 function hinted(value) { return value.charAt(0); }
