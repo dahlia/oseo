@@ -83,6 +83,10 @@ const propertyHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/propertyHelper.js",
 );
+const promiseHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/promiseHelper.js",
+);
 const asyncHelpersHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/asyncHelpers.js",
@@ -1317,6 +1321,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       ],
       ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
+      ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
     ]),
   };
 }

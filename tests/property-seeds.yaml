@@ -236,6 +236,10 @@ families:
     owner: tests/property/m5-array-buffer.property.test.ts
     start: 0x60003a00
     end: 0x60003aff
+  - family: m5-promise-combine
+    owner: tests/property/m5-promise-combine.property.test.ts
+    start: 0x60004500
+    end: 0x600045ff
   - family: unicode-tables
     owner: tests/property/unicode-tables.property.test.ts
     start: 0x60003b00

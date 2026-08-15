@@ -268,14 +268,20 @@ OseoResult oseo_internal_promise_builtin_dispatch(
         OseoValue environment = result.value;
         bool fulfilling =
             code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID;
-        if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        OseoValue reaction = result.value;
+        bool guarded = result.status == OSEO_STATUS_NORMAL && fulfilling &&
+            reaction_object(reaction)->kind == OSEO_REACTION_ALL;
+        if (result.status == OSEO_STATUS_NORMAL && guarded) {
             result = oseo_environment_get(context, environment, 1u);
         }
         bool already_fulfilled = result.status == OSEO_STATUS_NORMAL &&
-            fulfilling && oseo_to_boolean(result.value);
+            guarded && oseo_to_boolean(result.value);
         if (already_fulfilled) {
             result = normal(oseo_undefined());
-        } else if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
+        } else if (result.status == OSEO_STATUS_NORMAL && guarded) {
             result = oseo_environment_set(
                 context,
                 environment,
@@ -284,15 +290,12 @@ OseoResult oseo_internal_promise_builtin_dispatch(
             );
         }
         if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
-            result = oseo_environment_get(context, environment, 0u);
-        }
-        if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
             OseoValue argument = argument_count > 0u
                 ? arguments[0]
                 : oseo_undefined();
             result = oseo_internal_promise_aggregate_settle(
                 context,
-                result.value,
+                reaction,
                 argument,
                 fulfilling
             );
@@ -1447,10 +1450,17 @@ OseoResult oseo_internal_promise_aggregate_settle(
     frame.slots[4] = argument;
     size_t index = reaction->index;
     OseoReactionKind kind = reaction->kind;
-    if (!is_foreign_capability(frame.slots[2]) &&
-        promise_object(frame.slots[2])->state != OSEO_PROMISE_PENDING) {
+    bool native_capability = !is_foreign_capability(frame.slots[2]);
+    bool aggregate_already_settled = kind == OSEO_REACTION_RACE &&
+        aggregate->remaining == 0u;
+    if (native_capability &&
+        (aggregate_already_settled ||
+         promise_object(frame.slots[2])->state != OSEO_PROMISE_PENDING)) {
         result = normal(oseo_undefined());
     } else if (kind == OSEO_REACTION_RACE || !fulfilled) {
+        if (native_capability && frame.slots[3] == oseo_undefined()) {
+            aggregate->remaining = 0u;
+        }
         result = capability_settle(
             context,
             frame.slots[2],
@@ -1487,12 +1497,10 @@ OseoResult oseo_internal_promise_aggregate_settle(
 }
 
 /*
- * The shared Promise.all and Promise.race body. The capability comes
- * from the `this` value, so a constructor whose executor never supplies
- * resolving functions is a TypeError before the iterable is touched,
- * and a subclass receives its own promise. Reading `resolve` from the
- * constructor and the remaining combinator refinements belong to the
- * combinator graph node.
+ * The shared Promise.all and Promise.race body. The capability and the
+ * once-read resolve method both come from the `this` value. Promise.all
+ * gives each element its own guarded fulfillment closure and shares the
+ * capability rejection path; Promise.race shares both settlement closures.
  */
 static OseoResult promise_combine(
     OseoContext *context,
@@ -1501,12 +1509,51 @@ static OseoResult promise_combine(
     bool race
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 14u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 16u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = iterable;
-    result = new_promise_capability(context, constructor);
+    frame.slots[14] = constructor;
+    result = new_promise_capability(context, frame.slots[14]);
     frame.slots[1] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    static const uint16_t resolve_units[] = {
+        'r', 'e', 's', 'o', 'l', 'v', 'e'
+    };
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_string_from_units(context, resolve_units, 7u);
+        frame.slots[15] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            frame.slots[14],
+            frame.slots[15]
+        );
+        frame.slots[15] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_function(frame.slots[15])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The promise constructor resolve method is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+        frame.slots[2] = result.value;
+        oseo_context_clear_language_error(context);
+        result = capability_settle(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            false
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = capability_promise(context, frame.slots[1]);
+        }
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -1557,6 +1604,52 @@ static OseoResult promise_combine(
         result = oseo_string_from_units(context, then_units, 4u);
         frame.slots[7] = result.value;
     }
+    /* Promise.all shares its reject element between every invocation.
+     * Promise.race shares both settlement elements. A foreign capability
+     * exposes the constructor-created functions directly because their
+     * identity is observable by a yielded thenable. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = reaction_create(
+            context,
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined()
+        );
+        frame.slots[6] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPromiseReaction *reaction = reaction_object(frame.slots[6]);
+        reaction->aggregate = frame.slots[3];
+        reaction->index = 0u;
+        reaction->kind = OSEO_REACTION_RACE;
+        result = promise_aggregate_environment_create(
+            context,
+            frame.slots[6]
+        );
+        frame.slots[8] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && race) {
+        result = is_foreign_capability(frame.slots[1])
+            ? oseo_environment_get(context, frame.slots[1], 1u)
+            : promise_aggregate_function_create(
+                context,
+                frame.slots[8],
+                OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID
+            );
+        frame.slots[9] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = is_foreign_capability(frame.slots[1])
+            ? oseo_environment_get(context, frame.slots[1], 2u)
+            : promise_aggregate_function_create(
+                context,
+                frame.slots[8],
+                OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID
+            );
+        frame.slots[10] = result.value;
+    }
+    bool iteration_abrupt = false;
+    bool reject_call_abrupt = false;
     size_t index = 0u;
     while (result.status == OSEO_STATUS_NORMAL) {
         OseoValue element = oseo_undefined();
@@ -1575,22 +1668,31 @@ static OseoResult promise_combine(
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
             frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
+            iteration_abrupt = true;
             result = capability_settle(
                 context,
                 frame.slots[1],
                 frame.slots[4],
                 false
             );
+            reject_call_abrupt = result.status != OSEO_STATUS_NORMAL;
             break;
         }
         if (result.status != OSEO_STATUS_NORMAL || done) break;
         frame.slots[4] = element;
         if (!race) aggregate_object(frame.slots[3])->remaining += 1u;
         {
-            result = oseo_promise_resolve(context, frame.slots[4]);
+            result = oseo_call_function(
+                context,
+                frame.slots[15],
+                frame.slots[14],
+                1u,
+                &frame.slots[4],
+                oseo_undefined()
+            );
             frame.slots[5] = result.value;
         }
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.status == OSEO_STATUS_NORMAL && !race) {
             result = reaction_create(
                 context,
                 oseo_undefined(),
@@ -1599,7 +1701,7 @@ static OseoResult promise_combine(
             );
             frame.slots[6] = result.value;
         }
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.status == OSEO_STATUS_NORMAL && !race) {
             OseoPromiseReaction *reaction =
                 reaction_object(frame.slots[6]);
             reaction->aggregate = frame.slots[3];
@@ -1613,21 +1715,13 @@ static OseoResult promise_combine(
             );
             frame.slots[8] = result.value;
         }
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.status == OSEO_STATUS_NORMAL && !race) {
             result = promise_aggregate_function_create(
                 context,
                 frame.slots[8],
                 OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID
             );
             frame.slots[9] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = promise_aggregate_function_create(
-                context,
-                frame.slots[8],
-                OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID
-            );
-            frame.slots[10] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_get(
@@ -1656,6 +1750,7 @@ static OseoResult promise_combine(
              */
             frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
+            iteration_abrupt = true;
             OseoResult closed = oseo_iterator_close(
                 context,
                 frame.slots[12],
@@ -1671,11 +1766,12 @@ static OseoResult promise_combine(
                 frame.slots[4],
                 false
             );
+            reject_call_abrupt = result.status != OSEO_STATUS_NORMAL;
             if (result.status == OSEO_STATUS_NORMAL) break;
         }
         index += 1u;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !race) {
+    if (result.status == OSEO_STATUS_NORMAL && !race && !iteration_abrupt) {
         OseoPromiseAggregate *aggregate = aggregate_object(frame.slots[3]);
         aggregate->remaining -= 1u;
         if (aggregate->remaining == 0u) {
@@ -1686,6 +1782,17 @@ static OseoResult promise_combine(
                 true
             );
         }
+    }
+    if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic &&
+        !reject_call_abrupt) {
+        frame.slots[4] = result.value;
+        oseo_context_clear_language_error(context);
+        result = capability_settle(
+            context,
+            frame.slots[1],
+            frame.slots[4],
+            false
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = capability_promise(context, frame.slots[1]);

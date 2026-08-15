@@ -1,0 +1,58 @@
+version: 1
+id: promise-all-and-race
+title: "Promise.all and Promise.race"
+scope:
+  - "Promise.all over empty, sparse, array, and custom iterable inputs,
+    preserving input order independently of settlement order."
+  - "Promise.race over the same iterable domain, including the forever-
+    pending empty result and the first settled input."
+  - "NewPromiseCapability from the receiver, one observable resolve read,
+    per-element resolve calls with that receiver, and subclass and species
+    behavior."
+  - "Iterator closing after an abrupt resolve, then getter, or then call,
+    with the original throw completion preserved and no close after an
+    abrupt iterator step or a completed iterator."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-promise-combine.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_promise.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

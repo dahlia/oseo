@@ -490,6 +490,16 @@ defines selected values consecutively in its zero-length result. A non-Array
 receiver skips both species reads and uses the realm Array. The generated-code
 ABI gains no entry point.
 
+The `m5-67` ABI completes `Promise.all` and `Promise.race` over the
+materialized intrinsic. Both statics build a capability from their receiver,
+read its `resolve` property once before acquiring the iterator, and call that
+method with the receiver for every iterated value. `Promise.all` retains one
+guarded fulfillment closure per index and one shared rejection closure;
+`Promise.race` shares both settlement closures. An abrupt resolve call, `then`
+getter, or `then` call closes an unfinished iterator before rejecting, while an
+abrupt iterator step or final capability resolution preserves the completed
+iterator state. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

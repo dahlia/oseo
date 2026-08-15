@@ -14814,7 +14814,208 @@ tests:
   - path: test/built-ins/Promise/Symbol.species/symbol-species.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A2.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A2.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A2.3_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A2.3_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A2.3_T3.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A3.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A3.1_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A3.1_T3.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/S25.4.4.1_A4.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A5.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A7.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A7.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A8.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A8.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A8.2_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/call-resolve-element-after-return.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/call-resolve-element-items.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/call-resolve-element.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/capability-executor-called-twice.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/capability-executor-not-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/capability-resolve-throws-no-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/capability-resolve-throws-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/ctx-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/ctx-ctor.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/ctx-non-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/ctx-non-object.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/does-not-invoke-array-setters.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-get-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-get-error.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-get-once-multiple-calls.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-get-once-no-calls.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-on-promises-every-iteration-of-custom.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-on-promises-every-iteration-of-promise.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-on-values-every-iteration-of-promise.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve-return.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-resolve.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-then-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-then-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-then-get-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-then-get-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/invoke-then.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-arg-is-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-string-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-assigned-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-next-val-err-no-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-next-val-err-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-string-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-returns-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-step-err-no-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/iter-step-err-reject.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/length.js
@@ -14823,7 +15024,85 @@ tests:
   - path: test/built-ins/Promise/all/name.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/new-resolve-function.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/prop-desc.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/reject-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/reject-ignored-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/reject-ignored-immed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/reject-immed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-before-loop-exit-from-same.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-before-loop-exit.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-extensible.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-length.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-name.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-nonconstructor.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-property-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-element-function-prototype.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-from-same-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-ignores-late-rejection-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-ignores-late-rejection.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-non-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-non-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-not-callable-reject-with-typeerror.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-poisoned-then.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-throws-iterator-return-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/resolve-throws-iterator-return-null-or-undefined.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/same-reject-function.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/species-get-error.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/constructor.js
@@ -15240,10 +15519,196 @@ tests:
   - path: test/built-ins/Promise/prototype/then/rxn-handler-thrower.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A2.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A2.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A2.2_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A2.2_T3.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/S25.4.4.3_A3.1_T1.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/S25.4.4.3_A3.1_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A4.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A4.1_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A5.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A6.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A6.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.1_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.1_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.1_T3.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.2_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.3_T1.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A7.3_T2.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/capability-executor-called-twice.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/capability-executor-not-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/ctx-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/ctx-ctor.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/ctx-non-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/ctx-non-object.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-get-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-get-error.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-get-once-multiple-calls.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-get-once-no-calls.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-on-promises-every-iteration-of-custom.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-on-promises-every-iteration-of-promise.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-on-values-every-iteration-of-promise.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve-return.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-resolve.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-then-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-then-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-then-get-error-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-then-get-error-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/invoke-then.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-arg-is-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-string-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-assigned-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-next-val-err-no-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-next-val-err-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-false-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-null-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-number-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-string-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-symbol-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-true-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-returns-undefined-reject.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-step-err-no-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/iter-step-err-reject.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/length.js
@@ -15252,7 +15717,85 @@ tests:
   - path: test/built-ins/Promise/race/name.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/prop-desc.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/reject-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/reject-from-same-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/reject-ignored-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/reject-ignored-immed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/reject-immed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-from-same-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-ignores-late-rejection-deferred.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-ignores-late-rejection.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-non-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-non-obj.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-non-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-poisoned-then.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-prms-cstm-then.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-self.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-thenable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-throws-iterator-return-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolve-throws-iterator-return-null-or-undefined.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolved-sequence-extra-ticks.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolved-sequence-mixed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolved-sequence-with-rejections.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolved-sequence.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/resolved-then-catch-finally.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/same-reject-function.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/same-resolve-function.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/species-get-error.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject-function-extensible.js

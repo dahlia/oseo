@@ -1,0 +1,36 @@
+group: built-ins/Promise
+key: fc
+results:
+  - case:
+      async: true
+      features: []
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/Promise/all/does-not-invoke-array-setters.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/Promise/all/does-not-invoke-array-setters.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Promise/all/does-not-invoke-array-setters.js:121:5:
+        error[OSEO2001]: Unhandled promise rejection.\n"'
+      unsupportedCapability: unhandled-rejection-policy
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
