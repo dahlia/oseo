@@ -60,6 +60,9 @@ Ownership follows the plan's target layout:
     exotic object exposes, together with the `String` constructor,
     %String.prototype%, and the `fromCharCode`, `fromCodePoint`, and
     `raw` statics;
+ -  *runtime\_string\_match.c*: the `String.prototype` `match`,
+    `matchAll`, `search`, and `split` well-known-symbol dispatch and their
+    String-only fallback algorithms;
  -  *runtime\_object.c*: ordinary object creation and layout, the
     property vector and its growth, own-property lookup and removal,
     cell-backed property recognition, shape identifiers and the

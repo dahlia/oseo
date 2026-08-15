@@ -56,6 +56,8 @@ const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 const { stringPrototypeSearchAndSliceFixtures } =
   await import("./native/fixtures/string-prototype-search-and-slice.ts");
+const { stringPrototypeMatchAndSplitFixtures } =
+  await import("./native/fixtures/string-prototype-match-and-split.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -117,6 +119,7 @@ const fixtures: readonly Fixture[] = [
   ...stringFixtures.stringIntrinsicFixtures,
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
+  ...stringPrototypeMatchAndSplitFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -311,7 +314,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
-    fixture.name === "string-prototype-search-and-slice"
+    fixture.name === "string-prototype-search-and-slice" ||
+    fixture.name === "string-prototype-match-and-split"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -480,6 +484,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "string-prototype-search-and-slice" ||
+    fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
@@ -573,7 +578,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "promise-intrinsic" ||
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||
-            fixture.name === "string-prototype-search-and-slice"
+            fixture.name === "string-prototype-search-and-slice" ||
+            fixture.name === "string-prototype-match-and-split"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

@@ -8,6 +8,7 @@ supportedFeatures:
   - String.prototype.at
   - String.prototype.endsWith
   - String.prototype.includes
+  - String.prototype.matchAll
   - align-detached-buffer-semantics-with-web-reality
   - arraybuffer-transfer
   - arrow-function
@@ -17139,6 +17140,357 @@ tests:
   - path: test/built-ins/String/prototype/lastIndexOf/this-value-not-obj-coercible.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T10.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T11.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T12.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T13.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T18.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A8.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A9.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-on-bigint-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/duplicate-named-groups-properties.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/duplicate-named-indices-groups-properties.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/invoke-builtin-match.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/regexp-prototype-match-v-u-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/this-val-bool.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/this-val-obj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/this-value-not-obj-coercible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/cstm-matchall-on-bigint-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/cstm-matchall-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/cstm-matchall-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/cstm-matchall-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/flags-nonglobal-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/flags-undefined-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/name.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-get-matchAll-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-is-undefined-or-null-invokes-matchAll.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-is-undefined-or-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-not-callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-prototype-get-matchAll-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-invocation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/this-val-non-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/matchAll/toString-this-val.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A10.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A11.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T10.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T11.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T12.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T13.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T8.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T9.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A8.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/S15.5.4.12_A9.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-on-bigint-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/invoke-builtin-search-searcher-undef.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/invoke-builtin-search.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/regexp-prototype-search-v-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/regexp-prototype-search-v-u-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/this-value-not-obj-coercible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/slice/S15.5.4.13_A10.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -17253,6 +17605,366 @@ tests:
   - path: test/built-ins/String/prototype/slice/this-value-tostring-throws-toprimitive.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/split/argument-is-new-reg-exp-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-null-and-instance-is-function-call-that-returned-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-reg-exp-a-z-and-instance-is-string-abc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-a-z-and-instance-is-string-abc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-and-instance-is-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-d-and-instance-is-string-dfe23iu-34-65.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-l-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-reg-exp-d-and-instance-is-string-dfe23iu-34-65.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-s-and-instance-is-string-a-b-c-de-f.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-regexp-x-and-instance-is-string-a-b-c-de-f.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-undefined-and-instance-is-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/argument-is-void-0-and-instance-is-string-object-object-have-overrided-to-string-function.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-boolean-expression-function-call-and-null-and-instance-is-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-false-and-true-and-instance-is-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-0-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-1-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-2-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-3-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-4-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-hi-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-undefined-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-void-0-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-0-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-1-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-2-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-3-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-4-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-hi-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-undefined-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-void-0-and-instance-is-string-hello.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/arguments-are-regexp-s-and-3-and-instance-is-string-a-b-c-de-f.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-0-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-1-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-100-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-2-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-boo-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-math-pow-2-32-1-instance-is-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-1-void-0-instance-is-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-123-instance-is-this123is123a123string123object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-2-instance-is-string-one-two-three-four-five.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-4-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-h-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-hello-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-hellothere-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-instance-is-empty-string-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-instance-is-string-one-two-three-four-five.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-instance-is-string-one-two-three.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-instance-is-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-0-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-1-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-2-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-3-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-4-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-l-na-n-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-ll-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-new-reg-exp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-null-instance-is-thisnullisnullanullstringnullobject.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-o-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-on-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-r-42-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-true-instance-is-thistrueistrueatruestringtrueobject.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-undefined-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-void-0-instance-is-thisundefinedisundefinedaundefinedstringundefinedobject.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-without-arguments-and-instance-is-empty-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-x-instance-is-empty-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/call-split-x-instance-is-string-hello.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-by-using-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-if-creating-the-string-prototype-split-object-fails.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-if-deleting-the-string-prototype-split-length-property-fails.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-if-enumerating-the-string-prototype-split-length-property-fails.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-if-varying-the-string-prototype-split-length-property-fails.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-string-prototype-split-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/checking-string-prototype-split-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-on-bigint-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/cstm-split-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-array-1-2-3-4-5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-function.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-math.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-new-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-number-1234567890.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-number-1e21.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-number-na-n.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-string-one-two-three-four-five.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/instance-is-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/limit-touint32-error.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-colon-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-comma-instance-is-string-one-two-three-four-five.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-empty-string-instance-is-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-number-limit-math-pow-2-32-1-instance-is-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-tostring-limit-override-valueof-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-tostring-limit-override-valueof-tostring-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-tostring-limit-override-valueof-tostring.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-tostring-limit-override-valueof.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-tostring-throws-limit-override-valueof-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-override-valueof.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-regexp-comma-instance-is-string-one-1-two-2-four-4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-regexp-limit-string-via-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-regexp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-string-instance-is-empty-string-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-tostring-error.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-undef-limit-custom.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-undef-limit-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/separator-undef.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/this-value-tostring-error.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/transferred-to-custom.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/transferred-to-number-separator-override-tostring-returns-regexp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/split/valueOf-is-called-for-limit-argument.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/startsWith/coerced-values-of-position.js
     expectedClassification: pass
     dependencies: [object-properties]

@@ -7,6 +7,54 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T6.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/match/S15.5.4.10_A1_T6.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/match/S15.5.4.10_A1_T6\
+        .js:89:18: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T9.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/match/S15.5.4.10_A1_T9.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/match/S15.5.4.10_A1_T9\
+        .js:94:18: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/String/prototype/startsWith/return-abrupt-from-position.js
       strictness:
         - non-strict

@@ -540,8 +540,12 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "indexOf",
     "lastIndexOf",
     "length",
+    "match",
+    "matchAll",
     "raw",
+    "search",
     "slice",
+    "split",
     "startsWith",
     "String",
     "substring",
@@ -568,6 +572,10 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_ENDS_WITH_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SLICE_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SUBSTRING_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_MATCH_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_MATCH_ALL_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_SEARCH_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_SPLIT_CODE_ID/u);
   assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(internalHeader, /oseo_internal_install_string_global/u);
   assert.match(bindingSource, /oseo_internal_install_string_global/u);

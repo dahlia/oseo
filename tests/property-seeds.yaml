@@ -280,3 +280,7 @@ families:
     owner: tests/property/m5-array-prototype-species-mapping.property.test.ts
     start: 0x60004400
     end: 0x600044ff
+  - family: m5-string-prototype-match-and-split
+    owner: tests/property/m5-string-prototype-match-and-split.property.test.ts
+    start: 0x60004600
+    end: 0x600046ff

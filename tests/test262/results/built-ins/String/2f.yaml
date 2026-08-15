@@ -3,6 +3,29 @@ key: 2f
 results:
   - case:
       async: false
+      features:
+        - regexp-duplicate-named-groups
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/String/prototype/match/duplicate-named-groups-properties.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-duplicate-named-groups
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

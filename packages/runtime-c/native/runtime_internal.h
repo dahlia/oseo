@@ -392,6 +392,14 @@
     (OSEO_STRING_CODE_ID_RANGE_LAST - 17u)
 #define OSEO_STRING_SUBSTRING_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 18u)
+#define OSEO_STRING_MATCH_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 19u)
+#define OSEO_STRING_MATCH_ALL_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 20u)
+#define OSEO_STRING_SEARCH_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 21u)
+#define OSEO_STRING_SPLIT_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 22u)
 
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
@@ -1373,6 +1381,15 @@ OseoResult oseo_internal_string_builtin_dispatch(
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
+);
+/* Implements String.prototype match, matchAll, search, and split after
+ * their component-owned built-in dispatcher selects one of their code IDs. */
+OseoResult oseo_internal_string_protocol_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
 );
 /* Materializes %String% together with %String.prototype% and its
  * fromCharCode, fromCodePoint, and raw statics, and returns the

@@ -3614,6 +3614,37 @@ are unchanged. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-67` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
+M5b node `string-prototype-match-and-split` implements the materialized
+prototype's `match`, `matchAll`, `search`, and `split` functions. An object
+operand first receives the applicable `Symbol.match`, `Symbol.matchAll`,
+`Symbol.search`, or `Symbol.split` lookup. A callable method receives the
+original receiver and, for `split`, the original limit. A nullish method,
+primitive operand, or missing operand takes the fallback. `matchAll` first
+applies `IsRegExp` through `@@match`, requires a global `flags` value for a
+true result, and returns an iterator over nonoverlapping literal matches.
+`match` and `search` report the first literal match, including match index,
+input, and groups metadata. `split` preserves receiver, limit, and separator
+conversion order, `ToUint32` limits, empty separators, empty subjects, and
+the specified zero-limit behavior.
+
+Fixed native and generated differential evidence at seed `0x60004600` covers
+primitive, wrapper, and generic receivers, all four symbol dispatches, null
+protocol methods, match metadata and iteration, empty matches and separators,
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard misses, and generic fallback. Of the 239 paths
+under the node's inventory roots, 237 are reviewed: 128 pass and 109 retain
+explicit prerequisite boundaries for RegExp syntax and objects, dynamic
+source, realms, or unadmitted built-ins. The two null-method cases that
+dynamically produce the RegExp pattern `\d` remain outside the subset until
+`regexp-symbol-methods`; fixed and generated null-method literal cases retain
+replacement evidence for the dispatch contract. The combined manifest reaches
+10,785 cases: 7,888 passes, 1,364 expected negatives, and 1,533 unsupported
+profile features with no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-68` without adding a generated-code entry point or changing
+the graph's orchestration state.
 
 Known gaps inside the claim
 ---------------------------

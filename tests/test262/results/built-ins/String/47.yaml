@@ -1,0 +1,60 @@
+group: built-ins/String
+key: "47"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/match/S15.5.4.10_A6.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/match/this-val-bool.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/match/this-val-bool.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/match/this-val-bool.js\
+        :87:22: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

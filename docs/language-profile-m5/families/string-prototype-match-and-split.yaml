@@ -1,0 +1,58 @@
+version: 1
+id: string-prototype-match-and-split
+title: "String prototype match and split methods"
+scope:
+  - "String.prototype.match, matchAll, search, and split, including receiver
+    coercion, well-known-symbol dispatch, literal String fallbacks, split
+    limits, match metadata, and matchAll iteration."
+  - "RegExp pattern compilation and RegExp object symbol methods remain owned
+    by regexp-symbol-methods. The two inventory cases whose null protocol
+    method falls through to a dynamically produced \\d pattern use the fixed
+    and generated null-method literal evidence until that node lands."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/property/m5-string-prototype-match-and-split.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/property/m5-string-prototype-match-and-split.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-string-prototype-match-and-split.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/property/m5-string-prototype-match-and-split.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/property/m5-string-prototype-match-and-split.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_string.c
+      - packages/runtime-c/native/runtime_string_match.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

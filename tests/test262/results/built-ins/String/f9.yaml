@@ -33,4 +33,36 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/match/this-val-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/String/prototype/match/this-val-obj.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/match/this-val-obj.js:91:5:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
+      passed: false
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

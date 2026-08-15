@@ -999,6 +999,18 @@ OseoResult oseo_internal_string_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_STRING_MATCH_CODE_ID ||
+        code_id == OSEO_STRING_MATCH_ALL_CODE_ID ||
+        code_id == OSEO_STRING_SEARCH_CODE_ID ||
+        code_id == OSEO_STRING_SPLIT_CODE_ID) {
+        return oseo_internal_string_protocol_dispatch(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_STRING_FROM_CHAR_CODE_CODE_ID) {
         return string_from_char_code(context, argument_count, arguments);
     }
@@ -1138,10 +1150,7 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
     }
     static const char *const unadmitted_names[] = {
         "localeCompare",
-        "match",
         "replace",
-        "search",
-        "split",
         "toLocaleLowerCase",
         "toLocaleUpperCase",
         "toLowerCase",
@@ -1149,9 +1158,6 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         "trim",
     };
     static const size_t unadmitted_lengths[] = {
-        1u,
-        1u,
-        2u,
         1u,
         2u,
         0u,
@@ -1161,7 +1167,7 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         0u,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 10u;
+         result.status == OSEO_STATUS_NORMAL && index < 7u;
          index += 1u) {
         result = create_string_function(
             context,
@@ -1196,6 +1202,10 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         OSEO_STRING_ENDS_WITH_CODE_ID,
         OSEO_STRING_SLICE_CODE_ID,
         OSEO_STRING_SUBSTRING_CODE_ID,
+        OSEO_STRING_MATCH_CODE_ID,
+        OSEO_STRING_MATCH_ALL_CODE_ID,
+        OSEO_STRING_SEARCH_CODE_ID,
+        OSEO_STRING_SPLIT_CODE_ID,
     };
     static const char *const access_names[] = {
         "at",
@@ -1212,13 +1222,18 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         "endsWith",
         "slice",
         "substring",
+        "match",
+        "matchAll",
+        "search",
+        "split",
     };
     static const size_t access_lengths[] = {
         1u, 1u, 1u, 1u, 0u, 0u, 1u,
         1u, 1u, 1u, 1u, 1u, 2u, 2u,
+        1u, 1u, 1u, 2u,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 14u;
+         result.status == OSEO_STATUS_NORMAL && index < 18u;
          index += 1u) {
         result = create_string_function(
             context,

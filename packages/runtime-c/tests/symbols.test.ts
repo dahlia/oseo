@@ -78,6 +78,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_memory.c"],
       ["source", "runtime_binding.c"],
       ["source", "runtime_string.c"],
+      ["source", "runtime_string_match.c"],
       ["source", "runtime_object.c"],
       ["source", "runtime_property.c"],
       ["source", "runtime_descriptor.c"],

@@ -4065,6 +4065,30 @@ The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-67`
 without adding a generated-code entry point or changing the graph's
 orchestration state.
 
+Implemented M5b node `string-prototype-match-and-split` gives the realm-owned
+`%String.prototype%` ordinary `match`, `matchAll`, `search`, and `split`
+functions. Object operands dispatch through `Symbol.match`,
+`Symbol.matchAll`, `Symbol.search`, or `Symbol.split` before fallback
+conversion. `matchAll` performs `IsRegExp`, observes `flags` for a true
+`@@match` result, and requires `g` before dispatch. Literal fallbacks preserve
+receiver and operand conversion order, match result metadata, nonoverlapping
+iteration with empty-match progress, `ToUint32` split limits, empty subjects
+and separators, and separator conversion before the zero-limit result.
+
+Fixed native and generated differential evidence at seed `0x60004600` covers
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard misses, generic fallback, primitive and generic
+receivers, all four protocols, null methods, match metadata and iteration,
+empty matches, split limits, and abrupt conversion. Of the 239 paths under the
+node's four inventory roots, 237 are reviewed: 128 pass and 109 retain
+explicit prerequisite boundaries. The two null-method cases whose fallback
+object dynamically produces the RegExp pattern `\d` remain outside the
+subset until `regexp-symbol-methods`; fixed and generated literal cases retain
+replacement evidence for the null-method dispatch contract. The combined
+manifest moves to 10,785 paths with 7,888 passes, 1,364 expected
+negatives, and 1,533 unsupported profile features. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-68` without adding a
+generated-code entry point or changing the graph's orchestration state.
 
 Ahead-of-time challenge boundary
 --------------------------------
