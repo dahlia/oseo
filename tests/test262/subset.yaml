@@ -14896,7 +14896,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/does-not-invoke-array-setters.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-resolve-error-close.js
     expectedClassification: unsupported-profile-feature

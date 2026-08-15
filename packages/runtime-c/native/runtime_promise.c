@@ -1471,12 +1471,12 @@ OseoResult oseo_internal_promise_aggregate_settle(
         result = oseo_property_key(context, oseo_number((double)index));
         frame.slots[0] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_set(
+            result = oseo_object_define(
                 context,
                 frame.slots[3],
                 frame.slots[0],
                 frame.slots[4],
-                true
+                (OseoPropertyAttributes){true, true, true, false}
             );
         }
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -1669,11 +1669,13 @@ static OseoResult promise_combine(
             frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
             iteration_abrupt = true;
-            result = capability_settle(
+            result = oseo_call_function(
                 context,
-                frame.slots[1],
-                frame.slots[4],
-                false
+                frame.slots[10],
+                oseo_undefined(),
+                1u,
+                &frame.slots[4],
+                oseo_undefined()
             );
             reject_call_abrupt = result.status != OSEO_STATUS_NORMAL;
             break;
@@ -1760,11 +1762,13 @@ static OseoResult promise_combine(
                 result = closed;
                 break;
             }
-            result = capability_settle(
+            result = oseo_call_function(
                 context,
-                frame.slots[1],
-                frame.slots[4],
-                false
+                frame.slots[10],
+                oseo_undefined(),
+                1u,
+                &frame.slots[4],
+                oseo_undefined()
             );
             reject_call_abrupt = result.status != OSEO_STATUS_NORMAL;
             if (result.status == OSEO_STATUS_NORMAL) break;
@@ -1787,11 +1791,13 @@ static OseoResult promise_combine(
         !reject_call_abrupt) {
         frame.slots[4] = result.value;
         oseo_context_clear_language_error(context);
-        result = capability_settle(
+        result = oseo_call_function(
             context,
-            frame.slots[1],
-            frame.slots[4],
-            false
+            frame.slots[10],
+            oseo_undefined(),
+            1u,
+            &frame.slots[4],
+            oseo_undefined()
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {

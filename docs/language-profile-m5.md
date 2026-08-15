@@ -3582,25 +3582,32 @@ iterator, and calls the captured method with the constructor as receiver for
 every iterated value. `Promise.all` gives every index one guarded fulfillment
 closure, shares the capability rejection function, and resolves its result in
 input order. `Promise.race` shares both capability settlement functions and
-leaves an empty input pending. An abrupt resolve call, `then` getter, or `then`
-call closes an unfinished iterator before rejection and preserves the original
-throw over an abrupt `return`; an abrupt iterator step or value read marks the
-iterator done and does not close it. A subclass owns the aggregate promise
-independently of the species constructor that a later `then` selects.
+leaves an empty input pending. Its outer abrupt paths use the same
+first-settlement guard, so a thenable assimilation job queued by the first
+resolution wins over a later `then` getter or iterator-step throw. An abrupt
+resolve call, `then` getter, or `then` call closes an unfinished iterator before
+rejection and preserves the original throw over an abrupt `return`; an abrupt
+iterator step or value read marks the iterator done and does not close it.
+`Promise.all` creates own result data properties without invoking inherited
+indexed setters. A subclass owns the aggregate promise independently of the
+species constructor that a later `then` selects.
 
-Fixed native and generated differential evidence at seed `0x60004500` covers
+Fixed native and generated differential evidence at seeds `0x60004500` and
+`0x60004501` covers
 empty, sparse, array, and custom iterable inputs, bounded thenable schedules,
 both specialization policies, collection forced at every safepoint, false
 hints, deliberate guard misses, generic fallback, and observable constructor,
-resolve, iterator, and species operations. The reviewed *promiseHelper.js*
+resolve, iterator, and species operations, including first settlement before
+later abrupt completion and inherited indexed setters. The reviewed
+*promiseHelper.js*
 harness executes all 16 scheduling cases that use it. Of the 192 paths under
-the node's two inventory roots, 190 are reviewed: 172 pass and 18 retain
+the node's two inventory roots, 190 are reviewed: 173 pass and 17 retain
 explicit prerequisite boundaries for the unhandled-rejection host policy,
 `eval`, other profile syntax, `Object.getOwnPropertyNames`, or
 `Reflect.construct`. The two remaining paths require string iteration and stay
 with the separate `string-iterator` node; fixed and generated evidence covers
 the combinators' empty-input contracts. The manifest reaches 10,548 cases:
-7,759 passes, 1,364 expected negatives, and 1,425 unsupported profile features
+7,760 passes, 1,364 expected negatives, and 1,424 unsupported profile features
 with no semantic, harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema and vocabulary, and zero-override policy
 are unchanged. The admitted runtime checkpoint moves the runtime ABI to

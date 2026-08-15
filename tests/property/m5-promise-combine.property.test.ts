@@ -50,6 +50,14 @@ interface PromiseCombineCase {
   readonly operation: CombineOperation;
 }
 
+/** Values varied across the two reviewed aggregate regression schedules. */
+interface PromiseCombineRepairCase {
+  readonly allValues: readonly [number, number, number];
+  readonly iteratorRaceValue: number;
+  readonly setterIndex: number;
+  readonly thenGetRaceValue: number;
+}
+
 const entryArbitrary: fc.Arbitrary<CombineEntry> = fc.oneof(
   fc.constant({ kind: "hole" } as const),
   fc.record({
@@ -68,6 +76,17 @@ const caseArbitrary: fc.Arbitrary<PromiseCombineCase> = fc.record({
   failureIndex: fc.integer({ max: 3, min: 0 }),
   iterable: fc.constantFrom("array", "custom", "sparse"),
   operation: fc.constantFrom("all", "race"),
+});
+
+const repairCaseArbitrary: fc.Arbitrary<PromiseCombineRepairCase> = fc.record({
+  allValues: fc.tuple(
+    fc.integer({ max: 50, min: -50 }),
+    fc.integer({ max: 50, min: -50 }),
+    fc.integer({ max: 50, min: -50 }),
+  ),
+  iteratorRaceValue: fc.integer({ max: 50, min: -50 }),
+  setterIndex: fc.integer({ max: 2, min: 0 }),
+  thenGetRaceValue: fc.integer({ max: 50, min: -50 }),
 });
 
 const host = createNodeHost();
@@ -231,6 +250,124 @@ function expected(testCase: PromiseCombineCase): string {
   return lines.join("\n");
 }
 
+function repairSource(testCase: PromiseCombineRepairCase): string {
+  const values = testCase.allValues.join(", ");
+  return `
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 2), hinted("x", 2));
+const originalPromiseResolve = Promise.resolve;
+function assimilating(value, label) {
+  return {
+    then(resolve) {
+      console.log("assimilate", label, value);
+      resolve(value);
+    },
+  };
+}
+
+let thenGetResolveIndex = 0;
+Promise.resolve = function() {
+  const index = thenGetResolveIndex;
+  thenGetResolveIndex = thenGetResolveIndex + 1;
+  if (index === 0) {
+    return {
+      then(resolve) {
+        console.log("outer resolve", "then-get");
+        resolve(assimilating(${testCase.thenGetRaceValue}, "then-get"));
+      },
+    };
+  }
+  return Object.defineProperty({}, "then", {
+    get() {
+      console.log("abrupt", "then-get");
+      throw new Error("then-get-after-settlement");
+    },
+  });
+};
+Promise.race([0, 1]).then(
+  function(value) { console.log("race", "then-get", value); },
+  function(error) { console.log("unexpected", error.message); },
+);
+
+let iteratorStep = 0;
+Promise.resolve = function() {
+  return {
+    then(resolve) {
+      console.log("outer resolve", "iterator");
+      resolve(assimilating(${testCase.iteratorRaceValue}, "iterator"));
+    },
+  };
+};
+const abruptIterator = {
+  [Symbol.iterator]() {
+    return {
+      next() {
+        console.log("next", iteratorStep);
+        if (iteratorStep === 0) {
+          iteratorStep = 1;
+          return { value: 0, done: false };
+        }
+        throw new Error("iterator-after-settlement");
+      },
+      return() {
+        console.log("unexpected close");
+        return {};
+      },
+    };
+  },
+};
+Promise.race(abruptIterator).then(
+  function(value) { console.log("race", "iterator", value); },
+  function(error) { console.log("unexpected", error.message); },
+);
+Promise.resolve = originalPromiseResolve;
+
+setTimeout(function() {
+  const input = [${values}];
+  let setterCalls = 0;
+  Object.defineProperty(Array.prototype, ${testCase.setterIndex}, {
+    configurable: true,
+    set() { setterCalls = setterCalls + 1; },
+  });
+  Promise.all(input).then(
+    function(result) {
+      const own = Object.prototype.hasOwnProperty.call(
+        result,
+        ${JSON.stringify(String(testCase.setterIndex))},
+      );
+      const value = result[${testCase.setterIndex}];
+      delete Array.prototype[${testCase.setterIndex}];
+      console.log("all data", setterCalls, own, value);
+    },
+    function(error) {
+      delete Array.prototype[${testCase.setterIndex}];
+      console.log("unexpected", error.message);
+    },
+  );
+}, 0);
+console.log("sync");
+`;
+}
+
+function repairExpected(testCase: PromiseCombineRepairCase): string {
+  return [
+    "hint 3 x2",
+    "outer resolve then-get",
+    "abrupt then-get",
+    "next 0",
+    "outer resolve iterator",
+    "next 1",
+    "sync",
+    `assimilate then-get ${testCase.thenGetRaceValue}`,
+    `assimilate iterator ${testCase.iteratorRaceValue}`,
+    `race then-get ${testCase.thenGetRaceValue}`,
+    `race iterator ${testCase.iteratorRaceValue}`,
+    `all data 0 true ${testCase.allValues[testCase.setterIndex]}`,
+    "",
+  ].join("\n");
+}
+
 async function references(source: string): Promise<
   readonly [
     {
@@ -271,6 +408,60 @@ async function references(source: string): Promise<
     return observations;
   } finally {
     if (succeeded) await host.remove(directory);
+  }
+}
+
+async function assertGeneratedSchedule(
+  source: string,
+  expectedObservation: {
+    readonly exitStatus: number;
+    readonly stderr: string;
+    readonly stdout: string;
+  },
+): Promise<void> {
+  assertMatchingObservations([
+    expectedObservation,
+    ...(await references(source)),
+  ]);
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source, sourceId: "generated-m5-promise-combine-repair.ts" },
+      { observeSpecialization: true, specialization },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    const mir = printMir(compiled.mir);
+    if (specialization === "enabled") {
+      assert.match(mir, /guard-(?:shape|smi)/u);
+      assert.match(mir, /generic-fallback/u);
+    } else {
+      assert.doesNotMatch(mir, /guard-(?:shape|smi)/u);
+    }
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      await withNativeFixture(
+        {
+          backend: cBackend,
+          host,
+          input: compiled.mir,
+          operation: "execute",
+          runtime: cRuntimeProvider,
+          target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+          toolchain: zigToolchain,
+        },
+        (native) => {
+          assertMatchingObservations([expectedObservation, native]);
+          assert.ok(native.counters?.collections != null);
+          assert.ok(native.counters.collections > 0);
+          if (specialization === "enabled") {
+            assert.ok(native.counters.guardMisses > 0);
+          }
+        },
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
   }
 }
 
@@ -354,6 +545,45 @@ test(
         sizeLimit:
           "four iterable entries, four resolve calls, four thenable jobs, " +
           "one abrupt index, one iterator close, and one aggregate reaction",
+        timeLimitMilliseconds: 240_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated Promise combinator repair schedules match the M5 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "Promise combinator repaired settlement schedules agree",
+      fc.asyncProperty(repairCaseArbitrary, async (testCase) => {
+        await assertGeneratedSchedule(repairSource(testCase), {
+          exitStatus: 0,
+          stderr: "",
+          stdout: repairExpected(testCase),
+        });
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "race resolution with a thenable before a later then getter or " +
+          "iterator-step abrupt completion, and all result creation while " +
+          "an inherited indexed setter is installed",
+        numRuns: 8,
+        profile: "M5 Promise all and race repairs",
+        seed: 0x6000_4501,
+        sizeLimit:
+          "two two-step race schedules, two thenable assimilation jobs, " +
+          "three all values, and one inherited indexed setter",
         timeLimitMilliseconds: 240_000,
       },
     );

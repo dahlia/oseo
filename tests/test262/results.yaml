@@ -8005,9 +8005,9 @@ summary:
   expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 7759
+  passes: 7760
   semanticFailures: 0
-  unsupportedProfileFeatures: 1425
+  unsupportedProfileFeatures: 1424
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -8146,9 +8146,9 @@ summary:
       expectedNegatives: 90
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 712
+      passes: 713
       semanticFailures: 0
-      unsupportedProfileFeatures: 74
+      unsupportedProfileFeatures: 73
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0
@@ -8308,9 +8308,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 358
+      passes: 359
       semanticFailures: 0
-      unsupportedProfileFeatures: 70
+      unsupportedProfileFeatures: 69
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0

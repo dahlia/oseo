@@ -583,6 +583,76 @@ Promise.race([1]).then(
 );
 Promise.resolve = originalPromiseResolve;
 
+let thenGetRaceResolveCalls = 0;
+Promise.resolve = function () {
+  const index = thenGetRaceResolveCalls;
+  thenGetRaceResolveCalls = thenGetRaceResolveCalls + 1;
+  if (index === 0) {
+    return {
+      then(resolve) {
+        resolve({
+          then(assimilate) {
+            console.log("race then getter assimilated");
+            assimilate("then-get-first");
+          },
+        });
+      },
+    };
+  }
+  return Object.defineProperty({}, "then", {
+    get() {
+      console.log("race then getter abrupt");
+      throw new Error("then-get-after-settlement");
+    },
+  });
+};
+Promise.race([1, 2]).then(
+  function (value) {
+    console.log("race then getter first wins", value === "then-get-first");
+  },
+  function () { console.log("unexpected race then getter rejection"); },
+);
+Promise.resolve = originalPromiseResolve;
+
+let iteratorRaceStep = 0;
+Promise.resolve = function () {
+  return {
+    then(resolve) {
+      resolve({
+        then(assimilate) {
+          console.log("race iterator abrupt assimilated");
+          assimilate("iterator-first");
+        },
+      });
+    },
+  };
+};
+const settledThenAbruptIterator = {
+  [Symbol.iterator]() {
+    return {
+      next() {
+        if (iteratorRaceStep === 0) {
+          iteratorRaceStep = 1;
+          return { value: 1, done: false };
+        }
+        console.log("race iterator step abrupt");
+        throw new Error("iterator-after-settlement");
+      },
+      return() {
+        console.log("unexpected settled iterator close");
+        return {};
+      },
+    };
+  },
+};
+Promise.race(settledThenAbruptIterator).then(
+  function (value) {
+    console.log("race iterator first wins", value === "iterator-first");
+  },
+  function () { console.log("unexpected race iterator rejection"); },
+);
+Promise.resolve = originalPromiseResolve;
+
 let lateAllReject;
 const originalArrayThen = Array.prototype.then;
 Array.prototype.then = function (resolve) { resolve("all-array"); };
@@ -631,6 +701,27 @@ const emptyIterable = {
   },
 };
 Promise.all.call(FinalResolveCapability, emptyIterable);
+
+setTimeout(function () {
+  const setterInput = [42];
+  let inheritedSetterCalls = 0;
+  Object.defineProperty(Array.prototype, "0", {
+    configurable: true,
+    set() { inheritedSetterCalls = inheritedSetterCalls + 1; },
+  });
+  Promise.all(setterInput).then(
+    function (values) {
+      const own = Object.prototype.hasOwnProperty.call(values, "0");
+      const value = values[0];
+      delete Array.prototype[0];
+      console.log("all data property", inheritedSetterCalls, own, value);
+    },
+    function () {
+      delete Array.prototype[0];
+      console.log("unexpected all setter rejection");
+    },
+  );
+}, 0);
 `,
   },
 ];

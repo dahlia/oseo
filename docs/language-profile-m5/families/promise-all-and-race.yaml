@@ -3,9 +3,11 @@ id: promise-all-and-race
 title: "Promise.all and Promise.race"
 scope:
   - "Promise.all over empty, sparse, array, and custom iterable inputs,
-    preserving input order independently of settlement order."
+    preserving input order independently of settlement order and creating own
+    result data properties without invoking inherited indexed setters."
   - "Promise.race over the same iterable domain, including the forever-
-    pending empty result and the first settled input."
+    pending empty result and the first settled input even when a later outer
+    abrupt completion precedes queued thenable assimilation."
   - "NewPromiseCapability from the receiver, one observable resolve read,
     per-element resolve calls with that receiver, and subclass and species
     behavior."
