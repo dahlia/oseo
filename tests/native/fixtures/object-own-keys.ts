@@ -164,8 +164,18 @@ console.log(
   render(groupedString.after),
 );
 const stringPrototype = Object.getPrototypeOf(Object(""));
+const laterStringSymbol = Symbol("later string symbol");
+let stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   enumerable: true,
+});
+Object.defineProperty(stringPrototype, laterStringSymbol, {
+  configurable: true,
+  enumerable: true,
+  get() {
+    stringSymbolAccessLog.push("later");
+    return 42;
+  },
 });
 const virtualStringSymbols = Object.getOwnPropertySymbols(stringPrototype);
 const virtualStringDescriptor = Object.getOwnPropertyDescriptor(
@@ -180,6 +190,7 @@ console.log(
   "virtual string iterator reflection",
   virtualStringSymbols.length,
   virtualStringSymbols[0] === Symbol.iterator,
+  virtualStringSymbols[1] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   Object.hasOwn(virtualStringAssigned, Symbol.iterator),
   virtualStringDescriptor !== undefined,
@@ -190,6 +201,7 @@ console.log(
   // materialized by the later String iterator node.
   virtualStringAssigned[Symbol.iterator] ===
     stringPrototype[Symbol.iterator],
+  render(stringSymbolAccessLog),
 );
 const wrapperCallbacks = [];
 const groupedWrapperString = Object.groupBy(
@@ -206,11 +218,13 @@ console.log(
 );
 let stringIteratorReads = 0;
 let replacementReceiverIsWrapper = false;
+stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   configurable: true,
   enumerable: true,
   get: function () {
     stringIteratorReads = stringIteratorReads + 1;
+    stringSymbolAccessLog.push("iterator");
     return function () {
       replacementReceiverIsWrapper = this instanceof String;
       let done = false;
@@ -234,11 +248,13 @@ console.log(
   "replaced string iterator reflection",
   replacedStringSymbols.length,
   replacedStringSymbols[0] === Symbol.iterator,
+  replacedStringSymbols[1] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   Object.hasOwn(replacedStringAssigned, Symbol.iterator),
   replacedStringDescriptor.get !== undefined,
   replacedStringDescriptor.enumerable,
   stringIteratorReads,
+  render(stringSymbolAccessLog),
 );
 const replacedStringGroups = Object.groupBy(
   new String("ignored"),
@@ -266,6 +282,7 @@ const deletedStringAssigned = Object.assign({}, stringPrototype);
 console.log(
   "deleted string iterator reflection",
   deletedStringSymbols.length,
+  deletedStringSymbols[0] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   Object.hasOwn(deletedStringAssigned, Symbol.iterator),
   deletedStringDescriptor === undefined,
@@ -284,6 +301,20 @@ try {
     deletedStringIteratorCalls,
   );
 }
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  enumerable: true,
+  value: function () {
+    return { next: function () { return { done: true }; } };
+  },
+});
+const redefinedStringSymbols = Object.getOwnPropertySymbols(stringPrototype);
+console.log(
+  "redefined string iterator order",
+  redefinedStringSymbols.length,
+  redefinedStringSymbols[0] === laterStringSymbol,
+  redefinedStringSymbols[1] === Symbol.iterator,
+);
 const numberPrototype = Object.getPrototypeOf(Object(0));
 let numberIteratorReads = 0;
 Object.defineProperty(numberPrototype, Symbol.iterator, {

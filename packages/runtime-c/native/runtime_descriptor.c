@@ -12,6 +12,35 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+/* A concrete descriptor replacing the virtual String iterator keeps the
+ * virtual property's original position before every user-created symbol.
+ * The property vector already owns creation order, so inserting the
+ * replacement at its first symbol slot lets ordinary deletion and later
+ * redefinition recover the usual append-at-creation behavior. */
+static OseoProperty *append_property_slot(
+    OseoOrdinaryObject *object,
+    bool replaces_virtual
+) {
+    size_t insertion = object->property_count;
+    if (replaces_virtual) {
+        for (size_t index = 0u;
+             index < object->property_count;
+             index += 1u) {
+            if (is_symbol(object->properties[index].key)) {
+                insertion = index;
+                break;
+            }
+        }
+        for (size_t index = object->property_count;
+             index > insertion;
+             index -= 1u) {
+            object->properties[index] = object->properties[index - 1u];
+        }
+    }
+    object->property_count += 1u;
+    return &object->properties[insertion];
+}
+
 bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -344,13 +373,12 @@ static OseoResult define_data_property(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = &object->properties[object->property_count];
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
     property->key = key;
     property->value = value;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
-    object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;
@@ -526,13 +554,12 @@ OseoResult oseo_object_define_accessor(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = &object->properties[object->property_count];
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
     property->key = key;
     property->value = oseo_undefined();
     property->getter = new_getter;
     property->setter = new_setter;
-    object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;

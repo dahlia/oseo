@@ -30,6 +30,7 @@ interface PropertyCase {
   readonly booleanEntryValue: number;
   readonly entries: readonly EntryCase[];
   readonly grouped: readonly number[];
+  readonly laterSymbolEnumerable: boolean;
   readonly numberIteratorValues: readonly number[];
   readonly virtualIteratorEnumerable: boolean;
   readonly wrapperParts: readonly ("a" | "b" | "🥰" | "💩")[];
@@ -62,6 +63,7 @@ const caseArbitrary: fc.Arbitrary<PropertyCase> = fc.record({
     selector: (entry) => entry.key,
   }),
   grouped: fc.array(fc.integer({ max: 6, min: -6 }), { maxLength: 5 }),
+  laterSymbolEnumerable: fc.boolean(),
   numberIteratorValues: fc.array(fc.integer({ max: 6, min: -6 }), {
     maxLength: 4,
     minLength: 1,
@@ -168,8 +170,18 @@ console.log("guard", hinted("guard"));
 String.prototype.objectOwnKeysPropertyMarker = 1;
 console.log("guard", hinted("guard"));
 const stringPrototype = Object.getPrototypeOf(Object(""));
+const laterStringSymbol = Symbol("later string symbol");
+let stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   enumerable: ${String(testCase.virtualIteratorEnumerable)},
+});
+Object.defineProperty(stringPrototype, laterStringSymbol, {
+  configurable: true,
+  enumerable: ${String(testCase.laterSymbolEnumerable)},
+  get: function () {
+    stringSymbolAccessLog.push("later");
+    return 42;
+  },
 });
 const virtualStringSymbols = Object.getOwnPropertySymbols(stringPrototype);
 const virtualStringDescriptor = Object.getOwnPropertyDescriptor(
@@ -188,6 +200,7 @@ console.log(
   "virtual string reflection",
   virtualStringSymbols.length,
   virtualStringSymbols[0] === Symbol.iterator,
+  virtualStringSymbols[1] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   virtualStringAssignedOwn,
   virtualStringDescriptor !== undefined,
@@ -199,6 +212,9 @@ console.log(
   !virtualStringAssignedOwn ||
     virtualStringAssigned[Symbol.iterator] ===
       stringPrototype[Symbol.iterator],
+  stringSymbolAccessLog.length === 0
+    ? "none"
+    : render(stringSymbolAccessLog),
 );
 const wrapperCallbacks = [];
 const groupedWrapperString = Object.groupBy(
@@ -215,11 +231,13 @@ console.log(
 );
 let stringIteratorReads = 0;
 let replacementReceiverIsWrapper = false;
+stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   configurable: true,
   enumerable: true,
   get: function () {
     stringIteratorReads = stringIteratorReads + 1;
+    stringSymbolAccessLog.push("iterator");
     return function () {
       replacementReceiverIsWrapper = this instanceof String;
       let done = false;
@@ -243,11 +261,13 @@ console.log(
   "replaced string reflection",
   replacedStringSymbols.length,
   replacedStringSymbols[0] === Symbol.iterator,
+  replacedStringSymbols[1] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   Object.hasOwn(replacedStringAssigned, Symbol.iterator),
   replacedStringDescriptor.get !== undefined,
   replacedStringDescriptor.enumerable,
   stringIteratorReads,
+  render(stringSymbolAccessLog),
 );
 const replacedStringGroups = Object.groupBy(
   new String("ignored"),
@@ -272,6 +292,7 @@ const deletedStringAssigned = Object.assign({}, stringPrototype);
 console.log(
   "deleted string reflection",
   deletedStringSymbols.length,
+  deletedStringSymbols[0] === laterStringSymbol,
   Object.hasOwn(stringPrototype, Symbol.iterator),
   Object.hasOwn(deletedStringAssigned, Symbol.iterator),
   deletedStringDescriptor === undefined,
@@ -290,6 +311,20 @@ try {
     deletedStringIteratorCalls,
   );
 }
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: true,
+  enumerable: true,
+  value: function () {
+    return { next: function () { return { done: true }; } };
+  },
+});
+const redefinedStringSymbols = Object.getOwnPropertySymbols(stringPrototype);
+console.log(
+  "redefined string iterator order",
+  redefinedStringSymbols.length,
+  redefinedStringSymbols[0] === laterStringSymbol,
+  redefinedStringSymbols[1] === Symbol.iterator,
+);
 const numberIteratorValues = ${JSON.stringify(testCase.numberIteratorValues)};
 const numberPrototype = Object.getPrototypeOf(Object(0));
 let numberIteratorReads = 0;
@@ -450,17 +485,20 @@ function expected(testCase: PropertyCase): string {
     "false hint m",
     "guard g",
     "guard g",
-    "virtual string reflection 1 true true " +
+    "virtual string reflection 2 true true true " +
       `${String(testCase.virtualIteratorEnumerable)} true ` +
       `${String(testCase.virtualIteratorEnumerable)} true ` +
-      `${String(testCase.virtualIteratorEnumerable)} true`,
+      `${String(testCase.virtualIteratorEnumerable)} true ` +
+      (testCase.laterSymbolEnumerable ? "later" : "none"),
     `group wrapper string ${testCase.wrapperParts
       .map((part, index) => `${index}:${part}`)
       .join(",")} ${testCase.wrapperParts.join(",")}`,
-    "replaced string reflection 1 true true true true true 1",
+    "replaced string reflection 2 true true true true true true 1 " +
+      (testCase.laterSymbolEnumerable ? "iterator,later" : "iterator"),
     "group replaced string iterator 2 true replacement",
-    "deleted string reflection 0 false false true false",
+    "deleted string reflection 1 true false false true false",
     "group deleted string iterator true 0",
+    "redefined string iterator order 2 true true",
     `group primitive number 1 ${testCase.numberIteratorValues.join(",")}`,
     `for of primitive number 2 ${testCase.numberIteratorValues.join(",")}`,
     `from entries primitive boolean 1 ${testCase.booleanEntryValue}`,
@@ -592,7 +630,8 @@ test(
           "one to six distinct integer, string, and symbol own properties; " +
           "enumerable and hidden descriptors; bounded integer values; zero " +
           "to five grouped values; one to four String wrapper code points; " +
-          "virtual, enumerable, replaced, and deleted String iterators; " +
+          "virtual, enumerable, replaced, deleted, and redefined String " +
+          "iterators ordered against a generated later symbol; " +
           "inherited Number and Boolean iterators through built-in and " +
           "generated consumers; nullish and absent-iterator failures; a " +
           "false hint and one shape-guard miss",
@@ -602,7 +641,7 @@ test(
         sizeLimit:
           "at most six own properties, five grouped values, nine static " +
           "observations, four Number iterator values, four String wrapper " +
-          "code points, five String iterator observations, two Boolean " +
+          "code points, six String iterator observations, two Boolean " +
           "iterator observations, four nullish " +
           "observations, three invalid for-of observations, and four " +
           "specialization observations",

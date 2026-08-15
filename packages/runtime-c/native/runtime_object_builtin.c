@@ -1886,9 +1886,10 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
  * %String.prototype%[Symbol.iterator]. An array's `length` is created
  * before any property a program can add, so it leads the array's string
  * keys. A function's `prototype` follows the leading string keys its
- * `prototype_key_position` still counts. The String iterator follows
- * every string key with the other symbols. Slot 0 of `frame` holds the
- * object, slot 2 holds whichever synthesized string key this object
+ * `prototype_key_position` still counts. The untouched String iterator
+ * leads every symbol a program can add. A concrete replacement occupies
+ * that same position in the property vector. Slot 0 of `frame` holds
+ * the object, slot 2 holds whichever synthesized string key this object
  * needs, and the keys fill the `key_count` slots from index 3.
  */
 static OseoResult snapshot_own_keys(
@@ -1934,8 +1935,8 @@ static OseoResult snapshot_own_keys(
         frame->slots[3u + output] = frame->slots[2];
         output += 1u;
     }
-    /* No allocation happens from here to the end of the symbol pass, so
-     * the property vector cannot move under these two loops. */
+    /* No allocation happens through the remaining string-key pass, so
+     * the property vector cannot move under this loop. */
     bool pending_prototype = virtual_prototype;
     size_t prototype_position = virtual_prototype
         ? function_object(frame->slots[0])->prototype_key_position
@@ -1960,12 +1961,6 @@ static OseoResult snapshot_own_keys(
         frame->slots[3u + output] = frame->slots[2];
         output += 1u;
     }
-    for (size_t index = 0u; index < object->property_count; index += 1u) {
-        OseoValue key = object->properties[index].key;
-        if (!is_symbol(key)) continue;
-        frame->slots[3u + output] = key;
-        output += 1u;
-    }
     if (virtual_string_iterator) {
         OseoResult key = oseo_internal_well_known_symbol(
             context,
@@ -1973,6 +1968,16 @@ static OseoResult snapshot_own_keys(
         );
         if (key.status != OSEO_STATUS_NORMAL) return key;
         frame->slots[3u + output] = key.value;
+        output += 1u;
+    }
+    /* The virtual-key lookup above may allocate, so reacquire the object
+     * before reading its property vector. No allocation happens during
+     * the stored-symbol pass. */
+    object = ordinary_object(frame->slots[0]);
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        OseoValue key = object->properties[index].key;
+        if (!is_symbol(key)) continue;
+        frame->slots[3u + output] = key;
         output += 1u;
     }
     if (output != key_count) {
