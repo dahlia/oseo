@@ -32,6 +32,316 @@ static OseoResult match_subject(
     return oseo_internal_value_string(context, receiver);
 }
 
+typedef enum {
+    OSEO_FALLBACK_REGEXP_LITERAL,
+    OSEO_FALLBACK_REGEXP_DOT,
+    OSEO_FALLBACK_REGEXP_DIGIT,
+    OSEO_FALLBACK_REGEXP_NOT_DIGIT,
+    OSEO_FALLBACK_REGEXP_WORD,
+    OSEO_FALLBACK_REGEXP_NOT_WORD,
+    OSEO_FALLBACK_REGEXP_SPACE,
+    OSEO_FALLBACK_REGEXP_NOT_SPACE,
+} OseoFallbackRegExpAtomKind;
+
+typedef struct {
+    OseoFallbackRegExpAtomKind kind;
+    uint16_t literal;
+} OseoFallbackRegExpAtom;
+
+typedef enum {
+    OSEO_FALLBACK_REGEXP_ATOM_OK,
+    OSEO_FALLBACK_REGEXP_ATOM_INVALID,
+    OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED,
+} OseoFallbackRegExpAtomStatus;
+
+static bool fallback_regexp_hex(uint16_t unit, uint16_t *value) {
+    if (unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39)) {
+        *value = unit - UINT16_C(0x30);
+        return true;
+    }
+    if (unit >= UINT16_C(0x41) && unit <= UINT16_C(0x46)) {
+        *value = unit - UINT16_C(0x41) + UINT16_C(10);
+        return true;
+    }
+    if (unit >= UINT16_C(0x61) && unit <= UINT16_C(0x66)) {
+        *value = unit - UINT16_C(0x61) + UINT16_C(10);
+        return true;
+    }
+    return false;
+}
+
+static bool fallback_regexp_escaped_literal(uint16_t unit) {
+    switch (unit) {
+        case UINT16_C(0x24):
+        case UINT16_C(0x28):
+        case UINT16_C(0x29):
+        case UINT16_C(0x2a):
+        case UINT16_C(0x2b):
+        case UINT16_C(0x2e):
+        case UINT16_C(0x2f):
+        case UINT16_C(0x3f):
+        case UINT16_C(0x5b):
+        case UINT16_C(0x5c):
+        case UINT16_C(0x5d):
+        case UINT16_C(0x5e):
+        case UINT16_C(0x7b):
+        case UINT16_C(0x7c):
+        case UINT16_C(0x7d):
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool fallback_regexp_unescaped_syntax(uint16_t unit) {
+    return fallback_regexp_escaped_literal(unit) &&
+        unit != UINT16_C(0x2f) && unit != UINT16_C(0x5c);
+}
+
+static OseoFallbackRegExpAtomStatus fallback_regexp_atom(
+    const OseoString *pattern,
+    size_t *index,
+    OseoFallbackRegExpAtom *atom
+) {
+    uint16_t unit = pattern->units[*index];
+    *index += 1u;
+    atom->kind = OSEO_FALLBACK_REGEXP_LITERAL;
+    atom->literal = unit;
+    if (unit == UINT16_C(0x2e)) {
+        atom->kind = OSEO_FALLBACK_REGEXP_DOT;
+        return OSEO_FALLBACK_REGEXP_ATOM_OK;
+    }
+    if (unit != UINT16_C(0x5c)) {
+        return fallback_regexp_unescaped_syntax(unit)
+            ? OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED
+            : OSEO_FALLBACK_REGEXP_ATOM_OK;
+    }
+    if (*index >= pattern->length) {
+        return OSEO_FALLBACK_REGEXP_ATOM_INVALID;
+    }
+    unit = pattern->units[*index];
+    *index += 1u;
+    switch (unit) {
+        case UINT16_C(0x64):
+            atom->kind = OSEO_FALLBACK_REGEXP_DIGIT;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x44):
+            atom->kind = OSEO_FALLBACK_REGEXP_NOT_DIGIT;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x77):
+            atom->kind = OSEO_FALLBACK_REGEXP_WORD;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x57):
+            atom->kind = OSEO_FALLBACK_REGEXP_NOT_WORD;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x73):
+            atom->kind = OSEO_FALLBACK_REGEXP_SPACE;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x53):
+            atom->kind = OSEO_FALLBACK_REGEXP_NOT_SPACE;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x66):
+            atom->literal = UINT16_C(0x0c);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x6e):
+            atom->literal = UINT16_C(0x0a);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x72):
+            atom->literal = UINT16_C(0x0d);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x74):
+            atom->literal = UINT16_C(0x09);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x76):
+            atom->literal = UINT16_C(0x0b);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x30):
+            if (*index < pattern->length &&
+                pattern->units[*index] >= UINT16_C(0x30) &&
+                pattern->units[*index] <= UINT16_C(0x39)) {
+                return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
+            }
+            atom->literal = UINT16_C(0);
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        case UINT16_C(0x78):
+        case UINT16_C(0x75): {
+            size_t digits = unit == UINT16_C(0x78) ? 2u : 4u;
+            if (digits > pattern->length - *index) {
+                return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
+            }
+            uint16_t value = 0u;
+            for (size_t offset = 0u; offset < digits; offset += 1u) {
+                uint16_t digit = 0u;
+                if (!fallback_regexp_hex(
+                        pattern->units[*index + offset],
+                        &digit
+                    )) {
+                    return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
+                }
+                value = (uint16_t)(value * UINT16_C(16) + digit);
+            }
+            *index += digits;
+            atom->literal = value;
+            return OSEO_FALLBACK_REGEXP_ATOM_OK;
+        }
+        default:
+            if (fallback_regexp_escaped_literal(unit)) {
+                atom->literal = unit;
+                return OSEO_FALLBACK_REGEXP_ATOM_OK;
+            }
+            return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
+    }
+}
+
+static OseoResult fallback_regexp_validate(
+    OseoContext *context,
+    OseoValue pattern_value
+) {
+    const OseoString *pattern = string_object(pattern_value);
+    size_t index = 0u;
+    while (index < pattern->length) {
+        OseoFallbackRegExpAtom atom;
+        OseoFallbackRegExpAtomStatus status = fallback_regexp_atom(
+            pattern,
+            &index,
+            &atom
+        );
+        if (status == OSEO_FALLBACK_REGEXP_ATOM_INVALID) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_SYNTAX,
+                "Invalid regular expression fallback pattern."
+            );
+        }
+        if (status == OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Regular expression fallback syntax is not admitted in "
+                "this M5b node."
+            );
+        }
+    }
+    return normal(pattern_value);
+}
+
+static bool fallback_regexp_word(uint16_t unit) {
+    return (unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39)) ||
+        (unit >= UINT16_C(0x41) && unit <= UINT16_C(0x5a)) ||
+        unit == UINT16_C(0x5f) ||
+        (unit >= UINT16_C(0x61) && unit <= UINT16_C(0x7a));
+}
+
+static bool fallback_regexp_space(uint16_t unit) {
+    switch (unit) {
+        case UINT16_C(0x0009):
+        case UINT16_C(0x000a):
+        case UINT16_C(0x000b):
+        case UINT16_C(0x000c):
+        case UINT16_C(0x000d):
+        case UINT16_C(0x0020):
+        case UINT16_C(0x00a0):
+        case UINT16_C(0x1680):
+        case UINT16_C(0x2000):
+        case UINT16_C(0x2001):
+        case UINT16_C(0x2002):
+        case UINT16_C(0x2003):
+        case UINT16_C(0x2004):
+        case UINT16_C(0x2005):
+        case UINT16_C(0x2006):
+        case UINT16_C(0x2007):
+        case UINT16_C(0x2008):
+        case UINT16_C(0x2009):
+        case UINT16_C(0x200a):
+        case UINT16_C(0x2028):
+        case UINT16_C(0x2029):
+        case UINT16_C(0x202f):
+        case UINT16_C(0x205f):
+        case UINT16_C(0x3000):
+        case UINT16_C(0xfeff):
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool fallback_regexp_atom_matches(
+    OseoFallbackRegExpAtom atom,
+    uint16_t unit
+) {
+    switch (atom.kind) {
+        case OSEO_FALLBACK_REGEXP_LITERAL:
+            return atom.literal == unit;
+        case OSEO_FALLBACK_REGEXP_DOT:
+            return unit != UINT16_C(0x000a) && unit != UINT16_C(0x000d) &&
+                unit != UINT16_C(0x2028) && unit != UINT16_C(0x2029);
+        case OSEO_FALLBACK_REGEXP_DIGIT:
+            return unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39);
+        case OSEO_FALLBACK_REGEXP_NOT_DIGIT:
+            return unit < UINT16_C(0x30) || unit > UINT16_C(0x39);
+        case OSEO_FALLBACK_REGEXP_WORD:
+            return fallback_regexp_word(unit);
+        case OSEO_FALLBACK_REGEXP_NOT_WORD:
+            return !fallback_regexp_word(unit);
+        case OSEO_FALLBACK_REGEXP_SPACE:
+            return fallback_regexp_space(unit);
+        case OSEO_FALLBACK_REGEXP_NOT_SPACE:
+            return !fallback_regexp_space(unit);
+    }
+    return false;
+}
+
+static bool fallback_regexp_matches_at(
+    const OseoString *subject,
+    const OseoString *pattern,
+    size_t position,
+    size_t *match_length
+) {
+    size_t pattern_index = 0u;
+    size_t subject_index = position;
+    while (pattern_index < pattern->length) {
+        if (subject_index >= subject->length) return false;
+        OseoFallbackRegExpAtom atom;
+        if (fallback_regexp_atom(pattern, &pattern_index, &atom) !=
+            OSEO_FALLBACK_REGEXP_ATOM_OK) {
+            return false;
+        }
+        if (!fallback_regexp_atom_matches(
+                atom,
+                subject->units[subject_index]
+            )) {
+            return false;
+        }
+        subject_index += 1u;
+    }
+    *match_length = subject_index - position;
+    return true;
+}
+
+static bool fallback_regexp_find(
+    OseoValue subject_value,
+    OseoValue pattern_value,
+    size_t start,
+    size_t *position,
+    size_t *match_length
+) {
+    const OseoString *subject = string_object(subject_value);
+    const OseoString *pattern = string_object(pattern_value);
+    if (start > subject->length) return false;
+    for (size_t index = start; index <= subject->length; index += 1u) {
+        if (fallback_regexp_matches_at(
+                subject,
+                pattern,
+                index,
+                match_length
+            )) {
+            *position = index;
+            return true;
+        }
+    }
+    return false;
+}
+
 static bool match_matches_at(
     const OseoString *subject,
     const OseoString *search,
@@ -357,12 +667,17 @@ static OseoResult string_match_or_search(
         );
         frame.slots[1] = result.value;
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = fallback_regexp_validate(context, frame.slots[1]);
+    }
     size_t position = 0u;
-    bool found = result.status == OSEO_STATUS_NORMAL && string_find(
+    size_t match_length = 0u;
+    bool found = result.status == OSEO_STATUS_NORMAL && fallback_regexp_find(
         frame.slots[0],
         frame.slots[1],
         0u,
-        &position
+        &position,
+        &match_length
     );
     if (result.status == OSEO_STATUS_NORMAL &&
         code_id == OSEO_STRING_SEARCH_CODE_ID) {
@@ -374,10 +689,261 @@ static OseoResult string_match_or_search(
             context,
             frame.slots[0],
             position,
-            string_object(frame.slots[1])->length
+            match_length
         );
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_iterator_function(
+    OseoContext *context,
+    size_t code_id,
+    const char *name,
+    size_t length
+) {
+    size_t name_length = strlen(name);
+    uint16_t units[8];
+    if (name_length > sizeof(units) / sizeof(*units)) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            environment,
+            units,
+            name_length,
+            length,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_iterator_property(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    OseoValue slots[3] = {object, key, value};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_object_define(
+        context,
+        slots[0],
+        slots[1],
+        slots[2],
+        attributes
+    );
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_regexp_string_iterator_prototype(
+    OseoContext *context
+) {
+    OseoValue *prototype_cache = &context->intrinsics[
+        OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE
+    ];
+    OseoValue *next_cache = &context->intrinsics[
+        OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT
+    ];
+    if (is_object(*prototype_cache) && is_function(*next_cache)) {
+        return normal(*prototype_cache);
+    }
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_ITERATOR_PROTOTYPE
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_iterator_function(
+            context,
+            OSEO_REGEXP_STRING_ITERATOR_NEXT_CODE_ID,
+            "next",
+            0u
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "next");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_iterator_property(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[2],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(
+            context,
+            "RegExp String Iterator"
+        );
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_iterator_property(
+            context,
+            frame.slots[1],
+            frame.slots[4],
+            frame.slots[5],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *prototype_cache = frame.slots[1];
+        *next_cache = frame.slots[2];
+        result = normal(frame.slots[1]);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    } else {
+        *prototype_cache = oseo_undefined();
+        *next_cache = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_string_iterator_create(
+    OseoContext *context,
+    OseoValue subject,
+    OseoValue pattern
+) {
+    OseoValue slots[3] = {subject, pattern, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = fallback_regexp_validate(context, slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_regexp_string_iterator_prototype(context);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, slots[2]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoOrdinaryObject *iterator = ordinary_object(result.value);
+        iterator->regexp_string_iterator = true;
+        iterator->regexp_iterator_subject = slots[0];
+        iterator->regexp_iterator_pattern = slots[1];
+        iterator->regexp_iterator_index = 0u;
+        iterator->regexp_iterator_complete = false;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_string_iterator_next(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_regexp_string_iterator(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp String iterator next requires its iterator receiver."
+        );
+    }
+    OseoOrdinaryObject *state = ordinary_object(receiver);
+    if (state->regexp_iterator_complete) {
+        state->regexp_iterator_subject = oseo_undefined();
+        state->regexp_iterator_pattern = oseo_undefined();
+        return oseo_internal_iterator_result(
+            context,
+            oseo_undefined(),
+            true
+        );
+    }
+    OseoValue slots[4] = {
+        receiver,
+        state->regexp_iterator_subject,
+        state->regexp_iterator_pattern,
+        oseo_undefined(),
+    };
+    size_t start = state->regexp_iterator_index;
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    size_t position = 0u;
+    size_t match_length = 0u;
+    bool found = fallback_regexp_find(
+        slots[1],
+        slots[2],
+        start,
+        &position,
+        &match_length
+    );
+    OseoResult result = normal(oseo_undefined());
+    if (!found) {
+        state = ordinary_object(slots[0]);
+        state->regexp_iterator_complete = true;
+        state->regexp_iterator_subject = oseo_undefined();
+        state->regexp_iterator_pattern = oseo_undefined();
+        result = oseo_internal_iterator_result(
+            context,
+            oseo_undefined(),
+            true
+        );
+    } else {
+        result = string_match_result(
+            context,
+            slots[1],
+            position,
+            match_length
+        );
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            state = ordinary_object(slots[0]);
+            if (match_length == 0u) {
+                if (position == string_object(slots[1])->length) {
+                    state->regexp_iterator_complete = true;
+                } else {
+                    state->regexp_iterator_index = position + 1u;
+                }
+            } else {
+                state->regexp_iterator_index = position + match_length;
+            }
+            result = oseo_internal_iterator_result(
+                context,
+                slots[3],
+                false
+            );
+        }
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -398,7 +964,7 @@ static OseoResult string_match_all(
     );
     if (result.status != OSEO_STATUS_NORMAL || dispatched) return result;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 4u);
+    result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = match_subject(context, receiver);
     frame.slots[0] = result.value;
@@ -410,40 +976,11 @@ static OseoResult string_match_all(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_array_create(context, 0u);
-        frame.slots[2] = result.value;
-    }
-    size_t next = 0u;
-    while (result.status == OSEO_STATUS_NORMAL) {
-        size_t position = 0u;
-        if (!string_find(frame.slots[0], frame.slots[1], next, &position)) {
-            break;
-        }
-        result = string_match_result(
+        result = regexp_string_iterator_create(
             context,
             frame.slots[0],
-            position,
-            string_object(frame.slots[1])->length
+            frame.slots[1]
         );
-        frame.slots[3] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_array_append(
-                context,
-                frame.slots[2],
-                frame.slots[3]
-            );
-        }
-        size_t search_length = string_object(frame.slots[1])->length;
-        if (result.status != OSEO_STATUS_NORMAL) break;
-        if (search_length == 0u) {
-            if (position == string_object(frame.slots[0])->length) break;
-            next = position + 1u;
-        } else {
-            next = position + search_length;
-        }
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_array_values(context, frame.slots[2]);
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -603,6 +1140,9 @@ OseoResult oseo_internal_string_protocol_dispatch(
     size_t argument_count,
     const OseoValue *arguments
 ) {
+    if (code_id == OSEO_REGEXP_STRING_ITERATOR_NEXT_CODE_ID) {
+        return regexp_string_iterator_next(context, receiver);
+    }
     if (code_id == OSEO_STRING_MATCH_CODE_ID ||
         code_id == OSEO_STRING_SEARCH_CODE_ID) {
         return string_match_or_search(

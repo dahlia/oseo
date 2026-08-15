@@ -4070,25 +4070,39 @@ Implemented M5b node `string-prototype-match-and-split` gives the realm-owned
 functions. Object operands dispatch through `Symbol.match`,
 `Symbol.matchAll`, `Symbol.search`, or `Symbol.split` before fallback
 conversion. `matchAll` performs `IsRegExp`, observes `flags` for a true
-`@@match` result, and requires `g` before dispatch. Literal fallbacks preserve
+`@@match` result, and requires `g` before dispatch. Fallbacks preserve
 receiver and operand conversion order, match result metadata, nonoverlapping
 iteration with empty-match progress, `ToUint32` split limits, empty subjects
 and separators, and separator conversion before the zero-limit result.
 
-Fixed native and generated differential evidence at seed `0x60004600` covers
+The fallback now applies RegExp matching for its admitted fixed-width grammar:
+literal code units, dot, escaped syntax, control, hexadecimal, Unicode, digit,
+word, and whitespace atoms. Every other RegExp construct reaches a
+source-located `OSEO2001` boundary owned by `regexp-pattern-ast` and
+`regexp-generic-matcher`; no accepted pattern is treated as a literal
+approximation. A hexadecimal or Unicode escape without its required digits
+reaches that boundary, while a trailing backslash throws `SyntaxError` as an
+invalid pattern. `matchAll` returns a collector-traced RegExp String iterator
+whose own prototype supplies `next`, inherits the realm's iterator prototype,
+and remains independent from the mutable Array iterator prototype.
+
+Fixed native and generated differential evidence at seeds `0x60004600` and
+`0x60004601` covers
 both specialization policies, forced collection at every safepoint, false
 hints, deliberate shape-guard misses, generic fallback, primitive and generic
 receivers, all four protocols, null methods, match metadata and iteration,
-empty matches, split limits, and abrupt conversion. Of the 239 paths under the
-node's four inventory roots, 237 are reviewed: 128 pass and 109 retain
+metacharacter and escaped patterns, code-unit empty-match advancement, iterator
+prototype isolation, split limits, and abrupt conversion. All 239 paths under
+the node's four inventory roots are reviewed: 130 pass and 109 retain
 explicit prerequisite boundaries. The two null-method cases whose fallback
-object dynamically produces the RegExp pattern `\d` remain outside the
-subset until `regexp-symbol-methods`; fixed and generated literal cases retain
-replacement evidence for the null-method dispatch contract. The combined
-manifest moves to 10,785 paths with 7,888 passes, 1,364 expected
-negatives, and 1,533 unsupported profile features. The admitted runtime
-checkpoint moves the runtime ABI to `oseo-runtime-m5-68` without adding a
-generated-code entry point or changing the graph's orchestration state.
+object dynamically produces the RegExp pattern `\d` were outside the subset
+in the previous checkpoint. Both now pass with fixed and generated
+replacement evidence for the fallback contract. The combined manifest moves
+to 10,787 paths with 7,890 passes, 1,364 expected negatives, and 1,533
+unsupported profile features. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

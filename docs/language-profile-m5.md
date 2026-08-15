@@ -3621,30 +3621,43 @@ operand first receives the applicable `Symbol.match`, `Symbol.matchAll`,
 original receiver and, for `split`, the original limit. A nullish method,
 primitive operand, or missing operand takes the fallback. `matchAll` first
 applies `IsRegExp` through `@@match`, requires a global `flags` value for a
-true result, and returns an iterator over nonoverlapping literal matches.
-`match` and `search` report the first literal match, including match index,
+true result, and returns an iterator over nonoverlapping admitted matches.
+`match` and `search` report the first admitted match, including match index,
 input, and groups metadata. `split` preserves receiver, limit, and separator
 conversion order, `ToUint32` limits, empty separators, empty subjects, and
 the specified zero-limit behavior.
 
-Fixed native and generated differential evidence at seed `0x60004600` covers
+The RegExp fallback admits fixed-width literal, dot, escaped syntax, control,
+hexadecimal, Unicode, digit, word, and whitespace atoms. Quantifiers,
+alternatives, assertions, character classes, captures, and backreferences
+remain behind a source-located `OSEO2001` boundary owned by the RegExp pattern
+and matcher nodes, so no accepted pattern receives literal approximation.
+Hexadecimal and Unicode escapes without the required digits reach the same
+boundary. A trailing backslash throws `SyntaxError` as an invalid pattern.
+`matchAll` uses a collector-traced RegExp String iterator with its own shared
+prototype, inherited iterator identity, lazy `next`, and UTF-16 code-unit
+empty-match advancement. Mutating the Array iterator prototype cannot change
+its steps.
+
+Fixed native and generated differential evidence at seeds `0x60004600` and
+`0x60004601` covers
 primitive, wrapper, and generic receivers, all four symbol dispatches, null
 protocol methods, match metadata and iteration, empty matches and separators,
 both specialization policies, forced collection at every safepoint, false
-hints, deliberate shape-guard misses, and generic fallback. Of the 239 paths
-under the node's inventory roots, 237 are reviewed: 128 pass and 109 retain
+hints, deliberate shape-guard misses, and generic fallback. All 239 paths under
+the node's inventory roots are reviewed: 130 pass and 109 retain
 explicit prerequisite boundaries for RegExp syntax and objects, dynamic
 source, realms, or unadmitted built-ins. The two null-method cases that
-dynamically produce the RegExp pattern `\d` remain outside the subset until
-`regexp-symbol-methods`; fixed and generated null-method literal cases retain
-replacement evidence for the dispatch contract. The combined manifest reaches
-10,785 cases: 7,888 passes, 1,364 expected negatives, and 1,533 unsupported
-profile features with no semantic,
-harness, or infrastructure failures. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, and zero-override policy are
-unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-68` without adding a generated-code entry point or changing
-the graph's orchestration state.
+dynamically produce the RegExp pattern `\d` were outside the subset in the
+previous checkpoint. Both now pass with fixed and generated replacement
+evidence. The combined manifest reaches 10,787 cases: 7,890 passes, 1,364
+expected negatives, and 1,533 unsupported profile features with no semantic,
+harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry
+point or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

@@ -189,6 +189,53 @@ assert.match(
   /^deferred-string-trim\.ts:1:\d+: error\[OSEO2001\]: String prototype/u,
 );
 
+const deferredRegExpFallback = await runNativeCli(
+  {
+    args: ["deferred-regexp-fallback.ts"],
+    source: '"aaa".match("a*");',
+    sourceId: "deferred-regexp-fallback.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(deferredRegExpFallback.exitStatus, 1);
+assert.equal(deferredRegExpFallback.stdout, "");
+assert.match(
+  deferredRegExpFallback.stderr,
+  /^deferred-regexp-fallback\.ts:1:\d+: error\[OSEO2001\]: Regular/u,
+);
+
+for (const deferredPattern of [
+  {
+    name: "deferred-regexp-short-hex.ts",
+    units: "92, 120, 49",
+  },
+  {
+    name: "deferred-regexp-bad-unicode.ts",
+    units: "92, 117, 49, 50, 122, 52",
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredPattern.name],
+      source: '"x".match(String.fromCharCode(' + deferredPattern.units + "));",
+      sourceId: deferredPattern.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredPattern.name.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: Regular",
+      "u",
+    ),
+  );
+}
+
 const deferredObjectAssign = await runNativeCli(
   {
     args: ["deferred-object-assign.ts"],

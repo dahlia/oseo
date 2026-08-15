@@ -400,6 +400,8 @@
     (OSEO_STRING_CODE_ID_RANGE_LAST - 21u)
 #define OSEO_STRING_SPLIT_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 22u)
+#define OSEO_REGEXP_STRING_ITERATOR_NEXT_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 23u)
 
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
@@ -732,6 +734,17 @@ typedef struct {
     OseoValue iterator_array;
     size_t iterator_index;
     /*
+     * The private RegExp String iterator used by String.prototype.matchAll's
+     * admitted fallback. Its subject and pattern are collector-traced, and
+     * its cursor is a UTF-16 code-unit index because the fallback has no
+     * Unicode flag.
+     */
+    bool regexp_string_iterator;
+    OseoValue regexp_iterator_subject;
+    OseoValue regexp_iterator_pattern;
+    size_t regexp_iterator_index;
+    bool regexp_iterator_complete;
+    /*
      * AsyncFromSyncIterator state. A `for await` head whose iterable has
      * no Symbol.asyncIterator method wraps the synchronous iterator in a
      * flagged object, which is the only representation of that wrapper:
@@ -1054,6 +1067,11 @@ static inline bool is_array_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
         ordinary_object(value)->array_iterator;
+}
+static inline bool is_regexp_string_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->regexp_string_iterator;
 }
 static inline bool is_async_from_sync_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1390,6 +1408,10 @@ OseoResult oseo_internal_string_protocol_dispatch(
     OseoValue receiver,
     size_t argument_count,
     const OseoValue *arguments
+);
+/* The dedicated iterator prototype and next operation used by matchAll. */
+OseoResult oseo_internal_regexp_string_iterator_prototype(
+    OseoContext *context
 );
 /* Materializes %String% together with %String.prototype% and its
  * fromCharCode, fromCodePoint, and raw statics, and returns the

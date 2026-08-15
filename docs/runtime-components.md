@@ -62,7 +62,8 @@ Ownership follows the plan's target layout:
     `raw` statics;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`,
     `matchAll`, `search`, and `split` well-known-symbol dispatch and their
-    String-only fallback algorithms;
+    String fallback algorithms, including the admitted fixed-width regular
+    expression atoms and the dedicated RegExp String iterator;
  -  *runtime\_object.c*: ordinary object creation and layout, the
     property vector and its growth, own-property lookup and removal,
     cell-backed property recognition, shape identifiers and the

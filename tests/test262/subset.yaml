@@ -17248,6 +17248,9 @@ tests:
   - path: test/built-ins/String/prototype/match/cstm-matcher-invocation.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/match/cstm-matcher-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/cstm-matcher-on-bigint-primitive.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
@@ -17456,6 +17459,9 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/cstm-search-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/search/cstm-search-is-null.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/cstm-search-on-bigint-primitive.js

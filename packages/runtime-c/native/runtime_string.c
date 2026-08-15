@@ -1011,6 +1011,15 @@ OseoResult oseo_internal_string_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_REGEXP_STRING_ITERATOR_NEXT_CODE_ID) {
+        return oseo_internal_string_protocol_dispatch(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_STRING_FROM_CHAR_CODE_CODE_ID) {
         return string_from_char_code(context, argument_count, arguments);
     }

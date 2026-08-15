@@ -339,11 +339,232 @@ test(
           "four custom symbol methods; a false hint and shape-guard miss",
         numRuns: 12,
         profile: "M5 String prototype match and split",
-        seed: 0x6000_4500,
+        seed: 0x6000_4600,
         sizeLimit:
           "at most six subject units, three search units, one receiver, one " +
           "limit, five fallback observations, four dispatch observations, " +
           "two hint classes, and one prototype shape change",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+type FallbackPattern = "digit" | "dot" | "empty" | "escaped-dot" | "mixed";
+
+interface RegExpFallbackCase {
+  readonly pattern: FallbackPattern;
+  readonly subjectUnits: readonly number[];
+}
+
+const regexpFallbackArbitrary: fc.Arbitrary<RegExpFallbackCase> = fc.record({
+  pattern: fc.constantFrom<FallbackPattern>(
+    "digit",
+    "dot",
+    "empty",
+    "escaped-dot",
+    "mixed",
+  ),
+  subjectUnits: fc.array(
+    fc.constantFrom(0x0a, 0x2e, 0x31, 0x61, 0x62, 0xd83d, 0xde00),
+    { maxLength: 7 },
+  ),
+});
+
+function fallbackPatternText(pattern: FallbackPattern): string {
+  if (pattern === "digit") return "\\d";
+  if (pattern === "dot") return ".";
+  if (pattern === "escaped-dot") return "\\.";
+  if (pattern === "mixed") return "a.b";
+  return "";
+}
+
+function fallbackPatternMatchesAt(
+  testCase: RegExpFallbackCase,
+  position: number,
+): number {
+  const units = testCase.subjectUnits;
+  if (testCase.pattern === "empty") return 0;
+  if (testCase.pattern === "dot") {
+    return position < units.length && units[position] !== 0x0a ? 1 : -1;
+  }
+  if (testCase.pattern === "escaped-dot") {
+    return units[position] === 0x2e ? 1 : -1;
+  }
+  if (testCase.pattern === "digit") {
+    const unit = units[position];
+    return unit != null && unit >= 0x30 && unit <= 0x39 ? 1 : -1;
+  }
+  return position + 3 <= units.length &&
+    units[position] === 0x61 &&
+    units[position + 2] === 0x62 &&
+    units[position + 1] !== 0x0a
+    ? 3
+    : -1;
+}
+
+function fallbackPatternMatches(
+  testCase: RegExpFallbackCase,
+): readonly { readonly length: number; readonly position: number }[] {
+  const matches: { length: number; position: number }[] = [];
+  let next = 0;
+  while (next <= testCase.subjectUnits.length) {
+    let found = false;
+    for (
+      let position = next;
+      position <= testCase.subjectUnits.length;
+      position += 1
+    ) {
+      const length = fallbackPatternMatchesAt(testCase, position);
+      if (length < 0) continue;
+      matches.push({ length, position });
+      next = length === 0 ? position + 1 : position + length;
+      found = true;
+      break;
+    }
+    if (!found || next > testCase.subjectUnits.length) break;
+  }
+  return matches;
+}
+
+function printRegExpFallbackCase(testCase: RegExpFallbackCase): string {
+  return `
+const subject = String.fromCharCode(${testCase.subjectUnits.join(", ")});
+const pattern = ${JSON.stringify(fallbackPatternText(testCase.pattern))};
+function renderUnits(value) {
+  let rendered = "";
+  for (let index = 0; index < value.length; index = index + 1) {
+    if (rendered !== "") rendered = rendered + ".";
+    rendered = rendered + value.charCodeAt(index);
+  }
+  return rendered;
+}
+const iterator = subject.matchAll(pattern);
+const prototype = Object.getPrototypeOf(iterator);
+const arrayPrototype = Object.getPrototypeOf([][Symbol.iterator]());
+const savedNext = arrayPrototype.next;
+arrayPrototype.next = function() {
+  return { value: undefined, done: true };
+};
+const first = iterator.next();
+arrayPrototype.next = savedNext;
+console.log(
+  "iterator",
+  prototype !== arrayPrototype,
+  Object.getPrototypeOf(prototype) === Object.getPrototypeOf(arrayPrototype),
+  iterator[Symbol.iterator]() === iterator,
+  Object.prototype.toString.call(iterator),
+);
+console.log(
+  "first",
+  first.done,
+  first.done ? -1 : first.value.index,
+  first.done ? "" : renderUnits(first.value[0]),
+);
+let remaining = "";
+for (const match of iterator) {
+  if (remaining !== "") remaining = remaining + ",";
+  remaining = remaining + match.index + ":" + renderUnits(match[0]);
+}
+console.log("remaining", remaining);
+`;
+}
+
+function expectedRegExpFallback(testCase: RegExpFallbackCase): {
+  readonly exitStatus: number;
+  readonly stderr: string;
+  readonly stdout: string;
+} {
+  const matches = fallbackPatternMatches(testCase);
+  const first = matches[0];
+  const firstUnits =
+    first == null
+      ? ""
+      : testCase.subjectUnits
+          .slice(first.position, first.position + first.length)
+          .join(".");
+  const remaining = matches
+    .slice(1)
+    .map((match) => {
+      const units = testCase.subjectUnits
+        .slice(match.position, match.position + match.length)
+        .join(".");
+      return `${match.position}:${units}`;
+    })
+    .join(",");
+  return {
+    exitStatus: 0,
+    stderr: "",
+    stdout: [
+      "iterator true true true [object RegExp String Iterator]",
+      `first ${first == null} ${first?.position ?? -1} ${firstUnits}`,
+      `remaining ${remaining}`,
+      "",
+    ].join("\n"),
+  };
+}
+
+test(
+  "generated RegExp fallbacks keep matchAll iterator state isolated",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "RegExp fallback atoms and iterator state agree",
+      fc.asyncProperty(regexpFallbackArbitrary, async (testCase) => {
+        const source = printRegExpFallbackCase(testCase);
+        const expected = expectedRegExpFallback(testCase);
+        assertMatchingObservations([expected, ...(await references(source))]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-regexp-fallback.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expected, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "zero to seven UTF-16 code units; empty, dot, escaped dot, digit, " +
+          "and mixed dot patterns; dedicated iterator prototype mutation; " +
+          "both specialization policies and forced collection",
+        numRuns: 10,
+        profile: "M5 String RegExp fallback and matchAll iterator",
+        seed: 0x6000_4601,
+        sizeLimit:
+          "at most seven subject units, one of five fixed-width pattern " +
+          "forms, one isolated first step, and the remaining lazy steps",
         timeLimitMilliseconds: 180_000,
       },
     );

@@ -987,6 +987,11 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
                (intrinsic >= OSEO_INTRINSIC_STRING &&
                 intrinsic <= OSEO_INTRINSIC_STRING_RAW)) {
         materialized = oseo_internal_string_intrinsic(context);
+    } else if (
+        intrinsic == OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT
+    ) {
+        materialized = oseo_internal_regexp_string_iterator_prototype(context);
     } else if (intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_BIGINT_PROTOTYPE) {
         materialized = oseo_internal_primitive_wrapper_prototype(
@@ -1232,6 +1237,11 @@ OseoResult oseo_function_create(
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;
+    function->ordinary.regexp_string_iterator = false;
+    function->ordinary.regexp_iterator_subject = oseo_undefined();
+    function->ordinary.regexp_iterator_pattern = oseo_undefined();
+    function->ordinary.regexp_iterator_index = 0u;
+    function->ordinary.regexp_iterator_complete = false;
     function->ordinary.async_from_sync = false;
     function->ordinary.async_sync_iterator = oseo_undefined();
     function->ordinary.wrap_for_valid_iterator = false;

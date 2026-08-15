@@ -514,6 +514,7 @@ test("populates the realm-owned String intrinsic cluster", () => {
   const internalHeader = sources.get("runtime_internal.h") ?? "";
   const bindingSource = sources.get("runtime_binding.c") ?? "";
   const stringSource = sources.get("runtime_string.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
   const primitiveSource = sources.get("runtime_primitive.c") ?? "";
 
@@ -576,6 +577,19 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_MATCH_ALL_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SEARCH_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SPLIT_CODE_ID/u);
+  assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE/u);
+  assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT/u);
+  assert.match(internalHeader, /bool regexp_string_iterator;/u);
+  assert.match(internalHeader, /OseoValue regexp_iterator_subject;/u);
+  assert.match(internalHeader, /OseoValue regexp_iterator_pattern;/u);
+  assert.match(
+    memorySource,
+    /mark_value\(ordinary->regexp_iterator_subject, worklist\)/u,
+  );
+  assert.match(
+    memorySource,
+    /mark_value\(ordinary->regexp_iterator_pattern, worklist\)/u,
+  );
   assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(internalHeader, /oseo_internal_install_string_global/u);
   assert.match(bindingSource, /oseo_internal_install_string_global/u);

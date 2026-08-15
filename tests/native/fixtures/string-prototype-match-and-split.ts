@@ -149,6 +149,82 @@ for (const match of "a-b-a".matchAll("a")) {
 for (const match of "xy".matchAll("")) {
   console.log("matchAll empty", match.index);
 }
+const wildcard = "axb".match("a.b");
+const escapedDot = "a.b".match("a\\\\.b");
+console.log(
+  "regexp fallback",
+  wildcard[0],
+  wildcard.index,
+  escapedDot[0],
+  "x7y".search("\\\\d"),
+);
+const slash = String.fromCharCode(92);
+const regexpAtoms = [
+  ["not digit", slash + "D", "a"],
+  ["word", slash + "w", "_"],
+  ["not word", slash + "W", "-"],
+  ["space", slash + "s", String.fromCharCode(0x2028)],
+  ["not space", slash + "S", "x"],
+  ["form feed", slash + "f", String.fromCharCode(0x0c)],
+  ["newline", slash + "n", String.fromCharCode(0x0a)],
+  ["return", slash + "r", String.fromCharCode(0x0d)],
+  ["tab", slash + "t", String.fromCharCode(0x09)],
+  ["vertical tab", slash + "v", String.fromCharCode(0x0b)],
+  ["nul", slash + "0", String.fromCharCode(0)],
+  ["hex", slash + "x41", "A"],
+  ["unicode", slash + "u0042", "B"],
+  ["escaped plus", slash + "+", "+"],
+];
+for (const entry of regexpAtoms) {
+  const atomMatch = entry[2].match(entry[1]);
+  console.log(
+    "regexp atom",
+    entry[0],
+    atomMatch[0].charCodeAt(0),
+    atomMatch.index,
+  );
+}
+for (const unit of [0x0a, 0x0d, 0x2028, 0x2029]) {
+  console.log(
+    "regexp dot line terminator",
+    unit,
+    String.fromCharCode(unit).match(".") === null,
+  );
+}
+try {
+  "x".match(slash);
+} catch (error) {
+  console.log("regexp invalid trailing slash", error.name);
+}
+const surrogatePair = String.fromCharCode(0xd83d, 0xde00);
+let emptyIndexes = "";
+for (const match of surrogatePair.matchAll("")) {
+  if (emptyIndexes !== "") emptyIndexes = emptyIndexes + ",";
+  emptyIndexes = emptyIndexes + match.index;
+}
+console.log("matchAll code units", emptyIndexes);
+
+const arrayIteratorPrototype = Object.getPrototypeOf([][Symbol.iterator]());
+const regexpIterator = "aba".matchAll("a");
+const regexpIteratorPrototype = Object.getPrototypeOf(regexpIterator);
+const savedArrayNext = arrayIteratorPrototype.next;
+arrayIteratorPrototype.next = function() {
+  return { value: "array mutation", done: true };
+};
+const isolatedStep = regexpIterator.next();
+console.log(
+  "matchAll iterator",
+  regexpIteratorPrototype !== arrayIteratorPrototype,
+  Object.getPrototypeOf(regexpIteratorPrototype) ===
+    Object.getPrototypeOf(arrayIteratorPrototype),
+  Object.getPrototypeOf("a".matchAll("a")) === regexpIteratorPrototype,
+  regexpIterator[Symbol.iterator]() === regexpIterator,
+  isolatedStep.value[0],
+  isolatedStep.value.index,
+  isolatedStep.done,
+  Object.prototype.toString.call(regexpIterator),
+);
+arrayIteratorPrototype.next = savedArrayNext;
 
 console.log("split fallback", render("a-b--c".split("-")));
 console.log("split limit", render("a-b--c".split("-", 3)));

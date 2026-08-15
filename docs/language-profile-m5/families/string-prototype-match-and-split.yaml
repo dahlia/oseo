@@ -3,12 +3,18 @@ id: string-prototype-match-and-split
 title: "String prototype match and split methods"
 scope:
   - "String.prototype.match, matchAll, search, and split, including receiver
-    coercion, well-known-symbol dispatch, literal String fallbacks, split
-    limits, match metadata, and matchAll iteration."
-  - "RegExp pattern compilation and RegExp object symbol methods remain owned
-    by regexp-symbol-methods. The two inventory cases whose null protocol
-    method falls through to a dynamically produced \\d pattern use the fixed
-    and generated null-method literal evidence until that node lands."
+    coercion, well-known-symbol dispatch, fixed-width RegExp fallback atoms,
+    split limits, match metadata, and dedicated matchAll iteration."
+  - "Fallback patterns admit literal code units, dot, escaped syntax, control,
+    hex, Unicode, digit, word, and whitespace atoms. Quantifiers,
+    alternatives, assertions, character classes, captures, and backreferences
+    stop at a source-located OSEO2001 boundary owned by regexp-pattern-ast and
+    regexp-generic-matcher instead of receiving literal approximations."
+  - "Hexadecimal and Unicode escapes without their required digits reach the
+    same boundary. A trailing backslash throws SyntaxError as an invalid
+    pattern."
+  - "RegExp objects, flags, complete pattern compilation, and their symbol
+    methods remain owned by the regexp nodes."
 owners:
   - PLAN-M5.md
 evidence:

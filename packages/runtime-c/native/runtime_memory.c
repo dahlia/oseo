@@ -70,6 +70,10 @@ static void trace_object(
         if (ordinary->array_iterator) {
             mark_value(ordinary->iterator_array, worklist);
         }
+        if (ordinary->regexp_string_iterator) {
+            mark_value(ordinary->regexp_iterator_subject, worklist);
+            mark_value(ordinary->regexp_iterator_pattern, worklist);
+        }
         if (ordinary->async_from_sync) {
             mark_value(ordinary->async_sync_iterator, worklist);
         }
