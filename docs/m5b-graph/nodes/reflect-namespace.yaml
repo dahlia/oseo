@@ -13,4 +13,6 @@ dependencies:
   - object-descriptor-queries
   - object-own-keys
 landed: false
-status: blocked
+status: parked
+reason: "Depends on parked object-own-keys. Resume after its virtual String
+  iterator reflection paths pass a fresh mandatory review cycle."
