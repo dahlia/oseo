@@ -459,6 +459,15 @@ OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value) {
     return value_text(context, value, NULL);
 }
 
+OseoResult oseo_internal_array_join_element_string(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue array
+) {
+    ConversionAncestor current = {array, NULL};
+    return value_text(context, value, &current);
+}
+
 static bool conversion_property_exists(
     OseoValue object_value,
     OseoValue key
@@ -799,7 +808,8 @@ static OseoResult default_array_text(
         if (result.status == OSEO_STATUS_NORMAL &&
             is_function(frame.slots[2])) {
             OseoFunction *join = function_object(frame.slots[2]);
-            if (join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+            if ((join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
+                 join->code_id == OSEO_ARRAY_JOIN_CODE_ID) &&
                 oseo_internal_string_is_ascii(
                     join->initial_name,
                     "join"
@@ -820,10 +830,24 @@ static OseoResult default_array_text(
                 );
             }
         } else if (result.status == OSEO_STATUS_NORMAL) {
-            result = default_object_tag_text(context, frame.slots[0]);
+            result = oseo_call_function(
+                context,
+                context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+                frame.slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
         }
     } else if (result.status == OSEO_STATUS_NORMAL) {
-        result = array_join_text(context, frame.slots[0], previous);
+        result = oseo_call_function(
+            context,
+            context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -1011,7 +1035,8 @@ static OseoResult to_primitive_value(
         if (trying_to_string &&
             default_conversion_kind(context, frame.slots[0]) ==
                 OSEO_CONVERSION_ARRAY &&
-            method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+            (method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
+             method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID) &&
             oseo_internal_string_is_ascii(
                 method->initial_name,
                 "toString"
@@ -1034,17 +1059,6 @@ static OseoResult to_primitive_value(
                 context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING]) {
             DefaultConversionKind kind =
                 default_conversion_kind(context, frame.slots[0]);
-            if (kind == OSEO_CONVERSION_ARRAY) {
-                result = default_array_text(
-                    context,
-                    frame.slots[0],
-                    previous
-                );
-                if (result.status != OSEO_STATUS_NORMAL) break;
-                converted = !is_object(result.value);
-                if (converted) break;
-                continue;
-            }
             if (kind == OSEO_CONVERSION_FUNCTION &&
                 !is_function(frame.slots[0])) {
                 result = oseo_internal_throw_error(

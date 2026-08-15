@@ -500,6 +500,17 @@ getter, or `then` call closes an unfinished iterator before rejecting, while an
 abrupt iterator step or final capability resolution preserves the completed
 iterator state. The generated-code ABI gains no entry point.
 
+The `m5-69` ABI adds ordinary `concat`, `flat`, `flatMap`, `join`, `slice`,
+`toLocaleString`, and `toString` functions. Copying methods preserve holes,
+observable indexed access, and abrupt completion. `concat` applies
+`Symbol.isConcatSpreadable`; it, `flat`, `flatMap`, and `slice` allocate Array
+results through ArraySpeciesCreate. Flattening skips holes, observes nested
+Array elements recursively, and enforces the runtime's deterministic call
+depth limit for cyclic or unbounded input. `join` and `toLocaleString` retain
+their distinct element conversion rules, including recursion-safe Array
+stringification, while `toString` calls a callable `join` or falls back to
+`Object.prototype.toString`. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

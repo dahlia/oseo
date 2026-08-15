@@ -3658,6 +3658,46 @@ zero-override policy are unchanged. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry
 point or changing the graph's orchestration state.
 
+M5b node `array-prototype-copying` implements ordinary `concat`, `flat`,
+`flatMap`, `join`, `slice`, `toLocaleString`, and `toString` functions on the
+realm-owned `%Array.prototype%`. Each method converts its receiver before its
+later method-specific work, and each copying or stringification loop obtains
+LengthOfArrayLike at its specified point. Sparse copying uses HasProperty
+before Get, while `join` and `toLocaleString` retrieve every index and render
+nullish values as empty fields. `concat` reads `Symbol.isConcatSpreadable`
+before its Array fallback. `concat`, `flat`, `flatMap`, and `slice` create Array
+results through ArraySpeciesCreate, preserving observable constructor and
+`Symbol.species` reads, custom result constructors, and generic-receiver realm
+allocation.
+
+FlattenIntoArray skips holes, calls a `flatMap` mapper before deciding whether
+the mapped value is an Array, and recursively flattens only Array values. Zero
+and finite depth retain their ordinary results. Cyclic or positive-infinity
+paths that exceed the admitted nesting limit reach the runtime's deterministic
+depth boundary without native stack overflow. `join` converts its separator
+after reading length and uses recursion-safe nested Array stringification.
+`toLocaleString` invokes each non-nullish element's method without arguments
+and converts its result. `toString` calls a callable `join` property and
+otherwise delegates to `Object.prototype.toString`.
+
+Fixed native and generated differential evidence at seed `0x60004700` covers
+sparse Arrays, ordinary and primitive generic receivers, observable property
+order, `Symbol.isConcatSpreadable`, every ArraySpeciesCreate default and guard
+fallback, custom species, recursive and cyclic input, locale result coercion,
+callback behavior, and abrupt completion. Both specialization policies,
+forced collection at every safepoint, false hints, deliberate guard hits and
+misses, and generic fallback are exercised. All 229 paths under the node's
+seven inventory roots are reviewed: 182 pass and 47 retain explicit
+prerequisite boundaries. No new path outside those roots is added. Two
+already-reviewed cases outside the roots move from unsupported to pass
+because they exercise the newly admitted `toString` and generic `slice`
+behavior. The manifest reaches 11,016 cases: 8,074 passes, 1,364 expected
+negatives, and 1,578 unsupported profile features with no semantic, harness,
+or infrastructure failures. The suite revision, 41,091-path inventory,
+manifest schema and vocabulary, and zero-override policy are unchanged. The
+admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69`
+without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 Known gaps inside the claim
 ---------------------------

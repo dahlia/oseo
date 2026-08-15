@@ -4103,6 +4103,41 @@ unsupported profile features. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry point
 or changing the graph's orchestration state.
 
+Implemented M5b node `array-prototype-copying` gives the realm-owned
+`%Array.prototype%` ordinary `concat`, `flat`, `flatMap`, `join`, `slice`,
+`toLocaleString`, and `toString` functions. Each method converts the receiver
+before its later method-specific work, and each copying or stringification
+loop obtains LengthOfArrayLike at its specified point. Sparse copying checks
+HasProperty before Get, while stringification retrieves every index and
+renders nullish elements as empty fields. `concat` observes
+`Symbol.isConcatSpreadable`; `concat`, `flat`, `flatMap`, and `slice` use
+ArraySpeciesCreate and preserve constructor and `Symbol.species` reads,
+default allocation, custom constructors, and abrupt completion.
+
+FlattenIntoArray skips holes, maps before testing the mapped value for Array
+flattening, and applies the requested recursive depth. Cyclic or unbounded
+input reaches the deterministic runtime call-depth boundary rather than the
+native stack. `join` converts its separator after length and safely renders
+nested Arrays. `toLocaleString` calls each non-nullish element method without
+arguments and coerces its result. `toString` calls a callable `join` or falls
+back to `Object.prototype.toString`. The implementation stays in
+*runtime\_array.c* because these paths share property primitives, species
+allocation, collector roots, and recursion state with the Array intrinsic.
+
+Fixed native and generated differential evidence at seed `0x60004700` covers
+both specialization policies, forced collection at every safepoint, sparse
+and generic receivers, side-effect order, spreadability, every species guard
+hit and miss, custom results, recursion and cycles, locale coercion, abrupt
+completion, false hints, deliberate shape-guard misses, and generic fallback.
+All 229 paths under the node's seven inventory roots are reviewed: 182 pass
+and 47 retain explicit prerequisite boundaries. No new path outside those
+roots is added. Two already-reviewed cases outside the roots move from
+unsupported to pass because they exercise the newly admitted `toString` and
+generic `slice` behavior. The manifest moves to 11,016 paths with 8,074
+passes, 1,364 expected negatives, and 1,578 unsupported profile features.
+The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-69` without adding a generated-code entry point or changing
+the graph's orchestration state.
 
 Ahead-of-time challenge boundary
 --------------------------------

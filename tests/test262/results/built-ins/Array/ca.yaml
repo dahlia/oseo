@@ -103,6 +103,29 @@ results:
       async: false
       features:
         - Symbol.species
+        - Reflect.construct
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/Array/prototype/concat/create-species-non-ctor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+  - case:
+      async: false
+      features:
+        - Symbol.species
       flags: []
       includes: []
       mode: script
@@ -124,6 +147,36 @@ results:
           strictness: non-strict
         - specialization: enabled
           strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Array.prototype.flatMap
+      flags:
+        - onlyStrict
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/Array/prototype/flatMap/thisArg-argument.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
         - specialization: disabled
           strictness: strict
         - specialization: enabled
@@ -184,5 +237,29 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/toLocaleString/primitive_this_value_getter.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/toLocaleString/primitive_this_v\
+        alue_getter.js strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/toLocaleString/primitiv\
+        e_this_value_getter.js:102:23: error[OSEO1001]: Unknown binding
+        'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

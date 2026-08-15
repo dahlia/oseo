@@ -623,6 +623,23 @@ abrupt reads, mutation, both specialization policies, generic fallback, and
 collection at every safepoint. The node adds no generated-code entry point and
 moves `abiVersion` to `m5-66`.
 
+M5b node `array-prototype-copying` remains in *runtime\_array.c* because the
+methods share ordinary property access, ArraySpeciesCreate, collector roots,
+and recursion state with the existing Array intrinsic. Moving their loops into
+generated code would add a runtime crossing without replacing any semantic
+primitive. The component adds `concat`, `flat`, `flatMap`, `join`, `slice`,
+`toLocaleString`, and `toString` to the materialized `%Array.prototype%`.
+
+The copying paths preserve sparse HasProperty behavior and generic receiver
+order. `concat` honors `Symbol.isConcatSpreadable`; `concat`, `flat`, `flatMap`,
+and `slice` use ArraySpeciesCreate and propagate every constructor, species,
+indexed, callback, and coercion abrupt completion. Flattening skips holes and
+uses the deterministic runtime depth boundary for cycles or unbounded depth.
+Fixed and generated native differential evidence covers both specialization
+policies, every species fallback, false hints, deliberate guard hits and
+misses, and collection at every safepoint. The node adds no generated-code
+entry point and moves `abiVersion` to `m5-69`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

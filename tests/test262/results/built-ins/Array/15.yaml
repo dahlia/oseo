@@ -96,6 +96,28 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Proxy
+        - Symbol.species
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/slice/create-proxy.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Proxy
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

@@ -103,14 +103,40 @@ test("populates the realm-owned Object constructor cluster", () => {
   assert.match(functions, /intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF/u);
 });
 
-test("populates Array prototype iteration and species methods", () => {
+test("populates Array iteration, species, and copying methods", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
 
-  for (const method of ["every", "filter", "forEach", "map", "some"]) {
+  for (const method of [
+    "concat",
+    "every",
+    "filter",
+    "flat",
+    "flatMap",
+    "forEach",
+    "join",
+    "map",
+    "slice",
+    "some",
+    "toLocaleString",
+    "toString",
+  ]) {
     assert.match(arraySource, new RegExp(`"${method}"`, "u"));
   }
-  for (const code of ["EVERY", "FILTER", "FOR_EACH", "MAP", "SOME"]) {
+  for (const code of [
+    "CONCAT",
+    "EVERY",
+    "FILTER",
+    "FLAT",
+    "FLAT_MAP",
+    "FOR_EACH",
+    "JOIN",
+    "MAP",
+    "SLICE",
+    "SOME",
+    "TO_LOCALE_STRING",
+    "TO_STRING",
+  ]) {
     assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
   }
   assert.match(arraySource, /array_iteration[\s\S]*oseo_has_property/u);
@@ -123,6 +149,14 @@ test("populates Array prototype iteration and species methods", () => {
     arraySource,
     /array_species_mapping[\s\S]*create_index_property/u,
   );
+  assert.match(
+    arraySource,
+    /array_is_concat_spreadable[\s\S]*OSEO_WELL_KNOWN_IS_CONCAT_SPREADABLE/u,
+  );
+  assert.match(arraySource, /array_concat[\s\S]*array_species_create/u);
+  assert.match(arraySource, /flatten_into_array[\s\S]*create_index_property/u);
+  assert.match(arraySource, /array_slice[\s\S]*array_species_create/u);
+  assert.match(arraySource, /array_join[\s\S]*toLocaleString/u);
 });
 
 test("orders Object.defineProperty conversion before descriptors", () => {

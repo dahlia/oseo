@@ -55,4 +55,28 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/toLocaleString/primitive_this_value.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/toLocaleString/primitive_this_v\
+        alue.js strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/toLocaleString/primitiv\
+        e_this_value.js:102:1: error[OSEO1001]: Unknown binding
+        'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

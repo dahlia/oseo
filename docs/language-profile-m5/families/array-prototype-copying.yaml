@@ -1,0 +1,54 @@
+version: 1
+id: array-prototype-copying
+title: "Array prototype copying and stringification"
+scope:
+  - "Array.prototype concat, flat, flatMap, join, slice, toLocaleString,
+    and toString, including sparse and generic receivers, observable access
+    order, Symbol.isConcatSpreadable, ArraySpeciesCreate, recursive flattening,
+    cycles, locale result coercion, and abrupt completion."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-copying.ts
+      - tests/property/m5-array-prototype-copying.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-copying.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-copying.ts
+      - tests/property/m5-array-prototype-copying.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-copying.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-copying.ts
+      - tests/property/m5-array-prototype-copying.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-copying.ts
+      - tests/property/m5-array-prototype-copying.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

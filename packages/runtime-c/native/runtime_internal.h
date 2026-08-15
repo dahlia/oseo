@@ -213,6 +213,20 @@
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 10u)
 #define OSEO_ARRAY_MAP_CODE_ID \
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_ARRAY_CONCAT_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_ARRAY_FLAT_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_ARRAY_FLAT_MAP_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_ARRAY_JOIN_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_ARRAY_SLICE_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_ARRAY_TO_LOCALE_STRING_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_ARRAY_TO_STRING_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 18u)
 
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
@@ -1765,6 +1779,11 @@ OseoResult oseo_internal_array_push(
     const OseoValue *arguments
 );
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_array_join_element_string(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue array
+);
 OseoResult oseo_internal_jobs_drain_until(
     OseoContext *context,
     OseoValue promise
