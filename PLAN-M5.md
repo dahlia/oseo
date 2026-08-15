@@ -4030,6 +4030,41 @@ features. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-66` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
+Implemented M5b node `promise-all-and-race` completes both combinators over
+the materialized constructor. Each static builds NewPromiseCapability from its
+receiver, reads that constructor's `resolve` once before acquiring the
+iterator, and calls the captured method with the constructor as receiver for
+every iterated value. `Promise.all` retains one guarded fulfillment closure per
+index and one shared capability rejection function, preserving input order
+independently of settlement order. `Promise.race` shares both capability
+settlement functions and leaves an empty input pending. Its outer abrupt paths
+use the same first-settlement guard, so a thenable assimilation job queued by
+the first resolution wins over a later `then` getter or iterator-step throw.
+An abrupt resolve call, `then` getter, or `then` call closes an unfinished
+iterator before rejection while preserving the original throw completion; an
+abrupt iterator step or value read and final capability resolution retain the
+iterator's completed state without closing it. `Promise.all` creates own result
+data properties without invoking inherited indexed setters.
+
+Fixed native and generated differential evidence at seeds `0x60004500` and
+`0x60004501` covers
+empty, sparse, array, and custom iterables, bounded thenable schedules,
+subclass and species behavior, both specialization policies, forced collection
+at every safepoint, false hints, deliberate guard misses, generic fallback,
+first settlement before later abrupt completion, inherited indexed setters,
+and observable constructor, resolve, and iterator operations. The reviewed
+*promiseHelper.js* harness executes all 16 scheduling cases that use it. Of the
+192 paths under the node's two inventory roots, 190 are reviewed: 173 pass and
+17 retain explicit prerequisite boundaries for the unhandled-rejection host
+policy, `eval`, other profile syntax, `Object.getOwnPropertyNames`, or
+`Reflect.construct`. The two remaining paths require string iteration and stay
+with the separate `string-iterator` node; fixed and generated evidence covers
+the combinators' empty-input contracts. The manifest moves to 10,548 paths with
+7,760 passes, 1,364 expected negatives, and 1,424 unsupported profile features.
+The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-67`
+without adding a generated-code entry point or changing the graph's
+orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

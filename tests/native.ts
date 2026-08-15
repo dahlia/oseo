@@ -307,6 +307,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
+    fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
@@ -377,6 +378,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "number-intrinsic" ||
+    fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "object-constructor" ||
@@ -567,6 +569,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "number-intrinsic" ||
+            fixture.name === "promise-all-and-race" ||
             fixture.name === "promise-intrinsic" ||
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||

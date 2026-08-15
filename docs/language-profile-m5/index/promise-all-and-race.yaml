@@ -1,0 +1,3 @@
+version: 1
+id: promise-all-and-race
+record: docs/language-profile-m5/families/promise-all-and-race.yaml

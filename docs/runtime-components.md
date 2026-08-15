@@ -422,6 +422,22 @@ capabilities, foreign capability constructors, and collection forced at every
 safepoint. The node reviews the seven declared `Promise` inventory roots and
 promotes no path outside them.
 
+### Promise combinator evidence
+
+M5b node `promise-all-and-race` completes the two existing combinators in
+*runtime\_promise.c*. They read the receiver's `resolve` once, retain the
+constructor and method across iterator safepoints, and use the shared iterator
+component for every acquisition, step, and conditional close. `Promise.all`
+owns per-index fulfillment state and preserves input order, while both
+combinators share the callback identities their algorithms require.
+
+The completed semantic checkpoint moves `abiVersion` to `m5-67` without a
+public layout or generated-code entry-point change. Fixed and generated native
+differential evidence covers both specialization policies, false hints,
+generic fallback, deliberate guard misses, subclass and species behavior, and
+collection forced at every safepoint. The node reviews only its declared
+`Promise.all` and `Promise.race` test262 inventory roots.
+
 ### Object descriptor query evidence
 
 M5b node `object-descriptor-queries` completes the reporting half of the

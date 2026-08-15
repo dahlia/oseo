@@ -3575,6 +3575,45 @@ zero-override policy are unchanged. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-66` without adding a generated-code entry point
 or changing the graph's orchestration state.
 
+M5b node `promise-all-and-race` completes both combinators over the
+materialized constructor. Each static builds NewPromiseCapability from its
+receiver, reads that constructor's `resolve` once before acquiring the
+iterator, and calls the captured method with the constructor as receiver for
+every iterated value. `Promise.all` gives every index one guarded fulfillment
+closure, shares the capability rejection function, and resolves its result in
+input order. `Promise.race` shares both capability settlement functions and
+leaves an empty input pending. Its outer abrupt paths use the same
+first-settlement guard, so a thenable assimilation job queued by the first
+resolution wins over a later `then` getter or iterator-step throw. An abrupt
+resolve call, `then` getter, or `then` call closes an unfinished iterator before
+rejection and preserves the original throw over an abrupt `return`; an abrupt
+iterator step or value read marks the iterator done and does not close it.
+`Promise.all` creates own result data properties without invoking inherited
+indexed setters. A subclass owns the aggregate promise independently of the
+species constructor that a later `then` selects.
+
+Fixed native and generated differential evidence at seeds `0x60004500` and
+`0x60004501` covers
+empty, sparse, array, and custom iterable inputs, bounded thenable schedules,
+both specialization policies, collection forced at every safepoint, false
+hints, deliberate guard misses, generic fallback, and observable constructor,
+resolve, iterator, and species operations, including first settlement before
+later abrupt completion and inherited indexed setters. The reviewed
+*promiseHelper.js*
+harness executes all 16 scheduling cases that use it. Of the 192 paths under
+the node's two inventory roots, 190 are reviewed: 173 pass and 17 retain
+explicit prerequisite boundaries for the unhandled-rejection host policy,
+`eval`, other profile syntax, `Object.getOwnPropertyNames`, or
+`Reflect.construct`. The two remaining paths require string iteration and stay
+with the separate `string-iterator` node; fixed and generated evidence covers
+the combinators' empty-input contracts. The manifest reaches 10,548 cases:
+7,760 passes, 1,364 expected negatives, and 1,424 unsupported profile features
+with no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override policy
+are unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-67` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3728,15 +3767,8 @@ complete. The remaining gaps retain their existing owners.
  -  `Promise.allSettled` and `Promise.any` are own properties of `%Promise%`
     with their specified names and lengths, but calling either reports the
     owned `promise-static-method` diagnostic instead of combining.
-    `Promise.all` and `Promise.race` build their capability from the `this`
-    value, so a receiver that is not a constructor and a constructor whose
-    executor supplies no resolving functions both throw, but neither reads
-    `resolve` from that constructor; each resolves its elements through the
-    internal `PromiseResolve` instead, and a derived capability settles one
-    job earlier than the specification requires. The reviewed
-    *Promise/all/*, *Promise/allSettled/*, *Promise/any/*, and
-    *Promise/race/* roots stay outside this node. Owner: the
-    `promise-all-and-race` and `promise-allsettled-and-any` graph nodes.
+    The reviewed *Promise/allSettled/* and *Promise/any/* roots stay outside
+    this node. Owner: the `promise-allsettled-and-any` graph node.
  -  A rejected promise that no reaction ever handles ends the program at the
     next rejection checkpoint. A case whose reason is not a typed error
     names the owned `unhandled-rejection-policy` boundary, but a case whose
@@ -3746,10 +3778,10 @@ complete. The remaining gaps retain their existing owners.
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* stay
     outside the reviewed subset. Owner: the modules and asynchronous
     execution stream.
- -  The reviewed harness does not provide *promiseHelper.js*, so the seven
-    *Promise/prototype/then/* and two *Promise/resolve/* sequencing cases
-    that include it stay outside the reviewed subset. Owner: the
-    `harness-promise-helper` graph node.
+ -  The reviewed *promiseHelper.js* implements `checkSequence` for the
+    `Promise.all` and `Promise.race` scheduling inventory. Its
+    `checkSettledPromises` half stays deferred with the combinators that use
+    it. Owner: the `promise-allsettled-and-any` graph node.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
@@ -3760,10 +3792,9 @@ complete. The remaining gaps retain their existing owners.
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
-    *asyncHelpers.js*, *compareArray.js*, and *propertyHelper.js* only. Cases
-    that include *promiseHelper.js* stay outside the reviewed subset until the
-    include has a reviewed implementation. Cases in the reviewed function
-    inventory that need *nativeFunctionMatcher.js* or
+    *asyncHelpers.js*, *compareArray.js*, *propertyHelper.js*, and the
+    `checkSequence` portion of *promiseHelper.js*. Cases in the reviewed
+    function inventory that need *nativeFunctionMatcher.js* or
     *wellKnownIntrinsicObjects.js* classify as unsupported until those
     includes have reviewed implementations. Cases that need *nans.js* also
     remain unsupported because that include depends on the unadmitted
