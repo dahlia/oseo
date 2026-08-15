@@ -8059,7 +8059,7 @@ summary:
   expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 8074
+  passes: 8073
   semanticFailures: 0
   unsupportedProfileFeatures: 1578
   dependencies:
@@ -8151,7 +8151,7 @@ summary:
       expectedNegatives: 124
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1999
+      passes: 1998
       semanticFailures: 0
       unsupportedProfileFeatures: 534
     - dependency: generators
@@ -8193,7 +8193,7 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5349
+      passes: 5348
       semanticFailures: 0
       unsupportedProfileFeatures: 907
     - dependency: promise-settlement
@@ -8250,7 +8250,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1262
+      passes: 1261
       semanticFailures: 0
       unsupportedProfileFeatures: 214
     - group: built-ins/ArrayBuffer

@@ -635,6 +635,9 @@ order. `concat` honors `Symbol.isConcatSpreadable`; `concat`, `flat`, `flatMap`,
 and `slice` use ArraySpeciesCreate and propagate every constructor, species,
 indexed, callback, and coercion abrupt completion. Flattening skips holes and
 uses the deterministic runtime depth boundary for cycles or unbounded depth.
+`toLocaleString` forwards the rooted outer locales and options as exactly two
+arguments to every non-nullish element method, including two `undefined`
+values when the caller omits them.
 Fixed and generated native differential evidence covers both specialization
 policies, every species fallback, false hints, deliberate guard hits and
 misses, and collection at every safepoint. The node adds no generated-code

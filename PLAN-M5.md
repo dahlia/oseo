@@ -4118,23 +4118,30 @@ FlattenIntoArray skips holes, maps before testing the mapped value for Array
 flattening, and applies the requested recursive depth. Cyclic or unbounded
 input reaches the deterministic runtime call-depth boundary rather than the
 native stack. `join` converts its separator after length and safely renders
-nested Arrays. `toLocaleString` calls each non-nullish element method without
-arguments and coerces its result. `toString` calls a callable `join` or falls
-back to `Object.prototype.toString`. The implementation stays in
+nested Arrays. `toLocaleString` calls each non-nullish element method with the
+element as receiver, forwards the outer locales and options as exactly two
+arguments, and coerces its result. Omitted outer arguments are forwarded as two
+`undefined` values. `toString` calls a callable `join` or falls back to
+`Object.prototype.toString`. The implementation stays in
 *runtime\_array.c* because these paths share property primitives, species
 allocation, collector roots, and recursion state with the Array intrinsic.
 
 Fixed native and generated differential evidence at seed `0x60004700` covers
 both specialization policies, forced collection at every safepoint, sparse
 and generic receivers, side-effect order, spreadability, every species guard
-hit and miss, custom results, recursion and cycles, locale coercion, abrupt
-completion, false hints, deliberate shape-guard misses, and generic fallback.
-All 229 paths under the node's seven inventory roots are reviewed: 182 pass
-and 47 retain explicit prerequisite boundaries. No new path outside those
-roots is added. Two already-reviewed cases outside the roots move from
-unsupported to pass because they exercise the newly admitted `toString` and
-generic `slice` behavior. The manifest moves to 11,016 paths with 8,074
-passes, 1,364 expected negatives, and 1,578 unsupported profile features.
+hit and miss, custom results, recursion and cycles, locale argument forwarding,
+locale coercion, abrupt completion, false hints, deliberate shape-guard misses,
+and generic fallback.
+Of the 229 paths under the node's seven inventory roots, 228 are reviewed:
+181 pass and 47 retain explicit prerequisite boundaries. The pinned
+*invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's
+zero-argument call and is omitted because this method follows the ECMA-402
+superseding call contract; the fixed differential fixture replaces its
+element-call evidence. No new path outside those roots is added. Two
+already-reviewed cases outside the roots move from unsupported to pass because
+they exercise the newly admitted `toString` and generic `slice` behavior. The
+manifest moves to 11,015 paths with 8,073 passes, 1,364 expected negatives,
+and 1,578 unsupported profile features.
 The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-69` without adding a generated-code entry point or changing
 the graph's orchestration state.

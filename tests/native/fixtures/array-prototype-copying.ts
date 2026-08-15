@@ -219,13 +219,25 @@ console.log(
 
 const localeElement = {
   toLocaleString(locales, options) {
-    console.log("locale call", locales, options && options.style);
+    console.log(
+      "locale call",
+      this === localeElement,
+      arguments.length,
+      locales,
+      options === localeOptions,
+      options && options.style,
+    );
     return {
       toString() { console.log("locale coercion"); return "localized"; },
     };
   },
 };
-console.log("locale", [localeElement, null, localeElement].toLocaleString());
+const localeOptions = { style: "custom" };
+console.log(
+  "locale provided",
+  [localeElement, null, localeElement].toLocaleString("ko", localeOptions),
+);
+console.log("locale omitted", [localeElement].toLocaleString());
 
 const nested = [1, , [2, , [3]], 4];
 console.log("flat zero", nested.flat(0).join("/"));

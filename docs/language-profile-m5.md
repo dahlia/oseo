@@ -3676,23 +3676,30 @@ and finite depth retain their ordinary results. Cyclic or positive-infinity
 paths that exceed the admitted nesting limit reach the runtime's deterministic
 depth boundary without native stack overflow. `join` converts its separator
 after reading length and uses recursion-safe nested Array stringification.
-`toLocaleString` invokes each non-nullish element's method without arguments
-and converts its result. `toString` calls a callable `join` property and
-otherwise delegates to `Object.prototype.toString`.
+`toLocaleString` invokes each non-nullish element's method with the same
+receiver and exactly the outer locales and options, forwarding two `undefined`
+values when they were omitted, and converts its result. `toString` calls a
+callable `join` property and otherwise delegates to
+`Object.prototype.toString`.
 
 Fixed native and generated differential evidence at seed `0x60004700` covers
 sparse Arrays, ordinary and primitive generic receivers, observable property
 order, `Symbol.isConcatSpreadable`, every ArraySpeciesCreate default and guard
 fallback, custom species, recursive and cyclic input, locale result coercion,
-callback behavior, and abrupt completion. Both specialization policies,
+locale argument forwarding, callback behavior, and abrupt completion. Both
+specialization policies,
 forced collection at every safepoint, false hints, deliberate guard hits and
-misses, and generic fallback are exercised. All 229 paths under the node's
-seven inventory roots are reviewed: 182 pass and 47 retain explicit
-prerequisite boundaries. No new path outside those roots is added. Two
-already-reviewed cases outside the roots move from unsupported to pass
-because they exercise the newly admitted `toString` and generic `slice`
-behavior. The manifest reaches 11,016 cases: 8,074 passes, 1,364 expected
-negatives, and 1,578 unsupported profile features with no semantic, harness,
+misses, and generic fallback are exercised. Of the 229 paths under the node's
+seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
+prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
+asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
+this method follows the ECMA-402 superseding call contract; the fixed
+differential fixture replaces its element-call evidence. No new path outside
+those roots is added. Two already-reviewed cases outside the roots move from
+unsupported to pass because they exercise the newly admitted `toString` and
+generic `slice` behavior. The manifest reaches 11,015 cases: 8,073 passes,
+1,364 expected negatives, and 1,578 unsupported profile features with no
+semantic, harness,
 or infrastructure failures. The suite revision, 41,091-path inventory,
 manifest schema and vocabulary, and zero-override policy are unchanged. The
 admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69`

@@ -911,8 +911,8 @@ static OseoResult array_join(
                     context,
                     frame.slots[5],
                     frame.slots[4],
-                    0u,
-                    NULL,
+                    2u,
+                    &frame.slots[1],
                     oseo_undefined()
                 );
             }

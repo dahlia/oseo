@@ -4470,9 +4470,6 @@ tests:
   - path: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A3_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
-  - path: test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js
-    expectedClassification: pass
-    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/length.js
     expectedClassification: pass
     dependencies: [functions, object-properties]

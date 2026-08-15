@@ -5,7 +5,8 @@ scope:
   - "Array.prototype concat, flat, flatMap, join, slice, toLocaleString,
     and toString, including sparse and generic receivers, observable access
     order, Symbol.isConcatSpreadable, ArraySpeciesCreate, recursive flattening,
-    cycles, locale result coercion, and abrupt completion."
+    cycles, locale argument forwarding, locale result coercion, and abrupt
+    completion."
 owners:
   - PLAN-M5.md
 evidence:
