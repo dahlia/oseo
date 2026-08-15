@@ -13,4 +13,4 @@ dependencies:
   - object-constructor
   - promise-all-and-race
 landed: false
-status: blocked
+status: ready
