@@ -11,4 +11,4 @@ inventory:
 dependencies:
   - string-prototype-match-and-split
 landed: false
-status: blocked
+status: ready

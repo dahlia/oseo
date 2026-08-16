@@ -13,5 +13,5 @@ inventory:
 dependencies:
   - string-prototype-search-and-slice
   - well-known-symbols
-landed: false
+landed: true
 status: ready
