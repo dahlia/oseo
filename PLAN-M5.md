@@ -4121,10 +4121,12 @@ native stack. `join` converts its separator after length and safely renders
 nested Arrays. `toLocaleString` calls each non-nullish element method with the
 element as receiver, forwards the outer locales and options as exactly two
 arguments, and coerces its result. Omitted outer arguments are forwarded as two
-`undefined` values. A recursive locale conversion of the same receiver renders
-an empty element. Matching Node.js and Deno, `join` and `toLocaleString` reject
-lengths above `2**32 - 1` with `TypeError`, and runtime string construction
-rejects results above 536,870,888 UTF-16 code units with `RangeError`.
+`undefined` values. During element conversion, re-entry through `join`,
+`toString`, or `toLocaleString` on the same active receiver renders an empty
+string. Matching Node.js and Deno, these methods and ordinary string conversion
+that reaches intrinsic Array `toString` reject lengths above `2**32 - 1` with
+`TypeError`. Runtime string construction rejects results above 536,870,888
+UTF-16 code units with `RangeError`.
 `toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The implementation stays in
 *runtime\_array.c* because these paths share property primitives, species

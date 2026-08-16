@@ -167,6 +167,8 @@ static OseoResult object_tag_text(
         return failure(context, "OSEO2001", "Object tag is too long.");
     }
     size_t length = tag_length + 9u;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(*units));
     if (units == NULL) {
         return failure(context, "OSEO2001", "Object tag allocation failed.");

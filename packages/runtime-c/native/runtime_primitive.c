@@ -647,12 +647,27 @@ static bool conversion_is_ancestor(
     return false;
 }
 
+static bool array_string_is_ancestor(
+    OseoValue value,
+    const OseoArrayStringAncestor *ancestor
+) {
+    for (const OseoArrayStringAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
 static OseoResult array_join_text(
     OseoContext *context,
     OseoValue array_value,
     const ConversionAncestor *previous
 ) {
-    if (conversion_is_ancestor(array_value, previous)) {
+    const OseoArrayStringAncestor *previous_string =
+        context->array_string_stack;
+    if (conversion_is_ancestor(array_value, previous) ||
+        array_string_is_ancestor(array_value, previous_string)) {
         return oseo_string_from_units(context, NULL, 0u);
     }
     /* Nested array conversion recurses in C, so it consumes the same
@@ -666,6 +681,11 @@ static OseoResult array_join_text(
         return result;
     }
     frame.slots[0] = array_value;
+    OseoArrayStringAncestor current_string = {
+        frame.slots[0],
+        previous_string,
+    };
+    context->array_string_stack = &current_string;
     ConversionAncestor current = {frame.slots[0], previous};
     uint16_t *units = NULL;
     size_t length = 0u;
@@ -689,10 +709,17 @@ static OseoResult array_join_text(
     uint32_t array_length = 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         double numeric_length = number_value(frame.slots[2]);
-        if (isfinite(numeric_length) && numeric_length > 0.0) {
-            array_length = numeric_length >= (double)UINT32_MAX
-                ? UINT32_MAX
-                : (uint32_t)floor(numeric_length);
+        double truncated_length = numeric_length > 0.0
+            ? floor(numeric_length)
+            : 0.0;
+        if (truncated_length > (double)UINT32_MAX) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Invalid array length."
+            );
+        } else {
+            array_length = (uint32_t)truncated_length;
         }
     }
     for (uint32_t index = 0u;
@@ -776,6 +803,7 @@ static OseoResult array_join_text(
         result = oseo_string_from_units(context, units, length);
     }
     free(units);
+    context->array_string_stack = (void *)previous_string;
     oseo_roots_release(context, &frame);
     oseo_call_leave(context);
     return result;

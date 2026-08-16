@@ -477,16 +477,11 @@ typedef struct {
     size_t capacity;
 } ArrayStringBuilder;
 
-typedef struct ArrayLocaleAncestor {
-    OseoValue value;
-    const struct ArrayLocaleAncestor *previous;
-} ArrayLocaleAncestor;
-
-static bool array_locale_is_ancestor(
+static bool array_string_is_ancestor(
     OseoValue value,
-    const ArrayLocaleAncestor *ancestor
+    const OseoArrayStringAncestor *ancestor
 ) {
-    for (const ArrayLocaleAncestor *current = ancestor;
+    for (const OseoArrayStringAncestor *current = ancestor;
          current != NULL;
          current = current->previous) {
         if (current->value == value) return true;
@@ -888,23 +883,23 @@ static OseoResult array_join(
         }
         frame.slots[3] = result.value;
     }
-    const ArrayLocaleAncestor *previous_locale =
-        context->array_locale_stack;
-    bool recursive_locale = locale &&
-        array_locale_is_ancestor(frame.slots[0], previous_locale);
-    ArrayLocaleAncestor current_locale = {
+    const OseoArrayStringAncestor *previous_string =
+        context->array_string_stack;
+    bool recursive_string =
+        array_string_is_ancestor(frame.slots[0], previous_string);
+    OseoArrayStringAncestor current_string = {
         frame.slots[0],
-        previous_locale,
+        previous_string,
     };
-    if (result.status == OSEO_STATUS_NORMAL && recursive_locale) {
+    if (result.status == OSEO_STATUS_NORMAL && recursive_string) {
         result = oseo_string_from_units(context, NULL, 0u);
     }
-    if (result.status == OSEO_STATUS_NORMAL && locale && !recursive_locale) {
-        context->array_locale_stack = &current_locale;
+    if (result.status == OSEO_STATUS_NORMAL && !recursive_string) {
+        context->array_string_stack = &current_string;
     }
     ArrayStringBuilder builder = {NULL, 0u, 0u};
     for (double index = 0.0;
-         result.status == OSEO_STATUS_NORMAL && !recursive_locale &&
+         result.status == OSEO_STATUS_NORMAL && !recursive_string &&
              index < length;
          index += 1.0) {
         if (index > 0.0) {
@@ -978,7 +973,7 @@ static OseoResult array_join(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        if (!recursive_locale) {
+        if (!recursive_string) {
             result = oseo_string_from_units(
                 context,
                 builder.units,
@@ -986,8 +981,8 @@ static OseoResult array_join(
             );
         }
     }
-    if (locale && !recursive_locale) {
-        context->array_locale_stack = (void *)previous_locale;
+    if (!recursive_string) {
+        context->array_string_stack = (void *)previous_string;
     }
     free(builder.units);
     oseo_roots_release(context, &frame);

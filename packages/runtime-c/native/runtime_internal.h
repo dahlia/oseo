@@ -476,6 +476,12 @@ struct OseoHeapObject {
     bool marked;
 };
 
+/* Active native array stringification across user-code re-entry. */
+typedef struct OseoArrayStringAncestor {
+    OseoValue value;
+    const struct OseoArrayStringAncestor *previous;
+} OseoArrayStringAncestor;
+
 typedef struct {
     OseoHeapObject header;
     size_t length;

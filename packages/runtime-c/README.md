@@ -508,11 +508,13 @@ results through ArraySpeciesCreate. Flattening skips holes, observes nested
 Array elements recursively, and enforces the runtime's deterministic call
 depth limit for cyclic or unbounded input. `join` and `toLocaleString` retain
 their distinct element conversion rules, including recursion-safe Array
-stringification and empty rendering for a recursive locale conversion of the
-same receiver. Both methods reject a length above `2**32 - 1` with a catchable
-`TypeError`. Runtime string construction follows the Node.js and Deno ceiling
-of 536,870,888 UTF-16 code units and throws a catchable `RangeError` before
-publishing a larger string. `toString` calls a callable `join` or falls back to
+stringification. During element conversion, re-entry through `join`,
+`toString`, or `toLocaleString` on the same active receiver renders an empty
+string. These methods and ordinary string conversion that reaches intrinsic
+Array `toString` reject a length above `2**32 - 1` with a catchable `TypeError`.
+Runtime string construction follows the Node.js and Deno ceiling of 536,870,888
+UTF-16 code units and throws a catchable `RangeError` before publishing a larger
+string. `toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The generated-code ABI gains no entry point.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.

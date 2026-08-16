@@ -3665,9 +3665,10 @@ later method-specific work, and each copying or stringification loop obtains
 LengthOfArrayLike at its specified point. Sparse copying uses HasProperty
 before Get, while `join` and `toLocaleString` retrieve every index and render
 nullish values as empty fields for admitted lengths. Matching Node.js and Deno,
-both stringification methods reject a length above `2**32 - 1` with a catchable
-`TypeError`, and every runtime string producer rejects a result above
-536,870,888 UTF-16 code units with a catchable `RangeError`. `concat` reads
+these methods and ordinary string conversion that reaches intrinsic Array
+`toString` reject a length above `2**32 - 1` with a catchable `TypeError`, and
+every runtime string producer rejects a result above 536,870,888 UTF-16 code
+units with a catchable `RangeError`. `concat` reads
 `Symbol.isConcatSpreadable` before its Array fallback. `concat`, `flat`,
 `flatMap`, and `slice` create Array results through ArraySpeciesCreate,
 preserving observable constructor and `Symbol.species` reads, custom result
@@ -3682,9 +3683,11 @@ after reading length and uses recursion-safe nested Array stringification.
 `toLocaleString` invokes each non-nullish element's method with the same
 receiver and exactly the outer locales and options, forwarding two `undefined`
 values when they were omitted, and converts its result. A recursive locale
-conversion of the same receiver renders an empty element instead of exceeding
-the call-depth boundary. `toString` calls a callable `join` property and
-otherwise delegates to `Object.prototype.toString`.
+conversion of the same receiver renders an empty element. During element
+conversion, re-entry through `join`, `toString`, or `toLocaleString` on the
+same active receiver likewise renders an empty string instead of exceeding the
+call-depth boundary. `toString` calls a callable `join` property and otherwise
+delegates to `Object.prototype.toString`.
 
 Fixed native and generated differential evidence at seed `0x60004700` covers
 sparse Arrays, ordinary and primitive generic receivers, observable property

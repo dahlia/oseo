@@ -234,57 +234,66 @@ typedef struct {
     size_t capacity;
 } OseoStringBuilder;
 
-static size_t string_maximum_length(void) {
-    return (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t);
-}
-
-static bool string_builder_reserve(
+static OseoResult string_builder_reserve(
+    OseoContext *context,
     OseoStringBuilder *builder,
     size_t additional
 ) {
-    size_t limit = string_maximum_length();
-    if (additional > limit - builder->length) return false;
+    if (additional > SIZE_MAX - builder->length) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
     size_t required = builder->length + additional;
-    if (required <= builder->capacity) return true;
+    OseoResult valid = oseo_internal_validate_string_length(
+        context,
+        required
+    );
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (required <= builder->capacity) return normal(oseo_undefined());
     size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
     while (capacity < required) {
-        if (capacity > limit / 2u) {
+        if (capacity > OSEO_MAX_STRING_LENGTH / 2u) {
             capacity = required;
             break;
         }
         capacity *= 2u;
     }
     uint16_t *units = realloc(builder->units, capacity * sizeof(uint16_t));
-    if (units == NULL) return false;
+    if (units == NULL) {
+        return failure(context, "OSEO2001", "String allocation failed.");
+    }
     builder->units = units;
     builder->capacity = capacity;
-    return true;
+    return normal(oseo_undefined());
 }
 
-static bool string_builder_append_unit(
+static OseoResult string_builder_append_unit(
+    OseoContext *context,
     OseoStringBuilder *builder,
     uint16_t unit
 ) {
-    if (!string_builder_reserve(builder, 1u)) return false;
+    OseoResult result = string_builder_reserve(context, builder, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     builder->units[builder->length] = unit;
     builder->length += 1u;
-    return true;
+    return result;
 }
 
-static bool string_builder_append(
+static OseoResult string_builder_append(
+    OseoContext *context,
     OseoStringBuilder *builder,
     const uint16_t *units,
     size_t length
 ) {
-    if (length == 0u) return true;
-    if (!string_builder_reserve(builder, length)) return false;
+    if (length == 0u) return normal(oseo_undefined());
+    OseoResult result = string_builder_reserve(context, builder, length);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     memcpy(
         builder->units + builder->length,
         units,
         length * sizeof(uint16_t)
     );
     builder->length += length;
-    return true;
+    return result;
 }
 
 static void string_builder_release(OseoStringBuilder *builder) {
@@ -300,10 +309,6 @@ static uint16_t string_to_uint16(double value) {
     double modulo = fmod(trunc(value), 65536.0);
     if (modulo < 0.0) modulo += 65536.0;
     return (uint16_t)modulo;
-}
-
-static OseoResult string_allocation_failure(OseoContext *context) {
-    return failure(context, "OSEO2001", "String allocation failed.");
 }
 
 static OseoValue string_builtin_argument(
@@ -501,23 +506,27 @@ static OseoResult string_concat(
     frame.slots[0] = receiver;
     result = string_method_subject(context, frame.slots[0]);
     frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        !string_builder_append(
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append(
+            context,
             &builder,
             string_object(frame.slots[1])->units,
             string_object(frame.slots[1])->length
-        )) result = string_allocation_failure(context);
+        );
+    }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < argument_count;
          index += 1u) {
         result = oseo_internal_value_string(context, arguments[index]);
         frame.slots[1] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            !string_builder_append(
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = string_builder_append(
+                context,
                 &builder,
                 string_object(frame.slots[1])->units,
                 string_object(frame.slots[1])->length
-            )) result = string_allocation_failure(context);
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_allocate_string(
@@ -710,11 +719,12 @@ static OseoResult string_from_char_code(
     for (size_t index = 0u; index < argument_count; index += 1u) {
         result = oseo_internal_to_number(context, arguments[index]);
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (!string_builder_append_unit(
-                &builder,
-                string_to_uint16(number_value(result.value))
-            )) {
-            result = string_allocation_failure(context);
+        result = string_builder_append_unit(
+            context,
+            &builder,
+            string_to_uint16(number_value(result.value))
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
             break;
         }
     }
@@ -750,27 +760,26 @@ static OseoResult string_from_code_point(
             break;
         }
         uint32_t code_point = (uint32_t)next;
-        bool appended;
         if (code_point <= UINT32_C(0xffff)) {
-            appended = string_builder_append_unit(
+            result = string_builder_append_unit(
+                context,
                 &builder,
                 (uint16_t)code_point
             );
         } else {
             uint32_t rest = code_point - UINT32_C(0x10000);
-            appended = string_builder_append_unit(
+            uint16_t pair[] = {
+                (uint16_t)(UINT32_C(0xd800) + (rest >> 10u)),
+                (uint16_t)(UINT32_C(0xdc00) + (rest & UINT32_C(0x3ff))),
+            };
+            result = string_builder_append(
+                context,
                 &builder,
-                (uint16_t)(UINT32_C(0xd800) + (rest >> 10u))
-            );
-            appended = appended && string_builder_append_unit(
-                &builder,
-                (uint16_t)(UINT32_C(0xdc00) + (rest & UINT32_C(0x3ff)))
+                pair,
+                2u
             );
         }
-        if (!appended) {
-            result = string_allocation_failure(context);
-            break;
-        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_allocate_string(
@@ -862,12 +871,13 @@ static OseoResult string_raw(
         result = oseo_internal_value_string(context, frame.slots[2]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (!string_builder_append(
-                &builder,
-                string_object(frame.slots[2])->units,
-                string_object(frame.slots[2])->length
-            )) {
-            result = string_allocation_failure(context);
+        result = string_builder_append(
+            context,
+            &builder,
+            string_object(frame.slots[2])->units,
+            string_object(frame.slots[2])->length
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
             break;
         }
         if (next + 1.0 >= literal_count) break;
@@ -878,12 +888,13 @@ static OseoResult string_raw(
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (!string_builder_append(
-                &builder,
-                string_object(frame.slots[2])->units,
-                string_object(frame.slots[2])->length
-            )) {
-            result = string_allocation_failure(context);
+        result = string_builder_append(
+            context,
+            &builder,
+            string_object(frame.slots[2])->units,
+            string_object(frame.slots[2])->length
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
             break;
         }
     }

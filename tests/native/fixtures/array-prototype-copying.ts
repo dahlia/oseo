@@ -185,6 +185,11 @@ console.log("nested join", [1, [2, 3], 4].join(";"));
 const cyclic = [1];
 cyclic.push(cyclic, 2);
 console.log("cyclic join", cyclic.join("-"));
+const reentrantJoin = [];
+reentrantJoin[0] = {
+  toString() { return reentrantJoin.join("-"); },
+};
+console.log("reentrant join", reentrantJoin.join("+") === "");
 const customCyclic = [];
 customCyclic[0] = customCyclic;
 customCyclic.toString = function () { return "custom cycle"; };
@@ -246,6 +251,13 @@ try {
   Array.prototype.join.call({ length: 2 ** 32 });
 } catch (error) {
   console.log("join oversized length", error instanceof TypeError);
+}
+const inheritedArray = Object.create(Array.prototype);
+inheritedArray.length = 2 ** 33;
+try {
+  String(inheritedArray);
+} catch (error) {
+  console.log("toString oversized length", error instanceof TypeError);
 }
 const largeJoinOrdering = { length: 2 ** 31 };
 Object.defineProperty(largeJoinOrdering, "0", {
