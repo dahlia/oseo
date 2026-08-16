@@ -699,11 +699,11 @@ static OseoResult array_join_text(
          result.status == OSEO_STATUS_NORMAL && index < array_length;
          index += 1u) {
         if (index > 0u) {
-            if (length == SIZE_MAX / sizeof(uint16_t)) {
-                result = failure(
+            if (length >= OSEO_MAX_STRING_LENGTH) {
+                result = oseo_internal_throw_error(
                     context,
-                    "OSEO2001",
-                    "String allocation is too large."
+                    OSEO_ERROR_RANGE,
+                    "Invalid string length."
                 );
                 break;
             }
@@ -741,13 +741,11 @@ static OseoResult array_join_text(
         frame.slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         OseoString *element = string_object(frame.slots[3]);
-        if (element->length > SIZE_MAX - length ||
-            length + element->length >
-                SIZE_MAX / sizeof(uint16_t)) {
-            result = failure(
+        if (element->length > OSEO_MAX_STRING_LENGTH - length) {
+            result = oseo_internal_throw_error(
                 context,
-                "OSEO2001",
-                "String allocation is too large."
+                OSEO_ERROR_RANGE,
+                "Invalid string length."
             );
             break;
         }

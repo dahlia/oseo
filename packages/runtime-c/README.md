@@ -508,7 +508,11 @@ results through ArraySpeciesCreate. Flattening skips holes, observes nested
 Array elements recursively, and enforces the runtime's deterministic call
 depth limit for cyclic or unbounded input. `join` and `toLocaleString` retain
 their distinct element conversion rules, including recursion-safe Array
-stringification, while `toString` calls a callable `join` or falls back to
+stringification and empty rendering for a recursive locale conversion of the
+same receiver. Both methods reject a length above `2**32 - 1` with a catchable
+`TypeError`. Runtime string construction follows the Node.js and Deno ceiling
+of 536,870,888 UTF-16 code units and throws a catchable `RangeError` before
+publishing a larger string. `toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The generated-code ABI gains no entry point.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
@@ -521,9 +525,9 @@ binary64.
 Numeric coercion distinguishes an ordinary `NaN` conversion from temporary
 buffer allocation failure. Allocation failure propagates as an abrupt
 `OSEO2001` result through arithmetic and relational operations.
-String concatenation checks its combined UTF-16 length before addition or
-allocation, so an unrepresentable result fails with `OSEO2001` instead of
-wrapping a native allocation size.
+String construction checks its combined UTF-16 length before allocation and
+throws a catchable `RangeError` above the host-compatible ceiling. Native
+allocation failure remains an `OSEO2001` diagnostic.
 Declared-function calls have a deterministic maximum active depth of 256. The
 runtime returns an owned `OSEO2001` diagnostic before entering another C frame
 when that limit is reached.

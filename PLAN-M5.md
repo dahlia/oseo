@@ -4121,7 +4121,11 @@ native stack. `join` converts its separator after length and safely renders
 nested Arrays. `toLocaleString` calls each non-nullish element method with the
 element as receiver, forwards the outer locales and options as exactly two
 arguments, and coerces its result. Omitted outer arguments are forwarded as two
-`undefined` values. `toString` calls a callable `join` or falls back to
+`undefined` values. A recursive locale conversion of the same receiver renders
+an empty element. Matching Node.js and Deno, `join` and `toLocaleString` reject
+lengths above `2**32 - 1` with `TypeError`, and runtime string construction
+rejects results above 536,870,888 UTF-16 code units with `RangeError`.
+`toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The implementation stays in
 *runtime\_array.c* because these paths share property primitives, species
 allocation, collector roots, and recursion state with the Array intrinsic.
@@ -4130,8 +4134,9 @@ Fixed native and generated differential evidence at seed `0x60004700` covers
 both specialization policies, forced collection at every safepoint, sparse
 and generic receivers, side-effect order, spreadability, every species guard
 hit and miss, custom results, recursion and cycles, locale argument forwarding,
-locale coercion, abrupt completion, false hints, deliberate shape-guard misses,
-and generic fallback.
+locale coercion, cyclic locale conversion, oversized-length rejection,
+large-length index access ordering, abrupt completion, false hints, deliberate
+shape-guard misses, and generic fallback.
 Of the 229 paths under the node's seven inventory roots, 228 are reviewed:
 181 pass and 47 retain explicit prerequisite boundaries. The pinned
 *invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's

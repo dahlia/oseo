@@ -888,18 +888,6 @@ static OseoResult array_join(
         }
         frame.slots[3] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && length > 1.0) {
-        size_t separator_length = string_object(frame.slots[3])->length;
-        if (separator_length > 0u &&
-            length - 1.0 >
-                (double)(OSEO_MAX_STRING_LENGTH / separator_length)) {
-            result = oseo_internal_throw_error(
-                context,
-                OSEO_ERROR_RANGE,
-                "Invalid string length."
-            );
-        }
-    }
     const ArrayLocaleAncestor *previous_locale =
         context->array_locale_stack;
     bool recursive_locale = locale &&

@@ -247,6 +247,18 @@ try {
 } catch (error) {
   console.log("join oversized length", error instanceof TypeError);
 }
+const largeJoinOrdering = { length: 2 ** 31 };
+Object.defineProperty(largeJoinOrdering, "0", {
+  get() {
+    console.log("join large index");
+    throw new TypeError("first");
+  },
+});
+try {
+  Array.prototype.join.call(largeJoinOrdering, "abc");
+} catch (error) {
+  console.log("join large ordering", error instanceof TypeError);
+}
 
 const nested = [1, , [2, , [3]], 4];
 console.log("flat zero", nested.flat(0).join("/"));

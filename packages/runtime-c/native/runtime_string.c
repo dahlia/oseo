@@ -21,6 +21,13 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 ) {
+    if (length > OSEO_MAX_STRING_LENGTH) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid string length."
+        );
+    }
     if (length > (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t)) {
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
