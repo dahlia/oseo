@@ -56,6 +56,8 @@ const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 const { stringPrototypeSearchAndSliceFixtures } =
   await import("./native/fixtures/string-prototype-search-and-slice.ts");
+const { stringPrototypeMatchAndSplitFixtures } =
+  await import("./native/fixtures/string-prototype-match-and-split.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -117,6 +119,7 @@ const fixtures: readonly Fixture[] = [
   ...stringFixtures.stringIntrinsicFixtures,
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
+  ...stringPrototypeMatchAndSplitFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -185,6 +188,53 @@ assert.match(
   deferredStringTrim.stderr,
   /^deferred-string-trim\.ts:1:\d+: error\[OSEO2001\]: String prototype/u,
 );
+
+const deferredRegExpFallback = await runNativeCli(
+  {
+    args: ["deferred-regexp-fallback.ts"],
+    source: '"aaa".match("a*");',
+    sourceId: "deferred-regexp-fallback.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(deferredRegExpFallback.exitStatus, 1);
+assert.equal(deferredRegExpFallback.stdout, "");
+assert.match(
+  deferredRegExpFallback.stderr,
+  /^deferred-regexp-fallback\.ts:1:\d+: error\[OSEO2001\]: Regular/u,
+);
+
+for (const deferredPattern of [
+  {
+    name: "deferred-regexp-short-hex.ts",
+    units: "92, 120, 49",
+  },
+  {
+    name: "deferred-regexp-bad-unicode.ts",
+    units: "92, 117, 49, 50, 122, 52",
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredPattern.name],
+      source: '"x".match(String.fromCharCode(' + deferredPattern.units + "));",
+      sourceId: deferredPattern.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredPattern.name.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: Regular",
+      "u",
+    ),
+  );
+}
 
 const deferredObjectAssign = await runNativeCli(
   {
@@ -311,7 +361,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
-    fixture.name === "string-prototype-search-and-slice"
+    fixture.name === "string-prototype-search-and-slice" ||
+    fixture.name === "string-prototype-match-and-split"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -480,6 +531,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "string-prototype-search-and-slice" ||
+    fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
@@ -573,7 +625,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "promise-intrinsic" ||
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||
-            fixture.name === "string-prototype-search-and-slice"
+            fixture.name === "string-prototype-search-and-slice" ||
+            fixture.name === "string-prototype-match-and-split"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {

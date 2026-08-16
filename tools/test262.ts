@@ -95,6 +95,10 @@ const compareArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareArray.js",
 );
+const compareIteratorHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/compareIterator.js",
+);
 const detachArrayBufferHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/detachArrayBuffer.js",
@@ -102,6 +106,10 @@ const detachArrayBufferHarnessPath = join(
 const nativeErrorsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/nativeErrors.js",
+);
+const regexpUtilsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/regExpUtils.js",
 );
 
 const classifications = new Set<Test262Classification>([
@@ -1316,12 +1324,17 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
       ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
       [
+        "compareIterator.js",
+        await readFile(compareIteratorHarnessPath, "utf8"),
+      ],
+      [
         "detachArrayBuffer.js",
         await readFile(detachArrayBufferHarnessPath, "utf8"),
       ],
       ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
+      ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
     ]),
   };
 }

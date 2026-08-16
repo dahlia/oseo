@@ -69,6 +69,32 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/String/prototype/split/argument-is-reg-exp-a-z-and-instance-is-string-abc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/split/argument-is-reg-exp-a-z-\
+        and-instance-is-string-abc.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/split/argument-is-reg-\
+        exp-a-z-and-instance-is-string-abc.js:90:16: error[OSEO1001]:
+        Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/String/prototype/substring/S15.5.4.15_A1_T11.js
       strictness:
         - non-strict

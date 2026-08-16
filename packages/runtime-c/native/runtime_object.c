@@ -98,6 +98,11 @@ static OseoResult object_create(
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;
+    object->regexp_string_iterator = false;
+    object->regexp_iterator_subject = oseo_undefined();
+    object->regexp_iterator_pattern = oseo_undefined();
+    object->regexp_iterator_index = 0u;
+    object->regexp_iterator_complete = false;
     object->async_from_sync = false;
     object->async_sync_iterator = oseo_undefined();
     object->wrap_for_valid_iterator = false;
