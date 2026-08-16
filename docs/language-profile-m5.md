@@ -3692,24 +3692,24 @@ order, `Symbol.isConcatSpreadable`, every ArraySpeciesCreate default and guard
 fallback, custom species, recursive and cyclic input, locale result coercion,
 locale argument forwarding, locale cycles, oversized-length rejection,
 large-length index access ordering, callback behavior, and abrupt completion.
-Both specialization policies,
-forced collection at every safepoint, false hints, deliberate guard hits and
-misses, and generic fallback are exercised. Of the 229 paths under the node's
-seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
-prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
-asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
-this method follows the ECMA-402 superseding call contract; the fixed
-differential fixture replaces its element-call evidence. No new path outside
-those roots is added. Two already-reviewed cases outside the roots move from
-unsupported to pass because they exercise the newly admitted `toString` and
-generic `slice` behavior. The manifest reaches 11,015 cases: 8,073 passes,
-1,364 expected negatives, and 1,578 unsupported profile features with no
-semantic, harness,
-or infrastructure failures. The suite revision, 41,091-path inventory,
-manifest schema and vocabulary, and zero-override policy are unchanged. The
-admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69`
-without adding a generated-code entry point or changing the graph's
-orchestration state.
+Both specialization policies, forced collection at every safepoint, false
+hints, deliberate guard hits and misses, and generic fallback are exercised. Of
+the 229 paths under the node's seven inventory roots, 228 are reviewed: 181
+pass and 47 retain explicit prerequisite boundaries. The pinned
+*invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's
+zero-argument call and is omitted because this method follows the ECMA-402
+superseding call contract; the fixed differential fixture replaces its
+element-call evidence. No new path outside those roots is added. Two
+already-reviewed cases outside the roots move from unsupported to pass because
+they exercise the newly admitted `toString` and generic `slice` behavior. The
+manifest reaches 11,015 cases: 8,073 passes, 1,364 expected negatives, and
+1,578 unsupported profile features with no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, and zero-override policy are unchanged. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding a
+generated-code entry point or changing the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 

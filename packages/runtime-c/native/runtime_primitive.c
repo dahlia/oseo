@@ -1299,6 +1299,11 @@ OseoResult oseo_add(
         );
     }
     size_t length = left_object->length + right_object->length;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return valid;
+    }
     uint16_t *units = length == 0u
         ? NULL
         : malloc(length * sizeof(uint16_t));

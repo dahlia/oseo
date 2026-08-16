@@ -75,6 +75,8 @@ OseoResult oseo_internal_symbol_text(
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
     size_t length = description_length + 8u;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(uint16_t));
     if (units == NULL) {
         return failure(context, "OSEO2001", "String allocation failed.");
@@ -121,6 +123,8 @@ OseoResult oseo_internal_symbol_name(
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
     size_t length = description_length + 2u;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(uint16_t));
     if (units == NULL) {
         return failure(context, "OSEO2001", "String allocation failed.");

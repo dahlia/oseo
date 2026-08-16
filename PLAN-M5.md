@@ -4131,25 +4131,25 @@ rejects results above 536,870,888 UTF-16 code units with `RangeError`.
 allocation, collector roots, and recursion state with the Array intrinsic.
 
 Fixed native and generated differential evidence at seed `0x60004700` covers
-both specialization policies, forced collection at every safepoint, sparse
-and generic receivers, side-effect order, spreadability, every species guard
-hit and miss, custom results, recursion and cycles, locale argument forwarding,
+both specialization policies, forced collection at every safepoint, sparse and
+generic receivers, side-effect order, spreadability, every species guard hit
+and miss, custom results, recursion and cycles, locale argument forwarding,
 locale coercion, cyclic locale conversion, oversized-length rejection,
 large-length index access ordering, abrupt completion, false hints, deliberate
-shape-guard misses, and generic fallback.
-Of the 229 paths under the node's seven inventory roots, 228 are reviewed:
-181 pass and 47 retain explicit prerequisite boundaries. The pinned
-*invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's
-zero-argument call and is omitted because this method follows the ECMA-402
-superseding call contract; the fixed differential fixture replaces its
-element-call evidence. No new path outside those roots is added. Two
-already-reviewed cases outside the roots move from unsupported to pass because
-they exercise the newly admitted `toString` and generic `slice` behavior. The
-manifest moves to 11,015 paths with 8,073 passes, 1,364 expected negatives,
-and 1,578 unsupported profile features.
-The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-69` without adding a generated-code entry point or changing
-the graph's orchestration state.
+shape-guard misses, and generic fallback. Of the 229 paths under the node's
+seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
+prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
+asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
+this method follows the ECMA-402 superseding call contract; the fixed
+differential fixture replaces its element-call evidence. No new path outside
+those roots is added. Two already-reviewed cases outside the roots move from
+unsupported to pass because they exercise the newly admitted `toString` and
+generic `slice` behavior. The manifest moves to 11,015 paths with 8,073 passes,
+1,364 expected negatives, and 1,578 unsupported profile features. The admitted
+runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding
+a generated-code entry point or changing the graph's orchestration state.
+
+
 Ahead-of-time challenge boundary
 --------------------------------
 

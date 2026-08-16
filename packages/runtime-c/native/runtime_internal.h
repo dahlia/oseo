@@ -1365,6 +1365,11 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/* Reject a string length before a component allocates a staging buffer. */
+OseoResult oseo_internal_validate_string_length(
+    OseoContext *context,
+    size_t length
+);
 /*
  * String and property-key helpers owned by runtime_string.c. A string
  * property key names a property by content rather than by identity, so

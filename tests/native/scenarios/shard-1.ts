@@ -722,6 +722,44 @@ throw boom;
     /error\[OSEO2001\].*String allocation is too large/u,
   );
 
+  const concatenationCeilingHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_primitive.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "OseoString *right_object = string_object(slots[1]);",
+        "OseoString *right_object = string_object(slots[1]);\n" +
+          "    right_object->length = OSEO_MAX_STRING_LENGTH;",
+      );
+      assert.notEqual(injected, source, "concatenation ceiling injected");
+      return injected;
+    },
+  };
+  const concatenationCeiling = await runNativeCli(
+    {
+      args: ["concatenation-ceiling-runtime.ts"],
+      source:
+        'try { console.log("left" + "right"); } catch (error) {\n' +
+        "  console.log(error.name, error.message);\n" +
+        "}",
+      sourceId: "concatenation-ceiling-runtime.ts",
+      version: "0.1.0",
+    },
+    concatenationCeilingHost,
+  );
+  assert.equal(concatenationCeiling.exitStatus, 0);
+  assert.equal(
+    concatenationCeiling.stdout,
+    "RangeError Invalid string length.\n",
+  );
+  assert.equal(concatenationCeiling.stderr, "");
+
   const allocationFailureHost = {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {

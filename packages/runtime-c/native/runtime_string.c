@@ -16,9 +16,8 @@
  * `fromCodePoint`, and `raw` statics.
  */
 
-OseoResult oseo_internal_allocate_string(
+OseoResult oseo_internal_validate_string_length(
     OseoContext *context,
-    const uint16_t *units,
     size_t length
 ) {
     if (length > OSEO_MAX_STRING_LENGTH) {
@@ -28,6 +27,16 @@ OseoResult oseo_internal_allocate_string(
             "Invalid string length."
         );
     }
+    return normal(oseo_undefined());
+}
+
+OseoResult oseo_internal_allocate_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+) {
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (length > (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t)) {
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
