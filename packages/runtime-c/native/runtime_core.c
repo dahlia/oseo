@@ -36,6 +36,7 @@ void oseo_context_init(
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
+    context->array_locale_stack = NULL;
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -108,6 +109,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
+    context->array_locale_stack = NULL;
     context->timer_head = oseo_undefined();
     oseo_collect(context);
 }

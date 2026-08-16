@@ -15,6 +15,8 @@
 #define OSEO_CANONICAL_NAN UINT64_C(0x7ff8000000000000)
 #define OSEO_MAX_ACTIVE_FRAME_SLOTS ((size_t)32768u)
 #define OSEO_MAX_CALL_DEPTH ((size_t)256u)
+/* Node.js and Deno expose this V8 UTF-16 string ceiling. */
+#define OSEO_MAX_STRING_LENGTH ((size_t)536870888u)
 #define OSEO_PAYLOAD_MASK UINT64_C(0x0000ffffffffffff)
 #define OSEO_TAG_SHIFT 48u
 #define OSEO_TAG_SMI UINT64_C(1)

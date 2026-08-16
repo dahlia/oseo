@@ -238,6 +238,15 @@ console.log(
   [localeElement, null, localeElement].toLocaleString("ko", localeOptions),
 );
 console.log("locale omitted", [localeElement].toLocaleString());
+const cyclicLocale = [];
+cyclicLocale[0] = cyclicLocale;
+console.log("locale cycle", cyclicLocale.toLocaleString());
+
+try {
+  Array.prototype.join.call({ length: 2 ** 32 });
+} catch (error) {
+  console.log("join oversized length", error instanceof TypeError);
+}
 
 const nested = [1, , [2, , [3]], 4];
 console.log("flat zero", nested.flat(0).join("/"));

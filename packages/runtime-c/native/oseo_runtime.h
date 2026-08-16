@@ -297,6 +297,8 @@ struct OseoContext {
     void *template_cache;
     size_t template_cache_count;
     size_t template_cache_capacity;
+    /* Private stack of active Array.prototype.toLocaleString receivers. */
+    void *array_locale_stack;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;

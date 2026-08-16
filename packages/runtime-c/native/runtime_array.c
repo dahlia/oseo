@@ -477,20 +477,42 @@ typedef struct {
     size_t capacity;
 } ArrayStringBuilder;
 
-static bool array_string_append(
+typedef struct ArrayLocaleAncestor {
+    OseoValue value;
+    const struct ArrayLocaleAncestor *previous;
+} ArrayLocaleAncestor;
+
+static bool array_locale_is_ancestor(
+    OseoValue value,
+    const ArrayLocaleAncestor *ancestor
+) {
+    for (const ArrayLocaleAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
+static OseoResult array_string_append(
+    OseoContext *context,
     ArrayStringBuilder *builder,
     const uint16_t *units,
     size_t length
 ) {
-    if (length == 0u) return true;
-    if (length > SIZE_MAX / sizeof(uint16_t) - builder->length) {
-        return false;
+    if (length == 0u) return normal(oseo_undefined());
+    if (length > OSEO_MAX_STRING_LENGTH - builder->length) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid string length."
+        );
     }
     size_t required = builder->length + length;
     if (required > builder->capacity) {
         size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
         while (capacity < required) {
-            if (capacity > SIZE_MAX / sizeof(uint16_t) / 2u) {
+            if (capacity > OSEO_MAX_STRING_LENGTH / 2u) {
                 capacity = required;
                 break;
             }
@@ -500,7 +522,13 @@ static bool array_string_append(
             builder->units,
             capacity * sizeof(uint16_t)
         );
-        if (grown == NULL) return false;
+        if (grown == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Array string allocation failed."
+            );
+        }
         builder->units = grown;
         builder->capacity = capacity;
     }
@@ -510,7 +538,7 @@ static bool array_string_append(
         length * sizeof(uint16_t)
     );
     builder->length = required;
-    return true;
+    return normal(oseo_undefined());
 }
 
 static OseoResult array_integer_or_infinity(
@@ -849,6 +877,9 @@ static OseoResult array_join(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = array_like_length(context, frame.slots[0], &length);
     }
+    if (result.status == OSEO_STATUS_NORMAL && length > (double)UINT32_MAX) {
+        result = type_error(context, "Invalid array length.");
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         if (locale || tag_of(frame.slots[1]) == OSEO_TAG_UNDEFINED) {
             result = oseo_internal_ascii_string(context, ",");
@@ -857,24 +888,46 @@ static OseoResult array_join(
         }
         frame.slots[3] = result.value;
     }
+    if (result.status == OSEO_STATUS_NORMAL && length > 1.0) {
+        size_t separator_length = string_object(frame.slots[3])->length;
+        if (separator_length > 0u &&
+            length - 1.0 >
+                (double)(OSEO_MAX_STRING_LENGTH / separator_length)) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_RANGE,
+                "Invalid string length."
+            );
+        }
+    }
+    const ArrayLocaleAncestor *previous_locale =
+        context->array_locale_stack;
+    bool recursive_locale = locale &&
+        array_locale_is_ancestor(frame.slots[0], previous_locale);
+    ArrayLocaleAncestor current_locale = {
+        frame.slots[0],
+        previous_locale,
+    };
+    if (result.status == OSEO_STATUS_NORMAL && recursive_locale) {
+        result = oseo_string_from_units(context, NULL, 0u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && locale && !recursive_locale) {
+        context->array_locale_stack = &current_locale;
+    }
     ArrayStringBuilder builder = {NULL, 0u, 0u};
     for (double index = 0.0;
-         result.status == OSEO_STATUS_NORMAL && index < length;
+         result.status == OSEO_STATUS_NORMAL && !recursive_locale &&
+             index < length;
          index += 1.0) {
         if (index > 0.0) {
             OseoString *separator = string_object(frame.slots[3]);
-            if (!array_string_append(
-                    &builder,
-                    separator->units,
-                    separator->length
-                )) {
-                result = failure(
-                    context,
-                    "OSEO2001",
-                    "Array string allocation failed."
-                );
-                break;
-            }
+            result = array_string_append(
+                context,
+                &builder,
+                separator->units,
+                separator->length
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
         }
         result = oseo_property_key(context, oseo_number(index));
         frame.slots[4] = result.value;
@@ -929,24 +982,24 @@ static OseoResult array_join(
         frame.slots[5] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         OseoString *element = string_object(frame.slots[5]);
-        if (!array_string_append(
-                &builder,
-                element->units,
-                element->length
-            )) {
-            result = failure(
+        result = array_string_append(
+            context,
+            &builder,
+            element->units,
+            element->length
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (!recursive_locale) {
+            result = oseo_string_from_units(
                 context,
-                "OSEO2001",
-                "Array string allocation failed."
+                builder.units,
+                builder.length
             );
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_string_from_units(
-            context,
-            builder.units,
-            builder.length
-        );
+    if (locale && !recursive_locale) {
+        context->array_locale_stack = (void *)previous_locale;
     }
     free(builder.units);
     oseo_roots_release(context, &frame);
