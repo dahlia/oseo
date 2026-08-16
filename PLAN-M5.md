@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 9,909
-reviewed cases: 7,206 passes, 1,364 expected negatives, and 1,339 unsupported
+honest unsupported classifications. The current reviewed manifest records 11,015
+reviewed cases: 8,073 passes, 1,364 expected negatives, and 1,578 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -29,9 +29,9 @@ separate from the result manifest.
 M5a is complete. The 81 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 7,206
-passes across 9,909 paths, and the property inventory records 80 domains, 80
-seeds, and an ordinary case budget of 3,462.
+the M5b and M5c dependency order below. The reviewed manifest now records 8,073
+passes across 11,015 paths, and the property inventory records 86 domains, 86
+seeds, and an ordinary case budget of 3,534.
 
 
 M5a implementation history
@@ -4145,7 +4145,6 @@ and 1,578 unsupported profile features.
 The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-69` without adding a generated-code entry point or changing
 the graph's orchestration state.
-
 Ahead-of-time challenge boundary
 --------------------------------
 

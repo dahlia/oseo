@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 9,656 reviewed cases: 6,983 passes, 1,364
-expected negatives, and 1,309 unsupported profile features. It records no
+The current manifest contains 11,015 reviewed cases: 8,073 passes, 1,364
+expected negatives, and 1,578 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3705,7 +3705,6 @@ manifest schema and vocabulary, and zero-override policy are unchanged. The
 admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69`
 without adding a generated-code entry point or changing the graph's
 orchestration state.
-
 Known gaps inside the claim
 ---------------------------
 
