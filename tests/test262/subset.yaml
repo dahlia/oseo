@@ -5,6 +5,7 @@ supportedFeatures:
   - Array.prototype.flatMap
   - ArrayBuffer
   - BigInt
+  - Map
   - Object.is
   - String.fromCodePoint
   - String.prototype.at
@@ -12,6 +13,7 @@ supportedFeatures:
   - String.prototype.includes
   - String.prototype.matchAll
   - align-detached-buffer-semantics-with-web-reality
+  - array-grouping
   - arraybuffer-transfer
   - arrow-function
   - async-functions
@@ -6740,6 +6742,549 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/subclassable.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/Symbol.species/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/Symbol.species/return-value.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/Symbol.species/symbol-species-name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/Symbol.species/symbol-species.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/bigint-number-same-value.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/constructor.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/does-not-throw-when-set-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/get-set-method-failure.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/callback-arg.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/callback-throws.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/emptyList.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/evenOdd.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/groupLength.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/invalid-callback.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/invalid-iterable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/iterator-next-throws.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/map-instance.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/negativeZero.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/groupBy/toPropertyKey.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterable-calls-set.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-close-after-set-failure.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-close-failure-after-set-failure.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-is-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-item-first-entry-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-item-second-entry-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-items-are-not-object-close-iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-items-are-not-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-next-failure.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/iterator-value-failure.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map-iterable-empty-does-not-call-set.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map-iterable-throws-when-set-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map-iterable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map-no-iterable-does-not-call-set.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map-no-iterable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/newtarget.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/properties-of-map-instances.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/properties-of-the-map-prototype-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype-of-map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/Symbol.iterator/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/clear-map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/clear.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/context-is-not-map-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/context-is-not-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/context-is-set-object-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/context-is-weakmap-object-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/map-data-list-is-preserved.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/clear/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/context-is-not-map-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/context-is-not-object.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/context-is-set-object-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/context-is-weakmap-object-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/delete.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/does-not-break-iterators.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/returns-false.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/delete/returns-true-for-deleted-entry.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/descriptor.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/entries.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/returns-iterator-empty.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/entries/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/callback-parameters.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/callback-result-is-abrupt.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/callback-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/callback-this-strict.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/deleted-values-during-foreach.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/first-argument-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/forEach.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/iterates-in-key-insertion-order.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/iterates-values-added-after-foreach-begins.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/iterates-values-deleted-then-readded.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/return-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/second-parameter-as-callback-context.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/forEach/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/get.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/returns-value-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/returns-value-normalized-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/get/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/has.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/normalizes-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/return-false-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/return-true-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/has/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/keys.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/returns-iterator-empty.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/keys/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/append-new-values-normalizes-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/append-new-values-return-map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/append-new-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/replaces-a-value-normalizes-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/replaces-a-value-returns-map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/replaces-a-value.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/set.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/set/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/returns-count-of-present-values-before-after-set-clear.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/returns-count-of-present-values-before-after-set-delete.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/returns-count-of-present-values-by-insertion.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/returns-count-of-present-values-by-iterable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/size.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/size/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/returns-iterator-empty.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/values/values.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/undefined-newtarget.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/valid-keys.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/does-not-have-mapiterator-internal-slots-map.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/does-not-have-mapiterator-internal-slots.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/iteration.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/this-not-object-throw-entries.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/this-not-object-throw-keys.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/this-not-object-throw-prototype-iterator.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/MapIteratorPrototype/next/this-not-object-throw-values.js
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/NaN/15.1.1.1-0.js
     expectedClassification: pass
@@ -15361,7 +15906,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-map.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-nan.js
     expectedClassification: pass

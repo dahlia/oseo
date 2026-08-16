@@ -1,0 +1,3 @@
+version: 1
+id: map-intrinsic
+record: docs/language-profile-m5/families/map-intrinsic.yaml

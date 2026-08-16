@@ -61,7 +61,9 @@ static void trace_object(
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||
                object->kind == OSEO_HEAP_PROMISE ||
-               object->kind == OSEO_HEAP_ARRAY_BUFFER) {
+               object->kind == OSEO_HEAP_ARRAY_BUFFER ||
+               object->kind == OSEO_HEAP_MAP ||
+               object->kind == OSEO_HEAP_MAP_ITERATOR) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -143,6 +145,15 @@ static void trace_object(
             mark_value(promise->reaction_head, worklist);
             mark_value(promise->reaction_tail, worklist);
             mark_value(promise->unhandled_next, worklist);
+        } else if (object->kind == OSEO_HEAP_MAP) {
+            OseoMap *map = (OseoMap *)object;
+            for (size_t index = 0u; index < map->entry_count; index += 1u) {
+                if (!map->entries[index].live) continue;
+                mark_value(map->entries[index].key, worklist);
+                mark_value(map->entries[index].value, worklist);
+            }
+        } else if (object->kind == OSEO_HEAP_MAP_ITERATOR) {
+            mark_value(((OseoMapIterator *)object)->target, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -180,7 +191,9 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_ARRAY ||
         object->kind == OSEO_HEAP_FUNCTION ||
         object->kind == OSEO_HEAP_PROMISE ||
-        object->kind == OSEO_HEAP_ARRAY_BUFFER) {
+        object->kind == OSEO_HEAP_ARRAY_BUFFER ||
+        object->kind == OSEO_HEAP_MAP ||
+        object->kind == OSEO_HEAP_MAP_ITERATOR) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);
@@ -192,6 +205,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
              * release leaves the record detached, so a block already
              * given up by a transfer is never freed a second time. */
             oseo_internal_array_buffer_release(object);
+        } else if (object->kind == OSEO_HEAP_MAP) {
+            free(((OseoMap *)object)->entries);
         }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);

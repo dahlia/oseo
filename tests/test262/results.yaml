@@ -2390,6 +2390,414 @@ partitions:
   - group: built-ins/Iterator
     key: f6
     path: results/built-ins/Iterator/f6.yaml
+  - group: built-ins/Map
+    key: "00"
+    path: results/built-ins/Map/00.yaml
+  - group: built-ins/Map
+    key: "02"
+    path: results/built-ins/Map/02.yaml
+  - group: built-ins/Map
+    key: "03"
+    path: results/built-ins/Map/03.yaml
+  - group: built-ins/Map
+    key: "09"
+    path: results/built-ins/Map/09.yaml
+  - group: built-ins/Map
+    key: 0a
+    path: results/built-ins/Map/0a.yaml
+  - group: built-ins/Map
+    key: 0c
+    path: results/built-ins/Map/0c.yaml
+  - group: built-ins/Map
+    key: 0d
+    path: results/built-ins/Map/0d.yaml
+  - group: built-ins/Map
+    key: "10"
+    path: results/built-ins/Map/10.yaml
+  - group: built-ins/Map
+    key: "11"
+    path: results/built-ins/Map/11.yaml
+  - group: built-ins/Map
+    key: "12"
+    path: results/built-ins/Map/12.yaml
+  - group: built-ins/Map
+    key: "17"
+    path: results/built-ins/Map/17.yaml
+  - group: built-ins/Map
+    key: "19"
+    path: results/built-ins/Map/19.yaml
+  - group: built-ins/Map
+    key: 1a
+    path: results/built-ins/Map/1a.yaml
+  - group: built-ins/Map
+    key: 1b
+    path: results/built-ins/Map/1b.yaml
+  - group: built-ins/Map
+    key: 1e
+    path: results/built-ins/Map/1e.yaml
+  - group: built-ins/Map
+    key: 1f
+    path: results/built-ins/Map/1f.yaml
+  - group: built-ins/Map
+    key: "20"
+    path: results/built-ins/Map/20.yaml
+  - group: built-ins/Map
+    key: "21"
+    path: results/built-ins/Map/21.yaml
+  - group: built-ins/Map
+    key: "22"
+    path: results/built-ins/Map/22.yaml
+  - group: built-ins/Map
+    key: "23"
+    path: results/built-ins/Map/23.yaml
+  - group: built-ins/Map
+    key: "25"
+    path: results/built-ins/Map/25.yaml
+  - group: built-ins/Map
+    key: "29"
+    path: results/built-ins/Map/29.yaml
+  - group: built-ins/Map
+    key: 2a
+    path: results/built-ins/Map/2a.yaml
+  - group: built-ins/Map
+    key: 2c
+    path: results/built-ins/Map/2c.yaml
+  - group: built-ins/Map
+    key: 2e
+    path: results/built-ins/Map/2e.yaml
+  - group: built-ins/Map
+    key: "31"
+    path: results/built-ins/Map/31.yaml
+  - group: built-ins/Map
+    key: "35"
+    path: results/built-ins/Map/35.yaml
+  - group: built-ins/Map
+    key: "36"
+    path: results/built-ins/Map/36.yaml
+  - group: built-ins/Map
+    key: "39"
+    path: results/built-ins/Map/39.yaml
+  - group: built-ins/Map
+    key: 3a
+    path: results/built-ins/Map/3a.yaml
+  - group: built-ins/Map
+    key: 3b
+    path: results/built-ins/Map/3b.yaml
+  - group: built-ins/Map
+    key: "40"
+    path: results/built-ins/Map/40.yaml
+  - group: built-ins/Map
+    key: "41"
+    path: results/built-ins/Map/41.yaml
+  - group: built-ins/Map
+    key: "42"
+    path: results/built-ins/Map/42.yaml
+  - group: built-ins/Map
+    key: "45"
+    path: results/built-ins/Map/45.yaml
+  - group: built-ins/Map
+    key: "46"
+    path: results/built-ins/Map/46.yaml
+  - group: built-ins/Map
+    key: 4c
+    path: results/built-ins/Map/4c.yaml
+  - group: built-ins/Map
+    key: "50"
+    path: results/built-ins/Map/50.yaml
+  - group: built-ins/Map
+    key: "52"
+    path: results/built-ins/Map/52.yaml
+  - group: built-ins/Map
+    key: "53"
+    path: results/built-ins/Map/53.yaml
+  - group: built-ins/Map
+    key: "56"
+    path: results/built-ins/Map/56.yaml
+  - group: built-ins/Map
+    key: "58"
+    path: results/built-ins/Map/58.yaml
+  - group: built-ins/Map
+    key: "59"
+    path: results/built-ins/Map/59.yaml
+  - group: built-ins/Map
+    key: 5a
+    path: results/built-ins/Map/5a.yaml
+  - group: built-ins/Map
+    key: 5c
+    path: results/built-ins/Map/5c.yaml
+  - group: built-ins/Map
+    key: 5f
+    path: results/built-ins/Map/5f.yaml
+  - group: built-ins/Map
+    key: "60"
+    path: results/built-ins/Map/60.yaml
+  - group: built-ins/Map
+    key: "63"
+    path: results/built-ins/Map/63.yaml
+  - group: built-ins/Map
+    key: "67"
+    path: results/built-ins/Map/67.yaml
+  - group: built-ins/Map
+    key: "68"
+    path: results/built-ins/Map/68.yaml
+  - group: built-ins/Map
+    key: 6b
+    path: results/built-ins/Map/6b.yaml
+  - group: built-ins/Map
+    key: 6d
+    path: results/built-ins/Map/6d.yaml
+  - group: built-ins/Map
+    key: "70"
+    path: results/built-ins/Map/70.yaml
+  - group: built-ins/Map
+    key: "71"
+    path: results/built-ins/Map/71.yaml
+  - group: built-ins/Map
+    key: "72"
+    path: results/built-ins/Map/72.yaml
+  - group: built-ins/Map
+    key: "74"
+    path: results/built-ins/Map/74.yaml
+  - group: built-ins/Map
+    key: "77"
+    path: results/built-ins/Map/77.yaml
+  - group: built-ins/Map
+    key: "78"
+    path: results/built-ins/Map/78.yaml
+  - group: built-ins/Map
+    key: "79"
+    path: results/built-ins/Map/79.yaml
+  - group: built-ins/Map
+    key: 7c
+    path: results/built-ins/Map/7c.yaml
+  - group: built-ins/Map
+    key: 7d
+    path: results/built-ins/Map/7d.yaml
+  - group: built-ins/Map
+    key: 7e
+    path: results/built-ins/Map/7e.yaml
+  - group: built-ins/Map
+    key: 7f
+    path: results/built-ins/Map/7f.yaml
+  - group: built-ins/Map
+    key: "81"
+    path: results/built-ins/Map/81.yaml
+  - group: built-ins/Map
+    key: "82"
+    path: results/built-ins/Map/82.yaml
+  - group: built-ins/Map
+    key: "84"
+    path: results/built-ins/Map/84.yaml
+  - group: built-ins/Map
+    key: "86"
+    path: results/built-ins/Map/86.yaml
+  - group: built-ins/Map
+    key: "87"
+    path: results/built-ins/Map/87.yaml
+  - group: built-ins/Map
+    key: "88"
+    path: results/built-ins/Map/88.yaml
+  - group: built-ins/Map
+    key: 8f
+    path: results/built-ins/Map/8f.yaml
+  - group: built-ins/Map
+    key: "91"
+    path: results/built-ins/Map/91.yaml
+  - group: built-ins/Map
+    key: "93"
+    path: results/built-ins/Map/93.yaml
+  - group: built-ins/Map
+    key: "94"
+    path: results/built-ins/Map/94.yaml
+  - group: built-ins/Map
+    key: "96"
+    path: results/built-ins/Map/96.yaml
+  - group: built-ins/Map
+    key: "97"
+    path: results/built-ins/Map/97.yaml
+  - group: built-ins/Map
+    key: "98"
+    path: results/built-ins/Map/98.yaml
+  - group: built-ins/Map
+    key: "99"
+    path: results/built-ins/Map/99.yaml
+  - group: built-ins/Map
+    key: 9a
+    path: results/built-ins/Map/9a.yaml
+  - group: built-ins/Map
+    key: 9e
+    path: results/built-ins/Map/9e.yaml
+  - group: built-ins/Map
+    key: a0
+    path: results/built-ins/Map/a0.yaml
+  - group: built-ins/Map
+    key: a1
+    path: results/built-ins/Map/a1.yaml
+  - group: built-ins/Map
+    key: a4
+    path: results/built-ins/Map/a4.yaml
+  - group: built-ins/Map
+    key: a5
+    path: results/built-ins/Map/a5.yaml
+  - group: built-ins/Map
+    key: a7
+    path: results/built-ins/Map/a7.yaml
+  - group: built-ins/Map
+    key: a9
+    path: results/built-ins/Map/a9.yaml
+  - group: built-ins/Map
+    key: aa
+    path: results/built-ins/Map/aa.yaml
+  - group: built-ins/Map
+    key: ad
+    path: results/built-ins/Map/ad.yaml
+  - group: built-ins/Map
+    key: ae
+    path: results/built-ins/Map/ae.yaml
+  - group: built-ins/Map
+    key: b1
+    path: results/built-ins/Map/b1.yaml
+  - group: built-ins/Map
+    key: b3
+    path: results/built-ins/Map/b3.yaml
+  - group: built-ins/Map
+    key: b5
+    path: results/built-ins/Map/b5.yaml
+  - group: built-ins/Map
+    key: b6
+    path: results/built-ins/Map/b6.yaml
+  - group: built-ins/Map
+    key: b7
+    path: results/built-ins/Map/b7.yaml
+  - group: built-ins/Map
+    key: b8
+    path: results/built-ins/Map/b8.yaml
+  - group: built-ins/Map
+    key: ba
+    path: results/built-ins/Map/ba.yaml
+  - group: built-ins/Map
+    key: bb
+    path: results/built-ins/Map/bb.yaml
+  - group: built-ins/Map
+    key: bd
+    path: results/built-ins/Map/bd.yaml
+  - group: built-ins/Map
+    key: c0
+    path: results/built-ins/Map/c0.yaml
+  - group: built-ins/Map
+    key: c5
+    path: results/built-ins/Map/c5.yaml
+  - group: built-ins/Map
+    key: c8
+    path: results/built-ins/Map/c8.yaml
+  - group: built-ins/Map
+    key: c9
+    path: results/built-ins/Map/c9.yaml
+  - group: built-ins/Map
+    key: ca
+    path: results/built-ins/Map/ca.yaml
+  - group: built-ins/Map
+    key: cb
+    path: results/built-ins/Map/cb.yaml
+  - group: built-ins/Map
+    key: d1
+    path: results/built-ins/Map/d1.yaml
+  - group: built-ins/Map
+    key: d3
+    path: results/built-ins/Map/d3.yaml
+  - group: built-ins/Map
+    key: d5
+    path: results/built-ins/Map/d5.yaml
+  - group: built-ins/Map
+    key: d6
+    path: results/built-ins/Map/d6.yaml
+  - group: built-ins/Map
+    key: d7
+    path: results/built-ins/Map/d7.yaml
+  - group: built-ins/Map
+    key: d8
+    path: results/built-ins/Map/d8.yaml
+  - group: built-ins/Map
+    key: df
+    path: results/built-ins/Map/df.yaml
+  - group: built-ins/Map
+    key: e0
+    path: results/built-ins/Map/e0.yaml
+  - group: built-ins/Map
+    key: e3
+    path: results/built-ins/Map/e3.yaml
+  - group: built-ins/Map
+    key: e4
+    path: results/built-ins/Map/e4.yaml
+  - group: built-ins/Map
+    key: e6
+    path: results/built-ins/Map/e6.yaml
+  - group: built-ins/Map
+    key: ec
+    path: results/built-ins/Map/ec.yaml
+  - group: built-ins/Map
+    key: ed
+    path: results/built-ins/Map/ed.yaml
+  - group: built-ins/Map
+    key: f0
+    path: results/built-ins/Map/f0.yaml
+  - group: built-ins/Map
+    key: f1
+    path: results/built-ins/Map/f1.yaml
+  - group: built-ins/Map
+    key: f3
+    path: results/built-ins/Map/f3.yaml
+  - group: built-ins/Map
+    key: f5
+    path: results/built-ins/Map/f5.yaml
+  - group: built-ins/Map
+    key: f6
+    path: results/built-ins/Map/f6.yaml
+  - group: built-ins/Map
+    key: f7
+    path: results/built-ins/Map/f7.yaml
+  - group: built-ins/Map
+    key: f8
+    path: results/built-ins/Map/f8.yaml
+  - group: built-ins/Map
+    key: fa
+    path: results/built-ins/Map/fa.yaml
+  - group: built-ins/Map
+    key: fb
+    path: results/built-ins/Map/fb.yaml
+  - group: built-ins/Map
+    key: fe
+    path: results/built-ins/Map/fe.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: "17"
+    path: results/built-ins/MapIteratorPrototype/17.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: 1d
+    path: results/built-ins/MapIteratorPrototype/1d.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: "42"
+    path: results/built-ins/MapIteratorPrototype/42.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: 6f
+    path: results/built-ins/MapIteratorPrototype/6f.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: "79"
+    path: results/built-ins/MapIteratorPrototype/79.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: 7d
+    path: results/built-ins/MapIteratorPrototype/7d.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: 9e
+    path: results/built-ins/MapIteratorPrototype/9e.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: a1
+    path: results/built-ins/MapIteratorPrototype/a1.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: ec
+    path: results/built-ins/MapIteratorPrototype/ec.yaml
+  - group: built-ins/MapIteratorPrototype
+    key: f8
+    path: results/built-ins/MapIteratorPrototype/f8.yaml
   - group: built-ins/NaN
     key: "41"
     path: results/built-ins/NaN/41.yaml
@@ -8059,9 +8467,9 @@ summary:
   expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 8073
+  passes: 8221
   semanticFailures: 0
-  unsupportedProfileFeatures: 1578
+  unsupportedProfileFeatures: 1611
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -8165,9 +8573,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 857
+      passes: 1004
       semanticFailures: 0
-      unsupportedProfileFeatures: 56
+      unsupportedProfileFeatures: 90
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -8193,9 +8601,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5348
+      passes: 5349
       semanticFailures: 0
-      unsupportedProfileFeatures: 907
+      unsupportedProfileFeatures: 906
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -8330,6 +8738,20 @@ summary:
       passes: 5
       semanticFailures: 0
       unsupportedProfileFeatures: 32
+    - group: built-ins/Map
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 136
+      semanticFailures: 0
+      unsupportedProfileFeatures: 34
+    - group: built-ins/MapIteratorPrototype
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 11
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/NaN
       expectedNegatives: 0
       harnessFailures: 0
@@ -8355,9 +8777,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2268
+      passes: 2269
       semanticFailures: 0
-      unsupportedProfileFeatures: 444
+      unsupportedProfileFeatures: 443
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0

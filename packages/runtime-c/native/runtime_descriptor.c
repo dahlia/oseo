@@ -31,6 +31,22 @@ bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     return left == right;
 }
 
+bool oseo_internal_same_value_zero(OseoValue left, OseoValue right) {
+    if (is_number(left) && is_number(right)) {
+        double left_number = number_value(left);
+        double right_number = number_value(right);
+        if (isnan(left_number) && isnan(right_number)) return true;
+        return left_number == right_number;
+    }
+    if (is_string(left) && is_string(right)) {
+        return oseo_internal_string_equal(left, right);
+    }
+    if (is_bigint(left) && is_bigint(right)) {
+        return oseo_internal_bigint_equal(left, right);
+    }
+    return left == right;
+}
+
 bool oseo_internal_virtual_string_iterator_descriptor(
     OseoContext *context,
     OseoValue object_value,

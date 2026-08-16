@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/Symbol/species/builtin-getter-name.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Symbol/species/builtin-getter-name.js:9\
-        4:32: error[OSEO1001]: Unknown binding 'Map'.\\n\""
+        6:32: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -1,0 +1,62 @@
+version: 1
+id: map-intrinsic
+title: "Map intrinsic"
+scope:
+  - "The realm-owned %Map% constructor, its standard writable,
+    non-enumerable, configurable global property, and the ordinary
+    construction and iterable-consuming AddEntriesFromIterable behavior
+    it runs instead of a frontend fast path."
+  - "SameValueZero-keyed [[MapData]] storage with insertion order and
+    in-place tombstone deletion, and %Map.prototype%'s get, set, has,
+    delete, clear, forEach, entries, keys, values, size, constructor,
+    Symbol.iterator, and Symbol.toStringTag own properties."
+  - "The Symbol.species accessor and the groupBy static, which builds
+    directly into a fresh map's records rather than through an
+    observable set lookup."
+  - "%MapIteratorPrototype% and CreateMapIterator, including its
+    Symbol.toStringTag and receiver branding."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/map-intrinsic.ts
+      - tests/property/m5-map-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/map-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/map-intrinsic.ts
+      - tests/property/m5-map-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-map-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/map-intrinsic.ts
+      - tests/property/m5-map-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/map-intrinsic.ts
+      - tests/property/m5-map-intrinsic.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_map.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

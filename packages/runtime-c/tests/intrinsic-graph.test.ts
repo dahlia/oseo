@@ -637,3 +637,92 @@ test("populates the realm-owned String intrinsic cluster", () => {
   // reporting a plain object.
   assert.match(primitiveSource, /oseo_internal_string_data/u);
 });
+
+test("populates the realm-owned Map intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const mapSource = sources.get("runtime_map.c") ?? "";
+
+  for (const intrinsic of [
+    "MAP_ITERATOR_PROTOTYPE",
+    "MAP_ITERATOR_NEXT",
+    "MAP_PROTOTYPE",
+    "MAP_GET",
+    "MAP_SET",
+    "MAP_HAS",
+    "MAP_DELETE",
+    "MAP_CLEAR",
+    "MAP_FOR_EACH",
+    "MAP_ENTRIES",
+    "MAP_KEYS",
+    "MAP_VALUES",
+    "MAP_SIZE_GETTER",
+    "MAP",
+    "MAP_GROUP_BY",
+    "MAP_SPECIES",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "get",
+    "set",
+    "has",
+    "delete",
+    "clear",
+    "forEach",
+    "entries",
+    "keys",
+    "values",
+    "size",
+    "groupBy",
+    "constructor",
+    "Map",
+    "next",
+  ]) {
+    assert.match(mapSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The constructor is an ordinary constructible function reached through
+  // the realm's own global property, `entries` and `[Symbol.iterator]`
+  // share one function object, and the species accessor is a getter-only
+  // symbol-keyed property on the constructor.
+  assert.match(mapSource, /OSEO_MAP_CONSTRUCTOR_CODE_ID/u);
+  assert.match(mapSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(mapSource, /OSEO_INTRINSIC_MAP_ENTRIES\] = frame\.slots\[2\]/u);
+  assert.match(mapSource, /OSEO_WELL_KNOWN_ITERATOR/u);
+  assert.match(mapSource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(mapSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(mapSource, /oseo_object_define_accessor/u);
+  assert.match(internalHeader, /oseo_internal_install_map_global/u);
+  assert.match(bindingSource, /oseo_internal_install_map_global/u);
+});
+
+test("keeps Map deletions as in-place tombstones for live iterators", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const mapSource = sources.get("runtime_map.c") ?? "";
+
+  // A deleted or cleared record is marked dead in place instead of being
+  // removed, which is what keeps %MapIteratorPrototype%.next's own plain
+  // index valid across a concurrent delete.
+  assert.match(internalHeader, /OSEO_HEAP_MAP = 19/u);
+  assert.match(internalHeader, /OSEO_HEAP_MAP_ITERATOR = 20/u);
+  assert.match(internalHeader, /bool live;/u);
+  assert.doesNotMatch(mapSource, /oseo_internal_remove_property/u);
+  assert.match(
+    mapSource,
+    new RegExp(
+      String.raw`map_prototype_delete[\s\S]*?` +
+        String.raw`entries\[index\]\.live = false`,
+      "u",
+    ),
+  );
+  assert.match(
+    memorySource,
+    new RegExp(
+      String.raw`destroy_heap_object[\s\S]*OSEO_HEAP_MAP[\s\S]*` +
+        String.raw`free\(\(\(OseoMap \*\)object\)->entries\)`,
+      "u",
+    ),
+  );
+});
