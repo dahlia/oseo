@@ -90,8 +90,11 @@ Ownership follows the plan's target layout:
     `Object.defineProperties`, `Object.getOwnPropertyDescriptor`,
     `Object.keys`, and `Object.setPrototypeOf` entry points;
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
-    numeric constants, predicate statics, parser statics, and the standard
-    global constructor property;
+    numeric constants, predicate statics, parser statics, the standard
+    global constructor property, and the `%Number.prototype%` formatting
+    methods `toString`, `toFixed`, `toExponential`, `toPrecision`,
+    `toLocaleString`, and `valueOf`, including the exact bignum arithmetic
+    their rounding and radix conversion share;
  -  *runtime\_array\_buffer.c*: the `ArrayBuffer` constructor, the Data
     Block one buffer owns, `isView`, the `Symbol.species` accessor, the
     `byteLength`, `detached`, `maxByteLength`, and `resizable` accessors,
@@ -194,7 +197,7 @@ its read and write.
 
 ### Internal helpers
 
-One hundred and five helpers cross a translation-unit boundary. Each uses the
+One hundred and seven helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -292,6 +295,8 @@ One hundred and five helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c*        |
+| `oseo_internal_number_text`                         | *runtime\_primitive.c*        |
+| `oseo_internal_number_shortest_digits`              | *runtime\_primitive.c*        |
 | `oseo_internal_jobs_drain_until`                    | *runtime\_promise.c*          |
 | `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*          |
 | `oseo_internal_await_step`                          | *runtime\_event\_loop.c*      |

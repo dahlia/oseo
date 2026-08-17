@@ -3751,6 +3751,84 @@ zero-override policy are unchanged. The admitted runtime checkpoint moves
 the runtime ABI to `oseo-runtime-m5-70` without adding a generated-code
 entry point or changing the graph's orchestration state.
 
+Implemented M5b node `number-prototype` gives the materialized
+`%Number.prototype%` real `toString` and `valueOf` bodies in place of the
+placeholder that named this node, and adds `toFixed`, `toExponential`,
+`toPrecision`, and `toLocaleString`. `toString` accepts an optional radix:
+radix 10 reuses the existing shortest round-trip decimal algorithm, and
+radix 2 through 36 convert the receiver's exact mantissa and binary exponent
+through a bignum built for this node, rendering the integer part exactly and
+advancing the remaining fraction against the distance to the rounding
+boundary, stopping once the tail no longer exceeds it and raising the final
+digit when ordinary rounding selects it and the raised value still names the
+same double. This keeps a non-terminating radix from emitting digits the
+receiver's precision does not carry. It is the round-trip stopping rule
+rather than a shortest-string search, and its tie test inspects the final
+digit rather than the whole coefficient; ECMA-262 leaves both to the
+implementation for a non-decimal radix.
+
+The budget is two-sided. A power of two lies twice as far from its upper
+neighbor as from its lower one, so truncating spends the distance to the
+lower rounding boundary and rounding up spends the distance to the upper
+one. One shared budget would let a truncated expansion of a value such as
+`0.5` in radix 5 cross the lower boundary and name a different double.
+
+Because ECMA-262 leaves a non-decimal radix implementation-approximated,
+that exactness is a recorded divergence rather than a match. V8 advances its
+remaining fraction in floating point, so for a fraction whose expansion does
+not terminate its last digits can differ from the exact result. Over a
+767-case sweep of values and radices, including binade boundaries, the
+smallest denormal, and randomly drawn bit patterns, 280 outputs differed.
+Every Oseo result read back as the original double; 229 of V8's did not, and
+no case had the reverse relationship. Oseo keeps the exact result, so an
+admitted program can differ from V8 in the trailing digits of a
+non-terminating fractional expansion, always in the direction of
+round-tripping. Terminating radices, which include every power of two, agree
+exactly and are pinned digit for digit.
+Differential evidence for the non-terminating cases asserts the reparsed
+magnitude on all three engines instead of the spelling, because the
+reference engines do not agree with each other's exact digits either.
+
+`toFixed`, `toExponential`,
+and `toPrecision` round through the same bignum numerator-over-denominator
+representation rather than repeated floating-point arithmetic, so every
+fraction-digit and significant-digit count rounds to the nearest value with
+ties away from zero, exactly as ECMA-262 specifies. The decimal exponent a
+significant-digit request needs is found by exact bignum comparison against
+powers of ten instead of a `log10` estimate, because a value adjacent to a
+power-of-ten boundary can round to a self-consistent but wrong digit count
+on either side of that boundary if the exponent is only a floating-point
+guess. `toLocaleString` returns the base specification's own fallback,
+`thisNumberValue` followed by `ToString`, since no ECMA-402
+Internationalization API is admitted. Every method shares one
+`thisNumberValue` brand check, admitting a Number primitive or a Number
+wrapper object and rejecting every other receiver, including a generic
+object with a `valueOf` method: unlike String.prototype's coercing
+receiver, Number.prototype's brand check has no looser fallback. The generic
+`ToPrimitive` conversion path's narrow placeholder for the deferred
+`Number.prototype.toString`, which read the receiver's `[[NumberData]]`
+directly by prototype-chain position, is removed; the generic property
+lookup and call it already used for every other constructor now reaches
+this node's real methods instead. Fixed native and generated differential
+evidence at seed `0x60004700` covers both specialization policies, forced
+collection at every safepoint, a false hint, and a deliberate shape-guard
+miss. Of the 168 paths under the node's inventory root, 155 pass and 13
+retain explicit prerequisite boundaries for `Reflect.construct`, `Date`,
+`Boolean`, and the mutable global object implicit-assignment binding this
+checkpoint does not admit. Completing `valueOf` and `toString` also lets 19
+already-reviewed paths outside this node's own root, in `Number`, `Object`,
+`Array`, `Function.prototype.bind`, and `String.fromCharCode`/`split`, pass
+where they previously retained an unsupported-profile-feature boundary
+citing the same placeholder; their entries move with this change since the
+manifest requires every reviewed path's classification to match observed
+evidence. The combined manifest reaches 10,955 cases: 8,064 passes, 1,364
+expected negatives, and 1,527 unsupported profile features with no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-69` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

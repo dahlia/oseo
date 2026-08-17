@@ -1,0 +1,49 @@
+group: built-ins/Number
+key: c1
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Number/prototype/toString/S15.7.4.2_A4_T02.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Number/prototype/toString/S15.7.4.2_A4_T02.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Number/prototype/toString/S15.7.4.2_A4_\
+        T02.js:89:16: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+        - arrow-function
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/Number/prototype/toString/not-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

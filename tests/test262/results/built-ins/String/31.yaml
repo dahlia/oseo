@@ -87,10 +87,10 @@ results:
     observation:
       detail: 'test/built-ins/String/prototype/indexOf/position-tointeger-wrapped-values.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/indexOf/position-tointeger-wrapped-values.js:88:18:
-        error[OSEO2001]: Number prototype methods are not admitted
-        yet.\n"'
-      unsupportedCapability: number-prototype
+        stderr="test/built-ins/String/prototype/indexOf/position-tointeger-wrapped-values.js:151:18:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

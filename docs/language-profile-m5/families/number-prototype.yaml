@@ -1,0 +1,65 @@
+version: 1
+id: number-prototype
+title: "Number prototype formatting methods"
+scope:
+  - "Number.prototype.toString with an optional radix, toFixed,
+    toExponential, toPrecision, toLocaleString, and valueOf, including the
+    thisNumberValue receiver brand, method metadata, argument conversion
+    and abrupt-completion order, range validation, NaN/Infinity/signed-zero
+    handling, exact decimal rounding, and exponent formatting."
+  - "A non-terminating fractional expansion in a non-decimal radix stops
+    once the remaining tail lies within the rounding boundary, so it
+    always reads back as the same double. It is not a shortest-string
+    search and its tie test inspects the final digit, both of which
+    ECMA-262 leaves implementation-approximated, and it can differ from
+    V8 in the trailing digits. Its differential evidence asserts the
+    reparsed magnitude rather than the spelling, because the reference
+    engines do not produce the exact digits themselves; binade-boundary
+    cases are pinned by exact reparse and terminating radices digit for
+    digit."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/number-prototype.ts
+      - tests/property/m5-number-prototype.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/number-prototype.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/number-prototype.ts
+      - tests/property/m5-number-prototype.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-number-prototype.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/number-prototype.ts
+      - tests/property/m5-number-prototype.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/number-prototype.ts
+      - tests/property/m5-number-prototype.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_number.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
