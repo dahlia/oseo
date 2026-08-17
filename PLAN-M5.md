@@ -4223,19 +4223,22 @@ Internationalization API admitted. The generic `ToPrimitive` path's narrow
 placeholder for the deferred `Number.prototype.toString` is removed, so the
 generic property lookup and call it already used for every other
 constructor now reaches this node's real methods. Fixed native and
-generated differential evidence at seed `0x60004700` covers both
+generated differential evidence at seed `0x60004900` covers both
 specialization policies, forced collection at every safepoint, a false
 hint, and a deliberate shape-guard miss. Of the 168 paths under the node's
 inventory root, 155 pass and 13 retain explicit prerequisite boundaries for
 `Reflect.construct`, `Date`, `Boolean`, and the mutable global object.
-Completing `valueOf` and `toString` also lets 19 already-reviewed paths
+Completing `valueOf` and `toString` also lets 21 already-reviewed paths
 outside this node's own root pass where they previously retained an
 unsupported-profile-feature boundary citing the same placeholder; their
 entries move with this change since the manifest requires every reviewed
-path's classification to match observed evidence. The combined manifest
-moves to 10,955 paths with 8,064 passes, 1,364 expected negatives, and 1,527
+path's classification to match observed evidence. Two of them are the
+`Array.prototype.join` cases that take a Number wrapper as `length`, which
+the separately landed array-prototype-copying node reviewed while that
+placeholder still stood. The combined manifest
+moves to 11,364 paths with 8,397 passes, 1,364 expected negatives, and 1,603
 unsupported profile features. The admitted runtime checkpoint moves the
-runtime ABI to `oseo-runtime-m5-69` without adding a generated-code entry
+runtime ABI to `oseo-runtime-m5-71` without adding a generated-code entry
 point or changing the graph's orchestration state.
 
 

@@ -3810,23 +3810,27 @@ receiver, Number.prototype's brand check has no looser fallback. The generic
 directly by prototype-chain position, is removed; the generic property
 lookup and call it already used for every other constructor now reaches
 this node's real methods instead. Fixed native and generated differential
-evidence at seed `0x60004700` covers both specialization policies, forced
+evidence at seed `0x60004900` covers both specialization policies, forced
 collection at every safepoint, a false hint, and a deliberate shape-guard
 miss. Of the 168 paths under the node's inventory root, 155 pass and 13
 retain explicit prerequisite boundaries for `Reflect.construct`, `Date`,
 `Boolean`, and the mutable global object implicit-assignment binding this
-checkpoint does not admit. Completing `valueOf` and `toString` also lets 19
+checkpoint does not admit. Completing `valueOf` and `toString` also lets 21
 already-reviewed paths outside this node's own root, in `Number`, `Object`,
-`Array`, `Function.prototype.bind`, and `String.fromCharCode`/`split`, pass
-where they previously retained an unsupported-profile-feature boundary
-citing the same placeholder; their entries move with this change since the
-manifest requires every reviewed path's classification to match observed
-evidence. The combined manifest reaches 10,955 cases: 8,064 passes, 1,364
-expected negatives, and 1,527 unsupported profile features with no semantic,
+`Array`, `Array.prototype.join`, `Function.prototype.bind`, and
+`String.fromCharCode`/`split`, pass where they previously retained an
+unsupported-profile-feature boundary citing the same placeholder; their
+entries move with this change since the manifest requires every reviewed
+path's classification to match observed evidence. Two of the twenty-one are
+the `Array.prototype.join` cases that take a Number wrapper as `length`,
+which the separately landed array-prototype-copying node reviewed while
+that placeholder still stood. The combined manifest reaches 11,364 cases:
+8,397 passes, 1,364
+expected negatives, and 1,603 unsupported profile features with no semantic,
 harness, or infrastructure failures. The suite revision, 41,091-path
 inventory, manifest schema and vocabulary, and zero-override policy are
 unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-69` without adding a generated-code entry point or changing
+`oseo-runtime-m5-71` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
 
