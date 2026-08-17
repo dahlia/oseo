@@ -419,6 +419,26 @@
 #define OSEO_REGEXP_STRING_ITERATOR_NEXT_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 23u)
 
+#define OSEO_MAP_CODE_ID_RANGE_INDEX ((size_t)13u)
+#define OSEO_MAP_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_MAP_CODE_ID_RANGE_INDEX)
+#define OSEO_MAP_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_MAP_CODE_ID_RANGE_INDEX)
+#define OSEO_MAP_CONSTRUCTOR_CODE_ID OSEO_MAP_CODE_ID_RANGE_LAST
+#define OSEO_MAP_GET_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_MAP_SET_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_MAP_HAS_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_MAP_DELETE_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_MAP_CLEAR_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_MAP_FOR_EACH_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_MAP_ENTRIES_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_MAP_KEYS_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_MAP_VALUES_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_MAP_SIZE_GETTER_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_MAP_GROUP_BY_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_MAP_SPECIES_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_MAP_ITERATOR_NEXT_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 13u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -467,6 +487,8 @@ typedef enum {
     OSEO_HEAP_BIGINT = 16,
     OSEO_HEAP_ENUMERATION = 17,
     OSEO_HEAP_ARRAY_BUFFER = 18,
+    OSEO_HEAP_MAP = 19,
+    OSEO_HEAP_MAP_ITERATOR = 20,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -977,6 +999,50 @@ typedef struct {
     bool canceled;
 } OseoTimer;
 
+/*
+ * One [[MapData]] record. A deleted entry becomes a tombstone in place
+ * (`live` false, both values cleared) instead of being removed, because
+ * %MapIteratorPrototype%.next holds a plain index into this array and a
+ * removal that shifted later entries would skip or misalign a
+ * concurrently live iterator over the same map.
+ */
+typedef struct {
+    OseoValue key;
+    OseoValue value;
+    bool live;
+} OseoMapEntry;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoMapEntry *entries;
+    size_t entry_count;
+    size_t entry_capacity;
+    /* The live record count, kept incrementally so
+     * Map.prototype.size never scans past tombstones. */
+    size_t live_count;
+} OseoMap;
+
+/* [[MapIterationKind]]. */
+typedef enum {
+    OSEO_MAP_ITERATION_KEY = 0,
+    OSEO_MAP_ITERATION_VALUE = 1,
+    OSEO_MAP_ITERATION_KEY_VALUE = 2,
+} OseoMapIterationKind;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    /*
+     * [[Map]]. Undefined once exhausted, matching
+     * %MapIteratorPrototype%.next's specified step of setting it to
+     * undefined after the entries list is exhausted, so a repeated call
+     * takes the same short return without re-deriving that state.
+     */
+    OseoValue target;
+    /* [[MapNextIndex]]. */
+    size_t index;
+    OseoMapIterationKind kind;
+} OseoMapIterator;
+
 static inline OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
         (payload & OSEO_PAYLOAD_MASK);
@@ -1029,6 +1095,12 @@ static inline OseoAsyncGeneratorRequest *request_object(OseoValue value) {
 }
 static inline OseoTimer *timer_object(OseoValue value) {
     return (OseoTimer *)heap_object(value);
+}
+static inline OseoMap *map_object(OseoValue value) {
+    return (OseoMap *)heap_object(value);
+}
+static inline OseoMapIterator *map_iterator_object(OseoValue value) {
+    return (OseoMapIterator *)heap_object(value);
 }
 static inline OseoResult normal(OseoValue value) {
     OseoResult result = {OSEO_STATUS_NORMAL, value};
@@ -1165,12 +1237,21 @@ static inline bool is_array_buffer(OseoValue value) {
 static inline OseoArrayBuffer *array_buffer_object(OseoValue value) {
     return (OseoArrayBuffer *)heap_object(value);
 }
+static inline bool is_map(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_MAP;
+}
+static inline bool is_map_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_MAP_ITERATOR;
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
-        kind == OSEO_HEAP_ARRAY_BUFFER;
+        kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
+        kind == OSEO_HEAP_MAP_ITERATOR;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1644,6 +1725,24 @@ OseoResult oseo_internal_install_promise_global(
     OseoContext *context,
     OseoValue global
 );
+OseoResult oseo_internal_map_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_map_prototype(OseoContext *context);
+/* Materializes %Map%, %Map.prototype%, and %MapIteratorPrototype%
+ * together with every own property ECMA-262 gives them, and returns the
+ * constructor. */
+OseoResult oseo_internal_map_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_map_global(
+    OseoContext *context,
+    OseoValue global
+);
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%
  * methods and its `Symbol.asyncIterator`, selected by code id. */
 OseoResult oseo_internal_async_generator_method(
@@ -1696,6 +1795,8 @@ OseoResult oseo_internal_to_primitive(
     OseoToPrimitiveHint hint
 );
 bool oseo_internal_same_value(OseoValue left, OseoValue right);
+/* SameValueZero: SameValue, but +0 and -0 compare equal. */
+bool oseo_internal_same_value_zero(OseoValue left, OseoValue right);
 OseoResult oseo_internal_object_define_data(
     OseoContext *context,
     OseoValue object_value,

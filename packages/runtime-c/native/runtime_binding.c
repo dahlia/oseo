@@ -314,6 +314,12 @@ static OseoResult global_this_object(OseoContext *context) {
             frame.slots[0]
         );
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_map_global(
+            context,
+            frame.slots[0]
+        );
+    }
     static const char *const intrinsic_names[] = {
         "Function",
         "Symbol",

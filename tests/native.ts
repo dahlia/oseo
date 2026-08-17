@@ -40,6 +40,7 @@ import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
+import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
@@ -117,6 +118,7 @@ const fixtures: readonly Fixture[] = [
   ...receiverFixtures,
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
+  ...mapFixtures.mapIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
   ...stringFixtures.stringIntrinsicFixtures,
@@ -360,6 +362,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
+    fixture.name === "map-intrinsic" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -432,6 +435,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
+    fixture.name === "map-intrinsic" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -626,6 +630,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-intrinsic" ||
+            fixture.name === "map-intrinsic" ||
             fixture.name === "number-intrinsic" ||
             fixture.name === "promise-all-and-race" ||
             fixture.name === "promise-intrinsic" ||
@@ -639,6 +644,7 @@ for (const fixture of selectedFixtures) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
+                fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor"
               ) {
                 assert.ok(native.counters.guardHits > 0);
@@ -799,10 +805,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus thirteen admitted constructor
-            // property names shared by every Script, String being the one
-            // this node admits.
-            assert.equal(native.counters.allocations, 29);
+            // value-property allocations plus fourteen admitted constructor
+            // property names shared by every Script, Map being the one this
+            // node admits.
+            assert.equal(native.counters.allocations, 30);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

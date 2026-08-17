@@ -3712,6 +3712,45 @@ vocabulary, and zero-override policy are unchanged. The admitted runtime
 checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding a
 generated-code entry point or changing the graph's orchestration state.
 
+M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor
+together with SameValueZero-keyed `[[MapData]]` storage, insertion order,
+and `%MapIteratorPrototype%`. The constructor reads the target's `set`
+method once through AddEntriesFromIterable and calls it for every iterated
+two-element entry, closing an unfinished iterable on a non-object entry, an
+abrupt element read, or an abrupt `set` call while preserving the original
+throw completion. `set` normalizes a `-0` key to `+0`; `delete` and `clear`
+mark a record dead in place instead of removing it, so a live
+`%MapIteratorPrototype%.next` walking the same array by index never skips
+or misaligns past a concurrent mutation, and a key deleted and re-added
+reappears at the end of insertion order. `forEach` re-reads the entry array
+on every step, so a `set` call from inside the callback that grows the
+backing storage is still observed, and it always returns `undefined`
+regardless of the callback's return value. `Map.groupBy` builds its result
+directly into a fresh map's records instead of through an observable `set`
+lookup, and the `Symbol.species` accessor returns its receiver unchanged.
+
+Fixed native and generated differential evidence at seed `0x60004800` covers
+SameValueZero identity across canonical zero, NaN, a string, and two
+distinct object identities, insertion order, in-place tombstone deletion,
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate guard misses, generic fallback, and observable
+constructor, iterator, and `forEach` re-entrancy operations. Of the 182
+paths under the node's two inventory roots, 181 are reviewed: 147 pass and
+34 retain explicit prerequisite boundaries for constructor detection, the
+unimplemented `Set`, `WeakMap`, `WeakSet`, and `WeakRef` collection
+intrinsics, `Array.prototype.pop`, or realm creation. The remaining path
+requires string iteration and stays with the separate `string-iterator`
+node. One previously reviewed case, *test/built-ins/Object/seal/seal-map.js*,
+also moves from unsupported to pass because `Object.seal` now observes a
+real `Map` instance instead of an unresolved global. The combined manifest
+reaches 11,196 cases: 8,221 passes, 1,364 expected negatives, and 1,611
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves
+the runtime ABI to `oseo-runtime-m5-70` without adding a generated-code
+entry point or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3768,7 +3807,7 @@ complete. The remaining gaps retain their existing owners.
     top-level `this` and every non-strict nullish receiver one realm-wide
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
-    admitted `ArrayBuffer`, `Object`, `Number`, `Promise`, and `String`
+    admitted `ArrayBuffer`, `Map`, `Object`, `Number`, `Promise`, and `String`
     identities. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script

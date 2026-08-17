@@ -1,0 +1,24 @@
+group: built-ins/Map
+key: e3
+results:
+  - case:
+      async: false
+      features:
+        - WeakMap
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-weakmap.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - iterator-protocol
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - WeakMap
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

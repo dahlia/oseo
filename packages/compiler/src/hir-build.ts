@@ -195,6 +195,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Function" ||
     name === "Infinity" ||
     name === "Iterator" ||
+    name === "Map" ||
     name === "NaN" ||
     name === "Number" ||
     name === "Object" ||
@@ -539,6 +540,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "ArrayBuffer" ||
     name === "Function" ||
     name === "Iterator" ||
+    name === "Map" ||
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||

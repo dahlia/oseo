@@ -288,3 +288,7 @@ families:
     owner: tests/property/m5-array-prototype-copying.property.test.ts
     start: 0x60004700
     end: 0x600047ff
+  - family: m5-map-intrinsic
+    owner: tests/property/m5-map-intrinsic.property.test.ts
+    start: 0x60004800
+    end: 0x600048ff

@@ -17,29 +17,31 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-five reviewed assets in this order:
+The runtime input now lists twenty-seven reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
-*runtime\_object.c*, *runtime\_property.c*, *runtime\_descriptor.c*,
-*runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_number.c*,
-*runtime\_array\_buffer.c*, *runtime\_arguments.c*,
+*runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
+*runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
+*runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
-*runtime\_primitive.c*, *runtime\_promise.c*, and
-*runtime\_event\_loop.c*. The M5 named-error-intrinsics unit added
-*runtime\_error.c* as the first post-componentization component, and the
-symbol, iterator-protocol, generator, asynchronous-generator, and BigInt
-units each added one component the same way. The M5b preparation unit
-then split the original *runtime\_object.c* into the eight object-family
-components listed above, so the standard built-in objects can be
-authored in parallel lanes instead of competing for one translation
-unit; that split moved code and promoted eleven file-local helpers to
-the internal header without changing behavior. Every addition follows
-the same ownership, include, and one-definition rules. No catch-all
-*runtime.c* remains, and no temporary forwarding helper was needed at
-any point in the migration. Each source compiles as its own translation
-unit and is archived in exactly this order. The symbols test in
+*runtime\_primitive.c*, *runtime\_promise.c*,
+*runtime\_event\_loop.c*, and *runtime\_map.c*. The M5 named-error-intrinsics
+unit added *runtime\_error.c* as the first post-componentization
+component, and the symbol, iterator-protocol, generator,
+asynchronous-generator, BigInt, string-prototype-match-and-split, and
+map-intrinsic units each added one component the same way. The M5b
+preparation unit then split the
+original *runtime\_object.c* into the eight object-family components
+listed above, so the standard built-in objects can be authored in
+parallel lanes instead of competing for one translation unit; that
+split moved code and promoted eleven file-local helpers to the internal
+header without changing behavior. Every addition follows the same
+ownership, include, and one-definition rules. No catch-all *runtime.c*
+remains, and no temporary forwarding helper was needed at any point in
+the migration. Each source compiles as its own translation unit and is
+archived in exactly this order. The symbols test in
 *packages/runtime-c/tests/symbols.test.ts* enforces the reviewed list,
 the include boundaries, and the one-definition rule on every change.
 
@@ -129,7 +131,11 @@ Ownership follows the plan's target layout:
     rejection tracking, and job draining;
  -  *runtime\_event\_loop.c*: timer queues, task
     checkpoints, top-level await progress, and shutdown; timer delay
-    coercion goes through the shared primitive conversions.
+    coercion goes through the shared primitive conversions;
+ -  *runtime\_map.c*: the `%Map%` intrinsic and its statics, keyed
+    collection storage with SameValueZero identity, insertion order, and
+    in-place tombstone deletion, its realm-owned prototype methods, and
+    `%MapIteratorPrototype%`.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
@@ -188,7 +194,7 @@ its read and write.
 
 ### Internal helpers
 
-Ninety-six helpers cross a translation-unit boundary. Each uses the
+One hundred and five helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -290,6 +296,15 @@ Ninety-six helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*          |
 | `oseo_internal_await_step`                          | *runtime\_event\_loop.c*      |
 | `oseo_internal_async_iterator_key_matches`          | *runtime\_iterator.c*         |
+| `oseo_internal_validate_string_length`              | *runtime\_string.c*           |
+| `oseo_internal_string_protocol_dispatch`            | *runtime\_string\_match.c*    |
+| `oseo_internal_regexp_string_iterator_prototype`    | *runtime\_string\_match.c*    |
+| `oseo_internal_array_join_element_string`           | *runtime\_primitive.c*        |
+| `oseo_internal_map_builtin_dispatch`                | *runtime\_map.c*              |
+| `oseo_internal_map_prototype`                       | *runtime\_map.c*              |
+| `oseo_internal_map_intrinsic`                       | *runtime\_map.c*              |
+| `oseo_internal_install_map_global`                  | *runtime\_map.c*              |
+| `oseo_internal_same_value_zero`                     | *runtime\_descriptor.c*       |
 
 ### Documented component cycles
 

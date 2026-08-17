@@ -366,6 +366,7 @@ export function intrinsicGlobalKind(
     name === "ArrayBuffer" ||
     name === "Function" ||
     name === "Iterator" ||
+    name === "Map" ||
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||

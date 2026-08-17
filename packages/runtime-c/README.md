@@ -517,6 +517,21 @@ UTF-16 code units and throws a catchable `RangeError` before publishing a larger
 string. `toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The generated-code ABI gains no entry point.
 
+The `m5-70` ABI materializes `Map`, its keyed collection storage, and
+`%MapIteratorPrototype%`. `[[MapData]]` is a plain growable array searched by
+SameValueZero; a delete or clear marks a record dead in place instead of
+removing it, so a live `%MapIteratorPrototype%.next` walking the same array by
+index never skips or misaligns past a concurrent mutation, and a key deleted
+and re-added reappears at the end of insertion order rather than its original
+position. `set` normalizes a `-0` key to `+0` only when it creates a new
+record. The constructor reads `set` once and calls it for every iterated
+two-element entry, closing an unfinished iterable on a non-object entry, a
+failed element read, or an abrupt `set` call. `forEach` re-reads the entry
+array on every step, so a `set` call from inside the callback that grows the
+backing storage is still observed. `groupBy` builds its result directly into a
+fresh map's records instead of through an observable `set` lookup. The
+generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
