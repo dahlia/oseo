@@ -12,5 +12,5 @@ dependencies:
   - iterator-intrinsic
   - object-prototype
   - well-known-symbols
-landed: false
+landed: true
 status: ready
