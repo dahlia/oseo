@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 9,909
-reviewed cases: 7,206 passes, 1,364 expected negatives, and 1,339 unsupported
+honest unsupported classifications. The current reviewed manifest records 11,015
+reviewed cases: 8,073 passes, 1,364 expected negatives, and 1,578 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -29,9 +29,9 @@ separate from the result manifest.
 M5a is complete. The 81 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 7,206
-passes across 9,909 paths, and the property inventory records 80 domains, 80
-seeds, and an ordinary case budget of 3,462.
+the M5b and M5c dependency order below. The reviewed manifest now records 8,073
+passes across 11,015 paths, and the property inventory records 86 domains, 86
+seeds, and an ordinary case budget of 3,534.
 
 
 M5a implementation history
@@ -4102,6 +4102,54 @@ to 10,787 paths with 7,890 passes, 1,364 expected negatives, and 1,533
 unsupported profile features. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry point
 or changing the graph's orchestration state.
+
+Implemented M5b node `array-prototype-copying` gives the realm-owned
+`%Array.prototype%` ordinary `concat`, `flat`, `flatMap`, `join`, `slice`,
+`toLocaleString`, and `toString` functions. Each method converts the receiver
+before its later method-specific work, and each copying or stringification
+loop obtains LengthOfArrayLike at its specified point. Sparse copying checks
+HasProperty before Get, while stringification retrieves every index and
+renders nullish elements as empty fields. `concat` observes
+`Symbol.isConcatSpreadable`; `concat`, `flat`, `flatMap`, and `slice` use
+ArraySpeciesCreate and preserve constructor and `Symbol.species` reads,
+default allocation, custom constructors, and abrupt completion.
+
+FlattenIntoArray skips holes, maps before testing the mapped value for Array
+flattening, and applies the requested recursive depth. Cyclic or unbounded
+input reaches the deterministic runtime call-depth boundary rather than the
+native stack. `join` converts its separator after length and safely renders
+nested Arrays. `toLocaleString` calls each non-nullish element method with the
+element as receiver, forwards the outer locales and options as exactly two
+arguments, and coerces its result. Omitted outer arguments are forwarded as two
+`undefined` values. During element conversion, re-entry through `join`,
+`toString`, or `toLocaleString` on the same active receiver renders an empty
+string. Matching Node.js and Deno, these methods and ordinary string conversion
+that reaches intrinsic Array `toString` reject lengths above `2**32 - 1` with
+`TypeError`. Runtime string construction rejects results above 536,870,888
+UTF-16 code units with `RangeError`.
+`toString` calls a callable `join` or falls back to
+`Object.prototype.toString`. The implementation stays in
+*runtime\_array.c* because these paths share property primitives, species
+allocation, collector roots, and recursion state with the Array intrinsic.
+
+Fixed native and generated differential evidence at seed `0x60004700` covers
+both specialization policies, forced collection at every safepoint, sparse and
+generic receivers, side-effect order, spreadability, every species guard hit
+and miss, custom results, recursion and cycles, locale argument forwarding,
+locale coercion, cyclic locale conversion, oversized-length rejection,
+large-length index access ordering, abrupt completion, false hints, deliberate
+shape-guard misses, and generic fallback. Of the 229 paths under the node's
+seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
+prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
+asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
+this method follows the ECMA-402 superseding call contract; the fixed
+differential fixture replaces its element-call evidence. No new path outside
+those roots is added. Two already-reviewed cases outside the roots move from
+unsupported to pass because they exercise the newly admitted `toString` and
+generic `slice` behavior. The manifest moves to 11,015 paths with 8,073 passes,
+1,364 expected negatives, and 1,578 unsupported profile features. The admitted
+runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding
+a generated-code entry point or changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

@@ -445,6 +445,8 @@ static OseoResult bound_function_name(
         return failure(context, "OSEO2001", "Bound name is too large.");
     }
     size_t length = base_length + 6u;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(*units));
     if (units == NULL) {
         return failure(context, "OSEO2001", "Bound name allocation failed.");
@@ -608,6 +610,9 @@ static OseoResult native_function_text(
     size_t length = 9u + name_length + 20u;
     uint16_t *units = NULL;
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_validate_string_length(context, length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         units = malloc(length * sizeof(*units));
         if (units == NULL) {
             result = failure(
@@ -665,6 +670,8 @@ static OseoResult accessor_function_name(
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
     size_t length = base_length + 4u;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(uint16_t));
     if (units == NULL) {
         return failure(context, "OSEO2001", "String allocation failed.");

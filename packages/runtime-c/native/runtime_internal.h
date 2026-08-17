@@ -15,6 +15,8 @@
 #define OSEO_CANONICAL_NAN UINT64_C(0x7ff8000000000000)
 #define OSEO_MAX_ACTIVE_FRAME_SLOTS ((size_t)32768u)
 #define OSEO_MAX_CALL_DEPTH ((size_t)256u)
+/* Node.js and Deno expose this V8 UTF-16 string ceiling. */
+#define OSEO_MAX_STRING_LENGTH ((size_t)536870888u)
 #define OSEO_PAYLOAD_MASK UINT64_C(0x0000ffffffffffff)
 #define OSEO_TAG_SHIFT 48u
 #define OSEO_TAG_SMI UINT64_C(1)
@@ -213,6 +215,20 @@
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 10u)
 #define OSEO_ARRAY_MAP_CODE_ID \
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_ARRAY_CONCAT_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_ARRAY_FLAT_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_ARRAY_FLAT_MAP_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_ARRAY_JOIN_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_ARRAY_SLICE_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_ARRAY_TO_LOCALE_STRING_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_ARRAY_TO_STRING_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 18u)
 
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
@@ -459,6 +475,12 @@ struct OseoHeapObject {
     OseoHeapKind kind;
     bool marked;
 };
+
+/* Active native array stringification across user-code re-entry. */
+typedef struct OseoArrayStringAncestor {
+    OseoValue value;
+    const struct OseoArrayStringAncestor *previous;
+} OseoArrayStringAncestor;
 
 typedef struct {
     OseoHeapObject header;
@@ -1349,6 +1371,11 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/* Reject a string length before a component allocates a staging buffer. */
+OseoResult oseo_internal_validate_string_length(
+    OseoContext *context,
+    size_t length
+);
 /*
  * String and property-key helpers owned by runtime_string.c. A string
  * property key names a property by content rather than by identity, so
@@ -1765,6 +1792,11 @@ OseoResult oseo_internal_array_push(
     const OseoValue *arguments
 );
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_array_join_element_string(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue array
+);
 OseoResult oseo_internal_jobs_drain_until(
     OseoContext *context,
     OseoValue promise

@@ -78,6 +78,8 @@ static OseoResult ascii_runtime_string(
     const char *text
 ) {
     size_t length = strlen(text);
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = NULL;
     if (length > 0u) {
         units = malloc(length * sizeof(uint16_t));
@@ -478,6 +480,8 @@ static OseoResult error_text(
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
     size_t length = name_string->length + 2u + message_string->length;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
     uint16_t *units = malloc(length * sizeof(uint16_t));
     if (units == NULL) {
         return failure(context, "OSEO2001", "String allocation failed.");

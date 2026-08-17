@@ -500,6 +500,23 @@ getter, or `then` call closes an unfinished iterator before rejecting, while an
 abrupt iterator step or final capability resolution preserves the completed
 iterator state. The generated-code ABI gains no entry point.
 
+The `m5-69` ABI adds ordinary `concat`, `flat`, `flatMap`, `join`, `slice`,
+`toLocaleString`, and `toString` functions. Copying methods preserve holes,
+observable indexed access, and abrupt completion. `concat` applies
+`Symbol.isConcatSpreadable`; it, `flat`, `flatMap`, and `slice` allocate Array
+results through ArraySpeciesCreate. Flattening skips holes, observes nested
+Array elements recursively, and enforces the runtime's deterministic call
+depth limit for cyclic or unbounded input. `join` and `toLocaleString` retain
+their distinct element conversion rules, including recursion-safe Array
+stringification. During element conversion, re-entry through `join`,
+`toString`, or `toLocaleString` on the same active receiver renders an empty
+string. These methods and ordinary string conversion that reaches intrinsic
+Array `toString` reject a length above `2**32 - 1` with a catchable `TypeError`.
+Runtime string construction follows the Node.js and Deno ceiling of 536,870,888
+UTF-16 code units and throws a catchable `RangeError` before publishing a larger
+string. `toString` calls a callable `join` or falls back to
+`Object.prototype.toString`. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
@@ -510,9 +527,9 @@ binary64.
 Numeric coercion distinguishes an ordinary `NaN` conversion from temporary
 buffer allocation failure. Allocation failure propagates as an abrupt
 `OSEO2001` result through arithmetic and relational operations.
-String concatenation checks its combined UTF-16 length before addition or
-allocation, so an unrepresentable result fails with `OSEO2001` instead of
-wrapping a native allocation size.
+String construction checks its combined UTF-16 length before allocation and
+throws a catchable `RangeError` above the host-compatible ceiling. Native
+allocation failure remains an `OSEO2001` diagnostic.
 Declared-function calls have a deterministic maximum active depth of 256. The
 runtime returns an owned `OSEO2001` diagnostic before entering another C frame
 when that limit is reached.

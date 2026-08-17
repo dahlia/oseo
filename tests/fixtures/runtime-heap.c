@@ -1110,6 +1110,15 @@ static void test_global_this_install_failure(void) {
     oseo_context_destroy(&injected);
 }
 
+static void test_string_length_limit(OseoContext *context) {
+    OseoResult result = oseo_string_from_units(
+        context,
+        NULL,
+        (size_t)536870889u
+    );
+    assert(result.status == OSEO_STATUS_THROW);
+}
+
 /*
  * The var-scoped Script bindings the global object exposes. Each
  * property is a view of the binding cell rather than a copy of its
@@ -1522,6 +1531,7 @@ int main(void) {
     test_iterators(&context, frame.slots);
     test_accessor_descriptor_gc_safety(&context, frame.slots);
     test_global_this_install_failure();
+    test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);
     oseo_roots_release(&context, &frame);

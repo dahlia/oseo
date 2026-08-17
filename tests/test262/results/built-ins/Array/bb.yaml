@@ -167,6 +167,30 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/slice/create-non-array-invalid-len.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Array/prototype/slice/create-non-array-invalid-\
+        len.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/slice/create-non-array-\
+        invalid-len.js:99:17: error[OSEO1001]: Unknown binding
+        'Math'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-i-13.js
       strictness:
         - non-strict

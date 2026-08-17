@@ -722,6 +722,162 @@ throw boom;
     /error\[OSEO2001\].*String allocation is too large/u,
   );
 
+  const concatenationCeilingHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_primitive.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "OseoString *right_object = string_object(slots[1]);",
+        "OseoString *right_object = string_object(slots[1]);\n" +
+          "    right_object->length = OSEO_MAX_STRING_LENGTH;",
+      );
+      assert.notEqual(injected, source, "concatenation ceiling injected");
+      return injected;
+    },
+  };
+  const concatenationCeiling = await runNativeCli(
+    {
+      args: ["concatenation-ceiling-runtime.ts"],
+      source:
+        'try { console.log("left" + "right"); } catch (error) {\n' +
+        "  console.log(error.name, error.message);\n" +
+        "}",
+      sourceId: "concatenation-ceiling-runtime.ts",
+      version: "0.1.0",
+    },
+    concatenationCeilingHost,
+  );
+  assert.equal(concatenationCeiling.exitStatus, 0);
+  assert.equal(
+    concatenationCeiling.stdout,
+    "RangeError Invalid string length.\n",
+  );
+  assert.equal(concatenationCeiling.stderr, "");
+
+  const stagingCeilingHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (!(path instanceof URL)) return source;
+      if (path.pathname.endsWith("/runtime_string.c")) {
+        const lengthInjected = source.replace(
+          "size_t required = builder->length + additional;",
+          "if (builder->length > 0u) {\n" +
+            "        builder->length = OSEO_MAX_STRING_LENGTH;\n" +
+            "    }\n" +
+            "    size_t required = builder->length + additional;",
+        );
+        assert.notEqual(
+          lengthInjected,
+          source,
+          "String builder ceiling injected",
+        );
+        const allocationInjected = lengthInjected.replace(
+          "uint16_t *units = realloc(builder->units, capacity * " +
+            "sizeof(uint16_t));",
+          "uint16_t *units = required > OSEO_MAX_STRING_LENGTH\n" +
+            "        ? NULL\n" +
+            "        : realloc(builder->units, capacity * " +
+            "sizeof(uint16_t));",
+        );
+        assert.notEqual(
+          allocationInjected,
+          lengthInjected,
+          "String builder allocation fault injected",
+        );
+        return allocationInjected;
+      }
+      if (path.pathname.endsWith("/runtime_object_builtin.c")) {
+        const lengthInjected = source.replace(
+          "size_t length = tag_length + 9u;",
+          "tag_length = OSEO_MAX_STRING_LENGTH;\n" +
+            "    size_t length = tag_length + 9u;",
+        );
+        assert.notEqual(lengthInjected, source, "Object tag ceiling injected");
+        const allocationInjected = lengthInjected.replace(
+          "uint16_t *units = malloc(length * sizeof(*units));",
+          "uint16_t *units = NULL;",
+        );
+        assert.notEqual(
+          allocationInjected,
+          lengthInjected,
+          "Object tag allocation fault injected",
+        );
+        return allocationInjected;
+      }
+      return source;
+    },
+  };
+  const stagingCeiling = await runNativeCli(
+    {
+      args: ["staging-ceiling-runtime.ts"],
+      source:
+        'try { "a".concat("b"); } catch (error) {\n' +
+        '  console.log("concat", error.name, error.message);\n' +
+        "}\n" +
+        'const tagged = { [Symbol.toStringTag]: "tag" };\n' +
+        "try { tagged.toString(); } catch (error) {\n" +
+        '  console.log("tag", error.name, error.message);\n' +
+        "}",
+      sourceId: "staging-ceiling-runtime.ts",
+      version: "0.1.0",
+    },
+    stagingCeilingHost,
+  );
+  assert.equal(stagingCeiling.exitStatus, 0);
+  assert.equal(
+    stagingCeiling.stdout,
+    "concat RangeError Invalid string length.\n" +
+      "tag RangeError Invalid string length.\n",
+  );
+  assert.equal(stagingCeiling.stderr, "");
+
+  const fractionalArrayLengthHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_primitive.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "array_length = (uint32_t)truncated_length;",
+        "array_length = numeric_length == 4294967295.5\n" +
+          "                ? 1u\n" +
+          "                : (uint32_t)truncated_length;",
+      );
+      assert.notEqual(
+        injected,
+        source,
+        "fractional Array length bound injected",
+      );
+      return injected;
+    },
+  };
+  const fractionalArrayLength = await runNativeCli(
+    {
+      args: ["fractional-array-length-runtime.ts"],
+      source:
+        "const inherited = Object.create(Array.prototype);\n" +
+        "inherited.length = 2 ** 32 - 0.5;\n" +
+        'console.log(String(inherited) === "");',
+      sourceId: "fractional-array-length-runtime.ts",
+      version: "0.1.0",
+    },
+    fractionalArrayLengthHost,
+  );
+  assert.equal(fractionalArrayLength.exitStatus, 0);
+  assert.equal(fractionalArrayLength.stdout, "true\n");
+  assert.equal(fractionalArrayLength.stderr, "");
+
   const allocationFailureHost = {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {

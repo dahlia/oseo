@@ -193,6 +193,37 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/join/S15.4.4.5_A2_T3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/Array/prototype/join/S15.4.4.5_A2_T3.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Array/prototype/join/S15.4.4.5_A2_T3.js:111:5:
+        error[OSEO2001]: Number prototype methods are not admitted
+        yet.\n"'
+      unsupportedCapability: number-prototype
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/map/15.4.4.19-8-c-i-21.js
       strictness:
         - non-strict

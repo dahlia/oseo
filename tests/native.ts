@@ -50,6 +50,8 @@ const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
 const { arrayPrototypeIterativeFixtures } =
   await import("./native/fixtures/array-prototype-iterative.ts");
+const { arrayPrototypeCopyingFixtures } =
+  await import("./native/fixtures/array-prototype-copying.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
   await import("./native/fixtures/array-prototype-species-mapping.ts");
 const { stringPrototypeAccessFixtures } =
@@ -105,6 +107,7 @@ const fixtures: readonly Fixture[] = [
   ...objectFixtures,
   ...arrayBufferFixtures,
   ...arrayConstructorFixtures,
+  ...arrayPrototypeCopyingFixtures,
   ...arrayPrototypeIterativeFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
   ...classFixtures,
@@ -345,6 +348,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "array-buffer" ||
+    fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "object-constructor" ||
@@ -529,6 +533,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
     fixture.name === "string-prototype-access" ||
+    fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
@@ -609,6 +614,7 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "array-buffer" ||
+            fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "object-constructor" ||
@@ -632,6 +638,7 @@ for (const fixture of selectedFixtures) {
             if (mode === "enabled") {
               if (
                 fixture.name === "array-buffer" ||
+                fixture.name === "array-prototype-copying" ||
                 fixture.name === "object-constructor"
               ) {
                 assert.ok(native.counters.guardHits > 0);

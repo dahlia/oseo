@@ -1,6 +1,8 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - AggregateError
+  - Array.prototype.flat
+  - Array.prototype.flatMap
   - ArrayBuffer
   - BigInt
   - Object.is
@@ -623,6 +625,213 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/proto.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/15.4.4.4-5-b-iii-3-b-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/15.4.4.4-5-c-i-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-length-to-string-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-length-value-of-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-negative-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-primitive-non-number-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-string-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-to-length-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_holey-sloppy-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_large-typed-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_length-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_no-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_non-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments-with-dupes.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_small-typed-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-boolean-wrapper.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-function.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-getter-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-number-wrapper.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-reg-exp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-sparse-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-string-wrapper.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_strict-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A1_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A3_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/S15.4.4.4_A3_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/arg-length-exceeding-integer-limit.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/arg-length-near-integer-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/call-with-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-ctor-non-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-ctor-poisoned.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-non-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-proto-from-ctor-realm-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-proto-from-ctor-realm-non-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-revoked-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-non-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-non-extensible-spreadable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-non-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-poisoned.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-undef.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-with-non-configurable-property-spreadable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-with-non-configurable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-with-non-writable-property-spreadable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species-with-non-writable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/create-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-get-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-is-array-proxy-revoked.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-proxy-revoked.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-val-falsey.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-val-truthy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-val-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/concat/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-0-1.js
@@ -1993,6 +2202,135 @@ tests:
   - path: test/built-ins/Array/prototype/filter/target-array-with-non-writable-property.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/array-like-objects.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/bound-function-call.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/empty-array-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/empty-object-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/non-numeric-depth-should-not-throw.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/non-object-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/null-undefined-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/null-undefined-input-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/positive-infinity.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/proxy-access-count.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/symbol-object-create-null-depth-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/target-array-non-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/target-array-with-non-configurable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flat/target-array-with-non-writable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/array-like-objects-nested.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/array-like-objects-poisoned-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/array-like-objects-typedarrays.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/array-like-objects.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/bound-function-argument.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/depth-always-one.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/mapperfunction-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/non-callable-argument-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/proxy-access-count.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/target-array-non-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/target-array-with-non-configurable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/target-array-with-non-writable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-ctor-non-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-bad-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-custom-ctor-poisoned-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/this-value-null-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/flatMap/thisArg-argument.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -2551,6 +2889,75 @@ tests:
   - path: test/built-ins/Array/prototype/forEach/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A1.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A1.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A1.3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A2_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A3.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A3.1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A3.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A3.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A4_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A5_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/S15.4.4.5_A6.6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/coerced-separator-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/coerced-separator-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/join/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -2861,7 +3268,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-8-7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-8-8.js
     expectedClassification: pass
@@ -3197,6 +3604,219 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/target-array-with-non-writable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/15.4.4.10-10-c-ii-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.2_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.2_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.3_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.3_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.3_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.4_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.4_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.4_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.4_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.5_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.5_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.1_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.1_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.2_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.2_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2.2_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T5.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A3_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A3_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/S15.4.4.10_A4_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/coerced-start-end-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/coerced-start-end-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-ctor-non-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-ctor-poisoned.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-non-array-invalid-len.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-non-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-proto-from-ctor-realm-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-proto-from-ctor-realm-non-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-proxied-array-invalid-len.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-revoked-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-neg-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-non-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-poisoned.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species-undef.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/create-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/length-exceeding-integer-limit-proxied-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/length-exceeding-integer-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/target-array-non-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/target-array-with-non-configurable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/slice/target-array-with-non-writable-property.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-1.js
@@ -3842,6 +4462,72 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/primitive_this_value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/primitive_this_value_getter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/non-callable-join-string-tag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toString/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/ArrayBuffer/Symbol.species/length.js
@@ -16028,7 +16714,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/try/args.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/try/ctx-ctor-throws.js
     expectedClassification: pass

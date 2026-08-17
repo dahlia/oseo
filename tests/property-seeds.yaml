@@ -284,3 +284,7 @@ families:
     owner: tests/property/m5-string-prototype-match-and-split.property.test.ts
     start: 0x60004600
     end: 0x600046ff
+  - family: m5-array-prototype-copying
+    owner: tests/property/m5-array-prototype-copying.property.test.ts
+    start: 0x60004700
+    end: 0x600047ff

@@ -37,6 +37,57 @@ static OseoResult array_species_mapping(
     const OseoValue *arguments,
     size_t code_id
 );
+static OseoResult array_like_length(
+    OseoContext *context,
+    OseoValue value,
+    double *length
+);
+static OseoResult array_set_length(
+    OseoContext *context,
+    OseoValue array,
+    double length
+);
+static OseoResult create_index_property(
+    OseoContext *context,
+    OseoValue target,
+    double index,
+    OseoValue value
+);
+static OseoResult array_species_create(
+    OseoContext *context,
+    OseoValue original,
+    double length
+);
+static OseoResult array_concat(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_flattening(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+);
+static OseoResult array_join(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool locale
+);
+static OseoResult array_slice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_to_string(
+    OseoContext *context,
+    OseoValue receiver
+);
 
 OseoResult oseo_internal_array_builtin_dispatch(
     OseoContext *context,
@@ -104,6 +155,35 @@ OseoResult oseo_internal_array_builtin_dispatch(
             arguments,
             code_id
         );
+    }
+    if (code_id == OSEO_ARRAY_CONCAT_CODE_ID) {
+        return array_concat(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_FLAT_CODE_ID ||
+        code_id == OSEO_ARRAY_FLAT_MAP_CODE_ID) {
+        return array_flattening(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
+        );
+    }
+    if (code_id == OSEO_ARRAY_JOIN_CODE_ID ||
+        code_id == OSEO_ARRAY_TO_LOCALE_STRING_CODE_ID) {
+        return array_join(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_ARRAY_TO_LOCALE_STRING_CODE_ID
+        );
+    }
+    if (code_id == OSEO_ARRAY_SLICE_CODE_ID) {
+        return array_slice(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_TO_STRING_CODE_ID) {
+        return array_to_string(context, receiver);
     }
     if (code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID) {
         return failure(
@@ -388,6 +468,637 @@ static OseoResult construct_function(
         );
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+typedef struct {
+    uint16_t *units;
+    size_t length;
+    size_t capacity;
+} ArrayStringBuilder;
+
+static bool array_string_is_ancestor(
+    OseoValue value,
+    const OseoArrayStringAncestor *ancestor
+) {
+    for (const OseoArrayStringAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
+static OseoResult array_string_append(
+    OseoContext *context,
+    ArrayStringBuilder *builder,
+    const uint16_t *units,
+    size_t length
+) {
+    if (length == 0u) return normal(oseo_undefined());
+    if (length > OSEO_MAX_STRING_LENGTH - builder->length) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid string length."
+        );
+    }
+    size_t required = builder->length + length;
+    if (required > builder->capacity) {
+        size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
+        while (capacity < required) {
+            if (capacity > OSEO_MAX_STRING_LENGTH / 2u) {
+                capacity = required;
+                break;
+            }
+            capacity *= 2u;
+        }
+        uint16_t *grown = realloc(
+            builder->units,
+            capacity * sizeof(uint16_t)
+        );
+        if (grown == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Array string allocation failed."
+            );
+        }
+        builder->units = grown;
+        builder->capacity = capacity;
+    }
+    memcpy(
+        builder->units + builder->length,
+        units,
+        length * sizeof(uint16_t)
+    );
+    builder->length = required;
+    return normal(oseo_undefined());
+}
+
+static OseoResult array_integer_or_infinity(
+    OseoContext *context,
+    OseoValue value
+) {
+    OseoResult result = oseo_internal_to_number(context, value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    if (isnan(number) || number == 0.0) number = 0.0;
+    else if (isfinite(number)) number = trunc(number);
+    return normal(oseo_number(number));
+}
+
+static double array_clamped_index(double value, double length) {
+    if (value == -INFINITY) return 0.0;
+    if (value < 0.0) return fmax(length + value, 0.0);
+    return fmin(value, length);
+}
+
+static OseoResult array_is_concat_spreadable(
+    OseoContext *context,
+    OseoValue value,
+    bool *spreadable
+) {
+    *spreadable = false;
+    if (!is_object(value)) return normal(oseo_boolean(false));
+    OseoValue slots[2] = {value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_IS_CONCAT_SPREADABLE
+    );
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *spreadable = tag_of(result.value) == OSEO_TAG_UNDEFINED
+            ? is_array(slots[0])
+            : oseo_to_boolean(result.value);
+        result = normal(oseo_boolean(*spreadable));
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_concat(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Concat arguments are missing.");
+    }
+    if (argument_count > SIZE_MAX - 6u) {
+        return failure(context, "OSEO2001", "Concat argument list is large.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(
+        context,
+        &frame,
+        argument_count + 6u
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    for (size_t index = 0u; index < argument_count; index += 1u) {
+        frame.slots[index + 6u] = arguments[index];
+    }
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_species_create(context, frame.slots[0], 0.0);
+        frame.slots[1] = result.value;
+    }
+    const double maximum = 9007199254740991.0;
+    double next_index = 0.0;
+    for (size_t item_index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             item_index <= argument_count;
+         item_index += 1u) {
+        frame.slots[2] = item_index == 0u
+            ? frame.slots[0]
+            : frame.slots[item_index + 5u];
+        bool spreadable = false;
+        result = array_is_concat_spreadable(
+            context,
+            frame.slots[2],
+            &spreadable
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!spreadable) {
+            if (next_index >= maximum) {
+                result = type_error(context, "Concat result is too large.");
+                break;
+            }
+            result = create_index_property(
+                context,
+                frame.slots[1],
+                next_index,
+                frame.slots[2]
+            );
+            next_index += 1.0;
+            continue;
+        }
+        double length = 0.0;
+        result = array_like_length(context, frame.slots[2], &length);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (length > maximum - next_index) {
+            result = type_error(context, "Concat result is too large.");
+            break;
+        }
+        for (double source_index = 0.0;
+             result.status == OSEO_STATUS_NORMAL && source_index < length;
+             source_index += 1.0, next_index += 1.0) {
+            result = oseo_property_key(
+                context,
+                oseo_number(source_index)
+            );
+            frame.slots[3] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_has_property(
+                    context,
+                    frame.slots[3],
+                    frame.slots[2]
+                );
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (!oseo_to_boolean(result.value)) continue;
+            result = oseo_object_get(
+                context,
+                frame.slots[2],
+                frame.slots[3]
+            );
+            frame.slots[4] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = create_index_property(
+                    context,
+                    frame.slots[1],
+                    next_index,
+                    frame.slots[4]
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(context, frame.slots[1], next_index);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult flatten_into_array(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source,
+    double source_length,
+    double *target_index,
+    double depth,
+    OseoValue mapper,
+    OseoValue this_argument,
+    size_t recursion_depth
+) {
+    OseoValue slots[8] = {
+        target,
+        source,
+        mapper,
+        this_argument,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 8u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    const double maximum = 9007199254740991.0;
+    for (double source_index = 0.0;
+         result.status == OSEO_STATUS_NORMAL &&
+             source_index < source_length;
+         source_index += 1.0) {
+        result = oseo_property_key(context, oseo_number(source_index));
+        slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_has_property(context, slots[4], slots[1]);
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!oseo_to_boolean(result.value)) continue;
+        result = oseo_object_get(context, slots[1], slots[4]);
+        slots[5] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (is_function(slots[2])) {
+            slots[6] = slots[5];
+            slots[7] = oseo_number(source_index);
+            OseoValue callback_arguments[3] = {
+                slots[6],
+                slots[7],
+                slots[1],
+            };
+            result = oseo_call_function(
+                context,
+                slots[2],
+                slots[3],
+                3u,
+                callback_arguments,
+                oseo_undefined()
+            );
+            slots[5] = result.value;
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
+        if (depth > 0.0 && is_array(slots[5])) {
+            if (recursion_depth >= OSEO_MAX_CALL_DEPTH) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_RANGE,
+                    "Maximum array flattening depth exceeded."
+                );
+                break;
+            }
+            double element_length = 0.0;
+            result = array_like_length(
+                context,
+                slots[5],
+                &element_length
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = flatten_into_array(
+                    context,
+                    slots[0],
+                    slots[5],
+                    element_length,
+                    target_index,
+                    isfinite(depth) ? depth - 1.0 : depth,
+                    oseo_undefined(),
+                    oseo_undefined(),
+                    recursion_depth + 1u
+                );
+            }
+            continue;
+        }
+        if (*target_index >= maximum) {
+            result = type_error(context, "Flattened array is too large.");
+            break;
+        }
+        result = create_index_property(
+            context,
+            slots[0],
+            *target_index,
+            slots[5]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) *target_index += 1.0;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_flattening(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    OseoValue slots[4] = {
+        receiver,
+        builtin_argument(argument_count, arguments, 0u),
+        builtin_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double source_length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &source_length);
+    }
+    double depth = 1.0;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        code_id == OSEO_ARRAY_FLAT_CODE_ID &&
+        tag_of(slots[1]) != OSEO_TAG_UNDEFINED) {
+        result = array_integer_or_infinity(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            depth = fmax(number_value(result.value), 0.0);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        code_id == OSEO_ARRAY_FLAT_MAP_CODE_ID &&
+        !is_function(slots[1])) {
+        result = type_error(context, "Array flatMap callback is not callable.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_species_create(context, slots[0], 0.0);
+        slots[3] = result.value;
+    }
+    double target_index = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = flatten_into_array(
+            context,
+            slots[3],
+            slots[0],
+            source_length,
+            &target_index,
+            depth,
+            code_id == OSEO_ARRAY_FLAT_MAP_CODE_ID
+                ? slots[1]
+                : oseo_undefined(),
+            slots[2],
+            0u
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[3];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_join(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool locale
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
+    frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && length > (double)UINT32_MAX) {
+        result = type_error(context, "Invalid array length.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (locale || tag_of(frame.slots[1]) == OSEO_TAG_UNDEFINED) {
+            result = oseo_internal_ascii_string(context, ",");
+        } else {
+            result = oseo_internal_value_string(context, frame.slots[1]);
+        }
+        frame.slots[3] = result.value;
+    }
+    const OseoArrayStringAncestor *previous_string =
+        context->array_string_stack;
+    bool recursive_string =
+        array_string_is_ancestor(frame.slots[0], previous_string);
+    OseoArrayStringAncestor current_string = {
+        frame.slots[0],
+        previous_string,
+    };
+    if (result.status == OSEO_STATUS_NORMAL && recursive_string) {
+        result = oseo_string_from_units(context, NULL, 0u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !recursive_string) {
+        context->array_string_stack = &current_string;
+    }
+    ArrayStringBuilder builder = {NULL, 0u, 0u};
+    for (double index = 0.0;
+         result.status == OSEO_STATUS_NORMAL && !recursive_string &&
+             index < length;
+         index += 1.0) {
+        if (index > 0.0) {
+            OseoString *separator = string_object(frame.slots[3]);
+            result = array_string_append(
+                context,
+                &builder,
+                separator->units,
+                separator->length
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
+        result = oseo_property_key(context, oseo_number(index));
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[4]
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (is_nullish(frame.slots[4])) continue;
+        if (locale) {
+            result = oseo_internal_ascii_string(context, "toLocaleString");
+            frame.slots[5] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(
+                    context,
+                    frame.slots[4],
+                    frame.slots[5]
+                );
+                frame.slots[5] = result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL &&
+                !is_function(frame.slots[5])) {
+                result = type_error(
+                    context,
+                    "Element toLocaleString is not callable."
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_call_function(
+                    context,
+                    frame.slots[5],
+                    frame.slots[4],
+                    2u,
+                    &frame.slots[1],
+                    oseo_undefined()
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_value_string(context, result.value);
+            }
+        } else {
+            result = oseo_internal_array_join_element_string(
+                context,
+                frame.slots[4],
+                frame.slots[0]
+            );
+        }
+        frame.slots[5] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoString *element = string_object(frame.slots[5]);
+        result = array_string_append(
+            context,
+            &builder,
+            element->units,
+            element->length
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (!recursive_string) {
+            result = oseo_string_from_units(
+                context,
+                builder.units,
+                builder.length
+            );
+        }
+    }
+    if (!recursive_string) {
+        context->array_string_stack = (void *)previous_string;
+    }
+    free(builder.units);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult array_slice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[5] = {
+        receiver,
+        builtin_argument(argument_count, arguments, 0u),
+        builtin_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    double start = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_integer_or_infinity(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            start = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double final = length;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[2]) != OSEO_TAG_UNDEFINED) {
+        result = array_integer_or_infinity(context, slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            final = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double count = fmax(final - start, 0.0);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_species_create(context, slots[0], count);
+        slots[3] = result.value;
+    }
+    double output_index = 0.0;
+    for (double index = start;
+         result.status == OSEO_STATUS_NORMAL && index < final;
+         index += 1.0, output_index += 1.0) {
+        result = oseo_property_key(context, oseo_number(index));
+        slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_has_property(context, slots[4], slots[0]);
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!oseo_to_boolean(result.value)) continue;
+        result = oseo_object_get(context, slots[0], slots[4]);
+        slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = create_index_property(
+                context,
+                slots[3],
+                output_index,
+                slots[4]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(context, slots[3], output_index);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[3];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_to_string(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoValue slots[3] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "join");
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[2])) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_OBJECT_TO_STRING
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[2],
+            slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -1446,37 +2157,27 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         }
     }
     static const char *const unadmitted_names[] = {
-        "concat",
         "indexOf",
-        "join",
         "lastIndexOf",
         "pop",
         "reduce",
         "reduceRight",
         "reverse",
         "shift",
-        "slice",
         "sort",
         "splice",
-        "toLocaleString",
-        "toString",
         "unshift",
     };
     static const size_t unadmitted_lengths[] = {
         1u,
         1u,
-        1u,
-        1u,
         0u,
         1u,
         1u,
         0u,
         0u,
-        2u,
         1u,
         2u,
-        0u,
-        0u,
         1u,
     };
     _Static_assert(
@@ -1502,6 +2203,66 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             result = oseo_internal_ascii_string(
                 context,
                 unadmitted_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
+    static const size_t copying_codes[] = {
+        OSEO_ARRAY_CONCAT_CODE_ID,
+        OSEO_ARRAY_FLAT_CODE_ID,
+        OSEO_ARRAY_FLAT_MAP_CODE_ID,
+        OSEO_ARRAY_JOIN_CODE_ID,
+        OSEO_ARRAY_SLICE_CODE_ID,
+        OSEO_ARRAY_TO_LOCALE_STRING_CODE_ID,
+        OSEO_ARRAY_TO_STRING_CODE_ID,
+    };
+    static const char *const copying_names[] = {
+        "concat",
+        "flat",
+        "flatMap",
+        "join",
+        "slice",
+        "toLocaleString",
+        "toString",
+    };
+    static const size_t copying_lengths[] = {1u, 0u, 1u, 1u, 2u, 0u, 0u};
+    _Static_assert(
+        sizeof(copying_codes) / sizeof(copying_codes[0]) ==
+            sizeof(copying_names) / sizeof(copying_names[0]),
+        "Array copying method tables must stay aligned."
+    );
+    _Static_assert(
+        sizeof(copying_codes) / sizeof(copying_codes[0]) ==
+            sizeof(copying_lengths) / sizeof(copying_lengths[0]),
+        "Array copying length tables must stay aligned."
+    );
+    const size_t copying_count =
+        sizeof(copying_names) / sizeof(copying_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < copying_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            copying_codes[index],
+            copying_names[index],
+            copying_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                copying_names[index]
             );
             frame.slots[3] = result.value;
         }

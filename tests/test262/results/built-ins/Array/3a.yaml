@@ -3,6 +3,38 @@ key: 3a
 results:
   - case:
       async: false
+      features:
+        - Symbol.isConcatSpreadable
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/concat/Array.prototype.concat_array-like-length-value-of-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -100,6 +132,37 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/slice/S15.4.4.10_A1.1_T2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/some/15.4.4.17-3-20.js
       strictness:
         - non-strict
@@ -124,5 +187,27 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - resizableArrayBufferUtils.js
+      mode: script
+      path: test/built-ins/Array/prototype/toLocaleString/resizable-buffer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
+      passed: false
+      unsupportedCapability: harness-include
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

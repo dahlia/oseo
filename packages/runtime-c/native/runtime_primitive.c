@@ -459,6 +459,15 @@ OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value) {
     return value_text(context, value, NULL);
 }
 
+OseoResult oseo_internal_array_join_element_string(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue array
+) {
+    ConversionAncestor current = {array, NULL};
+    return value_text(context, value, &current);
+}
+
 static bool conversion_property_exists(
     OseoValue object_value,
     OseoValue key
@@ -638,12 +647,27 @@ static bool conversion_is_ancestor(
     return false;
 }
 
+static bool array_string_is_ancestor(
+    OseoValue value,
+    const OseoArrayStringAncestor *ancestor
+) {
+    for (const OseoArrayStringAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
 static OseoResult array_join_text(
     OseoContext *context,
     OseoValue array_value,
     const ConversionAncestor *previous
 ) {
-    if (conversion_is_ancestor(array_value, previous)) {
+    const OseoArrayStringAncestor *previous_string =
+        context->array_string_stack;
+    if (conversion_is_ancestor(array_value, previous) ||
+        array_string_is_ancestor(array_value, previous_string)) {
         return oseo_string_from_units(context, NULL, 0u);
     }
     /* Nested array conversion recurses in C, so it consumes the same
@@ -657,6 +681,11 @@ static OseoResult array_join_text(
         return result;
     }
     frame.slots[0] = array_value;
+    OseoArrayStringAncestor current_string = {
+        frame.slots[0],
+        previous_string,
+    };
+    context->array_string_stack = &current_string;
     ConversionAncestor current = {frame.slots[0], previous};
     uint16_t *units = NULL;
     size_t length = 0u;
@@ -680,21 +709,28 @@ static OseoResult array_join_text(
     uint32_t array_length = 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         double numeric_length = number_value(frame.slots[2]);
-        if (isfinite(numeric_length) && numeric_length > 0.0) {
-            array_length = numeric_length >= (double)UINT32_MAX
-                ? UINT32_MAX
-                : (uint32_t)floor(numeric_length);
+        double truncated_length = numeric_length > 0.0
+            ? floor(numeric_length)
+            : 0.0;
+        if (truncated_length > (double)UINT32_MAX) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Invalid array length."
+            );
+        } else {
+            array_length = (uint32_t)truncated_length;
         }
     }
     for (uint32_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < array_length;
          index += 1u) {
         if (index > 0u) {
-            if (length == SIZE_MAX / sizeof(uint16_t)) {
-                result = failure(
+            if (length >= OSEO_MAX_STRING_LENGTH) {
+                result = oseo_internal_throw_error(
                     context,
-                    "OSEO2001",
-                    "String allocation is too large."
+                    OSEO_ERROR_RANGE,
+                    "Invalid string length."
                 );
                 break;
             }
@@ -732,13 +768,11 @@ static OseoResult array_join_text(
         frame.slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         OseoString *element = string_object(frame.slots[3]);
-        if (element->length > SIZE_MAX - length ||
-            length + element->length >
-                SIZE_MAX / sizeof(uint16_t)) {
-            result = failure(
+        if (element->length > OSEO_MAX_STRING_LENGTH - length) {
+            result = oseo_internal_throw_error(
                 context,
-                "OSEO2001",
-                "String allocation is too large."
+                OSEO_ERROR_RANGE,
+                "Invalid string length."
             );
             break;
         }
@@ -769,6 +803,7 @@ static OseoResult array_join_text(
         result = oseo_string_from_units(context, units, length);
     }
     free(units);
+    context->array_string_stack = (void *)previous_string;
     oseo_roots_release(context, &frame);
     oseo_call_leave(context);
     return result;
@@ -799,7 +834,8 @@ static OseoResult default_array_text(
         if (result.status == OSEO_STATUS_NORMAL &&
             is_function(frame.slots[2])) {
             OseoFunction *join = function_object(frame.slots[2]);
-            if (join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+            if ((join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
+                 join->code_id == OSEO_ARRAY_JOIN_CODE_ID) &&
                 oseo_internal_string_is_ascii(
                     join->initial_name,
                     "join"
@@ -820,10 +856,24 @@ static OseoResult default_array_text(
                 );
             }
         } else if (result.status == OSEO_STATUS_NORMAL) {
-            result = default_object_tag_text(context, frame.slots[0]);
+            result = oseo_call_function(
+                context,
+                context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+                frame.slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
         }
     } else if (result.status == OSEO_STATUS_NORMAL) {
-        result = array_join_text(context, frame.slots[0], previous);
+        result = oseo_call_function(
+            context,
+            context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -1011,7 +1061,8 @@ static OseoResult to_primitive_value(
         if (trying_to_string &&
             default_conversion_kind(context, frame.slots[0]) ==
                 OSEO_CONVERSION_ARRAY &&
-            method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID &&
+            (method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
+             method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID) &&
             oseo_internal_string_is_ascii(
                 method->initial_name,
                 "toString"
@@ -1034,17 +1085,6 @@ static OseoResult to_primitive_value(
                 context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING]) {
             DefaultConversionKind kind =
                 default_conversion_kind(context, frame.slots[0]);
-            if (kind == OSEO_CONVERSION_ARRAY) {
-                result = default_array_text(
-                    context,
-                    frame.slots[0],
-                    previous
-                );
-                if (result.status != OSEO_STATUS_NORMAL) break;
-                converted = !is_object(result.value);
-                if (converted) break;
-                continue;
-            }
             if (kind == OSEO_CONVERSION_FUNCTION &&
                 !is_function(frame.slots[0])) {
                 result = oseo_internal_throw_error(
@@ -1287,6 +1327,11 @@ OseoResult oseo_add(
         );
     }
     size_t length = left_object->length + right_object->length;
+    OseoResult valid = oseo_internal_validate_string_length(context, length);
+    if (valid.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return valid;
+    }
     uint16_t *units = length == 0u
         ? NULL
         : malloc(length * sizeof(uint16_t));
