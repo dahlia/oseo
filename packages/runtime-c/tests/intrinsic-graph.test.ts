@@ -395,6 +395,12 @@ test("populates the realm-owned Number intrinsic cluster", () => {
     "isSafeInteger",
     "parseFloat",
     "parseInt",
+    "toString",
+    "valueOf",
+    "toFixed",
+    "toExponential",
+    "toPrecision",
+    "toLocaleString",
   ]) {
     assert.match(numberSource, new RegExp(`"${property}"`, "u"));
   }

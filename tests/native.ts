@@ -61,6 +61,8 @@ const { stringPrototypeSearchAndSliceFixtures } =
   await import("./native/fixtures/string-prototype-search-and-slice.ts");
 const { stringPrototypeMatchAndSplitFixtures } =
   await import("./native/fixtures/string-prototype-match-and-split.ts");
+const { numberPrototypeFixtures } =
+  await import("./native/fixtures/number-prototype.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -125,6 +127,7 @@ const fixtures: readonly Fixture[] = [
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
   ...stringPrototypeMatchAndSplitFixtures,
+  ...numberPrototypeFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -152,31 +155,6 @@ assert.match(
   spreadDescriptorMap.stderr,
   /error\[OSEO2001\].*descriptor maps are unsupported/u,
 );
-
-for (const [name, source] of [
-  ["number-primitive-to-string", "console.log((1).toString());"],
-  ["number-wrapper-to-string", "console.log(Object(1).toString());"],
-] as const) {
-  const deferredNumberText = await runNativeCli(
-    {
-      args: [`${name}.ts`],
-      source,
-      sourceId: `${name}.ts`,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(deferredNumberText.exitStatus, 1);
-  assert.equal(deferredNumberText.stdout, "");
-  assert.match(
-    deferredNumberText.stderr,
-    new RegExp(
-      `^${name}\\.ts:1:\\d+: error\\[OSEO2001\\]: ` +
-        "Number prototype methods are not admitted yet\\.",
-      "u",
-    ),
-  );
-}
 
 const deferredStringTrim = await runNativeCli(
   {
@@ -369,7 +347,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
     fixture.name === "string-prototype-search-and-slice" ||
-    fixture.name === "string-prototype-match-and-split"
+    fixture.name === "string-prototype-match-and-split" ||
+    fixture.name === "number-prototype"
   ) {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -541,6 +520,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
+    fixture.name === "number-prototype" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
@@ -637,7 +617,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||
             fixture.name === "string-prototype-search-and-slice" ||
-            fixture.name === "string-prototype-match-and-split"
+            fixture.name === "string-prototype-match-and-split" ||
+            fixture.name === "number-prototype"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -645,7 +626,8 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
                 fixture.name === "map-intrinsic" ||
-                fixture.name === "object-constructor"
+                fixture.name === "object-constructor" ||
+                fixture.name === "number-prototype"
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }

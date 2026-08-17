@@ -259,13 +259,18 @@ static void append_character(
     *length += 1u;
 }
 
-static size_t format_shortest_decimal(
+/*
+ * Parses a printf "%g"-family candidate's significant digits and decimal
+ * point position, discarding any sign. decimal_position is the count of
+ * digits of *digits that fall before the decimal point: value ==
+ * 0.digits * 10^decimal_position.
+ */
+static void decimal_candidate_digits(
     const char *candidate,
-    char *output,
-    size_t capacity
+    char digits[32],
+    size_t *digit_count,
+    int *decimal_position
 ) {
-    char digits[32];
-    size_t digit_count = 0u;
     size_t digits_before_point = 0u;
     bool before_point = true;
     bool negative = candidate[0] == '-';
@@ -274,12 +279,13 @@ static size_t format_shortest_decimal(
     const char *mantissa_end = exponent_marker == NULL
         ? cursor + strlen(cursor)
         : exponent_marker;
+    size_t count = 0u;
     for (const char *part = cursor; part < mantissa_end; part += 1) {
         if (*part == '.') {
             before_point = false;
         } else {
-            digits[digit_count] = *part;
-            digit_count += 1u;
+            digits[count] = *part;
+            count += 1u;
             if (before_point) digits_before_point += 1u;
         }
     }
@@ -297,7 +303,25 @@ static size_t format_shortest_decimal(
         }
         exponent *= sign;
     }
-    int decimal_position = (int)digits_before_point + exponent;
+    *digit_count = count;
+    *decimal_position = (int)digits_before_point + exponent;
+}
+
+static size_t format_shortest_decimal(
+    const char *candidate,
+    char *output,
+    size_t capacity
+) {
+    char digits[32];
+    size_t digit_count = 0u;
+    int decimal_position = 0;
+    bool negative = candidate[0] == '-';
+    decimal_candidate_digits(
+        candidate,
+        digits,
+        &digit_count,
+        &decimal_position
+    );
     char formatted[96];
     size_t length = 0u;
     if (negative) {
@@ -374,7 +398,7 @@ static size_t format_shortest_decimal(
     return (size_t)snprintf(output, capacity, "%s", formatted);
 }
 
-static size_t number_text(double value, char *output, size_t capacity) {
+size_t oseo_internal_number_text(double value, char *output, size_t capacity) {
     if (isnan(value)) return (size_t)snprintf(output, capacity, "NaN");
     if (isinf(value)) {
         return (size_t)snprintf(
@@ -402,6 +426,81 @@ static size_t number_text(double value, char *output, size_t capacity) {
     char fallback[64];
     (void)snprintf(fallback, sizeof(fallback), "%.17g", value);
     return format_shortest_decimal(fallback, output, capacity);
+}
+
+/*
+ * Drops the leading and trailing zeros a fixed-notation candidate carries,
+ * leaving only significant digits. A leading zero contributes no
+ * significant digit and shifts the decimal exponent down; a trailing zero
+ * leaves the exponent alone because the value is read as
+ * 0.digits * 10^exponent. Both must go: a retained leading zero would make
+ * the first digit zero, and a retained trailing zero would make the digit
+ * count larger than the smallest one that still round-trips.
+ */
+static void trim_insignificant_zeros(
+    char digits[32],
+    size_t *digit_count,
+    int *decimal_exponent
+) {
+    size_t leading = 0u;
+    while (leading < *digit_count && digits[leading] == '0') leading += 1u;
+    if (leading == *digit_count) {
+        digits[0] = '0';
+        *digit_count = 1u;
+        *decimal_exponent = 0;
+        return;
+    }
+    size_t length = *digit_count - leading;
+    memmove(digits, digits + leading, length);
+    while (length > 1u && digits[length - 1u] == '0') length -= 1u;
+    *digit_count = length;
+    *decimal_exponent -= (int)leading;
+}
+
+/*
+ * Same round-trip precision search as oseo_internal_number_text, but
+ * returns the parsed significant digits and decimal exponent instead of a
+ * formatted string. value must be finite, nonzero, and non-negative.
+ * At most 17 significant digits round-trip a double, so the trimmed result
+ * always fits the caller's buffer.
+ */
+void oseo_internal_number_shortest_digits(
+    double value,
+    char digits[18],
+    size_t *digit_count,
+    int *decimal_exponent
+) {
+    char parsed_digits[32];
+    size_t count = 0u;
+    for (int precision = 1; precision <= 17; precision += 1) {
+        char candidate[64];
+        (void)snprintf(candidate, sizeof(candidate), "%.*g", precision, value);
+        char *end;
+        double parsed = strtod(candidate, &end);
+        if (*end == '\0' && double_bits(parsed) == double_bits(value)) {
+            decimal_candidate_digits(
+                candidate,
+                parsed_digits,
+                &count,
+                decimal_exponent
+            );
+            trim_insignificant_zeros(parsed_digits, &count, decimal_exponent);
+            *digit_count = count;
+            memcpy(digits, parsed_digits, count);
+            return;
+        }
+    }
+    char fallback[64];
+    (void)snprintf(fallback, sizeof(fallback), "%.17g", value);
+    decimal_candidate_digits(
+        fallback,
+        parsed_digits,
+        &count,
+        decimal_exponent
+    );
+    trim_insignificant_zeros(parsed_digits, &count, decimal_exponent);
+    *digit_count = count;
+    memcpy(digits, parsed_digits, count);
 }
 
 static OseoResult value_text(
@@ -438,7 +537,11 @@ static OseoResult value_text(
     else if (tag == OSEO_TAG_BOOLEAN) {
         constant = (value & 1u) != 0u ? "true" : "false";
     } else if (is_number(value)) {
-        (void)number_text(number_value(value), number, sizeof(number));
+        (void)oseo_internal_number_text(
+            number_value(value),
+            number,
+            sizeof(number)
+        );
         constant = number;
     }
     if (constant == NULL) {
@@ -487,57 +590,6 @@ static bool conversion_property_exists(
                 &ignored_setter
             )) {
             return true;
-        }
-        current = ordinary_object(current)->prototype;
-    }
-    return false;
-}
-
-/*
- * Number.prototype.toString belongs to a later formatting node. Until it
- * lands, select its owned placeholder by prototype-chain position. A nearer
- * user property still owns the conversion, changing the receiver's prototype
- * chain removes this narrow fallback, and the selected method enforces the
- * [[NumberData]] receiver brand.
- */
-static bool uses_deferred_number_to_string(
-    OseoContext *context,
-    OseoValue value,
-    OseoValue key
-) {
-    if (!is_object(value)) return false;
-    bool reached_number_prototype = false;
-    OseoValue current = value;
-    while (is_object(current)) {
-        if (current ==
-            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
-            return reached_number_prototype;
-        }
-        OseoValue property_value = oseo_undefined();
-        OseoPropertyAttributes attributes = {false, false, false, false};
-        OseoValue getter = oseo_undefined();
-        OseoValue setter = oseo_undefined();
-        if (oseo_internal_own_descriptor(
-                current,
-                key,
-                &property_value,
-                &attributes,
-                &getter,
-                &setter
-            )) {
-            if (current ==
-                    context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] &&
-                !attributes.accessor &&
-                is_function(property_value) &&
-                function_object(property_value)->code_id ==
-                    OSEO_NUMBER_TO_STRING_CODE_ID) {
-                return true;
-            }
-            return false;
-        }
-        if (current ==
-            context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE]) {
-            reached_number_prototype = true;
         }
         current = ordinary_object(current)->prototype;
     }
@@ -1030,27 +1082,6 @@ static OseoResult to_primitive_value(
             result = default_object_tag_text(context, frame.slots[0]);
             if (result.status != OSEO_STATUS_NORMAL) break;
             converted = true;
-            break;
-        }
-        if (
-            trying_to_string &&
-            uses_deferred_number_to_string(
-                context,
-                frame.slots[0],
-                frame.slots[1]
-            )
-        ) {
-            OseoOrdinaryObject *receiver = ordinary_object(frame.slots[0]);
-            if (!receiver->number_data) {
-                result = oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "Number.prototype.toString requires a number receiver."
-                );
-            } else {
-                result = normal(receiver->number_value);
-                converted = true;
-            }
             break;
         }
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);

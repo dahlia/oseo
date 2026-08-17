@@ -1,0 +1,27 @@
+group: built-ins/Number
+key: "40"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Number/prototype/toFixed/S15.7.4.5_A1.3_T02.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/built-ins/Number/prototype/toFixed/S15.7.4.5_A1.3_T02.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Number/prototype/toFixed/S15.7.4.5_A1.3\
+        _T02.js:96:3: error[OSEO1001]: Unknown binding 's'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

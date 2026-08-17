@@ -4188,6 +4188,59 @@ moves to 11,196 paths with 8,221 passes, 1,364 expected negatives, and
 the runtime ABI to `oseo-runtime-m5-70` without adding a generated-code
 entry point or changing the graph's orchestration state.
 
+Implemented M5b node `number-prototype` replaces the placeholder `toString`
+and `valueOf` bodies with real ones and adds `toFixed`, `toExponential`,
+`toPrecision`, and `toLocaleString`. Every method shares one
+`thisNumberValue` brand check admitting only a Number primitive or wrapper.
+`toString`'s radix 10 case reuses the existing shortest round-trip decimal
+algorithm; radix 2 through 36 convert the receiver's exact mantissa and
+binary exponent through a new bignum, rendering the integer part exactly and
+advancing the remaining fraction against the distance to the rounding
+boundary on each side, which differ at a power of two, and stopping once the
+tail no longer exceeds that budget. That is the round-trip stopping rule
+rather than a shortest-string search, and the tie test inspects the final
+digit, both of which ECMA-262 leaves to the implementation here.
+
+Because ECMA-262 leaves a non-decimal
+radix implementation-approximated and V8 advances its fraction in floating
+point, a non-terminating expansion can differ from V8 in its trailing
+digits: over a 767-case sweep spanning binade boundaries, the smallest
+denormal, and random bit patterns, 280 differed, every Oseo result read back
+as the original double and 229 of V8's did not, so this node keeps the exact
+result and records the divergence rather than reproducing V8's arithmetic.
+Terminating radices agree exactly.
+
+`toFixed`, `toExponential`, and `toPrecision` round
+through the same exact numerator-over-denominator bignum representation
+instead of repeated floating-point arithmetic, with the decimal exponent a
+significant-digit request needs found by exact bignum comparison against
+powers of ten rather than a `log10` estimate, since a value adjacent to a
+power-of-ten boundary can round to a self-consistent but wrong digit count
+on either side of that boundary under a floating-point guess.
+`toLocaleString` returns the base specification's own fallback,
+`thisNumberValue` followed by `ToString`, with no ECMA-402
+Internationalization API admitted. The generic `ToPrimitive` path's narrow
+placeholder for the deferred `Number.prototype.toString` is removed, so the
+generic property lookup and call it already used for every other
+constructor now reaches this node's real methods. Fixed native and
+generated differential evidence at seed `0x60004900` covers both
+specialization policies, forced collection at every safepoint, a false
+hint, and a deliberate shape-guard miss. Of the 168 paths under the node's
+inventory root, 155 pass and 13 retain explicit prerequisite boundaries for
+`Reflect.construct`, `Date`, `Boolean`, and the mutable global object.
+Completing `valueOf` and `toString` also lets 21 already-reviewed paths
+outside this node's own root pass where they previously retained an
+unsupported-profile-feature boundary citing the same placeholder; their
+entries move with this change since the manifest requires every reviewed
+path's classification to match observed evidence. Two of them are the
+`Array.prototype.join` cases that take a Number wrapper as `length`, which
+the separately landed array-prototype-copying node reviewed while that
+placeholder still stood. The combined manifest
+moves to 11,364 paths with 8,397 passes, 1,364 expected negatives, and 1,603
+unsupported profile features. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-71` without adding a generated-code entry
+point or changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

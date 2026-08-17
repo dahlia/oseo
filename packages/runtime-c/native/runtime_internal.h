@@ -336,6 +336,14 @@
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 7u)
 #define OSEO_NUMBER_TO_STRING_CODE_ID \
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_NUMBER_TO_FIXED_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_NUMBER_TO_EXPONENTIAL_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_NUMBER_TO_PRECISION_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_NUMBER_TO_LOCALE_STRING_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 12u)
 
 #define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_INDEX ((size_t)11u)
 #define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_FIRST \
@@ -1456,6 +1464,26 @@ OseoResult oseo_internal_allocate_string(
 OseoResult oseo_internal_validate_string_length(
     OseoContext *context,
     size_t length
+);
+/*
+ * Number::toString's radix-10 algorithm (6.1.6.1.20), owned by
+ * runtime_primitive.c because the generic ToString conversion path uses it
+ * for every primitive-to-string coercion. runtime_number.c reuses it for
+ * Number.prototype.toString() and toLocaleString's no-radix formatting.
+ */
+size_t oseo_internal_number_text(double value, char *output, size_t capacity);
+/*
+ * Extracts the shortest round-trip decimal significant digits of a finite,
+ * nonzero, non-negative double, with no sign and no decimal point: value ==
+ * 0.d[0]d[1]...d[*digit_count - 1] * 10^*decimal_exponent. Shared by
+ * Number::toString(x, 10) and Number.prototype.toExponential's
+ * free-precision (fractionDigits undefined) branch.
+ */
+void oseo_internal_number_shortest_digits(
+    double value,
+    char digits[18],
+    size_t *digit_count,
+    int *decimal_exponent
 );
 /*
  * String and property-key helpers owned by runtime_string.c. A string
