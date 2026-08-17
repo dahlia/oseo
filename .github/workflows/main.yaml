@@ -83,7 +83,7 @@ jobs:
           if-no-files-found: warn
 
   test_test262:
-    name: test262 (${{ matrix.platform.target }}, ${{ matrix.shard }}/4)
+    name: test262 (${{ matrix.platform.target }}, ${{ matrix.shard }}/5)
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
@@ -99,18 +99,19 @@ jobs:
           - 2
           - 3
           - 4
+          - 5
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
-      - run: mise run test:test262 --shard ${{ matrix.shard }}/4
+      - run: mise run test:test262 --shard ${{ matrix.shard }}/5
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: test262-${{ matrix.platform.target }}-${{ matrix.shard }}-of-4
+          name: test262-${{ matrix.platform.target }}-${{ matrix.shard }}-of-5
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
