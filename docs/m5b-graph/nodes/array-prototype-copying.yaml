@@ -16,5 +16,5 @@ inventory:
 dependencies:
   - array-prototype-species-mapping
   - string-prototype-access
-landed: false
+landed: true
 status: ready

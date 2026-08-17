@@ -12,8 +12,8 @@ usage: "One record per node lives in docs/m5b-graph/nodes. Take a node whose
   takes when no node is ready, in the order listed."
 summary:
   nodes: 86
-  ready: 55
-  blocked: 11
+  ready: 57
+  blocked: 9
   parked: 20
 serializationPoints:
   - path: packages/runtime-c/src/index.ts

@@ -11,4 +11,4 @@ inventory:
 dependencies:
   - array-prototype-copying
 landed: false
-status: blocked
+status: ready
