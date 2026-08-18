@@ -5,5 +5,5 @@ delivers: "Adds the Oseo-owned pattern AST, parser, validator, and bounded
   generated pattern model for PLAN-REGEXP delivery items 1 and 2 without
   admitting execution."
 dependencies: []
-landed: false
+landed: true
 status: ready

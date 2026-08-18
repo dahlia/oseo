@@ -8,4 +8,4 @@ dependencies:
   - regexp-pattern-ast
   - unicode-tables
 landed: false
-status: blocked
+status: ready
