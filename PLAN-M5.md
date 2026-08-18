@@ -4241,6 +4241,58 @@ unsupported profile features. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-71` without adding a generated-code entry
 point or changing the graph's orchestration state.
 
+Implemented M5b node `regexp-pattern-ast` adds the Oseo-owned regular
+expression pattern model that
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) delivery items 1 and 2 define, and
+admits no execution. `@oseo/compiler` gains the pattern AST, a parser and
+validator over the ECMAScript 2025 main-body pattern grammar, owned
+resource limits, and a structural dump. The frontend converts a regular
+expression literal into an owned record of its pattern text, flag text, and
+source range, validates it there, and retains no bootstrap-parser node. An
+invalid pattern or flag set is now an early error located at the offending
+text inside the literal instead of one profile diagnostic at the whole
+literal; a valid pattern still reports the profile boundary, because
+nothing evaluates it.
+
+Annex B is outside the candidate claim, so a construct only Annex B admits,
+such as an identity escape over an identifier character, a legacy octal
+escape, a quantified assertion, an unescaped `]` or `}`, or an out-of-order
+class range, is rejected in every mode rather than accepted without the `u`
+flag. Class set notation, inline modifiers, and Unicode property escapes
+are recognized and refused with a located `unsupported` error rather than
+an early error. Modifiers and property escapes are admitted through a
+named extension point when a caller owns their semantics, and admitting a
+property escape without a resolver for its name refuses it rather than
+accepting a name nothing checked. The compiler core links no
+Unicode data, so the parser decides ASCII itself and takes an `ID_Start`
+and `ID_Continue` classifier from its caller; a group name or non-unicode
+identity escape outside ASCII is refused instead of guessed. Capture count,
+nesting depth, quantifier bound, and pattern length have reviewed limits
+that report an owned `limit` error rather than exhausting a host stack.
+
+Focused parser, validator, printer, limit, extension, and frontend
+diagnostic evidence covers every early error the grammar defines with its
+exact message and span. Generated evidence at seeds `0x60004a00` and
+`0x60004a01` keeps a structured pattern model until it prints source; the
+host engine is an independent oracle for validity, capture count, and group
+names, and a summary walk over the model is compared with one over the
+parsed tree. The invalid domain applies one mutation to a valid case and
+asserts the exact kind, section, and span it must produce, over pattern
+and flag violations alike. The generated domain found and fixed one defect: a
+surrogate pair escape joined into a supplementary code point without the `u`
+flag, which the grammar joins only under UnicodeMode. It is retained as a fixed
+regression case. Because the node admits no execution, it claims no language
+family, adds no reviewed test262 path, and needs no native, standards, or
+forced-collection evidence. The manifest stays at 11,364 paths with 8,397
+passes, 1,364 expected negatives, and 1,603 unsupported profile features; the
+68 reviewed rows whose recorded detail quoted the old literal diagnostic are
+regenerated with the new message, and no classification, phase, or capability
+moves. The runtime ABI does not move, and *docs/regexp-inventory.md* records
+the clause, directory, flag, prototype, symbol, Unicode, and diagnostic
+inventory that delivery item 1 requires. The reviewed `regular-expressions`
+dependency tag is not added: ADR 0013 freezes that vocabulary, and
+PLAN-REGEXP.md adds the tag with the first reviewed case that carries it.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

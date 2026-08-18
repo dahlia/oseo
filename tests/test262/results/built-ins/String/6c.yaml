@@ -42,7 +42,8 @@ results:
       detail: 'test/built-ins/String/prototype/endsWith/searchstring-is-regexp-throws.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/endsWith/searchstring-is-regexp-throws.js:93:20:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -69,7 +70,8 @@ results:
       detail: 'test/built-ins/String/prototype/matchAll/toString-this-val.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/matchAll/toString-this-val.js:95:14:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

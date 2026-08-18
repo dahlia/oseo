@@ -4,11 +4,19 @@ Regular expression plan
 Status
 ------
 
-Implementation status: planned, design and probe work not started. This plan
-defines the M5 semantic and compilation boundary for ECMAScript regular
-expressions. It does not admit regular expression literals or the `RegExp`
-family to the active language profile, select one matcher strategy, or add a
-repository command before implementation evidence exists.
+Implementation status: delivery items 1 and 2 landed; matcher, intrinsic, and
+probe work not started. This plan defines the M5 semantic and compilation
+boundary for ECMAScript regular expressions. It does not admit regular
+expression literals or the `RegExp` family to the active language profile,
+select one matcher strategy, or add a repository command before
+implementation evidence exists.
+
+The owned pattern AST, parser, validator, limits, extension points, and
+structural dump live in `@oseo/compiler`, and the frontend validates a
+literal's retained pattern and flag text there.
+[*docs/regexp-inventory.md*](./docs/regexp-inventory.md) is the delivery
+item 1 inventory. Nothing evaluates a pattern, so a valid literal still
+reports the profile boundary.
 
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
@@ -118,7 +126,10 @@ profile update must state exactly which checkpoints are observable.
 The frontend records the literal pattern text, flag text, and source range
 without retaining a bootstrap-parser node. It validates the flag set and
 pattern grammar for the candidate edition before HIR construction. Invalid
-literal patterns are early errors at their original source location.
+literal patterns are early errors at their original source location. That
+much is implemented: `parseRegExpLiteral` consumes the owned record, and a
+rejected pattern reports `OSEO0001` at the offending text inside the
+literal while a valid one reports the profile boundary at the literal.
 
 Each evaluation allocates a distinct initialized `RegExp` object. Repeated
 evaluation of one source occurrence and evaluation of two equal occurrences
@@ -151,7 +162,15 @@ or conversion can be observed.
 ### Pattern and flag behavior
 
 The owned pattern grammar covers every regular expression construct and flag in
-the candidate edition. The initial inventory includes:
+the candidate edition. The parser and validator implement the main-body
+grammar for every construct below except class set notation, which has no
+owned representation yet, and it recognizes and refuses that notation,
+inline modifiers, and Unicode property escapes with located `unsupported`
+errors rather than early errors. The last two are admitted through named
+extension points once a caller owns their semantics. Annex B is outside the
+claim, so a construct only Annex B admits is rejected without the `u` flag
+too, which *docs/regexp-inventory.md* lists exactly. The initial inventory
+includes:
 
  -  alternatives, sequences, assertions, greedy and non-greedy quantifiers;
  -  character escapes, classes, class set notation, and Unicode properties;
@@ -425,7 +444,25 @@ Property and differential evidence
 Regular expression properties extend [*PLAN-PT.md*](./PLAN-PT.md). They keep a
 structured pattern model until printing so shrinking can preserve capture
 indices, group names, assertion direction, Unicode mode, and reference
-validity.
+validity. The pattern domain exists at seeds `0x60004a00` and `0x60004a01`.
+Until a matcher exists it observes structure rather than match state: the
+host engine decides validity and reports its own capture count and group
+names, and a summary walk over the model is compared with one over the
+parsed tree. Pattern characters already cover the empty pattern, ASCII,
+syntax characters, embedded NUL, non-ASCII BMP code points, lone
+surrogates, and supplementary code points; the match-input half of the
+domain lands with the matcher that consumes it.
+
+The invalid domain applies one mutation to a valid case and asserts the
+exact error kind, section, and span. Its mutations cover escapes, class
+ranges, quantifier bounds, a quantifier without an atom, group names,
+numbered and named references, an unadmitted property escape, an
+unadmitted class set, a repeated flag, an undefined flag, and incompatible
+`u` and `v` flags. The host is a one-directional oracle, since it
+implements Annex B and this grammar does not, so host agreement is
+required for a flag error and for a pattern error under a unicode-mode
+flag, and never for an unadmitted construct, which is valid ECMAScript
+this unit refuses on purpose.
 
 The valid generator starts with a bounded candidate-edition grammar. It
 constructs alternatives, sequences, quantifiers, classes, assertions,
@@ -504,9 +541,17 @@ Delivery order
 1.  Inventory the ECMAScript 2025 clauses, test262 directories, flags,
     prototypes, symbol hooks, Unicode inputs, and current parser diagnostics.
     Extend the manifest dependency vocabulary without changing classifications.
+    Landed, in [*docs/regexp-inventory.md*](./docs/regexp-inventory.md),
+    except the `regular-expressions` dependency tag: ADR 0013 freezes that
+    vocabulary, no reviewed path selects a regular expression case yet, and
+    the tag lands with the first case that carries it.
 2.  Define an Oseo-owned pattern AST, parser contract, validator, and bounded
     generated pattern model. Retain literal text and flags at the frontend
-    boundary without admitting execution.
+    boundary without admitting execution. Landed. The parser reports one
+    located error per rejected construct, separating an early error from an
+    unadmitted construct and from an owned resource limit, and the generated
+    domain at seeds `0x60004a00` and `0x60004a01` keeps the structured model
+    until it prints source.
 3.  Implement and test a generic matcher artifact and executor for the complete
     admitted pattern grammar. Freeze its choice, capture, Unicode, and resource
     behavior before adding native literal lowering.

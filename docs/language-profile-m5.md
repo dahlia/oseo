@@ -3854,9 +3854,19 @@ complete. The remaining gaps retain their existing owners.
     those facilities or another unimplemented intrinsic remain
     `unsupported-profile-feature` instead of borrowing a partial M5a result.
     [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns the remaining checkpoint.
- -  Regular expression syntax, objects, matching, and ahead-of-time literal
+ -  Regular expression objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
-    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). Literal syntax is no longer
+    rejected as a whole: the frontend records a literal's pattern text,
+    flag text, and range as an owned value and validates it with the owned
+    pattern parser, so an invalid pattern or flag set is an early error at
+    the offending text, a construct a later unit owns is refused where it
+    appears, and only a valid pattern reports one profile boundary at the
+    literal. Nothing evaluates a pattern, and no reviewed test262 path
+    covers the family yet.
+    [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
+    directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
+    including the Annex B constructs this grammar rejects in every mode.
  -  `import.meta`, `export var`, and namespace re-exports such as
     `export * as ns from "./module.js"` remain rejected with source-located
     diagnostics. Reviewed test262 cases carrying
