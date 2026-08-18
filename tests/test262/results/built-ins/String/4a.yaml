@@ -84,7 +84,8 @@ results:
       detail: 'test/built-ins/String/prototype/split/argument-is-regexp-s-and-instance-is-string-a-b-c-de-f.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/split/argument-is-regexp-s-and-instance-is-string-a-b-c-de-f.js:90:12:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

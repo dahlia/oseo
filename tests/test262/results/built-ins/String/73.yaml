@@ -84,7 +84,8 @@ results:
       detail: 'test/built-ins/String/prototype/matchAll/regexp-get-matchAll-throws.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/matchAll/regexp-get-matchAll-throws.js:91:14:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -110,7 +111,8 @@ results:
       detail: 'test/built-ins/String/prototype/matchAll/regexp-prototype-get-matchAll-throws.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-get-matchAll-throws.js:96:15:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

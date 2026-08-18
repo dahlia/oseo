@@ -82,7 +82,8 @@ results:
       detail: 'test/built-ins/String/prototype/includes/return-abrupt-from-searchstring-regexp-test.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/includes/return-abrupt-from-searchstring-regexp-test.js:108:14:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -106,7 +107,8 @@ results:
       detail: 'test/built-ins/String/prototype/search/S15.5.4.12_A3_T1.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/search/S15.5.4.12_A3_T1.js:91:20:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

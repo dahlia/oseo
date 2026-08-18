@@ -46,6 +46,7 @@ import {
 } from "./babel.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
 import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
+import { regExpLiteral } from "./regexp-literal.ts";
 
 /**
  * The this mode of the environment a `this` expression at the current
@@ -708,6 +709,7 @@ export function expression(
     return { ...located, kind: "boolean", value: value.value };
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
+  if (value.type === "RegExpLiteral") return regExpLiteral(context, value);
   if (value.type === "ThisExpression") {
     return { ...located, kind: "this", thisMode: currentThisMode(context) };
   }

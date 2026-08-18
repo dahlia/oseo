@@ -296,3 +296,7 @@ families:
     owner: tests/property/m5-number-prototype.property.test.ts
     start: 0x60004900
     end: 0x600049ff
+  - family: m5-regexp-pattern
+    owner: tests/property/m5-regexp-pattern.property.test.ts
+    start: 0x60004a00
+    end: 0x60004aff
