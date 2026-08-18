@@ -10,5 +10,5 @@ inventory:
 dependencies:
   - number-intrinsic
   - string-intrinsic
-landed: false
+landed: true
 status: ready
