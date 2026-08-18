@@ -4177,6 +4177,62 @@ no semantic, harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema, and zero-override policy are
 unchanged.
 
+M5b node `string-prototype-replace` implements the materialized prototype's
+`replace` and `replaceAll` functions. `replace` leaves the
+unadmitted-method placeholder list, and `replaceAll` becomes an own property
+of `%String.prototype%` for the first time. Both observe their search
+operand only when it is an Object, which then receives a `Symbol.replace`
+lookup; a callable method is called on the operand with the original
+receiver and the original replacer as exactly two arguments. `replaceAll`
+first applies `IsRegExp` to an Object operand and, for a true `@@match`
+result, requires an object-coercible `flags` value containing `g` before the
+lookup. A primitive operand, a missing operand, and a nullish method take
+the String fallback.
+
+The fallback converts the receiver, then the search value, then a
+non-callable replacer, and matches UTF-16 code units. `replace` substitutes
+the first occurrence. `replaceAll` substitutes every nonoverlapping
+occurrence, advancing by one code unit for an empty search string, so an
+empty search inserts the replacement before every code unit and once after
+the last. A callable replacer is never converted, receives the matched text,
+its position, and the whole subject, and has its result converted through
+`ToString`. A String replacer runs through GetSubstitution, where `$$`,
+`` $` ``, `$&`, and `$'` substitute and substituted text is not rescanned.
+Both callers supply an empty capture list and an undefined named-capture
+object, so `$1` through `$99` and `$<name>` have no referent and copy their
+reference text unchanged; the RegExp nodes that introduce captures extend
+that operation.
+
+Observing the operand only when it is an Object is the current
+specification and the behavior the pinned suite revision asserts. The
+pinned Node.js reference host still performs the older unconditional
+lookup while the pinned Deno host does not, so that observation is carried
+by the reviewed test262 cases rather than by a fixed differential fixture,
+which requires both reference hosts to agree.
+
+Fixed native and generated differential evidence at seeds `0x60004b00` and
+`0x60004b01` covers primitive, wrapper, and generic receivers, both symbol
+dispatches, null, non-callable, and abruptly read methods, every
+GetSubstitution reference form against subjects that contain `$`,
+functional replacers with their arguments and abrupt results, empty
+searches and subjects, overlapping candidates, lone surrogates,
+`replaceAll`'s `IsRegExp` and `flags` observations with their abrupt forms,
+`replace`'s absence of those observations, nullish and Symbol receivers,
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard misses, and generic fallback.
+
+All 100 paths under the node's two inventory roots are reviewed: 52 pass and
+48 retain explicit prerequisite boundaries for RegExp objects and patterns,
+the `Function` constructor, `Reflect.construct`, and unadmitted wrapper
+receivers. No previously reviewed path changes classification. The combined
+manifest reaches 11,464 cases: 8,449 passes, 1,364 expected negatives, and
+1,651 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. The admitted
+runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-72` without
+adding a generated-code entry point or changing the graph's orchestration
+state.
+
 
 Known gaps inside the claim
 ---------------------------

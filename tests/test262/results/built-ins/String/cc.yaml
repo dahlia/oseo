@@ -1,0 +1,28 @@
+group: built-ins/String
+key: cc
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T14.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/replace/S15.5.4.11_A1_T14.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/replace/S15.5.4.11_A1_\
+        T14.js:85:17: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

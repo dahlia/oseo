@@ -605,6 +605,7 @@ test("populates the realm-owned String intrinsic cluster", () => {
   const internalHeader = sources.get("runtime_internal.h") ?? "";
   const bindingSource = sources.get("runtime_binding.c") ?? "";
   const stringSource = sources.get("runtime_string.c") ?? "";
+  const matchSource = sources.get("runtime_string_match.c") ?? "";
   const memorySource = sources.get("runtime_memory.c") ?? "";
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
   const primitiveSource = sources.get("runtime_primitive.c") ?? "";
@@ -635,6 +636,8 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "match",
     "matchAll",
     "raw",
+    "replace",
+    "replaceAll",
     "search",
     "slice",
     "split",
@@ -668,6 +671,8 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_MATCH_ALL_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SEARCH_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_SPLIT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_REPLACE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_REPLACE_ALL_CODE_ID/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT/u);
   assert.match(internalHeader, /bool regexp_string_iterator;/u);
@@ -693,6 +698,22 @@ test("populates the realm-owned String intrinsic cluster", () => {
   // Object.prototype.toString reads the [[StringData]] brand instead of
   // reporting a plain object.
   assert.match(primitiveSource, /oseo_internal_string_data/u);
+  // replace and replaceAll dispatch through Symbol.replace, share the
+  // GetSubstitution body, and reach the functional replacer through the
+  // ordinary call path rather than a generated-code entry point.
+  assert.match(matchSource, /OSEO_WELL_KNOWN_REPLACE/u);
+  assert.match(matchSource, /string_require_global_flags/u);
+  assert.match(
+    matchSource,
+    /string_replace\([\s\S]*string_protocol_method[\s\S]*match_subject/u,
+  );
+  assert.match(
+    matchSource,
+    /string_replace\([\s\S]*oseo_call_function[\s\S]*replace_substitution/u,
+  );
+  assert.doesNotMatch(header, /oseo_string_replace/u);
+  // The unadmitted-method placeholder no longer covers either name.
+  assert.doesNotMatch(stringSource, /unadmitted_names\[\] = \{[^}]*"replace"/u);
 });
 
 test("populates the realm-owned Map intrinsic cluster", () => {

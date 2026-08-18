@@ -63,6 +63,58 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Symbol.replace
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-bigint-primitive.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-\
+        bigint-primitive.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/String/prototype/replaceAll/cstm-replac\
+        eall-on-bigint-primitive.js:94:23: error[OSEO1001]: Unknown
+        binding 'BigInt'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - String.prototype.replaceAll
+        - Symbol.replace
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024NN.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: 'test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024NN.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024NN.js:139:16:
+        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
