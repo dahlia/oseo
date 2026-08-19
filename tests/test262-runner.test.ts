@@ -47,6 +47,10 @@ interface ReportedDescriptor {
   readonly writable: boolean;
 }
 
+interface PropertyHelperOwner {
+  readonly name?: unknown;
+}
+
 function successfulResult(): CliResult {
   return { exitStatus: 0, stderr: "", stdout: "" };
 }
@@ -499,7 +503,7 @@ test("property helper checks behavior beyond reported flags", async () => {
       Object: {
         defineProperty: Object.defineProperty,
         getOwnPropertyDescriptor(
-          object: object,
+          object: PropertyHelperOwner,
           name: PropertyKey,
         ): PropertyDescriptor | undefined {
           const actual = Object.getOwnPropertyDescriptor(object, name);
