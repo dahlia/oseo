@@ -23,6 +23,7 @@ import type {
   Diagnostic,
   SpecializationMode,
 } from "../packages/compiler/src/index.ts";
+import { parsedObject as record } from "./structured-data.ts";
 import {
   createFileModuleLoader,
   createNodeHost,
@@ -247,13 +248,6 @@ export function asyncObservationCompleted(stdout: string): boolean {
     lines.filter((line) => line === asyncCompletionMarker).length === 1 &&
     !lines.some((line) => line.startsWith(asyncFailureMarker))
   );
-}
-
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
 }
 
 function stringValue(value: unknown, description: string): string {

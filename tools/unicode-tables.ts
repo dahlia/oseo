@@ -37,6 +37,7 @@ import type {
   CodePointSet,
 } from "../packages/unicode/src/set.ts";
 import type { ConditionalCaseMapping } from "../packages/unicode/src/model.ts";
+import { parsedMapping as record } from "./structured-data.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageDirectory = "packages/unicode";
@@ -167,13 +168,6 @@ export interface PinnedInputManifest {
   readonly license: PinnedInput & { readonly identifier: string };
   readonly unicodeVersion: string;
   readonly version: number;
-}
-
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
 }
 
 function text(value: unknown, description: string): string {

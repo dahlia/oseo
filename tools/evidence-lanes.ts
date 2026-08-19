@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import {
+  parsedMapping as record,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
+
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
 export const evidenceIndexDirectory = "docs/language-profile-m5/index";
@@ -34,15 +39,8 @@ export interface EvidenceInventorySummary {
 
 export type EvidenceSourceReader = (path: string) => string;
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
 function requireExactKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -106,7 +104,7 @@ function checkReference(
 function parseSource(
   source: EvidenceSource,
   context: string,
-): Record<string, unknown> {
+): StructuredDataRecord {
   let value: unknown;
   try {
     value = parseYaml(source.text) as unknown;

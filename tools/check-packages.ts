@@ -32,11 +32,11 @@ interface CommandResult {
 }
 
 interface PackageManifest {
-  readonly dependencies?: Readonly<Record<string, unknown>>;
-  readonly devDependencies?: Readonly<Record<string, unknown>>;
+  readonly dependencies?: Readonly<Record<string, string>>;
+  readonly devDependencies?: Readonly<Record<string, string>>;
   readonly name?: unknown;
-  readonly optionalDependencies?: Readonly<Record<string, unknown>>;
-  readonly peerDependencies?: Readonly<Record<string, unknown>>;
+  readonly optionalDependencies?: Readonly<Record<string, string>>;
+  readonly peerDependencies?: Readonly<Record<string, string>>;
   readonly version?: unknown;
 }
 
@@ -157,9 +157,9 @@ function requireReleaseDependencies(
 }
 
 function releaseDependencies(
-  dependencies: Readonly<Record<string, unknown>> | undefined,
+  dependencies: Readonly<Record<string, string>> | undefined,
   version: string,
-): Readonly<Record<string, unknown>> | undefined {
+): Readonly<Record<string, string>> | undefined {
   if (dependencies == null) return undefined;
   return Object.fromEntries(
     Object.entries(dependencies).map(([name, range]) => {

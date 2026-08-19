@@ -24,10 +24,10 @@ interface PackageManifest {
   readonly name?: unknown;
   readonly private?: unknown;
   readonly version?: unknown;
-  readonly dependencies?: Readonly<Record<string, unknown>>;
-  readonly devDependencies?: Readonly<Record<string, unknown>>;
-  readonly optionalDependencies?: Readonly<Record<string, unknown>>;
-  readonly peerDependencies?: Readonly<Record<string, unknown>>;
+  readonly dependencies?: Readonly<Record<string, string>>;
+  readonly devDependencies?: Readonly<Record<string, string>>;
+  readonly optionalDependencies?: Readonly<Record<string, string>>;
+  readonly peerDependencies?: Readonly<Record<string, string>>;
 }
 
 interface LoadedManifest {

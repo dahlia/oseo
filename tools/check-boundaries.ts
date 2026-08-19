@@ -5,6 +5,8 @@ import { readFile, readdir } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import type { StructuredDataValue } from "./structured-data.ts";
+
 interface Manifest {
   readonly dependencies?: Readonly<Record<string, string>>;
   readonly optionalDependencies?: Readonly<Record<string, string>>;
@@ -48,8 +50,8 @@ const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
 ]);
 
 interface SyntaxNode {
-  readonly [key: string]: unknown;
-  readonly type?: unknown;
+  readonly [key: string]: StructuredDataValue | undefined;
+  readonly type?: StructuredDataValue;
 }
 
 function syntaxNode(value: unknown): SyntaxNode | undefined {

@@ -21,12 +21,13 @@ import {
   verifyPinnedInput,
 } from "../tools/unicode-tables.ts";
 import type { PinnedInputManifest } from "../tools/unicode-tables.ts";
+import type { StructuredDataRecord } from "../tools/structured-data.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageRoot = join(repositoryRoot, "packages/unicode");
 
 function manifestFixture(
-  overrides: Readonly<Record<string, unknown>> = {},
+  overrides: Readonly<StructuredDataRecord> = {},
 ): string {
   return JSON.stringify({
     emojiVersion: "17.0",

@@ -4,6 +4,11 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import {
+  parsedMapping as record,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
+
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
 /** The checked-in graph document, holding everything not owned by a node. */
@@ -68,15 +73,8 @@ export interface WorkGraphSummary {
   readonly ready: number;
 }
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
 function requireExactKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -144,7 +142,7 @@ function sortedUniqueStrings(
 function parseSource(
   source: WorkGraphSource,
   context: string,
-): Record<string, unknown> {
+): StructuredDataRecord {
   let value: unknown;
   try {
     value = parseYaml(source.text) as unknown;

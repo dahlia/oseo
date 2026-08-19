@@ -19,8 +19,17 @@ export interface BabelComment {
   readonly value?: string;
 }
 
+type BabelNodeValue =
+  | BabelComment
+  | BabelNode
+  | readonly BabelNodeValue[]
+  | boolean
+  | null
+  | number
+  | string;
+
 export interface BabelNode {
-  readonly [key: string]: unknown;
+  readonly [key: string]: BabelNodeValue | undefined;
   readonly end?: number;
   readonly leadingComments?: readonly BabelComment[];
   readonly start?: number;

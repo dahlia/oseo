@@ -12,6 +12,8 @@ import type {
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
 
+import { parsedObject as record } from "./structured-data.ts";
+
 const classifications = new Set<Test262Classification>([
   "expected-negative",
   "harness-failure",
@@ -49,13 +51,6 @@ interface ManifestPartitionReference {
   readonly group: string;
   readonly key: string;
   readonly path: string;
-}
-
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
 }
 
 function stringValue(value: unknown, description: string): string {

@@ -15,6 +15,10 @@ import {
   currentEvidenceFamilyIds,
   validatedEvidenceFamilyIdsFromTree,
 } from "./evidence-lanes.ts";
+import {
+  parsedMapping as record,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
@@ -118,13 +122,6 @@ export type BaselineIntent =
   | { readonly kind: "merge-base-main" }
   | { readonly kind: "skip"; readonly reason: string };
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
 function stringValue(value: unknown, context: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
@@ -146,7 +143,7 @@ function transitionValue(value: unknown, context: string): number | string {
 }
 
 function requireKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -237,10 +234,29 @@ function parseResults(
   return results;
 }
 
-type AstNode = Record<string, unknown> & { readonly type: string };
+type AstValue =
+  | AstRecord
+  | readonly AstValue[]
+  | boolean
+  | null
+  | number
+  | string;
+
+interface AstRecord {
+  readonly [key: string]: AstValue | undefined;
+}
+
+type AstNode = AstRecord & { readonly type: string };
+
+function astRecord(value: unknown, context: string): AstRecord {
+  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${context} must be an AST record.`);
+  }
+  return value as AstRecord;
+}
 
 function astNode(value: unknown, context: string): AstNode {
-  const node = record(value, context);
+  const node = astRecord(value, context);
   if (typeof node.type !== "string") {
     throw new Error(`${context} must be an AST node.`);
   }
@@ -309,8 +325,8 @@ function staticString(expression: AstNode, context: string): string {
     Array.isArray(value.quasis) &&
     value.quasis.length === 1
   ) {
-    const quasi = record(value.quasis[0], `${context} template element`);
-    const templateValue = record(
+    const quasi = astRecord(value.quasis[0], `${context} template element`);
+    const templateValue = astRecord(
       quasi.value,
       `${context} template element value`,
     );
@@ -432,7 +448,7 @@ function parsePropertyAllocations(
         return;
       }
       if (value == null || typeof value !== "object") return;
-      const node = value as Record<string, unknown>;
+      const node = value as AstRecord;
       if (node.type === "VariableDeclarator" && node.init != null) {
         const name = astNode(node.id, `${source.path} variable name`);
         if (name.type === "Identifier" && typeof name.name === "string") {
@@ -455,7 +471,7 @@ function parsePropertyAllocations(
         return;
       }
       if (value == null || typeof value !== "object") return;
-      const rawNode = value as Record<string, unknown>;
+      const rawNode = value as AstRecord;
       if (rawNode.type === "CallExpression") {
         const node = astNode(rawNode, `${source.path} call`);
         const target = unwrapExpression(

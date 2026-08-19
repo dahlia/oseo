@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import { parsedObject as record } from "./structured-data.ts";
+
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const policyPath = join(repositoryRoot, "tests/test262/inventory-policy.yaml");
 const inventoryPath = join(repositoryRoot, "tests/test262/inventory.tsv");
@@ -55,13 +57,6 @@ export interface Test262InventorySummary {
   readonly excluded: number;
   readonly featurelessIncluded: number;
   readonly included: number;
-}
-
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
 }
 
 function stringValue(value: unknown, description: string): string {
