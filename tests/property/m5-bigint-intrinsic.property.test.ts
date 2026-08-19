@@ -174,12 +174,12 @@ function operand(testCase: BigIntIntrinsicCase): ModelInteger {
   };
 }
 
-const parsePrefixes: Readonly<Record<number, string>> = {
+const parsePrefixes = {
   2: "0b",
   8: "0o",
   10: "",
   16: "0x",
-};
+} as const;
 
 function printCase(testCase: BigIntIntrinsicCase): string {
   const value = operand(testCase);
