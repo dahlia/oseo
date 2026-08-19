@@ -1,0 +1,29 @@
+group: built-ins/BigInt
+key: a8
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/BigInt/wrapper-object-ordinary-toprimitive.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - bigint-primitive
+      - object-properties
+    observation:
+      detail: "test/built-ins/BigInt/wrapper-object-ordinary-toprimitive.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/BigInt/wrapper-object-ordinary-toprimit\
+        ive.js:140:38: error[OSEO1001]: Unknown binding 'Date'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

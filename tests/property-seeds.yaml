@@ -300,3 +300,7 @@ families:
     owner: tests/property/m5-regexp-pattern.property.test.ts
     start: 0x60004a00
     end: 0x60004aff
+  - family: m5-bigint-intrinsic
+    owner: tests/property/m5-bigint-intrinsic.property.test.ts
+    start: 0x60004b00
+    end: 0x60004bff

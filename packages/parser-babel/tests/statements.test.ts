@@ -833,7 +833,6 @@ test("rejects typeof of an unimplemented standard global name", () => {
     "console.log(typeof Math);",
     "console.log(typeof JSON);",
     "console.log(typeof RegExp);",
-    "console.log(typeof BigInt);",
     "console.log(typeof eval);",
     "console.log(typeof globalThis);",
     "console.log(typeof parseInt);",

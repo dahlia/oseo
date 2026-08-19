@@ -1,0 +1,29 @@
+group: built-ins/BigInt
+key: "90"
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Reflect.construct
+        - arrow-function
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/BigInt/is-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - bigint-primitive
+      - object-literals
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

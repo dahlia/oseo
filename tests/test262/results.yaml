@@ -1532,6 +1532,210 @@ partitions:
   - group: built-ins/AsyncIteratorPrototype
     key: ec
     path: results/built-ins/AsyncIteratorPrototype/ec.yaml
+  - group: built-ins/BigInt
+    key: "01"
+    path: results/built-ins/BigInt/01.yaml
+  - group: built-ins/BigInt
+    key: "03"
+    path: results/built-ins/BigInt/03.yaml
+  - group: built-ins/BigInt
+    key: "04"
+    path: results/built-ins/BigInt/04.yaml
+  - group: built-ins/BigInt
+    key: 0b
+    path: results/built-ins/BigInt/0b.yaml
+  - group: built-ins/BigInt
+    key: 0d
+    path: results/built-ins/BigInt/0d.yaml
+  - group: built-ins/BigInt
+    key: "10"
+    path: results/built-ins/BigInt/10.yaml
+  - group: built-ins/BigInt
+    key: "11"
+    path: results/built-ins/BigInt/11.yaml
+  - group: built-ins/BigInt
+    key: "15"
+    path: results/built-ins/BigInt/15.yaml
+  - group: built-ins/BigInt
+    key: "17"
+    path: results/built-ins/BigInt/17.yaml
+  - group: built-ins/BigInt
+    key: "18"
+    path: results/built-ins/BigInt/18.yaml
+  - group: built-ins/BigInt
+    key: 1a
+    path: results/built-ins/BigInt/1a.yaml
+  - group: built-ins/BigInt
+    key: 1e
+    path: results/built-ins/BigInt/1e.yaml
+  - group: built-ins/BigInt
+    key: "21"
+    path: results/built-ins/BigInt/21.yaml
+  - group: built-ins/BigInt
+    key: "22"
+    path: results/built-ins/BigInt/22.yaml
+  - group: built-ins/BigInt
+    key: "23"
+    path: results/built-ins/BigInt/23.yaml
+  - group: built-ins/BigInt
+    key: "28"
+    path: results/built-ins/BigInt/28.yaml
+  - group: built-ins/BigInt
+    key: "29"
+    path: results/built-ins/BigInt/29.yaml
+  - group: built-ins/BigInt
+    key: 2b
+    path: results/built-ins/BigInt/2b.yaml
+  - group: built-ins/BigInt
+    key: "35"
+    path: results/built-ins/BigInt/35.yaml
+  - group: built-ins/BigInt
+    key: "38"
+    path: results/built-ins/BigInt/38.yaml
+  - group: built-ins/BigInt
+    key: 3a
+    path: results/built-ins/BigInt/3a.yaml
+  - group: built-ins/BigInt
+    key: 3e
+    path: results/built-ins/BigInt/3e.yaml
+  - group: built-ins/BigInt
+    key: "42"
+    path: results/built-ins/BigInt/42.yaml
+  - group: built-ins/BigInt
+    key: "43"
+    path: results/built-ins/BigInt/43.yaml
+  - group: built-ins/BigInt
+    key: "44"
+    path: results/built-ins/BigInt/44.yaml
+  - group: built-ins/BigInt
+    key: "46"
+    path: results/built-ins/BigInt/46.yaml
+  - group: built-ins/BigInt
+    key: 4d
+    path: results/built-ins/BigInt/4d.yaml
+  - group: built-ins/BigInt
+    key: 4f
+    path: results/built-ins/BigInt/4f.yaml
+  - group: built-ins/BigInt
+    key: "56"
+    path: results/built-ins/BigInt/56.yaml
+  - group: built-ins/BigInt
+    key: "57"
+    path: results/built-ins/BigInt/57.yaml
+  - group: built-ins/BigInt
+    key: 5d
+    path: results/built-ins/BigInt/5d.yaml
+  - group: built-ins/BigInt
+    key: 5e
+    path: results/built-ins/BigInt/5e.yaml
+  - group: built-ins/BigInt
+    key: 5f
+    path: results/built-ins/BigInt/5f.yaml
+  - group: built-ins/BigInt
+    key: "62"
+    path: results/built-ins/BigInt/62.yaml
+  - group: built-ins/BigInt
+    key: "63"
+    path: results/built-ins/BigInt/63.yaml
+  - group: built-ins/BigInt
+    key: "64"
+    path: results/built-ins/BigInt/64.yaml
+  - group: built-ins/BigInt
+    key: "69"
+    path: results/built-ins/BigInt/69.yaml
+  - group: built-ins/BigInt
+    key: "72"
+    path: results/built-ins/BigInt/72.yaml
+  - group: built-ins/BigInt
+    key: "76"
+    path: results/built-ins/BigInt/76.yaml
+  - group: built-ins/BigInt
+    key: "79"
+    path: results/built-ins/BigInt/79.yaml
+  - group: built-ins/BigInt
+    key: "89"
+    path: results/built-ins/BigInt/89.yaml
+  - group: built-ins/BigInt
+    key: "90"
+    path: results/built-ins/BigInt/90.yaml
+  - group: built-ins/BigInt
+    key: "95"
+    path: results/built-ins/BigInt/95.yaml
+  - group: built-ins/BigInt
+    key: a0
+    path: results/built-ins/BigInt/a0.yaml
+  - group: built-ins/BigInt
+    key: a4
+    path: results/built-ins/BigInt/a4.yaml
+  - group: built-ins/BigInt
+    key: a5
+    path: results/built-ins/BigInt/a5.yaml
+  - group: built-ins/BigInt
+    key: a8
+    path: results/built-ins/BigInt/a8.yaml
+  - group: built-ins/BigInt
+    key: ab
+    path: results/built-ins/BigInt/ab.yaml
+  - group: built-ins/BigInt
+    key: ac
+    path: results/built-ins/BigInt/ac.yaml
+  - group: built-ins/BigInt
+    key: b2
+    path: results/built-ins/BigInt/b2.yaml
+  - group: built-ins/BigInt
+    key: b4
+    path: results/built-ins/BigInt/b4.yaml
+  - group: built-ins/BigInt
+    key: b5
+    path: results/built-ins/BigInt/b5.yaml
+  - group: built-ins/BigInt
+    key: b6
+    path: results/built-ins/BigInt/b6.yaml
+  - group: built-ins/BigInt
+    key: c2
+    path: results/built-ins/BigInt/c2.yaml
+  - group: built-ins/BigInt
+    key: cb
+    path: results/built-ins/BigInt/cb.yaml
+  - group: built-ins/BigInt
+    key: cc
+    path: results/built-ins/BigInt/cc.yaml
+  - group: built-ins/BigInt
+    key: d7
+    path: results/built-ins/BigInt/d7.yaml
+  - group: built-ins/BigInt
+    key: da
+    path: results/built-ins/BigInt/da.yaml
+  - group: built-ins/BigInt
+    key: de
+    path: results/built-ins/BigInt/de.yaml
+  - group: built-ins/BigInt
+    key: df
+    path: results/built-ins/BigInt/df.yaml
+  - group: built-ins/BigInt
+    key: e2
+    path: results/built-ins/BigInt/e2.yaml
+  - group: built-ins/BigInt
+    key: e3
+    path: results/built-ins/BigInt/e3.yaml
+  - group: built-ins/BigInt
+    key: e5
+    path: results/built-ins/BigInt/e5.yaml
+  - group: built-ins/BigInt
+    key: ed
+    path: results/built-ins/BigInt/ed.yaml
+  - group: built-ins/BigInt
+    key: f0
+    path: results/built-ins/BigInt/f0.yaml
+  - group: built-ins/BigInt
+    key: f5
+    path: results/built-ins/BigInt/f5.yaml
+  - group: built-ins/BigInt
+    key: fb
+    path: results/built-ins/BigInt/fb.yaml
+  - group: built-ins/BigInt
+    key: fd
+    path: results/built-ins/BigInt/fd.yaml
   - group: built-ins/Error
     key: "02"
     path: results/built-ins/Error/02.yaml
@@ -8653,17 +8857,17 @@ summary:
   expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 8397
+  passes: 8468
   semanticFailures: 0
-  unsupportedProfileFeatures: 1603
+  unsupportedProfileFeatures: 1609
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 28
+      passes: 46
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 13
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -8689,9 +8893,9 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 117
+      passes: 178
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 28
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
@@ -8703,7 +8907,7 @@ summary:
       expectedNegatives: 225
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 485
+      passes: 489
       semanticFailures: 0
       unsupportedProfileFeatures: 41
     - dependency: default-parameters
@@ -8745,9 +8949,9 @@ summary:
       expectedNegatives: 124
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2003
+      passes: 2016
       semanticFailures: 0
-      unsupportedProfileFeatures: 535
+      unsupportedProfileFeatures: 540
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -8759,14 +8963,14 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1004
+      passes: 1005
       semanticFailures: 0
-      unsupportedProfileFeatures: 90
+      unsupportedProfileFeatures: 89
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 349
+      passes: 352
       semanticFailures: 0
       unsupportedProfileFeatures: 29
     - dependency: module-linking
@@ -8780,16 +8984,16 @@ summary:
       expectedNegatives: 12
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 370
+      passes: 385
       semanticFailures: 0
-      unsupportedProfileFeatures: 24
+      unsupportedProfileFeatures: 33
     - dependency: object-properties
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5524
+      passes: 5553
       semanticFailures: 0
-      unsupportedProfileFeatures: 899
+      unsupportedProfileFeatures: 890
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -8815,7 +9019,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 240
+      passes: 248
       semanticFailures: 0
       unsupportedProfileFeatures: 138
     - dependency: top-level-await
@@ -8829,9 +9033,9 @@ summary:
       expectedNegatives: 69
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 200
+      passes: 206
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 14
   groups:
     - group: built-ins/AggregateError
       expectedNegatives: 0
@@ -8882,6 +9086,13 @@ summary:
       passes: 4
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/BigInt
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 61
+      semanticFailures: 0
+      unsupportedProfileFeatures: 16
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -8963,9 +9174,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2281
+      passes: 2285
       semanticFailures: 0
-      unsupportedProfileFeatures: 431
+      unsupportedProfileFeatures: 427
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -8977,9 +9188,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 575
+      passes: 581
       semanticFailures: 0
-      unsupportedProfileFeatures: 167
+      unsupportedProfileFeatures: 161
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0

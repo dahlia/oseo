@@ -1101,9 +1101,17 @@ OseoResult oseo_internal_string_to_bigint(
     return result;
 }
 
+/*
+ * Lowercase digit characters for every radix ECMA-262 admits, so a
+ * value of 10 through 35 spells a through z.
+ */
+static const char bigint_digit_characters[] =
+    "0123456789abcdefghijklmnopqrstuvwxyz";
+
 static OseoResult bigint_string_rooted(
     OseoContext *context,
-    OseoValue value
+    OseoValue value,
+    uint32_t radix
 ) {
     OseoBigInt *integer = bigint_object(value);
     bool negative = integer->negative;
@@ -1111,11 +1119,12 @@ static OseoResult bigint_string_rooted(
     uint32_t *working = allocate_limbs(context, working_length, false);
     if (working == NULL) return allocation_failure(context);
     memcpy(working, integer->limbs, working_length * sizeof(uint32_t));
-    if (working_length > (SIZE_MAX - 2u) / 10u) {
-        free(working);
-        return failure(context, "OSEO2001", "BigInt text is too large.");
-    }
-    size_t capacity = working_length * 10u + 2u;
+    /*
+     * Every radix of at least two consumes one whole bit per digit, so
+     * the magnitude's bit length bounds the digit count, and the two
+     * extra bytes cover the zero digit and the sign.
+     */
+    size_t capacity = magnitude_bits(working, working_length) + 2u;
     char *reverse = oseo_internal_allocate_heap_bytes(context, capacity);
     if (reverse == NULL) {
         free(working);
@@ -1127,10 +1136,10 @@ static OseoResult bigint_string_rooted(
         for (size_t cursor = working_length; cursor > 0u; cursor -= 1u) {
             uint64_t current =
                 (remainder << BIGINT_BITS) | working[cursor - 1u];
-            working[cursor - 1u] = (uint32_t)(current / 10u);
-            remainder = current % 10u;
+            working[cursor - 1u] = (uint32_t)(current / radix);
+            remainder = current % radix;
         }
-        reverse[digits] = (char)('0' + remainder);
+        reverse[digits] = bigint_digit_characters[remainder];
         digits += 1u;
         working_length = normalized_length(working, working_length);
     } while (!(working_length == 1u && working[0] == 0u));
@@ -1169,10 +1178,150 @@ OseoResult oseo_internal_bigint_string(
     OseoContext *context,
     OseoValue value
 ) {
+    return oseo_internal_bigint_radix_string(context, value, 10u);
+}
+
+OseoResult oseo_internal_bigint_radix_string(
+    OseoContext *context,
+    OseoValue value,
+    uint32_t radix
+) {
+    if (radix < 2u || radix > 36u) {
+        return failure(context, "OSEO2001", "Invalid BigInt text radix.");
+    }
     OseoValue slot = value;
     OseoRootFrame frame = {NULL, &slot, 1u};
     oseo_roots_push(context, &frame);
-    OseoResult result = bigint_string_rooted(context, slot);
+    OseoResult result = bigint_string_rooted(context, slot, radix);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_bigint_from_integral_number(
+    OseoContext *context,
+    double number
+) {
+    if (number == 0.0) return small_bigint(context, false, 0u);
+    bool negative = number < 0.0;
+    double magnitude = negative ? -number : number;
+    int exponent = 0;
+    double fraction = frexp(magnitude, &exponent);
+    /*
+     * magnitude is fraction * 2**exponent with fraction in [0.5, 1), so
+     * the scaled significand is an exact integer and magnitude is
+     * significand * 2**(exponent - DBL_MANT_DIG). An integral magnitude
+     * below 2**DBL_MANT_DIG leaves that shift negative with the dropped
+     * low bits already zero, so the right shift stays exact.
+     */
+    uint64_t significand = (uint64_t)ldexp(fraction, DBL_MANT_DIG);
+    int shift = exponent - DBL_MANT_DIG;
+    if (shift < 0) {
+        significand >>= (unsigned)(-shift);
+        shift = 0;
+    }
+    size_t offset = (size_t)shift;
+    size_t length = (size_t)exponent / BIGINT_BITS + 1u;
+    uint32_t *limbs = allocate_limbs(context, length, true);
+    if (limbs == NULL) return allocation_failure(context);
+    for (unsigned index = 0u; index < 64u; index += 1u) {
+        if (((significand >> index) & UINT64_C(1)) == 0u) continue;
+        size_t bit = offset + index;
+        limbs[bit / BIGINT_BITS] |=
+            UINT32_C(1) << (bit % (size_t)BIGINT_BITS);
+    }
+    OseoResult result = publish_bigint(context, negative, limbs, length);
+    free(limbs);
+    return result;
+}
+
+/*
+ * Replace the width-bounded magnitude in `limbs` with 2**width minus
+ * itself, which the two's complement produces in place. The caller
+ * guarantees a nonzero input, so the increment never carries past the
+ * width.
+ */
+static void width_complement(
+    uint32_t *limbs,
+    size_t length,
+    size_t top_limb,
+    uint32_t top_mask
+) {
+    for (size_t index = 0u; index < length; index += 1u) {
+        limbs[index] = (~limbs[index]) & BIGINT_MASK;
+    }
+    limbs[top_limb] &= top_mask;
+    uint32_t carry = 1u;
+    for (size_t index = 0u; index < length && carry != 0u; index += 1u) {
+        uint32_t sum = limbs[index] + carry;
+        limbs[index] = sum & BIGINT_MASK;
+        carry = sum >> BIGINT_BITS;
+    }
+}
+
+static OseoResult bigint_as_width_rooted(
+    OseoContext *context,
+    OseoValue value,
+    double bits,
+    bool signed_result
+) {
+    const OseoBigInt *integer = bigint_object(value);
+    bool negative = integer->negative;
+    size_t source_bits = magnitude_bits(integer->limbs, integer->length);
+    if (bits == 0.0) return small_bigint(context, false, 0u);
+    if (bits > (double)source_bits) {
+        /*
+         * Every bit of the operand sits strictly below the sign bit of
+         * the requested width, so the signed result is the operand and
+         * the unsigned result is the operand whenever it is not
+         * negative. Neither needs 2**bits to exist.
+         */
+        if (signed_result || !negative) return normal(value);
+        if (bits > (double)BIGINT_MAX_BITS) return bigint_limit_error(context);
+    }
+    size_t width = (size_t)bits;
+    size_t top_limb = width / (size_t)BIGINT_BITS;
+    size_t top_bit = width % (size_t)BIGINT_BITS;
+    uint32_t top_mask = top_bit == 0u
+        ? 0u
+        : (uint32_t)((UINT32_C(1) << top_bit) - 1u);
+    size_t length = top_limb + 1u;
+    uint32_t *limbs = allocate_limbs(context, length, true);
+    if (limbs == NULL) return allocation_failure(context);
+    for (size_t index = 0u; index < length; index += 1u) {
+        limbs[index] = index < integer->length ? integer->limbs[index] : 0u;
+    }
+    limbs[top_limb] &= top_mask;
+    bool low_zero = normalized_length(limbs, length) == 1u && limbs[0] == 0u;
+    bool result_negative = false;
+    /*
+     * Both the unsigned wrap of a negative operand and the signed
+     * reading of a set sign bit are 2**width minus the current value,
+     * which the width-bounded two's complement produces without ever
+     * materializing 2**width itself.
+     */
+    bool complement = negative && !low_zero;
+    if (complement) width_complement(limbs, length, top_limb, top_mask);
+    if (signed_result && magnitude_bit(limbs, length, width - 1u)) {
+        width_complement(limbs, length, top_limb, top_mask);
+        result_negative = true;
+    }
+    OseoResult result =
+        publish_bigint(context, result_negative, limbs, length);
+    free(limbs);
+    return result;
+}
+
+OseoResult oseo_internal_bigint_as_width(
+    OseoContext *context,
+    OseoValue value,
+    double bits,
+    bool signed_result
+) {
+    OseoValue slot = value;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        bigint_as_width_rooted(context, slot, bits, signed_result);
     oseo_roots_pop(context, &frame);
     return result;
 }

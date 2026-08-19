@@ -2460,9 +2460,10 @@ passes, 1,128 to 1,167 expected negatives, and 519 to 559 unsupported profile
 features, with no semantic or harness failures.
 
 The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
-behavior, `BigInt.asIntN`, and `BigInt.asUintN` remain outside this M5a unit.
-They remain M5b work under [*PLAN-BIGINT.md*](../PLAN-BIGINT.md). Binary-data
-and atomic consumers also remain with their owning built-in families.
+behavior, `BigInt.asIntN`, and `BigInt.asUintN` are outside this M5a unit. The
+M5b `bigint-intrinsic` node recorded below admits them under
+[*PLAN-BIGINT.md*](../PLAN-BIGINT.md). Binary-data and atomic consumers remain
+with their owning built-in families.
 
 ### Delete expressions
 
@@ -3833,6 +3834,55 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-71` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
+M5b node `bigint-intrinsic` materializes the callable `BigInt` intrinsic,
+`%BigInt.prototype%`, branded wrapper objects, `asIntN`, `asUintN`, `toString`,
+`toLocaleString`, and `valueOf` over M5a's exact primitive. Calling `BigInt`
+applies `ToPrimitive` with the number hint once. An integral Number takes an
+exact `NumberToBigInt` branch; every other primitive takes the shared
+`ToBigInt` conversion, with the specified `TypeError`, `RangeError`, and
+`SyntaxError` order. The fixed-width statics convert their width through
+`ToIndex` before the operand and truncate through a width-bounded two's
+complement. An identity result never materializes `2**bits`.
+
+`BigInt` has a `[[Construct]]` slot, so class heritage and generic constructor
+selection observe `IsConstructor(BigInt)` as true. Every direct or derived
+construction throws `TypeError` before argument conversion, and generic
+`Array.from` and `Array.of` construction reaches that same rejection.
+
+`%BigInt.prototype%` is an ordinary object with no `[[BigIntData]]` slot. Its
+methods share one brand check that admits a BigInt primitive or branded wrapper
+and rejects the prototype itself and every other receiver. Radix conversion is
+exact from 2 through 36, and `toLocaleString` uses the base specification's
+fallback because ECMA-402 remains outside the profile. `Object.prototype`
+string tagging obtains `"BigInt"` through `Symbol.toStringTag`; overriding that
+property with a non-string correctly falls back to `"Object"`.
+
+The object model lives in *runtime\_bigint\_object.c* and reads no limb. The
+private *runtime\_bigint.c* operations retain exact integral-Number conversion,
+radix text, and fixed-width truncation behind `OseoValue`. Fixed and generated
+differential evidence covers both reference hosts, both specialization
+policies, forced collection, false hints, guard misses, mutable global binding
+behavior, the reviewed 65,536-bit resource ceiling, and deterministic
+allocation-attempt sweeps over result publication, Number conversion, radix
+staging buffers, wrappers, and partial intrinsic initialization. Each failed
+attempt is collected and retried to prove cleanup, stable identity, roots, and
+complete publication. The generated family uses seed `0x60004b00` in the
+reserved block through `0x60004bff` with an independent base-2^15 Number model.
+The runtime ABI moves to `oseo-runtime-m5-72`, and built-in code range index 14
+is
+allocated without a gap. No compiler IR or generated-code entry point changes.
+
+All 77 paths under *test/built-ins/BigInt/* are reviewed: 61 pass and 16 retain
+explicit boundaries. Eight need deferred non-BigInt primitive-wrapper methods,
+six need `Reflect.construct`, one needs realm creation, and one also reaches the
+unadmitted `Date` intrinsic. Four already-reviewed Object paths and six String
+paths outside that root also move from unsupported to pass. The complete
+manifest moves from 11,364 to 11,441 cases, from 8,397 to 8,468 passes, keeps
+1,364 expected negatives, and moves from 1,603 to 1,609 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3846,14 +3896,19 @@ owner. Unit 8.5o closes the sole M5a evidence gap from that audit, so M5a is
 complete. The remaining gaps retain their existing owners.
 
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
-    assignment, and update are admitted by M5a Unit 8.1a as recorded above.
-    `Object` now supplies collector-traced BigInt wrappers and a stable internal
-    prototype. The callable `BigInt` intrinsic, the prototype's standard
-    methods, and fixed-width conversions remain M5b work owned by the
-    intrinsics and built-in objects stream. Reviewed cases that also require
-    those facilities or another unimplemented intrinsic remain
-    `unsupported-profile-feature` instead of borrowing a partial M5a result.
-    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns the remaining checkpoint.
+    assignment, and update are admitted by M5a Unit 8.1a, and the callable
+    `BigInt` intrinsic, `BigInt.prototype`, branded wrappers, `toString`,
+    `toLocaleString`, `valueOf`, `asIntN`, and `asUintN` by the M5b
+    `bigint-intrinsic` node, both as recorded above. `Object` supplies
+    collector-traced BigInt wrappers whose ordinary `ToPrimitive` now reaches
+    the real prototype methods. What remains is the dependent-family
+    connection: typed arrays, `DataView`, `Atomics`, and `JSON` consume
+    `ToBigInt`, `asIntN`, and `asUintN` but keep their own object, buffer, and
+    concurrency prerequisites. `BigInt` now has the specified throwing
+    `[[Construct]]`, but reviewed cases that require the separately unadmitted
+    `Reflect.construct` namespace remain `unsupported-profile-feature` instead
+    of borrowing a partial result. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
+    delivery items 8 through 10.
  -  Regular expression objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). Literal syntax is no longer
@@ -3899,8 +3954,8 @@ complete. The remaining gaps retain their existing owners.
     top-level `this` and every non-strict nullish receiver one realm-wide
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
-    admitted `ArrayBuffer`, `Map`, `Object`, `Number`, `Promise`, and `String`
-    identities. Because this realm
+    admitted `ArrayBuffer`, `BigInt`, `Map`, `Object`, `Number`, `Promise`,
+    and `String` identities. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

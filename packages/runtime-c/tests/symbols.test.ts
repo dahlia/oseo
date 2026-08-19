@@ -99,6 +99,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_promise.c"],
       ["source", "runtime_event_loop.c"],
       ["source", "runtime_map.c"],
+      ["source", "runtime_bigint_object.c"],
     ],
   );
 });

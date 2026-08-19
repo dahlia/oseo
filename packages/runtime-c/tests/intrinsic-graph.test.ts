@@ -732,3 +732,57 @@ test("keeps Map deletions as in-place tombstones for live iterators", () => {
     ),
   );
 });
+
+test("populates the realm-owned BigInt intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const bigintSource = sources.get("runtime_bigint_object.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const intrinsic of [
+    "BIGINT_PROTOTYPE",
+    "BIGINT",
+    "BIGINT_AS_INT_N",
+    "BIGINT_AS_UINT_N",
+    "BIGINT_TO_STRING",
+    "BIGINT_TO_LOCALE_STRING",
+    "BIGINT_VALUE_OF",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "BigInt",
+    "asIntN",
+    "asUintN",
+    "constructor",
+    "toLocaleString",
+    "toString",
+    "valueOf",
+  ]) {
+    assert.match(bigintSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The ordinary kind makes IsConstructor true. Its dispatch rejects every
+  // construction before conversion, and its synthetic prototype property is
+  // fixed to the specified %BigInt.prototype% identity.
+  assert.match(bigintSource, /OSEO_FUNCTION_INTERNAL/u);
+  assert.match(bigintSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(
+    bigintSource,
+    /function_object\(frame\.slots\[0\]\)->prototype_object/u,
+  );
+  assert.match(bigintSource, /constructor->prototype_writable = false/u);
+  assert.match(bigintSource, /if \(constructing\)[\s\S]*OSEO_ERROR_TYPE/u);
+  assert.match(bigintSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  // %BigInt.prototype% is an ordinary object: the wrapper-prototype
+  // builder hands it to this cluster instead of branding it with a
+  // primitive value the way it brands %Boolean.prototype%.
+  assert.match(objectBuiltins, /intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE/u);
+  assert.doesNotMatch(objectBuiltins, /oseo_bigint_literal/u);
+  // The object model reads no limb; the representation stays behind the
+  // private operations runtime_bigint.c exports.
+  assert.doesNotMatch(bigintSource, /limbs/u);
+  assert.match(internalHeader, /oseo_internal_bigint_as_width/u);
+  assert.match(internalHeader, /oseo_internal_install_bigint_global/u);
+  assert.match(bindingSource, /oseo_internal_install_bigint_global/u);
+});

@@ -4,13 +4,19 @@ BigInt plan
 Status
 ------
 
-Implementation status: M5a Unit 8.1a is implemented. It admits exact BigInt
-literals, primitive values, `ToNumeric`, the M5a operator, assignment, update,
-comparison, conversion, and collector contracts.
+Implementation status: M5a Unit 8.1a is landed. M5b node `bigint-intrinsic`
+delivery item 7 is implemented on this branch pending mandatory review and
+landing. Unit 8.1a admits exact BigInt literals, primitive values,
+`ToNumeric`, the M5a operator, assignment, update, comparison, conversion, and
+collector contracts. The `bigint-intrinsic` node delivers item 7 of the
+delivery order below: the callable `BigInt` intrinsic, `BigInt.prototype`,
+branded wrapper objects, `toString`, `toLocaleString`, `valueOf`, `asIntN`, and
+`asUintN`.
 [ADR 0023](./docs/adr/0023-bigint-representation.md) selects an all-heap
 normalized sign-and-magnitude representation with 30-bit limbs and leaves the
-last unused NaN-box tag unassigned. The M5b intrinsic, prototype, wrappers,
-constructor behavior, and fixed-width conversions remain planned.
+last unused NaN-box tag unassigned. Delivery items 8 through 10, which connect
+the dependent string, JSON, binary-data, and atomic families and close the
+reviewed inventory, remain planned behind their own prerequisites.
 
 BigInt crosses the M5 core-language and built-in checkpoints. Literals,
 operators, coercions, and update expressions belong to M5a, while the `BigInt`
@@ -163,7 +169,7 @@ inventory policy, manifest schema, and classification vocabulary do not change.
 
 The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
 behavior, `BigInt.asIntN`, and `BigInt.asUintN` are not admitted by this
-checkpoint. They remain M5b work.
+checkpoint. The M5b `bigint-intrinsic` checkpoint below admits them.
 
 The portable M5a baseline admits magnitudes through 65,536 bits. Literal
 construction and operations that would exceed that reviewed ceiling throw a
@@ -171,6 +177,91 @@ catchable `RangeError` before allocating an oversized result. Allocation or
 host resource failure within the ceiling remains a non-catchable runtime
 diagnostic. This bound contains the initial schoolbook and long-division cost
 without changing exact results inside the admitted domain.
+
+
+M5b bigint-intrinsic checkpoint
+-------------------------------
+
+The `bigint-intrinsic` node implements delivery item 7 over the admitted
+primitive. It adds one runtime component, *runtime\_bigint\_object.c*, which
+owns the object model and reads no limb: the representation stays behind the
+private operations *runtime\_bigint.c* exports, and the three operations this
+node adds there, exact integral-Number conversion, radix text, and fixed-width
+truncation, take and return `OseoValue`. Compiler IR and generated C gain
+nothing: `BigInt` joins the property-owned intrinsic globals the realm's
+global object already binds, so no new HIR expression, MIR operation, or
+generated-code entry point exists. The runtime ABI moves to `m5-72`, the
+built-in code-ID range index 14 is allocated to the BigInt component, and the
+generated property family reserves the seed block `0x60004b00` through
+`0x60004bff`.
+
+`BigInt` is callable and has a `[[Construct]]` slot whose every invocation
+throws `TypeError` before any conversion. This makes `IsConstructor(BigInt)`
+true for class heritage and generic constructor selection without allowing an
+ordinary construction result. The intrinsic's synthetic `prototype` is a
+non-writable, non-enumerable, non-configurable own property. Calling it applies
+`ToPrimitive` with the number hint exactly once; an integral Number converts
+exactly through `NumberToBigInt`, and `NaN`, an infinity, and a fractional
+value throw `RangeError`. Every other primitive reaches the shared `ToBigInt`,
+which admits a BigInt and a Boolean, parses the candidate-edition
+`StringIntegerLiteral` grammar, rejects an unparseable string with
+`SyntaxError`, and rejects a Number, a Symbol, `undefined`, and `null` with
+`TypeError`. `ToBigInt` is the operation the later binary-data and atomic
+families consume; the intrinsic's Number branch is the intrinsic's own step,
+not part of it.
+
+`BigInt.asIntN` and `BigInt.asUintN` convert the width through `ToIndex`
+before the operand through `ToBigInt`, so a bad width is observed first even
+when both arguments have side effects. Both then take the exact value modulo
+`2**bits` inside a width-bounded two's complement. A width above the operand's
+bit length needs no `2**bits` at all: the signed result is the operand, and so
+is the unsigned result of a non-negative operand. `BigInt.asUintN` of a
+negative operand is the one request whose result grows to the full requested
+width, so it is the one request that can cross ADR 0023's reviewed 65,536-bit
+ceiling, where it throws the same catchable `RangeError` as every other
+oversized BigInt operation.
+
+`%BigInt.prototype%` is an ordinary object with no `[[BigIntData]]` slot, so
+one `thisBigIntValue` brand check admitting a BigInt primitive or a BigInt
+wrapper object rejects the prototype itself along with every other receiver.
+`toString` runs that check before converting an optional radix, admits radix 2
+through 36 using lowercase `a` through `z` for digit values 10 through 35, and
+shares one exact repeated-division conversion with ordinary BigInt string
+conversion. `toLocaleString` returns the base specification's own fallback,
+`thisBigIntValue` followed by `ToString`, because no ECMA-402
+Internationalization API is admitted; a reference host with ICU groups digits
+above 999, so the differential evidence keeps its magnitudes below that.
+`valueOf` returns the receiver's primitive. `Symbol.toStringTag` is `"BigInt"`.
+A wrapper created through `Object` reaches these methods through the ordinary
+`ToPrimitive` property lookup, and the BigInt storage itself acquires no
+object identity.
+
+The throwing `[[Construct]]` slot makes class heritage accept `BigInt` and
+makes `Array.from` and `Array.of` select their generic constructor path, which
+then observes the immediate `TypeError`. A derived constructor reaches the
+same rejection before its argument can be converted. `Reflect.construct`
+remains unadmitted, so reviewed cases requiring that separate namespace retain
+their explicit boundary even though the BigInt constructor contract is real.
+
+Fixed native evidence compares Node.js, Deno, and both native specialization
+policies over metadata, descriptors, prototype links, every conversion and
+failure order, throwing direct and derived construction, generic Array
+constructor selection, both fixed-width functions, every radix, receiver brand
+rejection, wrapper conversion, a false number hint, a deliberate intrinsic
+shape-guard miss, and the mutable global `BigInt` property, with collection
+forced at every safepoint. The reviewed 65,536-bit ceiling and a deliberately
+allocation-attempt sweep across intrinsic-cluster initialization, result
+publication, Number-to-BigInt, every radix staging buffer, and wrapper creation
+are Oseo's own resource boundaries rather than specified ones. They are
+observed directly instead of against a reference host: the ceiling throws a
+catchable `RangeError`, while each failed allocation reports the owned
+non-catchable `OSEO2001` diagnostic without publishing a partial value. Every
+attempt is collected and retried to prove complete cleanup, stable intrinsic
+identity, complete cluster publication, and rooted results. The generated
+property suite at seed `0x60004b00` keeps a structured sign and base-2^15
+magnitude until it prints source and compares an independent model of
+truncation, complement, and radix conversion written in ordinary Numbers, so no
+compared result comes from a host BigInt or from the runtime's own 30-bit limbs.
 
 
 Semantic boundary
@@ -231,10 +322,11 @@ deciding the result.
 
 ### Intrinsic and integration
 
-`BigInt` is callable and is not a constructor. Its conversion order, accepted
-strings, integral `Number` handling, object-to-primitive behavior, name,
-length, prototype links, and property attributes follow the candidate
-edition. `BigInt.asIntN` and `BigInt.asUintN` implement exact modulo-\(2^n\)
+`BigInt` is callable and has a throwing `[[Construct]]` slot. Its conversion
+order, accepted strings, integral `Number` handling, object-to-primitive
+behavior, name, length, prototype links, and property attributes follow the
+candidate edition. `BigInt.asIntN` and `BigInt.asUintN` implement exact
+modulo-\(2^n\)
 truncation with the specified index conversion and failure order.
 
 `BigInt.prototype` supplies `toString`, `toLocaleString`, and `valueOf` with

@@ -364,6 +364,7 @@ export function intrinsicGlobalKind(
   if (
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "BigInt" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "Map" ||
