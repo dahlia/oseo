@@ -260,11 +260,7 @@ function subjectSource(testCase: ForInCase): string {
   return levelName(0);
 }
 
-function headSource(testCase: ForInCase): {
-  readonly declaration: string;
-  readonly head: string;
-  readonly read: string;
-} {
+function headSource(testCase: ForInCase) {
   if (testCase.head === "const" || testCase.head === "let") {
     return {
       declaration: "",

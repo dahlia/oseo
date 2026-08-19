@@ -148,10 +148,7 @@ function element(testCase: DeleteSuperCase): {
   readonly trigger: string;
 } {
   const statements = body(testCase);
-  const members: Record<
-    ElementForm,
-    { readonly member: string; readonly trigger: string }
-  > = {
+  const members = {
     arrow: {
       member:
         `run() {\n    const reach = () => {${statements}\n    };\n` +
@@ -191,7 +188,10 @@ function element(testCase: DeleteSuperCase): {
       member: `static run() {${statements}\n  }`,
       trigger: "Probe.run()",
     },
-  };
+  } satisfies Record<
+    ElementForm,
+    { readonly member: string; readonly trigger: string }
+  >;
   return members[testCase.element];
 }
 

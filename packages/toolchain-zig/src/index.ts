@@ -135,7 +135,7 @@ function relativePath(
   );
 }
 
-function archiveKeyRecord(input: RuntimeArchiveKeyInput): object {
+function archiveKeyRecord(input: RuntimeArchiveKeyInput) {
   requireZigEnvironment(input.toolchainEnvironment);
   const runtimeCommon = commonFlags(input.target, ".");
   const linkCommon = commonFlags(input.target, "<runtime-directory>");

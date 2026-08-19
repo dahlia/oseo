@@ -280,10 +280,7 @@ function errorMessage(error: unknown): string {
     : `${error}`;
 }
 
-function splitCounters(observation: ProcessObservation): {
-  readonly counters?: RuntimeObservationCounters;
-  readonly observation: ProcessObservation;
-} {
+function splitCounters(observation: ProcessObservation) {
   const prefix = "OSEO_OBSERVATIONS ";
   const lines = observation.stderr.split(/(?<=\n)/u);
   // The machine-readable thrown-error marker is appended as the final

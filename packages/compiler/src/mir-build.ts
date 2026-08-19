@@ -179,7 +179,7 @@ function lowerReferenceObject(
   keyExpression: HirExpression,
   operand: (HirExpression & { readonly kind: "super-base" }) | undefined,
   builder: MirBuilder,
-): { readonly keyInput: number; readonly object: number } {
+) {
   if (operand == null) {
     const object = lowerExpression(objectExpression, builder);
     return { keyInput: lowerExpression(keyExpression, builder), object };
@@ -536,7 +536,7 @@ function lowerCallArguments(
   argumentsValue: readonly HirCallArgument[],
   range: SourceRange,
   builder: MirBuilder,
-): { readonly ids: readonly number[]; readonly list?: number } {
+) {
   if (!argumentsValue.some((argument) => argument.kind === "spread")) {
     return {
       ids: argumentsValue.map((argument) => {
@@ -985,7 +985,7 @@ function lowerWithRead(
   reference: HirWithReference,
   builder: MirBuilder,
   retainReceiver: boolean,
-): { readonly receiver?: number; readonly value: number } {
+) {
   const selected = lowerWithReference(reference, builder);
   const propertyBlock = createMirBlock(builder);
   const fallbackBlock = createMirBlock(builder);
@@ -1503,12 +1503,7 @@ function appendAsyncGeneratorYield(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
-): {
-  readonly resume: MutableMirBlock;
-  readonly returnResume: MutableMirBlock;
-  readonly sent: number;
-  readonly throwResume: MutableMirBlock;
-} {
+) {
   const yielded = value;
   appendMirMetadata(
     builder,
@@ -5635,7 +5630,7 @@ function lowerBindingIteratorNext(
   doneState: number,
   range: SourceRange,
   builder: MirBuilder,
-): { readonly hasValue: number; readonly value: number } {
+) {
   appendMirMetadata(
     builder,
     "safepoint",

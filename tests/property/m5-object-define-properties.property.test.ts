@@ -313,10 +313,7 @@ function dataDefinitionRejected(
   return false;
 }
 
-function modeledValue(entry: DefinePropertiesEntry): {
-  readonly identity: boolean;
-  readonly type: string;
-} {
+function modeledValue(entry: DefinePropertiesEntry) {
   switch (entry.valueKind) {
     case "bigint":
       return { identity: true, type: "bigint" };

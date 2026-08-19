@@ -11,7 +11,10 @@ test("accepts shared structured-data subtrees", () => {
 });
 
 test("rejects circular structured-data subtrees", () => {
-  const document: { self?: object } = {};
+  interface CircularDocument {
+    self?: CircularDocument;
+  }
+  const document: CircularDocument = {};
   document.self = document;
 
   assert.throws(

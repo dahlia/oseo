@@ -528,7 +528,11 @@ test("property helper exposes legacy verification APIs", async () => {
     new URL("test262/harness/propertyHelper.js", import.meta.url),
     "utf8",
   );
-  const target: Record<string, number | string> = { writable: 1 };
+  interface PropertyHelperTarget {
+    [name: string]: number | string;
+    writable: number;
+  }
+  const target: PropertyHelperTarget = { writable: 1 };
   Object.defineProperty(target, "fixed", {
     configurable: false,
     enumerable: false,

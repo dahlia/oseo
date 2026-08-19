@@ -226,10 +226,7 @@ function model(testCase: PatternCase): string {
 }
 
 /** The pattern text and the body reads that observe each stored value. */
-function patternSource(testCase: PatternCase): {
-  readonly pattern: string;
-  readonly reads: readonly string[];
-} {
+function patternSource(testCase: PatternCase) {
   const properties: string[] = [];
   const reads: string[] = [];
   testCase.properties.forEach((property, index) => {

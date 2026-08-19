@@ -219,10 +219,7 @@ while (turn < 3) {
 `;
 }
 
-function modeledValue(testCase: DefinePropertyCase): {
-  readonly identity: boolean;
-  readonly type: string;
-} {
+function modeledValue(testCase: DefinePropertyCase) {
   switch (testCase.valueKind) {
     case "bigint":
       return { identity: true, type: "bigint" };

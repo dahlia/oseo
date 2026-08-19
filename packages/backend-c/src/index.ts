@@ -37,7 +37,8 @@ type NormalizedCCatalog<Catalog extends CFragmentCatalog> = {
 
 function normalizeCCatalog<const Catalog extends CFragmentCatalog>(
   catalog: Catalog,
-): NormalizedCCatalog<Catalog> {
+): NormalizedCCatalog<Catalog>;
+function normalizeCCatalog(catalog: CFragmentCatalog) {
   const normalized: Record<string, Record<string, readonly string[]>> = {};
   for (const [groupName, group] of Object.entries(catalog)) {
     const normalizedGroup: Record<string, readonly string[]> = {};
@@ -48,7 +49,7 @@ function normalizeCCatalog<const Catalog extends CFragmentCatalog>(
     }
     normalized[groupName] = normalizedGroup;
   }
-  return normalized as NormalizedCCatalog<Catalog>;
+  return normalized;
 }
 
 const emittedC = normalizeCCatalog(emittedCSource);
@@ -193,7 +194,7 @@ function operationArgument(operation: MirOperation, index: number): number {
 }
 
 function operatorHelper(operator: BinaryOperator): string {
-  const helpers: Readonly<Record<BinaryOperator, string>> = {
+  const helpers = {
     "!=": renderC(emittedC.operatorHelper.oseoNotLooseEqual),
     "!==": renderC(emittedC.operatorHelper.oseoNotStrictEqual),
     "%": renderC(emittedC.operatorHelper.oseoRemainder),
@@ -216,7 +217,7 @@ function operatorHelper(operator: BinaryOperator): string {
     in: renderC(emittedC.operatorHelper.oseoHasProperty),
     instanceof: renderC(emittedC.operatorHelper.oseoInstanceof),
     "|": renderC(emittedC.operatorHelper.oseoBitwiseOr),
-  };
+  } satisfies Readonly<Record<BinaryOperator, string>>;
   return helpers[operator];
 }
 
@@ -456,10 +457,7 @@ function emitTemplateObject(state: EmitState, operation: MirOperation): void {
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
-function emitArguments(
-  state: EmitState,
-  operation: MirOperation,
-): { readonly count: string; readonly name: string } {
+function emitArguments(state: EmitState, operation: MirOperation) {
   if (operation.argumentListId != null) {
     const count = renderC(emittedC.arguments.argumentCount, operation.id);
     const name = renderC(emittedC.arguments.argumentValues, operation.id);

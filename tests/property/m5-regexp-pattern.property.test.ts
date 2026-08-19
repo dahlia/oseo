@@ -667,10 +667,7 @@ function summarizeParsed(pattern: RegExpPattern): string {
  * whatever the pattern does, so the result array length reports the
  * capture count without executing the generated pattern against input.
  */
-function hostCaptures(
-  source: string,
-  flags: string,
-): { readonly count: number; readonly names: readonly string[] } {
+function hostCaptures(source: string, flags: string) {
   const probe = new RegExp(`(?:${source})|`, flags);
   const match = probe.exec("");
   if (match == null) throw new Error("the empty alternative always matches");

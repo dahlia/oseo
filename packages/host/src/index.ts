@@ -176,7 +176,7 @@ function wait(milliseconds: number): Promise<void> {
 function selectEnvironment(
   names: readonly string[],
   read: (name: string) => string | undefined,
-): Readonly<Record<string, string>> {
+) {
   const selected: Record<string, string> = {};
   for (const name of names) {
     const value = read(name);

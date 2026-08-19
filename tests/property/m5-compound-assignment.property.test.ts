@@ -108,11 +108,7 @@ function binaryResult(
   return left | right;
 }
 
-function expected(testCase: CompoundAssignmentCase): {
-  readonly result: number | null;
-  readonly rightCount: number;
-  readonly writeCount: number;
-} {
+function expected(testCase: CompoundAssignmentCase) {
   const left = initialValue(testCase);
   if (testCase.operator === "&&") {
     return {

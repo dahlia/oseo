@@ -488,10 +488,7 @@ function validateReviewedSubset(
   }
 }
 
-function parseArguments(args: readonly string[]): {
-  readonly help: boolean;
-  readonly update: boolean;
-} {
+function parseArguments(args: readonly string[]) {
   if (args.length === 0) return { help: false, update: false };
   if (args.length === 1 && args[0] === "--update") {
     return { help: false, update: true };

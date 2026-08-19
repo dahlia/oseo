@@ -68,10 +68,7 @@ function activeStop(testCase: ForOfCase): number | undefined {
   return testCase.stopRaw % testCase.values.length;
 }
 
-function headSource(head: Head): {
-  readonly head: string;
-  readonly value: string;
-} {
+function headSource(head: Head) {
   if (head === "binding") return { head: "assigned", value: "assigned" };
   if (head === "property") {
     return { head: "holder.item", value: "holder.item" };
