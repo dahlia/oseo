@@ -15,8 +15,10 @@
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
     "@babel/parser": "8.0.4",
+    "@oxlint/plugins": "1.79.0",
     "@types/node": "24.13.3",
     "fast-check": "4.9.0",
+    "oxlint": "1.79.0",
     "publint": "0.3.21",
     "test262": "github:tc39/test262#f2d1435644797268dca1f7988cad5a4e89ccd8d2",
     "tsdown": "0.22.7",
