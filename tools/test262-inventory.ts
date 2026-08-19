@@ -8,6 +8,12 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
+
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const policyPath = join(repositoryRoot, "tests/test262/inventory-policy.yaml");
 const inventoryPath = join(repositoryRoot, "tests/test262/inventory.tsv");
@@ -57,21 +63,14 @@ export interface Test262InventorySummary {
   readonly included: number;
 }
 
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function stringValue(value: unknown, description: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+function stringValue(value: StructuredDataInput, description: string): string {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function sourceUrl(value: unknown, description: string): string {
+function sourceUrl(value: StructuredDataInput, description: string): string {
   const source = stringValue(value, description);
   const url = new URL(source);
   if (url.protocol !== "https:" || url.hostname !== "github.com") {
@@ -80,20 +79,29 @@ function sourceUrl(value: unknown, description: string): string {
   return source;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
   if (
     !Array.isArray(value) ||
-    value.some((entry) => typeof entry !== "string" || entry.length === 0)
+    value.some((entry) => !isString(entry) || entry.length === 0)
   ) {
     throw new Error(`${description} must be an array of non-empty strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
-function positiveInteger(value: unknown, description: string): number {
+function positiveInteger(
+  value: StructuredDataInput,
+  description: string,
+): number {
+  // SAFETY: Number.isSafeInteger establishes a numeric value for comparison.
   if (!Number.isSafeInteger(value) || (value as number) <= 0) {
     throw new Error(`${description} must be a positive integer.`);
   }
+  // SAFETY: Number.isSafeInteger above establishes a positive integer.
   return value as number;
 }
 
@@ -113,7 +121,11 @@ function sortedUnique(
 
 /** Parse and validate the reviewed inventory policy. */
 export function parseInventoryPolicy(text: string): Test262InventoryPolicy {
-  const root = record(parseYaml(text) as unknown, "test262 inventory policy");
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 inventory policy",
+  );
   const rawSources = record(root.sources, "test262 inventory sources");
   const rawFeatures = record(
     root.postEditionFeatures,
@@ -261,8 +273,9 @@ export function parseTest262Features(
   if (match?.[1] == null) {
     throw new Error(`${path} does not contain test262 frontmatter.`);
   }
+  // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
-    (parseYaml(match[1]) ?? {}) as unknown,
+    (parseYaml(match[1]) ?? {}) as StructuredDataInput,
     `${path} frontmatter`,
   );
   if (metadata.features == null) return [];
@@ -409,10 +422,11 @@ async function suiteRoot(revision: string): Promise<string> {
     import.meta.resolve("test262/package.json"),
   );
   const packageRoot = dirname(packagePath);
+  // SAFETY: parsedObject validates the complete JSON tree at this boundary.
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
-    ) as unknown,
+    ) as StructuredDataInput,
     "workspace package.json",
   );
   const dependencies = record(
@@ -462,7 +476,8 @@ async function createInventory(
 }
 
 function subsetPaths(text: string, suiteRevision: string): readonly string[] {
-  const root = record(parseYaml(text) as unknown, "test262 subset");
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
+  const root = record(parseYaml(text) as StructuredDataInput, "test262 subset");
   if (root.suiteRevision !== suiteRevision) {
     throw new Error("test262 subset and inventory revisions differ.");
   }
@@ -493,10 +508,7 @@ function validateReviewedSubset(
   }
 }
 
-function parseArguments(args: readonly string[]): {
-  readonly help: boolean;
-  readonly update: boolean;
-} {
+function parseArguments(args: readonly string[]) {
   if (args.length === 0) return { help: false, update: false };
   if (args.length === 1 && args[0] === "--update") {
     return { help: false, update: true };

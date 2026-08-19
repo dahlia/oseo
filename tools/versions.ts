@@ -5,6 +5,8 @@ import { readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { isObject, isString } from "./value-kinds.ts";
+
 const numericIdentifier = String.raw`(?:0|[1-9]\d*)`;
 const dotIdentifier = String.raw`[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*`;
 const alphanumericIdentifier = String.raw`\d*[A-Za-z-][0-9A-Za-z-]*`;
@@ -24,10 +26,10 @@ interface PackageManifest {
   readonly name?: unknown;
   readonly private?: unknown;
   readonly version?: unknown;
-  readonly dependencies?: Readonly<Record<string, unknown>>;
-  readonly devDependencies?: Readonly<Record<string, unknown>>;
-  readonly optionalDependencies?: Readonly<Record<string, unknown>>;
-  readonly peerDependencies?: Readonly<Record<string, unknown>>;
+  readonly dependencies?: unknown;
+  readonly devDependencies?: unknown;
+  readonly optionalDependencies?: unknown;
+  readonly peerDependencies?: unknown;
 }
 
 interface LoadedManifest {
@@ -87,10 +89,12 @@ function strictVersion(bytes: string, source: string): string {
 
 function parseManifest(bytes: string, path: string): PackageManifest {
   try {
+    // SAFETY: The following object check establishes a manifest record.
     const value = JSON.parse(bytes) as unknown;
-    if (value == null || typeof value !== "object" || Array.isArray(value)) {
+    if (!isObject(value) || Array.isArray(value)) {
       throw new Error("manifest is not an object");
     }
+    // SAFETY: Workspace manifests are trusted repository inputs.
     return value as PackageManifest;
   } catch (error) {
     throw new Error(`Could not read ${path} as a JSON manifest.`, {
@@ -114,8 +118,11 @@ async function loadManifest(
   return { bytes, manifest: parseManifest(bytes, path), path };
 }
 
-function requirePackageName(value: unknown, path: string): string {
-  if (typeof value !== "string" || !value.startsWith("@oseo/")) {
+function requirePackageName(
+  value: PackageManifest["name"],
+  path: string,
+): string {
+  if (!isString(value) || !value.startsWith("@oseo/")) {
     throw new Error(`${path} must name a public @oseo/* package.`);
   }
   return value;
@@ -133,7 +140,13 @@ function checkInternalDependencies(
   ];
   for (const field of fields) {
     if (field == null) continue;
+    if (!isObject(field) || Array.isArray(field)) {
+      throw new Error(`${path} dependency fields must be objects.`);
+    }
     for (const [name, range] of Object.entries(field)) {
+      if (!isString(range)) {
+        throw new Error(`${path} dependency ranges must be strings.`);
+      }
       if (!name.startsWith("@oseo/")) continue;
       if (range !== "workspace:*") {
         throw new Error(
@@ -329,6 +342,7 @@ async function main(args: readonly string[]): Promise<void> {
     return;
   }
   if (mode === "set") {
+    // SAFETY: This probe only reads the optional Deno global discriminator.
     const deno = (globalThis as { readonly Deno?: unknown }).Deno;
     if (deno != null) throw new Error("Version set mode requires Node.js.");
     const version = args[1];

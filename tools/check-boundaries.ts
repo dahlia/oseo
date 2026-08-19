@@ -5,6 +5,9 @@ import { readFile, readdir } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import type { StructuredDataValue } from "./structured-data.ts";
+import { isObject, isString } from "./value-kinds.ts";
+
 interface Manifest {
   readonly dependencies?: Readonly<Record<string, string>>;
   readonly optionalDependencies?: Readonly<Record<string, string>>;
@@ -48,27 +51,28 @@ const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
 ]);
 
 interface SyntaxNode {
-  readonly [key: string]: unknown;
-  readonly type?: unknown;
+  readonly [key: string]: StructuredDataValue | undefined;
+  readonly type?: StructuredDataValue;
 }
 
-function syntaxNode(value: unknown): SyntaxNode | undefined {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+function syntaxNode<T>(value: T): SyntaxNode | undefined {
+  if (!isObject(value) || Array.isArray(value)) {
     return undefined;
   }
+  // SAFETY: The object check establishes this open AST record.
   return value as SyntaxNode;
 }
 
-function stringLiteralValue(value: unknown): string | undefined {
+function stringLiteralValue<T>(value: T): string | undefined {
   const node = syntaxNode(value);
-  if (node?.type !== "StringLiteral" || typeof node.value !== "string") {
+  if (node?.type !== "StringLiteral" || !isString(node.value)) {
     return undefined;
   }
   return node.value;
 }
 
-function collectImportSpecifiers(
-  value: unknown,
+function collectImportSpecifiers<T>(
+  value: T,
   specifiers: Set<string>,
   visited: WeakSet<object>,
 ): void {
@@ -239,6 +243,7 @@ export async function checkPackageBoundaries(root: string): Promise<number> {
   for (const entry of await readdir(packagesRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const directory = join(packagesRoot, entry.name);
+    // SAFETY: Checked-in package manifests are repository-owned inputs.
     const manifest = JSON.parse(
       await readFile(join(directory, "package.json"), "utf8"),
     ) as Manifest;

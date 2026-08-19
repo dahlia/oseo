@@ -52,6 +52,13 @@ import type {
   SyntaxProgram,
   SyntaxStatement,
 } from "./syntax.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 export function sourceDiagnostic(
   sourceId: string,
   node: LocatedSyntax,
@@ -313,13 +320,23 @@ function intrinsicGlobalPatternTarget(
   const reference = intrinsicGlobalPropertyRead(name, located.range, state);
   const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
   return {
-    ...(located.byteRange == null ? {} : { byteRange: located.byteRange }),
+    ...includePropertiesWhen(() => {
+      if (located.byteRange == null) return undefined;
+      return {
+        byteRange: located.byteRange,
+      };
+    }),
     inferredName: name,
     key: reference.key,
     kind: "assignment-member",
     object: reference.object,
     range: located.range,
-    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+    ...includePropertiesWhen(() => {
+      if (strictGlobalFallback == null) return undefined;
+      return {
+        strictGlobalFallback,
+      };
+    }),
   };
 }
 
@@ -336,7 +353,12 @@ function intrinsicGlobalLoopTarget(
     kind: "property",
     object: reference.object,
     range,
-    ...(strictGlobalFallback == null ? {} : { strictGlobalFallback }),
+    ...includePropertiesWhen(() => {
+      if (strictGlobalFallback == null) return undefined;
+      return {
+        strictGlobalFallback,
+      };
+    }),
   };
 }
 
@@ -389,7 +411,12 @@ function identifierFallback(
 /** The source location of one syntax node, without its other fields. */
 function locatedOf(value: LocatedSyntax): LocatedSyntax {
   return {
-    ...(value.byteRange == null ? {} : { byteRange: value.byteRange }),
+    ...includePropertiesWhen(() => {
+      if (value.byteRange == null) return undefined;
+      return {
+        byteRange: value.byteRange,
+      };
+    }),
     range: value.range,
   };
 }
@@ -824,14 +851,15 @@ function resolveExpression(
               key: reference.key,
               kind: "property-set",
               object: reference.object,
-              ...(strictGlobalFallback == null
-                ? {}
-                : {
-                    strictGlobalFallback: {
-                      bindingId: strictGlobalFallback.id,
-                      name: strictGlobalFallback.name,
-                    },
-                  }),
+              ...includePropertiesWhen(() => {
+                if (strictGlobalFallback == null) return undefined;
+                return {
+                  strictGlobalFallback: {
+                    bindingId: strictGlobalFallback.id,
+                    name: strictGlobalFallback.name,
+                  },
+                };
+              }),
               value: inferred,
             }
           : {
@@ -840,14 +868,15 @@ function resolveExpression(
               kind: "property-update",
               object: reference.object,
               operator: expression.operator,
-              ...(strictGlobalFallback == null
-                ? {}
-                : {
-                    strictGlobalFallback: {
-                      bindingId: strictGlobalFallback.id,
-                      name: strictGlobalFallback.name,
-                    },
-                  }),
+              ...includePropertiesWhen(() => {
+                if (strictGlobalFallback == null) return undefined;
+                return {
+                  strictGlobalFallback: {
+                    bindingId: strictGlobalFallback.id,
+                    name: strictGlobalFallback.name,
+                  },
+                };
+              }),
               value: inferred,
             };
       if (expression.kind === "binding-set") return write;
@@ -922,12 +951,18 @@ function resolveExpression(
     if (resolution.objectBindingIds.length > 0) {
       const fallback = {
         bindingId: binding.id,
-        ...(binding.functionNameBinding === true
-          ? { functionNameBinding: true as const }
-          : {}),
-        ...(binding.importedBinding === true
-          ? { importedBinding: true as const }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(binding.functionNameBinding === true)) return undefined;
+          return {
+            functionNameBinding: true as const,
+          };
+        }),
+        ...includePropertiesWhen(() => {
+          if (!(binding.importedBinding === true)) return undefined;
+          return {
+            importedBinding: true as const,
+          };
+        }),
         mutable: binding.mutable,
         name: binding.name,
       };
@@ -951,10 +986,18 @@ function resolveExpression(
     return {
       ...expression,
       bindingId: binding.id,
-      ...(binding.functionNameBinding === true
-        ? { functionNameBinding: true }
-        : {}),
-      ...(binding.importedBinding === true ? { importedBinding: true } : {}),
+      ...includePropertiesWhen(() => {
+        if (!(binding.functionNameBinding === true)) return undefined;
+        return {
+          functionNameBinding: true,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (!(binding.importedBinding === true)) return undefined;
+        return {
+          importedBinding: true,
+        };
+      }),
       mutable: binding.mutable,
       value: inferred,
     };
@@ -981,14 +1024,15 @@ function resolveExpression(
         object: reference.object,
         operator: expression.operator,
         prefix: expression.prefix,
-        ...(strictGlobalFallback == null
-          ? {}
-          : {
-              strictGlobalFallback: {
-                bindingId: strictGlobalFallback.id,
-                name: strictGlobalFallback.name,
-              },
-            }),
+        ...includePropertiesWhen(() => {
+          if (strictGlobalFallback == null) return undefined;
+          return {
+            strictGlobalFallback: {
+              bindingId: strictGlobalFallback.id,
+              name: strictGlobalFallback.name,
+            },
+          };
+        }),
       };
       return {
         alternate: missingIntrinsicRead(
@@ -1040,12 +1084,16 @@ function resolveExpression(
         ...expression,
         fallback: {
           bindingId: binding.id,
-          ...(binding.functionNameBinding === true
-            ? { functionNameBinding: true }
-            : {}),
-          ...(binding.importedBinding === true
-            ? { importedBinding: true }
-            : {}),
+          ...includePropertiesWhen(() => {
+            if (!(binding.functionNameBinding === true)) return undefined;
+            return { functionNameBinding: true };
+          }),
+          ...includePropertiesWhen(() => {
+            if (!(binding.importedBinding === true)) return undefined;
+            return {
+              importedBinding: true,
+            };
+          }),
           mutable: binding.mutable,
           name: binding.name,
         },
@@ -1056,10 +1104,18 @@ function resolveExpression(
     return {
       ...expression,
       bindingId: binding.id,
-      ...(binding.functionNameBinding === true
-        ? { functionNameBinding: true }
-        : {}),
-      ...(binding.importedBinding === true ? { importedBinding: true } : {}),
+      ...includePropertiesWhen(() => {
+        if (!(binding.functionNameBinding === true)) return undefined;
+        return {
+          functionNameBinding: true,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (!(binding.importedBinding === true)) return undefined;
+        return {
+          importedBinding: true,
+        };
+      }),
       mutable: binding.mutable,
     };
   }
@@ -1103,9 +1159,12 @@ function resolveExpression(
   if (expression.kind === "yield") {
     if (expression.argument == null) {
       return {
-        ...(expression.byteRange == null
-          ? {}
-          : { byteRange: expression.byteRange }),
+        ...includePropertiesWhen(() => {
+          if (expression.byteRange == null) return undefined;
+          return {
+            byteRange: expression.byteRange,
+          };
+        }),
         kind: "yield",
         range: expression.range,
       };
@@ -1281,14 +1340,20 @@ function resolveExpression(
       const value = resolveExpression(property.value, scopes, state);
       if (key == null || value == null) return undefined;
       properties.push({
-        ...(property.accessorKind == null
-          ? {}
-          : { accessorKind: property.accessorKind }),
+        ...includePropertiesWhen(() => {
+          if (property.accessorKind == null) return undefined;
+          return {
+            accessorKind: property.accessorKind,
+          };
+        }),
         key,
         kind: "definition",
-        ...(property.prototypeSetter === true
-          ? { prototypeSetter: true as const }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(property.prototypeSetter === true)) return undefined;
+          return {
+            prototypeSetter: true as const,
+          };
+        }),
         value:
           key.kind === "string" && property.prototypeSetter !== true
             ? inferFunctionName(value, key.value)
@@ -1756,7 +1821,12 @@ function predeclareBindings(
       const alreadyInitialized =
         reusedFromOuterScope != null || previous?.alreadyInitialized === true;
       scope.set(name, {
-        ...(alreadyInitialized ? { alreadyInitialized: true } : {}),
+        ...includePropertiesWhen(() => {
+          if (!alreadyInitialized) return undefined;
+          return {
+            alreadyInitialized: true,
+          };
+        }),
         functionId,
         id: bindingId,
         mutable: true,
@@ -1765,7 +1835,12 @@ function predeclareBindings(
       state.functionInfo.set(statement, {
         bindingId,
         id: functionId,
-        ...(alreadyInitialized ? { alreadyInitialized: true } : {}),
+        ...includePropertiesWhen(() => {
+          if (!alreadyInitialized) return undefined;
+          return {
+            alreadyInitialized: true,
+          };
+        }),
       });
     } else {
       scope.set(name, {
@@ -1801,15 +1876,23 @@ function buildFunctionInits(
     if (scope.get(bindingName)?.functionId !== info.id) continue;
     const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
-      ...(info.alreadyInitialized === true ? { alreadyInitialized: true } : {}),
+      ...includePropertiesWhen(() => {
+        if (!(info.alreadyInitialized === true)) return undefined;
+        return {
+          alreadyInitialized: true,
+        };
+      }),
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
       functionKind: functionValue.functionKind,
       functionName: functionValue.name,
       functionLength: functionValue.functionLength,
-      ...(functionValue.sourceText == null
-        ? {}
-        : { sourceText: functionValue.sourceText }),
+      ...includePropertiesWhen(() => {
+        if (functionValue.sourceText == null) return undefined;
+        return {
+          sourceText: functionValue.sourceText,
+        };
+      }),
       kind: "function-init",
       name: bindingName,
       range: statement.range,
@@ -2023,14 +2106,25 @@ function resolveFunction(
     functionValue.simpleParameterList === true;
   const resolved: HirFunction = {
     ...functionValue,
-    ...(argumentsBinding == null
-      ? {}
-      : { argumentsBindingId: argumentsBinding.id }),
-    ...(argumentsMapped ? { argumentsMapped: true } : {}),
+    ...includePropertiesWhen(() => {
+      if (argumentsBinding == null) return undefined;
+      return {
+        argumentsBindingId: argumentsBinding.id,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!argumentsMapped) return undefined;
+      return {
+        argumentsMapped: true,
+      };
+    }),
     body,
-    ...(derivedThisBinding == null
-      ? {}
-      : { derivedThisBindingId: derivedThisBinding.bindingId }),
+    ...includePropertiesWhen(() => {
+      if (derivedThisBinding == null) return undefined;
+      return {
+        derivedThisBindingId: derivedThisBinding.bindingId,
+      };
+    }),
     functionLength: functionValue.functionLength ?? parameters.length,
     functionKind: functionValue.functionKind ?? "ordinary",
     id,
@@ -2045,7 +2139,12 @@ function resolveFunction(
     ],
     name: functionValue.name ?? `<anonymous-${id}>`,
     parameters,
-    ...(selfBinding == null ? {} : { selfBindingId: selfBinding.id }),
+    ...includePropertiesWhen(() => {
+      if (selfBinding == null) return undefined;
+      return {
+        selfBindingId: selfBinding.id,
+      };
+    }),
   };
   state.hirFunctions.push(resolved);
   return resolved;
@@ -2419,7 +2518,12 @@ function resolveFunctionExpression(
     kind: "function",
     name: expression.inferredName ?? functionValue.name ?? "",
     range: expression.range,
-    ...(resolved.sourceText == null ? {} : { sourceText: resolved.sourceText }),
+    ...includePropertiesWhen(() => {
+      if (resolved.sourceText == null) return undefined;
+      return {
+        sourceText: resolved.sourceText,
+      };
+    }),
   };
 }
 
@@ -2507,9 +2611,12 @@ function resolveClassField(
   if (keyNameBindingId != null) state.nextBindingId += 1;
   state.hirFunctions.push({
     body: [{ expression: named, kind: "return", range }],
-    ...(keyNameBindingId == null
-      ? {}
-      : { fieldKeyBindingId: keyNameBindingId }),
+    ...includePropertiesWhen(() => {
+      if (keyNameBindingId == null) return undefined;
+      return {
+        fieldKeyBindingId: keyNameBindingId,
+      };
+    }),
     functionKind: "method",
     functionLength: 0,
     id: initializerId,
@@ -2532,7 +2639,12 @@ function resolveClassField(
       range,
     },
     key,
-    ...(keyNameBindingId == null ? {} : { keyNameBindingId }),
+    ...includePropertiesWhen(() => {
+      if (keyNameBindingId == null) return undefined;
+      return {
+        keyNameBindingId,
+      };
+    }),
     kind: "field",
     ...placement,
   };
@@ -2614,9 +2726,12 @@ function resolveClassExpression(
     kind: "function",
     name: expression.inferredName ?? expression.constructorFunction.name ?? "",
     range: expression.range,
-    ...(resolvedConstructor.sourceText == null
-      ? {}
-      : { sourceText: resolvedConstructor.sourceText }),
+    ...includePropertiesWhen(() => {
+      if (resolvedConstructor.sourceText == null) return undefined;
+      return {
+        sourceText: resolvedConstructor.sourceText,
+      };
+    }),
   };
   const elements: HirClassElement[] = [];
   for (const element of expression.elements) {
@@ -2648,9 +2763,12 @@ function resolveClassExpression(
           kind: "function",
           name: "",
           range: element.range,
-          ...(resolvedBlock.sourceText == null
-            ? {}
-            : { sourceText: resolvedBlock.sourceText }),
+          ...includePropertiesWhen(() => {
+            if (resolvedBlock.sourceText == null) return undefined;
+            return {
+              sourceText: resolvedBlock.sourceText,
+            };
+          }),
         },
       });
       continue;
@@ -2673,9 +2791,12 @@ function resolveClassExpression(
       kind: "function",
       name: element.value.name ?? "",
       range: element.range,
-      ...(resolvedMethod.sourceText == null
-        ? {}
-        : { sourceText: resolvedMethod.sourceText }),
+      ...includePropertiesWhen(() => {
+        if (resolvedMethod.sourceText == null) return undefined;
+        return {
+          sourceText: resolvedMethod.sourceText,
+        };
+      }),
     };
     const staticName = classElementStaticName(key);
     elements.push({
@@ -2686,13 +2807,27 @@ function resolveClassExpression(
   }
   const byteRange = expression.byteRange;
   return {
-    ...(byteRange == null ? {} : { byteRange }),
+    ...includePropertiesWhen(() => {
+      if (byteRange == null) return undefined;
+      return { byteRange };
+    }),
     constructorFunction,
     elements,
-    ...(heritage == null ? {} : { heritage }),
+    ...includePropertiesWhen(() => {
+      if (heritage == null) return undefined;
+      return { heritage };
+    }),
     kind: "class",
-    ...(nameBinding == null ? {} : { nameBinding }),
-    ...(privateNames.length === 0 ? {} : { privateNames }),
+    ...includePropertiesWhen(() => {
+      if (nameBinding == null) return undefined;
+      return { nameBinding };
+    }),
+    ...includePropertiesWhen(() => {
+      if (privateNames.length === 0) return undefined;
+      return {
+        privateNames,
+      };
+    }),
     range: expression.range,
   };
 }
@@ -2801,16 +2936,23 @@ function resolveBindingPattern(
     return {
       ...pattern,
       bindingId: binding.id,
-      ...(binding.functionNameBinding === true
-        ? { functionNameBinding: true as const }
-        : {}),
-      ...(binding.importedBinding === true
-        ? { importedBinding: true as const }
-        : {}),
+      ...includePropertiesWhen(() => {
+        if (!(binding.functionNameBinding === true)) return undefined;
+        return {
+          functionNameBinding: true as const,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (!(binding.importedBinding === true)) return undefined;
+        return {
+          importedBinding: true as const,
+        };
+      }),
       mutable: binding.mutable,
-      ...(resolution.objectBindingIds.length === 0
-        ? {}
-        : { withObjectBindingIds: resolution.objectBindingIds }),
+      ...includePropertiesWhen(() => {
+        if (resolution.objectBindingIds.length === 0) return undefined;
+        return { withObjectBindingIds: resolution.objectBindingIds };
+      }),
     };
   }
   if (pattern.kind === "object-binding-pattern") {
@@ -2845,10 +2987,18 @@ function resolveBindingPattern(
         return undefined;
       }
       properties.push({
-        ...(property.byteRange == null
-          ? {}
-          : { byteRange: property.byteRange }),
-        ...(initializer == null ? {} : { initializer }),
+        ...includePropertiesWhen(() => {
+          if (property.byteRange == null) return undefined;
+          return {
+            byteRange: property.byteRange,
+          };
+        }),
+        ...includePropertiesWhen(() => {
+          if (initializer == null) return undefined;
+          return {
+            initializer,
+          };
+        }),
         key,
         pattern: resolvedPattern,
         range: property.range,
@@ -2873,10 +3023,18 @@ function resolveBindingPattern(
       rest = resolvedRest;
     }
     return {
-      ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
+      ...includePropertiesWhen(() => {
+        if (pattern.byteRange == null) return undefined;
+        return {
+          byteRange: pattern.byteRange,
+        };
+      }),
       kind: "object-binding-pattern",
       properties,
-      ...(rest == null ? {} : { rest }),
+      ...includePropertiesWhen(() => {
+        if (rest == null) return undefined;
+        return { rest };
+      }),
       range: pattern.range,
     };
   }
@@ -2913,8 +3071,16 @@ function resolveBindingPattern(
       return undefined;
     }
     elements.push({
-      ...(element.byteRange == null ? {} : { byteRange: element.byteRange }),
-      ...(initializer == null ? {} : { initializer }),
+      ...includePropertiesWhen(() => {
+        if (element.byteRange == null) return undefined;
+        return {
+          byteRange: element.byteRange,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (initializer == null) return undefined;
+        return { initializer };
+      }),
       pattern: resolvedPattern,
       range: element.range,
     });
@@ -2931,10 +3097,18 @@ function resolveBindingPattern(
         );
   if (pattern.rest != null && rest == null) return undefined;
   return {
-    ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
+    ...includePropertiesWhen(() => {
+      if (pattern.byteRange == null) return undefined;
+      return {
+        byteRange: pattern.byteRange,
+      };
+    }),
     elements,
     kind: "array-binding-pattern",
-    ...(rest == null ? {} : { rest }),
+    ...includePropertiesWhen(() => {
+      if (rest == null) return undefined;
+      return { rest };
+    }),
     range: pattern.range,
   };
 }
@@ -3101,16 +3275,23 @@ function resolveForInTarget(
     return {
       ...target,
       bindingId: binding.id,
-      ...(binding.functionNameBinding === true
-        ? { functionNameBinding: true as const }
-        : {}),
-      ...(binding.importedBinding === true
-        ? { importedBinding: true as const }
-        : {}),
+      ...includePropertiesWhen(() => {
+        if (!(binding.functionNameBinding === true)) return undefined;
+        return {
+          functionNameBinding: true as const,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (!(binding.importedBinding === true)) return undefined;
+        return {
+          importedBinding: true as const,
+        };
+      }),
       mutable: binding.mutable,
-      ...(resolution.objectBindingIds.length === 0
-        ? {}
-        : { withObjectBindingIds: resolution.objectBindingIds }),
+      ...includePropertiesWhen(() => {
+        if (resolution.objectBindingIds.length === 0) return undefined;
+        return { withObjectBindingIds: resolution.objectBindingIds };
+      }),
     };
   }
   if (target.kind === "property") {
@@ -3225,6 +3406,7 @@ function resolveStatement(
       // but a frontend that builds owned syntax directly can omit it;
       // recover with one located diagnostic instead of resolving a
       // clause that has no block to run.
+      // SAFETY: Direct frontends may omit this statically required field.
       if ((statement.handler.body as SyntaxStatement | undefined) == null) {
         state.diagnostics.push(
           sourceDiagnostic(
@@ -3512,16 +3694,33 @@ function resolveStatement(
     );
     if (body == null) return undefined;
     return {
-      ...(statement.byteRange == null
-        ? {}
-        : { byteRange: statement.byteRange }),
+      ...includePropertiesWhen(() => {
+        if (statement.byteRange == null) return undefined;
+        return {
+          byteRange: statement.byteRange,
+        };
+      }),
       body,
-      ...(declarations == null ? {} : { declarations }),
-      ...(init == null ? {} : { init }),
+      ...includePropertiesWhen(() => {
+        if (declarations == null) return undefined;
+        return {
+          declarations,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (init == null) return undefined;
+        return { init };
+      }),
       kind: "for",
       range: statement.range,
-      ...(test == null ? {} : { test }),
-      ...(update == null ? {} : { update }),
+      ...includePropertiesWhen(() => {
+        if (test == null) return undefined;
+        return { test };
+      }),
+      ...includePropertiesWhen(() => {
+        if (update == null) return undefined;
+        return { update };
+      }),
     };
   }
   if (statement.kind === "for-in") {
@@ -3726,16 +3925,21 @@ function resolveStatement(
           target = {
             ...statement.target,
             bindingId: binding.id,
-            ...(binding.functionNameBinding === true
-              ? { functionNameBinding: true as const }
-              : {}),
-            ...(binding.importedBinding === true
-              ? { importedBinding: true as const }
-              : {}),
+            ...includePropertiesWhen(() => {
+              if (!(binding.functionNameBinding === true)) return undefined;
+              return { functionNameBinding: true as const };
+            }),
+            ...includePropertiesWhen(() => {
+              if (!(binding.importedBinding === true)) return undefined;
+              return {
+                importedBinding: true as const,
+              };
+            }),
             mutable: binding.mutable,
-            ...(resolution.objectBindingIds.length === 0
-              ? {}
-              : { withObjectBindingIds: resolution.objectBindingIds }),
+            ...includePropertiesWhen(() => {
+              if (resolution.objectBindingIds.length === 0) return undefined;
+              return { withObjectBindingIds: resolution.objectBindingIds };
+            }),
           };
         }
       }
@@ -3838,14 +4042,22 @@ function resolveStatement(
       cases.push({
         body,
         range: switchCase.range,
-        ...(test == null ? {} : { test }),
+        ...includePropertiesWhen(() => {
+          if (test == null) return undefined;
+          return { test };
+        }),
       });
     }
     return {
       ...statement,
       cases,
       discriminant,
-      ...(functionInits.length === 0 ? {} : { functionInits }),
+      ...includePropertiesWhen(() => {
+        if (functionInits.length === 0) return undefined;
+        return {
+          functionInits,
+        };
+      }),
     };
   }
   if (statement.kind === "with") {
@@ -4049,12 +4261,12 @@ export function buildSeededHir(
         ...state.intrinsicReadFallbacks.values(),
       ],
       globalObjectBindings,
-      ...(state.intrinsicGlobalObjectBinding == null
-        ? {}
-        : {
-            intrinsicGlobalObjectBindingId:
-              state.intrinsicGlobalObjectBinding.id,
-          }),
+      ...includePropertiesWhen(() => {
+        if (state.intrinsicGlobalObjectBinding == null) return undefined;
+        return {
+          intrinsicGlobalObjectBindingId: state.intrinsicGlobalObjectBinding.id,
+        };
+      }),
       kind: "hir-program",
       range: program.range,
       sourceId: program.sourceId,

@@ -15,6 +15,7 @@ import {
   parseReviewedSubset,
   parseTest262Case,
   readSerializedManifestPartitions,
+  ReviewedTest262RunError,
   selectManifestShard,
   validateReviewedResults,
 } from "../tools/test262.ts";
@@ -33,6 +34,7 @@ import type {
   Test262Executor,
 } from "../tools/test262.ts";
 import type { Test262Result } from "../packages/testkit/src/index.ts";
+import { isString } from "../tools/value-kinds.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
 const harnesses = {
@@ -45,6 +47,10 @@ interface ReportedDescriptor {
   readonly configurable: boolean;
   readonly enumerable: boolean;
   readonly writable: boolean;
+}
+
+interface PropertyHelperOwner {
+  readonly name?: unknown;
 }
 
 function successfulResult(): CliResult {
@@ -366,14 +372,10 @@ for (const deterministicFailure of [
           executor,
           { poolLimit: 1 },
         ),
-        (error: unknown) => {
-          assert.ok(error instanceof Error);
-          const metadata = Reflect.get(error, "metadata") as
-            | Record<string, unknown>
-            | undefined;
-          assert.ok(metadata);
-          assert.equal(metadata.poolLimit, 1);
-          assert.equal(metadata.retries, 0);
+        (cause: unknown) => {
+          assert.ok(cause instanceof ReviewedTest262RunError);
+          assert.equal(cause.metadata.poolLimit, 1);
+          assert.equal(cause.metadata.retries, 0);
           return true;
         },
       );
@@ -487,9 +489,9 @@ test("property helper checks behavior beyond reported flags", async () => {
       writable: true,
     });
     const harnessAssert = Object.assign(
-      (value: unknown) => assert.equal(value, true),
+      (value: boolean) => assert.equal(value, true),
       {
-        sameValue(actual: unknown, expected: unknown): void {
+        sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
           assert.ok(Object.is(actual, expected));
         },
       },
@@ -499,7 +501,7 @@ test("property helper checks behavior beyond reported flags", async () => {
       Object: {
         defineProperty: Object.defineProperty,
         getOwnPropertyDescriptor(
-          object: object,
+          object: PropertyHelperOwner,
           name: PropertyKey,
         ): PropertyDescriptor | undefined {
           const actual = Object.getOwnPropertyDescriptor(object, name);
@@ -527,7 +529,11 @@ test("property helper exposes legacy verification APIs", async () => {
     new URL("test262/harness/propertyHelper.js", import.meta.url),
     "utf8",
   );
-  const target: Record<string, number | string> = { writable: 1 };
+  interface PropertyHelperTarget {
+    [name: string]: number | string;
+    writable: number;
+  }
+  const target: PropertyHelperTarget = { writable: 1 };
   Object.defineProperty(target, "fixed", {
     configurable: false,
     enumerable: false,
@@ -540,9 +546,9 @@ test("property helper exposes legacy verification APIs", async () => {
     value: 2,
   });
   const harnessAssert = Object.assign(
-    (value: unknown) => assert.equal(value, true),
+    (value: boolean) => assert.equal(value, true),
     {
-      sameValue(actual: unknown, expected: unknown): void {
+      sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
         assert.ok(Object.is(actual, expected));
       },
     },
@@ -579,9 +585,9 @@ test("property helper verifies accessors and rejects extra keys", async () => {
     get: propertyHelperGetter,
   });
   const harnessAssert = Object.assign(
-    (value: unknown) => assert.equal(value, true),
+    (value: boolean) => assert.equal(value, true),
     {
-      sameValue(actual: unknown, expected: unknown): void {
+      sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
         assert.ok(Object.is(actual, expected));
       },
     },
@@ -1434,7 +1440,7 @@ test("executes module cases with explicit module intent", async () => {
     );
     assert.ok(
       result.execution?.moduleGraph?.every(
-        (node) => typeof node.sourceHash === "string" && node.sourceHash !== "",
+        (node) => isString(node.sourceHash) && node.sourceHash !== "",
       ),
     );
   } finally {

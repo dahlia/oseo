@@ -23,5 +23,6 @@
     "tests/**/*.ts",
     "tools/**/*.ts",
     "tsdown.config.ts"
-  ]
+  ],
+  "exclude": ["tools/oxlint/anti-slop/**"]
 }

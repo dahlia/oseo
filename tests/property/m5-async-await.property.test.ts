@@ -20,6 +20,7 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { isNumber } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty, propertySize } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -240,7 +241,7 @@ function expectedOutput(testCase: AwaitCase): string {
   lines.push("finally before", "finally after");
   const value = rejects
     ? -99
-    : typeof body.value === "number"
+    : isNumber(body.value)
       ? body.value + 1
       : `${body.value}1`;
   lines.push(`result ${value}`);

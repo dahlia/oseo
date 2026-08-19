@@ -3,6 +3,7 @@ import {
   node,
   type BabelComment,
   type BabelNode,
+  type BabelNodeValue,
   type ConvertContext,
 } from "./babel.ts";
 import { sourceRange, unsupported } from "./locations.ts";
@@ -20,7 +21,7 @@ const hintNames: ReadonlyMap<string, HintName> = new Map<string, HintName>([
 
 export function typeHint(
   context: ConvertContext,
-  annotationValue: unknown,
+  annotationValue: BabelNodeValue,
 ): Hint | undefined {
   const annotation = node(annotationValue);
   if (annotation == null) return undefined;

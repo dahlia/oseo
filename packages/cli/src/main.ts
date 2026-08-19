@@ -9,6 +9,7 @@ interface PackageManifest {
   readonly version: string;
 }
 
+// SAFETY: This checked-in manifest is validated by the package checks.
 const manifest = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 ) as PackageManifest;

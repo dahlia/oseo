@@ -194,7 +194,7 @@ function operand(testCase: SuperTargetCase): string {
  */
 function statement(testCase: SuperTargetCase): string {
   const target = operand(testCase);
-  const statements: Record<TargetForm, string> = {
+  const statements = {
     "array-element": `[${target}] = [7];`,
     "array-rest": `[...${target}] = [7];`,
     "element-default": `[${target} = 7] = [];`,
@@ -205,7 +205,7 @@ function statement(testCase: SuperTargetCase): string {
     "nested-array": `[[${target}]] = [[7]];`,
     "object-property": `({ p: ${target} } = { p: 7 });`,
     "object-rest": `({ ...${target} } = { r: 7 });`,
-  };
+  } satisfies Record<TargetForm, string>;
   return statements[testCase.target];
 }
 
@@ -231,10 +231,7 @@ function element(testCase: SuperTargetCase): {
 } {
   const instance = body(testCase, "Base.prototype");
   const statics = body(testCase, "Base");
-  const members: Record<
-    ElementForm,
-    { readonly member: string; readonly trigger: string }
-  > = {
+  const members = {
     arrow: {
       member:
         `run() {\n    const reach = () => {${instance}\n    };\n` +
@@ -274,7 +271,10 @@ function element(testCase: SuperTargetCase): {
       member: `static run() {${statics}\n  }`,
       trigger: "Probe.run()",
     },
-  };
+  } satisfies Record<
+    ElementForm,
+    { readonly member: string; readonly trigger: string }
+  >;
   return members[testCase.element];
 }
 

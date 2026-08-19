@@ -12,6 +12,12 @@ import type {
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
 
+import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
+
 const classifications = new Set<Test262Classification>([
   "expected-negative",
   "harness-failure",
@@ -51,33 +57,31 @@ interface ManifestPartitionReference {
   readonly path: string;
 }
 
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function stringValue(value: unknown, description: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+function stringValue(value: StructuredDataInput, description: string): string {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
-  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
+  if (!Array.isArray(value) || value.some((item) => !isString(item))) {
     throw new Error(`${description} must be an array of strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
 function classification(
-  value: unknown,
+  value: StructuredDataInput,
   description: string,
 ): Test262Classification {
+  // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
-  if (typeof value === "string" && classifications.has(candidate)) {
+  if (isString(value) && classifications.has(candidate)) {
     return candidate;
   }
   throw new Error(`${description} is invalid.`);
@@ -110,7 +114,11 @@ function validateGroup(group: string, description: string): void {
 function parsePartitionReferences(
   text: string,
 ): readonly ManifestPartitionReference[] {
-  const root = record(parseYaml(text) as unknown, "test262 results index");
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 results index",
+  );
   if (!Array.isArray(root.partitions)) {
     throw new Error("test262 results index needs a partitions array.");
   }
@@ -173,7 +181,7 @@ export function validateReviewedManifestFileSet(
 }
 
 function parseResult(
-  value: unknown,
+  value: StructuredDataInput,
   index: number,
   group: string,
   key: string,
@@ -215,7 +223,16 @@ function parseResult(
   ) {
     throw new Error(`test262 result ${index} failure kind does not match.`);
   }
-  return item as unknown as Test262Result;
+  return assumeValidatedResult(item);
+}
+
+/** Convert only after parseResult has validated the record's owned fields. */
+function assumeValidatedResult(
+  value: StructuredDataInput<Test262Result>,
+): Test262Result {
+  // SAFETY: parseResult validates path, classification, dependencies,
+  // and failureKind, the fields consumed from reviewed results.
+  return value as Test262Result;
 }
 
 /** Parse the index and all of its canonical result partitions. */
@@ -223,7 +240,11 @@ export function parseReviewedManifest(
   indexText: string,
   readPartition: (path: string) => string,
 ): ReviewedTest262Manifest {
-  const root = record(parseYaml(indexText) as unknown, "test262 results index");
+  // SAFETY: parsedObject validates the complete YAML index tree.
+  const root = record(
+    parseYaml(indexText) as StructuredDataInput,
+    "test262 results index",
+  );
   const suiteRevision = stringValue(
     root.suiteRevision,
     "test262 results suiteRevision",
@@ -231,8 +252,9 @@ export function parseReviewedManifest(
   const references = parsePartitionReferences(indexText);
   const results: Test262Result[] = [];
   for (const reference of references) {
+    // SAFETY: parsedObject validates each complete partition tree.
     const partition = record(
-      parseYaml(readPartition(reference.path)) as unknown,
+      parseYaml(readPartition(reference.path)) as StructuredDataInput,
       `test262 partition ${reference.path}`,
     );
     if (partition.group !== reference.group) {
@@ -285,7 +307,7 @@ export function parseReviewedManifest(
   return { results, suiteRevision, summary };
 }
 
-function stringify(value: unknown): string {
+function stringify<Candidate>(value: StructuredDataInput<Candidate>): string {
   // Detail strings can occur at deep indentation, so reserve eight columns
   // below the repository limit for the serializer's indentation.
   return stringifyYaml(value, { lineWidth: 72 });
@@ -415,7 +437,11 @@ export function validateTargetParity(
   suiteRevision: string,
   executionTarget: string | undefined,
 ): void {
-  const root = record(parseYaml(text) as unknown, "test262 target parity");
+  // SAFETY: parsedObject validates the complete parity YAML tree.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 target parity",
+  );
   if (root.canonicalManifest !== "results.yaml") {
     throw new Error("test262 target parity must name results.yaml.");
   }

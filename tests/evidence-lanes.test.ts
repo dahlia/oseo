@@ -11,6 +11,7 @@ import {
   validatedEvidenceFamilyIdsFromTree,
 } from "../tools/evidence-lanes.ts";
 import type { EvidenceSource } from "../tools/evidence-lanes.ts";
+import type { StructuredDataRecord } from "../tools/structured-data.ts";
 
 const id = "sample-family";
 const indexPath = `${evidenceIndexDirectory}/${id}.yaml`;
@@ -21,7 +22,7 @@ const references = new Set([
 ]);
 
 function indexSource(
-  overrides: Readonly<Record<string, unknown>> = {},
+  overrides: Readonly<StructuredDataRecord> = {},
   path = indexPath,
 ): EvidenceSource {
   return {
@@ -35,7 +36,7 @@ function indexSource(
   };
 }
 
-function coveredEvidence(): Record<string, unknown> {
+function coveredEvidence(): StructuredDataRecord {
   return Object.fromEntries(
     evidenceClasses.map((className) => [
       className,
@@ -48,7 +49,7 @@ function coveredEvidence(): Record<string, unknown> {
 }
 
 function recordSource(
-  overrides: Readonly<Record<string, unknown>> = {},
+  overrides: Readonly<StructuredDataRecord> = {},
   path = recordPath,
 ): EvidenceSource {
   return {
@@ -103,8 +104,11 @@ test("rejects malformed records and unknown or missing fields", () => {
     () => validate(undefined, [recordSource({ extra: true })]),
     /unknown field extra/u,
   );
-  const value = JSON.parse(recordSource().text) as Record<string, unknown>;
-  delete value.title;
+  // SAFETY: recordSource returns a validated structured-data object fixture.
+  const value = {
+    ...(JSON.parse(recordSource().text) as StructuredDataRecord),
+    title: undefined,
+  };
   assert.throws(
     () =>
       validate(undefined, [{ path: recordPath, text: JSON.stringify(value) }]),
@@ -113,8 +117,7 @@ test("rejects malformed records and unknown or missing fields", () => {
 });
 
 test("rejects unknown or missing evidence classes", () => {
-  const missing = coveredEvidence();
-  delete missing.standards;
+  const missing = { ...coveredEvidence(), standards: undefined };
   assert.throws(
     () => validate(undefined, [recordSource({ evidence: missing })]),
     /missing field standards/u,

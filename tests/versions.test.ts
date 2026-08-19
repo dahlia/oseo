@@ -129,6 +129,7 @@ test("discovers newly added workspace packages", async () => {
     });
     await setWorkspaceVersion(root, "1.2.3");
     for (const filename of ["package.json", "deno.json"]) {
+      // SAFETY: The fixture generator writes manifests with a version field.
       const manifest = JSON.parse(
         await readFile(join(packageRoot, filename), "utf8"),
       ) as { readonly version: string };
@@ -183,12 +184,37 @@ test("rejects non-workspace internal dependencies", async () => {
   const root = await fixtureWorkspace();
   try {
     const cliPath = join(root, "packages", "cli", "package.json");
+    // SAFETY: The fixture writes this package's dependency record.
     const manifest = JSON.parse(await readFile(cliPath, "utf8")) as {
       dependencies: Record<string, string>;
     };
     manifest.dependencies["@oseo/compiler"] = "0.0.0";
     await writeFile(cliPath, `${JSON.stringify(manifest, null, 2)}\n`);
     await assert.rejects(checkWorkspaceVersions(root), /workspace:\*/u);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
+test("rejects malformed dependency fields and ranges", async () => {
+  const root = await fixtureWorkspace();
+  const cliPath = join(root, "packages", "cli", "package.json");
+  try {
+    const valid = JSON.parse(await readFile(cliPath, "utf8"));
+    await writeFile(
+      cliPath,
+      `${JSON.stringify({ ...valid, dependencies: "@oseo/compiler" })}\n`,
+    );
+    await assert.rejects(checkWorkspaceVersions(root), /must be objects/u);
+
+    await writeFile(
+      cliPath,
+      `${JSON.stringify({
+        ...valid,
+        dependencies: { "@oseo/compiler": 1 },
+      })}\n`,
+    );
+    await assert.rejects(checkWorkspaceVersions(root), /must be strings/u);
   } finally {
     await rm(root, { force: true, recursive: true });
   }

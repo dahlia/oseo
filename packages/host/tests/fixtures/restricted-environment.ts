@@ -5,6 +5,7 @@ interface RestrictedDenoRuntime {
   execPath(): string;
 }
 
+// SAFETY: The fixture runs only with this restricted Deno API.
 const runtime = (
   globalThis as typeof globalThis & {
     readonly Deno?: RestrictedDenoRuntime;

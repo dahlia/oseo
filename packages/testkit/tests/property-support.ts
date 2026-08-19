@@ -99,6 +99,7 @@ export function assertProperty<T>(
   options: PropertySuiteOptions,
 ): void {
   try {
+    // SAFETY: propertyParameters constructs fast-check's Parameters<T> fields.
     fc.assert(property, propertyParameters(options) as Parameters<T>);
   } catch (error) {
     const detail = error instanceof Error ? error.message : `${error}`;
@@ -120,6 +121,7 @@ export async function assertAsyncProperty<T>(
   options: PropertySuiteOptions,
 ): Promise<void> {
   try {
+    // SAFETY: propertyParameters constructs fast-check's Parameters<T> fields.
     await fc.assert(property, propertyParameters(options) as Parameters<T>);
   } catch (error) {
     const detail = error instanceof Error ? error.message : `${error}`;

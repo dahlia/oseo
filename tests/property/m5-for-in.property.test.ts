@@ -98,7 +98,10 @@ const caseArbitrary: fc.Arbitrary<ForInCase> = fc.record({
         maxLength: 4,
         selector: (spec) => spec.name,
       })
-      .map((specs) => specs as readonly KeySpec[]),
+      .map((specs) => {
+        // SAFETY: keySpecArbitrary generates exactly the KeySpec domain.
+        return specs as readonly KeySpec[];
+      }),
     { maxLength: 3, minLength: 1 },
   ),
   mutation: fc.constantFrom(
@@ -260,11 +263,7 @@ function subjectSource(testCase: ForInCase): string {
   return levelName(0);
 }
 
-function headSource(testCase: ForInCase): {
-  readonly declaration: string;
-  readonly head: string;
-  readonly read: string;
-} {
+function headSource(testCase: ForInCase) {
   if (testCase.head === "const" || testCase.head === "let") {
     return {
       declaration: "",

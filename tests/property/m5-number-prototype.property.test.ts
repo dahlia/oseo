@@ -74,10 +74,7 @@ const nativeTarget = targetForExecutionHost(
  * shared implementation.
  */
 
-function exactRatio(
-  mantissa: bigint,
-  exponent: number,
-): { readonly denominator: bigint; readonly numerator: bigint } {
+function exactRatio(mantissa: bigint, exponent: number) {
   if (exponent >= 0) {
     return { denominator: 1n, numerator: mantissa << BigInt(exponent) };
   }
@@ -103,7 +100,7 @@ function significantDigits(
   mantissa: bigint,
   exponent: number,
   precision: number,
-): { readonly digits: string; readonly e: number } {
+) {
   if (mantissa === 0n) return { digits: "0".repeat(precision), e: 0 };
   const { denominator, numerator } = exactRatio(mantissa, exponent);
   const value = Number(mantissa) * 2 ** exponent;

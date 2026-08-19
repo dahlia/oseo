@@ -44,6 +44,13 @@ import type {
   BindingPatternMode,
   LogicalOperator,
 } from "./syntax.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 function controlTarget(builder: MirBuilder, blockId: number): MirControlTarget {
   return { blockId, cleanupDepth: builder.finalizers.length };
 }
@@ -65,9 +72,10 @@ function appendMirMetadata(
     id,
     kind,
     range,
-    ...(kind === "check-status" && abruptTarget != null
-      ? { abruptTarget }
-      : {}),
+    ...includePropertiesWhen(() => {
+      if (!(kind === "check-status" && abruptTarget != null)) return undefined;
+      return { abruptTarget };
+    }),
     ...extra,
   });
 }
@@ -179,7 +187,7 @@ function lowerReferenceObject(
   keyExpression: HirExpression,
   operand: (HirExpression & { readonly kind: "super-base" }) | undefined,
   builder: MirBuilder,
-): { readonly keyInput: number; readonly object: number } {
+) {
   if (operand == null) {
     const object = lowerExpression(objectExpression, builder);
     return { keyInput: lowerExpression(keyExpression, builder), object };
@@ -195,7 +203,7 @@ function lowerSpecializedPropertyGet(
   builder: MirBuilder,
   superReceiver?: number,
 ): number {
-  const shapeBlock = createMirBlock(builder);
+  const cacheBlock = createMirBlock(builder);
   const hitBlock = createMirBlock(builder);
   const genericBlock = createMirBlock(builder);
   const joinBlock = createMirBlock(builder);
@@ -204,7 +212,7 @@ function lowerSpecializedPropertyGet(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [object],
-    detail: `object -> bb${shapeBlock.id}, miss -> bb${genericBlock.id}`,
+    detail: `object -> bb${cacheBlock.id}, miss -> bb${genericBlock.id}`,
     id: objectGuard,
     kind: "guard-object",
     range,
@@ -213,23 +221,23 @@ function lowerSpecializedPropertyGet(
     kind: "branch",
     test: objectGuard,
     whenFalse: genericBlock.id,
-    whenTrue: shapeBlock.id,
+    whenTrue: cacheBlock.id,
   };
 
-  builder.current = shapeBlock;
-  const shapeGuard = builder.nextValue;
+  builder.current = cacheBlock;
+  const cacheGuard = builder.nextValue;
   builder.nextValue += 1;
-  shapeBlock.operations.push({
+  cacheBlock.operations.push({
     arguments: [object],
-    cacheId: shapeGuard,
+    cacheId: cacheGuard,
     detail: `cached slot -> bb${hitBlock.id}, miss -> bb${genericBlock.id}`,
-    id: shapeGuard,
+    id: cacheGuard,
     kind: "guard-shape",
     range,
   });
-  shapeBlock.terminator = {
+  cacheBlock.terminator = {
     kind: "branch",
-    test: shapeGuard,
+    test: cacheGuard,
     whenFalse: genericBlock.id,
     whenTrue: hitBlock.id,
   };
@@ -240,7 +248,7 @@ function lowerSpecializedPropertyGet(
   builder.nextValue += 1;
   hitBlock.operations.push({
     arguments: [object],
-    cacheId: shapeGuard,
+    cacheId: cacheGuard,
     detail: "cached own-property slot",
     id: hitValue,
     kind: "load-fixed-slot",
@@ -272,7 +280,12 @@ function lowerSpecializedPropertyGet(
     id: genericValue,
     kind: "property-get",
     range,
-    ...(superReceiver == null ? {} : { superReference: true as const }),
+    ...includePropertiesWhen(() => {
+      if (superReceiver == null) return undefined;
+      return {
+        superReference: true as const,
+      };
+    }),
   });
   appendMirMetadata(
     builder,
@@ -288,7 +301,7 @@ function lowerSpecializedPropertyGet(
     "relearn stable own slot",
     [object, key],
     range,
-    { cacheId: shapeGuard },
+    { cacheId: cacheGuard },
   );
   genericBlock.terminator = {
     kind: "jump",
@@ -536,7 +549,7 @@ function lowerCallArguments(
   argumentsValue: readonly HirCallArgument[],
   range: SourceRange,
   builder: MirBuilder,
-): { readonly ids: readonly number[]; readonly list?: number } {
+) {
   if (!argumentsValue.some((argument) => argument.kind === "spread")) {
     return {
       ids: argumentsValue.map((argument) => {
@@ -617,10 +630,18 @@ function lowerBindingWrite(
     arguments: [value],
     bindingId: expression.bindingId,
     detail: `%b${expression.bindingId} ${expression.name}`,
-    ...(expression.functionNameBinding === true
-      ? { functionNameBinding: true }
-      : {}),
-    ...(expression.importedBinding === true ? { importedBinding: true } : {}),
+    ...includePropertiesWhen(() => {
+      if (!(expression.functionNameBinding === true)) return undefined;
+      return {
+        functionNameBinding: true,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!(expression.importedBinding === true)) return undefined;
+      return {
+        importedBinding: true,
+      };
+    }),
     id,
     kind: "write",
     mutable: expression.mutable,
@@ -659,7 +680,12 @@ function lowerPropertyRead(
     id,
     kind: "property-get",
     range,
-    ...(superReceiver == null ? {} : { superReference: true as const }),
+    ...includePropertiesWhen(() => {
+      if (superReceiver == null) return undefined;
+      return {
+        superReference: true as const,
+      };
+    }),
   });
   appendMirMetadata(
     builder,
@@ -841,7 +867,12 @@ function lowerPropertyWrite(
     kind: "property-set",
     range,
     ...strictCodeFlag(builder),
-    ...(superReceiver == null ? {} : { superReference: true as const }),
+    ...includePropertiesWhen(() => {
+      if (superReceiver == null) return undefined;
+      return {
+        superReference: true as const,
+      };
+    }),
   });
   appendMirMetadata(
     builder,
@@ -985,7 +1016,7 @@ function lowerWithRead(
   reference: HirWithReference,
   builder: MirBuilder,
   retainReceiver: boolean,
-): { readonly receiver?: number; readonly value: number } {
+) {
   const selected = lowerWithReference(reference, builder);
   const propertyBlock = createMirBlock(builder);
   const fallbackBlock = createMirBlock(builder);
@@ -1031,7 +1062,13 @@ function lowerWithRead(
   builder.current = joinBlock;
   recordRoot(builder, value, reference.range);
   if (receiver != null) recordRoot(builder, receiver, reference.range);
-  return { ...(receiver == null ? {} : { receiver }), value };
+  return {
+    ...includePropertiesWhen(() => {
+      if (receiver == null) return undefined;
+      return { receiver };
+    }),
+    value,
+  };
 }
 
 /** Delete the binding selected by one non-strict `with` environment chain. */
@@ -1503,12 +1540,7 @@ function appendAsyncGeneratorYield(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
-): {
-  readonly resume: MutableMirBlock;
-  readonly returnResume: MutableMirBlock;
-  readonly sent: number;
-  readonly throwResume: MutableMirBlock;
-} {
+) {
   const yielded = value;
   appendMirMetadata(
     builder,
@@ -1622,7 +1654,12 @@ function lowerAwaitedIteratorStep(
     id: continues,
     iteratorStepKind: kind,
     iteratorValueResult: value,
-    ...(valueWhenDone ? { iteratorValueWhenDone: true as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (!valueWhenDone) return undefined;
+      return {
+        iteratorValueWhenDone: true as const,
+      };
+    }),
     kind: "iterator-await-result",
     range,
   });
@@ -2801,9 +2838,12 @@ function lowerClassPrivateMethod(
   const recorded = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    ...(element.accessorKind == null
-      ? {}
-      : { accessorKind: element.accessorKind }),
+    ...includePropertiesWhen(() => {
+      if (element.accessorKind == null) return undefined;
+      return {
+        accessorKind: element.accessorKind,
+      };
+    }),
     arguments: [constructorValue, privateNameValue, value],
     detail:
       element.accessorKind == null
@@ -3290,7 +3330,12 @@ function lowerOptionalChain(
     const called = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
+      ...includePropertiesWhen(() => {
+        if (lowered.list == null) return undefined;
+        return {
+          argumentListId: lowered.list,
+        };
+      }),
       arguments: callArguments,
       detail: "optional chain function value",
       id: called,
@@ -3509,9 +3554,12 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      ...(accessorNamePrefix == null
-        ? {}
-        : { accessorKind: accessorNamePrefix }),
+      ...includePropertiesWhen(() => {
+        if (accessorNamePrefix == null) return undefined;
+        return {
+          accessorKind: accessorNamePrefix,
+        };
+      }),
       arguments: inferredFunctionName == null ? [] : [inferredFunctionName],
       detail:
         `function @f${expression.functionId} ` +
@@ -3521,9 +3569,12 @@ function lowerExpression(
       functionKind: expression.functionKind,
       functionLength: expression.functionLength,
       functionName: expression.name,
-      ...(expression.sourceText == null
-        ? {}
-        : { functionSource: expression.sourceText }),
+      ...includePropertiesWhen(() => {
+        if (expression.sourceText == null) return undefined;
+        return {
+          functionSource: expression.sourceText,
+        };
+      }),
       id,
       kind: "function-create",
       range: expression.range,
@@ -4261,7 +4312,12 @@ function lowerExpression(
       id,
       kind: expression.kind,
       range: expression.range,
-      ...(superReceiver == null ? {} : { superReference: true as const }),
+      ...includePropertiesWhen(() => {
+        if (superReceiver == null) return undefined;
+        return {
+          superReference: true as const,
+        };
+      }),
     });
     appendMirMetadata(
       builder,
@@ -4320,7 +4376,12 @@ function lowerExpression(
       kind: "property-set",
       range: expression.range,
       ...strictCodeFlag(builder),
-      ...(superReceiver == null ? {} : { superReference: true as const }),
+      ...includePropertiesWhen(() => {
+        if (superReceiver == null) return undefined;
+        return {
+          superReference: true as const,
+        };
+      }),
     });
     appendMirMetadata(
       builder,
@@ -4591,7 +4652,12 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
+      ...includePropertiesWhen(() => {
+        if (lowered.list == null) return undefined;
+        return {
+          argumentListId: lowered.list,
+        };
+      }),
       arguments: argumentsValue,
       detail: "dynamic constructor",
       id,
@@ -4720,7 +4786,12 @@ function lowerExpression(
         id: callee,
         kind: "property-get",
         range: expression.range,
-        ...(operand == null ? {} : { superReference: true as const }),
+        ...includePropertiesWhen(() => {
+          if (operand == null) return undefined;
+          return {
+            superReference: true as const,
+          };
+        }),
       });
       appendMirMetadata(
         builder,
@@ -4755,7 +4826,12 @@ function lowerExpression(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    ...(argumentListId == null ? {} : { argumentListId }),
+    ...includePropertiesWhen(() => {
+      if (argumentListId == null) return undefined;
+      return {
+        argumentListId,
+      };
+    }),
     arguments: callArguments,
     detail,
     id,
@@ -4827,7 +4903,12 @@ function lowerSuperCall(
   const constructed = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
+    ...includePropertiesWhen(() => {
+      if (lowered.list == null) return undefined;
+      return {
+        argumentListId: lowered.list,
+      };
+    }),
     arguments: callArguments,
     detail: "super constructor",
     id: constructed,
@@ -4970,7 +5051,12 @@ function setCompletion(
     {
       completionKind: kind,
       completionSlot: slot,
-      ...(target == null ? {} : { completionTarget: target }),
+      ...includePropertiesWhen(() => {
+        if (target == null) return undefined;
+        return {
+          completionTarget: target,
+        };
+      }),
     },
   );
 }
@@ -5097,8 +5183,18 @@ function lowerTryStatement(
       builder.current.terminator = {
         completionSlot: finallyBlock.id,
         kind: "resume-completion",
-        ...(outerAbrupt == null ? {} : { outerAbrupt }),
-        ...(outerFinalizer == null ? {} : { outerFinalizer }),
+        ...includePropertiesWhen(() => {
+          if (outerAbrupt == null) return undefined;
+          return {
+            outerAbrupt,
+          };
+        }),
+        ...includePropertiesWhen(() => {
+          if (outerFinalizer == null) return undefined;
+          return {
+            outerFinalizer,
+          };
+        }),
       };
     }
     if (finallyTerminated) {
@@ -5205,12 +5301,16 @@ function lowerForHeadTarget(
       arguments: [value],
       bindingId: target.bindingId,
       detail: `%b${target.bindingId} ${target.name}`,
-      ...(target.kind === "binding" && target.functionNameBinding === true
-        ? { functionNameBinding: true }
-        : {}),
-      ...(target.kind === "binding" && target.importedBinding === true
-        ? { importedBinding: true }
-        : {}),
+      ...includePropertiesWhen(() => {
+        if (!(target.kind === "binding" && target.functionNameBinding === true))
+          return undefined;
+        return { functionNameBinding: true };
+      }),
+      ...includePropertiesWhen(() => {
+        if (!(target.kind === "binding" && target.importedBinding === true))
+          return undefined;
+        return { importedBinding: true };
+      }),
       id,
       kind: "write",
       mutable: target.mutable,
@@ -5286,7 +5386,12 @@ function lowerForHeadTarget(
     kind: "property-set",
     range: target.range,
     ...strictCodeFlag(builder),
-    ...(superReceiver == null ? {} : { superReference: true as const }),
+    ...includePropertiesWhen(() => {
+      if (superReceiver == null) return undefined;
+      return {
+        superReference: true as const,
+      };
+    }),
   });
   appendMirMetadata(builder, "check-status", abruptNote, [id], target.range);
   recordRoot(builder, id, target.range);
@@ -5484,8 +5589,16 @@ function lowerForOfStatement(
   builder.current.terminator = {
     completionSlot: closeBlock.id,
     kind: "resume-completion",
-    ...(outerAbrupt == null ? {} : { outerAbrupt }),
-    ...(outerFinalizer == null ? {} : { outerFinalizer }),
+    ...includePropertiesWhen(() => {
+      if (outerAbrupt == null) return undefined;
+      return { outerAbrupt };
+    }),
+    ...includePropertiesWhen(() => {
+      if (outerFinalizer == null) return undefined;
+      return {
+        outerFinalizer,
+      };
+    }),
   };
 
   builder.current = exitBlock;
@@ -5635,7 +5748,7 @@ function lowerBindingIteratorNext(
   doneState: number,
   range: SourceRange,
   builder: MirBuilder,
-): { readonly hasValue: number; readonly value: number } {
+) {
   appendMirMetadata(
     builder,
     "safepoint",
@@ -5784,7 +5897,12 @@ function lowerBindingTarget(
       kind: "property-set",
       range: pattern.range,
       ...strictCodeFlag(builder),
-      ...(superReceiver == null ? {} : { superReference: true as const }),
+      ...includePropertiesWhen(() => {
+        if (superReceiver == null) return undefined;
+        return {
+          superReference: true as const,
+        };
+      }),
     });
     appendMirMetadata(
       builder,
@@ -5849,13 +5967,26 @@ function lowerBindingTarget(
     arguments: [value],
     bindingId: pattern.bindingId,
     detail: `%b${pattern.bindingId} ${pattern.name}`,
-    ...(pattern.functionNameBinding === true
-      ? { functionNameBinding: true }
-      : {}),
-    ...(pattern.importedBinding === true ? { importedBinding: true } : {}),
+    ...includePropertiesWhen(() => {
+      if (!(pattern.functionNameBinding === true)) return undefined;
+      return {
+        functionNameBinding: true,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!(pattern.importedBinding === true)) return undefined;
+      return {
+        importedBinding: true,
+      };
+    }),
     id,
     kind: mode === "write" ? "write" : "initialize",
-    ...(mode === "write" ? { mutable: pattern.mutable } : {}),
+    ...includePropertiesWhen(() => {
+      if (!(mode === "write")) return undefined;
+      return {
+        mutable: pattern.mutable,
+      };
+    }),
     range: pattern.range,
   });
   if (mode === "write") {
@@ -5919,11 +6050,24 @@ function lowerAssignmentReference(
       key: keyInput,
       kind: "property",
       object,
-      ...(superReceiver == null ? {} : { superReceiver }),
-      ...(initialExists == null ? {} : { initialExists }),
-      ...(pattern.strictGlobalFallback == null
-        ? {}
-        : { strictGlobalFallback: pattern.strictGlobalFallback }),
+      ...includePropertiesWhen(() => {
+        if (superReceiver == null) return undefined;
+        return {
+          superReceiver,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (initialExists == null) return undefined;
+        return {
+          initialExists,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (pattern.strictGlobalFallback == null) return undefined;
+        return {
+          strictGlobalFallback: pattern.strictGlobalFallback,
+        };
+      }),
     };
   }
   if (pattern.kind === "assignment-private") {
@@ -6220,8 +6364,16 @@ function lowerArrayBindingPattern(
   builder.current.terminator = {
     completionSlot: closeBlock.id,
     kind: "resume-completion",
-    ...(outerAbrupt == null ? {} : { outerAbrupt }),
-    ...(outerFinalizer == null ? {} : { outerFinalizer }),
+    ...includePropertiesWhen(() => {
+      if (outerAbrupt == null) return undefined;
+      return { outerAbrupt };
+    }),
+    ...includePropertiesWhen(() => {
+      if (outerFinalizer == null) return undefined;
+      return {
+        outerFinalizer,
+      };
+    }),
   };
   builder.current = exitBlock;
   appendMirMetadata(
@@ -6285,9 +6437,12 @@ function lowerStatements(
           kind: "function",
           name: statement.functionName,
           range: statement.range,
-          ...(statement.sourceText == null
-            ? {}
-            : { sourceText: statement.sourceText }),
+          ...includePropertiesWhen(() => {
+            if (statement.sourceText == null) return undefined;
+            return {
+              sourceText: statement.sourceText,
+            };
+          }),
         },
         builder,
       );
@@ -6314,7 +6469,12 @@ function lowerStatements(
         detail: `%b${statement.bindingId} ${statement.name}`,
         id,
         kind: writesThroughOuterBinding ? "write" : "initialize",
-        ...(writesThroughOuterBinding ? { mutable: true } : {}),
+        ...includePropertiesWhen(() => {
+          if (!writesThroughOuterBinding) return undefined;
+          return {
+            mutable: true,
+          };
+        }),
         range: statement.range,
       });
       if (writesThroughOuterBinding) {
@@ -6897,7 +7057,12 @@ function buildMirFunction(
     asyncGenerator,
     blocks: [entry],
     current: entry,
-    ...(fieldKeyBindingId == null ? {} : { fieldKeyBindingId }),
+    ...includePropertiesWhen(() => {
+      if (fieldKeyBindingId == null) return undefined;
+      return {
+        fieldKeyBindingId,
+      };
+    }),
     labels: [],
     loops: [],
     finalizers: [],
@@ -6960,24 +7125,67 @@ function buildMirFunction(
         end: { ...parameter.range.end },
         start: { ...parameter.range.start },
       },
-      ...(parameter.rest === true ? { rest: true as const } : {}),
+      ...includePropertiesWhen(() => {
+        if (!(parameter.rest === true)) return undefined;
+        return {
+          rest: true as const,
+        };
+      }),
     }),
   );
   return {
-    ...(argumentsBindingId == null ? {} : { argumentsBindingId }),
-    ...(argumentsMapped ? { argumentsMapped: true as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (argumentsBindingId == null) return undefined;
+      return {
+        argumentsBindingId,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!argumentsMapped) return undefined;
+      return {
+        argumentsMapped: true as const,
+      };
+    }),
     blocks: builder.blocks.map((block) => ({
       id: block.id,
       operations: block.operations,
-      ...(block.parameters == null ? {} : { parameters: block.parameters }),
+      ...includePropertiesWhen(() => {
+        if (block.parameters == null) return undefined;
+        return {
+          parameters: block.parameters,
+        };
+      }),
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
-    ...(asyncGenerator ? { asyncGenerator: true as const } : {}),
-    ...(asyncFunction ? { asyncFunction: true as const } : {}),
-    ...(derivedThisBindingId == null ? {} : { derivedThisBindingId }),
+    ...includePropertiesWhen(() => {
+      if (!asyncGenerator) return undefined;
+      return {
+        asyncGenerator: true as const,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!asyncFunction) return undefined;
+      return {
+        asyncFunction: true as const,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (derivedThisBindingId == null) return undefined;
+      return {
+        derivedThisBindingId,
+      };
+    }),
     functionLength,
-    ...(generator ? { generator: true as const } : {}),
-    ...(generatorBodyStart == null ? {} : { generatorBodyStart }),
+    ...includePropertiesWhen(() => {
+      if (!generator) return undefined;
+      return { generator: true as const };
+    }),
+    ...includePropertiesWhen(() => {
+      if (generatorBodyStart == null) return undefined;
+      return {
+        generatorBodyStart,
+      };
+    }),
     id,
     kind: "mir-function",
     localBindingIds: [...localBindingIds],
@@ -6987,7 +7195,12 @@ function buildMirFunction(
     range,
     rootSlotCount: builder.nextValue + parameters.length + 1,
     strict,
-    ...(selfBindingId == null ? {} : { selfBindingId }),
+    ...includePropertiesWhen(() => {
+      if (selfBindingId == null) return undefined;
+      return {
+        selfBindingId,
+      };
+    }),
   };
 }
 

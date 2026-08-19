@@ -19,8 +19,18 @@ export interface BabelComment {
   readonly value?: string;
 }
 
+export type BabelNodeValue =
+  | BabelComment
+  | BabelNode
+  | readonly BabelNodeValue[]
+  | boolean
+  | null
+  | number
+  | string
+  | undefined;
+
 export interface BabelNode {
-  readonly [key: string]: unknown;
+  readonly [key: string]: BabelNodeValue | undefined;
   readonly end?: number;
   readonly leadingComments?: readonly BabelComment[];
   readonly start?: number;
@@ -83,14 +93,39 @@ export interface SourceIndex {
 export type AssignmentArrayBindingElement =
   SyntaxArrayBindingPattern<SyntaxAssignmentPattern>["elements"][number];
 
-export function node(value: unknown): BabelNode | undefined {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+export function isBoolean<Candidate>(
+  value: Candidate,
+): value is Candidate & boolean {
+  return typeof value === "boolean";
+}
+
+export function isNumber<Candidate>(
+  value: Candidate,
+): value is Candidate & number {
+  return typeof value === "number";
+}
+
+export function isObject<Candidate>(
+  value: Candidate,
+): value is Candidate & object {
+  return value !== null && typeof value === "object";
+}
+
+export function isString<Candidate>(
+  value: Candidate,
+): value is Candidate & string {
+  return typeof value === "string";
+}
+
+export function node<T>(value: T): BabelNode | undefined {
+  if (!isObject(value) || Array.isArray(value)) {
     return undefined;
   }
+  // SAFETY: BabelNode is an open record and the object check establishes it.
   return value as BabelNode;
 }
 
-export function nodes(value: unknown): readonly BabelNode[] {
+export function nodes<T>(value: T): readonly BabelNode[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item) => {
     const valueNode = node(item);

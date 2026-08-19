@@ -15,7 +15,7 @@ const config: UserConfig = defineConfig({
   entry: ["src/*.ts"],
   format: ["esm"],
   minify: false,
-  outExtensions(): { readonly js: ".js" } {
+  outExtensions() {
     return { js: ".js" };
   },
   publint: {

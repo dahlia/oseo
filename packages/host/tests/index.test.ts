@@ -15,8 +15,27 @@ import {
   normalizeExecutionHost,
 } from "../src/index.ts";
 
+interface MinimalDenoCommand {
+  output(): Promise<{
+    readonly code: number;
+    readonly stderr: Uint8Array;
+    readonly stdout: Uint8Array;
+  }>;
+}
+
+interface MinimalDenoCommandConstructor {
+  new (
+    command: string,
+    options: {
+      readonly args: readonly string[];
+      readonly stderr: "piped";
+      readonly stdout: "piped";
+    },
+  ): MinimalDenoCommand;
+}
+
 interface MinimalDenoRuntime {
-  Command?: unknown;
+  Command?: MinimalDenoCommandConstructor;
   cwd?(): string;
   env?: {
     delete(name: string): void;
@@ -37,6 +56,10 @@ interface MinimalDenoRuntime {
     options?: { readonly recursive: boolean },
   ): Promise<void>;
   writeTextFile?(path: string, contents: string): Promise<void>;
+}
+
+function unusedDenoCommand(): never {
+  throw new Error("Deno command is unused in this fixture.");
 }
 
 test("normalizes execution hosts without choosing a target", () => {
@@ -72,6 +95,7 @@ test("runs a process with one captured environment snapshot", async () => {
     });
     assert.ok(environment != null);
     process.env.CPATH = "/tmp/changed-headers";
+    // SAFETY: The test supplies every field this execution path reads.
     const observation = await host.run({
       args: [
         "-e",
@@ -95,6 +119,7 @@ test("runs a process with one captured environment snapshot", async () => {
 });
 
 test("preserves Deno execution without environment access", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -105,20 +130,7 @@ test("preserves Deno execution without environment access", async () => {
     "fixtures/restricted-environment.ts",
     import.meta.url,
   );
-  const command = new (runtime.Command as unknown as new (
-    command: string,
-    options: {
-      readonly args: readonly string[];
-      readonly stderr: "piped";
-      readonly stdout: "piped";
-    },
-  ) => {
-    output(): Promise<{
-      readonly code: number;
-      readonly stderr: Uint8Array;
-      readonly stdout: Uint8Array;
-    }>;
-  })(runtime.execPath(), {
+  const command = new runtime.Command(runtime.execPath(), {
     args: [
       "run",
       "--allow-read",
@@ -135,6 +147,7 @@ test("preserves Deno execution without environment access", async () => {
 });
 
 test("runs a Deno process with only its requested environment", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -331,6 +344,7 @@ test("renews an active cache lease", async () => {
     );
     assert.ok(ownerName != null);
     const ownerPath = join(lockPath, ownerName);
+    // SAFETY: The cache implementation wrote this owner record.
     const before = JSON.parse(await readFile(ownerPath, "utf8")) as {
       readonly expiresAtMilliseconds: number;
     };
@@ -344,6 +358,7 @@ test("renews an active cache lease", async () => {
           (name) => name.startsWith("owner-") || name.startsWith("renew-"),
         );
         if (currentName == null) continue;
+        // SAFETY: The cache owns every record in this lock directory.
         const current = JSON.parse(
           await readFile(join(lockPath, currentName), "utf8"),
         ) as {
@@ -430,6 +445,7 @@ test("an expired owner cannot release its replacement", async () => {
     );
     assert.ok(ownerName != null);
     const ownerPath = join(lockPath, ownerName);
+    // SAFETY: The cache implementation wrote this owner record.
     const owner = JSON.parse(await readFile(ownerPath, "utf8")) as {
       readonly token: string;
     };
@@ -455,6 +471,7 @@ test("an expired owner cannot release its replacement", async () => {
 });
 
 test("reclaims an expired Deno cache lease", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -493,6 +510,7 @@ test("reclaims an expired Deno cache lease", async () => {
 });
 
 test("serializes concurrent Deno lease reclamation", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -545,6 +563,7 @@ test("serializes concurrent Deno lease reclamation", async () => {
 });
 
 test("renews an active Deno cache lease", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -570,6 +589,7 @@ test("renews an active Deno cache lease", async () => {
     }
     assert.ok(ownerName != null);
     const ownerPath = `${lockPath}/${ownerName}`;
+    // SAFETY: The cache implementation wrote this owner record.
     const before = JSON.parse(await runtime.readTextFile(ownerPath)) as {
       readonly expiresAtMilliseconds: number;
     };
@@ -586,6 +606,7 @@ test("renews an active Deno cache lease", async () => {
           ) {
             continue;
           }
+          // SAFETY: The cache owns every record in this lock directory.
           const current = JSON.parse(
             await runtime.readTextFile(`${lockPath}/${entry.name}`),
           ) as {
@@ -606,6 +627,7 @@ test("renews an active Deno cache lease", async () => {
 });
 
 test("fetches remote text assets in the Deno host", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };
@@ -617,10 +639,13 @@ test("fetches remote text assets in the Deno host", async () => {
     Object.defineProperty(globals, "Deno", {
       configurable: true,
       value: {
+        Command: unusedDenoCommand,
+        cwd: () => "/work",
         async readTextFile(): Promise<string> {
           localRead = true;
           throw new Error("Remote assets must not use Deno.readTextFile().");
         },
+        stat: async () => ({ isFile: true, size: 0 }),
       },
     });
   }
@@ -648,6 +673,7 @@ test("fetches remote text assets in the Deno host", async () => {
 });
 
 test("reads local text assets through the Deno file API", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };
@@ -672,10 +698,13 @@ test("reads local text assets through the Deno file API", async () => {
   Object.defineProperty(globals, "Deno", {
     configurable: true,
     value: {
+      Command: unusedDenoCommand,
+      cwd: () => "/work",
       async readTextFile(path: string | URL): Promise<string> {
         assert.equal(path, "/tmp/runtime.c");
         return "local asset\n";
       },
+      stat: async () => ({ isFile: true, size: 0 }),
     },
   });
   try {
@@ -742,6 +771,7 @@ test("rejects bare and non-file module resolution", () => {
 
 test("loads file modules with stable content hashes", async () => {
   const reads: (string | URL)[] = [];
+  // SAFETY: This fixture implements the loader's CompilerHost subset.
   const host = {
     async readTextFile(path: string | URL): Promise<string> {
       reads.push(path);
@@ -761,10 +791,11 @@ test("loads file modules with stable content hashes", async () => {
 
 test("locates dependency load failures at the import specifier", async () => {
   const loader = createFileModuleLoader({
+    ...createNodeHost(),
     readTextFile() {
       return Promise.reject(new Error("missing dependency"));
     },
-  } as unknown as CompilerHost);
+  });
   const specifier = {
     byteRange: { end: 27, start: 15 },
     range: {
@@ -791,6 +822,7 @@ test("canonicalizes filesystem characters as file URL data", async () => {
 });
 
 test("encodes literal percent signs in Deno file identities", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };
@@ -798,7 +830,12 @@ test("encodes literal percent signs in Deno file identities", async () => {
   if (globals.Deno == null) {
     Object.defineProperty(globals, "Deno", {
       configurable: true,
-      value: { cwd: () => "/work", readTextFile: async () => "" },
+      value: {
+        Command: unusedDenoCommand,
+        cwd: () => "/work",
+        readTextFile: async () => "",
+        stat: async () => ({ isFile: true, size: 0 }),
+      },
     });
   }
   try {

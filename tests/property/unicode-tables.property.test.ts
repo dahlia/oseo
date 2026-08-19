@@ -45,12 +45,12 @@ const maximumEntries = size === "large" ? 64 : 16;
  * shrunk counterexample a valid set, so a failure prints a case the decoder
  * is actually required to accept.
  */
-function setFromShape(
-  shape: readonly (readonly [number, number])[],
+function setFromSegments(
+  segments: readonly (readonly [number, number])[],
 ): CodePointSet {
   const boundaries: number[] = [];
   let cursor = -1;
-  for (const [gap, width] of shape) {
+  for (const [gap, width] of segments) {
     const start = cursor + gap + 1;
     const end = start + width;
     if (end > maxCodePoint + 1) break;
@@ -68,7 +68,7 @@ const setArbitrary = fc
     ),
     { maxLength: maximumRanges, minLength: 0 },
   )
-  .map(setFromShape);
+  .map(setFromSegments);
 
 const codePointArbitrary = fc.oneof(
   fc.integer({ max: maxCodePoint, min: 0 }),

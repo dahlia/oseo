@@ -9,16 +9,16 @@ interface DenoExistingTextFileWriter {
 const cacheLockRenameRetryMilliseconds = 5;
 
 function isTransientDirectoryRenameError(
-  error: unknown,
+  cause: unknown,
   retryPermissionErrors: boolean,
 ): boolean {
   return (
-    error instanceof Error &&
-    "code" in error &&
+    cause instanceof Error &&
+    "code" in cause &&
     ((retryPermissionErrors &&
-      (error.code === "EACCES" || error.code === "EPERM")) ||
-      error.code === "EBUSY" ||
-      error.code === "ENOTEMPTY")
+      (cause.code === "EACCES" || cause.code === "EPERM")) ||
+      cause.code === "EBUSY" ||
+      cause.code === "ENOTEMPTY")
   );
 }
 

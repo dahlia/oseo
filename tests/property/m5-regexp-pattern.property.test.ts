@@ -7,6 +7,7 @@ import {
   parseRegExpPattern,
   printRegExpPattern,
 } from "../../packages/compiler/src/index.ts";
+import { isString } from "../../tools/value-kinds.ts";
 import type {
   RegExpAlternative,
   RegExpClassItem,
@@ -16,6 +17,12 @@ import type {
   RegExpSpan,
   RegExpTerm,
 } from "../../packages/compiler/src/index.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
 
 const { assertProperty, propertySize } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -484,7 +491,7 @@ function printTerm(
   if (term.kind === "reference") {
     const target = referenceTarget(term, context);
     if (target == null) return printCharacter(0x61, context, false, digitGuard);
-    return typeof target === "string" ? `\\k<${target}>` : `\\${target.index}`;
+    return isString(target) ? `\\k<${target}>` : `\\${target.index}`;
   }
   const index = term.capturing ? cursor.count + 1 : 0;
   if (term.capturing) cursor.count += 1;
@@ -560,7 +567,7 @@ function summarizeModelTerm(
   if (term.kind === "reference") {
     const target = referenceTarget(term, context);
     if (target == null) return `char:${0x61}`;
-    if (typeof target === "string") {
+    if (isString(target)) {
       const indices = context.captures
         .filter((capture) => capture.name === target)
         .map((capture) => capture.index);
@@ -667,10 +674,7 @@ function summarizeParsed(pattern: RegExpPattern): string {
  * whatever the pattern does, so the result array length reports the
  * capture count without executing the generated pattern against input.
  */
-function hostCaptures(
-  source: string,
-  flags: string,
-): { readonly count: number; readonly names: readonly string[] } {
+function hostCaptures(source: string, flags: string) {
   const probe = new RegExp(`(?:${source})|`, flags);
   const match = probe.exec("");
   if (match == null) throw new Error("the empty alternative always matches");
@@ -780,7 +784,10 @@ function suffix(
   applies?: (flags: string) => boolean,
 ): MutationModel {
   return {
-    ...(applies == null ? {} : { applies }),
+    ...includePropertiesWhen(() => {
+      if (applies == null) return undefined;
+      return { applies };
+    }),
     apply: (source, flags) => [`${source}${text}`, flags],
     expect: (source, flags) => expect(source.length, unicodeMode(flags)),
     label,

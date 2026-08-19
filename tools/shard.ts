@@ -1,5 +1,11 @@
 import { parseArgs } from "node:util";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** A one-based shard index and the total number of shards. */
 export interface TestShard {
   readonly index: number;
@@ -69,7 +75,10 @@ export function parseTestShardArguments(
   }
   return {
     help: parsed.values.help === true,
-    ...(shard == null ? {} : { shard }),
+    ...includePropertiesWhen(() => {
+      if (shard == null) return undefined;
+      return { shard };
+    }),
     update: parsed.values.update === true,
   };
 }

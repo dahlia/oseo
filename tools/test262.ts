@@ -24,6 +24,11 @@ import type {
   SpecializationMode,
 } from "../packages/compiler/src/index.ts";
 import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
+import { isObject, isString } from "./value-kinds.ts";
+import {
   createFileModuleLoader,
   createNodeHost,
   fileModuleResolver,
@@ -69,6 +74,12 @@ import type {
   SerializedTest262Manifest,
   SerializedTest262Partition,
 } from "./test262-manifest.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
@@ -249,39 +260,33 @@ export function asyncObservationCompleted(stdout: string): boolean {
   );
 }
 
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be an object.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function stringValue(value: unknown, description: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+function stringValue(value: StructuredDataInput, description: string): string {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
   if (value == null) return [];
-  if (
-    !Array.isArray(value) ||
-    value.some((entry) => typeof entry !== "string")
-  ) {
+  if (!Array.isArray(value) || value.some((entry) => !isString(entry))) {
     throw new Error(`${description} must be an array of strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
-function failurePhase(value: unknown): Test262FailurePhase {
+function failurePhase(value: StructuredDataInput): Test262FailurePhase {
   if (value === "parse" || value === "resolution" || value === "runtime") {
     return value;
   }
   throw new Error("test262 negative.phase is invalid.");
 }
 
-function negative(value: unknown): FrontmatterNegative | undefined {
+function negative(value: StructuredDataInput): FrontmatterNegative | undefined {
   if (value == null) return undefined;
   const item = record(value, "test262 negative metadata");
   return {
@@ -311,8 +316,9 @@ export function parseTest262Case(
   if (match?.[1] == null) {
     throw new Error(`${path} does not contain test262 frontmatter.`);
   }
+  // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
-    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as unknown,
+    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as StructuredDataInput,
     `${path} frontmatter`,
   );
   const flags = stringArray(metadata.flags, `${path} flags`);
@@ -320,12 +326,13 @@ export function parseTest262Case(
   return {
     case: {
       async: flags.includes("async"),
-      ...(expected == null
-        ? {}
-        : {
-            expectedErrorType: expected.type,
-            expectedFailurePhase: expected.phase,
-          }),
+      ...includePropertiesWhen(() => {
+        if (expected == null) return undefined;
+        return {
+          expectedErrorType: expected.type,
+          expectedFailurePhase: expected.phase,
+        };
+      }),
       features: stringArray(metadata.features, `${path} features`),
       flags,
       includes: stringArray(metadata.includes, `${path} includes`),
@@ -338,9 +345,10 @@ export function parseTest262Case(
   };
 }
 
-function classification(value: unknown): Test262Classification {
+function classification(value: StructuredDataInput): Test262Classification {
+  // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
-  if (typeof value === "string" && classifications.has(candidate)) {
+  if (isString(value) && classifications.has(candidate)) {
     return candidate;
   }
   throw new Error("Reviewed test262 classification is invalid.");
@@ -348,7 +356,8 @@ function classification(value: unknown): Test262Classification {
 
 /** Validate the checked-in subset shape, ordering, and uniqueness. */
 export function parseReviewedSubset(text: string): ReviewedTest262Subset {
-  const root = record(parseYaml(text) as unknown, "test262 subset");
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
+  const root = record(parseYaml(text) as StructuredDataInput, "test262 subset");
   const rawTests = root.tests;
   if (!Array.isArray(rawTests)) {
     throw new Error("test262 subset tests must be an array.");
@@ -439,10 +448,10 @@ function parseInputSource(
   return source;
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error
-    ? `${error.name}: ${error.message}`
-    : `${error}`;
+function errorMessage(cause: unknown): string {
+  return cause instanceof Error
+    ? `${cause.name}: ${cause.message}`
+    : `${cause}`;
 }
 
 /**
@@ -835,7 +844,10 @@ async function moduleNegativeResult(
     {
       detail: diagnosticDetail(diagnostic),
       errorType: "SyntaxError",
-      ...(failedPhase == null ? {} : { failedPhase }),
+      ...includePropertiesWhen(() => {
+        if (failedPhase == null) return undefined;
+        return { failedPhase };
+      }),
       passed: false,
     },
     supportedFeatures,
@@ -862,8 +874,16 @@ async function executedResult(
     harnessIncludes: parsed.flags.includes("raw")
       ? []
       : harnessIncludeNames(testCase),
-    ...(moduleGraph == null ? {} : { moduleGraph }),
-    ...(scheduled ? { scheduler: "deterministic-logical-clock" as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (moduleGraph == null) return undefined;
+      return { moduleGraph };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!scheduled) return undefined;
+      return {
+        scheduler: "deterministic-logical-clock" as const,
+      };
+    }),
     target: executor.target ?? canonicalTarget,
     variants,
   });
@@ -922,10 +942,17 @@ async function executedResult(
         testCase,
         {
           detail: diagnosticDetail(diagnostic),
-          ...(unsupportedCapability != null ? { unsupportedCapability } : {}),
-          ...(unsupportedCapability == null && failedPhase != null
-            ? { failedPhase }
-            : {}),
+          ...includePropertiesWhen(() => {
+            if (!(unsupportedCapability != null)) return undefined;
+            return {
+              unsupportedCapability,
+            };
+          }),
+          ...includePropertiesWhen(() => {
+            if (!(unsupportedCapability == null && failedPhase != null))
+              return undefined;
+            return { failedPhase };
+          }),
           passed: false,
         },
         supportedFeatures,
@@ -971,7 +998,12 @@ async function executedResult(
           mode: testCase.mode,
           source: input,
           sourceId: testCase.path,
-          ...(sourcePath == null ? {} : { sourcePath }),
+          ...includePropertiesWhen(() => {
+            if (sourcePath == null) return undefined;
+            return {
+              sourcePath,
+            };
+          }),
           specialization,
         });
       } catch (error) {
@@ -1036,9 +1068,11 @@ async function executedResult(
                 : runtimeCapability == null
                   ? { failedPhase: "runtime" as const }
                   : { unsupportedCapability: runtimeCapability }),
-            ...(!compileStage && infrastructureFailure(observation)
-              ? { failureKind: "infrastructure" as const }
-              : {}),
+            ...includePropertiesWhen(() => {
+              if (!(!compileStage && infrastructureFailure(observation)))
+                return undefined;
+              return { failureKind: "infrastructure" as const };
+            }),
             passed: false,
           },
           supportedFeatures,
@@ -1299,10 +1333,11 @@ async function suiteRoot(revision: string): Promise<string> {
     import.meta.resolve("test262/package.json"),
   );
   const packageRoot = dirname(packagePath);
+  // SAFETY: parsedObject validates the complete JSON tree at this boundary.
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
-    ) as unknown,
+    ) as StructuredDataInput,
     "workspace package.json",
   );
   const dependencies = record(
@@ -1340,7 +1375,12 @@ async function readHarnesses(): Promise<Test262Harnesses> {
 }
 
 const nativeExecutor: Test262Executor = {
-  ...(executionTarget == null ? {} : { target: executionTarget }),
+  ...includePropertiesWhen(() => {
+    if (executionTarget == null) return undefined;
+    return {
+      target: executionTarget,
+    };
+  }),
   async execute(request: Test262ExecutionRequest): Promise<CliResult> {
     const entry =
       request.mode === "module" && request.sourcePath != null
@@ -1411,7 +1451,12 @@ export async function createReviewedManifest(
   let retries = 0;
   let aborted = false;
   const retryingExecutor: Test262Executor = {
-    ...(executor.target == null ? {} : { target: executor.target }),
+    ...includePropertiesWhen(() => {
+      if (executor.target == null) return undefined;
+      return {
+        target: executor.target,
+      };
+    }),
     async execute(request): Promise<CliResult> {
       let result = await executor.execute(request);
       for (
@@ -1497,14 +1542,15 @@ function canonicalizeManifestTarget(
     ...manifest,
     results: manifest.results.map((result) => ({
       ...result,
-      ...(result.execution == null
-        ? {}
-        : {
-            execution: {
-              ...result.execution,
-              target: canonicalTarget,
-            },
-          }),
+      ...includePropertiesWhen(() => {
+        if (result.execution == null) return undefined;
+        return {
+          execution: {
+            ...result.execution,
+            target: canonicalTarget,
+          },
+        };
+      }),
     })),
   };
 }
@@ -1587,12 +1633,7 @@ async function existingPartitionPaths(): Promise<readonly string[]> {
       .filter((path) => path.endsWith(".yaml"))
       .map((path) => `results/${path.replaceAll("\\", "/")}`);
   } catch (error) {
-    if (
-      error != null &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
+    if (isObject(error) && "code" in error && error.code === "ENOENT") {
       return [];
     }
     throw error;

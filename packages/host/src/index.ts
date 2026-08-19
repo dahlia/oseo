@@ -17,6 +17,12 @@ import {
   renameClaimedCacheLockDirectory,
 } from "./cache-files.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Normalize Node.js or Deno platform facts at the concrete host boundary. */
 export function normalizeExecutionHost(
   reportedOperatingSystem: string,
@@ -104,10 +110,23 @@ interface DenoRuntime {
   ): Promise<void>;
 }
 
+function isDenoRuntime<T>(value: T): value is T & DenoRuntime {
+  return (
+    value instanceof Object &&
+    "Command" in value &&
+    typeof value.Command === "function" &&
+    "cwd" in value &&
+    typeof value.cwd === "function" &&
+    "readTextFile" in value &&
+    typeof value.readTextFile === "function" &&
+    "stat" in value &&
+    typeof value.stat === "function"
+  );
+}
+
 function denoRuntime(): DenoRuntime {
-  const runtime = (globalThis as unknown as { readonly Deno?: DenoRuntime })
-    .Deno;
-  if (runtime == null) throw new Error("Deno host is unavailable.");
+  const runtime = Object.getOwnPropertyDescriptor(globalThis, "Deno")?.value;
+  if (!isDenoRuntime(runtime)) throw new Error("Deno host is unavailable.");
   return runtime;
 }
 
@@ -129,25 +148,25 @@ function requireCacheName(name: string): void {
   }
 }
 
-function isNotFound(error: unknown): boolean {
+function isNotFound(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "NotFound" || ("code" in error && error.code === "ENOENT"))
+    cause instanceof Error &&
+    (cause.name === "NotFound" || ("code" in cause && cause.code === "ENOENT"))
   );
 }
 
-function isAlreadyExists(error: unknown): boolean {
+function isAlreadyExists(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "AlreadyExists" ||
-      ("code" in error && error.code === "EEXIST"))
+    cause instanceof Error &&
+    (cause.name === "AlreadyExists" ||
+      ("code" in cause && cause.code === "EEXIST"))
   );
 }
 
-function isEnvironmentPermissionDenied(error: unknown): boolean {
+function isEnvironmentPermissionDenied(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "NotCapable" || error.name === "PermissionDenied")
+    cause instanceof Error &&
+    (cause.name === "NotCapable" || cause.name === "PermissionDenied")
   );
 }
 
@@ -163,7 +182,7 @@ function wait(milliseconds: number): Promise<void> {
 function selectEnvironment(
   names: readonly string[],
   read: (name: string) => string | undefined,
-): Readonly<Record<string, string>> {
+) {
   const selected: Record<string, string> = {};
   for (const name of names) {
     const value = read(name);
@@ -182,13 +201,22 @@ interface CacheLockObservation {
   readonly ownerPath?: string | undefined;
 }
 
+function isCacheLockOwner(
+  value: Partial<CacheLockOwner>,
+): value is CacheLockOwner {
+  return (
+    typeof value.token === "string" &&
+    /^[A-Za-z0-9-]+$/u.test(value.token) &&
+    typeof value.expiresAtMilliseconds === "number" &&
+    Number.isFinite(value.expiresAtMilliseconds)
+  );
+}
+
 function parseCacheLockOwner(contents: string): CacheLockOwner | undefined {
   try {
+    // SAFETY: The optional fields are validated before this value is returned.
     const value = JSON.parse(contents) as Partial<CacheLockOwner>;
-    return typeof value.token === "string" &&
-      /^[A-Za-z0-9-]+$/u.test(value.token) &&
-      typeof value.expiresAtMilliseconds === "number" &&
-      Number.isFinite(value.expiresAtMilliseconds)
+    return isCacheLockOwner(value)
       ? {
           expiresAtMilliseconds: value.expiresAtMilliseconds,
           token: value.token,
@@ -265,6 +293,7 @@ function createRenewingCacheLock(
           if (!released) schedule();
         });
     }, cacheLockRenewMilliseconds);
+    // SAFETY: Runtime timers may expose unref; its presence is checked below.
     const unref = (
       timer as ReturnType<typeof setTimeout> & {
         readonly unref?: () => void;
@@ -1114,12 +1143,13 @@ export function createDenoHost(): CompilerHost {
       const environment = request.environment;
       const command = new runtime.Command(request.command, {
         args: request.args,
-        ...(environment == null
-          ? {}
-          : {
-              clearEnv: true,
-              env: environment.variables,
-            }),
+        ...includePropertiesWhen(() => {
+          if (environment == null) return undefined;
+          return {
+            clearEnv: true,
+            env: environment.variables,
+          };
+        }),
         cwd: request.cwd,
         stderr: "piped",
         stdout: "piped",

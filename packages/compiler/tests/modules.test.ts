@@ -15,6 +15,12 @@ import type {
   SyntaxModuleSpecifier,
 } from "../src/index.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const diagnostic: Diagnostic = {
   byteRange: { end: 0, start: 0 },
   code: "OSEO1001",
@@ -805,7 +811,10 @@ test("schedules async module cycles through traced continuations", () => {
 
 function forOfStatement(awaited: boolean) {
   return {
-    ...(awaited ? { awaited: true as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (!awaited) return undefined;
+      return { awaited: true as const };
+    }),
     body: { body: [], kind: "block" as const, range },
     iterable: { elements: [], kind: "array" as const, range },
     kind: "for-of" as const,

@@ -9,6 +9,7 @@ import {
   workGraphNodeDirectory,
 } from "../tools/m5b-graph.ts";
 import type { WorkGraphSource } from "../tools/m5b-graph.ts";
+import type { StructuredDataRecord } from "../tools/structured-data.ts";
 
 const includedPaths = [
   "test/built-ins/Sample/length.js",
@@ -17,7 +18,7 @@ const includedPaths = [
 ];
 
 function nodeSource(
-  overrides: Readonly<Record<string, unknown>>,
+  overrides: Readonly<StructuredDataRecord>,
   id: string,
 ): WorkGraphSource {
   return {
@@ -36,7 +37,7 @@ function nodeSource(
 }
 
 function graphSource(
-  overrides: Readonly<Record<string, unknown>> = {},
+  overrides: Readonly<StructuredDataRecord> = {},
 ): WorkGraphSource {
   return {
     path: "docs/m5b-graph/graph.yaml",

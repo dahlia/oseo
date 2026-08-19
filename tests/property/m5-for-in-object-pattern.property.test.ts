@@ -21,6 +21,7 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { isString } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -105,7 +106,10 @@ const caseArbitrary: fc.Arbitrary<PatternCase> = fc.record({
   ),
   properties: fc
     .array(propertyArbitrary, { maxLength: 3, minLength: 1 })
-    .map((properties) => properties as readonly PropertySpec[]),
+    .map((properties) => {
+      // SAFETY: propertyArbitrary generates exactly the PropertySpec domain.
+      return properties as readonly PropertySpec[];
+    }),
   rest: fc.boolean(),
   subject: fc.constantFrom(
     "empty" as const,
@@ -145,7 +149,7 @@ function effectiveLeaf(head: HeadKind, leaf: LeafKind): LeafKind {
  * generated names can reach.
  */
 function getV(value: ModelValue, name: string): ModelValue {
-  if (typeof value !== "string") return undefined;
+  if (!isString(value)) return undefined;
   if (name === "length") return value.length;
   if (name === "0") return value.length > 0 ? value[0] : undefined;
   return undefined;
@@ -226,10 +230,7 @@ function model(testCase: PatternCase): string {
 }
 
 /** The pattern text and the body reads that observe each stored value. */
-function patternSource(testCase: PatternCase): {
-  readonly pattern: string;
-  readonly reads: readonly string[];
-} {
+function patternSource(testCase: PatternCase) {
   const properties: string[] = [];
   const reads: string[] = [];
   testCase.properties.forEach((property, index) => {

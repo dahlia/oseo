@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
+import { isString } from "./value-kinds.ts";
 
 interface PackedFile {
   readonly path: string;
@@ -32,11 +33,11 @@ interface CommandResult {
 }
 
 interface PackageManifest {
-  readonly dependencies?: Readonly<Record<string, unknown>>;
-  readonly devDependencies?: Readonly<Record<string, unknown>>;
+  readonly dependencies?: Readonly<Record<string, string>>;
+  readonly devDependencies?: Readonly<Record<string, string>>;
   readonly name?: unknown;
-  readonly optionalDependencies?: Readonly<Record<string, unknown>>;
-  readonly peerDependencies?: Readonly<Record<string, unknown>>;
+  readonly optionalDependencies?: Readonly<Record<string, string>>;
+  readonly peerDependencies?: Readonly<Record<string, string>>;
   readonly version?: unknown;
 }
 
@@ -133,7 +134,7 @@ function requireReleaseDependencies(
   manifest: PackageManifest,
   expectedName: string,
 ): void {
-  if (manifest.name !== expectedName || typeof manifest.version !== "string") {
+  if (manifest.name !== expectedName || !isString(manifest.version)) {
     throw new Error(`${expectedName} archive has invalid package metadata.`);
   }
   const fields = [
@@ -157,9 +158,9 @@ function requireReleaseDependencies(
 }
 
 function releaseDependencies(
-  dependencies: Readonly<Record<string, unknown>> | undefined,
+  dependencies: Readonly<Record<string, string>> | undefined,
   version: string,
-): Readonly<Record<string, unknown>> | undefined {
+): Readonly<Record<string, string>> | undefined {
   if (dependencies == null) return undefined;
   return Object.fromEntries(
     Object.entries(dependencies).map(([name, range]) => {
@@ -181,10 +182,11 @@ async function stagePackage(
 ): Promise<string> {
   const source = join(root, "packages", directory);
   const stage = join(destination, `stage-${directory}`);
+  // SAFETY: Checked-in package manifests are repository-owned build inputs.
   const manifest = JSON.parse(
     await readFile(join(source, "package.json"), "utf8"),
   ) as PackageManifest;
-  if (typeof manifest.version !== "string") {
+  if (!isString(manifest.version)) {
     throw new Error(`${directory} package version is missing.`);
   }
   const [rootLicense, packageLicense] = await Promise.all([
@@ -252,6 +254,7 @@ async function main(): Promise<void> {
         ["pack", "-C", stage, "--json", "--pack-destination", destination],
         root,
       );
+      // SAFETY: npm pack --json returns an array of pack result records.
       const packed = (JSON.parse(result.stdout) as readonly PackResult[])[0];
       if (packed == null)
         throw new Error(`${directory} did not produce a pack.`);
@@ -281,6 +284,7 @@ async function main(): Promise<void> {
         ["-xOzf", packed.filename, "package/package.json"],
         root,
       );
+      // SAFETY: npm exposes the packed package.json bytes at this exact path.
       const manifest = JSON.parse(manifestBytes.stdout) as PackageManifest;
       requireReleaseDependencies(manifest, packed.name);
       console.log(`${packed.name}: npm archive valid`);

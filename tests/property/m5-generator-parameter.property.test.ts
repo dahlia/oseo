@@ -214,11 +214,7 @@ function expected(testCase: GeneratorParameterCase): ModelResult {
   };
 }
 
-function expectedObservation(testCase: GeneratorParameterCase): {
-  readonly exitStatus: number;
-  readonly stderr: string;
-  readonly stdout: string;
-} {
+function expectedObservation(testCase: GeneratorParameterCase) {
   const modeled = expected(testCase);
   if (modeled.value == null || modeled.nested == null) {
     return {

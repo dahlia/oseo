@@ -13,6 +13,12 @@ import {
 } from "../src/index.ts";
 import type { NativeFixtureOptions } from "../src/index.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 type Host = NativeFixtureOptions["host"];
 type ProcessObservation = Awaited<ReturnType<Host["run"]>>;
 
@@ -184,6 +190,7 @@ test("records complete failed build observations", async () => {
     "/tmp/oseo-native-test/native-observation.json",
   );
   assert.ok(bytes != null);
+  // SAFETY: compileNativeTest writes this metadata using the asserted schema.
   const metadata = JSON.parse(bytes) as {
     readonly compilerInvocation: readonly string[];
     readonly steps: readonly {
@@ -379,9 +386,10 @@ test("serializes concurrent builds for one cold archive key", async () => {
                   cwd: input.workingDirectory,
                 },
               ],
-        ...(input.prebuiltRuntimeArchivePath == null
-          ? { runtimeArchivePath: archivePath }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(input.prebuiltRuntimeArchivePath == null)) return undefined;
+          return { runtimeArchivePath: archivePath };
+        }),
         target: input.target,
       };
     },
@@ -477,9 +485,10 @@ test("retries a failed toolchain identity probe", async () => {
       return {
         executablePath: `${input.workingDirectory}/fixture`,
         requests: [],
-        ...(input.prebuiltRuntimeArchivePath == null
-          ? { runtimeArchivePath: archivePath }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(input.prebuiltRuntimeArchivePath == null)) return undefined;
+          return { runtimeArchivePath: archivePath };
+        }),
         target: input.target,
       };
     },
@@ -632,11 +641,11 @@ test("rejects assets that collide with the generated name", async () => {
       },
       () => assert.fail("A colliding asset name must not reach the build."),
     ),
-    (error: unknown) => {
-      assert.ok(error instanceof Error);
-      assert.match(error.message, /Native artifacts retained/u);
-      assert.ok(error.cause instanceof Error);
-      assert.match(error.cause.message, /generated source name: generated\.c/u);
+    (cause: unknown) => {
+      assert.ok(cause instanceof Error);
+      assert.match(cause.message, /Native artifacts retained/u);
+      assert.ok(cause.cause instanceof Error);
+      assert.match(cause.cause.message, /generated source name: generated\.c/u);
       return true;
     },
   );

@@ -112,9 +112,12 @@ export const generalCategoryNames: readonly string[] = [
 ];
 
 /** Base categories each General_Category supercategory covers. */
-export const generalCategorySupercategories: Readonly<
-  Record<string, readonly string[]>
-> = {
+export interface GeneralCategorySupercategoryTable {
+  readonly [name: string]: readonly string[];
+}
+
+export const generalCategorySupercategories:
+  GeneralCategorySupercategoryTable = {
   "Cased_Letter": [
     "Lowercase_Letter", "Titlecase_Letter", "Uppercase_Letter",
   ],
@@ -145,7 +148,11 @@ export const generalCategorySupercategories: Readonly<
 };
 
 /** Every accepted General_Category spelling and its canonical name. */
-export const generalCategoryAliases: Readonly<Record<string, string>> =
+export interface GeneralCategoryAliasTable {
+  readonly [name: string]: string;
+}
+
+export const generalCategoryAliases: GeneralCategoryAliasTable =
   {
   "C": "Other",
   "Cased_Letter": "Cased_Letter",
@@ -535,7 +542,11 @@ export const scriptNames: readonly string[] = [
 ];
 
 /** Every accepted Script spelling and its canonical name. */
-export const scriptAliases: Readonly<Record<string, string>> =
+export interface ScriptAliasTable {
+  readonly [name: string]: string;
+}
+
+export const scriptAliases: ScriptAliasTable =
   {
   "Adlam": "Adlam",
   "Adlm": "Adlam",
@@ -1172,7 +1183,11 @@ export const scriptExtensionsPartition: string = `
   6o 10`;
 
 /** Every accepted binary property spelling and its canonical name. */
-export const propertyNameAliases: Readonly<Record<string, string>> =
+export interface PropertyNameAliasTable {
+  readonly [name: string]: string;
+}
+
+export const propertyNameAliases: PropertyNameAliasTable =
   {
   "AHex": "ASCII_Hex_Digit",
   "ASCII": "ASCII",
@@ -1282,7 +1297,11 @@ export const propertyNameAliases: Readonly<Record<string, string>> =
 };
 
 /** One encoded code-point set per ECMAScript binary property. */
-export const binaryPropertySets: Readonly<Record<string, string>> =
+export interface BinaryPropertySetTable {
+  readonly [name: string]: string;
+}
+
+export const binaryPropertySets: BinaryPropertySetTable =
   {
   "ASCII": `
     0 3k`,

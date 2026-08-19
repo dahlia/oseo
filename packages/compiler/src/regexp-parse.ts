@@ -29,6 +29,12 @@ import {
   type RegExpUnicodePropertyEscape,
 } from "./regexp.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Characters the grammar reserves, which a pattern character excludes. */
 const syntaxCharacters = new Set("^$\\.*+?()[]{}|");
 
@@ -498,7 +504,10 @@ function readUnicodePropertyEscape(
     negated: character === "P",
     property: first,
     span: location,
-    ...(second == null ? {} : { value: second }),
+    ...includePropertiesWhen(() => {
+      if (second == null) return undefined;
+      return { value: second };
+    }),
   };
   if (!resolve(escape)) {
     fail("invalid", "This Unicode property is not defined.", location);
@@ -579,12 +588,14 @@ function readModifierFlags(
   while (!done(state)) {
     const character = at(state, 0);
     if (character == null || !modifierFlags.has(character)) break;
+    // SAFETY: Membership in modifierFlags establishes the modifier domain.
     if (selected.includes(character as RegExpModifierFlag)) {
       fail("invalid", "A modifier group repeats a flag.", {
         end: state.index + 1,
         start,
       });
     }
+    // SAFETY: Membership in modifierFlags establishes the modifier domain.
     selected.push(character as RegExpModifierFlag);
     state.index += 1;
   }
@@ -797,7 +808,10 @@ function declareCapture(
   state.captures.push({
     index,
     span: location,
-    ...(name == null ? {} : { name }),
+    ...includePropertiesWhen(() => {
+      if (name == null) return undefined;
+      return { name };
+    }),
   });
   if (name != null) {
     state.namedGroups.push({
@@ -899,7 +913,12 @@ function readBracedQuantifier(state: ParseState): QuantifierBounds | undefined {
   if (!eat(state, "}")) return undefined;
   return {
     maximum,
-    ...(maximumDigits == null ? {} : { maximumDigits }),
+    ...includePropertiesWhen(() => {
+      if (maximumDigits == null) return undefined;
+      return {
+        maximumDigits,
+      };
+    }),
     minimum,
     minimumDigits,
   };

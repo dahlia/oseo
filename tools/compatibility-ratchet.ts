@@ -15,6 +15,12 @@ import {
   currentEvidenceFamilyIds,
   validatedEvidenceFamilyIdsFromTree,
 } from "./evidence-lanes.ts";
+import {
+  parsedMapping as record,
+  type StructuredDataInput,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
+import { isNumber, isObject, isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
@@ -118,35 +124,28 @@ export type BaselineIntent =
   | { readonly kind: "merge-base-main" }
   | { readonly kind: "skip"; readonly reason: string };
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function stringValue(value: unknown, context: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+function stringValue(value: StructuredDataInput, context: string): string {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
 }
 
-function transitionValue(value: unknown, context: string): number | string {
-  if (
-    (typeof value !== "string" || value.length === 0) &&
-    typeof value !== "number"
-  ) {
+function transitionValue(
+  value: StructuredDataInput,
+  context: string,
+): number | string {
+  if ((!isString(value) || value.length === 0) && !isNumber(value)) {
     throw new Error(`${context} must be a number or non-empty string.`);
   }
-  if (typeof value === "number" && !Number.isSafeInteger(value)) {
+  if (isNumber(value) && !Number.isSafeInteger(value)) {
     throw new Error(`${context} must be a safe integer.`);
   }
   return value;
 }
 
 function requireKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -157,7 +156,10 @@ function requireKeys(
   }
 }
 
-function classification(value: unknown, context: string): Classification {
+function classification(
+  value: StructuredDataInput,
+  context: string,
+): Classification {
   switch (value) {
     case "expected-negative":
     case "harness-failure":
@@ -172,7 +174,11 @@ function classification(value: unknown, context: string): Classification {
 }
 
 function parseSubset(text: string): ReadonlySet<string> {
-  const root = record(parseYaml(text) as unknown, "reviewed subset");
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "reviewed subset",
+  );
   if (!Array.isArray(root.tests)) {
     throw new Error("reviewed subset tests must be an array.");
   }
@@ -193,8 +199,9 @@ function parseResults(
   source: ResultManifestSource,
   allowLegacyGitBaseline: boolean,
 ): ReadonlyMap<string, Classification> {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const legacy = record(
-    parseYaml(source.indexText) as unknown,
+    parseYaml(source.indexText) as StructuredDataInput,
     "result manifest",
   );
   if (Array.isArray(legacy.results)) {
@@ -237,13 +244,34 @@ function parseResults(
   return results;
 }
 
-type AstNode = Record<string, unknown> & { readonly type: string };
+type AstValue =
+  | AstRecord
+  | readonly AstValue[]
+  | boolean
+  | null
+  | number
+  | string;
 
-function astNode(value: unknown, context: string): AstNode {
-  const node = record(value, context);
-  if (typeof node.type !== "string") {
+interface AstRecord {
+  readonly [key: string]: AstValue | undefined;
+}
+
+type AstNode = AstRecord & { readonly type: string };
+
+function astRecord(value: StructuredDataInput, context: string): AstRecord {
+  if (!isObject(value) || Array.isArray(value)) {
+    throw new Error(`${context} must be an AST record.`);
+  }
+  // SAFETY: AstRecord is an open record and the object check establishes it.
+  return value as AstRecord;
+}
+
+function astNode(value: StructuredDataInput, context: string): AstNode {
+  const node = astRecord(value, context);
+  if (!isString(node.type)) {
     throw new Error(`${context} must be an AST node.`);
   }
+  // SAFETY: The record and string type-tag checks establish an AST node.
   return node as AstNode;
 }
 
@@ -263,7 +291,7 @@ function unwrapExpression(expression: AstNode): AstNode {
 function numericLiteral(expression: AstNode, context: string): number {
   const value = unwrapExpression(expression);
   let parsed: number;
-  if (value.type === "NumericLiteral" && typeof value.value === "number") {
+  if (value.type === "NumericLiteral" && isNumber(value.value)) {
     parsed = value.value;
   } else if (
     value.type === "UnaryExpression" &&
@@ -283,9 +311,9 @@ function numericLiteral(expression: AstNode, context: string): number {
   return parsed;
 }
 
-function fastCheckSeed(value: unknown, context: string): number {
+function fastCheckSeed(value: StructuredDataInput, context: string): number {
   if (
-    typeof value !== "number" ||
+    !isNumber(value) ||
     !Number.isSafeInteger(value) ||
     value < minimumFastCheckSeed ||
     value > maximumFastCheckSeed
@@ -299,7 +327,7 @@ function fastCheckSeed(value: unknown, context: string): number {
 
 function staticString(expression: AstNode, context: string): string {
   const value = unwrapExpression(expression);
-  if (value.type === "StringLiteral" && typeof value.value === "string") {
+  if (value.type === "StringLiteral" && isString(value.value)) {
     return value.value;
   }
   if (
@@ -309,8 +337,8 @@ function staticString(expression: AstNode, context: string): string {
     Array.isArray(value.quasis) &&
     value.quasis.length === 1
   ) {
-    const quasi = record(value.quasis[0], `${context} template element`);
-    const templateValue = record(
+    const quasi = astRecord(value.quasis[0], `${context} template element`);
+    const templateValue = astRecord(
       quasi.value,
       `${context} template element value`,
     );
@@ -326,12 +354,12 @@ function staticString(expression: AstNode, context: string): string {
 }
 
 function propertyName(name: AstNode, context: string): string {
-  if (name.type === "Identifier" && typeof name.name === "string") {
+  if (name.type === "Identifier" && isString(name.name)) {
     return name.name;
   }
   if (
     (name.type === "StringLiteral" || name.type === "NumericLiteral") &&
-    (typeof name.value === "string" || typeof name.value === "number")
+    (isString(name.value) || isNumber(name.value))
   ) {
     return `${name.value}`;
   }
@@ -345,7 +373,7 @@ function optionsObject(
   seen: ReadonlySet<string> = new Set(),
 ): ReadonlyMap<string, AstNode> {
   const value = unwrapExpression(expression);
-  if (value.type === "Identifier" && typeof value.name === "string") {
+  if (value.type === "Identifier" && isString(value.name)) {
     if (seen.has(value.name)) {
       throw new Error(`${context} contains a circular options declaration.`);
     }
@@ -426,16 +454,19 @@ function parsePropertyAllocations(
       sourceType: "module",
     });
     const declarations = new Map<string, AstNode[]>();
-    const collectDeclarations = (value: unknown): void => {
+    const collectDeclarations = (
+      value: StructuredDataInput<typeof sourceFile>,
+    ): void => {
       if (Array.isArray(value)) {
         for (const item of value) collectDeclarations(item);
         return;
       }
-      if (value == null || typeof value !== "object") return;
-      const node = value as Record<string, unknown>;
+      if (!isObject(value)) return;
+      // SAFETY: Babel traversal supplies AST records after the object check.
+      const node = value as AstRecord;
       if (node.type === "VariableDeclarator" && node.init != null) {
         const name = astNode(node.id, `${source.path} variable name`);
-        if (name.type === "Identifier" && typeof name.name === "string") {
+        if (name.type === "Identifier" && isString(name.name)) {
           const matches = declarations.get(name.name) ?? [];
           matches.push(
             astNode(node.init, `${source.path} variable initializer`),
@@ -449,13 +480,14 @@ function parsePropertyAllocations(
     };
     collectDeclarations(sourceFile);
 
-    const visit = (value: unknown): void => {
+    const visit = (value: StructuredDataInput<typeof sourceFile>): void => {
       if (Array.isArray(value)) {
         for (const item of value) visit(item);
         return;
       }
-      if (value == null || typeof value !== "object") return;
-      const rawNode = value as Record<string, unknown>;
+      if (!isObject(value)) return;
+      // SAFETY: Babel traversal supplies AST records after the object check.
+      const rawNode = value as AstRecord;
       if (rawNode.type === "CallExpression") {
         const node = astNode(rawNode, `${source.path} call`);
         const target = unwrapExpression(
@@ -554,14 +586,14 @@ interface PropertySeedFamily {
   readonly start: number;
 }
 
-function registryInteger(value: unknown, context: string): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value)) {
+function registryInteger(value: StructuredDataInput, context: string): number {
+  if (!isNumber(value) || !Number.isSafeInteger(value)) {
     throw new Error(`${context} must be a safe integer.`);
   }
   return value;
 }
 
-function registryOwner(value: unknown, context: string): string {
+function registryOwner(value: StructuredDataInput, context: string): string {
   const owner = stringValue(value, context);
   if (
     owner.startsWith("/") ||
@@ -579,7 +611,11 @@ function registryOwner(value: unknown, context: string): string {
 function parsePropertySeedRegistry(
   text: string,
 ): readonly PropertySeedFamily[] {
-  const root = record(parseYaml(text) as unknown, "property seed registry");
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "property seed registry",
+  );
   requireKeys(root, new Set(["families", "version"]), "property seed registry");
   if (root.version !== 1) {
     throw new Error("property seed registry version must be 1.");
@@ -867,7 +903,11 @@ function detectViolations(
 }
 
 function parseOverrides(text: string): readonly RatchetOverride[] {
-  const root = record(parseYaml(text) as unknown, "ratchet override record");
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "ratchet override record",
+  );
   if (!Array.isArray(root.overrides)) {
     throw new Error("ratchet overrides must be an array.");
   }
@@ -995,7 +1035,7 @@ function zeroCommit(value: string): boolean {
 
 export function selectBaselineIntent(
   environment: Readonly<Record<string, string | undefined>>,
-  event: unknown,
+  event: StructuredDataInput,
   localBranch: string | undefined,
 ): BaselineIntent {
   if (environment.GITHUB_ACTIONS === "true") {
@@ -1058,10 +1098,7 @@ function git(args: readonly string[]): string {
     }).trim();
   } catch (error) {
     const detail =
-      error != null &&
-      typeof error === "object" &&
-      "stderr" in error &&
-      typeof error.stderr === "string"
+      isObject(error) && "stderr" in error && isString(error.stderr)
         ? error.stderr.trim()
         : `${error}`;
     throw new Error(`git ${args.join(" ")} failed: ${detail}`, {
@@ -1206,12 +1243,7 @@ function currentResultPartitionPaths(): readonly string[] {
       .filter((path) => path.endsWith(".yaml"))
       .map((path) => `results/${path.replaceAll("\\", "/")}`);
   } catch (error) {
-    if (
-      error != null &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
+    if (isObject(error) && "code" in error && error.code === "ENOENT") {
       return [];
     }
     throw error;
@@ -1238,11 +1270,15 @@ function formatViolation(violation: RatchetViolation): string {
 async function main(): Promise<void> {
   const branch = optionalGit(["symbolic-ref", "--quiet", "--short", "HEAD"]);
   const eventPath = process.env.GITHUB_EVENT_PATH;
+  // SAFETY: parsedMapping validates the complete GitHub event JSON tree.
   const event =
     process.env.GITHUB_ACTIONS === "true"
-      ? (JSON.parse(
-          readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
-        ) as unknown)
+      ? record(
+          JSON.parse(
+            readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
+          ) as StructuredDataInput,
+          "GitHub event",
+        )
       : {};
   const intent = selectBaselineIntent(process.env, event, branch);
   if (intent.kind === "skip") {

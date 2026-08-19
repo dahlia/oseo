@@ -14,7 +14,6 @@ aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
 oxfmt = "0.59.0"
-oxlint = "1.74.0"
 shellcheck = "0.11.0"
 zig = "0.16.0"
 
@@ -37,6 +36,7 @@ mise run check:versions
 [tasks.check]
 depends = [
   "check:actions",
+  "check:anti-slop",
   "check:boundaries",
   "check:compatibility-ratchet",
   "check:evidence-lanes",
@@ -54,6 +54,10 @@ depends = [
 [tasks."check:actions"]
 description = "Validate GitHub Actions workflows"
 run = "actionlint"
+
+[tasks."check:anti-slop"]
+description = "Exercise every enabled generic anti-slop rule"
+run = "node --test tests/anti-slop.test.ts"
 
 [tasks."check:boundaries"]
 run = "node tools/check-boundaries.ts"
@@ -87,7 +91,7 @@ run = "oxfmt --check ."
 run = "node tools/check-lines.ts"
 
 [tasks."check:lint"]
-run = "oxlint --deny-warnings ."
+run = "aube exec -- oxlint ."
 
 [tasks."check:m5b-graph"]
 description = "Validate the checked-in M5b work graph"
@@ -109,6 +113,7 @@ depends = ["build"]
 run = '''
 aube exec -- tsc --version
 aube exec -- tsc --project tsconfig.json
+aube exec -- tsc --project tools/oxlint/tsconfig.json
 '''
 
 [tasks."check:unicode-tables"]

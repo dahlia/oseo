@@ -37,6 +37,11 @@ import type {
   CodePointSet,
 } from "../packages/unicode/src/set.ts";
 import type { ConditionalCaseMapping } from "../packages/unicode/src/model.ts";
+import {
+  parsedMapping as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
+import { isNumber, isString } from "./value-kinds.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageDirectory = "packages/unicode";
@@ -169,35 +174,34 @@ export interface PinnedInputManifest {
   readonly version: number;
 }
 
-function record(value: unknown, description: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${description} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function text(value: unknown, description: string): string {
-  if (typeof value !== "string" || value === "") {
+function text(value: StructuredDataInput, description: string): string {
+  if (!isString(value) || value === "") {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function count(value: unknown, description: string): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) {
+function count(value: StructuredDataInput, description: string): number {
+  if (!isNumber(value) || !Number.isSafeInteger(value) || value < 0) {
     throw new Error(`${description} must be a non-negative integer.`);
   }
   return value;
 }
 
-function headerKind(value: unknown, description: string): PinnedInputHeader {
+function headerKind(
+  value: StructuredDataInput,
+  description: string,
+): PinnedInputHeader {
   if (value !== "emoji" && value !== "none" && value !== "unicode") {
     throw new Error(`${description} must be emoji, none, or unicode.`);
   }
   return value;
 }
 
-function pinnedInput(value: unknown, description: string): PinnedInput {
+function pinnedInput(
+  value: StructuredDataInput,
+  description: string,
+): PinnedInput {
   const entry = record(value, description);
   return {
     bytes: count(entry.bytes, `${description} bytes`),
@@ -211,7 +215,11 @@ function pinnedInput(value: unknown, description: string): PinnedInput {
 
 /** Parse and validate the reviewed pinned-input manifest. */
 export function parsePinnedInputManifest(source: string): PinnedInputManifest {
-  const root = record(parseYaml(source) as unknown, "The input manifest");
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
+  const root = record(
+    parseYaml(source) as StructuredDataInput,
+    "The input manifest",
+  );
   if (root.version !== 1) {
     throw new Error("The input manifest must declare version 1.");
   }
@@ -1289,14 +1297,21 @@ export function renderTablesModule(tables: UnicodeTables): string {
     )};`,
     "",
     "/** Base categories each General_Category supercategory covers. */",
-    "export const generalCategorySupercategories: Readonly<",
-    "  Record<string, readonly string[]>",
-    `> = {`,
+    "export interface GeneralCategorySupercategoryTable {",
+    "  readonly [name: string]: readonly string[];",
+    "}",
+    "",
+    "export const generalCategorySupercategories:",
+    "  GeneralCategorySupercategoryTable = {",
     supercategoryEntries,
     "};",
     "",
     "/** Every accepted General_Category spelling and its canonical name. */",
-    "export const generalCategoryAliases: Readonly<Record<string, string>> =",
+    "export interface GeneralCategoryAliasTable {",
+    "  readonly [name: string]: string;",
+    "}",
+    "",
+    "export const generalCategoryAliases: GeneralCategoryAliasTable =",
     `  ${stringRecord(tables.generalCategoryAliases)};`,
     "",
     "/** The total General_Category assignment over every code point. */",
@@ -1324,7 +1339,11 @@ export function renderTablesModule(tables: UnicodeTables): string {
     )};`,
     "",
     "/** Every accepted Script spelling and its canonical name. */",
-    "export const scriptAliases: Readonly<Record<string, string>> =",
+    "export interface ScriptAliasTable {",
+    "  readonly [name: string]: string;",
+    "}",
+    "",
+    "export const scriptAliases: ScriptAliasTable =",
     `  ${stringRecord(tables.scriptAliases)};`,
     "",
     "/** The total Script assignment over every code point. */",
@@ -1346,11 +1365,19 @@ export function renderTablesModule(tables: UnicodeTables): string {
     )};`,
     "",
     "/** Every accepted binary property spelling and its canonical name. */",
-    "export const propertyNameAliases: Readonly<Record<string, string>> =",
+    "export interface PropertyNameAliasTable {",
+    "  readonly [name: string]: string;",
+    "}",
+    "",
+    "export const propertyNameAliases: PropertyNameAliasTable =",
     `  ${stringRecord(tables.propertyNameAliases)};`,
     "",
     "/** One encoded code-point set per ECMAScript binary property. */",
-    "export const binaryPropertySets: Readonly<Record<string, string>> =",
+    "export interface BinaryPropertySetTable {",
+    "  readonly [name: string]: string;",
+    "}",
+    "",
+    "export const binaryPropertySets: BinaryPropertySetTable =",
     `  ${encodedRecord(binaryEntries)};`,
     "",
     "/** Simple case folding, as the C and S statuses of CaseFolding.txt. */",

@@ -78,10 +78,12 @@ test("requires explicit native and cross targets", () => {
     undefined,
   );
   assert.throws(
+    // SAFETY: This invalid value exercises the runtime rejection path.
     () => describeTarget("unknown" as never),
     /Unsupported native target/u,
   );
   assert.throws(
+    // SAFETY: This invalid value exercises the runtime rejection path.
     () => describeTarget("aarch64-macos" as never),
     /Unsupported native target/u,
   );

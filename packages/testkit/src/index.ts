@@ -14,6 +14,12 @@ import type {
 } from "@oseo/compiler";
 import { canExecuteTarget } from "@oseo/compiler";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 export { summarizeTest262, test262Group } from "./test262-summary.ts";
 
 /** Complete observation retained for one native fixture build and run. */
@@ -274,16 +280,13 @@ function failedProcess(
   );
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error
-    ? `${error.name}: ${error.message}`
-    : `${error}`;
+function errorMessage(cause: unknown): string {
+  return cause instanceof Error
+    ? `${cause.name}: ${cause.message}`
+    : `${cause}`;
 }
 
-function splitCounters(observation: ProcessObservation): {
-  readonly counters?: RuntimeObservationCounters;
-  readonly observation: ProcessObservation;
-} {
+function splitCounters(observation: ProcessObservation) {
   const prefix = "OSEO_OBSERVATIONS ";
   const lines = observation.stderr.split(/(?<=\n)/u);
   // The machine-readable thrown-error marker is appended as the final
@@ -304,6 +307,7 @@ function splitCounters(observation: ProcessObservation): {
   const line = lines[index];
   if (line == null)
     return { observation: { ...observation, stderr: strippedStderr } };
+  // SAFETY: Every counter field is validated before the record is returned.
   const parsed = JSON.parse(
     line.slice(prefix.length),
   ) as Partial<RuntimeObservationCounters>;
@@ -322,6 +326,7 @@ function splitCounters(observation: ProcessObservation): {
   }
   lines.splice(index, 1);
   return {
+    // SAFETY: The loop above validates every RuntimeObservationCounters field.
     counters: parsed as RuntimeObservationCounters,
     observation: { ...observation, stderr: lines.join("") },
   };
@@ -372,7 +377,12 @@ export function classifyTest262(
     case: testCase,
     classification,
     dependencies: evidence.dependencies,
-    ...(evidence.execution == null ? {} : { execution: evidence.execution }),
+    ...includePropertiesWhen(() => {
+      if (evidence.execution == null) return undefined;
+      return {
+        execution: evidence.execution,
+      };
+    }),
     observation,
     unsupportedFeatures,
   };
@@ -520,13 +530,19 @@ export async function withNativeFixture<T>(
     }
 
     const plan = options.toolchain.createBuildPlan({
-      ...(toolchainEnvironment == null
-        ? {}
-        : { environment: toolchainEnvironment }),
+      ...includePropertiesWhen(() => {
+        if (toolchainEnvironment == null) return undefined;
+        return {
+          environment: toolchainEnvironment,
+        };
+      }),
       generatedSourcePath,
-      ...(cachedArchivePath == null
-        ? {}
-        : { prebuiltRuntimeArchivePath: cachedArchivePath }),
+      ...includePropertiesWhen(() => {
+        if (cachedArchivePath == null) return undefined;
+        return {
+          prebuiltRuntimeArchivePath: cachedArchivePath,
+        };
+      }),
       runtimeDirectory: directory,
       runtimeSourcePaths,
       target: options.target,
@@ -582,11 +598,19 @@ export async function withNativeFixture<T>(
     const completeObservation: NativeFixtureObservation = {
       ...separated.observation,
       compilerInvocation,
-      ...(separated.counters == null ? {} : { counters: separated.counters }),
+      ...includePropertiesWhen(() => {
+        if (separated.counters == null) return undefined;
+        return {
+          counters: separated.counters,
+        };
+      }),
       emittedC: emitted.source,
-      ...(options.host.executionHost == null
-        ? {}
-        : { executionHost: options.host.executionHost }),
+      ...includePropertiesWhen(() => {
+        if (options.host.executionHost == null) return undefined;
+        return {
+          executionHost: options.host.executionHost,
+        };
+      }),
       target: options.target,
     };
     nativeObservation = completeObservation;

@@ -208,11 +208,7 @@ console.log("guard", render(hinted(subject)));
 `;
 }
 
-function expectedObservation(testCase: MatchAndSplitCase): {
-  readonly exitStatus: number;
-  readonly stderr: string;
-  readonly stdout: string;
-} {
+function expectedObservation(testCase: MatchAndSplitCase) {
   const first = firstMatch(testCase.subjectUnits, testCase.searchUnits, 0);
   const positions = allMatches(testCase.subjectUnits, testCase.searchUnits);
   const pieces = splitUnits(
@@ -470,11 +466,7 @@ console.log("remaining", remaining);
 `;
 }
 
-function expectedRegExpFallback(testCase: RegExpFallbackCase): {
-  readonly exitStatus: number;
-  readonly stderr: string;
-  readonly stdout: string;
-} {
+function expectedRegExpFallback(testCase: RegExpFallbackCase) {
   const matches = fallbackPatternMatches(testCase);
   const first = matches[0];
   const firstUnits =

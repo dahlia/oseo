@@ -5,6 +5,13 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import {
+  parsedMapping as record,
+  type StructuredDataInput,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
+
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
 export const evidenceIndexDirectory = "docs/language-profile-m5/index";
@@ -34,15 +41,8 @@ export interface EvidenceInventorySummary {
 
 export type EvidenceSourceReader = (path: string) => string;
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
 function requireExactKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -58,14 +58,14 @@ function requireExactKeys(
   }
 }
 
-function stringValue(value: unknown, context: string): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
+function stringValue(value: StructuredDataInput, context: string): string {
+  if (!isString(value) || value.trim().length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
 }
 
-function familyId(value: unknown, context: string): string {
+function familyId(value: StructuredDataInput, context: string): string {
   const id = stringValue(value, context);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(id)) {
     throw new Error(`${context} must be a kebab-case family ID.`);
@@ -73,7 +73,10 @@ function familyId(value: unknown, context: string): string {
   return id;
 }
 
-function stringArray(value: unknown, context: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  context: string,
+): readonly string[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw new Error(`${context} must be a non-empty array.`);
   }
@@ -103,15 +106,21 @@ function checkReference(
   }
 }
 
-function parseSource(source: EvidenceSource, context: string): unknown {
+function parseSource(
+  source: EvidenceSource,
+  context: string,
+): StructuredDataRecord {
+  let value: StructuredDataInput;
   try {
-    return parseYaml(source.text) as unknown;
+    // SAFETY: parsedMapping validates the complete YAML tree immediately below.
+    value = parseYaml(source.text) as StructuredDataInput;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`${context} is malformed YAML: ${detail}`, {
       cause: error,
     });
   }
+  return record(value, context);
 }
 
 function expectedPath(directory: string, id: string): string {
@@ -127,7 +136,7 @@ export function validateEvidenceInventory(
   const indexed = new Map<string, string>();
   for (const source of indexSources) {
     const context = `evidence index ${source.path}`;
-    const value = record(parseSource(source, context), context);
+    const value = parseSource(source, context);
     requireExactKeys(value, new Set(["id", "record", "version"]), context);
     if (value.version !== 1) {
       throw new Error(`${context} version must be 1.`);
@@ -151,7 +160,7 @@ export function validateEvidenceInventory(
   let omitted = 0;
   for (const source of recordSources) {
     const context = `evidence record ${source.path}`;
-    const value = record(parseSource(source, context), context);
+    const value = parseSource(source, context);
     requireExactKeys(
       value,
       new Set(["evidence", "id", "owners", "scope", "title", "version"]),

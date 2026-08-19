@@ -28,7 +28,7 @@ const { assertAsyncProperty } = await import(
 
 type DeclarationKind = "const" | "let" | "var";
 type HintKind = "absent" | "false" | "truthful";
-type Shape =
+type BindingPatternKind =
   | "computed"
   | "computed-literal"
   | "default"
@@ -48,7 +48,7 @@ interface ObjectBindingCase {
   readonly fallback: number;
   readonly hintKind: HintKind;
   readonly nestedAnnotationMatches: boolean;
-  readonly shape: Shape;
+  readonly patternKind: BindingPatternKind;
   readonly sourceKind: SourceKind;
   readonly value: number;
 }
@@ -84,7 +84,10 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
     arbitrary: fc.record({
       ...sharedArbitraries,
       hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
-      shape: fc.constantFrom<Shape>("computed", "computed-literal"),
+      patternKind: fc.constantFrom<BindingPatternKind>(
+        "computed",
+        "computed-literal",
+      ),
     }),
     weight: 1,
   },
@@ -92,7 +95,7 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
     arbitrary: fc.record({
       ...sharedArbitraries,
       hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
-      shape: fc.constantFrom<Shape>(
+      patternKind: fc.constantFrom<BindingPatternKind>(
         "default",
         "nested-array",
         "nested-object",
@@ -105,32 +108,32 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
 
 function patternSource(testCase: ObjectBindingCase): string {
   let pattern: string;
-  if (testCase.shape === "static") {
+  if (testCase.patternKind === "static") {
     pattern = "{ value: bound }";
-  } else if (testCase.shape === "default") {
+  } else if (testCase.patternKind === "default") {
     const fallback = testCase.fallback;
     pattern = `{ value: bound = (order = order + "d", ${fallback}) }`;
-  } else if (testCase.shape === "computed") {
+  } else if (testCase.patternKind === "computed") {
     pattern =
       `{ [(order = order + "e", keyObject)]: bound = ` +
       `(order = order + "d", ${testCase.fallback}) }`;
-  } else if (testCase.shape === "computed-literal") {
+  } else if (testCase.patternKind === "computed-literal") {
     const fallback = testCase.fallback;
     pattern = `{ ["value"]: bound = (order = order + "d", ${fallback}) }`;
-  } else if (testCase.shape === "nested-array") {
+  } else if (testCase.patternKind === "nested-array") {
     pattern = `{ nested: [bound = ${testCase.fallback}] = [] }`;
   } else {
     pattern = `{ nested: { value: bound = ${testCase.fallback} } = {} }`;
   }
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
-  if (testCase.shape === "nested-array") {
+  if (testCase.patternKind === "nested-array") {
     if (!testCase.nestedAnnotationMatches) {
       return `${pattern}: { nested: ${type} }`;
     }
     return `${pattern}: { nested: ${type}[] }`;
   }
-  if (testCase.shape === "nested-object") {
+  if (testCase.patternKind === "nested-object") {
     if (!testCase.nestedAnnotationMatches) {
       return `${pattern}: { nested: ${type} }`;
     }
@@ -145,10 +148,10 @@ function sourceValue(testCase: ObjectBindingCase): string {
   if (testCase.sourceKind === "number") return "1";
   if (testCase.sourceKind === "string") return '"text"';
   if (testCase.sourceKind === "missing") return "{}";
-  if (testCase.shape === "nested-array") {
+  if (testCase.patternKind === "nested-array") {
     return `{ nested: [${testCase.value}] }`;
   }
-  if (testCase.shape === "nested-object") {
+  if (testCase.patternKind === "nested-object") {
     return `{ nested: { value: ${testCase.value} } }`;
   }
   return `{ value: ${testCase.value} }`;
@@ -181,17 +184,17 @@ function expected(testCase: ObjectBindingCase): ModelResult {
     return { order: "", result: "error TypeError" };
   }
   const present = testCase.sourceKind === "present";
-  let order = testCase.shape === "computed" ? "ek" : "";
+  let order = testCase.patternKind === "computed" ? "ek" : "";
   let value: number | undefined = present ? testCase.value : undefined;
-  if (value === undefined && testCase.shape !== "static") {
+  if (value === undefined && testCase.patternKind !== "static") {
     value = testCase.fallback;
     if (
-      testCase.shape === "computed" ||
-      testCase.shape === "computed-literal"
+      testCase.patternKind === "computed" ||
+      testCase.patternKind === "computed-literal"
     ) {
       order += "d";
     }
-    if (testCase.shape === "default") order += "d";
+    if (testCase.patternKind === "default") order += "d";
   }
   return { order, result: `result ${String(value)}` };
 }
@@ -243,7 +246,7 @@ test("object binding model checks nullish inputs before computed keys", () => {
       fallback: 2,
       hintKind: "absent",
       nestedAnnotationMatches: true,
-      shape: "computed",
+      patternKind: "computed",
       sourceKind: "null",
       value: 1,
     }),
@@ -281,10 +284,10 @@ test(
           const hir = printHir(compiled.hir);
           if (
             testCase.hintKind === "absent" ||
-            testCase.shape === "computed" ||
-            testCase.shape === "computed-literal" ||
-            ((testCase.shape === "nested-array" ||
-              testCase.shape === "nested-object") &&
+            testCase.patternKind === "computed" ||
+            testCase.patternKind === "computed-literal" ||
+            ((testCase.patternKind === "nested-array" ||
+              testCase.patternKind === "nested-object") &&
               !testCase.nestedAnnotationMatches)
           ) {
             assert.doesNotMatch(hir, /bound hints=/u);

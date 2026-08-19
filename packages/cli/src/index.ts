@@ -45,6 +45,12 @@ import { argument, flag, option } from "@optique/core/primitives";
 import { defineProgram } from "@optique/core/program";
 import { choice, string as stringValue } from "@optique/core/valueparser";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const modeParser = withDefault(
   or(
     map(
@@ -479,10 +485,14 @@ interface ProcessStartFailure {
   readonly failure: "resource-exhaustion" | "unknown";
 }
 
-function processStartFailure(error: unknown): ProcessStartFailure {
-  if (error != null && typeof error === "object") {
-    const code = Reflect.get(error, "code");
-    const name = Reflect.get(error, "name");
+function isNonNullObject<T>(value: T): value is T & object {
+  return value !== null && typeof value === "object";
+}
+
+function processStartFailure(cause: unknown): ProcessStartFailure {
+  if (isNonNullObject(cause)) {
+    const code = "code" in cause ? cause.code : undefined;
+    const name = "name" in cause ? cause.name : undefined;
     if (
       code === "EAGAIN" ||
       code === "ENOMEM" ||
@@ -683,13 +693,19 @@ async function executeNativeWorkflow(
   let executablePath: string | undefined;
   try {
     const plan = defaultComponents.toolchain.createBuildPlan({
-      ...(toolchainEnvironment == null
-        ? {}
-        : { environment: toolchainEnvironment }),
+      ...includePropertiesWhen(() => {
+        if (toolchainEnvironment == null) return undefined;
+        return {
+          environment: toolchainEnvironment,
+        };
+      }),
       generatedSourcePath,
-      ...(cachedArchivePath == null
-        ? {}
-        : { prebuiltRuntimeArchivePath: cachedArchivePath }),
+      ...includePropertiesWhen(() => {
+        if (cachedArchivePath == null) return undefined;
+        return {
+          prebuiltRuntimeArchivePath: cachedArchivePath,
+        };
+      }),
       runtimeDirectory: directory,
       runtimeSourcePaths,
       target,

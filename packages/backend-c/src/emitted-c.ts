@@ -680,7 +680,7 @@ export const emittedC = {
       ["]);"],
     ],
   },
-  guardShape: {
+  propertyCacheGuard: {
     staticOseoPropertyCacheAssignUUStatement: [
       ["static OseoPropertyCache "],
       [" = {0u, 0u};"],

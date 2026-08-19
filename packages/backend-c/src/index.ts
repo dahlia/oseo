@@ -14,6 +14,12 @@ import type {
 
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 type CInterpolation = boolean | number | string;
 
 type NormalizedCFragment<Fragment extends CFragment> = {
@@ -37,7 +43,8 @@ type NormalizedCCatalog<Catalog extends CFragmentCatalog> = {
 
 function normalizeCCatalog<const Catalog extends CFragmentCatalog>(
   catalog: Catalog,
-): NormalizedCCatalog<Catalog> {
+): NormalizedCCatalog<Catalog>;
+function normalizeCCatalog(catalog: CFragmentCatalog) {
   const normalized: Record<string, Record<string, readonly string[]>> = {};
   for (const [groupName, group] of Object.entries(catalog)) {
     const normalizedGroup: Record<string, readonly string[]> = {};
@@ -48,7 +55,7 @@ function normalizeCCatalog<const Catalog extends CFragmentCatalog>(
     }
     normalized[groupName] = normalizedGroup;
   }
-  return normalized as NormalizedCCatalog<Catalog>;
+  return normalized;
 }
 
 const emittedC = normalizeCCatalog(emittedCSource);
@@ -193,7 +200,7 @@ function operationArgument(operation: MirOperation, index: number): number {
 }
 
 function operatorHelper(operator: BinaryOperator): string {
-  const helpers: Readonly<Record<BinaryOperator, string>> = {
+  const helpers = {
     "!=": renderC(emittedC.operatorHelper.oseoNotLooseEqual),
     "!==": renderC(emittedC.operatorHelper.oseoNotStrictEqual),
     "%": renderC(emittedC.operatorHelper.oseoRemainder),
@@ -216,7 +223,7 @@ function operatorHelper(operator: BinaryOperator): string {
     in: renderC(emittedC.operatorHelper.oseoHasProperty),
     instanceof: renderC(emittedC.operatorHelper.oseoInstanceof),
     "|": renderC(emittedC.operatorHelper.oseoBitwiseOr),
-  };
+  } satisfies Readonly<Record<BinaryOperator, string>>;
   return helpers[operator];
 }
 
@@ -456,10 +463,7 @@ function emitTemplateObject(state: EmitState, operation: MirOperation): void {
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
-function emitArguments(
-  state: EmitState,
-  operation: MirOperation,
-): { readonly count: string; readonly name: string } {
+function emitArguments(state: EmitState, operation: MirOperation) {
   if (operation.argumentListId != null) {
     const count = renderC(emittedC.arguments.argumentCount, operation.id);
     const name = renderC(emittedC.arguments.argumentValues, operation.id);
@@ -712,6 +716,7 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   if (operator == null || !(operator in helpers)) {
     throw new Error(`MIR unary %${operation.id} has no valid operator.`);
   }
+  // SAFETY: Membership in helpers above establishes its exact key domain.
   const helper = helpers[operator as keyof typeof helpers];
   location(state, operation.range);
   state.usesAbrupt = true;
@@ -1836,23 +1841,27 @@ function emitGuardObject(state: EmitState, operation: MirOperation): void {
   );
 }
 
-function emitGuardShape(state: EmitState, operation: MirOperation): void {
+function emitPropertyCacheGuard(
+  state: EmitState,
+  operation: MirOperation,
+): void {
   const object = operationArgument(operation, 0);
   const cache = propertyCacheName(operation);
   state.scalarKinds.set(operation.id, "boolean");
   line(
     state,
     renderC(
-      emittedC.guardShape.staticOseoPropertyCacheAssignUUStatement,
+      emittedC.propertyCacheGuard.staticOseoPropertyCacheAssignUUStatement,
       cache,
     ),
   );
   line(
     state,
     renderC(
-      emittedC.guardShape.boolFastAssignOseoPropertyCacheMatches,
+      emittedC.propertyCacheGuard.boolFastAssignOseoPropertyCacheMatches,
       operation.id,
-    ) + renderC(emittedC.guardShape.rootsAddressStatement, object, cache),
+    ) +
+      renderC(emittedC.propertyCacheGuard.rootsAddressStatement, object, cache),
   );
 }
 
@@ -2758,7 +2767,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "guard-object") {
     emitGuardObject(state, operation);
   } else if (operation.kind === "guard-shape") {
-    emitGuardShape(state, operation);
+    emitPropertyCacheGuard(state, operation);
   } else if (operation.kind === "guard-smi") {
     emitGuardSmi(state, operation);
   } else if (operation.kind === "unbox-smi") {
@@ -3326,13 +3335,19 @@ function yieldResumePoints(
     if (block.terminator.kind !== "generator-yield") continue;
     const terminator = block.terminator;
     points.set(terminator.resume, {
-      ...(terminator.returnResume == null
-        ? {}
-        : { returnResume: terminator.returnResume }),
+      ...includePropertiesWhen(() => {
+        if (terminator.returnResume == null) return undefined;
+        return {
+          returnResume: terminator.returnResume,
+        };
+      }),
       sent: terminator.sent,
-      ...(terminator.throwResume == null
-        ? {}
-        : { throwResume: terminator.throwResume }),
+      ...includePropertiesWhen(() => {
+        if (terminator.throwResume == null) return undefined;
+        return {
+          throwResume: terminator.throwResume,
+        };
+      }),
     });
   }
   return points;
@@ -3891,9 +3906,10 @@ function emitFunction(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
     completionSlotStart: baseRootCount + argumentSlots,
-    ...(functionValue.derivedThisBindingId == null
-      ? {}
-      : { derivedThisBindingId: functionValue.derivedThisBindingId }),
+    ...includePropertiesWhen(() => {
+      if (functionValue.derivedThisBindingId == null) return undefined;
+      return { derivedThisBindingId: functionValue.derivedThisBindingId };
+    }),
     functionRootCounts,
     environmentSlot,
     globalObjectBindingIds: new Set(
@@ -3921,7 +3937,12 @@ function emitFunction(
       ]),
     ),
     generator: false,
-    ...(generatorBodyStart == null ? {} : { generatorBodyStart }),
+    ...includePropertiesWhen(() => {
+      if (generatorBodyStart == null) return undefined;
+      return {
+        generatorBodyStart,
+      };
+    }),
     lines: [],
   };
   state.usesAbrupt = true;

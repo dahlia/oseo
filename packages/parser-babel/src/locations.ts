@@ -114,10 +114,15 @@ export function bytes(index: SourceIndex, value: BabelNode): ByteRange {
   };
 }
 
+export interface BabelLocation {
+  readonly byteRange: ByteRange;
+  readonly range: SourceRange;
+}
+
 export function location(
   context: ConvertContext,
   value: BabelNode,
-): { readonly byteRange: ByteRange; readonly range: SourceRange } {
+): BabelLocation {
   return {
     byteRange: bytes(context.locations, value),
     range: sourceRange(context.locations, value),

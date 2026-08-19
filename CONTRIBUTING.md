@@ -86,11 +86,18 @@ The workspace uses this toolchain:
  -  Zig's C toolchain, invoked through `zig cc`, as the default way to compile
     generated C11 and the initial runtime.
 
-Repository-wide tools must be pinned through mise and exposed through mise
-tasks. Package build and test dependencies belong in aube workspace manifests.
-Oxfmt owns JavaScript, TypeScript, and supported data files. Hongdown owns
-Markdown, and `mise fmt` owns *mise.toml*. Generated lockfiles are never
-formatter inputs.
+Standalone repository-wide tools must be pinned through mise and exposed
+through mise tasks. Node.js-hosted tools that load workspace packages belong
+in the aube workspace manifest and must run through `aube exec` from a mise
+task. Oxlint follows the latter rule because its local JavaScript plugin
+requires the Node.js wrapper. Package build and test dependencies also belong
+in aube workspace manifests. Oxfmt owns JavaScript, TypeScript, and supported
+data files. Hongdown owns Markdown, and `mise fmt` owns *mise.toml*. Generated
+lockfiles are never formatter inputs.
+
+Anti-slop rules with existing violations remain warnings during migration.
+Rules with a clean baseline stay errors. Promote each warning after its
+existing findings have been resolved.
 
 Using Zig as a C toolchain does not make Zig the runtime implementation
 language. The C runtime and the native backend remain replaceable architectural
@@ -185,6 +192,8 @@ at or below 80 columns. Wrap prose and code instead of relying on an editor's
 soft wrapping. Markdown table rows and link destinations are exempt. A URL may
 also exceed the limit wherever it appears, including in a source-code comment.
 Generated lockfiles are exempt and must not be hand-edited.
+Vendored source under *tools/oxlint/anti-slop/* is also exempt so that it stays
+directly comparable with upstream. Do not reformat it.
 
 
 C and native toolchain policy

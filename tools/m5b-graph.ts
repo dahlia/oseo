@@ -4,6 +4,13 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
+import {
+  parsedMapping as record,
+  type StructuredDataInput,
+  type StructuredDataRecord,
+} from "./structured-data.ts";
+import { isBoolean, isString } from "./value-kinds.ts";
+
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
 /** The checked-in graph document, holding everything not owned by a node. */
@@ -68,15 +75,8 @@ export interface WorkGraphSummary {
   readonly ready: number;
 }
 
-function record(value: unknown, context: string): Record<string, unknown> {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be a mapping.`);
-  }
-  return value as Record<string, unknown>;
-}
-
 function requireExactKeys(
-  value: Record<string, unknown>,
+  value: StructuredDataRecord,
   expected: ReadonlySet<string>,
   context: string,
 ): void {
@@ -92,28 +92,30 @@ function requireExactKeys(
   }
 }
 
-function stringValue(value: unknown, context: string): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
+function stringValue(value: StructuredDataInput, context: string): string {
+  if (!isString(value) || value.trim().length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
 }
 
-function booleanValue(value: unknown, context: string): boolean {
-  if (typeof value !== "boolean") {
+function booleanValue(value: StructuredDataInput, context: string): boolean {
+  if (!isBoolean(value)) {
     throw new Error(`${context} must be a boolean.`);
   }
   return value;
 }
 
-function countValue(value: unknown, context: string): number {
+function countValue(value: StructuredDataInput, context: string): number {
+  // SAFETY: Number.isSafeInteger establishes a numeric value for comparison.
   if (!Number.isSafeInteger(value) || (value as number) < 0) {
     throw new Error(`${context} must be a non-negative integer.`);
   }
+  // SAFETY: Number.isSafeInteger above establishes a non-negative integer.
   return value as number;
 }
 
-function nodeId(value: unknown, context: string): string {
+function nodeId(value: StructuredDataInput, context: string): string {
   const id = stringValue(value, context);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(id)) {
     throw new Error(`${context} must be a kebab-case node ID.`);
@@ -122,7 +124,7 @@ function nodeId(value: unknown, context: string): string {
 }
 
 function sortedUniqueStrings(
-  value: unknown,
+  value: StructuredDataInput,
   context: string,
 ): readonly string[] {
   if (!Array.isArray(value) || value.length === 0) {
@@ -141,15 +143,21 @@ function sortedUniqueStrings(
   return values;
 }
 
-function parseSource(source: WorkGraphSource, context: string): unknown {
+function parseSource(
+  source: WorkGraphSource,
+  context: string,
+): StructuredDataRecord {
+  let value: StructuredDataInput;
   try {
-    return parseYaml(source.text) as unknown;
+    // SAFETY: parsedMapping validates the complete YAML tree immediately below.
+    value = parseYaml(source.text) as StructuredDataInput;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`${context} is malformed YAML: ${detail}`, {
       cause: error,
     });
   }
+  return record(value, context);
 }
 
 /**
@@ -189,7 +197,7 @@ export function selectInventoryPaths(
 }
 
 function parseInventory(
-  value: unknown,
+  value: StructuredDataInput,
   context: string,
   includedPaths: readonly string[],
   claimed: Map<string, string>,
@@ -230,7 +238,7 @@ function parseNode(
   claimed: Map<string, string>,
 ): WorkGraphNode {
   const context = `work graph node ${source.path}`;
-  const value = record(parseSource(source, context), context);
+  const value = parseSource(source, context);
   const parked = value.status === "parked";
   const optional = "inventory" in value ? ["inventory"] : [];
   requireExactKeys(
@@ -335,7 +343,7 @@ function parseGraphDocument(
   summary: WorkGraphSummary,
 ): void {
   const context = `work graph ${source.path}`;
-  const value = record(parseSource(source, context), context);
+  const value = parseSource(source, context);
   requireExactKeys(
     value,
     new Set([
@@ -524,7 +532,10 @@ export function parseIncludedInventoryPaths(text: string): readonly string[] {
     .filter((line) => line.length > 0 && !line.startsWith("#"))
     .map((line) => line.split("\t"))
     .filter((columns) => columns[1] === "included")
-    .map((columns) => columns[0] as string);
+    .map((columns) => {
+      // SAFETY: split always supplies column zero, even for an empty line.
+      return columns[0] as string;
+    });
 }
 
 function readNodeSources(): readonly WorkGraphSource[] {
