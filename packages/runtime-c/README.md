@@ -532,6 +532,35 @@ backing storage is still observed. `groupBy` builds its result directly into a
 fresh map's records instead of through an observable `set` lookup. The
 generated-code ABI gains no entry point.
 
+The `m5-72` ABI adds the *runtime\_bigint\_object.c* component and
+materializes the callable `BigInt` intrinsic, `%BigInt.prototype%`, and their
+own properties over the already admitted primitive. `BigInt` has a
+`[[Construct]]` slot, so class heritage and generic constructor selection see
+it as a constructor, but every direct or derived construction throws
+`TypeError` before any conversion. Its `prototype` is a non-writable,
+non-enumerable, non-configurable own property whose value is an ordinary object
+with no `[[BigIntData]]` slot. The callable path
+applies `ToPrimitive` with the number hint exactly once, converts an integral
+Number exactly and rejects `NaN`, an infinity, and a fractional value with
+`RangeError`, and otherwise applies the shared `ToBigInt`, which rejects a
+Number, a Symbol, `undefined`, and `null` with `TypeError` and an unparseable
+string with `SyntaxError`. `BigInt.asIntN` and `BigInt.asUintN` convert the
+width through `ToIndex` before the operand through `ToBigInt`, then truncate to
+the exact value modulo `2**bits` inside a width-bounded two's complement, so a
+width above the operand's bit length never materializes `2**bits`;
+`BigInt.asUintN` of a negative operand is the one request whose result grows to
+the full width and rejects a width past the reviewed 65,536-bit ceiling with a
+catchable `RangeError`. `%BigInt.prototype%.toString` checks its receiver brand
+before converting an optional radix, admits radix 2 through 36 using lowercase
+`a` through `z` for digit values 10 through 35, and shares one exact
+repeated-division conversion with ordinary BigInt string conversion.
+`toLocaleString` returns the base specification's own fallback,
+`thisBigIntValue` followed by `ToString`. `valueOf` returns the receiver's
+primitive. All three admit a BigInt primitive or a BigInt wrapper object and
+reject every other receiver, including `%BigInt.prototype%` itself.
+`%BigInt.prototype%` carries `Symbol.toStringTag` `"BigInt"`. The
+generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

@@ -160,6 +160,240 @@ static void test_bigint_survival(OseoContext *context, OseoValue *roots) {
            OSEO_STATUS_THROW);
 }
 
+typedef enum {
+    BIGINT_ALLOCATION_CLUSTER,
+    BIGINT_ALLOCATION_PUBLICATION,
+    BIGINT_ALLOCATION_NUMBER,
+    BIGINT_ALLOCATION_RADIX,
+    BIGINT_ALLOCATION_WRAPPER,
+    BIGINT_ALLOCATION_OPERATION_COUNT,
+} BigIntAllocationOperation;
+
+static void prepare_bigint_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    BigIntAllocationOperation operation
+) {
+    if (operation == BIGINT_ALLOCATION_CLUSTER) {
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_OBJECT)
+        );
+    } else if (operation == BIGINT_ALLOCATION_NUMBER) {
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT)
+        );
+    } else if (operation == BIGINT_ALLOCATION_RADIX) {
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT_TO_STRING)
+        );
+        roots[1] = require_normal(oseo_bigint_literal(
+            context,
+            "123456789012345678901234567890",
+            10u
+        ));
+        roots[2] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT)
+        );
+    } else if (operation == BIGINT_ALLOCATION_WRAPPER) {
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_OBJECT)
+        );
+        roots[1] = require_normal(
+            oseo_bigint_literal(context, "12345678901234567890", 10u)
+        );
+        roots[2] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT)
+        );
+    }
+}
+
+static OseoResult run_bigint_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    BigIntAllocationOperation operation
+) {
+    if (operation == BIGINT_ALLOCATION_CLUSTER) {
+        return oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT);
+    }
+    if (operation == BIGINT_ALLOCATION_PUBLICATION) {
+        return oseo_bigint_literal(
+            context,
+            "123456789012345678901234567890",
+            10u
+        );
+    }
+    if (operation == BIGINT_ALLOCATION_NUMBER) {
+        OseoValue argument = oseo_number(0x1p70);
+        return oseo_call_function(
+            context,
+            roots[0],
+            oseo_undefined(),
+            1u,
+            &argument,
+            oseo_undefined()
+        );
+    }
+    if (operation == BIGINT_ALLOCATION_RADIX) {
+        OseoValue radix = oseo_number(16.0);
+        return oseo_call_function(
+            context,
+            roots[0],
+            roots[1],
+            1u,
+            &radix,
+            oseo_undefined()
+        );
+    }
+    return oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    );
+}
+
+static void assert_bigint_cluster_unpublished(const OseoContext *context) {
+    assert(
+        context->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] ==
+        oseo_undefined()
+    );
+    for (size_t intrinsic = OSEO_INTRINSIC_BIGINT;
+         intrinsic <= OSEO_INTRINSIC_BIGINT_VALUE_OF;
+         intrinsic += 1u) {
+        assert(context->intrinsics[intrinsic] == oseo_undefined());
+    }
+}
+
+static size_t bigint_allocation_attempt_count(
+    BigIntAllocationOperation operation
+) {
+    OseoContext context;
+    OseoValue roots[6] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 6u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    prepare_bigint_allocation_operation(&context, roots, operation);
+    context.collect_every_safepoint = true;
+    oseo_context_fail_allocation_at(&context, 0u);
+    roots[3] = require_normal(
+        run_bigint_allocation_operation(&context, roots, operation)
+    );
+    size_t attempts = context.allocation_attempts;
+    assert(attempts > 0u && attempts <= 128u);
+    oseo_collect(&context);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+    return attempts;
+}
+
+static void validate_bigint_allocation_retry(
+    OseoContext *context,
+    OseoValue *roots,
+    BigIntAllocationOperation operation
+) {
+    if (operation == BIGINT_ALLOCATION_CLUSTER) {
+        assert(
+            roots[3] ==
+            require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_BIGINT))
+        );
+        for (size_t intrinsic = OSEO_INTRINSIC_BIGINT;
+             intrinsic <= OSEO_INTRINSIC_BIGINT_VALUE_OF;
+             intrinsic += 1u) {
+            assert(context->intrinsics[intrinsic] != oseo_undefined());
+        }
+        return;
+    }
+    if (operation == BIGINT_ALLOCATION_WRAPPER) {
+        assert(
+            require_normal(oseo_loose_equal(context, roots[3], roots[1])) ==
+            oseo_boolean(true)
+        );
+        return;
+    }
+    roots[4] = require_normal(oseo_to_string(context, roots[3]));
+    const char *expected = operation == BIGINT_ALLOCATION_RADIX
+        ? "18ee90ff6c373e0ee4e3f0ad2"
+        : operation == BIGINT_ALLOCATION_NUMBER
+          ? "1180591620717411303424"
+          : "123456789012345678901234567890";
+    roots[5] = make_text(context, expected);
+    assert(
+        require_normal(oseo_strict_equal(context, roots[4], roots[5])) ==
+        oseo_boolean(true)
+    );
+}
+
+/* Every allocation in each BigInt-owned path fails once in a fresh context.
+ * No attempt publishes a result or partial cluster. Collection then runs and
+ * the same context retries with stable intrinsic identity and rooted output. */
+static void test_bigint_allocation_sweep(void) {
+    for (BigIntAllocationOperation operation = BIGINT_ALLOCATION_CLUSTER;
+         operation < BIGINT_ALLOCATION_OPERATION_COUNT;
+         operation += 1) {
+        size_t attempts = bigint_allocation_attempt_count(operation);
+        for (size_t attempt = 1u; attempt <= attempts; attempt += 1u) {
+            OseoContext context;
+            OseoValue roots[6] = {
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+            };
+            OseoRootFrame frame = {NULL, roots, 6u};
+            oseo_context_init(&context, "runtime-heap.c", 14u);
+            oseo_roots_push(&context, &frame);
+            prepare_bigint_allocation_operation(&context, roots, operation);
+            OseoValue identity = roots[2];
+            if (operation == BIGINT_ALLOCATION_NUMBER) identity = roots[0];
+            context.collect_every_safepoint = true;
+            oseo_context_fail_allocation_at(&context, attempt);
+            OseoResult failed = run_bigint_allocation_operation(
+                &context,
+                roots,
+                operation
+            );
+            assert(failed.status == OSEO_STATUS_THROW);
+            assert(failed.value == oseo_undefined());
+            assert(context.has_diagnostic);
+            if (operation == BIGINT_ALLOCATION_CLUSTER) {
+                assert_bigint_cluster_unpublished(&context);
+            } else if (identity != oseo_undefined()) {
+                assert(
+                    require_normal(oseo_intrinsic(
+                        &context,
+                        OSEO_INTRINSIC_BIGINT
+                    )) == identity
+                );
+            }
+            oseo_collect(&context);
+            oseo_context_fail_allocation_at(&context, 0u);
+            context.has_diagnostic = false;
+            context.error_code = NULL;
+            context.error_message = NULL;
+            roots[3] = require_normal(run_bigint_allocation_operation(
+                &context,
+                roots,
+                operation
+            ));
+            oseo_collect(&context);
+            validate_bigint_allocation_retry(&context, roots, operation);
+            oseo_roots_pop(&context, &frame);
+            oseo_context_destroy(&context);
+        }
+    }
+}
+
 static OseoValue make_key(
     OseoContext *context,
     uint16_t unit
@@ -1531,6 +1765,7 @@ int main(void) {
     test_iterators(&context, frame.slots);
     test_accessor_descriptor_gc_safety(&context, frame.slots);
     test_global_this_install_failure();
+    test_bigint_allocation_sweep();
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);

@@ -140,12 +140,10 @@ static const char *object_builtin_tag(OseoValue receiver) {
         OseoValue primitive = ordinary_object(receiver)->primitive_value;
         if (is_string(primitive)) return "String";
         if (is_symbol(primitive)) return "Symbol";
-        if (is_bigint(primitive)) return "BigInt";
         if (tag_of(primitive) == OSEO_TAG_BOOLEAN) return "Boolean";
     }
     if (is_string(receiver)) return "String";
     if (is_symbol(receiver)) return "Symbol";
-    if (is_bigint(receiver)) return "BigInt";
     if (is_number(receiver)) return "Number";
     if (tag_of(receiver) == OSEO_TAG_BOOLEAN) return "Boolean";
     return "Object";
@@ -373,7 +371,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
      * the exotic own properties and the `constructor` property, is
      * reached through the realm intrinsic table rather than built here.
      */
-    if (intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
+    if (intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         result = oseo_internal_intrinsic(context, intrinsic);
@@ -393,7 +392,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         }
     }
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
+    if (intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         return result;
@@ -401,15 +401,7 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
     if (created) {
         OseoOrdinaryObject *prototype = ordinary_object(result.value);
         prototype->primitive_data = true;
-        if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE) {
-            prototype->primitive_value = oseo_boolean(false);
-        } else {
-            result = oseo_bigint_literal(context, "0", 10u);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                prototype = ordinary_object(context->intrinsics[intrinsic]);
-                prototype->primitive_value = result.value;
-            }
-        }
+        prototype->primitive_value = oseo_boolean(false);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_install_primitive_wrapper_methods(

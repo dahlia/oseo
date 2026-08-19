@@ -4293,6 +4293,51 @@ inventory that delivery item 1 requires. The reviewed `regular-expressions`
 dependency tag is not added: ADR 0013 freezes that vocabulary, and
 PLAN-REGEXP.md adds the tag with the first reviewed case that carries it.
 
+Implemented M5b node `bigint-intrinsic` materializes the callable `BigInt`
+intrinsic, `%BigInt.prototype%`, branded wrapper objects, `asIntN`, `asUintN`,
+`toString`, `toLocaleString`, and `valueOf` over the exact primitive admitted
+by M5a Unit 8.1a. The call path applies `ToPrimitive` with the number hint once,
+converts an integral Number exactly, and otherwise uses one shared `ToBigInt`
+operation. Its `[[Construct]]` slot makes `IsConstructor(BigInt)` true for class
+heritage and generic constructor selection but throws before converting any
+argument, including through a derived constructor. The fixed-width statics
+convert their width through `ToIndex` before the operand and perform
+width-bounded two's-complement truncation without materializing `2**bits` for
+an identity result. The prototype is an ordinary, unbranded object; its methods
+admit a BigInt primitive or branded wrapper and reject every other receiver.
+Radix text shares the primitive's exact conversion and covers every radix from
+2 through 36. The base-specification `toLocaleString` fallback remains
+independent of ECMA-402.
+
+The new *runtime\_bigint\_object.c* component owns that object model without
+reading a limb. Exact integral-Number conversion, radix text, and fixed-width
+truncation remain private `OseoValue` operations in *runtime\_bigint.c*. Fixed
+and generated differential evidence covers both reference hosts, both
+specialization policies, forced collection at every safepoint, false hints,
+guard misses, mutable global binding behavior, every conversion and failure
+order, direct and derived construction rejection, generic Array constructor
+selection, the 65,536-bit resource ceiling, and a bounded allocation-attempt
+sweep. The sweep covers result publication, Number conversion, every radix
+staging buffer, wrapper creation, and partial intrinsic initialization, then
+collects and retries each attempt to prove cleanup, roots, stable identity, and
+complete publication. The generated family uses seed `0x60004b00` in the
+reserved block through `0x60004bff` and an independent base-2^15 Number model.
+The runtime ABI moves to `oseo-runtime-m5-72`, and built-in code range index 14
+is allocated without a gap. No compiler IR, generated-code entry point,
+inventory policy, manifest schema, vocabulary, or override changes.
+
+All 77 paths under *test/built-ins/BigInt/* are reviewed: 61 pass and 16 retain
+explicit boundaries. Eight need deferred non-BigInt primitive-wrapper methods,
+six need `Reflect.construct`, one needs realm creation, and one also reaches the
+unadmitted `Date` intrinsic. Four already-reviewed Object paths and six String
+paths outside the node root move from unsupported to pass because they now
+observe the real intrinsic, wrapper tag, conversion, or symbol-dispatch
+behavior. The combined manifest moves from 11,364 to 11,441 paths, from 8,397
+to 8,468 passes, keeps 1,364 expected negatives, and moves from 1,603 to 1,609
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The suite revision and 41,091-path applicable inventory remain
+unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

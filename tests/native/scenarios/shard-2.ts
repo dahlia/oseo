@@ -744,4 +744,51 @@ await Promise.reject("bad");
       delete process.env.OSEO_GC_EVERY_SAFEPOINT;
     }
   }
+
+  // BigInt.asUintN allocates one width-bounded working buffer before it
+  // publishes anything. A failed allocation there must report the owned
+  // OSEO2001 diagnostic and leave no partial BigInt behind, so the
+  // program prints nothing and exits nonzero.
+  const bigintWidthAllocationHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_bigint.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "    size_t length = top_limb + 1u;\n" +
+          "    uint32_t *limbs = allocate_limbs(context, length, true);",
+        "    size_t length = top_limb + 1u;\n" +
+          "    uint32_t *limbs = NULL;\n" +
+          "    (void)length;",
+      );
+      assert.notEqual(
+        injected,
+        source,
+        "BigInt width allocation failure injected",
+      );
+      return injected;
+    },
+  };
+  const bigintWidthAllocation = await runNativeCli(
+    {
+      args: ["bigint-width-allocation.ts"],
+      source:
+        'console.log("before");\n' +
+        "console.log(String(BigInt.asUintN(70, -1n)));",
+      sourceId: "bigint-width-allocation.ts",
+      version: "0.1.0",
+    },
+    bigintWidthAllocationHost,
+  );
+  assert.equal(bigintWidthAllocation.exitStatus, 1);
+  assert.equal(bigintWidthAllocation.stdout, "before\n");
+  assert.match(
+    bigintWidthAllocation.stderr,
+    /error\[OSEO2001\].*BigInt allocation failed/u,
+  );
 }

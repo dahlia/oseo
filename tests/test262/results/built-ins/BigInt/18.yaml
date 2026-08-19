@@ -1,0 +1,40 @@
+group: built-ins/BigInt
+key: "18"
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - computed-property-names
+        - Symbol
+        - Symbol.toPrimitive
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/BigInt/asUintN/bigint-tobigint-errors.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - bigint-primitive
+      - object-literals
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/BigInt/asUintN/bigint-tobigint-errors.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/BigInt/asUintN/bigint-tobigint-errors.js:182:3:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

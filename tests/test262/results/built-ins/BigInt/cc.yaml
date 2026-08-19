@@ -1,0 +1,74 @@
+group: built-ins/BigInt
+key: cc
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - computed-property-names
+        - Symbol
+        - Symbol.toPrimitive
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/BigInt/asIntN/bits-toindex-wrapped-values.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-literals
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/BigInt/asIntN/bits-toindex-wrapped-values.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/BigInt/asIntN/bits-toindex-wrapped-values.js:151:18:
+        error[OSEO2001]: Primitive wrapper prototype methods are not
+        admitted yet.\n"'
+      unsupportedCapability: primitive-wrapper-prototype
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/BigInt/asIntN/order-of-steps.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - object-literals
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

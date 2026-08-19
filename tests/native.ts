@@ -34,6 +34,7 @@ import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { bigintFixtures } from "./native/fixtures/bigint.ts";
+import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
@@ -116,6 +117,7 @@ const fixtures: readonly Fixture[] = [
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
+  ...bigintIntrinsicFixtures,
   ...expressionFixtures,
   ...receiverFixtures,
   ...generatorFixtures,
@@ -235,6 +237,31 @@ assert.match(
   /^deferred-object-assign\.ts:1:\d+: error\[OSEO2001\]: Object static/u,
 );
 
+// ADR 0023's portable baseline admits magnitudes through 65,536 bits, and
+// BigInt.asUintN is the one fixed-width request whose result grows to the
+// full requested width. The reviewed ceiling is Oseo's own resource
+// boundary rather than a specified one, so it is checked here instead of
+// in a fixture that also has to match the reference hosts.
+const bigintWidthCeiling = await runNativeCli(
+  {
+    args: ["bigint-width-ceiling.ts"],
+    source: [
+      "console.log(BigInt.asUintN(65536, -1n) > 0n);",
+      "try { BigInt.asUintN(65537, -1n); } catch (error) {",
+      "  console.log(error instanceof RangeError, error.message);",
+      "}",
+    ].join("\n"),
+    sourceId: "bigint-width-ceiling.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(bigintWidthCeiling.exitStatus, 0, bigintWidthCeiling.stderr);
+assert.equal(
+  bigintWidthCeiling.stdout,
+  "true\ntrue BigInt exceeds the 65,536-bit implementation limit.\n",
+);
+
 async function requireSuccess(
   command: string,
   args: readonly string[],
@@ -331,6 +358,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-species-mapping" ||
+    fixture.name === "bigint-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -534,6 +562,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||
     fixture.name === "typeof-unresolved" ||
+    fixture.name === "bigint-intrinsic" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -601,6 +630,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
             fixture.name === "array-prototype-species-mapping" ||
+            fixture.name === "bigint-intrinsic" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -787,10 +817,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus fourteen admitted constructor
-            // property names shared by every Script, Map being the one this
-            // node admits.
-            assert.equal(native.counters.allocations, 30);
+            // value-property allocations plus fifteen admitted constructor
+            // property names shared by every Script, BigInt being the one
+            // this node admits.
+            assert.equal(native.counters.allocations, 31);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

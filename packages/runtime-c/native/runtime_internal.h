@@ -447,6 +447,19 @@
 #define OSEO_MAP_SPECIES_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 12u)
 #define OSEO_MAP_ITERATOR_NEXT_CODE_ID (OSEO_MAP_CODE_ID_RANGE_LAST - 13u)
 
+#define OSEO_BIGINT_CODE_ID_RANGE_INDEX ((size_t)14u)
+#define OSEO_BIGINT_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_BIGINT_CODE_ID_RANGE_INDEX)
+#define OSEO_BIGINT_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_BIGINT_CODE_ID_RANGE_INDEX)
+#define OSEO_BIGINT_CONSTRUCTOR_CODE_ID OSEO_BIGINT_CODE_ID_RANGE_LAST
+#define OSEO_BIGINT_AS_INT_N_CODE_ID (OSEO_BIGINT_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_BIGINT_AS_UINT_N_CODE_ID (OSEO_BIGINT_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_BIGINT_TO_STRING_CODE_ID (OSEO_BIGINT_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_BIGINT_TO_LOCALE_STRING_CODE_ID \
+    (OSEO_BIGINT_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_BIGINT_VALUE_OF_CODE_ID (OSEO_BIGINT_CODE_ID_RANGE_LAST - 5u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1606,6 +1619,39 @@ double oseo_internal_integer_digits_to_number(
     uint32_t radix
 );
 /*
+ * NumberToBigInt over an already integral finite double. The caller
+ * rejects NaN, an infinity, and a fractional value with the specified
+ * RangeError before reaching this exact conversion.
+ */
+OseoResult oseo_internal_bigint_from_integral_number(
+    OseoContext *context,
+    double number
+);
+/*
+ * The BigInt text in one radix from 2 through 36, using the lowercase
+ * letters a through z for the digit values 10 through 35. Radix 10
+ * produces exactly the ToString(BigInt) spelling.
+ */
+OseoResult oseo_internal_bigint_radix_string(
+    OseoContext *context,
+    OseoValue value,
+    uint32_t radix
+);
+/*
+ * BigInt.asIntN and BigInt.asUintN: the exact value modulo 2**bits,
+ * interpreted as signed when `signed_result` is true. `bits` is the
+ * already converted ToIndex result, so it may exceed the reviewed
+ * magnitude ceiling; a request whose result would cross that ceiling
+ * throws the same catchable RangeError as every other oversized
+ * BigInt operation.
+ */
+OseoResult oseo_internal_bigint_as_width(
+    OseoContext *context,
+    OseoValue value,
+    double bits,
+    bool signed_result
+);
+/*
  * Reads the own property descriptor named by key, including the
  * synthetic `prototype` and array `length` descriptors. A module
  * namespace export returns its stored cell, while namespace metadata
@@ -1768,6 +1814,28 @@ OseoResult oseo_internal_map_prototype(OseoContext *context);
  * constructor. */
 OseoResult oseo_internal_map_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_map_global(
+    OseoContext *context,
+    OseoValue global
+);
+OseoResult oseo_internal_bigint_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/*
+ * ToBigInt(argument), 7.1.13. An Object first reaches ToPrimitive with
+ * the number hint; a Number is the specified TypeError rather than the
+ * callable intrinsic's NumberToBigInt branch.
+ */
+OseoResult oseo_internal_to_bigint(OseoContext *context, OseoValue value);
+/* Materializes %BigInt% together with %BigInt.prototype% and every own
+ * property ECMA-262 gives them, and returns the intrinsic. */
+OseoResult oseo_internal_bigint_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_bigint_global(
     OseoContext *context,
     OseoValue global
 );

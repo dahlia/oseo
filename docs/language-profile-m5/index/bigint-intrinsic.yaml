@@ -1,0 +1,3 @@
+version: 1
+id: bigint-intrinsic
+record: docs/language-profile-m5/families/bigint-intrinsic.yaml

@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-seven reviewed assets in this order:
+The runtime input now lists twenty-eight reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
@@ -27,11 +27,13 @@ The runtime input now lists twenty-seven reviewed assets in this order:
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
 *runtime\_primitive.c*, *runtime\_promise.c*,
-*runtime\_event\_loop.c*, and *runtime\_map.c*. The M5 named-error-intrinsics
+*runtime\_event\_loop.c*, *runtime\_map.c*, and
+*runtime\_bigint\_object.c*. The M5 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
-asynchronous-generator, BigInt, string-prototype-match-and-split, and
-map-intrinsic units each added one component the same way. The M5b
+asynchronous-generator, BigInt, string-prototype-match-and-split,
+map-intrinsic, and BigInt-intrinsic units each added one component the same
+way. The M5b
 preparation unit then split the
 original *runtime\_object.c* into the eight object-family components
 listed above, so the standard built-in objects can be authored in
@@ -138,7 +140,13 @@ Ownership follows the plan's target layout:
  -  *runtime\_map.c*: the `%Map%` intrinsic and its statics, keyed
     collection storage with SameValueZero identity, insertion order, and
     in-place tombstone deletion, its realm-owned prototype methods, and
-    `%MapIteratorPrototype%`.
+    `%MapIteratorPrototype%`;
+ -  *runtime\_bigint\_object.c*: the callable `%BigInt%` intrinsic,
+    `BigInt.asIntN` and `BigInt.asUintN`, `%BigInt.prototype%` and its
+    `toString`, `toLocaleString`, and `valueOf` methods, the
+    `thisBigIntValue` brand check, and the `ToBigInt` and `NumberToBigInt`
+    conversions. It reads no limb: the representation stays behind the
+    private operations *runtime\_bigint.c* exports.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
@@ -197,8 +205,8 @@ its read and write.
 
 ### Internal helpers
 
-One hundred and seven helpers cross a translation-unit boundary. Each uses the
-`oseo_internal_` prefix, has exactly one declaration in
+One hundred and fourteen helpers cross a translation-unit boundary. Each uses
+the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
 | Internal helper                                     | Defined in                    |
@@ -245,6 +253,13 @@ One hundred and seven helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_bigint_is_zero`                      | *runtime\_bigint.c*           |
 | `oseo_internal_bigint_to_number`                    | *runtime\_bigint.c*           |
 | `oseo_internal_integer_digits_to_number`            | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_from_integral_number`         | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_radix_string`                 | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_as_width`                     | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_builtin_dispatch`             | *runtime\_bigint\_object.c*   |
+| `oseo_internal_to_bigint`                           | *runtime\_bigint\_object.c*   |
+| `oseo_internal_bigint_intrinsic`                    | *runtime\_bigint\_object.c*   |
+| `oseo_internal_install_bigint_global`               | *runtime\_bigint\_object.c*   |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
 | `oseo_internal_append_own_property`                 | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |

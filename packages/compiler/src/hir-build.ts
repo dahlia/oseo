@@ -197,6 +197,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "AggregateError" ||
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "BigInt" ||
     name === "Error" ||
     name === "EvalError" ||
     name === "Function" ||
@@ -565,6 +566,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "console" ||
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "BigInt" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "Map" ||
