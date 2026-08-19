@@ -104,10 +104,23 @@ interface DenoRuntime {
   ): Promise<void>;
 }
 
+function isDenoRuntime(value: unknown): value is DenoRuntime {
+  return (
+    value instanceof Object &&
+    "Command" in value &&
+    typeof value.Command === "function" &&
+    "cwd" in value &&
+    typeof value.cwd === "function" &&
+    "readTextFile" in value &&
+    typeof value.readTextFile === "function" &&
+    "stat" in value &&
+    typeof value.stat === "function"
+  );
+}
+
 function denoRuntime(): DenoRuntime {
-  const runtime = (globalThis as unknown as { readonly Deno?: DenoRuntime })
-    .Deno;
-  if (runtime == null) throw new Error("Deno host is unavailable.");
+  const runtime = Object.getOwnPropertyDescriptor(globalThis, "Deno")?.value;
+  if (!isDenoRuntime(runtime)) throw new Error("Deno host is unavailable.");
   return runtime;
 }
 

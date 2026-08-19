@@ -215,7 +215,12 @@ function parseResult(
   ) {
     throw new Error(`test262 result ${index} failure kind does not match.`);
   }
-  return item as unknown as Test262Result;
+  return assumeValidatedResult(item);
+}
+
+/** Convert only after parseResult has validated the record's owned fields. */
+function assumeValidatedResult(value: unknown): Test262Result {
+  return value as Test262Result;
 }
 
 /** Parse the index and all of its canonical result partitions. */

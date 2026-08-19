@@ -18,6 +18,18 @@ import {
   renameClaimedCacheLockDirectory,
 } from "../src/cache-files.ts";
 
+interface DenoTextFileRuntime {
+  writeTextFile(
+    path: string,
+    contents: string,
+    options: { readonly create: false },
+  ): Promise<void>;
+}
+
+function isDenoTextFileRuntime(value: unknown): value is DenoTextFileRuntime {
+  return value instanceof Object && "writeTextFile" in value;
+}
+
 test("retries transient claimed-directory rename failures", async () => {
   let attempts = 0;
   await renameClaimedCacheLockDirectory(
@@ -140,18 +152,8 @@ test("does not join a replacement Node cache-lock directory", async () => {
 });
 
 test("does not join a replacement Deno cache-lock directory", async () => {
-  const runtime = (
-    globalThis as unknown as {
-      readonly Deno?: {
-        writeTextFile(
-          path: string,
-          contents: string,
-          options: { readonly create: false },
-        ): Promise<void>;
-      };
-    }
-  ).Deno;
-  if (runtime == null) return;
+  const runtime = Object.getOwnPropertyDescriptor(globalThis, "Deno")?.value;
+  if (!isDenoTextFileRuntime(runtime)) return;
 
   const directory = await mkdtemp(join(tmpdir(), "oseo-deno-claim-"));
   const lockPath = join(directory, "artifact.lock");

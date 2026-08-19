@@ -9,6 +9,10 @@ const range: SourceRange = {
   start: { column: 1, line: 1 },
 };
 
+function buildInvalidHir(value: unknown) {
+  return buildHir(value as SyntaxProgram);
+}
+
 test("resolves owned syntax and prints deterministic generic IR", () => {
   const syntax: SyntaxProgram = {
     body: [
@@ -951,7 +955,7 @@ test("resolves an owned catch clause without a parameter", () => {
 });
 
 test("treats a nullish owned catch pattern as the absent parameter", () => {
-  const result = buildHir({
+  const result = buildInvalidHir({
     body: [
       {
         block: { body: [], kind: "block", range },
@@ -968,14 +972,14 @@ test("treats a nullish owned catch pattern as the absent parameter", () => {
     kind: "program",
     range,
     sourceId: "null-catch-pattern.ts",
-  } as unknown as SyntaxProgram);
+  });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.program != null);
   assert.match(printHir(result.program), /^\s*catch$/mu);
 });
 
 test("rejects an owned catch handler without a body", () => {
-  const result = buildHir({
+  const result = buildInvalidHir({
     body: [
       {
         block: { body: [], kind: "block", range },
@@ -988,7 +992,7 @@ test("rejects an owned catch handler without a body", () => {
     kind: "program",
     range,
     sourceId: "catch-without-body.ts",
-  } as unknown as SyntaxProgram);
+  });
   assert.equal(result.program, undefined);
   assert.equal(result.diagnostics.length, 1);
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
@@ -1019,7 +1023,7 @@ test("rejects assignment members in owned binding patterns", () => {
   ] as const;
   for (const declaration of declarations) {
     for (const pattern of patterns) {
-      const result = buildHir({
+      const result = buildInvalidHir({
         body: [
           {
             ...declaration,
@@ -1032,7 +1036,7 @@ test("rejects assignment members in owned binding patterns", () => {
         kind: "program",
         range,
         sourceId: `invalid-${declaration.declarationKind}-member-pattern.ts`,
-      } as unknown as SyntaxProgram);
+      });
       assert.equal(result.program, undefined);
       assert.match(
         result.diagnostics[0]?.message ?? "",
@@ -1043,7 +1047,7 @@ test("rejects assignment members in owned binding patterns", () => {
 });
 
 test("rejects assignment members in owned for-of declarations", () => {
-  const result = buildHir({
+  const result = buildInvalidHir({
     body: [
       {
         body: { body: [], kind: "block", range },
@@ -1066,7 +1070,7 @@ test("rejects assignment members in owned for-of declarations", () => {
     kind: "program",
     range,
     sourceId: "invalid-for-of-member-pattern.ts",
-  } as unknown as SyntaxProgram);
+  });
   assert.equal(result.program, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
@@ -1097,7 +1101,7 @@ test("rejects nested array patterns in owned for-in heads", () => {
     { kind: "assignment-pattern", range },
   ] as const;
   for (const head of heads) {
-    const result = buildHir({
+    const result = buildInvalidHir({
       body: [
         {
           hint: undefined,
@@ -1130,7 +1134,7 @@ test("rejects nested array patterns in owned for-in heads", () => {
       kind: "program",
       range,
       sourceId: "invalid-for-in-array-pattern.ts",
-    } as unknown as SyntaxProgram);
+    });
     assert.equal(result.program, undefined, head.kind);
     assert.match(
       result.diagnostics[0]?.message ?? "",
@@ -1141,7 +1145,7 @@ test("rejects nested array patterns in owned for-in heads", () => {
 });
 
 test("rejects a non-object owned for-in head pattern", () => {
-  const result = buildHir({
+  const result = buildInvalidHir({
     body: [
       {
         body: { body: [], kind: "block", range },
@@ -1163,7 +1167,7 @@ test("rejects a non-object owned for-in head pattern", () => {
     kind: "program",
     range,
     sourceId: "invalid-for-in-head-pattern.ts",
-  } as unknown as SyntaxProgram);
+  });
   assert.equal(result.program, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",

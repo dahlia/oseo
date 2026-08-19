@@ -4,11 +4,7 @@ import type {
   SourceFrontend,
   SourceInput,
 } from "@oseo/compiler";
-import {
-  type BabelNode,
-  type ConvertContext,
-  type ParserError,
-} from "./babel.ts";
+import { node, type ConvertContext, type ParserError } from "./babel.ts";
 import { program } from "./convert.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule } from "./modules.ts";
@@ -17,15 +13,18 @@ export const babelFrontend: SourceFrontend = {
   parse(input: SourceInput) {
     const locations = createSourceIndex(input.source);
     try {
-      const file = parseBabel(input.source, {
-        allowImportExportEverywhere: true,
-        attachComment: true,
-        createParenthesizedExpressions: true,
-        errorRecovery: true,
-        plugins: ["typescript"],
-        sourceType: "script",
-        tokens: true,
-      }) as unknown as BabelNode;
+      const file = node(
+        parseBabel(input.source, {
+          allowImportExportEverywhere: true,
+          attachComment: true,
+          createParenthesizedExpressions: true,
+          errorRecovery: true,
+          plugins: ["typescript"],
+          sourceType: "script",
+          tokens: true,
+        }),
+      );
+      if (file == null) throw new Error("Babel returned a non-node result.");
       const parserErrors = Array.isArray(file.errors)
         ? (file.errors as readonly ParserError[])
         : [];
@@ -77,14 +76,17 @@ export const babelModuleFrontend: ModuleSourceFrontend = {
   parseModule(input: SourceInput) {
     const locations = createSourceIndex(input.source);
     try {
-      const file = parseBabel(input.source, {
-        attachComment: true,
-        createParenthesizedExpressions: true,
-        errorRecovery: true,
-        plugins: ["typescript"],
-        sourceType: "module",
-        tokens: true,
-      }) as unknown as BabelNode;
+      const file = node(
+        parseBabel(input.source, {
+          attachComment: true,
+          createParenthesizedExpressions: true,
+          errorRecovery: true,
+          plugins: ["typescript"],
+          sourceType: "module",
+          tokens: true,
+        }),
+      );
+      if (file == null) throw new Error("Babel returned a non-node result.");
       return convertModule(input, file);
     } catch (error) {
       const value = error as ParserError;

@@ -15,8 +15,27 @@ import {
   normalizeExecutionHost,
 } from "../src/index.ts";
 
+interface MinimalDenoCommand {
+  output(): Promise<{
+    readonly code: number;
+    readonly stderr: Uint8Array;
+    readonly stdout: Uint8Array;
+  }>;
+}
+
+interface MinimalDenoCommandConstructor {
+  new (
+    command: string,
+    options: {
+      readonly args: readonly string[];
+      readonly stderr: "piped";
+      readonly stdout: "piped";
+    },
+  ): MinimalDenoCommand;
+}
+
 interface MinimalDenoRuntime {
-  Command?: unknown;
+  Command?: MinimalDenoCommandConstructor;
   cwd?(): string;
   env?: {
     delete(name: string): void;
@@ -37,6 +56,10 @@ interface MinimalDenoRuntime {
     options?: { readonly recursive: boolean },
   ): Promise<void>;
   writeTextFile?(path: string, contents: string): Promise<void>;
+}
+
+function unusedDenoCommand(): never {
+  throw new Error("Deno command is unused in this fixture.");
 }
 
 test("normalizes execution hosts without choosing a target", () => {
@@ -105,20 +128,7 @@ test("preserves Deno execution without environment access", async () => {
     "fixtures/restricted-environment.ts",
     import.meta.url,
   );
-  const command = new (runtime.Command as unknown as new (
-    command: string,
-    options: {
-      readonly args: readonly string[];
-      readonly stderr: "piped";
-      readonly stdout: "piped";
-    },
-  ) => {
-    output(): Promise<{
-      readonly code: number;
-      readonly stderr: Uint8Array;
-      readonly stdout: Uint8Array;
-    }>;
-  })(runtime.execPath(), {
+  const command = new runtime.Command(runtime.execPath(), {
     args: [
       "run",
       "--allow-read",
@@ -617,10 +627,13 @@ test("fetches remote text assets in the Deno host", async () => {
     Object.defineProperty(globals, "Deno", {
       configurable: true,
       value: {
+        Command: unusedDenoCommand,
+        cwd: () => "/work",
         async readTextFile(): Promise<string> {
           localRead = true;
           throw new Error("Remote assets must not use Deno.readTextFile().");
         },
+        stat: async () => ({ isFile: true, size: 0 }),
       },
     });
   }
@@ -672,10 +685,13 @@ test("reads local text assets through the Deno file API", async () => {
   Object.defineProperty(globals, "Deno", {
     configurable: true,
     value: {
+      Command: unusedDenoCommand,
+      cwd: () => "/work",
       async readTextFile(path: string | URL): Promise<string> {
         assert.equal(path, "/tmp/runtime.c");
         return "local asset\n";
       },
+      stat: async () => ({ isFile: true, size: 0 }),
     },
   });
   try {
@@ -761,10 +777,11 @@ test("loads file modules with stable content hashes", async () => {
 
 test("locates dependency load failures at the import specifier", async () => {
   const loader = createFileModuleLoader({
+    ...createNodeHost(),
     readTextFile() {
       return Promise.reject(new Error("missing dependency"));
     },
-  } as unknown as CompilerHost);
+  });
   const specifier = {
     byteRange: { end: 27, start: 15 },
     range: {
@@ -798,7 +815,12 @@ test("encodes literal percent signs in Deno file identities", async () => {
   if (globals.Deno == null) {
     Object.defineProperty(globals, "Deno", {
       configurable: true,
-      value: { cwd: () => "/work", readTextFile: async () => "" },
+      value: {
+        Command: unusedDenoCommand,
+        cwd: () => "/work",
+        readTextFile: async () => "",
+        stat: async () => ({ isFile: true, size: 0 }),
+      },
     });
   }
   try {
