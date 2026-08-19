@@ -481,8 +481,8 @@ interface ProcessStartFailure {
 
 function processStartFailure(error: unknown): ProcessStartFailure {
   if (error != null && typeof error === "object") {
-    const code = Reflect.get(error, "code");
-    const name = Reflect.get(error, "name");
+    const code = "code" in error ? error.code : undefined;
+    const name = "name" in error ? error.name : undefined;
     if (
       code === "EAGAIN" ||
       code === "ENOMEM" ||

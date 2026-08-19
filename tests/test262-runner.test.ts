@@ -15,6 +15,7 @@ import {
   parseReviewedSubset,
   parseTest262Case,
   readSerializedManifestPartitions,
+  ReviewedTest262RunError,
   selectManifestShard,
   validateReviewedResults,
 } from "../tools/test262.ts";
@@ -371,13 +372,9 @@ for (const deterministicFailure of [
           { poolLimit: 1 },
         ),
         (error: unknown) => {
-          assert.ok(error instanceof Error);
-          const metadata = Reflect.get(error, "metadata") as
-            | Record<string, unknown>
-            | undefined;
-          assert.ok(metadata);
-          assert.equal(metadata.poolLimit, 1);
-          assert.equal(metadata.retries, 0);
+          assert.ok(error instanceof ReviewedTest262RunError);
+          assert.equal(error.metadata.poolLimit, 1);
+          assert.equal(error.metadata.retries, 0);
           return true;
         },
       );
