@@ -274,10 +274,10 @@ function failedProcess(
   );
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error
-    ? `${error.name}: ${error.message}`
-    : `${error}`;
+function errorMessage(cause: unknown): string {
+  return cause instanceof Error
+    ? `${cause.name}: ${cause.message}`
+    : `${cause}`;
 }
 
 function splitCounters(observation: ProcessObservation) {

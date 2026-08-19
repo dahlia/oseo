@@ -104,7 +104,7 @@ interface DenoRuntime {
   ): Promise<void>;
 }
 
-function isDenoRuntime(value: unknown): value is DenoRuntime {
+function isDenoRuntime<T>(value: T): value is T & DenoRuntime {
   return (
     value instanceof Object &&
     "Command" in value &&
@@ -142,25 +142,25 @@ function requireCacheName(name: string): void {
   }
 }
 
-function isNotFound(error: unknown): boolean {
+function isNotFound(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "NotFound" || ("code" in error && error.code === "ENOENT"))
+    cause instanceof Error &&
+    (cause.name === "NotFound" || ("code" in cause && cause.code === "ENOENT"))
   );
 }
 
-function isAlreadyExists(error: unknown): boolean {
+function isAlreadyExists(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "AlreadyExists" ||
-      ("code" in error && error.code === "EEXIST"))
+    cause instanceof Error &&
+    (cause.name === "AlreadyExists" ||
+      ("code" in cause && cause.code === "EEXIST"))
   );
 }
 
-function isEnvironmentPermissionDenied(error: unknown): boolean {
+function isEnvironmentPermissionDenied(cause: unknown): boolean {
   return (
-    error instanceof Error &&
-    (error.name === "NotCapable" || error.name === "PermissionDenied")
+    cause instanceof Error &&
+    (cause.name === "NotCapable" || cause.name === "PermissionDenied")
   );
 }
 

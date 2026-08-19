@@ -271,7 +271,7 @@ console.log("state", steps, closes);
 `;
 }
 
-function display(value: unknown): string {
+function display(value: IteratedValue): string {
   return value === undefined ? "undefined" : String(value);
 }
 

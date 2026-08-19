@@ -37,7 +37,10 @@ import type {
   CodePointSet,
 } from "../packages/unicode/src/set.ts";
 import type { ConditionalCaseMapping } from "../packages/unicode/src/model.ts";
-import { parsedMapping as record } from "./structured-data.ts";
+import {
+  parsedMapping as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageDirectory = "packages/unicode";
@@ -170,28 +173,34 @@ export interface PinnedInputManifest {
   readonly version: number;
 }
 
-function text(value: unknown, description: string): string {
+function text(value: StructuredDataInput, description: string): string {
   if (typeof value !== "string" || value === "") {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function count(value: unknown, description: string): number {
+function count(value: StructuredDataInput, description: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) {
     throw new Error(`${description} must be a non-negative integer.`);
   }
   return value;
 }
 
-function headerKind(value: unknown, description: string): PinnedInputHeader {
+function headerKind(
+  value: StructuredDataInput,
+  description: string,
+): PinnedInputHeader {
   if (value !== "emoji" && value !== "none" && value !== "unicode") {
     throw new Error(`${description} must be emoji, none, or unicode.`);
   }
   return value;
 }
 
-function pinnedInput(value: unknown, description: string): PinnedInput {
+function pinnedInput(
+  value: StructuredDataInput,
+  description: string,
+): PinnedInput {
   const entry = record(value, description);
   return {
     bytes: count(entry.bytes, `${description} bytes`),
@@ -206,7 +215,10 @@ function pinnedInput(value: unknown, description: string): PinnedInput {
 /** Parse and validate the reviewed pinned-input manifest. */
 export function parsePinnedInputManifest(source: string): PinnedInputManifest {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(source) as unknown, "The input manifest");
+  const root = record(
+    parseYaml(source) as StructuredDataInput,
+    "The input manifest",
+  );
   if (root.version !== 1) {
     throw new Error("The input manifest must declare version 1.");
   }

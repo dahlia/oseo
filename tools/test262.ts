@@ -23,7 +23,10 @@ import type {
   Diagnostic,
   SpecializationMode,
 } from "../packages/compiler/src/index.ts";
-import { parsedObject as record } from "./structured-data.ts";
+import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
 import {
   createFileModuleLoader,
   createNodeHost,
@@ -250,14 +253,17 @@ export function asyncObservationCompleted(stdout: string): boolean {
   );
 }
 
-function stringValue(value: unknown, description: string): string {
+function stringValue(value: StructuredDataInput, description: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
   if (value == null) return [];
   if (
     !Array.isArray(value) ||
@@ -269,14 +275,14 @@ function stringArray(value: unknown, description: string): readonly string[] {
   return value as readonly string[];
 }
 
-function failurePhase(value: unknown): Test262FailurePhase {
+function failurePhase(value: StructuredDataInput): Test262FailurePhase {
   if (value === "parse" || value === "resolution" || value === "runtime") {
     return value;
   }
   throw new Error("test262 negative.phase is invalid.");
 }
 
-function negative(value: unknown): FrontmatterNegative | undefined {
+function negative(value: StructuredDataInput): FrontmatterNegative | undefined {
   if (value == null) return undefined;
   const item = record(value, "test262 negative metadata");
   return {
@@ -308,7 +314,7 @@ export function parseTest262Case(
   }
   // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
-    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as unknown,
+    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as StructuredDataInput,
     `${path} frontmatter`,
   );
   const flags = stringArray(metadata.flags, `${path} flags`);
@@ -334,7 +340,7 @@ export function parseTest262Case(
   };
 }
 
-function classification(value: unknown): Test262Classification {
+function classification(value: StructuredDataInput): Test262Classification {
   // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
   if (typeof value === "string" && classifications.has(candidate)) {
@@ -346,7 +352,7 @@ function classification(value: unknown): Test262Classification {
 /** Validate the checked-in subset shape, ordering, and uniqueness. */
 export function parseReviewedSubset(text: string): ReviewedTest262Subset {
   // SAFETY: parsedObject validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "test262 subset");
+  const root = record(parseYaml(text) as StructuredDataInput, "test262 subset");
   const rawTests = root.tests;
   if (!Array.isArray(rawTests)) {
     throw new Error("test262 subset tests must be an array.");
@@ -437,10 +443,10 @@ function parseInputSource(
   return source;
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error
-    ? `${error.name}: ${error.message}`
-    : `${error}`;
+function errorMessage(cause: unknown): string {
+  return cause instanceof Error
+    ? `${cause.name}: ${cause.message}`
+    : `${cause}`;
 }
 
 /**
@@ -1301,7 +1307,7 @@ async function suiteRoot(revision: string): Promise<string> {
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
-    ) as unknown,
+    ) as StructuredDataInput,
     "workspace package.json",
   );
   const dependencies = record(

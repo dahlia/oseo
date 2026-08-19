@@ -12,7 +12,10 @@ import type {
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
 
-import { parsedObject as record } from "./structured-data.ts";
+import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
 
 const classifications = new Set<Test262Classification>([
   "expected-negative",
@@ -53,14 +56,17 @@ interface ManifestPartitionReference {
   readonly path: string;
 }
 
-function stringValue(value: unknown, description: string): string {
+function stringValue(value: StructuredDataInput, description: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
     throw new Error(`${description} must be an array of strings.`);
   }
@@ -69,7 +75,7 @@ function stringArray(value: unknown, description: string): readonly string[] {
 }
 
 function classification(
-  value: unknown,
+  value: StructuredDataInput,
   description: string,
 ): Test262Classification {
   // SAFETY: The membership check below validates this candidate before return.
@@ -108,7 +114,10 @@ function parsePartitionReferences(
   text: string,
 ): readonly ManifestPartitionReference[] {
   // SAFETY: parsedObject validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "test262 results index");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 results index",
+  );
   if (!Array.isArray(root.partitions)) {
     throw new Error("test262 results index needs a partitions array.");
   }
@@ -171,7 +180,7 @@ export function validateReviewedManifestFileSet(
 }
 
 function parseResult(
-  value: unknown,
+  value: StructuredDataInput,
   index: number,
   group: string,
   key: string,
@@ -217,7 +226,9 @@ function parseResult(
 }
 
 /** Convert only after parseResult has validated the record's owned fields. */
-function assumeValidatedResult(value: unknown): Test262Result {
+function assumeValidatedResult(
+  value: StructuredDataInput<Test262Result>,
+): Test262Result {
   // SAFETY: parseResult validates path, classification, dependencies,
   // and failureKind, the fields consumed from reviewed results.
   return value as Test262Result;
@@ -229,7 +240,10 @@ export function parseReviewedManifest(
   readPartition: (path: string) => string,
 ): ReviewedTest262Manifest {
   // SAFETY: parsedObject validates the complete YAML index tree.
-  const root = record(parseYaml(indexText) as unknown, "test262 results index");
+  const root = record(
+    parseYaml(indexText) as StructuredDataInput,
+    "test262 results index",
+  );
   const suiteRevision = stringValue(
     root.suiteRevision,
     "test262 results suiteRevision",
@@ -239,7 +253,7 @@ export function parseReviewedManifest(
   for (const reference of references) {
     // SAFETY: parsedObject validates each complete partition tree.
     const partition = record(
-      parseYaml(readPartition(reference.path)) as unknown,
+      parseYaml(readPartition(reference.path)) as StructuredDataInput,
       `test262 partition ${reference.path}`,
     );
     if (partition.group !== reference.group) {
@@ -292,7 +306,7 @@ export function parseReviewedManifest(
   return { results, suiteRevision, summary };
 }
 
-function stringify(value: unknown): string {
+function stringify<Candidate>(value: StructuredDataInput<Candidate>): string {
   // Detail strings can occur at deep indentation, so reserve eight columns
   // below the repository limit for the serializer's indentation.
   return stringifyYaml(value, { lineWidth: 72 });
@@ -423,7 +437,10 @@ export function validateTargetParity(
   executionTarget: string | undefined,
 ): void {
   // SAFETY: parsedObject validates the complete parity YAML tree.
-  const root = record(parseYaml(text) as unknown, "test262 target parity");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 target parity",
+  );
   if (root.canonicalManifest !== "results.yaml") {
     throw new Error("test262 target parity must name results.yaml.");
   }

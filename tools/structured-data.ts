@@ -12,11 +12,17 @@ export interface StructuredDataRecord {
   readonly [key: string]: StructuredDataValue | undefined;
 }
 
-function isStructuredDataRecord(
-  value: unknown,
+/** An unvalidated value admitted at a structured-data parsing boundary. */
+export type StructuredDataInput<Candidate = never> =
+  | Candidate
+  | StructuredDataValue
+  | undefined;
+
+function isStructuredDataRecord<Candidate>(
+  value: StructuredDataInput<Candidate>,
   ancestors: WeakSet<object>,
   validated: WeakSet<object>,
-): value is StructuredDataRecord {
+): value is StructuredDataInput<Candidate> & StructuredDataRecord {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     return false;
   }
@@ -33,11 +39,11 @@ function isStructuredDataRecord(
   return valid;
 }
 
-function isStructuredDataValue(
-  value: unknown,
+function isStructuredDataValue<Candidate>(
+  value: StructuredDataInput<Candidate>,
   ancestors: WeakSet<object>,
   validated: WeakSet<object>,
-): value is StructuredDataValue {
+): value is StructuredDataInput<Candidate> & StructuredDataValue {
   if (
     value == null ||
     typeof value === "boolean" ||
@@ -50,9 +56,18 @@ function isStructuredDataValue(
     if (validated.has(value)) return true;
     if (ancestors.has(value)) return false;
     ancestors.add(value);
-    const valid = value.every((entry) =>
-      isStructuredDataValue(entry, ancestors, validated),
-    );
+    let valid = true;
+    for (let index = 0; index < value.length; index += 1) {
+      const entry = value[index];
+      if (
+        !(index in value) ||
+        entry === undefined ||
+        !isStructuredDataValue(entry, ancestors, validated)
+      ) {
+        valid = false;
+        break;
+      }
+    }
     ancestors.delete(value);
     if (valid) validated.add(value);
     return valid;
@@ -60,8 +75,8 @@ function isStructuredDataValue(
   return isStructuredDataRecord(value, ancestors, validated);
 }
 
-function structuredDataRecord(
-  value: unknown,
+function structuredDataRecord<Candidate>(
+  value: StructuredDataInput<Candidate>,
   description: string,
   kind: "mapping" | "object",
 ): StructuredDataRecord {
@@ -74,8 +89,8 @@ function structuredDataRecord(
 /**
  * Validate a complete parsed data tree whose root is described as a mapping.
  */
-export function parsedMapping(
-  value: unknown,
+export function parsedMapping<Candidate>(
+  value: StructuredDataInput<Candidate>,
   description: string,
 ): StructuredDataRecord {
   return structuredDataRecord(value, description, "mapping");
@@ -84,8 +99,8 @@ export function parsedMapping(
 /**
  * Validate a complete parsed data tree whose root is described as an object.
  */
-export function parsedObject(
-  value: unknown,
+export function parsedObject<Candidate>(
+  value: StructuredDataInput<Candidate>,
   description: string,
 ): StructuredDataRecord {
   return structuredDataRecord(value, description, "object");

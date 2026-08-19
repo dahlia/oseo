@@ -479,10 +479,10 @@ interface ProcessStartFailure {
   readonly failure: "resource-exhaustion" | "unknown";
 }
 
-function processStartFailure(error: unknown): ProcessStartFailure {
-  if (error != null && typeof error === "object") {
-    const code = "code" in error ? error.code : undefined;
-    const name = "name" in error ? error.name : undefined;
+function processStartFailure(cause: unknown): ProcessStartFailure {
+  if (cause != null && typeof cause === "object") {
+    const code = "code" in cause ? cause.code : undefined;
+    const name = "name" in cause ? cause.name : undefined;
     if (
       code === "EAGAIN" ||
       code === "ENOMEM" ||

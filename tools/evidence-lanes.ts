@@ -7,6 +7,7 @@ import { parse as parseYaml } from "yaml";
 
 import {
   parsedMapping as record,
+  type StructuredDataInput,
   type StructuredDataRecord,
 } from "./structured-data.ts";
 
@@ -56,14 +57,14 @@ function requireExactKeys(
   }
 }
 
-function stringValue(value: unknown, context: string): string {
+function stringValue(value: StructuredDataInput, context: string): string {
   if (typeof value !== "string" || value.trim().length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
 }
 
-function familyId(value: unknown, context: string): string {
+function familyId(value: StructuredDataInput, context: string): string {
   const id = stringValue(value, context);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(id)) {
     throw new Error(`${context} must be a kebab-case family ID.`);
@@ -71,7 +72,10 @@ function familyId(value: unknown, context: string): string {
   return id;
 }
 
-function stringArray(value: unknown, context: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  context: string,
+): readonly string[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw new Error(`${context} must be a non-empty array.`);
   }
@@ -105,10 +109,10 @@ function parseSource(
   source: EvidenceSource,
   context: string,
 ): StructuredDataRecord {
-  let value: unknown;
+  let value: StructuredDataInput;
   try {
     // SAFETY: parsedMapping validates the complete YAML tree immediately below.
-    value = parseYaml(source.text) as unknown;
+    value = parseYaml(source.text) as StructuredDataInput;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`${context} is malformed YAML: ${detail}`, {

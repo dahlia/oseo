@@ -113,7 +113,7 @@ function declarationNamed(
   return undefined;
 }
 
-function isSourceRange(value: unknown): value is SourceRange {
+function isSourceRange<T>(value: T): value is T & SourceRange {
   if (value == null || typeof value !== "object") return false;
   // SAFETY: The object check permits reading only optional range fields here.
   const candidate = value as Partial<SourceRange>;

@@ -8,7 +8,10 @@ import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
-import { parsedObject as record } from "./structured-data.ts";
+import {
+  parsedObject as record,
+  type StructuredDataInput,
+} from "./structured-data.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const policyPath = join(repositoryRoot, "tests/test262/inventory-policy.yaml");
@@ -59,14 +62,14 @@ export interface Test262InventorySummary {
   readonly included: number;
 }
 
-function stringValue(value: unknown, description: string): string {
+function stringValue(value: StructuredDataInput, description: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
-function sourceUrl(value: unknown, description: string): string {
+function sourceUrl(value: StructuredDataInput, description: string): string {
   const source = stringValue(value, description);
   const url = new URL(source);
   if (url.protocol !== "https:" || url.hostname !== "github.com") {
@@ -75,7 +78,10 @@ function sourceUrl(value: unknown, description: string): string {
   return source;
 }
 
-function stringArray(value: unknown, description: string): readonly string[] {
+function stringArray(
+  value: StructuredDataInput,
+  description: string,
+): readonly string[] {
   if (
     !Array.isArray(value) ||
     value.some((entry) => typeof entry !== "string" || entry.length === 0)
@@ -86,7 +92,10 @@ function stringArray(value: unknown, description: string): readonly string[] {
   return value as readonly string[];
 }
 
-function positiveInteger(value: unknown, description: string): number {
+function positiveInteger(
+  value: StructuredDataInput,
+  description: string,
+): number {
   // SAFETY: Number.isSafeInteger establishes a numeric value for comparison.
   if (!Number.isSafeInteger(value) || (value as number) <= 0) {
     throw new Error(`${description} must be a positive integer.`);
@@ -112,7 +121,10 @@ function sortedUnique(
 /** Parse and validate the reviewed inventory policy. */
 export function parseInventoryPolicy(text: string): Test262InventoryPolicy {
   // SAFETY: parsedObject validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "test262 inventory policy");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "test262 inventory policy",
+  );
   const rawSources = record(root.sources, "test262 inventory sources");
   const rawFeatures = record(
     root.postEditionFeatures,
@@ -262,7 +274,7 @@ export function parseTest262Features(
   }
   // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
-    (parseYaml(match[1]) ?? {}) as unknown,
+    (parseYaml(match[1]) ?? {}) as StructuredDataInput,
     `${path} frontmatter`,
   );
   if (metadata.features == null) return [];
@@ -413,7 +425,7 @@ async function suiteRoot(revision: string): Promise<string> {
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
-    ) as unknown,
+    ) as StructuredDataInput,
     "workspace package.json",
   );
   const dependencies = record(
@@ -464,7 +476,7 @@ async function createInventory(
 
 function subsetPaths(text: string, suiteRevision: string): readonly string[] {
   // SAFETY: parsedObject validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "test262 subset");
+  const root = record(parseYaml(text) as StructuredDataInput, "test262 subset");
   if (root.suiteRevision !== suiteRevision) {
     throw new Error("test262 subset and inventory revisions differ.");
   }

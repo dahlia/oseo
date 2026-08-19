@@ -26,7 +26,7 @@ interface DenoTextFileRuntime {
   ): Promise<void>;
 }
 
-function isDenoTextFileRuntime(value: unknown): value is DenoTextFileRuntime {
+function isDenoTextFileRuntime<T>(value: T): value is T & DenoTextFileRuntime {
   return value instanceof Object && "writeTextFile" in value;
 }
 

@@ -371,10 +371,10 @@ for (const deterministicFailure of [
           executor,
           { poolLimit: 1 },
         ),
-        (error: unknown) => {
-          assert.ok(error instanceof ReviewedTest262RunError);
-          assert.equal(error.metadata.poolLimit, 1);
-          assert.equal(error.metadata.retries, 0);
+        (cause: unknown) => {
+          assert.ok(cause instanceof ReviewedTest262RunError);
+          assert.equal(cause.metadata.poolLimit, 1);
+          assert.equal(cause.metadata.retries, 0);
           return true;
         },
       );
@@ -488,9 +488,9 @@ test("property helper checks behavior beyond reported flags", async () => {
       writable: true,
     });
     const harnessAssert = Object.assign(
-      (value: unknown) => assert.equal(value, true),
+      (value: boolean) => assert.equal(value, true),
       {
-        sameValue(actual: unknown, expected: unknown): void {
+        sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
           assert.ok(Object.is(actual, expected));
         },
       },
@@ -545,9 +545,9 @@ test("property helper exposes legacy verification APIs", async () => {
     value: 2,
   });
   const harnessAssert = Object.assign(
-    (value: unknown) => assert.equal(value, true),
+    (value: boolean) => assert.equal(value, true),
     {
-      sameValue(actual: unknown, expected: unknown): void {
+      sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
         assert.ok(Object.is(actual, expected));
       },
     },
@@ -584,9 +584,9 @@ test("property helper verifies accessors and rejects extra keys", async () => {
     get: propertyHelperGetter,
   });
   const harnessAssert = Object.assign(
-    (value: unknown) => assert.equal(value, true),
+    (value: boolean) => assert.equal(value, true),
     {
-      sameValue(actual: unknown, expected: unknown): void {
+      sameValue<Actual, Expected>(actual: Actual, expected: Expected): void {
         assert.ok(Object.is(actual, expected));
       },
     },

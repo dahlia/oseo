@@ -196,6 +196,30 @@ test("rejects non-workspace internal dependencies", async () => {
   }
 });
 
+test("rejects malformed dependency fields and ranges", async () => {
+  const root = await fixtureWorkspace();
+  const cliPath = join(root, "packages", "cli", "package.json");
+  try {
+    const valid = JSON.parse(await readFile(cliPath, "utf8"));
+    await writeFile(
+      cliPath,
+      `${JSON.stringify({ ...valid, dependencies: "@oseo/compiler" })}\n`,
+    );
+    await assert.rejects(checkWorkspaceVersions(root), /must be objects/u);
+
+    await writeFile(
+      cliPath,
+      `${JSON.stringify({
+        ...valid,
+        dependencies: { "@oseo/compiler": 1 },
+      })}\n`,
+    );
+    await assert.rejects(checkWorkspaceVersions(root), /must be strings/u);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
 test("rejects invalid strict SemVer values", async () => {
   const root = await fixtureWorkspace();
   try {

@@ -54,7 +54,7 @@ interface SyntaxNode {
   readonly type?: StructuredDataValue;
 }
 
-function syntaxNode(value: unknown): SyntaxNode | undefined {
+function syntaxNode<T>(value: T): SyntaxNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
@@ -62,7 +62,7 @@ function syntaxNode(value: unknown): SyntaxNode | undefined {
   return value as SyntaxNode;
 }
 
-function stringLiteralValue(value: unknown): string | undefined {
+function stringLiteralValue<T>(value: T): string | undefined {
   const node = syntaxNode(value);
   if (node?.type !== "StringLiteral" || typeof node.value !== "string") {
     return undefined;
@@ -70,8 +70,8 @@ function stringLiteralValue(value: unknown): string | undefined {
   return node.value;
 }
 
-function collectImportSpecifiers(
-  value: unknown,
+function collectImportSpecifiers<T>(
+  value: T,
   specifiers: Set<string>,
   visited: WeakSet<object>,
 ): void {

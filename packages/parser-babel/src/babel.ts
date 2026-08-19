@@ -19,14 +19,15 @@ export interface BabelComment {
   readonly value?: string;
 }
 
-type BabelNodeValue =
+export type BabelNodeValue =
   | BabelComment
   | BabelNode
   | readonly BabelNodeValue[]
   | boolean
   | null
   | number
-  | string;
+  | string
+  | undefined;
 
 export interface BabelNode {
   readonly [key: string]: BabelNodeValue | undefined;
@@ -92,7 +93,7 @@ export interface SourceIndex {
 export type AssignmentArrayBindingElement =
   SyntaxArrayBindingPattern<SyntaxAssignmentPattern>["elements"][number];
 
-export function node(value: unknown): BabelNode | undefined {
+export function node<T>(value: T): BabelNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
@@ -100,7 +101,7 @@ export function node(value: unknown): BabelNode | undefined {
   return value as BabelNode;
 }
 
-export function nodes(value: unknown): readonly BabelNode[] {
+export function nodes<T>(value: T): readonly BabelNode[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item) => {
     const valueNode = node(item);

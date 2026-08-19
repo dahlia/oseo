@@ -24,10 +24,10 @@ interface PackageManifest {
   readonly name?: unknown;
   readonly private?: unknown;
   readonly version?: unknown;
-  readonly dependencies?: Readonly<Record<string, string>>;
-  readonly devDependencies?: Readonly<Record<string, string>>;
-  readonly optionalDependencies?: Readonly<Record<string, string>>;
-  readonly peerDependencies?: Readonly<Record<string, string>>;
+  readonly dependencies?: unknown;
+  readonly devDependencies?: unknown;
+  readonly optionalDependencies?: unknown;
+  readonly peerDependencies?: unknown;
 }
 
 interface LoadedManifest {
@@ -116,7 +116,10 @@ async function loadManifest(
   return { bytes, manifest: parseManifest(bytes, path), path };
 }
 
-function requirePackageName(value: unknown, path: string): string {
+function requirePackageName(
+  value: PackageManifest["name"],
+  path: string,
+): string {
   if (typeof value !== "string" || !value.startsWith("@oseo/")) {
     throw new Error(`${path} must name a public @oseo/* package.`);
   }
@@ -135,7 +138,13 @@ function checkInternalDependencies(
   ];
   for (const field of fields) {
     if (field == null) continue;
+    if (typeof field !== "object" || Array.isArray(field)) {
+      throw new Error(`${path} dependency fields must be objects.`);
+    }
     for (const [name, range] of Object.entries(field)) {
+      if (typeof range !== "string") {
+        throw new Error(`${path} dependency ranges must be strings.`);
+      }
       if (!name.startsWith("@oseo/")) continue;
       if (range !== "workspace:*") {
         throw new Error(

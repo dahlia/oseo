@@ -39,6 +39,7 @@ import {
   nodes,
   type AssignmentArrayBindingElement,
   type BabelNode,
+  type BabelNodeValue,
   type ConvertContext,
   type ReceiverContext,
   type ReceiverKind,
@@ -1562,7 +1563,7 @@ export function bindingPattern(
   }
   // SAFETY: Array.isArray establishes the read-only element sequence.
   const rawElements = Array.isArray(value.elements)
-    ? (value.elements as readonly unknown[])
+    ? (value.elements as readonly BabelNodeValue[])
     : [];
   const elements: AssignmentArrayBindingElement[] = [];
   let rest: SyntaxAssignmentPattern | undefined;
@@ -1679,7 +1680,7 @@ function parameterPatternHints(
   };
 }
 
-function annotationType(value: unknown): BabelNode | undefined {
+function annotationType(value: BabelNodeValue): BabelNode | undefined {
   const valueNode = node(value);
   if (valueNode == null) return undefined;
   if (valueNode.type === "TSTypeAnnotation") {
@@ -1898,7 +1899,7 @@ function annotationArrayRestType(
 function bindingPatternTypeHints(
   context: ConvertContext,
   pattern: SyntaxBindingPattern,
-  annotationValue: unknown,
+  annotationValue: BabelNodeValue,
   atRoot = true,
 ): SyntaxBindingPattern {
   const typeNode = annotationType(annotationValue);
@@ -2864,7 +2865,7 @@ export function identifierExpression(
 }
 
 export function unparenthesizedExpression(
-  value: unknown,
+  value: BabelNodeValue,
 ): BabelNode | undefined {
   let current = node(value);
   while (current?.type === "ParenthesizedExpression") {

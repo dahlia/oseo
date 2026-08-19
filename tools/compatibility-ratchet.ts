@@ -17,6 +17,7 @@ import {
 } from "./evidence-lanes.ts";
 import {
   parsedMapping as record,
+  type StructuredDataInput,
   type StructuredDataRecord,
 } from "./structured-data.ts";
 
@@ -122,14 +123,17 @@ export type BaselineIntent =
   | { readonly kind: "merge-base-main" }
   | { readonly kind: "skip"; readonly reason: string };
 
-function stringValue(value: unknown, context: string): string {
+function stringValue(value: StructuredDataInput, context: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
 }
 
-function transitionValue(value: unknown, context: string): number | string {
+function transitionValue(
+  value: StructuredDataInput,
+  context: string,
+): number | string {
   if (
     (typeof value !== "string" || value.length === 0) &&
     typeof value !== "number"
@@ -154,7 +158,10 @@ function requireKeys(
   }
 }
 
-function classification(value: unknown, context: string): Classification {
+function classification(
+  value: StructuredDataInput,
+  context: string,
+): Classification {
   switch (value) {
     case "expected-negative":
     case "harness-failure":
@@ -170,7 +177,10 @@ function classification(value: unknown, context: string): Classification {
 
 function parseSubset(text: string): ReadonlySet<string> {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "reviewed subset");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "reviewed subset",
+  );
   if (!Array.isArray(root.tests)) {
     throw new Error("reviewed subset tests must be an array.");
   }
@@ -193,7 +203,7 @@ function parseResults(
 ): ReadonlyMap<string, Classification> {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const legacy = record(
-    parseYaml(source.indexText) as unknown,
+    parseYaml(source.indexText) as StructuredDataInput,
     "result manifest",
   );
   if (Array.isArray(legacy.results)) {
@@ -250,7 +260,7 @@ interface AstRecord {
 
 type AstNode = AstRecord & { readonly type: string };
 
-function astRecord(value: unknown, context: string): AstRecord {
+function astRecord(value: StructuredDataInput, context: string): AstRecord {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(`${context} must be an AST record.`);
   }
@@ -258,7 +268,7 @@ function astRecord(value: unknown, context: string): AstRecord {
   return value as AstRecord;
 }
 
-function astNode(value: unknown, context: string): AstNode {
+function astNode(value: StructuredDataInput, context: string): AstNode {
   const node = astRecord(value, context);
   if (typeof node.type !== "string") {
     throw new Error(`${context} must be an AST node.`);
@@ -303,7 +313,7 @@ function numericLiteral(expression: AstNode, context: string): number {
   return parsed;
 }
 
-function fastCheckSeed(value: unknown, context: string): number {
+function fastCheckSeed(value: StructuredDataInput, context: string): number {
   if (
     typeof value !== "number" ||
     !Number.isSafeInteger(value) ||
@@ -446,7 +456,9 @@ function parsePropertyAllocations(
       sourceType: "module",
     });
     const declarations = new Map<string, AstNode[]>();
-    const collectDeclarations = (value: unknown): void => {
+    const collectDeclarations = (
+      value: StructuredDataInput<typeof sourceFile>,
+    ): void => {
       if (Array.isArray(value)) {
         for (const item of value) collectDeclarations(item);
         return;
@@ -470,7 +482,7 @@ function parsePropertyAllocations(
     };
     collectDeclarations(sourceFile);
 
-    const visit = (value: unknown): void => {
+    const visit = (value: StructuredDataInput<typeof sourceFile>): void => {
       if (Array.isArray(value)) {
         for (const item of value) visit(item);
         return;
@@ -576,14 +588,14 @@ interface PropertySeedFamily {
   readonly start: number;
 }
 
-function registryInteger(value: unknown, context: string): number {
+function registryInteger(value: StructuredDataInput, context: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value)) {
     throw new Error(`${context} must be a safe integer.`);
   }
   return value;
 }
 
-function registryOwner(value: unknown, context: string): string {
+function registryOwner(value: StructuredDataInput, context: string): string {
   const owner = stringValue(value, context);
   if (
     owner.startsWith("/") ||
@@ -602,7 +614,10 @@ function parsePropertySeedRegistry(
   text: string,
 ): readonly PropertySeedFamily[] {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "property seed registry");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "property seed registry",
+  );
   requireKeys(root, new Set(["families", "version"]), "property seed registry");
   if (root.version !== 1) {
     throw new Error("property seed registry version must be 1.");
@@ -891,7 +906,10 @@ function detectViolations(
 
 function parseOverrides(text: string): readonly RatchetOverride[] {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
-  const root = record(parseYaml(text) as unknown, "ratchet override record");
+  const root = record(
+    parseYaml(text) as StructuredDataInput,
+    "ratchet override record",
+  );
   if (!Array.isArray(root.overrides)) {
     throw new Error("ratchet overrides must be an array.");
   }
@@ -1019,7 +1037,7 @@ function zeroCommit(value: string): boolean {
 
 export function selectBaselineIntent(
   environment: Readonly<Record<string, string | undefined>>,
-  event: unknown,
+  event: StructuredDataInput,
   localBranch: string | undefined,
 ): BaselineIntent {
   if (environment.GITHUB_ACTIONS === "true") {
@@ -1268,7 +1286,7 @@ async function main(): Promise<void> {
       ? record(
           JSON.parse(
             readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
-          ) as unknown,
+          ) as StructuredDataInput,
           "GitHub event",
         )
       : {};

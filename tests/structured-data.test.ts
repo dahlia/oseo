@@ -22,3 +22,16 @@ test("rejects circular structured-data subtrees", () => {
     /document must be a mapping/u,
   );
 });
+
+test("rejects undefined and missing array entries", () => {
+  const sparse: (number | undefined)[] = [];
+  sparse.length = 1;
+  assert.throws(
+    () => parsedMapping({ values: [undefined] }, "document"),
+    /document must be a mapping/u,
+  );
+  assert.throws(
+    () => parsedMapping({ values: sparse }, "document"),
+    /document must be a mapping/u,
+  );
+});

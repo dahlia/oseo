@@ -9,8 +9,31 @@ const range: SourceRange = {
   start: { column: 1, line: 1 },
 };
 
-function buildInvalidHir(value: unknown) {
-  // SAFETY: This helper passes malformed syntax for recovery tests.
+type MalformedSyntaxValue =
+  | MalformedSyntaxRecord
+  | SourceRange
+  | readonly MalformedSyntaxValue[]
+  | boolean
+  | null
+  | number
+  | string
+  | undefined;
+
+interface MalformedSyntaxRecord {
+  readonly [key: string]: MalformedSyntaxValue;
+}
+
+interface MalformedSyntaxStatement extends MalformedSyntaxRecord {
+  readonly kind: SyntaxProgram["body"][number]["kind"];
+  readonly range: SourceRange;
+}
+
+interface MalformedSyntaxProgram extends Omit<SyntaxProgram, "body"> {
+  readonly body: readonly MalformedSyntaxStatement[];
+}
+
+function buildInvalidHir(value: MalformedSyntaxProgram) {
+  // SAFETY: Recovery tests supply structurally valid trees with invalid nodes.
   return buildHir(value as SyntaxProgram);
 }
 

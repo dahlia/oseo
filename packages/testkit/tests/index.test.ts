@@ -633,11 +633,11 @@ test("rejects assets that collide with the generated name", async () => {
       },
       () => assert.fail("A colliding asset name must not reach the build."),
     ),
-    (error: unknown) => {
-      assert.ok(error instanceof Error);
-      assert.match(error.message, /Native artifacts retained/u);
-      assert.ok(error.cause instanceof Error);
-      assert.match(error.cause.message, /generated source name: generated\.c/u);
+    (cause: unknown) => {
+      assert.ok(cause instanceof Error);
+      assert.match(cause.message, /Native artifacts retained/u);
+      assert.ok(cause.cause instanceof Error);
+      assert.match(cause.cause.message, /generated source name: generated\.c/u);
       return true;
     },
   );
