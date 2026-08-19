@@ -17,6 +17,12 @@ import {
   renameClaimedCacheLockDirectory,
 } from "./cache-files.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Normalize Node.js or Deno platform facts at the concrete host boundary. */
 export function normalizeExecutionHost(
   reportedOperatingSystem: string,
@@ -1137,12 +1143,13 @@ export function createDenoHost(): CompilerHost {
       const environment = request.environment;
       const command = new runtime.Command(request.command, {
         args: request.args,
-        ...(environment == null
-          ? {}
-          : {
-              clearEnv: true,
-              env: environment.variables,
-            }),
+        ...includePropertiesWhen(() => {
+          if (environment == null) return undefined;
+          return {
+            clearEnv: true,
+            env: environment.variables,
+          };
+        }),
         cwd: request.cwd,
         stderr: "piped",
         stdout: "piped",

@@ -75,6 +75,12 @@ import type {
   SerializedTest262Partition,
 } from "./test262-manifest.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
 const resultPath = join(repositoryRoot, "tests/test262/results.yaml");
@@ -320,12 +326,13 @@ export function parseTest262Case(
   return {
     case: {
       async: flags.includes("async"),
-      ...(expected == null
-        ? {}
-        : {
-            expectedErrorType: expected.type,
-            expectedFailurePhase: expected.phase,
-          }),
+      ...includePropertiesWhen(() => {
+        if (expected == null) return undefined;
+        return {
+          expectedErrorType: expected.type,
+          expectedFailurePhase: expected.phase,
+        };
+      }),
       features: stringArray(metadata.features, `${path} features`),
       flags,
       includes: stringArray(metadata.includes, `${path} includes`),
@@ -837,7 +844,10 @@ async function moduleNegativeResult(
     {
       detail: diagnosticDetail(diagnostic),
       errorType: "SyntaxError",
-      ...(failedPhase == null ? {} : { failedPhase }),
+      ...includePropertiesWhen(() => {
+        if (failedPhase == null) return undefined;
+        return { failedPhase };
+      }),
       passed: false,
     },
     supportedFeatures,
@@ -864,8 +874,16 @@ async function executedResult(
     harnessIncludes: parsed.flags.includes("raw")
       ? []
       : harnessIncludeNames(testCase),
-    ...(moduleGraph == null ? {} : { moduleGraph }),
-    ...(scheduled ? { scheduler: "deterministic-logical-clock" as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (moduleGraph == null) return undefined;
+      return { moduleGraph };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!scheduled) return undefined;
+      return {
+        scheduler: "deterministic-logical-clock" as const,
+      };
+    }),
     target: executor.target ?? canonicalTarget,
     variants,
   });
@@ -924,10 +942,17 @@ async function executedResult(
         testCase,
         {
           detail: diagnosticDetail(diagnostic),
-          ...(unsupportedCapability != null ? { unsupportedCapability } : {}),
-          ...(unsupportedCapability == null && failedPhase != null
-            ? { failedPhase }
-            : {}),
+          ...includePropertiesWhen(() => {
+            if (!(unsupportedCapability != null)) return undefined;
+            return {
+              unsupportedCapability,
+            };
+          }),
+          ...includePropertiesWhen(() => {
+            if (!(unsupportedCapability == null && failedPhase != null))
+              return undefined;
+            return { failedPhase };
+          }),
           passed: false,
         },
         supportedFeatures,
@@ -973,7 +998,12 @@ async function executedResult(
           mode: testCase.mode,
           source: input,
           sourceId: testCase.path,
-          ...(sourcePath == null ? {} : { sourcePath }),
+          ...includePropertiesWhen(() => {
+            if (sourcePath == null) return undefined;
+            return {
+              sourcePath,
+            };
+          }),
           specialization,
         });
       } catch (error) {
@@ -1038,9 +1068,11 @@ async function executedResult(
                 : runtimeCapability == null
                   ? { failedPhase: "runtime" as const }
                   : { unsupportedCapability: runtimeCapability }),
-            ...(!compileStage && infrastructureFailure(observation)
-              ? { failureKind: "infrastructure" as const }
-              : {}),
+            ...includePropertiesWhen(() => {
+              if (!(!compileStage && infrastructureFailure(observation)))
+                return undefined;
+              return { failureKind: "infrastructure" as const };
+            }),
             passed: false,
           },
           supportedFeatures,
@@ -1343,7 +1375,12 @@ async function readHarnesses(): Promise<Test262Harnesses> {
 }
 
 const nativeExecutor: Test262Executor = {
-  ...(executionTarget == null ? {} : { target: executionTarget }),
+  ...includePropertiesWhen(() => {
+    if (executionTarget == null) return undefined;
+    return {
+      target: executionTarget,
+    };
+  }),
   async execute(request: Test262ExecutionRequest): Promise<CliResult> {
     const entry =
       request.mode === "module" && request.sourcePath != null
@@ -1414,7 +1451,12 @@ export async function createReviewedManifest(
   let retries = 0;
   let aborted = false;
   const retryingExecutor: Test262Executor = {
-    ...(executor.target == null ? {} : { target: executor.target }),
+    ...includePropertiesWhen(() => {
+      if (executor.target == null) return undefined;
+      return {
+        target: executor.target,
+      };
+    }),
     async execute(request): Promise<CliResult> {
       let result = await executor.execute(request);
       for (
@@ -1500,14 +1542,15 @@ function canonicalizeManifestTarget(
     ...manifest,
     results: manifest.results.map((result) => ({
       ...result,
-      ...(result.execution == null
-        ? {}
-        : {
-            execution: {
-              ...result.execution,
-              target: canonicalTarget,
-            },
-          }),
+      ...includePropertiesWhen(() => {
+        if (result.execution == null) return undefined;
+        return {
+          execution: {
+            ...result.execution,
+            target: canonicalTarget,
+          },
+        };
+      }),
     })),
   };
 }

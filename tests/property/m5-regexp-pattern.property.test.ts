@@ -18,6 +18,12 @@ import type {
   RegExpTerm,
 } from "../../packages/compiler/src/index.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const { assertProperty, propertySize } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
@@ -778,7 +784,10 @@ function suffix(
   applies?: (flags: string) => boolean,
 ): MutationModel {
   return {
-    ...(applies == null ? {} : { applies }),
+    ...includePropertiesWhen(() => {
+      if (applies == null) return undefined;
+      return { applies };
+    }),
     apply: (source, flags) => [`${source}${text}`, flags],
     expect: (source, flags) => expect(source.length, unicodeMode(flags)),
     label,

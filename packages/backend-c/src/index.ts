@@ -14,6 +14,12 @@ import type {
 
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 type CInterpolation = boolean | number | string;
 
 type NormalizedCFragment<Fragment extends CFragment> = {
@@ -3329,13 +3335,19 @@ function yieldResumePoints(
     if (block.terminator.kind !== "generator-yield") continue;
     const terminator = block.terminator;
     points.set(terminator.resume, {
-      ...(terminator.returnResume == null
-        ? {}
-        : { returnResume: terminator.returnResume }),
+      ...includePropertiesWhen(() => {
+        if (terminator.returnResume == null) return undefined;
+        return {
+          returnResume: terminator.returnResume,
+        };
+      }),
       sent: terminator.sent,
-      ...(terminator.throwResume == null
-        ? {}
-        : { throwResume: terminator.throwResume }),
+      ...includePropertiesWhen(() => {
+        if (terminator.throwResume == null) return undefined;
+        return {
+          throwResume: terminator.throwResume,
+        };
+      }),
     });
   }
   return points;
@@ -3894,9 +3906,10 @@ function emitFunction(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
     completionSlotStart: baseRootCount + argumentSlots,
-    ...(functionValue.derivedThisBindingId == null
-      ? {}
-      : { derivedThisBindingId: functionValue.derivedThisBindingId }),
+    ...includePropertiesWhen(() => {
+      if (functionValue.derivedThisBindingId == null) return undefined;
+      return { derivedThisBindingId: functionValue.derivedThisBindingId };
+    }),
     functionRootCounts,
     environmentSlot,
     globalObjectBindingIds: new Set(
@@ -3924,7 +3937,12 @@ function emitFunction(
       ]),
     ),
     generator: false,
-    ...(generatorBodyStart == null ? {} : { generatorBodyStart }),
+    ...includePropertiesWhen(() => {
+      if (generatorBodyStart == null) return undefined;
+      return {
+        generatorBodyStart,
+      };
+    }),
     lines: [],
   };
   state.usesAbrupt = true;

@@ -45,6 +45,12 @@ import { argument, flag, option } from "@optique/core/primitives";
 import { defineProgram } from "@optique/core/program";
 import { choice, string as stringValue } from "@optique/core/valueparser";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const modeParser = withDefault(
   or(
     map(
@@ -687,13 +693,19 @@ async function executeNativeWorkflow(
   let executablePath: string | undefined;
   try {
     const plan = defaultComponents.toolchain.createBuildPlan({
-      ...(toolchainEnvironment == null
-        ? {}
-        : { environment: toolchainEnvironment }),
+      ...includePropertiesWhen(() => {
+        if (toolchainEnvironment == null) return undefined;
+        return {
+          environment: toolchainEnvironment,
+        };
+      }),
       generatedSourcePath,
-      ...(cachedArchivePath == null
-        ? {}
-        : { prebuiltRuntimeArchivePath: cachedArchivePath }),
+      ...includePropertiesWhen(() => {
+        if (cachedArchivePath == null) return undefined;
+        return {
+          prebuiltRuntimeArchivePath: cachedArchivePath,
+        };
+      }),
       runtimeDirectory: directory,
       runtimeSourcePaths,
       target,

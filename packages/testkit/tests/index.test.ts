@@ -13,6 +13,12 @@ import {
 } from "../src/index.ts";
 import type { NativeFixtureOptions } from "../src/index.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 type Host = NativeFixtureOptions["host"];
 type ProcessObservation = Awaited<ReturnType<Host["run"]>>;
 
@@ -380,9 +386,10 @@ test("serializes concurrent builds for one cold archive key", async () => {
                   cwd: input.workingDirectory,
                 },
               ],
-        ...(input.prebuiltRuntimeArchivePath == null
-          ? { runtimeArchivePath: archivePath }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(input.prebuiltRuntimeArchivePath == null)) return undefined;
+          return { runtimeArchivePath: archivePath };
+        }),
         target: input.target,
       };
     },
@@ -478,9 +485,10 @@ test("retries a failed toolchain identity probe", async () => {
       return {
         executablePath: `${input.workingDirectory}/fixture`,
         requests: [],
-        ...(input.prebuiltRuntimeArchivePath == null
-          ? { runtimeArchivePath: archivePath }
-          : {}),
+        ...includePropertiesWhen(() => {
+          if (!(input.prebuiltRuntimeArchivePath == null)) return undefined;
+          return { runtimeArchivePath: archivePath };
+        }),
         target: input.target,
       };
     },

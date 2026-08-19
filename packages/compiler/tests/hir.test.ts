@@ -4,6 +4,12 @@ import test from "node:test";
 import { buildHir, buildMir, printHir, printMir } from "../src/index.ts";
 import type { SourceRange, SyntaxProgram } from "../src/index.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const range: SourceRange = {
   end: { column: 2, line: 1 },
   start: { column: 1, line: 1 },
@@ -1450,7 +1456,12 @@ test("keeps a parameter-environment body wrapper var-like", () => {
       body: [declaration(1), declaration(2)],
       kind: "block" as const,
       range,
-      ...(parameterEnvironmentBody ? { parameterEnvironmentBody } : {}),
+      ...includePropertiesWhen(() => {
+        if (!parameterEnvironmentBody) return undefined;
+        return {
+          parameterEnvironmentBody,
+        };
+      }),
     },
   ];
   const wrapped = buildHir({

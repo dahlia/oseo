@@ -52,6 +52,12 @@ import { jsdocHints, typeHint } from "./hints.ts";
 import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
 import { regExpLiteral } from "./regexp-literal.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /**
  * The this mode of the environment a `this` expression at the current
  * position resolves through. The stack always carries the entry for the
@@ -698,7 +704,10 @@ export function expression(
     return {
       ...located,
       argument,
-      ...(delegate ? { delegate: true as const } : {}),
+      ...includePropertiesWhen(() => {
+        if (!delegate) return undefined;
+        return { delegate: true as const };
+      }),
       kind: "yield",
     };
   }
@@ -924,10 +933,20 @@ export function expression(
       }
       if (key == null || propertyValue == null) return undefined;
       properties.push({
-        ...(accessorKind == null ? {} : { accessorKind }),
+        ...includePropertiesWhen(() => {
+          if (accessorKind == null) return undefined;
+          return {
+            accessorKind,
+          };
+        }),
         key,
         kind: "definition",
-        ...(prototypeSetter ? { prototypeSetter: true as const } : {}),
+        ...includePropertiesWhen(() => {
+          if (!prototypeSetter) return undefined;
+          return {
+            prototypeSetter: true as const,
+          };
+        }),
         value: propertyValue,
       });
     }
@@ -1551,8 +1570,18 @@ export function bindingPattern(
       if (right != null && initializer == null) return undefined;
       properties.push({
         ...location(context, property),
-        ...(property.computed === true ? { computed: true as const } : {}),
-        ...(initializer == null ? {} : { initializer }),
+        ...includePropertiesWhen(() => {
+          if (!(property.computed === true)) return undefined;
+          return {
+            computed: true as const,
+          };
+        }),
+        ...includePropertiesWhen(() => {
+          if (initializer == null) return undefined;
+          return {
+            initializer,
+          };
+        }),
         key,
         pattern,
       });
@@ -1561,7 +1590,10 @@ export function bindingPattern(
       ...location(context, value),
       kind: "object-binding-pattern",
       properties,
-      ...(rest == null ? {} : { rest }),
+      ...includePropertiesWhen(() => {
+        if (rest == null) return undefined;
+        return { rest };
+      }),
     };
   }
   // SAFETY: Array.isArray establishes the read-only element sequence.
@@ -1603,7 +1635,10 @@ export function bindingPattern(
     if (right != null && initializer == null) return undefined;
     elements.push({
       ...location(context, element),
-      ...(initializer == null ? {} : { initializer }),
+      ...includePropertiesWhen(() => {
+        if (initializer == null) return undefined;
+        return { initializer };
+      }),
       pattern,
     });
   }
@@ -1611,7 +1646,10 @@ export function bindingPattern(
     ...location(context, value),
     elements,
     kind: "array-binding-pattern",
-    ...(rest == null ? {} : { rest }),
+    ...includePropertiesWhen(() => {
+      if (rest == null) return undefined;
+      return { rest };
+    }),
   };
 }
 
@@ -1662,9 +1700,12 @@ function parameterPatternHints(
         ...property,
         pattern: parameterPatternHints(property.pattern, hints),
       })),
-      ...(pattern.rest == null
-        ? {}
-        : { rest: parameterIdentifierHints(pattern.rest, hints) }),
+      ...includePropertiesWhen(() => {
+        if (pattern.rest == null) return undefined;
+        return {
+          rest: parameterIdentifierHints(pattern.rest, hints),
+        };
+      }),
     };
   }
   return {
@@ -1677,9 +1718,12 @@ function parameterPatternHints(
             pattern: parameterPatternHints(element.pattern, hints),
           },
     ),
-    ...(pattern.rest == null
-      ? {}
-      : { rest: parameterPatternHints(pattern.rest, hints) }),
+    ...includePropertiesWhen(() => {
+      if (pattern.rest == null) return undefined;
+      return {
+        rest: parameterPatternHints(pattern.rest, hints),
+      };
+    }),
   };
 }
 
@@ -1978,16 +2022,17 @@ function bindingPatternTypeHints(
             ),
           };
     }),
-    ...(pattern.rest?.kind !== "array-binding-pattern"
-      ? {}
-      : {
-          rest: bindingPatternTypeHints(
-            context,
-            pattern.rest,
-            annotationArrayRestType(arrayTypes, pattern.elements.length),
-            false,
-          ),
-        }),
+    ...includePropertiesWhen(() => {
+      if (pattern.rest?.kind !== "array-binding-pattern") return undefined;
+      return {
+        rest: bindingPatternTypeHints(
+          context,
+          pattern.rest,
+          annotationArrayRestType(arrayTypes, pattern.elements.length),
+          false,
+        ),
+      };
+    }),
   };
 }
 
@@ -2241,7 +2286,10 @@ export function statement(
     return {
       ...located,
       kind: value.type === "BreakStatement" ? "break" : "continue",
-      ...(label == null ? {} : { label }),
+      ...includePropertiesWhen(() => {
+        if (label == null) return undefined;
+        return { label };
+      }),
     };
   }
   if (value.type === "LabeledStatement") {
@@ -2308,7 +2356,10 @@ export function statement(
       cases.push({
         body,
         range: location(context, caseNode).range,
-        ...(test == null ? {} : { test }),
+        ...includePropertiesWhen(() => {
+          if (test == null) return undefined;
+          return { test };
+        }),
       });
     }
     return { ...located, cases, discriminant, kind: "switch" };
@@ -2601,7 +2652,10 @@ export function statement(
       ? undefined
       : {
           ...located,
-          ...(awaited ? { awaited: true as const } : {}),
+          ...includePropertiesWhen(() => {
+            if (!awaited) return undefined;
+            return { awaited: true as const };
+          }),
           body,
           iterable,
           kind: "for-of",
@@ -2711,11 +2765,25 @@ export function statement(
     return {
       ...located,
       body,
-      ...(declarations == null ? {} : { declarations }),
-      ...(init == null ? {} : { init }),
+      ...includePropertiesWhen(() => {
+        if (declarations == null) return undefined;
+        return {
+          declarations,
+        };
+      }),
+      ...includePropertiesWhen(() => {
+        if (init == null) return undefined;
+        return { init };
+      }),
       kind: "for",
-      ...(test == null ? {} : { test }),
-      ...(update == null ? {} : { update }),
+      ...includePropertiesWhen(() => {
+        if (test == null) return undefined;
+        return { test };
+      }),
+      ...includePropertiesWhen(() => {
+        if (update == null) return undefined;
+        return { update };
+      }),
     };
   }
   if (value.type === "DoWhileStatement") {
@@ -3454,7 +3522,10 @@ export function functionDeclaration(
         hints,
         name: hiddenName,
         range: pattern.range,
-        ...(rest ? { rest: true as const } : {}),
+        ...includePropertiesWhen(() => {
+          if (!rest) return undefined;
+          return { rest: true as const };
+        }),
       });
       const input = identifierExpression(hiddenName, pattern.range);
       const initializer =
@@ -3505,7 +3576,10 @@ export function functionDeclaration(
       ...location(context, parameterNode),
       hints,
       name: parameterName,
-      ...(rest ? { rest: true as const } : {}),
+      ...includePropertiesWhen(() => {
+        if (!rest) return undefined;
+        return { rest: true as const };
+      }),
     });
     parameterNames.push(parameterName);
   }
@@ -3526,8 +3600,18 @@ export function functionDeclaration(
       ? [
           {
             argument: bodyNode,
-            ...(bodyNode.end == null ? {} : { end: bodyNode.end }),
-            ...(bodyNode.start == null ? {} : { start: bodyNode.start }),
+            ...includePropertiesWhen(() => {
+              if (bodyNode.end == null) return undefined;
+              return {
+                end: bodyNode.end,
+              };
+            }),
+            ...includePropertiesWhen(() => {
+              if (bodyNode.start == null) return undefined;
+              return {
+                start: bodyNode.start,
+              };
+            }),
             type: "ReturnStatement",
           } satisfies BabelNode,
         ]
@@ -3637,7 +3721,12 @@ export function functionDeclaration(
   const sourceStart = functionSourceStart(context, value);
   return {
     ...location(context, value),
-    ...(argumentsFormal ? { argumentsFormal: true as const } : {}),
+    ...includePropertiesWhen(() => {
+      if (!argumentsFormal) return undefined;
+      return {
+        argumentsFormal: true as const,
+      };
+    }),
     body,
     functionLength,
     functionKind:
@@ -3652,19 +3741,28 @@ export function functionDeclaration(
           : value.async === true
             ? "async"
             : (memberKind ?? "ordinary"),
-    ...(generatorCallStatementCount === 0
-      ? {}
-      : { generatorCallStatementCount }),
+    ...includePropertiesWhen(() => {
+      if (generatorCallStatementCount === 0) return undefined;
+      return {
+        generatorCallStatementCount,
+      };
+    }),
     kind: "function",
     name,
     parameters,
     returnHints,
-    ...(sourceStart == null || value.end == null
-      ? {}
-      : {
-          sourceText: context.input.source.slice(sourceStart, value.end),
-        }),
-    ...(simpleParameterList ? { simpleParameterList: true } : {}),
+    ...includePropertiesWhen(() => {
+      if (sourceStart == null || value.end == null) return undefined;
+      return {
+        sourceText: context.input.source.slice(sourceStart, value.end),
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (!simpleParameterList) return undefined;
+      return {
+        simpleParameterList: true,
+      };
+    }),
     strict,
   };
 }
@@ -3825,8 +3923,18 @@ function classStaticBlock(
   derived: boolean,
 ): SyntaxClassStaticBlock | undefined {
   const bounds = {
-    ...(element.end == null ? {} : { end: element.end }),
-    ...(element.start == null ? {} : { start: element.start }),
+    ...includePropertiesWhen(() => {
+      if (element.end == null) return undefined;
+      return {
+        end: element.end,
+      };
+    }),
+    ...includePropertiesWhen(() => {
+      if (element.start == null) return undefined;
+      return {
+        start: element.start,
+      };
+    }),
   };
   const body = functionDeclaration(
     context,
@@ -3952,10 +4060,20 @@ export function classExpression(
     if (key == null || method == null) break;
     elements.push({
       ...location(context, element),
-      ...(accessorKind == null ? {} : { accessorKind }),
+      ...includePropertiesWhen(() => {
+        if (accessorKind == null) return undefined;
+        return {
+          accessorKind,
+        };
+      }),
       key,
       kind: "method",
-      ...(staticPlacement ? { staticPlacement: true as const } : {}),
+      ...includePropertiesWhen(() => {
+        if (!staticPlacement) return undefined;
+        return {
+          staticPlacement: true as const,
+        };
+      }),
       value: method,
     });
   }
@@ -3999,9 +4117,15 @@ export function classExpression(
       ? { ...classConstructor, initializesInstanceElements: true }
       : classConstructor,
     elements,
-    ...(heritage == null ? {} : { heritage }),
+    ...includePropertiesWhen(() => {
+      if (heritage == null) return undefined;
+      return { heritage };
+    }),
     kind: "class",
-    ...(name == null ? {} : { nameBinding: name }),
+    ...includePropertiesWhen(() => {
+      if (name == null) return undefined;
+      return { nameBinding: name };
+    }),
   };
 }
 

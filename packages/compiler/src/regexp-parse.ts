@@ -29,6 +29,12 @@ import {
   type RegExpUnicodePropertyEscape,
 } from "./regexp.ts";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Characters the grammar reserves, which a pattern character excludes. */
 const syntaxCharacters = new Set("^$\\.*+?()[]{}|");
 
@@ -498,7 +504,10 @@ function readUnicodePropertyEscape(
     negated: character === "P",
     property: first,
     span: location,
-    ...(second == null ? {} : { value: second }),
+    ...includePropertiesWhen(() => {
+      if (second == null) return undefined;
+      return { value: second };
+    }),
   };
   if (!resolve(escape)) {
     fail("invalid", "This Unicode property is not defined.", location);
@@ -799,7 +808,10 @@ function declareCapture(
   state.captures.push({
     index,
     span: location,
-    ...(name == null ? {} : { name }),
+    ...includePropertiesWhen(() => {
+      if (name == null) return undefined;
+      return { name };
+    }),
   });
   if (name != null) {
     state.namedGroups.push({
@@ -901,7 +913,12 @@ function readBracedQuantifier(state: ParseState): QuantifierBounds | undefined {
   if (!eat(state, "}")) return undefined;
   return {
     maximum,
-    ...(maximumDigits == null ? {} : { maximumDigits }),
+    ...includePropertiesWhen(() => {
+      if (maximumDigits == null) return undefined;
+      return {
+        maximumDigits,
+      };
+    }),
     minimum,
     minimumDigits,
   };

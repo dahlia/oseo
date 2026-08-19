@@ -30,6 +30,13 @@ import type {
   SyntaxModule,
   SyntaxProgram,
 } from "./syntax.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Result of the host-neutral compiler pipeline. */
 export interface CompilationResult {
   readonly diagnostics: readonly Diagnostic[];
@@ -70,7 +77,12 @@ function moduleProgramBody(
       initializer = { ...entry.declaration, inferredName: "default" };
     }
     items.push({
-      ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
+      ...includePropertiesWhen(() => {
+        if (entry.byteRange == null) return undefined;
+        return {
+          byteRange: entry.byteRange,
+        };
+      }),
       hint: undefined,
       initializer,
       kind: "const",
@@ -1075,9 +1087,12 @@ function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
     kind: "function",
     name: functionValue.name,
     range: functionValue.range,
-    ...(functionValue.sourceText == null
-      ? {}
-      : { sourceText: functionValue.sourceText }),
+    ...includePropertiesWhen(() => {
+      if (functionValue.sourceText == null) return undefined;
+      return {
+        sourceText: functionValue.sourceText,
+      };
+    }),
   };
 }
 

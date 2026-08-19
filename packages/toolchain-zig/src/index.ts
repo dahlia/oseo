@@ -9,6 +9,12 @@ import type {
 } from "@oseo/compiler";
 import { posix, win32 } from "node:path";
 
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 const zigTargetNames = {
   "linux-aarch64-musl": "aarch64-linux-musl",
   "linux-x86_64-gnu": "x86_64-linux-gnu",
@@ -92,7 +98,10 @@ function request(
     args,
     command,
     cwd,
-    ...(environment == null ? {} : { environment }),
+    ...includePropertiesWhen(() => {
+      if (environment == null) return undefined;
+      return { environment };
+    }),
   };
 }
 
@@ -325,9 +334,12 @@ export const zigToolchain: NativeToolchain = {
           input.environment,
         ),
       ],
-      ...(builtArchivePath == null
-        ? {}
-        : { runtimeArchivePath: builtArchivePath }),
+      ...includePropertiesWhen(() => {
+        if (builtArchivePath == null) return undefined;
+        return {
+          runtimeArchivePath: builtArchivePath,
+        };
+      }),
       target: input.target,
     };
   },
