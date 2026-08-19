@@ -30,7 +30,12 @@ type DeclarationKind = "const" | "let" | "var";
 type AnnotationKind = "array" | "tuple-fixed-spread" | "tuple-rest";
 type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
-type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
+type BindingPatternKind =
+  | "default-elision"
+  | "head"
+  | "nested"
+  | "rest-array"
+  | "rest-id";
 type Value = number | undefined;
 type IteratedValue = Value | readonly Value[];
 
@@ -43,7 +48,7 @@ interface ArrayBindingCase {
   readonly nestedAnnotationMatches: boolean;
   readonly nestedMissing: boolean;
   readonly nestedValues: readonly Value[];
-  readonly shape: Shape;
+  readonly patternKind: BindingPatternKind;
   readonly stepFailure: boolean;
   readonly stepRaw: number;
   readonly values: readonly Value[];
@@ -91,7 +96,7 @@ const bindingArbitraries = {
   nestedAnnotationMatches: fc.boolean(),
   nestedMissing: fc.boolean(),
   nestedValues: valuesArbitrary,
-  shape: fc.constantFrom<Shape>(
+  patternKind: fc.constantFrom<BindingPatternKind>(
     "default-elision",
     "head",
     "nested",
@@ -124,7 +129,7 @@ function arraySource(values: readonly Value[]): string {
 }
 
 function outerValues(testCase: ArrayBindingCase): readonly IteratedValue[] {
-  if (testCase.shape !== "nested") return testCase.values;
+  if (testCase.patternKind !== "nested") return testCase.values;
   return [
     testCase.nestedMissing ? undefined : testCase.nestedValues,
     ...testCase.values,
@@ -132,7 +137,7 @@ function outerValues(testCase: ArrayBindingCase): readonly IteratedValue[] {
 }
 
 function outerValuesSource(testCase: ArrayBindingCase): string {
-  if (testCase.shape !== "nested") return arraySource(testCase.values);
+  if (testCase.patternKind !== "nested") return arraySource(testCase.values);
   const first = testCase.nestedMissing
     ? "undefined"
     : arraySource(testCase.nestedValues);
@@ -144,20 +149,20 @@ function patternSource(testCase: ArrayBindingCase): string {
     ? '(function () { throw new RangeError("default"); })()'
     : "31";
   let pattern: string;
-  if (testCase.shape === "head") {
+  if (testCase.patternKind === "head") {
     pattern = `[a = ${firstDefault}]`;
-  } else if (testCase.shape === "default-elision") {
+  } else if (testCase.patternKind === "default-elision") {
     pattern = `[a = ${firstDefault}, , b = 32]`;
-  } else if (testCase.shape === "nested") {
+  } else if (testCase.patternKind === "nested") {
     pattern = `[[a = ${firstDefault}, b = 32] = [33, 34]]`;
-  } else if (testCase.shape === "rest-id") {
+  } else if (testCase.patternKind === "rest-id") {
     pattern = `[a = ${firstDefault}, ...rest]`;
   } else {
     pattern = `[a = ${firstDefault}, ...[b = 32, c = 33]]`;
   }
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
-  if (testCase.shape === "nested") {
+  if (testCase.patternKind === "nested") {
     if (!testCase.nestedAnnotationMatches) {
       return `${pattern}: [${type}]`;
     }
@@ -175,38 +180,41 @@ function patternSource(testCase: ArrayBindingCase): string {
     : `${pattern}: ${type}[]`;
 }
 
-function resultSource(shape: Shape): string {
-  if (shape === "head") return '"" + a';
-  if (shape === "default-elision") return 'a + ":" + b';
-  if (shape === "nested") return 'a + ":" + b';
-  if (shape === "rest-id") {
+function resultSource(patternKind: BindingPatternKind): string {
+  if (patternKind === "head") return '"" + a';
+  if (patternKind === "default-elision") return 'a + ":" + b';
+  if (patternKind === "nested") return 'a + ":" + b';
+  if (patternKind === "rest-id") {
     return 'a + ":" + rest.length + ":" + (rest[0] ?? -99)';
   }
   return 'a + ":" + b + ":" + c';
 }
 
-function hintedBindingNames(shape: Shape): readonly string[] {
-  if (shape === "head" || shape === "rest-id") return ["a"];
-  if (shape === "default-elision" || shape === "nested") return ["a", "b"];
+function hintedBindingNames(
+  patternKind: BindingPatternKind,
+): readonly string[] {
+  if (patternKind === "head" || patternKind === "rest-id") return ["a"];
+  if (patternKind === "default-elision" || patternKind === "nested")
+    return ["a", "b"];
   return ["a", "b", "c"];
 }
 
 function assertGeneratedHints(testCase: ArrayBindingCase, hir: string): void {
   if (
     testCase.hintKind === "absent" ||
-    (testCase.shape === "nested" && !testCase.nestedAnnotationMatches)
+    (testCase.patternKind === "nested" && !testCase.nestedAnnotationMatches)
   ) {
     assert.doesNotMatch(hir, / hints=/u);
     return;
   }
   const type = testCase.hintKind === "truthful" ? "number" : "string";
-  for (const name of hintedBindingNames(testCase.shape)) {
+  for (const name of hintedBindingNames(testCase.patternKind)) {
     assert.match(
       hir,
       new RegExp(`${name} hints=\\[typescript:${type}\\]`, "u"),
     );
   }
-  if (testCase.shape === "rest-id") {
+  if (testCase.patternKind === "rest-id") {
     assert.doesNotMatch(hir, /rest hints=/u);
   }
 }
@@ -252,7 +260,7 @@ const values = ${values};
 const iterable = ${iterable};
 function consume() {
   ${testCase.declarationKind} ${patternSource(testCase)} = iterable;
-  return ${resultSource(testCase.shape)};
+  return ${resultSource(testCase.patternKind)};
 }
 try {
   console.log("result", consume());
@@ -314,20 +322,20 @@ function expected(testCase: ArrayBindingCase): ModelResult {
   try {
     const first = nextValue(state);
     let result: string;
-    if (testCase.shape === "head") {
+    if (testCase.patternKind === "head") {
       result = display(initialized(first, 31, testCase.defaultThrows));
-    } else if (testCase.shape === "default-elision") {
+    } else if (testCase.patternKind === "default-elision") {
       const a = initialized(first, 31, testCase.defaultThrows);
       nextValue(state);
       const b = initialized(nextValue(state), 32, false);
       result = `${display(a)}:${display(b)}`;
-    } else if (testCase.shape === "nested") {
+    } else if (testCase.patternKind === "nested") {
       const nested =
         first === undefined ? ([33, 34] as const) : (first as readonly Value[]);
       const a = initialized(nested[0], 31, testCase.defaultThrows);
       const b = initialized(nested[1], 32, false);
       result = `${display(a)}:${display(b)}`;
-    } else if (testCase.shape === "rest-id") {
+    } else if (testCase.patternKind === "rest-id") {
       const a = initialized(first, 31, testCase.defaultThrows);
       const rest: IteratedValue[] = [];
       while (!state.done) {
@@ -346,7 +354,8 @@ function expected(testCase: ArrayBindingCase): ModelResult {
       const c = initialized(rest[1], 33, false);
       result = `${display(a)}:${display(b)}:${display(c)}`;
     }
-    if (!state.done && !testCase.shape.startsWith("rest-")) state.closes += 1;
+    if (!state.done && !testCase.patternKind.startsWith("rest-"))
+      state.closes += 1;
     return {
       closes: state.closes,
       result: `result ${result}`,
@@ -374,7 +383,7 @@ test("array binding model ignores custom iterator controls", () => {
       nestedAnnotationMatches: true,
       nestedMissing: false,
       nestedValues: [],
-      shape: "default-elision",
+      patternKind: "default-elision",
       stepFailure: true,
       stepRaw: 0,
       values: [],

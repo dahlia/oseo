@@ -1346,19 +1346,19 @@ test("converts ordinary object operations to owned syntax", () => {
   });
   assert.ok(namedRead.mir != null);
   const namedReadText = printMir(namedRead.mir);
-  const shapeGuard = namedReadText.indexOf("guard-shape");
+  const cacheGuard = namedReadText.indexOf("guard-shape");
   const keyConversion = namedReadText.indexOf("property-key");
-  assert.notEqual(shapeGuard, -1);
+  assert.notEqual(cacheGuard, -1);
   assert.notEqual(keyConversion, -1);
-  assert.ok(shapeGuard < keyConversion);
+  assert.ok(cacheGuard < keyConversion);
   const hitCount = namedReadText.indexOf("count-guard-hit");
   const fixedLoad = namedReadText.indexOf("load-fixed-slot");
   const missCount = namedReadText.indexOf("count-guard-miss");
-  assert.ok(shapeGuard < hitCount);
+  assert.ok(cacheGuard < hitCount);
   assert.ok(hitCount < fixedLoad);
   assert.ok(fixedLoad < missCount);
   assert.doesNotMatch(
-    namedReadText.slice(shapeGuard, missCount),
+    namedReadText.slice(cacheGuard, missCount),
     /safepoint string allocation|property-key/u,
   );
   const generic = compileSource(

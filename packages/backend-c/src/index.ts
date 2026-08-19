@@ -1834,23 +1834,27 @@ function emitGuardObject(state: EmitState, operation: MirOperation): void {
   );
 }
 
-function emitGuardShape(state: EmitState, operation: MirOperation): void {
+function emitPropertyCacheGuard(
+  state: EmitState,
+  operation: MirOperation,
+): void {
   const object = operationArgument(operation, 0);
   const cache = propertyCacheName(operation);
   state.scalarKinds.set(operation.id, "boolean");
   line(
     state,
     renderC(
-      emittedC.guardShape.staticOseoPropertyCacheAssignUUStatement,
+      emittedC.propertyCacheGuard.staticOseoPropertyCacheAssignUUStatement,
       cache,
     ),
   );
   line(
     state,
     renderC(
-      emittedC.guardShape.boolFastAssignOseoPropertyCacheMatches,
+      emittedC.propertyCacheGuard.boolFastAssignOseoPropertyCacheMatches,
       operation.id,
-    ) + renderC(emittedC.guardShape.rootsAddressStatement, object, cache),
+    ) +
+      renderC(emittedC.propertyCacheGuard.rootsAddressStatement, object, cache),
   );
 }
 
@@ -2756,7 +2760,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "guard-object") {
     emitGuardObject(state, operation);
   } else if (operation.kind === "guard-shape") {
-    emitGuardShape(state, operation);
+    emitPropertyCacheGuard(state, operation);
   } else if (operation.kind === "guard-smi") {
     emitGuardSmi(state, operation);
   } else if (operation.kind === "unbox-smi") {

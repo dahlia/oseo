@@ -424,7 +424,7 @@ test(
  * form that owns one. This domain generates the owning form, the
  * strictness of the enclosing scope, the parameter list's simplicity,
  * and whether the reads happen inside a nested arrow, then checks the
- * one shape ECMA-262 selects: a non-strict simple list keeps the mapped
+ * one form ECMA-262 selects: a non-strict simple list keeps the mapped
  * alias, and every other eligible form takes an unmapped snapshot whose
  * `callee` is the poisoned accessor.
  */
@@ -437,12 +437,12 @@ type OwnerForm =
   | "generator"
   | "object-method";
 
-type ParameterShape = "default" | "pattern" | "rest" | "simple";
+type ParameterForm = "default" | "pattern" | "rest" | "simple";
 
 interface UnmappedArgumentsCase {
   readonly form: OwnerForm;
   readonly paramCount: number;
-  readonly parameterShape: ParameterShape;
+  readonly parameterForm: ParameterForm;
   readonly readThroughArrow: boolean;
   readonly replacement1: number;
   readonly replacement2: number;
@@ -462,7 +462,7 @@ const unmappedCaseArbitrary: fc.Arbitrary<UnmappedArgumentsCase> = fc.record({
     "object-method",
   ),
   paramCount: fc.integer({ max: 3, min: 1 }),
-  parameterShape: fc.constantFrom<ParameterShape>(
+  parameterForm: fc.constantFrom<ParameterForm>(
     "default",
     "pattern",
     "rest",
@@ -490,7 +490,7 @@ function isStrictCase(testCase: UnmappedArgumentsCase): boolean {
  * only from its non-strict, simple-parameter-list branch.
  */
 function isMappedCase(testCase: UnmappedArgumentsCase): boolean {
-  return !isStrictCase(testCase) && testCase.parameterShape === "simple";
+  return !isStrictCase(testCase) && testCase.parameterForm === "simple";
 }
 
 /**
@@ -498,8 +498,8 @@ function isMappedCase(testCase: UnmappedArgumentsCase): boolean {
  * generated argument value at its own position and beyond, and the body
  * never reads it, so only the leading simple parameters are observed.
  */
-function shapeParameter(shape: ParameterShape): string {
-  switch (shape) {
+function nonSimpleParameter(form: ParameterForm): string {
+  switch (form) {
     case "default":
       return ", extra = 0";
     case "pattern":
@@ -520,7 +520,7 @@ function unmappedBody(testCase: UnmappedArgumentsCase): string {
     ${writesParameter ? `${parameterName} = ${testCase.replacement2};` : ""}
     const argAfterParamWrite = arguments[${testCase.writeIndex}];
     const descriptor = Object.getOwnPropertyDescriptor(arguments, "callee");
-    const calleeShape = "value" in descriptor
+    const calleeDescriptor = "value" in descriptor
       ? "data " + (typeof descriptor.value)
       : "poison " + (descriptor.get === descriptor.set) + " " +
         descriptor.enumerable + " " + descriptor.configurable;
@@ -531,7 +531,7 @@ function unmappedBody(testCase: UnmappedArgumentsCase): string {
       paramAfterArgWrite,
       argAfterParamWrite,
       arguments.length,
-      calleeShape,
+      calleeDescriptor,
       calleeRead,
     );
 `;
@@ -545,7 +545,7 @@ function printUnmappedCase(testCase: UnmappedArgumentsCase): string {
     Array.from(
       { length: testCase.paramCount },
       (_value, index) => `p${index}`,
-    ).join(", ") + shapeParameter(testCase.parameterShape);
+    ).join(", ") + nonSimpleParameter(testCase.parameterForm);
   const call = testCase.suppliedValues.join(", ");
   const body = unmappedBody(testCase);
   const program = ((): string => {
@@ -608,11 +608,11 @@ function unmappedExpected(testCase: UnmappedArgumentsCase): string {
   const argAfterParamWrite = aliased
     ? testCase.replacement2
     : testCase.replacement1;
-  const calleeShape = mapped ? "data function" : "poison true false false";
+  const calleeDescriptor = mapped ? "data function" : "poison true false false";
   const calleeRead = mapped ? "function" : "throws true";
   return (
     `${printed(paramAfterArgWrite)} ${printed(argAfterParamWrite)} ` +
-    `${testCase.suppliedValues.length} ${calleeShape} ${calleeRead}\n`
+    `${testCase.suppliedValues.length} ${calleeDescriptor} ${calleeRead}\n`
   );
 }
 
@@ -676,7 +676,7 @@ function assertExplicitBindingBoundary(testCase: UnmappedArgumentsCase): void {
 }
 
 test(
-  "every owning function form selects its ECMA-262 arguments shape",
+  "every owning function form selects its ECMA-262 arguments form",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(

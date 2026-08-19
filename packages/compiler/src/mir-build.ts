@@ -195,7 +195,7 @@ function lowerSpecializedPropertyGet(
   builder: MirBuilder,
   superReceiver?: number,
 ): number {
-  const shapeBlock = createMirBlock(builder);
+  const cacheBlock = createMirBlock(builder);
   const hitBlock = createMirBlock(builder);
   const genericBlock = createMirBlock(builder);
   const joinBlock = createMirBlock(builder);
@@ -204,7 +204,7 @@ function lowerSpecializedPropertyGet(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [object],
-    detail: `object -> bb${shapeBlock.id}, miss -> bb${genericBlock.id}`,
+    detail: `object -> bb${cacheBlock.id}, miss -> bb${genericBlock.id}`,
     id: objectGuard,
     kind: "guard-object",
     range,
@@ -213,23 +213,23 @@ function lowerSpecializedPropertyGet(
     kind: "branch",
     test: objectGuard,
     whenFalse: genericBlock.id,
-    whenTrue: shapeBlock.id,
+    whenTrue: cacheBlock.id,
   };
 
-  builder.current = shapeBlock;
-  const shapeGuard = builder.nextValue;
+  builder.current = cacheBlock;
+  const cacheGuard = builder.nextValue;
   builder.nextValue += 1;
-  shapeBlock.operations.push({
+  cacheBlock.operations.push({
     arguments: [object],
-    cacheId: shapeGuard,
+    cacheId: cacheGuard,
     detail: `cached slot -> bb${hitBlock.id}, miss -> bb${genericBlock.id}`,
-    id: shapeGuard,
+    id: cacheGuard,
     kind: "guard-shape",
     range,
   });
-  shapeBlock.terminator = {
+  cacheBlock.terminator = {
     kind: "branch",
-    test: shapeGuard,
+    test: cacheGuard,
     whenFalse: genericBlock.id,
     whenTrue: hitBlock.id,
   };
@@ -240,7 +240,7 @@ function lowerSpecializedPropertyGet(
   builder.nextValue += 1;
   hitBlock.operations.push({
     arguments: [object],
-    cacheId: shapeGuard,
+    cacheId: cacheGuard,
     detail: "cached own-property slot",
     id: hitValue,
     kind: "load-fixed-slot",
@@ -288,7 +288,7 @@ function lowerSpecializedPropertyGet(
     "relearn stable own slot",
     [object, key],
     range,
-    { cacheId: shapeGuard },
+    { cacheId: cacheGuard },
   );
   genericBlock.terminator = {
     kind: "jump",

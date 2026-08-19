@@ -1712,7 +1712,7 @@ function annotationPropertyName(value: BabelNode): string | undefined {
   return undefined;
 }
 
-function annotationHasConcreteShape(typeNode: BabelNode): boolean {
+function annotationHasConcreteType(typeNode: BabelNode): boolean {
   return (
     typeNode.type === "TSAnyKeyword" ||
     typeNode.type === "TSBooleanKeyword" ||
@@ -1910,7 +1910,7 @@ function bindingPatternTypeHints(
   }
   if (pattern.kind === "object-binding-pattern") {
     if (typeNode.type !== "TSTypeLiteral") {
-      if (atRoot || !annotationHasConcreteShape(typeNode)) {
+      if (atRoot || !annotationHasConcreteType(typeNode)) {
         unsupported(
           context,
           typeNode,
@@ -1944,7 +1944,7 @@ function bindingPatternTypeHints(
     };
   }
   if (typeNode.type !== "TSArrayType" && typeNode.type !== "TSTupleType") {
-    if (atRoot || !annotationHasConcreteShape(typeNode)) {
+    if (atRoot || !annotationHasConcreteType(typeNode)) {
       unsupported(
         context,
         typeNode,
