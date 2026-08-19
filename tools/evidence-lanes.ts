@@ -103,15 +103,20 @@ function checkReference(
   }
 }
 
-function parseSource(source: EvidenceSource, context: string): unknown {
+function parseSource(
+  source: EvidenceSource,
+  context: string,
+): Record<string, unknown> {
+  let value: unknown;
   try {
-    return parseYaml(source.text) as unknown;
+    value = parseYaml(source.text) as unknown;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`${context} is malformed YAML: ${detail}`, {
       cause: error,
     });
   }
+  return record(value, context);
 }
 
 function expectedPath(directory: string, id: string): string {
@@ -127,7 +132,7 @@ export function validateEvidenceInventory(
   const indexed = new Map<string, string>();
   for (const source of indexSources) {
     const context = `evidence index ${source.path}`;
-    const value = record(parseSource(source, context), context);
+    const value = parseSource(source, context);
     requireExactKeys(value, new Set(["id", "record", "version"]), context);
     if (value.version !== 1) {
       throw new Error(`${context} version must be 1.`);
@@ -151,7 +156,7 @@ export function validateEvidenceInventory(
   let omitted = 0;
   for (const source of recordSources) {
     const context = `evidence record ${source.path}`;
-    const value = record(parseSource(source, context), context);
+    const value = parseSource(source, context);
     requireExactKeys(
       value,
       new Set(["evidence", "id", "owners", "scope", "title", "version"]),

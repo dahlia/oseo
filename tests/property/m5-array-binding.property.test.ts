@@ -32,6 +32,7 @@ type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
 type Value = number | undefined;
+type IteratedValue = Value | readonly Value[];
 
 interface ArrayBindingCase {
   readonly annotationKind: AnnotationKind;
@@ -54,7 +55,7 @@ interface ModelState {
   index: number;
   readonly stepFailureAt: number | undefined;
   steps: number;
-  readonly values: readonly unknown[];
+  readonly values: readonly IteratedValue[];
 }
 
 interface ModelResult {
@@ -122,7 +123,7 @@ function arraySource(values: readonly Value[]): string {
   return `[${values.map(valueSource).join(", ")}]`;
 }
 
-function outerValues(testCase: ArrayBindingCase): readonly unknown[] {
+function outerValues(testCase: ArrayBindingCase): readonly IteratedValue[] {
   if (testCase.shape !== "nested") return testCase.values;
   return [
     testCase.nestedMissing ? undefined : testCase.nestedValues,
@@ -266,7 +267,7 @@ function display(value: unknown): string {
   return value === undefined ? "undefined" : String(value);
 }
 
-function nextValue(state: ModelState): unknown {
+function nextValue(state: ModelState): IteratedValue {
   if (state.done) return undefined;
   const step = state.steps;
   state.steps += 1;
@@ -284,10 +285,10 @@ function nextValue(state: ModelState): unknown {
 }
 
 function initialized(
-  value: unknown,
+  value: IteratedValue,
   fallback: number,
   defaultThrows: boolean,
-): unknown {
+): IteratedValue {
   if (value !== undefined) return value;
   if (defaultThrows) throw new RangeError("default");
   return fallback;
@@ -328,7 +329,7 @@ function expected(testCase: ArrayBindingCase): ModelResult {
       result = `${display(a)}:${display(b)}`;
     } else if (testCase.shape === "rest-id") {
       const a = initialized(first, 31, testCase.defaultThrows);
-      const rest: unknown[] = [];
+      const rest: IteratedValue[] = [];
       while (!state.done) {
         const value = nextValue(state);
         if (!state.done) rest.push(value);
@@ -336,7 +337,7 @@ function expected(testCase: ArrayBindingCase): ModelResult {
       result = `${display(a)}:${rest.length}:${display(rest[0] ?? -99)}`;
     } else {
       const a = initialized(first, 31, testCase.defaultThrows);
-      const rest: unknown[] = [];
+      const rest: IteratedValue[] = [];
       while (!state.done) {
         const value = nextValue(state);
         if (!state.done) rest.push(value);

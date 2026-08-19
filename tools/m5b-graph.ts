@@ -141,15 +141,20 @@ function sortedUniqueStrings(
   return values;
 }
 
-function parseSource(source: WorkGraphSource, context: string): unknown {
+function parseSource(
+  source: WorkGraphSource,
+  context: string,
+): Record<string, unknown> {
+  let value: unknown;
   try {
-    return parseYaml(source.text) as unknown;
+    value = parseYaml(source.text) as unknown;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`${context} is malformed YAML: ${detail}`, {
       cause: error,
     });
   }
+  return record(value, context);
 }
 
 /**
@@ -230,7 +235,7 @@ function parseNode(
   claimed: Map<string, string>,
 ): WorkGraphNode {
   const context = `work graph node ${source.path}`;
-  const value = record(parseSource(source, context), context);
+  const value = parseSource(source, context);
   const parked = value.status === "parked";
   const optional = "inventory" in value ? ["inventory"] : [];
   requireExactKeys(
@@ -335,7 +340,7 @@ function parseGraphDocument(
   summary: WorkGraphSummary,
 ): void {
   const context = `work graph ${source.path}`;
-  const value = record(parseSource(source, context), context);
+  const value = parseSource(source, context);
   requireExactKeys(
     value,
     new Set([
