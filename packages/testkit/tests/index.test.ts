@@ -184,6 +184,7 @@ test("records complete failed build observations", async () => {
     "/tmp/oseo-native-test/native-observation.json",
   );
   assert.ok(bytes != null);
+  // SAFETY: compileNativeTest writes this metadata using the asserted schema.
   const metadata = JSON.parse(bytes) as {
     readonly compilerInvocation: readonly string[];
     readonly steps: readonly {

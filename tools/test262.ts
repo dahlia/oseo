@@ -265,6 +265,7 @@ function stringArray(value: unknown, description: string): readonly string[] {
   ) {
     throw new Error(`${description} must be an array of strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
@@ -305,6 +306,7 @@ export function parseTest262Case(
   if (match?.[1] == null) {
     throw new Error(`${path} does not contain test262 frontmatter.`);
   }
+  // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
     (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as unknown,
     `${path} frontmatter`,
@@ -333,6 +335,7 @@ export function parseTest262Case(
 }
 
 function classification(value: unknown): Test262Classification {
+  // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
   if (typeof value === "string" && classifications.has(candidate)) {
     return candidate;
@@ -342,6 +345,7 @@ function classification(value: unknown): Test262Classification {
 
 /** Validate the checked-in subset shape, ordering, and uniqueness. */
 export function parseReviewedSubset(text: string): ReviewedTest262Subset {
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "test262 subset");
   const rawTests = root.tests;
   if (!Array.isArray(rawTests)) {
@@ -1293,6 +1297,7 @@ async function suiteRoot(revision: string): Promise<string> {
     import.meta.resolve("test262/package.json"),
   );
   const packageRoot = dirname(packagePath);
+  // SAFETY: parsedObject validates the complete JSON tree at this boundary.
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),

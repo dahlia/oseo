@@ -96,6 +96,7 @@ export function node(value: unknown): BabelNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
+  // SAFETY: BabelNode is an open record and the object check establishes it.
   return value as BabelNode;
 }
 

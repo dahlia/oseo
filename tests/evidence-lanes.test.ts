@@ -104,6 +104,7 @@ test("rejects malformed records and unknown or missing fields", () => {
     () => validate(undefined, [recordSource({ extra: true })]),
     /unknown field extra/u,
   );
+  // SAFETY: recordSource returns a validated structured-data object fixture.
   const value = {
     ...(JSON.parse(recordSource().text) as StructuredDataRecord),
     title: undefined,

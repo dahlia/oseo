@@ -301,6 +301,7 @@ function splitCounters(observation: ProcessObservation) {
   const line = lines[index];
   if (line == null)
     return { observation: { ...observation, stderr: strippedStderr } };
+  // SAFETY: Every counter field is validated before the record is returned.
   const parsed = JSON.parse(
     line.slice(prefix.length),
   ) as Partial<RuntimeObservationCounters>;
@@ -319,6 +320,7 @@ function splitCounters(observation: ProcessObservation) {
   }
   lines.splice(index, 1);
   return {
+    // SAFETY: The loop above validates every RuntimeObservationCounters field.
     counters: parsed as RuntimeObservationCounters,
     observation: { ...observation, stderr: lines.join("") },
   };

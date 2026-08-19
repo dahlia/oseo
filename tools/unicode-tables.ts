@@ -205,6 +205,7 @@ function pinnedInput(value: unknown, description: string): PinnedInput {
 
 /** Parse and validate the reviewed pinned-input manifest. */
 export function parsePinnedInputManifest(source: string): PinnedInputManifest {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const root = record(parseYaml(source) as unknown, "The input manifest");
   if (root.version !== 1) {
     throw new Error("The input manifest must declare version 1.");

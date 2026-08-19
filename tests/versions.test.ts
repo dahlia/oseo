@@ -129,6 +129,7 @@ test("discovers newly added workspace packages", async () => {
     });
     await setWorkspaceVersion(root, "1.2.3");
     for (const filename of ["package.json", "deno.json"]) {
+      // SAFETY: The fixture generator writes manifests with a version field.
       const manifest = JSON.parse(
         await readFile(join(packageRoot, filename), "utf8"),
       ) as { readonly version: string };
@@ -183,6 +184,7 @@ test("rejects non-workspace internal dependencies", async () => {
   const root = await fixtureWorkspace();
   try {
     const cliPath = join(root, "packages", "cli", "package.json");
+    // SAFETY: The fixture writes this package's dependency record.
     const manifest = JSON.parse(await readFile(cliPath, "utf8")) as {
       dependencies: Record<string, string>;
     };

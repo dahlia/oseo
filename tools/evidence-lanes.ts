@@ -107,6 +107,7 @@ function parseSource(
 ): StructuredDataRecord {
   let value: unknown;
   try {
+    // SAFETY: parsedMapping validates the complete YAML tree immediately below.
     value = parseYaml(source.text) as unknown;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);

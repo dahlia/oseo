@@ -10,6 +10,7 @@ const range: SourceRange = {
 };
 
 function buildInvalidHir(value: unknown) {
+  // SAFETY: This helper passes malformed syntax for recovery tests.
   return buildHir(value as SyntaxProgram);
 }
 

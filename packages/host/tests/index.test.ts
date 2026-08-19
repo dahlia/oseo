@@ -95,6 +95,7 @@ test("runs a process with one captured environment snapshot", async () => {
     });
     assert.ok(environment != null);
     process.env.CPATH = "/tmp/changed-headers";
+    // SAFETY: The test supplies every field this execution path reads.
     const observation = await host.run({
       args: [
         "-e",
@@ -118,6 +119,7 @@ test("runs a process with one captured environment snapshot", async () => {
 });
 
 test("preserves Deno execution without environment access", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -145,6 +147,7 @@ test("preserves Deno execution without environment access", async () => {
 });
 
 test("runs a Deno process with only its requested environment", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -341,6 +344,7 @@ test("renews an active cache lease", async () => {
     );
     assert.ok(ownerName != null);
     const ownerPath = join(lockPath, ownerName);
+    // SAFETY: The cache implementation wrote this owner record.
     const before = JSON.parse(await readFile(ownerPath, "utf8")) as {
       readonly expiresAtMilliseconds: number;
     };
@@ -354,6 +358,7 @@ test("renews an active cache lease", async () => {
           (name) => name.startsWith("owner-") || name.startsWith("renew-"),
         );
         if (currentName == null) continue;
+        // SAFETY: The cache owns every record in this lock directory.
         const current = JSON.parse(
           await readFile(join(lockPath, currentName), "utf8"),
         ) as {
@@ -440,6 +445,7 @@ test("an expired owner cannot release its replacement", async () => {
     );
     assert.ok(ownerName != null);
     const ownerPath = join(lockPath, ownerName);
+    // SAFETY: The cache implementation wrote this owner record.
     const owner = JSON.parse(await readFile(ownerPath, "utf8")) as {
       readonly token: string;
     };
@@ -465,6 +471,7 @@ test("an expired owner cannot release its replacement", async () => {
 });
 
 test("reclaims an expired Deno cache lease", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -503,6 +510,7 @@ test("reclaims an expired Deno cache lease", async () => {
 });
 
 test("serializes concurrent Deno lease reclamation", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -555,6 +563,7 @@ test("serializes concurrent Deno lease reclamation", async () => {
 });
 
 test("renews an active Deno cache lease", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const runtime = (
     globalThis as typeof globalThis & {
       readonly Deno?: MinimalDenoRuntime;
@@ -580,6 +589,7 @@ test("renews an active Deno cache lease", async () => {
     }
     assert.ok(ownerName != null);
     const ownerPath = `${lockPath}/${ownerName}`;
+    // SAFETY: The cache implementation wrote this owner record.
     const before = JSON.parse(await runtime.readTextFile(ownerPath)) as {
       readonly expiresAtMilliseconds: number;
     };
@@ -596,6 +606,7 @@ test("renews an active Deno cache lease", async () => {
           ) {
             continue;
           }
+          // SAFETY: The cache owns every record in this lock directory.
           const current = JSON.parse(
             await runtime.readTextFile(`${lockPath}/${entry.name}`),
           ) as {
@@ -616,6 +627,7 @@ test("renews an active Deno cache lease", async () => {
 });
 
 test("fetches remote text assets in the Deno host", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };
@@ -661,6 +673,7 @@ test("fetches remote text assets in the Deno host", async () => {
 });
 
 test("reads local text assets through the Deno file API", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };
@@ -758,6 +771,7 @@ test("rejects bare and non-file module resolution", () => {
 
 test("loads file modules with stable content hashes", async () => {
   const reads: (string | URL)[] = [];
+  // SAFETY: This fixture implements the loader's CompilerHost subset.
   const host = {
     async readTextFile(path: string | URL): Promise<string> {
       reads.push(path);
@@ -808,6 +822,7 @@ test("canonicalizes filesystem characters as file URL data", async () => {
 });
 
 test("encodes literal percent signs in Deno file identities", async () => {
+  // SAFETY: The test temporarily installs the declared Deno fixture API.
   const globals = globalThis as typeof globalThis & {
     Deno?: MinimalDenoRuntime;
   };

@@ -56,6 +56,7 @@ function results(
   const suiteRevision = "0123456789abcdef0123456789abcdef01234567";
   const manifestResults: readonly Test262Result[] = entries.map(
     ([path, resultClassification]) => {
+      // SAFETY: Callers supply classifications from the closed test262 domain.
       const classification = resultClassification as Test262Classification;
       return {
         case: {

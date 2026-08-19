@@ -105,7 +105,10 @@ const caseArbitrary: fc.Arbitrary<PatternCase> = fc.record({
   ),
   properties: fc
     .array(propertyArbitrary, { maxLength: 3, minLength: 1 })
-    .map((properties) => properties as readonly PropertySpec[]),
+    .map((properties) => {
+      // SAFETY: propertyArbitrary generates exactly the PropertySpec domain.
+      return properties as readonly PropertySpec[];
+    }),
   rest: fc.boolean(),
   subject: fc.constantFrom(
     "empty" as const,

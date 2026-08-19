@@ -710,6 +710,7 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   if (operator == null || !(operator in helpers)) {
     throw new Error(`MIR unary %${operation.id} has no valid operator.`);
   }
+  // SAFETY: Membership in helpers above establishes its exact key domain.
   const helper = helpers[operator as keyof typeof helpers];
   location(state, operation.range);
   state.usesAbrupt = true;

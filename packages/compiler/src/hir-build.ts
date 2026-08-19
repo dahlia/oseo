@@ -3225,6 +3225,7 @@ function resolveStatement(
       // but a frontend that builds owned syntax directly can omit it;
       // recover with one located diagnostic instead of resolving a
       // clause that has no block to run.
+      // SAFETY: Direct frontends may omit this statically required field.
       if ((statement.handler.body as SyntaxStatement | undefined) == null) {
         state.diagnostics.push(
           sourceDiagnostic(

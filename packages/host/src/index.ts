@@ -197,6 +197,7 @@ interface CacheLockObservation {
 
 function parseCacheLockOwner(contents: string): CacheLockOwner | undefined {
   try {
+    // SAFETY: The optional fields are validated before this value is returned.
     const value = JSON.parse(contents) as Partial<CacheLockOwner>;
     return typeof value.token === "string" &&
       /^[A-Za-z0-9-]+$/u.test(value.token) &&
@@ -278,6 +279,7 @@ function createRenewingCacheLock(
           if (!released) schedule();
         });
     }, cacheLockRenewMilliseconds);
+    // SAFETY: Runtime timers may expose unref; its presence is checked below.
     const unref = (
       timer as ReturnType<typeof setTimeout> & {
         readonly unref?: () => void;

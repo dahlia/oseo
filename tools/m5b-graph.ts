@@ -105,9 +105,11 @@ function booleanValue(value: unknown, context: string): boolean {
 }
 
 function countValue(value: unknown, context: string): number {
+  // SAFETY: Number.isSafeInteger establishes a numeric value for comparison.
   if (!Number.isSafeInteger(value) || (value as number) < 0) {
     throw new Error(`${context} must be a non-negative integer.`);
   }
+  // SAFETY: Number.isSafeInteger above establishes a non-negative integer.
   return value as number;
 }
 
@@ -145,6 +147,7 @@ function parseSource(
 ): StructuredDataRecord {
   let value: unknown;
   try {
+    // SAFETY: parsedMapping validates the complete YAML tree immediately below.
     value = parseYaml(source.text) as unknown;
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
@@ -527,7 +530,10 @@ export function parseIncludedInventoryPaths(text: string): readonly string[] {
     .filter((line) => line.length > 0 && !line.startsWith("#"))
     .map((line) => line.split("\t"))
     .filter((columns) => columns[1] === "included")
-    .map((columns) => columns[0] as string);
+    .map((columns) => {
+      // SAFETY: split always supplies column zero, even for an empty line.
+      return columns[0] as string;
+    });
 }
 
 function readNodeSources(): readonly WorkGraphSource[] {

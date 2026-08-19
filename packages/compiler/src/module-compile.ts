@@ -115,6 +115,7 @@ function declarationNamed(
 
 function isSourceRange(value: unknown): value is SourceRange {
   if (value == null || typeof value !== "object") return false;
+  // SAFETY: The object check permits reading only optional range fields here.
   const candidate = value as Partial<SourceRange>;
   return (
     candidate.start != null &&
@@ -128,11 +129,20 @@ function isSourceRange(value: unknown): value is SourceRange {
 
 /** Retain module identity on every owned range before graph HIR is merged. */
 function retainModuleSource<T>(value: T, sourceId: string): T {
-  if (isSourceRange(value)) return { ...value, sourceId } as T;
+  if (isSourceRange(value)) {
+    return (
+      // SAFETY: Updating the source ID preserves every other SourceRange field.
+      { ...value, sourceId } as T
+    );
+  }
   if (Array.isArray(value)) {
-    return value.map((item) => retainModuleSource(item, sourceId)) as T;
+    return (
+      // SAFETY: Recursing element-wise preserves the input array's structure.
+      value.map((item) => retainModuleSource(item, sourceId)) as T
+    );
   }
   if (value == null || typeof value !== "object") return value;
+  // SAFETY: Recursing over every entry preserves the input object's structure.
   return Object.fromEntries(
     Object.entries(value).map(([key, item]) => [
       key,

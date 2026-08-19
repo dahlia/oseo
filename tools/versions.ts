@@ -87,10 +87,12 @@ function strictVersion(bytes: string, source: string): string {
 
 function parseManifest(bytes: string, path: string): PackageManifest {
   try {
+    // SAFETY: The following object check establishes a manifest record.
     const value = JSON.parse(bytes) as unknown;
     if (value == null || typeof value !== "object" || Array.isArray(value)) {
       throw new Error("manifest is not an object");
     }
+    // SAFETY: Workspace manifests are trusted repository inputs.
     return value as PackageManifest;
   } catch (error) {
     throw new Error(`Could not read ${path} as a JSON manifest.`, {
@@ -329,6 +331,7 @@ async function main(args: readonly string[]): Promise<void> {
     return;
   }
   if (mode === "set") {
+    // SAFETY: This probe only reads the optional Deno global discriminator.
     const deno = (globalThis as { readonly Deno?: unknown }).Deno;
     if (deno != null) throw new Error("Version set mode requires Node.js.");
     const version = args[1];

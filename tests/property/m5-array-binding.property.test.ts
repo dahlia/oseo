@@ -330,6 +330,7 @@ function expected(testCase: ArrayBindingCase): ModelResult {
       const b = initialized(nextValue(state), 32, false);
       result = `${display(a)}:${display(b)}`;
     } else if (testCase.patternKind === "nested") {
+      // SAFETY: The nested pattern domain supplies an array at this position.
       const nested =
         first === undefined ? ([33, 34] as const) : (first as readonly Value[]);
       const a = initialized(nested[0], 31, testCase.defaultThrows);
@@ -363,6 +364,7 @@ function expected(testCase: ArrayBindingCase): ModelResult {
     };
   } catch (error) {
     if (!state.done) state.closes += 1;
+    // SAFETY: The model only throws Error instances from generated defaults.
     const reason = error as Error;
     return {
       closes: state.closes,

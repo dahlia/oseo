@@ -25,9 +25,11 @@ export const babelFrontend: SourceFrontend = {
         }),
       );
       if (file == null) throw new Error("Babel returned a non-node result.");
-      const parserErrors = Array.isArray(file.errors)
-        ? (file.errors as readonly ParserError[])
-        : [];
+      let parserErrors: readonly ParserError[] = [];
+      if (Array.isArray(file.errors)) {
+        // SAFETY: Array.isArray establishes Babel's parser-error sequence.
+        parserErrors = file.errors as readonly ParserError[];
+      }
       if (parserErrors.length > 0) {
         return {
           diagnostics: parserErrors.map((error) =>
@@ -61,6 +63,7 @@ export const babelFrontend: SourceFrontend = {
         sourceId: input.sourceId,
       };
     } catch (error) {
+      // SAFETY: Babel errors expose the optional offsets read below.
       const value = error as ParserError;
       return {
         diagnostics: [diagnosticAt(input, locations, errorOffset(value))],
@@ -89,6 +92,7 @@ export const babelModuleFrontend: ModuleSourceFrontend = {
       if (file == null) throw new Error("Babel returned a non-node result.");
       return convertModule(input, file);
     } catch (error) {
+      // SAFETY: Babel errors expose the optional offsets read below.
       const value = error as ParserError;
       return {
         diagnostics: [diagnosticAt(input, locations, errorOffset(value))],

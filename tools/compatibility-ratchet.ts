@@ -169,6 +169,7 @@ function classification(value: unknown, context: string): Classification {
 }
 
 function parseSubset(text: string): ReadonlySet<string> {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "reviewed subset");
   if (!Array.isArray(root.tests)) {
     throw new Error("reviewed subset tests must be an array.");
@@ -190,6 +191,7 @@ function parseResults(
   source: ResultManifestSource,
   allowLegacyGitBaseline: boolean,
 ): ReadonlyMap<string, Classification> {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const legacy = record(
     parseYaml(source.indexText) as unknown,
     "result manifest",
@@ -252,6 +254,7 @@ function astRecord(value: unknown, context: string): AstRecord {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(`${context} must be an AST record.`);
   }
+  // SAFETY: AstRecord is an open record and the object check establishes it.
   return value as AstRecord;
 }
 
@@ -260,6 +263,7 @@ function astNode(value: unknown, context: string): AstNode {
   if (typeof node.type !== "string") {
     throw new Error(`${context} must be an AST node.`);
   }
+  // SAFETY: The record and string type-tag checks establish an AST node.
   return node as AstNode;
 }
 
@@ -448,6 +452,7 @@ function parsePropertyAllocations(
         return;
       }
       if (value == null || typeof value !== "object") return;
+      // SAFETY: Babel traversal supplies AST records after the object check.
       const node = value as AstRecord;
       if (node.type === "VariableDeclarator" && node.init != null) {
         const name = astNode(node.id, `${source.path} variable name`);
@@ -471,6 +476,7 @@ function parsePropertyAllocations(
         return;
       }
       if (value == null || typeof value !== "object") return;
+      // SAFETY: Babel traversal supplies AST records after the object check.
       const rawNode = value as AstRecord;
       if (rawNode.type === "CallExpression") {
         const node = astNode(rawNode, `${source.path} call`);
@@ -595,6 +601,7 @@ function registryOwner(value: unknown, context: string): string {
 function parsePropertySeedRegistry(
   text: string,
 ): readonly PropertySeedFamily[] {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "property seed registry");
   requireKeys(root, new Set(["families", "version"]), "property seed registry");
   if (root.version !== 1) {
@@ -883,6 +890,7 @@ function detectViolations(
 }
 
 function parseOverrides(text: string): readonly RatchetOverride[] {
+  // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "ratchet override record");
   if (!Array.isArray(root.overrides)) {
     throw new Error("ratchet overrides must be an array.");
@@ -1254,11 +1262,15 @@ function formatViolation(violation: RatchetViolation): string {
 async function main(): Promise<void> {
   const branch = optionalGit(["symbolic-ref", "--quiet", "--short", "HEAD"]);
   const eventPath = process.env.GITHUB_EVENT_PATH;
+  // SAFETY: parsedMapping validates the complete GitHub event JSON tree.
   const event =
     process.env.GITHUB_ACTIONS === "true"
-      ? (JSON.parse(
-          readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
-        ) as unknown)
+      ? record(
+          JSON.parse(
+            readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
+          ) as unknown,
+          "GitHub event",
+        )
       : {};
   const intent = selectBaselineIntent(process.env, event, branch);
   if (intent.kind === "skip") {

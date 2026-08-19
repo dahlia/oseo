@@ -1269,6 +1269,7 @@ export function expression(
       ...located,
       kind: "binary",
       left,
+      // SAFETY: The check above establishes this operator union member.
       operator: operator as BinaryOperator,
       right,
     };
@@ -1559,6 +1560,7 @@ export function bindingPattern(
       ...(rest == null ? {} : { rest }),
     };
   }
+  // SAFETY: Array.isArray establishes the read-only element sequence.
   const rawElements = Array.isArray(value.elements)
     ? (value.elements as readonly unknown[])
     : [];
@@ -2839,6 +2841,7 @@ export function undefinedExpression(range: SourceRange): SyntaxExpression {
 }
 
 export function cookedTemplateText(element: BabelNode): string | undefined {
+  // SAFETY: Babel template values are records with an optional cooked field.
   const elementValue = element.value as
     | { readonly cooked?: unknown }
     | undefined;
@@ -2848,6 +2851,7 @@ export function cookedTemplateText(element: BabelNode): string | undefined {
 }
 
 export function rawTemplateText(element: BabelNode): string | undefined {
+  // SAFETY: Babel template values are records with an optional raw field.
   const elementValue = element.value as { readonly raw?: unknown } | undefined;
   return typeof elementValue?.raw === "string" ? elementValue.raw : undefined;
 }

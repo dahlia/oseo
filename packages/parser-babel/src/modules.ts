@@ -384,9 +384,11 @@ export function convertModule(
   file: BabelNode,
 ): ModuleFrontendResult {
   const locations = createSourceIndex(input.source);
-  const parserErrors = Array.isArray(file.errors)
-    ? (file.errors as readonly ParserError[])
-    : [];
+  let parserErrors: readonly ParserError[] = [];
+  if (Array.isArray(file.errors)) {
+    // SAFETY: Array.isArray establishes Babel's parser-error sequence.
+    parserErrors = file.errors as readonly ParserError[];
+  }
   if (parserErrors.length > 0) {
     return {
       diagnostics: parserErrors.map((error) =>

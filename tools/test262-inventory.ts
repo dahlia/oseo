@@ -82,13 +82,16 @@ function stringArray(value: unknown, description: string): readonly string[] {
   ) {
     throw new Error(`${description} must be an array of non-empty strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
 function positiveInteger(value: unknown, description: string): number {
+  // SAFETY: Number.isSafeInteger establishes a numeric value for comparison.
   if (!Number.isSafeInteger(value) || (value as number) <= 0) {
     throw new Error(`${description} must be a positive integer.`);
   }
+  // SAFETY: Number.isSafeInteger above establishes a positive integer.
   return value as number;
 }
 
@@ -108,6 +111,7 @@ function sortedUnique(
 
 /** Parse and validate the reviewed inventory policy. */
 export function parseInventoryPolicy(text: string): Test262InventoryPolicy {
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "test262 inventory policy");
   const rawSources = record(root.sources, "test262 inventory sources");
   const rawFeatures = record(
@@ -256,6 +260,7 @@ export function parseTest262Features(
   if (match?.[1] == null) {
     throw new Error(`${path} does not contain test262 frontmatter.`);
   }
+  // SAFETY: parsedObject validates the complete YAML frontmatter tree.
   const metadata = record(
     (parseYaml(match[1]) ?? {}) as unknown,
     `${path} frontmatter`,
@@ -404,6 +409,7 @@ async function suiteRoot(revision: string): Promise<string> {
     import.meta.resolve("test262/package.json"),
   );
   const packageRoot = dirname(packagePath);
+  // SAFETY: parsedObject validates the complete JSON tree at this boundary.
   const workspace = record(
     JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
@@ -457,6 +463,7 @@ async function createInventory(
 }
 
 function subsetPaths(text: string, suiteRevision: string): readonly string[] {
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "test262 subset");
   if (root.suiteRevision !== suiteRevision) {
     throw new Error("test262 subset and inventory revisions differ.");

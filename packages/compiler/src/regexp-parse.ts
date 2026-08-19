@@ -579,12 +579,14 @@ function readModifierFlags(
   while (!done(state)) {
     const character = at(state, 0);
     if (character == null || !modifierFlags.has(character)) break;
+    // SAFETY: Membership in modifierFlags establishes the modifier domain.
     if (selected.includes(character as RegExpModifierFlag)) {
       fail("invalid", "A modifier group repeats a flag.", {
         end: state.index + 1,
         start,
       });
     }
+    // SAFETY: Membership in modifierFlags establishes the modifier domain.
     selected.push(character as RegExpModifierFlag);
     state.index += 1;
   }

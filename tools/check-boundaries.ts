@@ -58,6 +58,7 @@ function syntaxNode(value: unknown): SyntaxNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
+  // SAFETY: The object check establishes this open AST record.
   return value as SyntaxNode;
 }
 
@@ -241,6 +242,7 @@ export async function checkPackageBoundaries(root: string): Promise<number> {
   for (const entry of await readdir(packagesRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const directory = join(packagesRoot, entry.name);
+    // SAFETY: Checked-in package manifests are repository-owned inputs.
     const manifest = JSON.parse(
       await readFile(join(directory, "package.json"), "utf8"),
     ) as Manifest;

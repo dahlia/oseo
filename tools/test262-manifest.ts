@@ -64,6 +64,7 @@ function stringArray(value: unknown, description: string): readonly string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
     throw new Error(`${description} must be an array of strings.`);
   }
+  // SAFETY: The array and element checks establish the string sequence.
   return value as readonly string[];
 }
 
@@ -71,6 +72,7 @@ function classification(
   value: unknown,
   description: string,
 ): Test262Classification {
+  // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
   if (typeof value === "string" && classifications.has(candidate)) {
     return candidate;
@@ -105,6 +107,7 @@ function validateGroup(group: string, description: string): void {
 function parsePartitionReferences(
   text: string,
 ): readonly ManifestPartitionReference[] {
+  // SAFETY: parsedObject validates the complete YAML tree at this boundary.
   const root = record(parseYaml(text) as unknown, "test262 results index");
   if (!Array.isArray(root.partitions)) {
     throw new Error("test262 results index needs a partitions array.");
@@ -215,6 +218,8 @@ function parseResult(
 
 /** Convert only after parseResult has validated the record's owned fields. */
 function assumeValidatedResult(value: unknown): Test262Result {
+  // SAFETY: parseResult validates path, classification, dependencies,
+  // and failureKind, the fields consumed from reviewed results.
   return value as Test262Result;
 }
 
@@ -223,6 +228,7 @@ export function parseReviewedManifest(
   indexText: string,
   readPartition: (path: string) => string,
 ): ReviewedTest262Manifest {
+  // SAFETY: parsedObject validates the complete YAML index tree.
   const root = record(parseYaml(indexText) as unknown, "test262 results index");
   const suiteRevision = stringValue(
     root.suiteRevision,
@@ -231,6 +237,7 @@ export function parseReviewedManifest(
   const references = parsePartitionReferences(indexText);
   const results: Test262Result[] = [];
   for (const reference of references) {
+    // SAFETY: parsedObject validates each complete partition tree.
     const partition = record(
       parseYaml(readPartition(reference.path)) as unknown,
       `test262 partition ${reference.path}`,
@@ -415,6 +422,7 @@ export function validateTargetParity(
   suiteRevision: string,
   executionTarget: string | undefined,
 ): void {
+  // SAFETY: parsedObject validates the complete parity YAML tree.
   const root = record(parseYaml(text) as unknown, "test262 target parity");
   if (root.canonicalManifest !== "results.yaml") {
     throw new Error("test262 target parity must name results.yaml.");
