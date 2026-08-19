@@ -41,6 +41,7 @@ import {
   parsedMapping as record,
   type StructuredDataInput,
 } from "./structured-data.ts";
+import { isNumber, isString } from "./value-kinds.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageDirectory = "packages/unicode";
@@ -174,14 +175,14 @@ export interface PinnedInputManifest {
 }
 
 function text(value: StructuredDataInput, description: string): string {
-  if (typeof value !== "string" || value === "") {
+  if (!isString(value) || value === "") {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
 }
 
 function count(value: StructuredDataInput, description: string): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) {
+  if (!isNumber(value) || !Number.isSafeInteger(value) || value < 0) {
     throw new Error(`${description} must be a non-negative integer.`);
   }
   return value;

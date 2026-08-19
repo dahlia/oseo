@@ -10,6 +10,7 @@ import {
   type StructuredDataInput,
   type StructuredDataRecord,
 } from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
@@ -58,7 +59,7 @@ function requireExactKeys(
 }
 
 function stringValue(value: StructuredDataInput, context: string): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
+  if (!isString(value) || value.trim().length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;

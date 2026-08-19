@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
+import { isString } from "./value-kinds.ts";
 
 interface PackedFile {
   readonly path: string;
@@ -133,7 +134,7 @@ function requireReleaseDependencies(
   manifest: PackageManifest,
   expectedName: string,
 ): void {
-  if (manifest.name !== expectedName || typeof manifest.version !== "string") {
+  if (manifest.name !== expectedName || !isString(manifest.version)) {
     throw new Error(`${expectedName} archive has invalid package metadata.`);
   }
   const fields = [
@@ -185,7 +186,7 @@ async function stagePackage(
   const manifest = JSON.parse(
     await readFile(join(source, "package.json"), "utf8"),
   ) as PackageManifest;
-  if (typeof manifest.version !== "string") {
+  if (!isString(manifest.version)) {
     throw new Error(`${directory} package version is missing.`);
   }
   const [rootLicense, packageLicense] = await Promise.all([

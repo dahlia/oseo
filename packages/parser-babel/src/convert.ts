@@ -35,6 +35,9 @@ import type {
 } from "@oseo/compiler";
 import {
   hasUseStrictDirective,
+  isBoolean,
+  isNumber,
+  isString,
   node,
   nodes,
   type AssignmentArrayBindingElement,
@@ -73,7 +76,7 @@ function nestedThisMode(
 }
 
 export function identifierName(value: BabelNode): string | undefined {
-  return value.type === "Identifier" && typeof value.name === "string"
+  return value.type === "Identifier" && isString(value.name)
     ? value.name
     : undefined;
 }
@@ -311,7 +314,7 @@ const compoundAssignmentOperators = new Map<unknown, AssignmentOperator>([
 ]);
 
 export function moduleName(value: BabelNode): string | undefined {
-  if (value.type === "StringLiteral" && typeof value.value === "string") {
+  if (value.type === "StringLiteral" && isString(value.value)) {
     return value.value;
   }
   return identifierName(value);
@@ -321,7 +324,7 @@ export function moduleSpecifier(
   context: ConvertContext,
   value: BabelNode | undefined,
 ): SyntaxModuleSpecifier | undefined {
-  if (value?.type !== "StringLiteral" || typeof value.value !== "string") {
+  if (value?.type !== "StringLiteral" || !isString(value.value)) {
     if (value != null) {
       unsupported(context, value, "A module specifier must be a string.");
     }
@@ -699,14 +702,14 @@ export function expression(
       kind: "yield",
     };
   }
-  if (value.type === "NumericLiteral" && typeof value.value === "number") {
+  if (value.type === "NumericLiteral" && isNumber(value.value)) {
     return { ...located, kind: "number", value: value.value };
   }
   if (value.type === "BigIntLiteral") return bigintLiteral(context, value);
-  if (value.type === "StringLiteral" && typeof value.value === "string") {
+  if (value.type === "StringLiteral" && isString(value.value)) {
     return { ...located, kind: "string", value: value.value };
   }
-  if (value.type === "BooleanLiteral" && typeof value.value === "boolean") {
+  if (value.type === "BooleanLiteral" && isBoolean(value.value)) {
     return { ...located, kind: "boolean", value: value.value };
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
@@ -1708,7 +1711,7 @@ function annotationPropertyName(value: BabelNode): string | undefined {
   if (identifier != null) return identifier;
   if (
     (value.type === "StringLiteral" || value.type === "NumericLiteral") &&
-    (typeof value.value === "string" || typeof value.value === "number")
+    (isString(value.value) || isNumber(value.value))
   ) {
     return String(value.value);
   }
@@ -2846,15 +2849,13 @@ export function cookedTemplateText(element: BabelNode): string | undefined {
   const elementValue = element.value as
     | { readonly cooked?: unknown }
     | undefined;
-  return typeof elementValue?.cooked === "string"
-    ? elementValue.cooked
-    : undefined;
+  return isString(elementValue?.cooked) ? elementValue.cooked : undefined;
 }
 
 export function rawTemplateText(element: BabelNode): string | undefined {
   // SAFETY: Babel template values are records with an optional raw field.
   const elementValue = element.value as { readonly raw?: unknown } | undefined;
-  return typeof elementValue?.raw === "string" ? elementValue.raw : undefined;
+  return isString(elementValue?.raw) ? elementValue.raw : undefined;
 }
 
 export function identifierExpression(

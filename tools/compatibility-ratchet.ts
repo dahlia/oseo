@@ -20,6 +20,7 @@ import {
   type StructuredDataInput,
   type StructuredDataRecord,
 } from "./structured-data.ts";
+import { isNumber, isObject, isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
@@ -124,7 +125,7 @@ export type BaselineIntent =
   | { readonly kind: "skip"; readonly reason: string };
 
 function stringValue(value: StructuredDataInput, context: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${context} must be a non-empty string.`);
   }
   return value;
@@ -134,13 +135,10 @@ function transitionValue(
   value: StructuredDataInput,
   context: string,
 ): number | string {
-  if (
-    (typeof value !== "string" || value.length === 0) &&
-    typeof value !== "number"
-  ) {
+  if ((!isString(value) || value.length === 0) && !isNumber(value)) {
     throw new Error(`${context} must be a number or non-empty string.`);
   }
-  if (typeof value === "number" && !Number.isSafeInteger(value)) {
+  if (isNumber(value) && !Number.isSafeInteger(value)) {
     throw new Error(`${context} must be a safe integer.`);
   }
   return value;
@@ -261,7 +259,7 @@ interface AstRecord {
 type AstNode = AstRecord & { readonly type: string };
 
 function astRecord(value: StructuredDataInput, context: string): AstRecord {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+  if (!isObject(value) || Array.isArray(value)) {
     throw new Error(`${context} must be an AST record.`);
   }
   // SAFETY: AstRecord is an open record and the object check establishes it.
@@ -270,7 +268,7 @@ function astRecord(value: StructuredDataInput, context: string): AstRecord {
 
 function astNode(value: StructuredDataInput, context: string): AstNode {
   const node = astRecord(value, context);
-  if (typeof node.type !== "string") {
+  if (!isString(node.type)) {
     throw new Error(`${context} must be an AST node.`);
   }
   // SAFETY: The record and string type-tag checks establish an AST node.
@@ -293,7 +291,7 @@ function unwrapExpression(expression: AstNode): AstNode {
 function numericLiteral(expression: AstNode, context: string): number {
   const value = unwrapExpression(expression);
   let parsed: number;
-  if (value.type === "NumericLiteral" && typeof value.value === "number") {
+  if (value.type === "NumericLiteral" && isNumber(value.value)) {
     parsed = value.value;
   } else if (
     value.type === "UnaryExpression" &&
@@ -315,7 +313,7 @@ function numericLiteral(expression: AstNode, context: string): number {
 
 function fastCheckSeed(value: StructuredDataInput, context: string): number {
   if (
-    typeof value !== "number" ||
+    !isNumber(value) ||
     !Number.isSafeInteger(value) ||
     value < minimumFastCheckSeed ||
     value > maximumFastCheckSeed
@@ -329,7 +327,7 @@ function fastCheckSeed(value: StructuredDataInput, context: string): number {
 
 function staticString(expression: AstNode, context: string): string {
   const value = unwrapExpression(expression);
-  if (value.type === "StringLiteral" && typeof value.value === "string") {
+  if (value.type === "StringLiteral" && isString(value.value)) {
     return value.value;
   }
   if (
@@ -356,12 +354,12 @@ function staticString(expression: AstNode, context: string): string {
 }
 
 function propertyName(name: AstNode, context: string): string {
-  if (name.type === "Identifier" && typeof name.name === "string") {
+  if (name.type === "Identifier" && isString(name.name)) {
     return name.name;
   }
   if (
     (name.type === "StringLiteral" || name.type === "NumericLiteral") &&
-    (typeof name.value === "string" || typeof name.value === "number")
+    (isString(name.value) || isNumber(name.value))
   ) {
     return `${name.value}`;
   }
@@ -375,7 +373,7 @@ function optionsObject(
   seen: ReadonlySet<string> = new Set(),
 ): ReadonlyMap<string, AstNode> {
   const value = unwrapExpression(expression);
-  if (value.type === "Identifier" && typeof value.name === "string") {
+  if (value.type === "Identifier" && isString(value.name)) {
     if (seen.has(value.name)) {
       throw new Error(`${context} contains a circular options declaration.`);
     }
@@ -463,12 +461,12 @@ function parsePropertyAllocations(
         for (const item of value) collectDeclarations(item);
         return;
       }
-      if (value == null || typeof value !== "object") return;
+      if (!isObject(value)) return;
       // SAFETY: Babel traversal supplies AST records after the object check.
       const node = value as AstRecord;
       if (node.type === "VariableDeclarator" && node.init != null) {
         const name = astNode(node.id, `${source.path} variable name`);
-        if (name.type === "Identifier" && typeof name.name === "string") {
+        if (name.type === "Identifier" && isString(name.name)) {
           const matches = declarations.get(name.name) ?? [];
           matches.push(
             astNode(node.init, `${source.path} variable initializer`),
@@ -487,7 +485,7 @@ function parsePropertyAllocations(
         for (const item of value) visit(item);
         return;
       }
-      if (value == null || typeof value !== "object") return;
+      if (!isObject(value)) return;
       // SAFETY: Babel traversal supplies AST records after the object check.
       const rawNode = value as AstRecord;
       if (rawNode.type === "CallExpression") {
@@ -589,7 +587,7 @@ interface PropertySeedFamily {
 }
 
 function registryInteger(value: StructuredDataInput, context: string): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value)) {
+  if (!isNumber(value) || !Number.isSafeInteger(value)) {
     throw new Error(`${context} must be a safe integer.`);
   }
   return value;
@@ -1100,10 +1098,7 @@ function git(args: readonly string[]): string {
     }).trim();
   } catch (error) {
     const detail =
-      error != null &&
-      typeof error === "object" &&
-      "stderr" in error &&
-      typeof error.stderr === "string"
+      isObject(error) && "stderr" in error && isString(error.stderr)
         ? error.stderr.trim()
         : `${error}`;
     throw new Error(`git ${args.join(" ")} failed: ${detail}`, {
@@ -1248,12 +1243,7 @@ function currentResultPartitionPaths(): readonly string[] {
       .filter((path) => path.endsWith(".yaml"))
       .map((path) => `results/${path.replaceAll("\\", "/")}`);
   } catch (error) {
-    if (
-      error != null &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
+    if (isObject(error) && "code" in error && error.code === "ENOENT") {
       return [];
     }
     throw error;

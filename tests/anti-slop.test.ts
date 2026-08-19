@@ -128,6 +128,45 @@ try {
       }),
     ),
   );
+  await test("no-runtime-typeof allows explicit type guards", async () => {
+    const directory = join(temporaryRoot, "no-runtime-typeof-guards");
+    await mkdir(directory);
+    await writeFile(
+      join(directory, ".oxlintrc.json"),
+      JSON.stringify({
+        jsPlugins: [{ name: "anti-slop", specifier: pluginPath }],
+        rules: {
+          "anti-slop/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
+        },
+      }),
+    );
+    await writeFile(
+      join(directory, "guard.ts"),
+      [
+        "export function isString<T>(value: T): value is T & string {",
+        '  return typeof value === "string";',
+        "}",
+      ].join("\n"),
+    );
+    await writeFile(
+      join(directory, "violation.ts"),
+      [
+        "declare const value: string | number;",
+        'export const x = typeof value === "string";',
+      ].join("\n"),
+    );
+
+    const result = spawnSync(
+      process.execPath,
+      [oxlintPath, "--format", "unix", directory],
+      { encoding: "utf8" },
+    );
+    const output = `${result.stdout}${result.stderr}`;
+    assert.equal(result.status, 1, output);
+    assert.match(output, /anti-slop\(no-runtime-typeof\)/u);
+    assert.match(output, /violation\.ts/u);
+    assert.doesNotMatch(output, /guard\.ts/u);
+  });
 } finally {
   await rm(temporaryRoot, { recursive: true, force: true });
 }

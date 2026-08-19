@@ -7,6 +7,7 @@ import {
   parseRegExpPattern,
   printRegExpPattern,
 } from "../../packages/compiler/src/index.ts";
+import { isString } from "../../tools/value-kinds.ts";
 import type {
   RegExpAlternative,
   RegExpClassItem,
@@ -484,7 +485,7 @@ function printTerm(
   if (term.kind === "reference") {
     const target = referenceTarget(term, context);
     if (target == null) return printCharacter(0x61, context, false, digitGuard);
-    return typeof target === "string" ? `\\k<${target}>` : `\\${target.index}`;
+    return isString(target) ? `\\k<${target}>` : `\\${target.index}`;
   }
   const index = term.capturing ? cursor.count + 1 : 0;
   if (term.capturing) cursor.count += 1;
@@ -560,7 +561,7 @@ function summarizeModelTerm(
   if (term.kind === "reference") {
     const target = referenceTarget(term, context);
     if (target == null) return `char:${0x61}`;
-    if (typeof target === "string") {
+    if (isString(target)) {
       const indices = context.captures
         .filter((capture) => capture.name === target)
         .map((capture) => capture.index);

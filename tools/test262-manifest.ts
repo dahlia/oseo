@@ -16,6 +16,7 @@ import {
   parsedObject as record,
   type StructuredDataInput,
 } from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
 
 const classifications = new Set<Test262Classification>([
   "expected-negative",
@@ -57,7 +58,7 @@ interface ManifestPartitionReference {
 }
 
 function stringValue(value: StructuredDataInput, description: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
@@ -67,7 +68,7 @@ function stringArray(
   value: StructuredDataInput,
   description: string,
 ): readonly string[] {
-  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+  if (!Array.isArray(value) || value.some((item) => !isString(item))) {
     throw new Error(`${description} must be an array of strings.`);
   }
   // SAFETY: The array and element checks establish the string sequence.
@@ -80,7 +81,7 @@ function classification(
 ): Test262Classification {
   // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
-  if (typeof value === "string" && classifications.has(candidate)) {
+  if (isString(value) && classifications.has(candidate)) {
     return candidate;
   }
   throw new Error(`${description} is invalid.`);

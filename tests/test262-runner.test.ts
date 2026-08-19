@@ -34,6 +34,7 @@ import type {
   Test262Executor,
 } from "../tools/test262.ts";
 import type { Test262Result } from "../packages/testkit/src/index.ts";
+import { isString } from "../tools/value-kinds.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
 const harnesses = {
@@ -1439,7 +1440,7 @@ test("executes module cases with explicit module intent", async () => {
     );
     assert.ok(
       result.execution?.moduleGraph?.every(
-        (node) => typeof node.sourceHash === "string" && node.sourceHash !== "",
+        (node) => isString(node.sourceHash) && node.sourceHash !== "",
       ),
     );
   } finally {

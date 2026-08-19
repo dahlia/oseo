@@ -127,6 +127,10 @@ function isSourceRange<T>(value: T): value is T & SourceRange {
   );
 }
 
+function isNonNullObject<T>(value: T): value is T & object {
+  return value !== null && typeof value === "object";
+}
+
 /** Retain module identity on every owned range before graph HIR is merged. */
 function retainModuleSource<T>(value: T, sourceId: string): T {
   if (isSourceRange(value)) {
@@ -141,7 +145,7 @@ function retainModuleSource<T>(value: T, sourceId: string): T {
       value.map((item) => retainModuleSource(item, sourceId)) as T
     );
   }
-  if (value == null || typeof value !== "object") return value;
+  if (!isNonNullObject(value)) return value;
   // SAFETY: Recursing over every entry preserves the input object's structure.
   return Object.fromEntries(
     Object.entries(value).map(([key, item]) => [

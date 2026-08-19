@@ -5,6 +5,8 @@ import { readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { isObject, isString } from "./value-kinds.ts";
+
 const numericIdentifier = String.raw`(?:0|[1-9]\d*)`;
 const dotIdentifier = String.raw`[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*`;
 const alphanumericIdentifier = String.raw`\d*[A-Za-z-][0-9A-Za-z-]*`;
@@ -89,7 +91,7 @@ function parseManifest(bytes: string, path: string): PackageManifest {
   try {
     // SAFETY: The following object check establishes a manifest record.
     const value = JSON.parse(bytes) as unknown;
-    if (value == null || typeof value !== "object" || Array.isArray(value)) {
+    if (!isObject(value) || Array.isArray(value)) {
       throw new Error("manifest is not an object");
     }
     // SAFETY: Workspace manifests are trusted repository inputs.
@@ -120,7 +122,7 @@ function requirePackageName(
   value: PackageManifest["name"],
   path: string,
 ): string {
-  if (typeof value !== "string" || !value.startsWith("@oseo/")) {
+  if (!isString(value) || !value.startsWith("@oseo/")) {
     throw new Error(`${path} must name a public @oseo/* package.`);
   }
   return value;
@@ -138,11 +140,11 @@ function checkInternalDependencies(
   ];
   for (const field of fields) {
     if (field == null) continue;
-    if (typeof field !== "object" || Array.isArray(field)) {
+    if (!isObject(field) || Array.isArray(field)) {
       throw new Error(`${path} dependency fields must be objects.`);
     }
     for (const [name, range] of Object.entries(field)) {
-      if (typeof range !== "string") {
+      if (!isString(range)) {
         throw new Error(`${path} dependency ranges must be strings.`);
       }
       if (!name.startsWith("@oseo/")) continue;

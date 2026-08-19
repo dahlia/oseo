@@ -479,8 +479,12 @@ interface ProcessStartFailure {
   readonly failure: "resource-exhaustion" | "unknown";
 }
 
+function isNonNullObject<T>(value: T): value is T & object {
+  return value !== null && typeof value === "object";
+}
+
 function processStartFailure(cause: unknown): ProcessStartFailure {
-  if (cause != null && typeof cause === "object") {
+  if (isNonNullObject(cause)) {
     const code = "code" in cause ? cause.code : undefined;
     const name = "name" in cause ? cause.name : undefined;
     if (

@@ -12,6 +12,7 @@ import {
   parsedObject as record,
   type StructuredDataInput,
 } from "./structured-data.ts";
+import { isString } from "./value-kinds.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const policyPath = join(repositoryRoot, "tests/test262/inventory-policy.yaml");
@@ -63,7 +64,7 @@ export interface Test262InventorySummary {
 }
 
 function stringValue(value: StructuredDataInput, description: string): string {
-  if (typeof value !== "string" || value.length === 0) {
+  if (!isString(value) || value.length === 0) {
     throw new Error(`${description} must be a non-empty string.`);
   }
   return value;
@@ -84,7 +85,7 @@ function stringArray(
 ): readonly string[] {
   if (
     !Array.isArray(value) ||
-    value.some((entry) => typeof entry !== "string" || entry.length === 0)
+    value.some((entry) => !isString(entry) || entry.length === 0)
   ) {
     throw new Error(`${description} must be an array of non-empty strings.`);
   }

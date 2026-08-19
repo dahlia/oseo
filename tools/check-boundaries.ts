@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import type { StructuredDataValue } from "./structured-data.ts";
+import { isObject, isString } from "./value-kinds.ts";
 
 interface Manifest {
   readonly dependencies?: Readonly<Record<string, string>>;
@@ -55,7 +56,7 @@ interface SyntaxNode {
 }
 
 function syntaxNode<T>(value: T): SyntaxNode | undefined {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+  if (!isObject(value) || Array.isArray(value)) {
     return undefined;
   }
   // SAFETY: The object check establishes this open AST record.
@@ -64,7 +65,7 @@ function syntaxNode<T>(value: T): SyntaxNode | undefined {
 
 function stringLiteralValue<T>(value: T): string | undefined {
   const node = syntaxNode(value);
-  if (node?.type !== "StringLiteral" || typeof node.value !== "string") {
+  if (node?.type !== "StringLiteral" || !isString(node.value)) {
     return undefined;
   }
   return node.value;

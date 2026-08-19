@@ -195,14 +195,22 @@ interface CacheLockObservation {
   readonly ownerPath?: string | undefined;
 }
 
+function isCacheLockOwner(
+  value: Partial<CacheLockOwner>,
+): value is CacheLockOwner {
+  return (
+    typeof value.token === "string" &&
+    /^[A-Za-z0-9-]+$/u.test(value.token) &&
+    typeof value.expiresAtMilliseconds === "number" &&
+    Number.isFinite(value.expiresAtMilliseconds)
+  );
+}
+
 function parseCacheLockOwner(contents: string): CacheLockOwner | undefined {
   try {
     // SAFETY: The optional fields are validated before this value is returned.
     const value = JSON.parse(contents) as Partial<CacheLockOwner>;
-    return typeof value.token === "string" &&
-      /^[A-Za-z0-9-]+$/u.test(value.token) &&
-      typeof value.expiresAtMilliseconds === "number" &&
-      Number.isFinite(value.expiresAtMilliseconds)
+    return isCacheLockOwner(value)
       ? {
           expiresAtMilliseconds: value.expiresAtMilliseconds,
           token: value.token,

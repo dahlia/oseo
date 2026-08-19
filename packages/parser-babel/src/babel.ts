@@ -93,8 +93,32 @@ export interface SourceIndex {
 export type AssignmentArrayBindingElement =
   SyntaxArrayBindingPattern<SyntaxAssignmentPattern>["elements"][number];
 
+export function isBoolean<Candidate>(
+  value: Candidate,
+): value is Candidate & boolean {
+  return typeof value === "boolean";
+}
+
+export function isNumber<Candidate>(
+  value: Candidate,
+): value is Candidate & number {
+  return typeof value === "number";
+}
+
+export function isObject<Candidate>(
+  value: Candidate,
+): value is Candidate & object {
+  return value !== null && typeof value === "object";
+}
+
+export function isString<Candidate>(
+  value: Candidate,
+): value is Candidate & string {
+  return typeof value === "string";
+}
+
 export function node<T>(value: T): BabelNode | undefined {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+  if (!isObject(value) || Array.isArray(value)) {
     return undefined;
   }
   // SAFETY: BabelNode is an open record and the object check establishes it.

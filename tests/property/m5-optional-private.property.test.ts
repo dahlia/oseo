@@ -20,6 +20,7 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { isNumber } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -96,10 +97,9 @@ function expected(testCase: OptionalPrivateCase): OptionalPrivateModel {
   const argument = argumentValue(testCase);
   return {
     order: "base argument call ",
-    result:
-      typeof argument === "number"
-        ? testCase.value + argument
-        : `${testCase.value}${argument}`,
+    result: isNumber(argument)
+      ? testCase.value + argument
+      : `${testCase.value}${argument}`,
     throwsTypeError: false,
   };
 }

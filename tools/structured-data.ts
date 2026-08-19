@@ -1,3 +1,5 @@
+import { isBoolean, isNumber, isObject, isString } from "./value-kinds.ts";
+
 /** A recursively structured value produced by the repository's data parsers. */
 export type StructuredDataValue =
   | StructuredDataRecord
@@ -23,7 +25,7 @@ function isStructuredDataRecord<Candidate>(
   ancestors: WeakSet<object>,
   validated: WeakSet<object>,
 ): value is StructuredDataInput<Candidate> & StructuredDataRecord {
-  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+  if (!isObject(value) || Array.isArray(value)) {
     return false;
   }
   const prototype = Object.getPrototypeOf(value);
@@ -44,12 +46,7 @@ function isStructuredDataValue<Candidate>(
   ancestors: WeakSet<object>,
   validated: WeakSet<object>,
 ): value is StructuredDataInput<Candidate> & StructuredDataValue {
-  if (
-    value == null ||
-    typeof value === "boolean" ||
-    typeof value === "number" ||
-    typeof value === "string"
-  ) {
+  if (value == null || isBoolean(value) || isNumber(value) || isString(value)) {
     return true;
   }
   if (Array.isArray(value)) {

@@ -5,7 +5,12 @@ import type {
   RegExpPatternError,
 } from "@oseo/compiler";
 
-import type { BabelNode, ConvertContext, SourceIndex } from "./babel.ts";
+import {
+  isString,
+  type BabelNode,
+  type ConvertContext,
+  type SourceIndex,
+} from "./babel.ts";
 import { byteOffset, location, offsets, positionAt } from "./locations.ts";
 
 /**
@@ -21,7 +26,7 @@ export function regExpLiteralSyntax(
 ): RegExpLiteralSyntax | undefined {
   const pattern = value.pattern;
   const flags = value.flags ?? "";
-  if (typeof pattern !== "string" || typeof flags !== "string") {
+  if (!isString(pattern) || !isString(flags)) {
     return undefined;
   }
   return {

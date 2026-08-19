@@ -21,6 +21,7 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { isString } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -148,7 +149,7 @@ function effectiveLeaf(head: HeadKind, leaf: LeafKind): LeafKind {
  * generated names can reach.
  */
 function getV(value: ModelValue, name: string): ModelValue {
-  if (typeof value !== "string") return undefined;
+  if (!isString(value)) return undefined;
   if (name === "length") return value.length;
   if (name === "0") return value.length > 0 ? value[0] : undefined;
   return undefined;
