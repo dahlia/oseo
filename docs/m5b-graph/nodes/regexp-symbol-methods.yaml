@@ -20,4 +20,8 @@ dependencies:
   - string-prototype-match-and-split
   - string-prototype-replace
 landed: false
-status: blocked
+status: parked
+reason: "The string-prototype-replace prerequisite exhausted its five-round
+  mandatory review cycle with contradictory RegExp dependency-tag delivery
+  status still recorded in the living plans. Resume after that prerequisite
+  completes a new clean review cycle."

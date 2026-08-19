@@ -11,4 +11,9 @@ inventory:
 dependencies:
   - string-prototype-match-and-split
 landed: false
-status: ready
+status: parked
+reason: "Mandatory codex review still found contradictory RegExp delivery
+  status after five rounds: PLAN-REGEXP.md calls delivery item 1 landed while
+  its dependency-tag work remains open, and PLAN-M5.md retains the superseded
+  first-selected-case tagging policy. Preserve branch m5b-string-replace for
+  plan reconciliation and a new clean review cycle."
