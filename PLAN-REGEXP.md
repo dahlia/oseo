@@ -4,8 +4,8 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1 and 2 landed; matcher, intrinsic, and
-probe work not started. This plan defines the M5 semantic and compilation
+Implementation status: delivery items 1, 2, and 3 landed; intrinsic, literal,
+and probe work not started. This plan defines the M5 semantic and compilation
 boundary for ECMAScript regular expressions. It does not admit regular
 expression literals or the `RegExp` family to the active language profile,
 select one matcher strategy, or add a repository command before
@@ -15,8 +15,11 @@ The owned pattern AST, parser, validator, limits, extension points, and
 structural dump live in `@oseo/compiler`, and the frontend validates a
 literal's retained pattern and flag text there.
 [*docs/regexp-inventory.md*](./docs/regexp-inventory.md) is the delivery
-item 1 inventory. Nothing evaluates a pattern, so a valid literal still
-reports the profile boundary.
+item 1 inventory. The generic matcher artifact and its executor live in the
+same package and are the semantic authority for the admitted grammar.
+Nothing in a compiled program reaches them yet, so a valid literal still
+reports the profile boundary and the `RegExp` family stays outside the
+active profile.
 
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
@@ -287,6 +290,47 @@ same owned pattern, input, start index, and flags. The implementation should
 share validators, canonical pattern fixtures, and match-state comparison even
 if build-time and run-time parsers cannot share executable source initially.
 
+That authority now exists. `buildRegExpMatcher` compiles one validated
+pattern into an immutable artifact, and `matchRegExpMatcher` and
+`searchRegExpMatcher` execute it. The artifact is a flat instruction
+program over a register file: capture registers, repetition counters and
+positions, and lookaround frames. It carries no mutable field and no
+reference to a regular expression object, so equal artifacts may be shared
+while every evaluation still owns its object identity and `lastIndex`.
+
+The executor holds an explicit backtrack stack and an undo trail rather
+than a native call stack, so backtracking depth is data and a later C
+lowering needs no recursion. Every register write is trailed, so one
+backtrack entry restores the whole state by truncating the trail. A
+lookaround runs as an atomic submatch: its body's remaining choices are
+discarded when it finishes, a positive assertion keeps the captures its
+body set and restores the entry position, and a negative one restores
+both and fails.
+
+Choice order, capture reset and visibility, assertion and lookaround
+behavior, backreference resolution, quantifier priority, empty-progress
+failure, UTF-16 and code-point iteration, and canonicalization are frozen
+by that pair. Positions are UTF-16 code-unit indices, and under `u` or `v`
+they always name a code-point boundary: a start index that splits a
+surrogate pair names the pair, and the search advances past the whole
+pair, which is what
+*test/built-ins/RegExp/prototype/exec/u-lastindex-adv.js* requires.
+
+Ignore-case behavior is decided while the artifact is built. Each
+consuming atom becomes one code-point set closed under the pattern's
+canonicalization, and a negated class is complemented after that closing,
+which is the order `CharacterSetMatcher` uses. Only a backreference has to
+compare two input characters at run time, so only a pattern with both `i`
+and a backreference carries a canonicalization table. The two unicode-mode flags
+complement a property differently: `v` folds a property set before
+complementing it over the folded code points, while `u` complements the
+unfolded set and canonicalizes afterwards, so `\P{Ll}` accepts a lowercase
+letter under `iu` and refuses it under `iv`.
+
+An inline modifier group has no matcher lowering: the unit that admits
+that syntax owns its flag scoping, and until then the builder refuses it
+with a located error rather than matching it with the outer flags.
+
 An ahead-of-time path that implements the complete matcher IR does not need a
 run-time guard merely because it is native code. A path that assumes a string
 layout, simple case-folding class, bounded capture count, or other narrower
@@ -393,6 +437,12 @@ regenerates the tables and `mise run check:unicode-tables` fails when the
 checked-in module is not what the pinned inputs produce, offline in both
 directions.
 
+The generic matcher reads the tables through its caller rather than
+directly, so the builder resolves `\d`, `\s`, `\w`, `\p`, and every
+ignore-case closure into inversion lists while the artifact is built and
+the executor needs no table at all. That keeps the package boundary and
+already gives an artifact one native lowering could consume unchanged.
+
 Two pieces remain. Properties of strings, which only the `v` flag needs,
 are out of scope for that package: they are sequence rather than code-point
 properties and need emoji sequence files it does not pin, so the unit that
@@ -413,6 +463,17 @@ Any implementation-defined resource failure needs an owned, testable boundary
 consistent with the candidate edition and the runtime's existing allocation
 policy. Avoiding pathological work through a semantics-preserving algorithm is
 preferred to imposing a new observable limit.
+
+The generic matcher's boundaries are those of the artifact and of one
+attempt. Building one reports a located `limit` error when a pattern needs
+more instructions or registers than the reviewed limits allow. Executing
+one reports a distinct `limit` outcome naming the boundary reached, over
+instruction steps, backtrack entries, and trail entries. Each boundary is
+deterministic, so the same artifact, input, and limits produce the same
+answer on every host and target, and lowering a limit can only replace an
+answer with that failure rather than with a different match. None of these
+is observable yet: the unit that adds the `RegExp` intrinsic decides what
+a reached boundary means to a program.
 
 
 Optimization contract
@@ -554,7 +615,14 @@ Delivery order
     until it prints source.
 3.  Implement and test a generic matcher artifact and executor for the complete
     admitted pattern grammar. Freeze its choice, capture, Unicode, and resource
-    behavior before adding native literal lowering.
+    behavior before adding native literal lowering. Landed, in
+    `@oseo/compiler`, with an instruction dump, reviewed artifact and
+    execution limits, and a generated domain at seeds `0x60004d00` and
+    `0x60004d01`. The compiler core still links no Unicode data, so the
+    builder takes case-equivalence classes, `Space_Separator`, and property
+    escape sets from its caller and refuses a pattern whose facts the caller
+    did not supply. The artifact reaches no compiled program: item 4 links it
+    to the runtime.
 4.  Add the `RegExp` intrinsic, allocation, initialization, object state,
     built-in execution, result construction, and catchable dynamic-pattern
     errors. Trace dynamic artifacts and matcher work areas.

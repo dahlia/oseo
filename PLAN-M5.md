@@ -4293,6 +4293,79 @@ inventory that delivery item 1 requires. The reviewed `regular-expressions`
 dependency tag is not added: ADR 0013 freezes that vocabulary, and
 PLAN-REGEXP.md adds the tag with the first reviewed case that carries it.
 
+Implemented M5b node `regexp-generic-matcher` adds the generic matcher
+artifact and executor that
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) delivery item 3 defines, and admits no
+execution to a compiled program. `@oseo/compiler` gains
+`buildRegExpMatcher`, which compiles one validated pattern into an
+immutable instruction artifact, `matchRegExpMatcher` and
+`searchRegExpMatcher`, which execute it, and an instruction dump. The
+artifact is the semantic authority for the admitted grammar: an
+ahead-of-time lowering and any later fast path must reproduce the match
+state it produces.
+
+The artifact is a flat program over a register file holding capture pairs,
+repetition counters and positions, and lookaround frames. It carries no
+mutable field and no reference to a regular expression object, so equal
+artifacts may be shared while every evaluation still owns its identity and
+`lastIndex`. The executor keeps an explicit backtrack stack and an undo
+trail instead of a native call stack, which is what lets a later C lowering
+backtrack without recursion; every register write is trailed, so one
+backtrack entry restores the whole state by truncating it.
+
+Choice order, capture reset and visibility, edge and word-boundary
+assertions, lookaround as an atomic submatch, backreference resolution
+across duplicate group names, greedy and lazy priority, empty-progress
+failure, and both iteration modes are frozen here. Positions are UTF-16
+code-unit indices that always name a code-point boundary under `u` and `v`,
+so a start index inside a surrogate pair names the pair and the search
+advances past the whole pair. Ignore-case behavior is decided while the
+artifact is built: each consuming atom becomes one set closed under the
+pattern's canonicalization, and a negated class is complemented after that
+closing. Only a backreference compares two input characters at run time, so
+only a pattern with both `i` and a backreference carries a canonicalization
+table. The two unicode-mode flags complement a property
+differently, so `\P{Ll}` accepts a lowercase letter under `iu` and refuses
+it under `iv`. An inline modifier group has no matcher lowering and is refused
+with a located error, because the unit that admits that syntax owns its flag
+scoping. Building and executing report owned `limit` outcomes over
+instructions, registers, steps, backtrack entries, and trail entries, and a
+lowered limit can only replace an answer with that failure.
+
+The compiler core still links no Unicode data. The builder takes
+case-equivalence classes for the pattern's mode, the `Space_Separator`
+category, and property escape sets from its caller, owns every ECMAScript
+decision made from them, and refuses a pattern whose facts the caller did
+not supply. The cross-package suite is that caller: it wires
+`@oseo/unicode` in and then compares the derived `WordCharacters` with the
+pinned word-character tables and every class escape with the host engine
+across the basic plane.
+
+Evidence is focused artifact, executor, refusal, and limit tests with exact
+dumps, messages, and spans, a host-differential corpus that runs unchanged
+under Node.js and Deno inside ASCII, a cross-package corpus over the pinned
+tables, and a generated domain at seeds `0x60004d00` and `0x60004d01` whose
+oracles are the host engine and a structural walk over the artifact. The
+generated domain found and fixed one defect: a repetition nested in another
+one resumed the count it left behind instead of starting over, so the inner
+quantifier stopped iterating after the outer body ran once. It is retained
+as a fixed regression case. It also isolated one position family the host
+does not implement as the edition specifies, a zero-width assertion
+evaluated between the two code units of a surrogate pair; that case is
+recorded as an example with its derivation and excluded from the generated
+oracle.
+
+Because the node admits no execution, it claims no language family, adds no
+reviewed test262 path, and needs no native, standards, or forced-collection
+evidence. It adds no specialized path, no hint, and no MIR or backend
+surface, so the specialization policy cannot reach the matcher; the suite
+records that by compiling one literal under both policies. The manifest
+stays at 11,441 paths with 8,468 passes. Property domains, seeds, and case
+budget move from 91, 91, and 3,982 to 93, 93, and 4,582, and no override is
+used. The runtime ABI does not move and no built-in code range is
+allocated, because nothing in the runtime reaches the artifact yet;
+PLAN-REGEXP.md delivery item 4 links it there.
+
 Implemented M5b node `bigint-intrinsic` materializes the callable `BigInt`
 intrinsic, `%BigInt.prototype%`, branded wrapper objects, `asIntN`, `asUintN`,
 `toString`, `toLocaleString`, and `valueOf` over the exact primitive admitted
