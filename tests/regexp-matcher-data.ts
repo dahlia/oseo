@@ -47,6 +47,16 @@ function canonicalizeCodeUnit(unit: number): number {
   return mapped;
 }
 
+/**
+ * Group the code points one mode canonicalizes together.
+ *
+ * Every bucket is keyed by its canonical code point and seeded with it, so
+ * a self-canonical code point whose bucket a lower member already created
+ * is present once and must not be appended again. Under `u` or `v` simple
+ * case folding usually names a later code point, which makes that the
+ * ordinary order rather than an edge case: `A` creates the bucket `a`
+ * names, and `a` then reaches a bucket it already occupies.
+ */
 function buildClasses(unicodeMode: boolean): readonly (readonly number[])[] {
   const last = unicodeMode ? maxCodePoint : 0xff_ff;
   const buckets = new Map<number, number[]>();
@@ -54,8 +64,8 @@ function buildClasses(unicodeMode: boolean): readonly (readonly number[])[] {
     const canonical = unicodeMode
       ? simpleCaseFolding(codePoint)
       : canonicalizeCodeUnit(codePoint);
-    if (canonical === codePoint && !buckets.has(codePoint)) {
-      buckets.set(codePoint, [codePoint]);
+    if (canonical === codePoint) {
+      if (!buckets.has(codePoint)) buckets.set(codePoint, [codePoint]);
       continue;
     }
     const members = buckets.get(canonical);

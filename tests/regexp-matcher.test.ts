@@ -38,6 +38,7 @@ import {
 } from "../packages/unicode/src/index.ts";
 
 import {
+  caseEquivalenceClasses,
   propertyEscapeSet,
   unicodeMatcherData,
 } from "./regexp-matcher-data.ts";
@@ -212,6 +213,48 @@ test("compares backreference characters through the artifact's table", () => {
   assert.equal(observe("(.)\\1", "i", "ſS"), undefined);
   assert.equal(artifact("(.)\\1", "u").canonicalization, undefined);
   assert.equal(artifact(".", "iu").canonicalization, undefined);
+});
+
+/*
+ * The provider groups code points into buckets keyed by their canonical
+ * form, and a bucket is seeded with that key. Simple case folding usually
+ * names a code point above the one it folds, so a self-canonical code
+ * point ordinarily reaches a bucket a lower member already created and
+ * must not be recorded twice. A duplicated member reaches the artifact as
+ * a repeated `characters` entry, which breaks the strictly-increasing
+ * invariant the executor's table documents and grows every ignore-case
+ * backreference artifact.
+ */
+test("provides each case-equivalence member exactly once", () => {
+  for (const unicodeMode of [false, true]) {
+    for (const members of caseEquivalenceClasses(unicodeMode)) {
+      assert.equal(
+        new Set(members).size,
+        members.length,
+        `a class repeats a member under unicodeMode ${unicodeMode}: ` +
+          `${members.join(",")}`,
+      );
+    }
+  }
+});
+
+test("records a strictly increasing canonicalization table", () => {
+  for (const flags of ["i", "iu", "iv"]) {
+    const table = artifact("(a)\\1", flags).canonicalization;
+    if (table == null) throw new Error(`/(a)\\1/${flags} records a table`);
+    assert.equal(table.characters.length, table.canonical.length);
+    assert.ok(table.characters.length > 0);
+    for (let offset = 0; offset < table.characters.length; offset += 1) {
+      const character = table.characters[offset] ?? -1;
+      if (offset > 0) {
+        assert.ok(
+          character > (table.characters[offset - 1] ?? -1),
+          `/(a)\\1/${flags} repeats or unsorts ${character}`,
+        );
+      }
+      assert.ok((table.canonical[offset] ?? -1) < character);
+    }
+  }
 });
 
 /*
