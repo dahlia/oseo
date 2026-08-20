@@ -7,5 +7,5 @@ delivers: "Implements the semantic-authority matcher artifact and executor for
 dependencies:
   - regexp-pattern-ast
   - unicode-tables
-landed: false
+landed: true
 status: ready

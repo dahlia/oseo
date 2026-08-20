@@ -14,4 +14,4 @@ dependencies:
   - regexp-generic-matcher
   - well-known-symbols
 landed: false
-status: blocked
+status: ready
