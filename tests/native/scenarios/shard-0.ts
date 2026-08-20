@@ -743,4 +743,45 @@ setTimeout(task, delay);
   assert.equal(descriptorFieldReadOrder.exitStatus, 0);
   assert.equal(descriptorFieldReadOrder.stdout, "threw true\necvwgs\n");
   assert.equal(descriptorFieldReadOrder.stderr, "");
+
+  // A DataView owns no Data Block, so the record it publishes is its only
+  // allocation. A failed allocation there must report the owned OSEO2001
+  // diagnostic and leave no partly built view behind, so the program
+  // prints nothing after the marker and exits nonzero.
+  const dataViewAllocationHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_data_view.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "    OseoDataView *view =\n" +
+          "        oseo_internal_allocate_heap_bytes(context, sizeof(*view));",
+        "    OseoDataView *view = NULL;",
+      );
+      assert.notEqual(injected, source, "DataView allocation failure injected");
+      return injected;
+    },
+  };
+  const dataViewAllocation = await runNativeCli(
+    {
+      args: ["data-view-allocation.ts"],
+      source:
+        'console.log("before");\n' +
+        "console.log(new DataView(new ArrayBuffer(8)).byteLength);",
+      sourceId: "data-view-allocation.ts",
+      version: "0.1.0",
+    },
+    dataViewAllocationHost,
+  );
+  assert.equal(dataViewAllocation.exitStatus, 1);
+  assert.equal(dataViewAllocation.stdout, "before\n");
+  assert.match(
+    dataViewAllocation.stderr,
+    /error\[OSEO2001\].*DataView allocation failed/u,
+  );
 }

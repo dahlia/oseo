@@ -1311,6 +1311,39 @@ static OseoResult bigint_as_width_rooted(
     return result;
 }
 
+uint64_t oseo_internal_bigint_to_raw_uint64(OseoValue value) {
+    const OseoBigInt *integer = bigint_object(value);
+    /*
+     * The limbs are little-endian and each holds BIGINT_BITS bits, so
+     * three of them span the low 64 bits and every higher limb only
+     * contributes multiples of 2**64. Unsigned overflow is the modulo
+     * this conversion wants, so the discarded bits need no separate
+     * reduction.
+     */
+    size_t limit = integer->length < 3u ? integer->length : 3u;
+    uint64_t magnitude = 0u;
+    for (size_t index = limit; index > 0u; index -= 1u) {
+        magnitude = (magnitude << BIGINT_BITS) |
+            (uint64_t)integer->limbs[index - 1u];
+    }
+    /* Two's complement over the same 64-bit width, which is the
+     * specified ToBigUint64 of a negative operand. */
+    return integer->negative ? UINT64_C(0) - magnitude : magnitude;
+}
+
+OseoResult oseo_internal_bigint_from_uint64(
+    OseoContext *context,
+    uint64_t magnitude,
+    bool negative
+) {
+    uint32_t limbs[3];
+    for (size_t index = 0u; index < 3u; index += 1u) {
+        limbs[index] = (uint32_t)(magnitude & BIGINT_MASK);
+        magnitude >>= BIGINT_BITS;
+    }
+    return publish_bigint(context, negative, limbs, 3u);
+}
+
 OseoResult oseo_internal_bigint_as_width(
     OseoContext *context,
     OseoValue value,

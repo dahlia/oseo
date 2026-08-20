@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Object/defineProperties/15.2.3.7-5-b-154.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperties/15.2.3.7-5-b-15\
-        4.js:339:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        4.js:350:19: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

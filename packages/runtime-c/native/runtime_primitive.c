@@ -206,6 +206,40 @@ static OseoResult value_text(
     const ConversionAncestor *previous
 );
 
+/*
+ * ToIndex(value), 7.1.22. The admitted result is one integer in the
+ * inclusive interval from 0 to 2**53 - 1, reported as the Number it is.
+ * NaN converts to +0 and every other value truncates toward zero, so
+ * -0.5 is admitted as 0 while -1 is not. `description` is the complete
+ * RangeError message, because each caller names its own argument.
+ */
+OseoResult oseo_internal_to_index(
+    OseoContext *context,
+    OseoValue value,
+    const char *description,
+    double *index
+) {
+    OseoResult number = oseo_internal_to_number(context, value);
+    if (number.status != OSEO_STATUS_NORMAL) return number;
+    double integer = number_value(number.value);
+    if (isnan(integer)) {
+        integer = 0.0;
+    } else if (isfinite(integer)) {
+        integer = trunc(integer);
+    }
+    /* An infinity fails the comparison below rather than truncating, so
+     * both signs reach the same RangeError. */
+    if (!(integer >= 0.0) || integer > OSEO_INDEX_LIMIT) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            description
+        );
+    }
+    *index = integer;
+    return normal(oseo_number(integer));
+}
+
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
     uint64_t tag = tag_of(value);
     if (is_number(value)) return normal(value);

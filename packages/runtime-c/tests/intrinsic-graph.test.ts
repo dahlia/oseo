@@ -786,3 +786,92 @@ test("populates the realm-owned BigInt intrinsic cluster", () => {
   assert.match(internalHeader, /oseo_internal_install_bigint_global/u);
   assert.match(bindingSource, /oseo_internal_install_bigint_global/u);
 });
+
+test("populates the realm-owned DataView intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const bufferSource = sources.get("runtime_array_buffer.c") ?? "";
+  const viewSource = sources.get("runtime_data_view.c") ?? "";
+
+  for (const intrinsic of [
+    "DATA_VIEW_PROTOTYPE",
+    "DATA_VIEW",
+    "DATA_VIEW_BUFFER",
+    "DATA_VIEW_BYTE_LENGTH",
+    "DATA_VIEW_BYTE_OFFSET",
+    "DATA_VIEW_GET_INT8",
+    "DATA_VIEW_GET_BIG_UINT64",
+    "DATA_VIEW_SET_INT8",
+    "DATA_VIEW_SET_BIG_UINT64",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "DataView",
+    "buffer",
+    "byteLength",
+    "byteOffset",
+    "constructor",
+    "getBigInt64",
+    "getBigUint64",
+    "getFloat16",
+    "getFloat32",
+    "getFloat64",
+    "getInt8",
+    "getInt16",
+    "getInt32",
+    "getUint8",
+    "getUint16",
+    "getUint32",
+    "setBigInt64",
+    "setBigUint64",
+    "setFloat16",
+    "setFloat32",
+    "setFloat64",
+    "setInt8",
+    "setInt16",
+    "setInt32",
+    "setUint8",
+    "setUint16",
+    "setUint32",
+  ]) {
+    assert.match(viewSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(viewSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(
+    viewSource,
+    /OseoFunction \*constructor = function_object\(frame\.slots\[1\]\)/u,
+  );
+  assert.match(viewSource, /constructor->prototype_writable = false/u);
+  assert.match(viewSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  // A view owns no Data Block: nothing in the component allocates, frees,
+  // or resizes one, and the collector traces the buffer instead of
+  // releasing anything of the view's own.
+  assert.doesNotMatch(viewSource, /\bfree\s*\(/u);
+  assert.doesNotMatch(viewSource, /oseo_internal_array_buffer_release/u);
+  assert.match(
+    memorySource,
+    new RegExp(
+      String.raw`OSEO_HEAP_DATA_VIEW\) \{` +
+        String.raw`[\s\S]*?mark_value\(\(\(OseoDataView \*\)object\)->buffer`,
+      "u",
+    ),
+  );
+  // Detachment and out-of-bounds are rechecked at every access rather than
+  // cached in the view, and the element bytes move through a local copy so
+  // no access assumes an aligned block.
+  assert.match(viewSource, /data_view_out_of_bounds/u);
+  assert.match(viewSource, /memcpy\(raw, buffer->data \+ offset, /u);
+  assert.match(viewSource, /memcpy\(buffer->data \+ offset, raw, /u);
+  // The BigInt element types reach the representation only through the
+  // owning component's exported raw-integer operations.
+  assert.doesNotMatch(viewSource, /limbs/u);
+  assert.match(internalHeader, /oseo_internal_bigint_to_raw_uint64/u);
+  assert.match(internalHeader, /oseo_internal_bigint_from_uint64/u);
+  assert.match(internalHeader, /oseo_internal_install_data_view_global/u);
+  assert.match(bindingSource, /oseo_internal_install_data_view_global/u);
+  // ArrayBuffer.isView now reports the one admitted view kind.
+  assert.match(bufferSource, /is_data_view\(arguments\[0\]\)/u);
+});

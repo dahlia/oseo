@@ -63,7 +63,8 @@ static void trace_object(
                object->kind == OSEO_HEAP_PROMISE ||
                object->kind == OSEO_HEAP_ARRAY_BUFFER ||
                object->kind == OSEO_HEAP_MAP ||
-               object->kind == OSEO_HEAP_MAP_ITERATOR) {
+               object->kind == OSEO_HEAP_MAP_ITERATOR ||
+               object->kind == OSEO_HEAP_DATA_VIEW) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -154,6 +155,10 @@ static void trace_object(
             }
         } else if (object->kind == OSEO_HEAP_MAP_ITERATOR) {
             mark_value(((OseoMapIterator *)object)->target, worklist);
+        } else if (object->kind == OSEO_HEAP_DATA_VIEW) {
+            /* A view holds no Data Block of its own; tracing its buffer
+             * is what keeps that buffer's block alive. */
+            mark_value(((OseoDataView *)object)->buffer, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -193,7 +198,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_PROMISE ||
         object->kind == OSEO_HEAP_ARRAY_BUFFER ||
         object->kind == OSEO_HEAP_MAP ||
-        object->kind == OSEO_HEAP_MAP_ITERATOR) {
+        object->kind == OSEO_HEAP_MAP_ITERATOR ||
+        object->kind == OSEO_HEAP_DATA_VIEW) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);

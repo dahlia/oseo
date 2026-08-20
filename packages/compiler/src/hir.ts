@@ -365,6 +365,7 @@ export function intrinsicGlobalKind(
     name === "Array" ||
     name === "ArrayBuffer" ||
     name === "BigInt" ||
+    name === "DataView" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "Map" ||

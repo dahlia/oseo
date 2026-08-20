@@ -13,6 +13,8 @@
 #include <string.h>
 
 #define OSEO_CANONICAL_NAN UINT64_C(0x7ff8000000000000)
+/* 2^53 - 1, the largest integer ToIndex admits. */
+#define OSEO_INDEX_LIMIT 9007199254740991.0
 #define OSEO_MAX_ACTIVE_FRAME_SLOTS ((size_t)32768u)
 #define OSEO_MAX_CALL_DEPTH ((size_t)256u)
 /* Node.js and Deno expose this V8 UTF-16 string ceiling. */
@@ -460,6 +462,32 @@
     (OSEO_BIGINT_CODE_ID_RANGE_LAST - 4u)
 #define OSEO_BIGINT_VALUE_OF_CODE_ID (OSEO_BIGINT_CODE_ID_RANGE_LAST - 5u)
 
+#define OSEO_DATA_VIEW_CODE_ID_RANGE_INDEX ((size_t)15u)
+#define OSEO_DATA_VIEW_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_DATA_VIEW_CODE_ID_RANGE_INDEX)
+#define OSEO_DATA_VIEW_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_DATA_VIEW_CODE_ID_RANGE_INDEX)
+#define OSEO_DATA_VIEW_CONSTRUCTOR_CODE_ID OSEO_DATA_VIEW_CODE_ID_RANGE_LAST
+#define OSEO_DATA_VIEW_BUFFER_CODE_ID \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_DATA_VIEW_BYTE_LENGTH_CODE_ID \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_DATA_VIEW_BYTE_OFFSET_CODE_ID \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 3u)
+/*
+ * The eleven get and eleven set accessors keep the element-type order of
+ * `OseoDataViewElement`, so a code ID is the range last minus four or
+ * fifteen plus that element index and dispatch needs no table.
+ */
+#define OSEO_DATA_VIEW_GET_CODE_ID_FIRST \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_DATA_VIEW_GET_CODE_ID_LAST \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_DATA_VIEW_SET_CODE_ID_FIRST \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 25u)
+#define OSEO_DATA_VIEW_SET_CODE_ID_LAST \
+    (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 15u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -510,6 +538,7 @@ typedef enum {
     OSEO_HEAP_ARRAY_BUFFER = 18,
     OSEO_HEAP_MAP = 19,
     OSEO_HEAP_MAP_ITERATOR = 20,
+    OSEO_HEAP_DATA_VIEW = 21,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -969,6 +998,51 @@ typedef struct {
     bool detached;
 } OseoArrayBuffer;
 
+/*
+ * The eleven DataView element types, in the order the prototype's get and
+ * set accessors are created and dispatched. `OSEO_DATA_VIEW_ELEMENT_COUNT`
+ * closes the range; nothing else may be appended without moving the code
+ * IDs derived from these indexes.
+ */
+typedef enum {
+    OSEO_DATA_VIEW_INT8 = 0,
+    OSEO_DATA_VIEW_UINT8 = 1,
+    OSEO_DATA_VIEW_INT16 = 2,
+    OSEO_DATA_VIEW_UINT16 = 3,
+    OSEO_DATA_VIEW_INT32 = 4,
+    OSEO_DATA_VIEW_UINT32 = 5,
+    OSEO_DATA_VIEW_FLOAT16 = 6,
+    OSEO_DATA_VIEW_FLOAT32 = 7,
+    OSEO_DATA_VIEW_FLOAT64 = 8,
+    OSEO_DATA_VIEW_BIGINT64 = 9,
+    OSEO_DATA_VIEW_BIGUINT64 = 10,
+    OSEO_DATA_VIEW_ELEMENT_COUNT = 11,
+} OseoDataViewElement;
+
+/*
+ * One DataView. `buffer` is [[ViewedArrayBuffer]] and is always an
+ * ArrayBuffer value, so the collector traces it as an ordinary field and
+ * the view keeps its buffer, and therefore that buffer's Data Block,
+ * alive. A view never owns, allocates, or releases a Data Block: it holds
+ * no pointer into one, and every access rereads the buffer's current
+ * `data`, `byte_length`, and `detached` state through this reference.
+ *
+ * `byte_offset` is [[ByteOffset]]. `byte_length` is [[ByteLength]] when
+ * `track_length` is false; when `track_length` is true, [[ByteLength]] is
+ * the specification's `auto` and `byte_length` is meaningless, so every
+ * read goes through `data_view_byte_length` instead of this field. A
+ * length-tracking view exists only over a resizable buffer, but a later
+ * transfer can detach that buffer, so neither flag implies the buffer's
+ * current state.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue buffer;
+    size_t byte_offset;
+    size_t byte_length;
+    bool track_length;
+} OseoDataView;
+
 typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
@@ -1258,6 +1332,13 @@ static inline bool is_array_buffer(OseoValue value) {
 static inline OseoArrayBuffer *array_buffer_object(OseoValue value) {
     return (OseoArrayBuffer *)heap_object(value);
 }
+static inline bool is_data_view(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_DATA_VIEW;
+}
+static inline OseoDataView *data_view_object(OseoValue value) {
+    return (OseoDataView *)heap_object(value);
+}
 static inline bool is_map(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_MAP;
@@ -1272,7 +1353,7 @@ static inline bool is_object(OseoValue value) {
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
-        kind == OSEO_HEAP_MAP_ITERATOR;
+        kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1652,6 +1733,23 @@ OseoResult oseo_internal_bigint_as_width(
     bool signed_result
 );
 /*
+ * The exact 64-bit two's-complement image of one BigInt, which is
+ * ToBigUint64 and, reinterpreted, ToBigInt64. The result is a plain
+ * integer rather than a BigInt, so a caller that stores raw bytes never
+ * reads a limb and no allocation can fail on the way.
+ */
+uint64_t oseo_internal_bigint_to_raw_uint64(OseoValue value);
+/*
+ * One BigInt whose value is `magnitude`, negated when `negative` is true.
+ * The caller supplies the sign separately because the magnitude is an
+ * unsigned 64-bit integer, so -2**63 is expressible.
+ */
+OseoResult oseo_internal_bigint_from_uint64(
+    OseoContext *context,
+    uint64_t magnitude,
+    bool negative
+);
+/*
  * Reads the own property descriptor named by key, including the
  * synthetic `prototype` and array `length` descriptors. A module
  * namespace export returns its stored cell, while namespace metadata
@@ -1839,6 +1937,22 @@ OseoResult oseo_internal_install_bigint_global(
     OseoContext *context,
     OseoValue global
 );
+OseoResult oseo_internal_data_view_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/* Materializes %DataView% together with %DataView.prototype% and every
+ * own property ECMA-262 gives them, and returns the constructor. */
+OseoResult oseo_internal_data_view_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_data_view_global(
+    OseoContext *context,
+    OseoValue global
+);
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%
  * methods and its `Symbol.asyncIterator`, selected by code id. */
 OseoResult oseo_internal_async_generator_method(
@@ -1885,6 +1999,17 @@ OseoResult oseo_internal_install_number_global(
     OseoValue global
 );
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
+/*
+ * ToIndex(value), 7.1.22, reporting the admitted integer through
+ * `index`. `description` is the complete RangeError message a rejected
+ * value receives, so a caller names its own argument.
+ */
+OseoResult oseo_internal_to_index(
+    OseoContext *context,
+    OseoValue value,
+    const char *description,
+    double *index
+);
 OseoResult oseo_internal_to_primitive(
     OseoContext *context,
     OseoValue value,

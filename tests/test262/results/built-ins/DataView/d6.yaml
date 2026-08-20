@@ -1,0 +1,27 @@
+group: built-ins/DataView
+key: d6
+results:
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/DataView/proto-from-ctor-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+      - data-view
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+      - Reflect
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

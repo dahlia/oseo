@@ -1736,6 +1736,663 @@ partitions:
   - group: built-ins/BigInt
     key: fd
     path: results/built-ins/BigInt/fd.yaml
+  - group: built-ins/DataView
+    key: "00"
+    path: results/built-ins/DataView/00.yaml
+  - group: built-ins/DataView
+    key: "01"
+    path: results/built-ins/DataView/01.yaml
+  - group: built-ins/DataView
+    key: "02"
+    path: results/built-ins/DataView/02.yaml
+  - group: built-ins/DataView
+    key: "03"
+    path: results/built-ins/DataView/03.yaml
+  - group: built-ins/DataView
+    key: "04"
+    path: results/built-ins/DataView/04.yaml
+  - group: built-ins/DataView
+    key: "05"
+    path: results/built-ins/DataView/05.yaml
+  - group: built-ins/DataView
+    key: "06"
+    path: results/built-ins/DataView/06.yaml
+  - group: built-ins/DataView
+    key: "07"
+    path: results/built-ins/DataView/07.yaml
+  - group: built-ins/DataView
+    key: "08"
+    path: results/built-ins/DataView/08.yaml
+  - group: built-ins/DataView
+    key: "09"
+    path: results/built-ins/DataView/09.yaml
+  - group: built-ins/DataView
+    key: 0a
+    path: results/built-ins/DataView/0a.yaml
+  - group: built-ins/DataView
+    key: 0b
+    path: results/built-ins/DataView/0b.yaml
+  - group: built-ins/DataView
+    key: 0d
+    path: results/built-ins/DataView/0d.yaml
+  - group: built-ins/DataView
+    key: 0e
+    path: results/built-ins/DataView/0e.yaml
+  - group: built-ins/DataView
+    key: 0f
+    path: results/built-ins/DataView/0f.yaml
+  - group: built-ins/DataView
+    key: "11"
+    path: results/built-ins/DataView/11.yaml
+  - group: built-ins/DataView
+    key: "13"
+    path: results/built-ins/DataView/13.yaml
+  - group: built-ins/DataView
+    key: "14"
+    path: results/built-ins/DataView/14.yaml
+  - group: built-ins/DataView
+    key: "15"
+    path: results/built-ins/DataView/15.yaml
+  - group: built-ins/DataView
+    key: "16"
+    path: results/built-ins/DataView/16.yaml
+  - group: built-ins/DataView
+    key: "17"
+    path: results/built-ins/DataView/17.yaml
+  - group: built-ins/DataView
+    key: 1a
+    path: results/built-ins/DataView/1a.yaml
+  - group: built-ins/DataView
+    key: 1b
+    path: results/built-ins/DataView/1b.yaml
+  - group: built-ins/DataView
+    key: 1c
+    path: results/built-ins/DataView/1c.yaml
+  - group: built-ins/DataView
+    key: 1d
+    path: results/built-ins/DataView/1d.yaml
+  - group: built-ins/DataView
+    key: 1e
+    path: results/built-ins/DataView/1e.yaml
+  - group: built-ins/DataView
+    key: "20"
+    path: results/built-ins/DataView/20.yaml
+  - group: built-ins/DataView
+    key: "21"
+    path: results/built-ins/DataView/21.yaml
+  - group: built-ins/DataView
+    key: "22"
+    path: results/built-ins/DataView/22.yaml
+  - group: built-ins/DataView
+    key: "23"
+    path: results/built-ins/DataView/23.yaml
+  - group: built-ins/DataView
+    key: "24"
+    path: results/built-ins/DataView/24.yaml
+  - group: built-ins/DataView
+    key: "25"
+    path: results/built-ins/DataView/25.yaml
+  - group: built-ins/DataView
+    key: "26"
+    path: results/built-ins/DataView/26.yaml
+  - group: built-ins/DataView
+    key: "27"
+    path: results/built-ins/DataView/27.yaml
+  - group: built-ins/DataView
+    key: "29"
+    path: results/built-ins/DataView/29.yaml
+  - group: built-ins/DataView
+    key: 2a
+    path: results/built-ins/DataView/2a.yaml
+  - group: built-ins/DataView
+    key: 2b
+    path: results/built-ins/DataView/2b.yaml
+  - group: built-ins/DataView
+    key: 2c
+    path: results/built-ins/DataView/2c.yaml
+  - group: built-ins/DataView
+    key: 2e
+    path: results/built-ins/DataView/2e.yaml
+  - group: built-ins/DataView
+    key: 2f
+    path: results/built-ins/DataView/2f.yaml
+  - group: built-ins/DataView
+    key: "31"
+    path: results/built-ins/DataView/31.yaml
+  - group: built-ins/DataView
+    key: "32"
+    path: results/built-ins/DataView/32.yaml
+  - group: built-ins/DataView
+    key: "33"
+    path: results/built-ins/DataView/33.yaml
+  - group: built-ins/DataView
+    key: "34"
+    path: results/built-ins/DataView/34.yaml
+  - group: built-ins/DataView
+    key: "35"
+    path: results/built-ins/DataView/35.yaml
+  - group: built-ins/DataView
+    key: "36"
+    path: results/built-ins/DataView/36.yaml
+  - group: built-ins/DataView
+    key: "37"
+    path: results/built-ins/DataView/37.yaml
+  - group: built-ins/DataView
+    key: "38"
+    path: results/built-ins/DataView/38.yaml
+  - group: built-ins/DataView
+    key: "39"
+    path: results/built-ins/DataView/39.yaml
+  - group: built-ins/DataView
+    key: 3a
+    path: results/built-ins/DataView/3a.yaml
+  - group: built-ins/DataView
+    key: 3b
+    path: results/built-ins/DataView/3b.yaml
+  - group: built-ins/DataView
+    key: 3c
+    path: results/built-ins/DataView/3c.yaml
+  - group: built-ins/DataView
+    key: 3d
+    path: results/built-ins/DataView/3d.yaml
+  - group: built-ins/DataView
+    key: 3f
+    path: results/built-ins/DataView/3f.yaml
+  - group: built-ins/DataView
+    key: "42"
+    path: results/built-ins/DataView/42.yaml
+  - group: built-ins/DataView
+    key: "43"
+    path: results/built-ins/DataView/43.yaml
+  - group: built-ins/DataView
+    key: "44"
+    path: results/built-ins/DataView/44.yaml
+  - group: built-ins/DataView
+    key: "45"
+    path: results/built-ins/DataView/45.yaml
+  - group: built-ins/DataView
+    key: "46"
+    path: results/built-ins/DataView/46.yaml
+  - group: built-ins/DataView
+    key: "47"
+    path: results/built-ins/DataView/47.yaml
+  - group: built-ins/DataView
+    key: "48"
+    path: results/built-ins/DataView/48.yaml
+  - group: built-ins/DataView
+    key: "49"
+    path: results/built-ins/DataView/49.yaml
+  - group: built-ins/DataView
+    key: 4b
+    path: results/built-ins/DataView/4b.yaml
+  - group: built-ins/DataView
+    key: 4c
+    path: results/built-ins/DataView/4c.yaml
+  - group: built-ins/DataView
+    key: 4d
+    path: results/built-ins/DataView/4d.yaml
+  - group: built-ins/DataView
+    key: 4e
+    path: results/built-ins/DataView/4e.yaml
+  - group: built-ins/DataView
+    key: 4f
+    path: results/built-ins/DataView/4f.yaml
+  - group: built-ins/DataView
+    key: "50"
+    path: results/built-ins/DataView/50.yaml
+  - group: built-ins/DataView
+    key: "51"
+    path: results/built-ins/DataView/51.yaml
+  - group: built-ins/DataView
+    key: "52"
+    path: results/built-ins/DataView/52.yaml
+  - group: built-ins/DataView
+    key: "54"
+    path: results/built-ins/DataView/54.yaml
+  - group: built-ins/DataView
+    key: "55"
+    path: results/built-ins/DataView/55.yaml
+  - group: built-ins/DataView
+    key: "56"
+    path: results/built-ins/DataView/56.yaml
+  - group: built-ins/DataView
+    key: "57"
+    path: results/built-ins/DataView/57.yaml
+  - group: built-ins/DataView
+    key: "58"
+    path: results/built-ins/DataView/58.yaml
+  - group: built-ins/DataView
+    key: "59"
+    path: results/built-ins/DataView/59.yaml
+  - group: built-ins/DataView
+    key: 5b
+    path: results/built-ins/DataView/5b.yaml
+  - group: built-ins/DataView
+    key: 5c
+    path: results/built-ins/DataView/5c.yaml
+  - group: built-ins/DataView
+    key: 5d
+    path: results/built-ins/DataView/5d.yaml
+  - group: built-ins/DataView
+    key: 5f
+    path: results/built-ins/DataView/5f.yaml
+  - group: built-ins/DataView
+    key: "61"
+    path: results/built-ins/DataView/61.yaml
+  - group: built-ins/DataView
+    key: "62"
+    path: results/built-ins/DataView/62.yaml
+  - group: built-ins/DataView
+    key: "63"
+    path: results/built-ins/DataView/63.yaml
+  - group: built-ins/DataView
+    key: "64"
+    path: results/built-ins/DataView/64.yaml
+  - group: built-ins/DataView
+    key: "65"
+    path: results/built-ins/DataView/65.yaml
+  - group: built-ins/DataView
+    key: "66"
+    path: results/built-ins/DataView/66.yaml
+  - group: built-ins/DataView
+    key: "67"
+    path: results/built-ins/DataView/67.yaml
+  - group: built-ins/DataView
+    key: "69"
+    path: results/built-ins/DataView/69.yaml
+  - group: built-ins/DataView
+    key: 6a
+    path: results/built-ins/DataView/6a.yaml
+  - group: built-ins/DataView
+    key: 6b
+    path: results/built-ins/DataView/6b.yaml
+  - group: built-ins/DataView
+    key: 6c
+    path: results/built-ins/DataView/6c.yaml
+  - group: built-ins/DataView
+    key: 6d
+    path: results/built-ins/DataView/6d.yaml
+  - group: built-ins/DataView
+    key: 6e
+    path: results/built-ins/DataView/6e.yaml
+  - group: built-ins/DataView
+    key: 6f
+    path: results/built-ins/DataView/6f.yaml
+  - group: built-ins/DataView
+    key: "70"
+    path: results/built-ins/DataView/70.yaml
+  - group: built-ins/DataView
+    key: "71"
+    path: results/built-ins/DataView/71.yaml
+  - group: built-ins/DataView
+    key: "72"
+    path: results/built-ins/DataView/72.yaml
+  - group: built-ins/DataView
+    key: "73"
+    path: results/built-ins/DataView/73.yaml
+  - group: built-ins/DataView
+    key: "74"
+    path: results/built-ins/DataView/74.yaml
+  - group: built-ins/DataView
+    key: "75"
+    path: results/built-ins/DataView/75.yaml
+  - group: built-ins/DataView
+    key: "77"
+    path: results/built-ins/DataView/77.yaml
+  - group: built-ins/DataView
+    key: "78"
+    path: results/built-ins/DataView/78.yaml
+  - group: built-ins/DataView
+    key: "79"
+    path: results/built-ins/DataView/79.yaml
+  - group: built-ins/DataView
+    key: 7a
+    path: results/built-ins/DataView/7a.yaml
+  - group: built-ins/DataView
+    key: 7c
+    path: results/built-ins/DataView/7c.yaml
+  - group: built-ins/DataView
+    key: 7d
+    path: results/built-ins/DataView/7d.yaml
+  - group: built-ins/DataView
+    key: 7e
+    path: results/built-ins/DataView/7e.yaml
+  - group: built-ins/DataView
+    key: 7f
+    path: results/built-ins/DataView/7f.yaml
+  - group: built-ins/DataView
+    key: "80"
+    path: results/built-ins/DataView/80.yaml
+  - group: built-ins/DataView
+    key: "81"
+    path: results/built-ins/DataView/81.yaml
+  - group: built-ins/DataView
+    key: "82"
+    path: results/built-ins/DataView/82.yaml
+  - group: built-ins/DataView
+    key: "83"
+    path: results/built-ins/DataView/83.yaml
+  - group: built-ins/DataView
+    key: "84"
+    path: results/built-ins/DataView/84.yaml
+  - group: built-ins/DataView
+    key: "85"
+    path: results/built-ins/DataView/85.yaml
+  - group: built-ins/DataView
+    key: "87"
+    path: results/built-ins/DataView/87.yaml
+  - group: built-ins/DataView
+    key: "88"
+    path: results/built-ins/DataView/88.yaml
+  - group: built-ins/DataView
+    key: "89"
+    path: results/built-ins/DataView/89.yaml
+  - group: built-ins/DataView
+    key: 8a
+    path: results/built-ins/DataView/8a.yaml
+  - group: built-ins/DataView
+    key: 8b
+    path: results/built-ins/DataView/8b.yaml
+  - group: built-ins/DataView
+    key: 8c
+    path: results/built-ins/DataView/8c.yaml
+  - group: built-ins/DataView
+    key: 8d
+    path: results/built-ins/DataView/8d.yaml
+  - group: built-ins/DataView
+    key: 8f
+    path: results/built-ins/DataView/8f.yaml
+  - group: built-ins/DataView
+    key: "90"
+    path: results/built-ins/DataView/90.yaml
+  - group: built-ins/DataView
+    key: "91"
+    path: results/built-ins/DataView/91.yaml
+  - group: built-ins/DataView
+    key: "92"
+    path: results/built-ins/DataView/92.yaml
+  - group: built-ins/DataView
+    key: "93"
+    path: results/built-ins/DataView/93.yaml
+  - group: built-ins/DataView
+    key: "94"
+    path: results/built-ins/DataView/94.yaml
+  - group: built-ins/DataView
+    key: "95"
+    path: results/built-ins/DataView/95.yaml
+  - group: built-ins/DataView
+    key: "96"
+    path: results/built-ins/DataView/96.yaml
+  - group: built-ins/DataView
+    key: "97"
+    path: results/built-ins/DataView/97.yaml
+  - group: built-ins/DataView
+    key: "98"
+    path: results/built-ins/DataView/98.yaml
+  - group: built-ins/DataView
+    key: "99"
+    path: results/built-ins/DataView/99.yaml
+  - group: built-ins/DataView
+    key: 9a
+    path: results/built-ins/DataView/9a.yaml
+  - group: built-ins/DataView
+    key: 9b
+    path: results/built-ins/DataView/9b.yaml
+  - group: built-ins/DataView
+    key: 9c
+    path: results/built-ins/DataView/9c.yaml
+  - group: built-ins/DataView
+    key: 9d
+    path: results/built-ins/DataView/9d.yaml
+  - group: built-ins/DataView
+    key: 9e
+    path: results/built-ins/DataView/9e.yaml
+  - group: built-ins/DataView
+    key: 9f
+    path: results/built-ins/DataView/9f.yaml
+  - group: built-ins/DataView
+    key: a1
+    path: results/built-ins/DataView/a1.yaml
+  - group: built-ins/DataView
+    key: a2
+    path: results/built-ins/DataView/a2.yaml
+  - group: built-ins/DataView
+    key: a3
+    path: results/built-ins/DataView/a3.yaml
+  - group: built-ins/DataView
+    key: a5
+    path: results/built-ins/DataView/a5.yaml
+  - group: built-ins/DataView
+    key: a6
+    path: results/built-ins/DataView/a6.yaml
+  - group: built-ins/DataView
+    key: a7
+    path: results/built-ins/DataView/a7.yaml
+  - group: built-ins/DataView
+    key: a8
+    path: results/built-ins/DataView/a8.yaml
+  - group: built-ins/DataView
+    key: a9
+    path: results/built-ins/DataView/a9.yaml
+  - group: built-ins/DataView
+    key: aa
+    path: results/built-ins/DataView/aa.yaml
+  - group: built-ins/DataView
+    key: ab
+    path: results/built-ins/DataView/ab.yaml
+  - group: built-ins/DataView
+    key: ac
+    path: results/built-ins/DataView/ac.yaml
+  - group: built-ins/DataView
+    key: ad
+    path: results/built-ins/DataView/ad.yaml
+  - group: built-ins/DataView
+    key: ae
+    path: results/built-ins/DataView/ae.yaml
+  - group: built-ins/DataView
+    key: af
+    path: results/built-ins/DataView/af.yaml
+  - group: built-ins/DataView
+    key: b0
+    path: results/built-ins/DataView/b0.yaml
+  - group: built-ins/DataView
+    key: b1
+    path: results/built-ins/DataView/b1.yaml
+  - group: built-ins/DataView
+    key: b2
+    path: results/built-ins/DataView/b2.yaml
+  - group: built-ins/DataView
+    key: b3
+    path: results/built-ins/DataView/b3.yaml
+  - group: built-ins/DataView
+    key: b4
+    path: results/built-ins/DataView/b4.yaml
+  - group: built-ins/DataView
+    key: b5
+    path: results/built-ins/DataView/b5.yaml
+  - group: built-ins/DataView
+    key: b7
+    path: results/built-ins/DataView/b7.yaml
+  - group: built-ins/DataView
+    key: b8
+    path: results/built-ins/DataView/b8.yaml
+  - group: built-ins/DataView
+    key: b9
+    path: results/built-ins/DataView/b9.yaml
+  - group: built-ins/DataView
+    key: ba
+    path: results/built-ins/DataView/ba.yaml
+  - group: built-ins/DataView
+    key: bb
+    path: results/built-ins/DataView/bb.yaml
+  - group: built-ins/DataView
+    key: bc
+    path: results/built-ins/DataView/bc.yaml
+  - group: built-ins/DataView
+    key: bd
+    path: results/built-ins/DataView/bd.yaml
+  - group: built-ins/DataView
+    key: be
+    path: results/built-ins/DataView/be.yaml
+  - group: built-ins/DataView
+    key: bf
+    path: results/built-ins/DataView/bf.yaml
+  - group: built-ins/DataView
+    key: c1
+    path: results/built-ins/DataView/c1.yaml
+  - group: built-ins/DataView
+    key: c2
+    path: results/built-ins/DataView/c2.yaml
+  - group: built-ins/DataView
+    key: c3
+    path: results/built-ins/DataView/c3.yaml
+  - group: built-ins/DataView
+    key: c4
+    path: results/built-ins/DataView/c4.yaml
+  - group: built-ins/DataView
+    key: c5
+    path: results/built-ins/DataView/c5.yaml
+  - group: built-ins/DataView
+    key: c6
+    path: results/built-ins/DataView/c6.yaml
+  - group: built-ins/DataView
+    key: c7
+    path: results/built-ins/DataView/c7.yaml
+  - group: built-ins/DataView
+    key: c9
+    path: results/built-ins/DataView/c9.yaml
+  - group: built-ins/DataView
+    key: ca
+    path: results/built-ins/DataView/ca.yaml
+  - group: built-ins/DataView
+    key: cb
+    path: results/built-ins/DataView/cb.yaml
+  - group: built-ins/DataView
+    key: cc
+    path: results/built-ins/DataView/cc.yaml
+  - group: built-ins/DataView
+    key: cd
+    path: results/built-ins/DataView/cd.yaml
+  - group: built-ins/DataView
+    key: cf
+    path: results/built-ins/DataView/cf.yaml
+  - group: built-ins/DataView
+    key: d0
+    path: results/built-ins/DataView/d0.yaml
+  - group: built-ins/DataView
+    key: d1
+    path: results/built-ins/DataView/d1.yaml
+  - group: built-ins/DataView
+    key: d2
+    path: results/built-ins/DataView/d2.yaml
+  - group: built-ins/DataView
+    key: d3
+    path: results/built-ins/DataView/d3.yaml
+  - group: built-ins/DataView
+    key: d5
+    path: results/built-ins/DataView/d5.yaml
+  - group: built-ins/DataView
+    key: d6
+    path: results/built-ins/DataView/d6.yaml
+  - group: built-ins/DataView
+    key: d7
+    path: results/built-ins/DataView/d7.yaml
+  - group: built-ins/DataView
+    key: d8
+    path: results/built-ins/DataView/d8.yaml
+  - group: built-ins/DataView
+    key: d9
+    path: results/built-ins/DataView/d9.yaml
+  - group: built-ins/DataView
+    key: da
+    path: results/built-ins/DataView/da.yaml
+  - group: built-ins/DataView
+    key: dc
+    path: results/built-ins/DataView/dc.yaml
+  - group: built-ins/DataView
+    key: dd
+    path: results/built-ins/DataView/dd.yaml
+  - group: built-ins/DataView
+    key: de
+    path: results/built-ins/DataView/de.yaml
+  - group: built-ins/DataView
+    key: df
+    path: results/built-ins/DataView/df.yaml
+  - group: built-ins/DataView
+    key: e0
+    path: results/built-ins/DataView/e0.yaml
+  - group: built-ins/DataView
+    key: e1
+    path: results/built-ins/DataView/e1.yaml
+  - group: built-ins/DataView
+    key: e2
+    path: results/built-ins/DataView/e2.yaml
+  - group: built-ins/DataView
+    key: e3
+    path: results/built-ins/DataView/e3.yaml
+  - group: built-ins/DataView
+    key: e4
+    path: results/built-ins/DataView/e4.yaml
+  - group: built-ins/DataView
+    key: e5
+    path: results/built-ins/DataView/e5.yaml
+  - group: built-ins/DataView
+    key: e6
+    path: results/built-ins/DataView/e6.yaml
+  - group: built-ins/DataView
+    key: e7
+    path: results/built-ins/DataView/e7.yaml
+  - group: built-ins/DataView
+    key: e8
+    path: results/built-ins/DataView/e8.yaml
+  - group: built-ins/DataView
+    key: e9
+    path: results/built-ins/DataView/e9.yaml
+  - group: built-ins/DataView
+    key: eb
+    path: results/built-ins/DataView/eb.yaml
+  - group: built-ins/DataView
+    key: ec
+    path: results/built-ins/DataView/ec.yaml
+  - group: built-ins/DataView
+    key: ed
+    path: results/built-ins/DataView/ed.yaml
+  - group: built-ins/DataView
+    key: ef
+    path: results/built-ins/DataView/ef.yaml
+  - group: built-ins/DataView
+    key: f0
+    path: results/built-ins/DataView/f0.yaml
+  - group: built-ins/DataView
+    key: f1
+    path: results/built-ins/DataView/f1.yaml
+  - group: built-ins/DataView
+    key: f2
+    path: results/built-ins/DataView/f2.yaml
+  - group: built-ins/DataView
+    key: f4
+    path: results/built-ins/DataView/f4.yaml
+  - group: built-ins/DataView
+    key: f6
+    path: results/built-ins/DataView/f6.yaml
+  - group: built-ins/DataView
+    key: f8
+    path: results/built-ins/DataView/f8.yaml
+  - group: built-ins/DataView
+    key: f9
+    path: results/built-ins/DataView/f9.yaml
+  - group: built-ins/DataView
+    key: fa
+    path: results/built-ins/DataView/fa.yaml
+  - group: built-ins/DataView
+    key: fb
+    path: results/built-ins/DataView/fb.yaml
+  - group: built-ins/DataView
+    key: fe
+    path: results/built-ins/DataView/fe.yaml
+  - group: built-ins/DataView
+    key: ff
+    path: results/built-ins/DataView/ff.yaml
   - group: built-ins/Error
     key: "02"
     path: results/built-ins/Error/02.yaml
@@ -8857,9 +9514,9 @@ summary:
   expectedNegatives: 1364
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 8468
+  passes: 8918
   semanticFailures: 0
-  unsupportedProfileFeatures: 1609
+  unsupportedProfileFeatures: 1709
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -8872,9 +9529,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 132
+      passes: 580
       semanticFailures: 0
-      unsupportedProfileFeatures: 60
+      unsupportedProfileFeatures: 162
     - dependency: async-functions
       expectedNegatives: 161
       harnessFailures: 0
@@ -8893,9 +9550,9 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 178
+      passes: 234
       semanticFailures: 0
-      unsupportedProfileFeatures: 28
+      unsupportedProfileFeatures: 39
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
@@ -8910,6 +9567,13 @@ summary:
       passes: 489
       semanticFailures: 0
       unsupportedProfileFeatures: 41
+    - dependency: data-view
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 443
+      semanticFailures: 0
+      unsupportedProfileFeatures: 107
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -8949,9 +9613,9 @@ summary:
       expectedNegatives: 124
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2016
+      passes: 2035
       semanticFailures: 0
-      unsupportedProfileFeatures: 540
+      unsupportedProfileFeatures: 563
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -8991,9 +9655,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5553
+      passes: 5555
       semanticFailures: 0
-      unsupportedProfileFeatures: 890
+      unsupportedProfileFeatures: 888
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -9019,9 +9683,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 248
+      passes: 326
       semanticFailures: 0
-      unsupportedProfileFeatures: 138
+      unsupportedProfileFeatures: 146
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -9048,16 +9712,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1264
+      passes: 1265
       semanticFailures: 0
-      unsupportedProfileFeatures: 211
+      unsupportedProfileFeatures: 210
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 132
+      passes: 137
       semanticFailures: 0
-      unsupportedProfileFeatures: 60
+      unsupportedProfileFeatures: 55
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -9093,6 +9757,13 @@ summary:
       passes: 61
       semanticFailures: 0
       unsupportedProfileFeatures: 16
+    - group: built-ins/DataView
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 443
+      semanticFailures: 0
+      unsupportedProfileFeatures: 107
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -9174,9 +9845,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2285
+      passes: 2286
       semanticFailures: 0
-      unsupportedProfileFeatures: 427
+      unsupportedProfileFeatures: 426
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0

@@ -22,6 +22,5 @@ results:
       detail: "Not executed: the frontmatter needs an unsupported feature."
       passed: false
     unsupportedFeatures:
-      - DataView
       - Int8Array
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

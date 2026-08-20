@@ -50,7 +50,7 @@ results:
       detail: "test/built-ins/Object/defineProperties/15.2.3.7-5-b-158.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperties/15.2.3.7-5-b-15\
-        8.js:339:19: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        8.js:350:19: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

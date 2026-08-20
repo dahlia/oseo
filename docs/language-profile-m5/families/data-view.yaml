@@ -1,0 +1,109 @@
+version: 1
+id: data-view
+title: "DataView over the ArrayBuffer Data Block"
+scope:
+  - "The `DataView` constructor with its `[[Construct]]`-only call
+    behavior, the `[[ArrayBufferData]]` brand check on its first
+    argument, `ToIndex` over `byteOffset` and `byteLength`, the
+    detached and range validation that runs before and again after
+    `OrdinaryCreateFromConstructor` reads the new target's `prototype`,
+    and the fixed-length or length-tracking `[[ByteLength]]` the
+    candidate edition selects from the buffer's resizability. No
+    admitted source construct reaches that `prototype` read with an
+    accessor, because a class's `prototype` is a non-configurable data
+    property and `Reflect.construct` and `Proxy` stay unadmitted, so the
+    second validation's evidence is direct native observation of a
+    detach and of each resize outcome under that read."
+  - "`%DataView.prototype%` as an ordinary object with no `[[DataView]]`
+    slot, its `constructor` and `Symbol.toStringTag` properties, and the
+    `buffer`, `byteLength`, and `byteOffset` accessors. `buffer` reports
+    a detached buffer, while both measurements reject a view whose
+    buffer detached or shrank out from under it."
+  - "The eleven `get` and eleven `set` element accessors over the
+    `Int8`, `Uint8`, `Int16`, `Uint16`, `Int32`, `Uint32`, `Float16`,
+    `Float32`, `Float64`, `BigInt64`, and `BigUint64` element types,
+    with their names, lengths, and descriptors; the specified order,
+    which is `ToIndex` then `ToBoolean` for a `get` accessor and
+    `ToIndex`, then `ToNumber` or `ToBigInt`, then `ToBoolean` for a
+    `set` accessor, followed in both by the out-of-bounds `TypeError`
+    and the range `RangeError`; and the byte order both parameters
+    select. A one-byte accessor takes no byte-order parameter: it
+    passes little-endian directly and runs no `ToBoolean`."
+  - "`NumericToRawBytes` and `RawBytesToNumeric` for every admitted
+    element type. The integer types wrap through exact truncation modulo
+    the element width in two's complement. The float types round to
+    nearest with ties to even in exact integer arithmetic over the
+    operand's own binary64 encoding, so no narrowing floating conversion
+    and no out-of-range conversion occurs, and `Float64` is
+    bit-preserving. A signed zero keeps its sign, and a NaN keeps its
+    class."
+  - "Every element access recomputes the buffer's detached state, byte
+    length, and view bounds, then copies exactly the element's bytes
+    through a local buffer, so an unaligned access is ordinary and no
+    host addition on an index or a size can wrap. A view never owns,
+    allocates, or releases a Data Block: the collector traces its buffer
+    value, and the buffer's own release path stays the single owner."
+  - "`ArrayBuffer.isView` now reports the one admitted view kind."
+  - "The only allocation these paths perform is the view record, the
+    intrinsic cluster, and the BigInt one 64-bit load produces. A
+    bounded allocation-attempt sweep covers all three, and each failure
+    reports the owned non-catchable OSEO2001 diagnostic without partial
+    publication before cleanup, collection, retry, stable intrinsic
+    identity, and complete publication are verified. These are Oseo's
+    own resource boundaries rather than specified ones, so their
+    evidence is direct native observation instead of a reference-host
+    comparison."
+  - "SharedArrayBuffer, the TypedArray constructors, `Reflect`,
+    `Reflect.construct`, realm creation, and the non-BigInt primitive
+    wrapper prototype methods stay unadmitted, so reviewed cases that
+    require one of them retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/data-view.ts
+      - tests/property/m5-data-view.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/data-view.ts
+      - tests/native/scenarios/shard-0.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/data-view.ts
+      - tests/property/m5-data-view.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-data-view.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/data-view.ts
+      - tests/property/m5-data-view.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/data-view.ts
+      - tests/property/m5-data-view.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_data_view.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - tests/fixtures/runtime-heap.c

@@ -10,9 +10,6 @@
  * and the species accessor.
  */
 
-/* 2^53 - 1, the largest integer ToIndex admits. */
-#define OSEO_ARRAY_BUFFER_INDEX_LIMIT 9007199254740991.0
-
 /*
  * The largest Data Block this runtime creates, in bytes. CreateByteDataBlock
  * throws a RangeError when a block of the requested size cannot be created
@@ -36,29 +33,18 @@ static bool array_buffer_size(double length, size_t *size) {
     return true;
 }
 
-/* ToIndex(value), reported as the integer it admits. */
+/* ToIndex(value) over a length, reported as the integer it admits. */
 static OseoResult array_buffer_to_index(
     OseoContext *context,
     OseoValue value,
     double *index
 ) {
-    OseoResult number = oseo_internal_to_number(context, value);
-    if (number.status != OSEO_STATUS_NORMAL) return number;
-    double integer = number_value(number.value);
-    if (isnan(integer)) {
-        integer = 0.0;
-    } else if (isfinite(integer)) {
-        integer = trunc(integer);
-    }
-    if (!(integer >= 0.0) || integer > OSEO_ARRAY_BUFFER_INDEX_LIMIT) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_RANGE,
-            "ArrayBuffer length is outside the admitted index range."
-        );
-    }
-    *index = integer;
-    return normal(oseo_number(integer));
+    return oseo_internal_to_index(
+        context,
+        value,
+        "ArrayBuffer length is outside the admitted index range.",
+        index
+    );
 }
 
 /*
@@ -357,19 +343,16 @@ static OseoResult array_buffer_construct(
 }
 
 /*
- * ArrayBuffer.isView(arg). No admitted value carries
- * [[ViewedArrayBuffer]], because neither DataView nor a TypedArray is
- * part of this profile yet, so the predicate is false for every value
- * that can reach it. The node that materializes a view kind extends this
- * test with its own brand.
+ * ArrayBuffer.isView(arg). A DataView is the one admitted value that
+ * carries [[ViewedArrayBuffer]]; the node that materializes a TypedArray
+ * extends this test with its own brand.
  */
 static OseoResult array_buffer_is_view(
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    (void)argument_count;
-    (void)arguments;
-    return normal(oseo_boolean(false));
+    if (argument_count == 0u) return normal(oseo_boolean(false));
+    return normal(oseo_boolean(is_data_view(arguments[0])));
 }
 
 static OseoResult array_buffer_byte_length(

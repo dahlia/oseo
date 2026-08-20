@@ -150,6 +150,17 @@ function verifyProperty(object, name, descriptor) {
   return true;
 }
 
+/*
+ * The upstream helper's primordial variant asks `verifyProperty` to
+ * restore whatever its writability and configurability probes changed,
+ * so that verifying a property of a shared intrinsic leaves that
+ * intrinsic as it found it. This reviewed `verifyProperty` always
+ * restores, so the two are the same check.
+ */
+function verifyPrimordialProperty(object, name, descriptor) {
+  return verifyProperty(object, name, descriptor);
+}
+
 function verifyEqualTo(object, name, value) {
   if (!__oseoSameValue(object[name], value)) {
     throw new Test262Error(

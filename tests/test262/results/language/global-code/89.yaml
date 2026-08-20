@@ -21,7 +21,7 @@ results:
     observation:
       detail: "test/language/global-code/script-decl-func.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/global-code/script-decl-func.js:365:1:
+        stderr=\"test/language/global-code/script-decl-func.js:376:1:
         error[OSEO1001]: Unknown binding '$262'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

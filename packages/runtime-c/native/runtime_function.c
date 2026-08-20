@@ -154,6 +154,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_BIGINT_CODE_ID_RANGE_FIRST,
      OSEO_BIGINT_CODE_ID_RANGE_LAST,
      oseo_internal_bigint_builtin_dispatch},
+    {OSEO_DATA_VIEW_CODE_ID_RANGE_FIRST,
+     OSEO_DATA_VIEW_CODE_ID_RANGE_LAST,
+     oseo_internal_data_view_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -1025,6 +1028,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES) {
         materialized = oseo_internal_array_buffer_intrinsic(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64) {
+        materialized = oseo_internal_data_view_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&

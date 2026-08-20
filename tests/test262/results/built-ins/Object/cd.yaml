@@ -296,7 +296,7 @@ results:
       detail: "test/built-ins/Object/preventExtensions/15.2.3.10-3-9.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/preventExtensions/15.2.3.10-3-9.\
-        js:336:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        js:347:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

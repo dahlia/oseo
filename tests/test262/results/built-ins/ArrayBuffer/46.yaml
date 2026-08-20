@@ -23,7 +23,6 @@ results:
       passed: false
     unsupportedFeatures:
       - TypedArray
-      - DataView
   - case:
       async: false
       features:
