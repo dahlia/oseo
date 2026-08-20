@@ -3888,7 +3888,9 @@ the Data Block the `array-buffer` node already owns, so a program can read and
 write those bytes for the first time. The constructor requires `new`, requires
 an `ArrayBuffer`, runs `ToIndex` over `byteOffset` and then over `byteLength`,
 and validates the detached state and both bounds once before and once after
-`OrdinaryCreateFromConstructor` reads the new target's `prototype`. An absent
+`OrdinaryCreateFromConstructor` reads the new target's `prototype`. No
+admitted source construct reaches that read with an accessor, so the second
+validation is observed natively rather than from a reviewed program. An absent
 `byteLength` fixes the view's length over a fixed-length buffer and makes it
 length-tracking over a resizable one, which is the candidate edition's `auto`.
 
@@ -3903,19 +3905,21 @@ bounds.
 
 The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
 `Uint16`, `Int32`, `Uint32`, `Float16`, `Float32`, `Float64`, `BigInt64`, and
-`BigUint64`. Each runs `ToIndex` over the byte offset, then `ToNumber` or
-`ToBigInt` over a stored value, then `ToBoolean` over the byte-order flag, then
+`BigUint64`. Each `get` accessor runs `ToIndex` over the byte offset, then
+`ToBoolean` over the byte-order flag; each `set` accessor runs `ToIndex`, then
+`ToNumber` or `ToBigInt` over the stored value, then `ToBoolean`. Both then run
 the out-of-bounds `TypeError` and the range `RangeError`, so a conversion that
-detaches or shrinks the buffer still reaches the specified rejection. The
-integer element types truncate and wrap modulo the element width in two's
-complement. The float element types round to nearest with ties to even in exact
-integer arithmetic over the operand's own binary64 encoding, so no narrowing
-floating conversion happens and no operand can reach an out-of-range one;
-`Float64` is bit-preserving, a signed zero keeps its sign, and a NaN keeps its
-class. Each element moves through a local byte buffer rather than a cast, so an
-unaligned access is ordinary, and every index and size comparison is written so
-that no host addition can wrap. `ArrayBuffer.isView` now reports the one
-admitted view kind.
+detaches or shrinks the buffer still reaches the specified rejection. A
+one-byte accessor takes no byte-order parameter: it passes little-endian
+directly and runs no `ToBoolean`. The integer element types truncate and wrap
+modulo the element width in two's complement. The float element types round to
+nearest with ties to even in exact integer arithmetic over the operand's own
+binary64 encoding, so no narrowing floating conversion happens and no operand
+can reach an out-of-range one; `Float64` is bit-preserving, a signed zero keeps
+its sign, and a NaN keeps its class. Each element moves through a local byte
+buffer rather than a cast, so an unaligned access is ordinary, and every index
+and size comparison is written so that no host addition can wrap.
+`ArrayBuffer.isView` now reports the one admitted view kind.
 
 The object model lives in *runtime\_data\_view.c* and reads no BigInt limb: the
 two 64-bit element types reach the representation only through the raw-integer

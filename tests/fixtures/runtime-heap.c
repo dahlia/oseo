@@ -1583,6 +1583,370 @@ static void test_data_view_allocation_sweep(void) {
     }
 }
 
+/*
+ * The DataView constructor revalidates its buffer after
+ * OrdinaryCreateFromConstructor reads the new target's `prototype`,
+ * because that read is the specified Get and can run arbitrary code.
+ * No admitted source construct reaches that Get with an accessor: a
+ * class's `prototype` is a non-configurable data property, and
+ * `Reflect.construct` and `Proxy` stay unadmitted. The revalidation is
+ * therefore driven here, through a bound `%DataView%` carrying an own
+ * accessor `prototype` that detaches or resizes the buffer the first
+ * validation already accepted. A bound function is constructible and
+ * starts without an own `prototype`, so it is the one new target this
+ * runtime can build that both satisfies the [[Construct]] invariant and
+ * accepts the accessor.
+ */
+
+typedef enum {
+    DATA_VIEW_TARGET_DETACH,
+    DATA_VIEW_TARGET_RESIZE,
+} DataViewTargetAction;
+
+typedef struct {
+    /* What the `prototype` getter does to the buffer under the
+     * constructor. */
+    DataViewTargetAction action;
+    double resized_byte_length;
+    /* The constructor's own arguments over an eight-byte buffer that is
+     * resizable to sixteen. An absent byte length tracks, because the
+     * buffer is resizable. */
+    double byte_offset;
+    bool has_byte_length;
+    double byte_length;
+    /* What the constructor must then do. `error` is read only when
+     * `throws` is true, and `view_byte_length` only when it is false. */
+    bool throws;
+    OseoErrorKind error;
+    double view_byte_length;
+} DataViewPrototypeScenario;
+
+static const DataViewPrototypeScenario data_view_prototype_scenarios[] = {
+    /* Detaching under the read reaches the second detached check. */
+    {
+        DATA_VIEW_TARGET_DETACH,
+        0.0,
+        0.0,
+        true,
+        4.0,
+        true,
+        OSEO_ERROR_TYPE,
+        0.0,
+    },
+    /* Shrinking past the byte offset reaches the second offset check,
+     * which is the only bound a tracking view has left. */
+    {
+        DATA_VIEW_TARGET_RESIZE,
+        2.0,
+        4.0,
+        false,
+        0.0,
+        true,
+        OSEO_ERROR_RANGE,
+        0.0,
+    },
+    /* Shrinking exactly to the byte offset leaves that check satisfied
+     * and yields an empty tracking view, so the comparison is a strict
+     * one over the offset rather than an inclusive one. */
+    {
+        DATA_VIEW_TARGET_RESIZE,
+        2.0,
+        2.0,
+        false,
+        0.0,
+        false,
+        OSEO_ERROR_TYPE,
+        0.0,
+    },
+    /* Shrinking past an explicit byte length reaches the second length
+     * check, which the tracking cases above cannot reach. */
+    {
+        DATA_VIEW_TARGET_RESIZE,
+        2.0,
+        0.0,
+        true,
+        8.0,
+        true,
+        OSEO_ERROR_RANGE,
+        0.0,
+    },
+    /* Shrinking exactly to the requested end stays in bounds, so that
+     * check is a bound rather than a rejection of every resize. */
+    {
+        DATA_VIEW_TARGET_RESIZE,
+        2.0,
+        0.0,
+        true,
+        2.0,
+        false,
+        OSEO_ERROR_TYPE,
+        2.0,
+    },
+    /* A grow stays in bounds and does not widen a fixed-length view. */
+    {
+        DATA_VIEW_TARGET_RESIZE,
+        16.0,
+        0.0,
+        true,
+        8.0,
+        false,
+        OSEO_ERROR_TYPE,
+        8.0,
+    },
+};
+
+/*
+ * The getter reads its buffer from, and publishes its returned object
+ * to, the running test's root slots, so neither survives a collection
+ * unrooted. The constructor runs under the forced-collection policy, so
+ * every allocation the getter performs collects.
+ */
+static OseoValue *data_view_target_roots = NULL;
+static DataViewTargetAction data_view_target_action =
+    DATA_VIEW_TARGET_DETACH;
+static double data_view_target_size = 0.0;
+static size_t data_view_target_prototype_reads = 0u;
+
+static OseoResult data_view_target_prototype_dispatcher(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    data_view_target_prototype_reads += 1u;
+    bool detach = data_view_target_action == DATA_VIEW_TARGET_DETACH;
+    OseoResult method = oseo_intrinsic(
+        context,
+        detach ? OSEO_INTRINSIC_ARRAY_BUFFER_TRANSFER
+               : OSEO_INTRINSIC_ARRAY_BUFFER_RESIZE
+    );
+    if (method.status != OSEO_STATUS_NORMAL) return method;
+    OseoValue size = oseo_number(data_view_target_size);
+    OseoResult mutated = oseo_call_function(
+        context,
+        method.value,
+        data_view_target_roots[0],
+        detach ? 0u : 1u,
+        &size,
+        oseo_undefined()
+    );
+    if (mutated.status != OSEO_STATUS_NORMAL) return mutated;
+    /* An ordinary object, so the Get succeeds and the constructor uses
+     * it rather than falling back to %DataView.prototype%. The marker
+     * property below is how a successful case proves that. The object
+     * and its key are rooted before the property write, because that
+     * write allocates and every allocation here collects. */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult allocated = oseo_roots_allocate(context, &frame, 2u);
+    if (allocated.status != OSEO_STATUS_NORMAL) return allocated;
+    OseoResult created = oseo_object_create(context, oseo_null());
+    frame.slots[0] = created.value;
+    if (created.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return created;
+    }
+    frame.slots[1] = make_text(context, "tag");
+    OseoResult tagged = oseo_object_set(
+        context,
+        frame.slots[0],
+        frame.slots[1],
+        oseo_number(1.0),
+        true
+    );
+    OseoValue marked = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    if (tagged.status != OSEO_STATUS_NORMAL) return tagged;
+    data_view_target_roots[5] = marked;
+    return (OseoResult){OSEO_STATUS_NORMAL, marked};
+}
+
+/*
+ * new ArrayBuffer(byteLength, { maxByteLength }), through two rooted
+ * scratch slots so that neither the options object nor its key depends
+ * on a collection not running.
+ */
+static OseoValue make_resizable_array_buffer(
+    OseoContext *context,
+    OseoValue *scratch,
+    double byte_length,
+    double max_byte_length
+) {
+    scratch[0] = require_normal(oseo_object_create(context, oseo_null()));
+    scratch[1] = make_text(context, "maxByteLength");
+    (void)require_normal(oseo_object_set(
+        context,
+        scratch[0],
+        scratch[1],
+        oseo_number(max_byte_length),
+        true
+    ));
+    OseoValue constructor =
+        require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_ARRAY_BUFFER));
+    OseoValue arguments[2] = {oseo_number(byte_length), scratch[0]};
+    OseoValue buffer = require_normal(oseo_call_function(
+        context,
+        constructor,
+        oseo_undefined(),
+        2u,
+        arguments,
+        constructor
+    ));
+    scratch[0] = oseo_undefined();
+    scratch[1] = oseo_undefined();
+    return buffer;
+}
+
+/*
+ * %DataView%.bind(), which construction would forward to %DataView%
+ * itself, carrying an own accessor `prototype`. Calling %DataView% with
+ * this object as the new target is what an admitted `Reflect.construct`
+ * would otherwise produce.
+ */
+static OseoValue make_data_view_prototype_target(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    static const uint16_t getter_name[] = {
+        'p', 'r', 'o', 't', 'o', 't', 'y', 'p', 'e',
+    };
+    roots[1] = require_normal(oseo_environment_create(context, 0u));
+    roots[2] = require_normal(oseo_function_create(
+        context,
+        300u,
+        roots[1],
+        getter_name,
+        sizeof(getter_name) / sizeof(*getter_name),
+        0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+    OseoValue bind =
+        require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_FUNCTION_BIND));
+    OseoValue target = require_normal(oseo_call_function(
+        context,
+        bind,
+        roots[4],
+        0u,
+        NULL,
+        oseo_undefined()
+    ));
+    roots[3] = target;
+    roots[6] = make_text(context, "prototype");
+    (void)require_normal(oseo_object_define_accessor(
+        context,
+        roots[3],
+        roots[6],
+        roots[2],
+        oseo_undefined(),
+        true,
+        false,
+        (OseoPropertyAttributes){true, true, false, true}
+    ));
+    roots[6] = oseo_undefined();
+    return roots[3];
+}
+
+static void test_data_view_prototype_revalidation(void) {
+    const size_t scenario_count = sizeof(data_view_prototype_scenarios) /
+        sizeof(data_view_prototype_scenarios[0]);
+    for (size_t index = 0u; index < scenario_count; index += 1u) {
+        const DataViewPrototypeScenario *scenario =
+            &data_view_prototype_scenarios[index];
+        OseoContext context;
+        OseoValue roots[8] = {
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+        };
+        OseoRootFrame frame = {NULL, roots, 8u};
+        oseo_context_init(&context, "runtime-heap.c", 14u);
+        oseo_roots_push(&context, &frame);
+        data_view_target_roots = roots;
+        data_view_target_action = scenario->action;
+        data_view_target_size = scenario->resized_byte_length;
+        data_view_target_prototype_reads = 0u;
+        oseo_context_set_function_dispatcher(
+            &context,
+            data_view_target_prototype_dispatcher
+        );
+        roots[0] =
+            make_resizable_array_buffer(&context, &roots[6], 8.0, 16.0);
+        roots[4] = require_normal(
+            oseo_intrinsic(&context, OSEO_INTRINSIC_DATA_VIEW)
+        );
+        (void)make_data_view_prototype_target(&context, roots);
+        OseoValue arguments[3] = {
+            roots[0],
+            oseo_number(scenario->byte_offset),
+            oseo_number(scenario->byte_length),
+        };
+        /* Every allocation the getter performs collects, so a value the
+         * constructor holds across the read must be rooted to survive. */
+        context.collect_every_safepoint = true;
+        OseoResult constructed = oseo_call_function(
+            &context,
+            roots[4],
+            oseo_undefined(),
+            scenario->has_byte_length ? 3u : 2u,
+            arguments,
+            roots[3]
+        );
+        roots[6] = constructed.value;
+        context.collect_every_safepoint = false;
+        /* The first validation accepted these arguments, so the read
+         * ran and the outcome below is the second validation's. */
+        assert(data_view_target_prototype_reads == 1u);
+        if (scenario->throws) {
+            assert(constructed.status == OSEO_STATUS_THROW);
+            assert(!context.has_diagnostic);
+            roots[7] = require_normal(
+                oseo_error_intrinsic(&context, scenario->error)
+            );
+            assert(
+                require_normal(
+                    oseo_instanceof(&context, roots[6], roots[7])
+                ) == oseo_boolean(true)
+            );
+        } else {
+            assert(constructed.status == OSEO_STATUS_NORMAL);
+            roots[7] = data_view_byte_length_of(&context, roots[6]);
+            assert(
+                require_normal(oseo_strict_equal(
+                    &context,
+                    roots[7],
+                    oseo_number(scenario->view_byte_length)
+                )) == oseo_boolean(true)
+            );
+            /* The view inherits the getter's marker, so it took the
+             * object that Get returned. */
+            roots[5] = make_text(&context, "tag");
+            roots[7] = require_normal(
+                oseo_object_get(&context, roots[6], roots[5])
+            );
+            assert(roots[7] == oseo_number(1.0));
+        }
+        oseo_collect(&context);
+        oseo_context_set_function_dispatcher(&context, NULL);
+        data_view_target_roots = NULL;
+        oseo_roots_pop(&context, &frame);
+        oseo_context_destroy(&context);
+    }
+}
+
 static void test_string_length_limit(OseoContext *context) {
     OseoResult result = oseo_string_from_units(
         context,
@@ -2006,6 +2370,7 @@ int main(void) {
     test_global_this_install_failure();
     test_bigint_allocation_sweep();
     test_data_view_allocation_sweep();
+    test_data_view_prototype_revalidation();
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);

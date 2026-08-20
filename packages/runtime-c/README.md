@@ -583,20 +583,22 @@ bounds.
 
 The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
 `Uint16`, `Int32`, `Uint32`, `Float16`, `Float32`, `Float64`, `BigInt64`, and
-`BigUint64`. Each runs `ToIndex` over the byte offset, then `ToNumber` or
-`ToBigInt` over a stored value, then `ToBoolean` over the byte-order flag,
-then the out-of-bounds `TypeError` and the range `RangeError`, so a conversion
-that detaches or shrinks the buffer still reaches the specified rejection. A
-one-byte element has no byte order and ignores its flag. The integer element
-types truncate and wrap modulo the element width in two's complement. The
-float element types round to nearest with ties to even using exact integer
-arithmetic over the operand's own binary64 encoding, so no narrowing floating
-conversion happens and no operand can reach an out-of-range one; `Float64` is
-bit-preserving, a signed zero keeps its sign, and a NaN keeps its class. Each
-element moves through a local byte buffer rather than a cast, so an unaligned
-access is ordinary, and every index and size comparison is written so that no
-host addition can wrap. `ArrayBuffer.isView` now reports the one admitted view
-kind. The generated-code ABI gains no entry point.
+`BigUint64`. Each `get` accessor runs `ToIndex` over the byte offset, then
+`ToBoolean` over the byte-order flag; each `set` accessor runs `ToIndex`, then
+`ToNumber` or `ToBigInt` over the stored value, then `ToBoolean`. Both then run
+the out-of-bounds `TypeError` and the range `RangeError`, so a conversion that
+detaches or shrinks the buffer still reaches the specified rejection. A
+one-byte accessor takes no byte-order parameter: it passes little-endian
+directly and runs no `ToBoolean`. The integer element types truncate and wrap
+modulo the element width in two's complement. The float element types round to
+nearest with ties to even using exact integer arithmetic over the operand's own
+binary64 encoding, so no narrowing floating conversion happens and no operand
+can reach an out-of-range one; `Float64` is bit-preserving, a signed zero keeps
+its sign, and a NaN keeps its class. Each element moves through a local byte
+buffer rather than a cast, so an unaligned access is ordinary, and every index
+and size comparison is written so that no host addition can wrap.
+`ArrayBuffer.isView` now reports the one admitted view kind. The generated-code
+ABI gains no entry point.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

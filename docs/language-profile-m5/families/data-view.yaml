@@ -8,7 +8,12 @@ scope:
     detached and range validation that runs before and again after
     `OrdinaryCreateFromConstructor` reads the new target's `prototype`,
     and the fixed-length or length-tracking `[[ByteLength]]` the
-    candidate edition selects from the buffer's resizability."
+    candidate edition selects from the buffer's resizability. No
+    admitted source construct reaches that `prototype` read with an
+    accessor, because a class's `prototype` is a non-configurable data
+    property and `Reflect.construct` and `Proxy` stay unadmitted, so the
+    second validation's evidence is direct native observation of a
+    detach and of each resize outcome under that read."
   - "`%DataView.prototype%` as an ordinary object with no `[[DataView]]`
     slot, its `constructor` and `Symbol.toStringTag` properties, and the
     `buffer`, `byteLength`, and `byteOffset` accessors. `buffer` reports
@@ -17,10 +22,13 @@ scope:
   - "The eleven `get` and eleven `set` element accessors over the
     `Int8`, `Uint8`, `Int16`, `Uint16`, `Int32`, `Uint32`, `Float16`,
     `Float32`, `Float64`, `BigInt64`, and `BigUint64` element types,
-    with their names, lengths, and descriptors; the specified order of
-    `ToIndex`, `ToNumber` or `ToBigInt`, `ToBoolean`, the
-    out-of-bounds `TypeError`, and the range `RangeError`; and the byte
-    order both parameters select."
+    with their names, lengths, and descriptors; the specified order,
+    which is `ToIndex` then `ToBoolean` for a `get` accessor and
+    `ToIndex`, then `ToNumber` or `ToBigInt`, then `ToBoolean` for a
+    `set` accessor, followed in both by the out-of-bounds `TypeError`
+    and the range `RangeError`; and the byte order both parameters
+    select. A one-byte accessor takes no byte-order parameter: it
+    passes little-endian directly and runs no `ToBoolean`."
   - "`NumericToRawBytes` and `RawBytesToNumeric` for every admitted
     element type. The integer types wrap through exact truncation modulo
     the element width in two's complement. The float types round to

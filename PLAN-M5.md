@@ -4423,17 +4423,19 @@ accessors and the eleven `get` and eleven `set` element accessors recompute the
 buffer's detached state and byte length on every call, so a detached or shrunk
 buffer produces the specified `TypeError` while `buffer` still reports it.
 
-Each element accessor runs `ToIndex`, then `ToNumber` or `ToBigInt`, then
-`ToBoolean`, then the out-of-bounds `TypeError` and the range `RangeError`, so
-a conversion that detaches or shrinks the buffer still reaches the specified
-rejection. Integer element types wrap modulo the element width in two's
-complement. Float element types round to nearest with ties to even in exact
-integer arithmetic over the operand's own binary64 encoding, so no narrowing
-floating conversion and no out-of-range conversion occurs; `Float64` is
-bit-preserving, a signed zero keeps its sign, and a NaN keeps its class. Every
-element moves through a local byte buffer rather than a cast, so an unaligned
-access is ordinary, and every index and size comparison is written so no host
-addition can wrap.
+Each `get` accessor runs `ToIndex`, then `ToBoolean`; each `set` accessor runs
+`ToIndex`, then `ToNumber` or `ToBigInt` over the stored value, then
+`ToBoolean`. Both then run the out-of-bounds `TypeError` and the range
+`RangeError`, so a conversion that detaches or shrinks the buffer still reaches
+the specified rejection. A one-byte accessor takes no byte-order parameter: it
+passes little-endian directly and runs no `ToBoolean`. Integer element types
+wrap modulo the element width in two's complement. Float element types round to
+nearest with ties to even in exact integer arithmetic over the operand's own
+binary64 encoding, so no narrowing floating conversion and no out-of-range
+conversion occurs; `Float64` is bit-preserving, a signed zero keeps its sign,
+and a NaN keeps its class. Every element moves through a local byte buffer
+rather than a cast, so an unaligned access is ordinary, and every index and
+size comparison is written so no host addition can wrap.
 
 The new *runtime\_data\_view.c* component owns that object model and owns no
 Data Block: it holds only its buffer's value, the collector keeps the block

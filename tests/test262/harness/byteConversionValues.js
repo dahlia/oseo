@@ -56,21 +56,32 @@ var byteConversionValues = {
     Infinity,
     -Infinity,
     0,
-    2049, // an integer which rounds down under ties-to-even when cast to float16
+    // an integer which rounds down under ties-to-even when cast to float16
+    2049,
     2051, // an integer which rounds up under ties-to-even when cast to float16
     0.00006103515625, // smallest normal float16
     0.00006097555160522461, // largest subnormal float16
     5.960464477539063e-8, // smallest float16
-    2.9802322387695312e-8, // largest double which rounds to 0 when cast to float16
-    2.980232238769532e-8, // smallest double which does not round to 0 when cast to float16
-    8.940696716308594e-8, // a double which rounds up to a subnormal under ties-to-even when cast to float16
-    1.4901161193847656e-7, // a double which rounds down to a subnormal under ties-to-even when cast to float16
-    1.490116119384766e-7, // the next double above the one on the previous line one
+    // largest double which rounds to 0 when cast to float16
+    2.9802322387695312e-8,
+    // smallest double which does not round to 0 when cast to float16
+    2.980232238769532e-8,
+    // a double which rounds up to a subnormal under ties-to-even when cast to
+    // float16
+    8.940696716308594e-8,
+    // a double which rounds down to a subnormal under ties-to-even when cast to
+    // float16
+    1.4901161193847656e-7,
+    // the next double above the preceding value
+    1.490116119384766e-7,
     65504, // max finite float16
     65520, // smallest double which rounds to infinity when cast to float16
-    65519.99999999999, // largest double which does not round to infinity when cast to float16
-    0.000061005353927612305, // smallest double which rounds to a non-subnormal when cast to float16
-    0.0000610053539276123, // largest double which rounds to a subnormal when cast to float16
+    // largest double which does not round to infinity when cast to float16
+    65519.99999999999,
+    // smallest double which rounds to a non-subnormal when cast to float16
+    0.000061005353927612305,
+    // largest double which rounds to a subnormal when cast to float16
+    0.0000610053539276123,
   ],
 
   expected: {
