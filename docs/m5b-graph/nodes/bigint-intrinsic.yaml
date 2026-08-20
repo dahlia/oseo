@@ -11,5 +11,5 @@ inventory:
 dependencies:
   - number-intrinsic
   - object-prototype
-landed: false
+landed: true
 status: ready
