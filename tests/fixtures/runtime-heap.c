@@ -1344,6 +1344,245 @@ static void test_global_this_install_failure(void) {
     oseo_context_destroy(&injected);
 }
 
+typedef enum {
+    DATA_VIEW_ALLOCATION_CLUSTER,
+    DATA_VIEW_ALLOCATION_VIEW,
+    DATA_VIEW_ALLOCATION_ELEMENT,
+    DATA_VIEW_ALLOCATION_OPERATION_COUNT,
+} DataViewAllocationOperation;
+
+/* new ArrayBuffer(byteLength), for a context that already has %ArrayBuffer%. */
+static OseoValue make_array_buffer(OseoContext *context, double byte_length) {
+    OseoValue constructor =
+        require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_ARRAY_BUFFER));
+    OseoValue argument = oseo_number(byte_length);
+    return require_normal(oseo_call_function(
+        context,
+        constructor,
+        oseo_undefined(),
+        1u,
+        &argument,
+        constructor
+    ));
+}
+
+static void prepare_data_view_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    DataViewAllocationOperation operation
+) {
+    if (operation == DATA_VIEW_ALLOCATION_CLUSTER) {
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_OBJECT)
+        );
+        return;
+    }
+    roots[0] = require_normal(
+        oseo_intrinsic(context, OSEO_INTRINSIC_DATA_VIEW)
+    );
+    roots[1] = make_array_buffer(context, 8.0);
+    roots[2] = roots[0];
+    if (operation == DATA_VIEW_ALLOCATION_ELEMENT) {
+        OseoValue arguments[2] = {roots[1], oseo_number(0.0)};
+        roots[1] = require_normal(oseo_call_function(
+            context,
+            roots[0],
+            oseo_undefined(),
+            2u,
+            arguments,
+            roots[0]
+        ));
+        roots[0] = require_normal(
+            oseo_intrinsic(context, OSEO_INTRINSIC_DATA_VIEW_GET_BIG_INT64)
+        );
+    }
+}
+
+static OseoResult run_data_view_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    DataViewAllocationOperation operation
+) {
+    if (operation == DATA_VIEW_ALLOCATION_CLUSTER) {
+        return oseo_intrinsic(context, OSEO_INTRINSIC_DATA_VIEW);
+    }
+    if (operation == DATA_VIEW_ALLOCATION_VIEW) {
+        OseoValue arguments[2] = {roots[1], oseo_number(0.0)};
+        return oseo_call_function(
+            context,
+            roots[0],
+            oseo_undefined(),
+            2u,
+            arguments,
+            roots[0]
+        );
+    }
+    OseoValue offset = oseo_number(0.0);
+    return oseo_call_function(
+        context,
+        roots[0],
+        roots[1],
+        1u,
+        &offset,
+        oseo_undefined()
+    );
+}
+
+static void assert_data_view_cluster_unpublished(const OseoContext *context) {
+    for (size_t intrinsic = OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE;
+         intrinsic <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64;
+         intrinsic += 1u) {
+        assert(context->intrinsics[intrinsic] == oseo_undefined());
+    }
+}
+
+static size_t data_view_allocation_attempt_count(
+    DataViewAllocationOperation operation
+) {
+    OseoContext context;
+    OseoValue roots[6] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 6u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    prepare_data_view_allocation_operation(&context, roots, operation);
+    context.collect_every_safepoint = true;
+    oseo_context_fail_allocation_at(&context, 0u);
+    roots[3] = require_normal(
+        run_data_view_allocation_operation(&context, roots, operation)
+    );
+    size_t attempts = context.allocation_attempts;
+    assert(attempts > 0u && attempts <= 512u);
+    oseo_collect(&context);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+    return attempts;
+}
+
+/* One byte length read through the %DataView.prototype% byteLength getter. */
+static OseoValue data_view_byte_length_of(
+    OseoContext *context,
+    OseoValue view
+) {
+    OseoValue getter = require_normal(
+        oseo_intrinsic(context, OSEO_INTRINSIC_DATA_VIEW_BYTE_LENGTH)
+    );
+    return require_normal(oseo_call_function(
+        context,
+        getter,
+        view,
+        0u,
+        NULL,
+        oseo_undefined()
+    ));
+}
+
+static void validate_data_view_allocation_retry(
+    OseoContext *context,
+    OseoValue *roots,
+    DataViewAllocationOperation operation
+) {
+    if (operation == DATA_VIEW_ALLOCATION_CLUSTER) {
+        assert(
+            roots[3] ==
+            require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_DATA_VIEW))
+        );
+        for (size_t intrinsic = OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE;
+             intrinsic <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64;
+             intrinsic += 1u) {
+            assert(context->intrinsics[intrinsic] != oseo_undefined());
+        }
+        return;
+    }
+    if (operation == DATA_VIEW_ALLOCATION_VIEW) {
+        roots[4] = data_view_byte_length_of(context, roots[3]);
+        assert(
+            require_normal(
+                oseo_strict_equal(context, roots[4], oseo_number(8.0))
+            ) == oseo_boolean(true)
+        );
+        return;
+    }
+    roots[4] = require_normal(oseo_to_string(context, roots[3]));
+    roots[5] = make_text(context, "0");
+    assert(
+        require_normal(oseo_strict_equal(context, roots[4], roots[5])) ==
+        oseo_boolean(true)
+    );
+}
+
+/*
+ * Every allocation in each DataView-owned path fails once in a fresh
+ * context. A view owns no Data Block, so the only records these paths
+ * publish are the intrinsic cluster, the view itself, and the BigInt a
+ * 64-bit load produces; none of them is published by a failed attempt.
+ * Collection then runs and the same context retries with stable
+ * intrinsic identity and a complete, rooted result.
+ */
+static void test_data_view_allocation_sweep(void) {
+    for (DataViewAllocationOperation operation = DATA_VIEW_ALLOCATION_CLUSTER;
+         operation < DATA_VIEW_ALLOCATION_OPERATION_COUNT;
+         operation += 1) {
+        size_t attempts = data_view_allocation_attempt_count(operation);
+        for (size_t attempt = 1u; attempt <= attempts; attempt += 1u) {
+            OseoContext context;
+            OseoValue roots[6] = {
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+            };
+            OseoRootFrame frame = {NULL, roots, 6u};
+            oseo_context_init(&context, "runtime-heap.c", 14u);
+            oseo_roots_push(&context, &frame);
+            prepare_data_view_allocation_operation(&context, roots, operation);
+            OseoValue identity = roots[2];
+            context.collect_every_safepoint = true;
+            oseo_context_fail_allocation_at(&context, attempt);
+            OseoResult failed = run_data_view_allocation_operation(
+                &context,
+                roots,
+                operation
+            );
+            assert(failed.status == OSEO_STATUS_THROW);
+            assert(failed.value == oseo_undefined());
+            assert(context.has_diagnostic);
+            if (operation == DATA_VIEW_ALLOCATION_CLUSTER) {
+                assert_data_view_cluster_unpublished(&context);
+            } else {
+                assert(
+                    require_normal(oseo_intrinsic(
+                        &context,
+                        OSEO_INTRINSIC_DATA_VIEW
+                    )) == identity
+                );
+            }
+            oseo_collect(&context);
+            oseo_context_fail_allocation_at(&context, 0u);
+            context.has_diagnostic = false;
+            context.error_code = NULL;
+            context.error_message = NULL;
+            roots[3] = require_normal(run_data_view_allocation_operation(
+                &context,
+                roots,
+                operation
+            ));
+            oseo_collect(&context);
+            validate_data_view_allocation_retry(&context, roots, operation);
+            oseo_roots_pop(&context, &frame);
+            oseo_context_destroy(&context);
+        }
+    }
+}
+
 static void test_string_length_limit(OseoContext *context) {
     OseoResult result = oseo_string_from_units(
         context,
@@ -1766,6 +2005,7 @@ int main(void) {
     test_accessor_descriptor_gc_safety(&context, frame.slots);
     test_global_this_install_failure();
     test_bigint_allocation_sweep();
+    test_data_view_allocation_sweep();
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);

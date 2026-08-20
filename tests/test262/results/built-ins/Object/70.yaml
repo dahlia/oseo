@@ -295,7 +295,7 @@ results:
         date-object-that-uses-object-s-get-own-property.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/seal/object-seal-p-is-own-proper\
-        ty-of-a-date-object-that-uses-object-s-get-own-property.js:336:\
+        ty-of-a-date-object-that-uses-object-s-get-own-property.js:347:\
         15: error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -1,0 +1,62 @@
+group: built-ins/DataView
+key: cd
+results:
+  - case:
+      async: false
+      features:
+        - resizable-arraybuffer
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/DataView/custom-proto-access-resizes-buffer-valid-by-offset.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+      - data-view
+    observation:
+      detail: "test/built-ins/DataView/custom-proto-access-resizes-buffer-val\
+        id-by-offset.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/DataView/custom-proto-access-resizes-bu\
+        ffer-valid-by-offset.js:107:14: error[OSEO1001]: Unknown binding
+        'Reflect'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - detachArrayBuffer.js
+      mode: script
+      path: test/built-ins/DataView/prototype/setFloat32/detached-buffer-after-toindex-byteoffset.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - array-buffer
+      - data-view
+    execution:
+      harnessIncludes:
+        - base.js
+        - detachArrayBuffer.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

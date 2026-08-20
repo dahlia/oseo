@@ -36,6 +36,7 @@ import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
+import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
@@ -118,6 +119,7 @@ const fixtures: readonly Fixture[] = [
   ...bindingFixtures,
   ...bigintFixtures,
   ...bigintIntrinsicFixtures,
+  ...dataViewFixtures,
   ...expressionFixtures,
   ...receiverFixtures,
   ...generatorFixtures,
@@ -359,6 +361,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
+    fixture.name === "data-view" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -563,6 +566,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typeof-void-remainder" ||
     fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-intrinsic" ||
+    fixture.name === "data-view" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -631,6 +635,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-iterative" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
+            fixture.name === "data-view" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -817,10 +822,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus fifteen admitted constructor
-            // property names shared by every Script, BigInt being the one
+            // value-property allocations plus sixteen admitted constructor
+            // property names shared by every Script, DataView being the one
             // this node admits.
-            assert.equal(native.counters.allocations, 31);
+            assert.equal(native.counters.allocations, 32);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

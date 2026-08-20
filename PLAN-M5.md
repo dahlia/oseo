@@ -4411,6 +4411,69 @@ unsupported profile features, with no semantic, harness, or infrastructure
 failures. The suite revision and 41,091-path applicable inventory remain
 unchanged.
 
+Implemented M5b node `data-view` materializes `%DataView%` and
+`%DataView.prototype%` over the Data Block the `array-buffer` node owns, so a
+program can read and write those bytes for the first time. The constructor
+requires `new` and an `ArrayBuffer`, runs `ToIndex` over `byteOffset` and then
+over `byteLength`, and validates the detached state and both bounds once before
+and once after `OrdinaryCreateFromConstructor` reads the new target's
+`prototype`. An absent `byteLength` fixes the view's length over a fixed-length
+buffer and makes it length-tracking over a resizable one. The three prototype
+accessors and the eleven `get` and eleven `set` element accessors recompute the
+buffer's detached state and byte length on every call, so a detached or shrunk
+buffer produces the specified `TypeError` while `buffer` still reports it.
+
+Each element accessor runs `ToIndex`, then `ToNumber` or `ToBigInt`, then
+`ToBoolean`, then the out-of-bounds `TypeError` and the range `RangeError`, so
+a conversion that detaches or shrinks the buffer still reaches the specified
+rejection. Integer element types wrap modulo the element width in two's
+complement. Float element types round to nearest with ties to even in exact
+integer arithmetic over the operand's own binary64 encoding, so no narrowing
+floating conversion and no out-of-range conversion occurs; `Float64` is
+bit-preserving, a signed zero keeps its sign, and a NaN keeps its class. Every
+element moves through a local byte buffer rather than a cast, so an unaligned
+access is ordinary, and every index and size comparison is written so no host
+addition can wrap.
+
+The new *runtime\_data\_view.c* component owns that object model and owns no
+Data Block: it holds only its buffer's value, the collector keeps the block
+alive by tracing that buffer, and nothing in the component allocates, resizes,
+or releases a block. It reads no BigInt limb, reaching the representation only
+through raw-integer operations *runtime\_bigint.c* exports. `ToIndex` becomes
+one shared conversion in *runtime\_primitive.c*, which `ArrayBuffer` now calls
+with its own diagnostic, and `ArrayBuffer.isView` reports the one admitted view
+kind. Fixed and generated differential evidence covers both reference hosts,
+both specialization policies, forced collection at every safepoint, false
+hints, guard misses, mutable global binding behavior, every conversion and
+failure order, subclass construction, unaligned access at every offset of an
+eight-byte element, tracking and fixed-length views across grow and shrink, and
+a bounded allocation-attempt sweep over the view record, the intrinsic cluster,
+and the BigInt a 64-bit load produces, each collected and retried to prove
+cleanup, roots, stable identity, and complete publication. The generated family
+uses seed `0x60004c00` in the reserved block through `0x60004cff` with an
+independent byte-level model that reads no host `DataView` and no host BigInt.
+The runtime ABI moves to `oseo-runtime-m5-73`, and built-in code range index 15
+is allocated without a gap. No compiler IR, generated-code entry point,
+inventory policy, manifest schema, or override changes.
+
+All 550 paths under *test/built-ins/DataView/* are reviewed: 443 pass and 107
+retain explicit boundaries. Thirty-nine need `SharedArrayBuffer`, thirty-two
+need `Reflect.construct` or the `Reflect` namespace, thirty need a TypedArray
+constructor, four need the deferred non-BigInt primitive-wrapper prototype
+methods, and one reaches an unresolvable identifier this profile rejects at
+compile time; two of the `Reflect` paths also need a second realm. Five
+already-reviewed `ArrayBuffer` paths, one `Array.prototype` path, and one
+`Object.seal` path outside that root move from unsupported to pass. The
+reviewed feature list gains `DataView`, `Float16Array`, and the eight
+`DataView.prototype.*` accessor features this node implements; the reviewed
+dependency vocabulary gains `data-view`; and the reviewed harness gains
+upstream's *byteConversionValues.js* data table and a
+`verifyPrimordialProperty` alias. The combined manifest moves from 11,441 to
+11,991 paths, from 8,468 to 8,918 passes, keeps 1,364 expected negatives, and
+moves from 1,609 to 1,709 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The suite revision and 41,091-path
+applicable inventory remain unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

@@ -1,0 +1,58 @@
+group: built-ins/DataView
+key: "32"
+results:
+  - case:
+      async: false
+      features:
+        - SharedArrayBuffer
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/DataView/prototype/getInt32/return-abrupt-from-tonumber-byteoffset-sab.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+      - data-view
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - SharedArrayBuffer
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/DataView/prototype/setInt32/this-is-not-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - array-buffer
+      - data-view
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

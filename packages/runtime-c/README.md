@@ -561,6 +561,43 @@ reject every other receiver, including `%BigInt.prototype%` itself.
 `%BigInt.prototype%` carries `Symbol.toStringTag` `"BigInt"`. The
 generated-code ABI gains no entry point.
 
+The `m5-73` ABI adds the *runtime\_data\_view.c* component and materializes
+`%DataView%` and `%DataView.prototype%` over the already admitted
+`ArrayBuffer` Data Block. `DataView` is a constructor the global object binds
+as a writable, non-enumerable, configurable property, so calling it without
+`new` throws `TypeError`. It requires an `ArrayBuffer` argument, runs `ToIndex`
+over `byteOffset` and then over `byteLength`, and validates the detached state
+and both bounds once before and once after `OrdinaryCreateFromConstructor`
+reads the new target's `prototype`, so arbitrary code in that read observes
+the specified second rejection. An absent `byteLength` fixes the view's length
+over a fixed-length buffer and makes it length-tracking over a resizable one.
+
+A view owns no Data Block. It holds only its buffer's value, so the collector
+keeps the block alive by tracing the buffer, and nothing in the component
+allocates, resizes, or releases a block. Every accessor and every element
+access recomputes the buffer's detached state and byte length, so a detached
+or shrunk buffer produces the specified `TypeError` from `byteLength`,
+`byteOffset`, and every `get` and `set`, while `buffer` still reports the
+detached buffer. A zero-length view exactly at the end of its buffer stays in
+bounds.
+
+The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
+`Uint16`, `Int32`, `Uint32`, `Float16`, `Float32`, `Float64`, `BigInt64`, and
+`BigUint64`. Each runs `ToIndex` over the byte offset, then `ToNumber` or
+`ToBigInt` over a stored value, then `ToBoolean` over the byte-order flag,
+then the out-of-bounds `TypeError` and the range `RangeError`, so a conversion
+that detaches or shrinks the buffer still reaches the specified rejection. A
+one-byte element has no byte order and ignores its flag. The integer element
+types truncate and wrap modulo the element width in two's complement. The
+float element types round to nearest with ties to even using exact integer
+arithmetic over the operand's own binary64 encoding, so no narrowing floating
+conversion happens and no operand can reach an out-of-range one; `Float64` is
+bit-preserving, a signed zero keeps its sign, and a NaN keeps its class. Each
+element moves through a local byte buffer rather than a cast, so an unaligned
+access is ordinary, and every index and size comparison is written so that no
+host addition can wrap. `ArrayBuffer.isView` now reports the one admitted view
+kind. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

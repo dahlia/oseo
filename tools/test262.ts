@@ -106,6 +106,10 @@ const compareArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareArray.js",
 );
+const byteConversionHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/byteConversionValues.js",
+);
 const compareIteratorHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareIterator.js",
@@ -1357,6 +1361,10 @@ async function readHarnesses(): Promise<Test262Harnesses> {
     done: await readFile(doneHarnessPath, "utf8"),
     includes: new Map([
       ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
+      [
+        "byteConversionValues.js",
+        await readFile(byteConversionHarnessPath, "utf8"),
+      ],
       ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
       [
         "compareIterator.js",

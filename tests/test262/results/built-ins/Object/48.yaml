@@ -279,7 +279,7 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/seal/object-seal-p-is-own-proper\
         ty-of-a-reg-exp-object-that-uses-object-s-get-own-property.js:3\
-        36:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+        47:15: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

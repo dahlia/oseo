@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Number/POSITIVE_INFINITY/S15.7.3.6_A2.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Number/POSITIVE_INFINITY/S15.7.3.6_A2.j\
-        s:339:4: error[OSEO1001]: Unknown binding 'isFinite'.\\n\""
+        s:350:4: error[OSEO1001]: Unknown binding 'isFinite'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

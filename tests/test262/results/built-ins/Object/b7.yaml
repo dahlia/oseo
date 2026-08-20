@@ -20,7 +20,7 @@ results:
       detail: "test/built-ins/Object/defineProperties/15.2.3.7-5-b-156.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/defineProperties/15.2.3.7-5-b-15\
-        6.js:340:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
+        6.js:351:1: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -3883,6 +3883,77 @@ features, with no semantic, harness, or infrastructure failures. The suite
 revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged.
 
+M5b node `data-view` materializes `%DataView%` and `%DataView.prototype%` over
+the Data Block the `array-buffer` node already owns, so a program can read and
+write those bytes for the first time. The constructor requires `new`, requires
+an `ArrayBuffer`, runs `ToIndex` over `byteOffset` and then over `byteLength`,
+and validates the detached state and both bounds once before and once after
+`OrdinaryCreateFromConstructor` reads the new target's `prototype`. An absent
+`byteLength` fixes the view's length over a fixed-length buffer and makes it
+length-tracking over a resizable one, which is the candidate edition's `auto`.
+
+A view owns no Data Block. It holds only its buffer's value, so the collector
+keeps the block alive by tracing the buffer, and nothing in the component
+allocates, resizes, or releases a block. Every accessor and every element
+access recomputes the buffer's detached state and byte length, so a detached or
+shrunk buffer produces the specified `TypeError` from `byteLength`,
+`byteOffset`, and every `get` and `set`, while `buffer` still reports the
+detached buffer. A zero-length view exactly at the end of its buffer stays in
+bounds.
+
+The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
+`Uint16`, `Int32`, `Uint32`, `Float16`, `Float32`, `Float64`, `BigInt64`, and
+`BigUint64`. Each runs `ToIndex` over the byte offset, then `ToNumber` or
+`ToBigInt` over a stored value, then `ToBoolean` over the byte-order flag, then
+the out-of-bounds `TypeError` and the range `RangeError`, so a conversion that
+detaches or shrinks the buffer still reaches the specified rejection. The
+integer element types truncate and wrap modulo the element width in two's
+complement. The float element types round to nearest with ties to even in exact
+integer arithmetic over the operand's own binary64 encoding, so no narrowing
+floating conversion happens and no operand can reach an out-of-range one;
+`Float64` is bit-preserving, a signed zero keeps its sign, and a NaN keeps its
+class. Each element moves through a local byte buffer rather than a cast, so an
+unaligned access is ordinary, and every index and size comparison is written so
+that no host addition can wrap. `ArrayBuffer.isView` now reports the one
+admitted view kind.
+
+The object model lives in *runtime\_data\_view.c* and reads no BigInt limb: the
+two 64-bit element types reach the representation only through the raw-integer
+operations *runtime\_bigint.c* exports. `ToIndex` becomes one shared conversion
+in *runtime\_primitive.c* that both this node and `ArrayBuffer` call with their
+own diagnostics. Fixed and generated differential evidence covers both
+reference hosts, both specialization policies, forced collection at every
+safepoint, false hints, guard misses, mutable global binding behavior, every
+conversion and failure order, subclass construction, unaligned access at every
+offset of an eight-byte element, length-tracking and fixed-length views across
+grow and shrink, and a deterministic allocation-attempt sweep over the view
+record, the intrinsic cluster, and the BigInt a 64-bit load produces. Each
+failed attempt is collected and retried to prove cleanup, roots, stable
+identity, and complete publication. The generated family uses seed `0x60004c00`
+in the reserved block through `0x60004cff` with an independent byte-level model
+that reads no host `DataView` and no host BigInt. The runtime ABI moves to
+`oseo-runtime-m5-73`, and built-in code range index 15 is allocated without a
+gap. No compiler IR or generated-code entry point changes.
+
+All 550 paths under *test/built-ins/DataView/* are reviewed: 443 pass and 107
+retain explicit boundaries. Thirty-nine need `SharedArrayBuffer`, thirty-two
+need `Reflect.construct` or the `Reflect` namespace, thirty need a TypedArray
+constructor, four need the deferred non-BigInt primitive-wrapper prototype
+methods, one reaches an unresolvable identifier this profile rejects at compile
+time, and two of those also need a second realm. Five already-reviewed
+`ArrayBuffer` paths, one `Array.prototype` path, and one `Object.seal` path
+outside that root move from unsupported to pass. The reviewed feature list
+gains `DataView`, `Float16Array`, and the eight `DataView.prototype.*` accessor
+features this node implements; the reviewed dependency vocabulary gains
+`data-view`; and the reviewed harness gains upstream's
+`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias
+whose reviewed `verifyProperty` already restores what it probes. The complete
+manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918 passes, keeps
+1,364 expected negatives, and moves from 1,609 to 1,709 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema, and zero-override policy are
+unchanged.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3902,10 +3973,11 @@ complete. The remaining gaps retain their existing owners.
     `bigint-intrinsic` node, both as recorded above. `Object` supplies
     collector-traced BigInt wrappers whose ordinary `ToPrimitive` now reaches
     the real prototype methods. What remains is the dependent-family
-    connection: typed arrays, `DataView`, `Atomics`, and `JSON` consume
-    `ToBigInt`, `asIntN`, and `asUintN` but keep their own object, buffer, and
-    concurrency prerequisites. `BigInt` now has the specified throwing
-    `[[Construct]]`, but reviewed cases that require the separately unadmitted
+    connection: the M5b `data-view` node now consumes `ToBigInt` for its two
+    64-bit element types, while typed arrays, `Atomics`, and `JSON` keep their
+    own object and concurrency prerequisites. `BigInt` now has the specified
+    throwing `[[Construct]]`, but reviewed cases that require the separately
+    unadmitted
     `Reflect.construct` namespace remain `unsupported-profile-feature` instead
     of borrowing a partial result. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
     delivery items 8 through 10.
@@ -3942,11 +4014,12 @@ complete. The remaining gaps retain their existing owners.
     built-in objects stream.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, and the
-    `ArrayBuffer` constructor with its Data Block. The remaining standard
+    `ArrayBuffer` constructor with its Data Block, and `DataView` over that
+    block. The remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
-    `ArrayBuffer.isView` reports `false` for every value this profile can
-    produce, and the node that admits a view kind extends it with that
-    kind's brand.
+    `ArrayBuffer.isView` reports `true` for a `DataView` and `false` for
+    every other value this profile can produce; the node that admits a
+    TypedArray extends it with that kind's brand.
     No built-in dispatches through `Symbol.hasInstance` yet. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
@@ -3957,8 +4030,8 @@ complete. The remaining gaps retain their existing owners.
     top-level `this` and every non-strict nullish receiver one realm-wide
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
-    admitted `ArrayBuffer`, `BigInt`, `Map`, `Object`, `Number`, `Promise`,
-    and `String` identities. Because this realm
+    admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
+    `Promise`, and `String` identities. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

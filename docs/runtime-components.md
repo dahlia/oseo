@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-eight reviewed assets in this order:
+The runtime input now lists twenty-nine reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
@@ -27,12 +27,14 @@ The runtime input now lists twenty-eight reviewed assets in this order:
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
 *runtime\_primitive.c*, *runtime\_promise.c*,
-*runtime\_event\_loop.c*, *runtime\_map.c*, and
-*runtime\_bigint\_object.c*. The M5 named-error-intrinsics
+*runtime\_event\_loop.c*, *runtime\_map.c*,
+*runtime\_bigint\_object.c*, and *runtime\_data\_view.c*. The M5
+named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
-map-intrinsic, and BigInt-intrinsic units each added one component the same
+map-intrinsic, BigInt-intrinsic, and DataView units each added one
+component the same
 way. The M5b
 preparation unit then split the
 original *runtime\_object.c* into the eight object-family components
@@ -146,7 +148,15 @@ Ownership follows the plan's target layout:
     `toString`, `toLocaleString`, and `valueOf` methods, the
     `thisBigIntValue` brand check, and the `ToBigInt` and `NumberToBigInt`
     conversions. It reads no limb: the representation stays behind the
-    private operations *runtime\_bigint.c* exports.
+    private operations *runtime\_bigint.c* exports;
+ -  *runtime\_data\_view.c*: the `%DataView%` intrinsic,
+    `%DataView.prototype%` with its `buffer`, `byteLength`, and
+    `byteOffset` accessors, and the eleven `get` and eleven `set`
+    element accessors with their `NumericToRawBytes` and
+    `RawBytesToNumeric` conversions and byte-order handling. It owns no
+    Data Block: it holds only its buffer's value, rereads that buffer's
+    pointer, byte length, and detached state on every access, and never
+    allocates, resizes, or releases a block.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
@@ -205,7 +215,7 @@ its read and write.
 
 ### Internal helpers
 
-One hundred and fourteen helpers cross a translation-unit boundary. Each uses
+One hundred and twenty helpers cross a translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -260,6 +270,12 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_to_bigint`                           | *runtime\_bigint\_object.c*   |
 | `oseo_internal_bigint_intrinsic`                    | *runtime\_bigint\_object.c*   |
 | `oseo_internal_install_bigint_global`               | *runtime\_bigint\_object.c*   |
+| `oseo_internal_bigint_to_raw_uint64`                | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_from_uint64`                  | *runtime\_bigint.c*           |
+| `oseo_internal_to_index`                            | *runtime\_primitive.c*        |
+| `oseo_internal_data_view_builtin_dispatch`          | *runtime\_data\_view.c*       |
+| `oseo_internal_data_view_intrinsic`                 | *runtime\_data\_view.c*       |
+| `oseo_internal_install_data_view_global`            | *runtime\_data\_view.c*       |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
 | `oseo_internal_append_own_property`                 | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |

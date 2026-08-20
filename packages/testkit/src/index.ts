@@ -95,6 +95,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "bigint-primitive",
   "classes",
   "control-flow",
+  "data-view",
   "default-parameters",
   "destructuring-bindings",
   "dynamic-source",

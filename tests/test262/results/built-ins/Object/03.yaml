@@ -263,7 +263,7 @@ results:
     observation:
       detail: "test/built-ins/Object/freeze/15.2.3.9-2-c-4.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/freeze/15.2.3.9-2-c-4.js:381:99:
+        stderr=\"test/built-ins/Object/freeze/15.2.3.9-2-c-4.js:392:99:
         error[OSEO1001]: Unknown binding 'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
