@@ -1,4 +1,9 @@
 import type {
+  RegExpMatcherInstruction,
+  RegExpMatcherProgram,
+  RegExpMatcherSet,
+} from "./regexp-matcher.ts";
+import type {
   RegExpAlternative,
   RegExpClassItem,
   RegExpDisjunction,
@@ -146,5 +151,133 @@ export function printRegExpPattern(pattern: RegExpPattern): string {
     `pattern /${pattern.source}/${pattern.flags.text}\n` +
     `  captures ${captures}\n` +
     printDisjunction(pattern.body, "  ")
+  );
+}
+
+function address(value: number): string {
+  return value.toString().padStart(4, "0");
+}
+
+function setText(set: RegExpMatcherSet): string {
+  const parts: string[] = [];
+  for (let index = 0; index + 1 < set.length; index += 2) {
+    const start = set[index] ?? 0;
+    const end = (set[index + 1] ?? 0) - 1;
+    parts.push(
+      start === end
+        ? `u+${start.toString(16)}`
+        : `u+${start.toString(16)}..u+${end.toString(16)}`,
+    );
+  }
+  return parts.length === 0 ? "empty" : parts.join(" ");
+}
+
+function instructionText(instruction: RegExpMatcherInstruction): string {
+  if (instruction.kind === "consume") {
+    return (
+      `consume ${instruction.backward ? "backward" : "forward"} ` +
+      `set ${instruction.set}`
+    );
+  }
+  if (instruction.kind === "edge") {
+    return (
+      `edge ${instruction.assertion}` +
+      `${instruction.multiline ? " multiline" : ""}`
+    );
+  }
+  if (instruction.kind === "boundary") {
+    const polarity = instruction.negated ? "not " : "";
+    return `boundary ${polarity}set ${instruction.set}`;
+  }
+  if (instruction.kind === "save") return `save ${instruction.slot}`;
+  if (instruction.kind === "clear") {
+    return `clear ${instruction.from}..${instruction.to}`;
+  }
+  if (instruction.kind === "fork") {
+    return (
+      `fork ${address(instruction.preferred)} ` +
+      address(instruction.alternative)
+    );
+  }
+  if (instruction.kind === "jump") return `jump ${address(instruction.target)}`;
+  if (instruction.kind === "repeat") {
+    const maximum = Number.isFinite(instruction.maximum)
+      ? String(instruction.maximum)
+      : "inf";
+    return (
+      `repeat r${instruction.counter} ${instruction.minimum}..` +
+      `${maximum} ${instruction.greedy ? "greedy" : "lazy"} ` +
+      `${address(instruction.enter)} ${address(instruction.exit)}`
+    );
+  }
+  if (instruction.kind === "repeat-init") {
+    return `repeat-init r${instruction.counter}`;
+  }
+  if (instruction.kind === "repeat-enter") {
+    return (
+      `repeat-enter r${instruction.counter} r${instruction.position} ` +
+      `clear ${instruction.clearFrom}..${instruction.clearTo} ` +
+      address(instruction.body)
+    );
+  }
+  if (instruction.kind === "repeat-end") {
+    return (
+      `repeat-end r${instruction.counter} r${instruction.position} ` +
+      `min ${instruction.minimum} ${address(instruction.head)}`
+    );
+  }
+  if (instruction.kind === "look-start") {
+    return (
+      `look-start ${instruction.negated ? "negative" : "positive"} ` +
+      `r${instruction.frame} ${address(instruction.body)} ` +
+      address(instruction.onFail)
+    );
+  }
+  if (instruction.kind === "look-end") {
+    return (
+      `look-end ${instruction.negated ? "negative" : "positive"} ` +
+      `r${instruction.frame} ${address(instruction.exit)}`
+    );
+  }
+  if (instruction.kind === "backreference") {
+    return (
+      `backreference ${instruction.backward ? "backward" : "forward"} ` +
+      `${instruction.ignoreCase ? "folded " : ""}` +
+      `slots ${instruction.slots.join(",")}`
+    );
+  }
+  if (instruction.kind === "accept") return "accept";
+  return "fail";
+}
+
+/**
+ * Render one matcher artifact as an instruction listing.
+ *
+ * The dump is the reviewed way to inspect choice order, capture writes,
+ * repetition bounds, and lookaround framing before a backend lowers the
+ * artifact. It records the compiled program rather than the written
+ * pattern, so two patterns that compile to one program share one dump.
+ */
+export function printRegExpMatcher(program: RegExpMatcherProgram): string {
+  const captures = program.captures
+    .map((capture) =>
+      capture.name == null
+        ? `${capture.index}`
+        : `${capture.index}:${capture.name}`,
+    )
+    .join(" ");
+  const sets = program.sets.map(
+    (set, index) => `    ${index} ${setText(set)}\n`,
+  );
+  const code = program.instructions.map(
+    (instruction, index) =>
+      `    ${address(index)} ${instructionText(instruction)}\n`,
+  );
+  return (
+    `matcher /${program.source}/${program.flags.text}\n` +
+    `  captures ${captures}\n` +
+    `  registers ${program.registers}\n` +
+    `  sets\n${sets.join("")}` +
+    `  code\n${code.join("")}`
   );
 }

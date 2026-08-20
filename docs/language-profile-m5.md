@@ -3917,7 +3917,10 @@ complete. The remaining gaps retain their existing owners.
     pattern parser, so an invalid pattern or flag set is an early error at
     the offending text, a construct a later unit owns is refused where it
     appears, and only a valid pattern reports one profile boundary at the
-    literal. Nothing evaluates a pattern, and no reviewed test262 path
+    literal. `@oseo/compiler` now also owns a generic matcher artifact and
+    executor for that admitted grammar, which is the semantic authority a
+    later ahead-of-time lowering must reproduce, but no compiled program
+    reaches it: nothing evaluates a pattern, and no reviewed test262 path
     covers the family yet.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
