@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 90
+M5a is complete. The normative family records described below inventory 91
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -3989,6 +3989,53 @@ negatives, and 2,192 unsupported profile features, with no semantic, harness,
 or infrastructure failures. The suite revision, inventory policy, ADR 0013
 vocabulary, and zero-override policy do not change.
 
+M5b node `regexp-intrinsic` materializes `%RegExp%` and
+`%RegExp.prototype%`, defines the constructor link and `Symbol.species`
+accessor, and installs the writable global binding. Calling `RegExp` uses the
+intrinsic as `newTarget` and preserves the specified same-constructor identity
+case. Construction keeps the actual `newTarget`, reads its `prototype` before
+operand conversion, and therefore gives a derived constructor's instances the
+derived prototype.
+
+`IsRegExp` reads `Symbol.match` before falling back to the runtime brand. A
+branded RegExp copies its internal source and, when flags are absent, its
+internal flags. Another regexp-like object supplies those values through
+ordered `source` and `flags` property reads. Allocation precedes pattern and
+flags string conversion. Every instance owns an ordinary `lastIndex` data
+property initialized to zero, writable, non-enumerable, and non-configurable,
+and points to a separately allocated immutable matcher artifact. The collector
+traces the instance, artifact, source, and flags as one ownership chain.
+
+Dynamic initialization validates the admitted generic-matcher grammar.
+Invalid patterns and flags throw a catchable `SyntaxError`; Unicode property
+escapes, Unicode set and string syntax, modifier groups, and reviewed resource
+limits retain source-located `OSEO2001` boundaries. Pattern execution, result
+construction, prototype accessors, symbol methods, String replacement,
+literal lowering, and those pattern extensions remain outside this node. The
+`exec`, `test`, and `toString` properties exist with their built-in metadata
+but report the explicit execution boundary when called.
+
+Fixed and generated differential evidence covers both reference hosts, both
+specialization policies, forced collection at every safepoint, call and
+construction behavior, regexp-like conversion order, false hints, guard hits
+and misses, subclass allocation, catchable dynamic errors, and mutable
+`lastIndex` state. A deterministic allocation-attempt sweep covers complete
+cluster construction, successful wrapper and artifact initialization, and the
+catchable-SyntaxError path. Each failed attempt is collected and retried to
+prove cleanup, roots, stable intrinsic identity, and complete publication. The
+generated family uses seeds `0x60004f00` and `0x60004f01` in the reserved block
+through `0x60004fff`, with an independent constructor-state and error oracle.
+The runtime ABI moves to `oseo-runtime-m5-75`, and built-in code range index 16
+is allocated without a gap. No generated-code entry point changes.
+
+All 492 paths in the node's reviewed RegExp roots are included: 111 pass and
+381 retain explicit downstream boundaries. Sixty-nine already-reviewed Array,
+Object, and Symbol paths outside those roots also move from unsupported to
+pass because they observe the real RegExp object. The combined manifest moves
+from 12,616 to 13,108 paths, keeps 9,098 passes and 1,506 expected negatives,
+and moves from 2,192 to 2,504 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema, and zero-override policy are unchanged.
 
 Known gaps inside the claim
 ---------------------------
@@ -4016,8 +4063,11 @@ complete. The remaining gaps retain their existing owners.
     `Reflect.construct` namespace remain `unsupported-profile-feature` instead
     of borrowing a partial result. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
     delivery items 8 through 10.
- -  Regular expression objects, matching, and ahead-of-time literal
-    compilation are outside the admitted profile and owned by
+ -  Regular expression allocation, initialization, `lastIndex`, dynamic
+    validation, and intrinsic identity are admitted by the M5b
+    `regexp-intrinsic` node as recorded above. Matching, prototype accessors
+    and methods, symbol and String integration, and ahead-of-time literal
+    compilation remain outside the admitted profile and are owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). Literal syntax is no longer
     rejected as a whole: the frontend records a literal's pattern text,
     flag text, and range as an owned value and validates it with the owned
@@ -4027,10 +4077,11 @@ complete. The remaining gaps retain their existing owners.
     only a valid pattern reports one profile boundary at the literal.
     `@oseo/compiler` also owns a generic matcher artifact and executor for
     that admitted grammar, which is the semantic authority a later
-    ahead-of-time lowering must reproduce, but no compiled program reaches
-    it: nothing evaluates a pattern. The reviewed property and character
-    class escape roots contribute 142 expected negatives and 483 explicit
-    later-node boundaries.
+    ahead-of-time lowering must reproduce. Dynamic construction reaches its
+    admitted validation and artifact boundary, but no pattern executes until
+    the next RegExp node connects that artifact to result construction. The
+    reviewed property and character class escape roots contribute 142 expected
+    negatives and 483 explicit later-node boundaries.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.

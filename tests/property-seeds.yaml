@@ -316,3 +316,7 @@ families:
     owner: tests/property/m5-regexp-unicode-property-escapes.property.test.ts
     start: 0x60004e00
     end: 0x60004eff
+  - family: m5-regexp-intrinsic
+    owner: tests/property/m5-regexp-intrinsic.property.test.ts
+    start: 0x60004f00
+    end: 0x60004fff

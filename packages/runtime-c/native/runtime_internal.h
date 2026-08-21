@@ -488,6 +488,15 @@
 #define OSEO_DATA_VIEW_SET_CODE_ID_LAST \
     (OSEO_DATA_VIEW_CODE_ID_RANGE_LAST - 15u)
 
+#define OSEO_REGEXP_CODE_ID_RANGE_INDEX ((size_t)16u)
+#define OSEO_REGEXP_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_REGEXP_CODE_ID_RANGE_INDEX)
+#define OSEO_REGEXP_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_REGEXP_CODE_ID_RANGE_INDEX)
+#define OSEO_REGEXP_CONSTRUCTOR_CODE_ID OSEO_REGEXP_CODE_ID_RANGE_LAST
+#define OSEO_REGEXP_SPECIES_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_REGEXP_DEFERRED_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 2u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -539,6 +548,8 @@ typedef enum {
     OSEO_HEAP_MAP = 19,
     OSEO_HEAP_MAP_ITERATOR = 20,
     OSEO_HEAP_DATA_VIEW = 21,
+    OSEO_HEAP_REGEXP_MATCHER = 22,
+    OSEO_HEAP_REGEXP = 23,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -1043,6 +1054,33 @@ typedef struct {
     bool track_length;
 } OseoDataView;
 
+/*
+ * One immutable matcher artifact produced from a dynamic pattern. The
+ * generic matcher consumes UTF-16 source and the normalized flag mask;
+ * keeping both as traced values makes the artifact independent from the
+ * RegExp wrapper that owns it and lets a later executor allocate only its
+ * mutable work area.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue source;
+    OseoValue flags;
+    size_t capture_count;
+    size_t instruction_count;
+    uint16_t flag_mask;
+} OseoRegExpMatcher;
+
+/*
+ * One initialized RegExp object. `matcher` is undefined only between
+ * RegExpAlloc and a successful RegExpInitialize; no such partial object is
+ * returned to source code. `lastIndex` is ordinary own property storage so
+ * every generic property operation observes its specified descriptor.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue matcher;
+} OseoRegExp;
+
 typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
@@ -1339,6 +1377,16 @@ static inline bool is_data_view(OseoValue value) {
 static inline OseoDataView *data_view_object(OseoValue value) {
     return (OseoDataView *)heap_object(value);
 }
+static inline bool is_regexp(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_REGEXP;
+}
+static inline OseoRegExp *regexp_object(OseoValue value) {
+    return (OseoRegExp *)heap_object(value);
+}
+static inline OseoRegExpMatcher *regexp_matcher_object(OseoValue value) {
+    return (OseoRegExpMatcher *)heap_object(value);
+}
 static inline bool is_map(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_MAP;
@@ -1353,7 +1401,8 @@ static inline bool is_object(OseoValue value) {
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
-        kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW;
+        kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
+        kind == OSEO_HEAP_REGEXP;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1952,6 +2001,27 @@ OseoResult oseo_internal_data_view_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_data_view_global(
     OseoContext *context,
     OseoValue global
+);
+OseoResult oseo_internal_regexp_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/* Materializes %RegExp% and its initialization-only prototype surface. */
+OseoResult oseo_internal_regexp_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_regexp_global(
+    OseoContext *context,
+    OseoValue global
+);
+/* IsRegExp, shared by the constructor and String predicate methods. */
+OseoResult oseo_internal_is_regexp(
+    OseoContext *context,
+    OseoValue value,
+    bool *regexp
 );
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%
  * methods and its `Symbol.asyncIterator`, selected by code id. */

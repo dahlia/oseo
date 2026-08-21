@@ -73,12 +73,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/String/prototype/match/invoke-builtin-match.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/String/prototype/match/invoke-builtin-m\
-        atch.js:90:21: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/String/prototype/match/invoke-builtin-match.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/match/invoke-builtin-match.js:101:12:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:

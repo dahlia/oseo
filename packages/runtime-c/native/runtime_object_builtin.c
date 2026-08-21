@@ -126,6 +126,7 @@ static OseoResult object_prototype_is_prototype_of(
 
 static const char *object_builtin_tag(OseoValue receiver) {
     if (is_array(receiver)) return "Array";
+    if (is_regexp(receiver)) return "RegExp";
     if (is_function(receiver)) return "Function";
     if (is_object(receiver) && ordinary_object(receiver)->arguments_object) {
         return "Arguments";

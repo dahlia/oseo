@@ -607,6 +607,22 @@ remains the semantic authority for those sets. This checkpoint changes no C
 layout, runtime component, generated-code entry point, allocation path, or
 built-in code range.
 
+The `m5-75` ABI adds the *runtime\_regexp.c* component and materializes the
+callable and constructible `%RegExp%` intrinsic, `%RegExp.prototype%`, the
+constructor link, and the `Symbol.species` accessor. `IsRegExp` observes
+`Symbol.match` before the native brand. Calling the intrinsic uses it as
+`newTarget` and preserves the same-constructor identity case; construction
+retains the actual `newTarget`, reads its `prototype`, and allocates an object
+with one writable, non-enumerable, non-configurable `lastIndex` data property
+initialized to zero. Pattern conversion precedes flags conversion only after
+allocation. A separately allocated immutable matcher artifact owns the
+converted source, decoded flags, capture count, and instruction budget, and the
+collector traces the RegExp-to-artifact-to-strings ownership chain. Invalid
+dynamic patterns and flags throw a catchable `SyntaxError`; unadmitted pattern
+extensions and resource limits retain `OSEO2001`. Prototype execution, result
+construction, accessors, symbol methods, and String integration remain later
+RegExp nodes. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

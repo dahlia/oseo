@@ -3,6 +3,72 @@ key: bb
 results:
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/S15.10.2.10_A1.5_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/RegExp/S15.10.2.10_A1.5_T1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.2.10_A1.5_T1.js:87:11:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/S15.10.2.8_A3_T18.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/RegExp/S15.10.2.8_A3_T18.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.2.8_A3_T18.js:89:85:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/early-err-modifiers-other-code-point-combining-i.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-modifiers
+  - case:
+      async: false
       features:
         - regexp-unicode-property-escapes
       flags: []

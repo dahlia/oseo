@@ -357,37 +357,12 @@ static bool match_matches_at(
         ) == 0;
 }
 
-/* IsRegExp, before the RegExp heap kind itself is admitted. */
 static OseoResult match_is_regexp(
     OseoContext *context,
     OseoValue value,
     bool *regexp
 ) {
-    if (!is_object(value)) {
-        *regexp = false;
-        return normal(oseo_boolean(false));
-    }
-    OseoValue slots[2] = {value, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_well_known_symbol(
-        context,
-        OSEO_WELL_KNOWN_MATCH
-    );
-    slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[1]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        tag_of(result.value) != OSEO_TAG_UNDEFINED) {
-        *regexp = oseo_to_boolean(result.value);
-    } else if (result.status == OSEO_STATUS_NORMAL) {
-        *regexp = false;
-    }
-    oseo_roots_pop(context, &frame);
-    return result.status == OSEO_STATUS_NORMAL
-        ? normal(oseo_boolean(*regexp))
-        : result;
+    return oseo_internal_is_regexp(context, value, regexp);
 }
 
 static OseoResult string_named_property(
@@ -638,6 +613,67 @@ static OseoResult string_fallback_pattern(
         : oseo_internal_value_string(context, value);
 }
 
+/*
+ * The earlier String node keeps its string-only fallback until the RegExp
+ * symbol-method node can perform RegExpCreate and Invoke. Once user code
+ * installs the corresponding prototype hook, continuing through that
+ * fallback would silently skip the observable call.
+ */
+static OseoResult deferred_regexp_string_dispatch(
+    OseoContext *context,
+    size_t code_id
+) {
+    OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_REGEXP_PROTOTYPE
+    );
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            string_symbol_index(code_id)
+        );
+        slots[1] = result.value;
+    }
+    while (result.status == OSEO_STATUS_NORMAL && is_object(slots[0])) {
+        OseoValue value = oseo_undefined();
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        if (oseo_internal_own_descriptor(
+                slots[0],
+                slots[1],
+                &value,
+                &attributes,
+                &getter,
+                &setter
+            )) {
+            bool deferred_placeholder =
+                slots[0] == context->intrinsics[
+                    OSEO_INTRINSIC_REGEXP_PROTOTYPE
+                ] &&
+                attributes.accessor &&
+                is_function(getter) &&
+                function_object(getter)->code_id ==
+                    OSEO_REGEXP_DEFERRED_CODE_ID;
+            if (!deferred_placeholder) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "RegExp String dispatch is not admitted yet."
+                );
+                break;
+            }
+        }
+        slots[0] = ordinary_object(slots[0])->prototype;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult string_match_or_search(
     OseoContext *context,
     size_t code_id,
@@ -666,6 +702,9 @@ static OseoResult string_match_or_search(
             match_argument(argument_count, arguments, 0u)
         );
         frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = deferred_regexp_string_dispatch(context, code_id);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = fallback_regexp_validate(context, frame.slots[1]);
@@ -974,6 +1013,12 @@ static OseoResult string_match_all(
             match_argument(argument_count, arguments, 0u)
         );
         frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = deferred_regexp_string_dispatch(
+            context,
+            OSEO_STRING_MATCH_ALL_CODE_ID
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = regexp_string_iterator_create(

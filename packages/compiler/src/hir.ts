@@ -372,6 +372,7 @@ export function intrinsicGlobalKind(
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "RegExp" ||
     name === "String" ||
     name === "Symbol" ||
     errorIntrinsicName(name) != null

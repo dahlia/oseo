@@ -48,4 +48,24 @@ results:
       failedPhase: parse
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-i.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-modifiers
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

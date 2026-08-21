@@ -1,0 +1,97 @@
+version: 1
+id: regexp-intrinsic
+title: "RegExp intrinsic and initialization"
+scope:
+  - "The callable and constructible `RegExp` intrinsic, its ordinary
+    prototype object, constructor link, and `Symbol.species` accessor.
+    Calling the intrinsic without `new` uses the intrinsic itself as
+    `newTarget`; the specified same-constructor call case returns its
+    RegExp argument unchanged. Construction retains the actual
+    `newTarget`, reads its `prototype` before operand conversion, and
+    falls back to the realm's `%RegExp.prototype%` for a non-object
+    value. Derived construction therefore allocates an instance with the
+    derived prototype without changing the intrinsic's allocation path."
+  - "`IsRegExp` first reads `Symbol.match`, propagating that read's abrupt
+    completion, and otherwise tests the runtime's RegExp brand. A branded
+    RegExp supplies its internal source and flags when copied. Another
+    regexp-like object supplies `source` and, only when the flags argument
+    is absent, `flags` through ordered ordinary property reads. A value
+    whose `Symbol.match` is false follows ordinary pattern conversion."
+  - "`RegExpAlloc` runs before pattern and flags string conversion. It
+    creates a collector-owned RegExp record with the selected prototype
+    and defines one own `lastIndex` data property whose initial value is
+    zero and whose attributes are writable, non-enumerable, and
+    non-configurable. Reads and writes use ordinary property semantics,
+    and each instance retains independent state."
+  - "`RegExpInitialize` converts the pattern before the flags, validates
+    the complete admitted generic-matcher grammar, and creates a separate
+    immutable collector-owned matcher artifact holding the source, flags,
+    capture count, instruction budget, and decoded flag set. Invalid
+    dynamic patterns and flags throw a catchable `SyntaxError`. The reviewed
+    pattern-length, capture-count, nesting, quantifier-bound, and instruction
+    limits retain a source-located `OSEO2001` boundary. Unicode property
+    escapes, Unicode set and string syntax, duplicate names across disjoint
+    alternatives, and modifier groups retain source-located `OSEO2001`
+    boundaries owned by their later graph nodes."
+  - "The collector traces each RegExp's matcher artifact and each
+    artifact's source and flags. A deterministic allocation-attempt sweep
+    fails every allocation in cluster publication, successful
+    initialization, and catchable-SyntaxError construction once, collects,
+    and retries in the same context. No failed path publishes a partial
+    intrinsic, wrapper, matcher, or language error."
+  - "The `exec`, `test`, and `toString` properties are present with their
+    specified built-in metadata but retain an explicit execution boundary.
+    Pattern execution, result construction, prototype accessors, symbol
+    methods, String replacement integration, literal lowering, Unicode
+    property escapes, and pattern extensions remain owned by later RegExp
+    nodes."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/regexp-intrinsic.ts
+      - tests/property/m5-regexp-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/fixtures/runtime-heap.c
+      - tests/native.ts
+      - tests/native/fixtures/regexp-intrinsic.ts
+      - tests/property/m5-regexp-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-intrinsic.ts
+      - tests/property/m5-regexp-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-intrinsic.ts
+      - tests/property/m5-regexp-intrinsic.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_regexp.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - tests/fixtures/runtime-heap.c

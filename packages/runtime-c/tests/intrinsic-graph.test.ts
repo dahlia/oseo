@@ -875,3 +875,62 @@ test("populates the realm-owned DataView intrinsic cluster", () => {
   // ArrayBuffer.isView now reports the one admitted view kind.
   assert.match(bufferSource, /is_data_view\(arguments\[0\]\)/u);
 });
+
+test("populates the realm-owned RegExp intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const objectSource = sources.get("runtime_object_builtin.c") ?? "";
+  const regexpSource = sources.get("runtime_regexp.c") ?? "";
+
+  for (const intrinsic of ["REGEXP_PROTOTYPE", "REGEXP", "REGEXP_SPECIES"]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "RegExp",
+    "constructor",
+    "dotAll",
+    "exec",
+    "flags",
+    "global",
+    "hasIndices",
+    "ignoreCase",
+    "lastIndex",
+    "multiline",
+    "source",
+    "sticky",
+    "test",
+    "toString",
+    "unicode",
+    "unicodeSets",
+  ]) {
+    assert.match(regexpSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(regexpSource, /OSEO_WELL_KNOWN_MATCH/u);
+  assert.match(regexpSource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(regexpSource, /regexp_prototype_from_target/u);
+  assert.match(regexpSource, /regexp_allocate[\s\S]*regexp_initialize/u);
+  assert.match(
+    regexpSource,
+    /\(OseoPropertyAttributes\)\{false, false, true, false\}/u,
+  );
+  assert.match(regexpSource, /OSEO_ERROR_SYNTAX/u);
+  assert.match(regexpSource, /OSEO_HEAP_REGEXP_MATCHER/u);
+  assert.match(internalHeader, /oseo_internal_is_regexp/u);
+  assert.match(internalHeader, /oseo_internal_install_regexp_global/u);
+  assert.match(bindingSource, /oseo_internal_install_regexp_global/u);
+  assert.match(objectSource, /is_regexp\(receiver\)[\s\S]*"RegExp"/u);
+  assert.match(
+    memorySource,
+    /OSEO_HEAP_REGEXP_MATCHER[\s\S]*mark_value\(matcher->source/u,
+  );
+  assert.match(
+    memorySource,
+    new RegExp(
+      String.raw`OSEO_HEAP_REGEXP\)[\s\S]*mark_value\(` +
+        String.raw`\(\(OseoRegExp \*\)object\)->matcher`,
+      "u",
+    ),
+  );
+});

@@ -1,0 +1,3 @@
+version: 1
+id: regexp-intrinsic
+record: docs/language-profile-m5/families/regexp-intrinsic.yaml

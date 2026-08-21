@@ -47,6 +47,7 @@ import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
+import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
@@ -122,6 +123,7 @@ const fixtures: readonly Fixture[] = [
   ...dataViewFixtures,
   ...expressionFixtures,
   ...receiverFixtures,
+  ...regexpIntrinsicFixtures,
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
@@ -191,6 +193,53 @@ assert.match(
   deferredRegExpFallback.stderr,
   /^deferred-regexp-fallback\.ts:1:\d+: error\[OSEO2001\]: Regular/u,
 );
+
+for (const deferredRegExp of [
+  {
+    name: "deferred-regexp-property.ts",
+    source: 'new RegExp("\\\\p{ASCII}", "u");',
+  },
+  {
+    name: "deferred-regexp-class-string.ts",
+    source: 'new RegExp("[\\\\q{ab}]", "v");',
+  },
+  {
+    name: "deferred-regexp-modifier.ts",
+    source: 'new RegExp("(?i:a)");',
+  },
+  {
+    name: "deferred-regexp-exec.ts",
+    source: 'new RegExp("a").exec("a");',
+  },
+  {
+    name: "deferred-regexp-source.ts",
+    source: 'new RegExp("a").source;',
+  },
+  {
+    name: "deferred-regexp-symbol-search.ts",
+    source: "RegExp.prototype[Symbol.search];",
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredRegExp.name],
+      source: deferredRegExp.source,
+      sourceId: deferredRegExp.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredRegExp.name.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: (?:RegExp|Regular expression)",
+      "u",
+    ),
+  );
+}
 
 for (const deferredPattern of [
   {
@@ -362,6 +411,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "regexp-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -567,6 +617,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "regexp-intrinsic" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -636,6 +687,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
+            fixture.name === "regexp-intrinsic" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -822,10 +874,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus sixteen admitted constructor
-            // property names shared by every Script, DataView being the one
+            // value-property allocations plus seventeen admitted constructor
+            // property names shared by every Script, RegExp being the one
             // this node admits.
-            assert.equal(native.counters.allocations, 32);
+            assert.equal(native.counters.allocations, 33);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

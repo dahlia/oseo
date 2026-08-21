@@ -410,7 +410,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -860,7 +860,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-13.js
     expectedClassification: unsupported-profile-feature
@@ -1085,7 +1085,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-17.js
     expectedClassification: unsupported-profile-feature
@@ -1397,7 +1397,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-22.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-23.js
     expectedClassification: unsupported-profile-feature
@@ -1499,7 +1499,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-13.js
     expectedClassification: unsupported-profile-feature
@@ -1733,7 +1733,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-17.js
     expectedClassification: unsupported-profile-feature
@@ -2099,7 +2099,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-23.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-24.js
     expectedClassification: unsupported-profile-feature
@@ -2354,7 +2354,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-13.js
     expectedClassification: unsupported-profile-feature
@@ -2576,7 +2576,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-17.js
     expectedClassification: unsupported-profile-feature
@@ -2981,7 +2981,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-13.js
     expectedClassification: unsupported-profile-feature
@@ -3212,7 +3212,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-17.js
     expectedClassification: unsupported-profile-feature
@@ -3842,7 +3842,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-13.js
     expectedClassification: unsupported-profile-feature
@@ -4073,7 +4073,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-17.js
     expectedClassification: unsupported-profile-feature
@@ -4385,7 +4385,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-22.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-23.js
     expectedClassification: unsupported-profile-feature
@@ -10497,7 +10497,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-13.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-14.js
     expectedClassification: unsupported-profile-feature
@@ -10575,7 +10575,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-15.js
     expectedClassification: unsupported-profile-feature
@@ -10629,7 +10629,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-104.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-105.js
     expectedClassification: unsupported-profile-feature
@@ -10719,7 +10719,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-132.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-133.js
     expectedClassification: unsupported-profile-feature
@@ -10800,7 +10800,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-158.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-159.js
     expectedClassification: unsupported-profile-feature
@@ -10881,7 +10881,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-183.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-184.js
     expectedClassification: unsupported-profile-feature
@@ -10974,7 +10974,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-211.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-212.js
     expectedClassification: unsupported-profile-feature
@@ -11079,7 +11079,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-246.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-247.js
     expectedClassification: unsupported-profile-feature
@@ -11115,7 +11115,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-26.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-261.js
     expectedClassification: pass
@@ -11208,7 +11208,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-51.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-52.js
     expectedClassification: unsupported-profile-feature
@@ -11295,7 +11295,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-79.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-8.js
     expectedClassification: pass
@@ -11661,7 +11661,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-19.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-190.js
     expectedClassification: pass
@@ -12591,7 +12591,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-118.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-119.js
     expectedClassification: unsupported-profile-feature
@@ -12699,10 +12699,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-146-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-146.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-147-1.js
     expectedClassification: unsupported-profile-feature
@@ -12816,10 +12816,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-172-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-172.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-173-1.js
     expectedClassification: unsupported-profile-feature
@@ -12906,7 +12906,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-197.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-198.js
     expectedClassification: unsupported-profile-feature
@@ -13020,10 +13020,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-225-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-225.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-226-1.js
     expectedClassification: unsupported-profile-feature
@@ -13143,10 +13143,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-255-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-255.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-256-1.js
     expectedClassification: unsupported-profile-feature
@@ -13245,10 +13245,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-40-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-40.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-41-1.js
     expectedClassification: unsupported-profile-feature
@@ -13335,7 +13335,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-65.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-66.js
     expectedClassification: unsupported-profile-feature
@@ -13446,10 +13446,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-93-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-93.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-94-1.js
     expectedClassification: unsupported-profile-feature
@@ -14637,7 +14637,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-393.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-394.js
     expectedClassification: pass
@@ -14661,7 +14661,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-40.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-402.js
     expectedClassification: pass
@@ -14685,7 +14685,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-409.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-41.js
     expectedClassification: unsupported-profile-feature
@@ -15351,7 +15351,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-585.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-586.js
     expectedClassification: unsupported-profile-feature
@@ -15864,7 +15864,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/15.2.3.9-2-d-7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/15.2.3.9-2-d-8.js
     expectedClassification: pass
@@ -16302,16 +16302,16 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-163.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-165.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-166.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-167.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-168.js
     expectedClassification: pass
@@ -16449,19 +16449,19 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-211.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-212.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-213.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-214.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-215.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-216.js
     expectedClassification: pass
@@ -16875,7 +16875,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-11.js
     expectedClassification: pass
@@ -16926,7 +16926,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-26.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-27.js
     expectedClassification: pass
@@ -17079,7 +17079,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-11.js
     expectedClassification: pass
@@ -17112,7 +17112,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-20.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-21.js
     expectedClassification: pass
@@ -17271,10 +17271,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-17.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-19.js
     expectedClassification: pass
@@ -17376,10 +17376,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-17.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-19.js
     expectedClassification: pass
@@ -17508,7 +17508,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-19.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-2.js
     expectedClassification: pass
@@ -17550,7 +17550,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/abrupt-completion.js
     expectedClassification: unsupported-profile-feature
@@ -18168,7 +18168,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-o-is-a-reg-exp-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-o-is-a-string-object.js
     expectedClassification: pass
@@ -18219,7 +18219,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-p-is-own-property-of-a-reg-exp-object-that-uses-object-s-get-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-p-is-own-property-of-a-string-object-which-implements-its-own-get-own-property.js
     expectedClassification: pass
@@ -18333,7 +18333,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-regexp.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-set.js
     expectedClassification: unsupported-profile-feature
@@ -19715,6 +19715,24 @@ tests:
   - path: test/built-ins/Promise/withResolvers/result.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/RegExp/15.10.2.15-6-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/15.10.2.5-3-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/15.10.4.1-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/15.10.4.1-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/15.10.4.1-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/15.10.4.1-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-digit-class-escape-negative-cases.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
@@ -19751,6 +19769,1242 @@ tests:
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-positive-cases.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.1_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A1.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A1.2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A1.3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A1.4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A1.5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A2.1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A3.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A3.1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A4.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A4.1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A4.1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.10_A5.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.11_A1_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.12_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.12_A4_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A1_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A2_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.13_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T23.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T24.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T25.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T26.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T27.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T30.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T31.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T33.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T34.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T35.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T36.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T37.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T38.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T39.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T40.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T41.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.15_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.3_A1_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.5_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.5_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.5_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.5_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.5_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A2_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A3_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A4_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A5_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A6_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A6_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A6_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.6_A6_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A1_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A3_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T18.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T19.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T20.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T21.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A4_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A5_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.7_A6_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A2_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T13.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T18.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T19.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T20.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T21.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T22.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T23.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T24.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T25.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T26.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T27.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T28.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T29.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T30.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T31.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T32.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T33.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A3_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A4_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.8_A5_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.9_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.9_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.9_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2.9_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.2_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A1_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A1_T3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.3.1_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A1_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A4_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A4_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A6_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A7_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A7_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T11.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A9_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A9_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.4.1_A9_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.5_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.5_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.5_A2_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A1_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A2_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/S15.10.7_A3_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/Symbol.species/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/Symbol.species/return-value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/Symbol.species/symbol-species-name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/Symbol.species/symbol-species.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/call_with_non_regexp_same_constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/call_with_regexp_match_falsy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/call_with_regexp_not_same_constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/character-class-escape-non-whitespace-u180e.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/character-class-escape-non-whitespace.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/duplicate-flags.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/duplicate-named-capturing-groups-syntax.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-code-point-repeat-i-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-code-point-repeat-i-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-arbitrary.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-combining-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-combining-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-combining-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-d.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-g.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-non-display-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-non-display-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-non-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-u.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-uppercase-I.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-y.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-zwj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-zwnbsp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-other-code-point-zwnj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-should-not-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-should-not-case-fold-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-should-not-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-should-not-unicode-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/early-err-modifiers-should-not-unicode-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like-flag-override.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like-get-ctor-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like-get-flags-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like-get-source-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like-short-circuit.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/from-regexp-like.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/lastIndex.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/lookahead-quantifier-match-groups.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/nullable-quantifier.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/RegExp/property-escapes/binary-property-with-value-ASCII_-_F-negated.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -21590,6 +22844,228 @@ tests:
   - path: test/built-ins/RegExp/property-escapes/unsupported-property-Line_Break.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/built-ins/RegExp/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/quantifier-integer-limit.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/regexp-class-chars.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-add-remove-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-add-remove-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-add-remove-multi-duplicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-add-remove-s-escape.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-add-remove-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-both-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-code-point-repeat-i-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-code-point-repeat-i-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-arbitrary.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-combining-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-combining-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-combining-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-d.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-g.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-non-display-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-non-display-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-non-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-u.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-uppercase-I.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-y.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-zwj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-zwnbsp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-other-code-point-zwnj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-multi-duplicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-s-escape.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-code-point-repeat-i-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-code-point-repeat-i-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-arbitrary.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-combining-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-combining-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-combining-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-d.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-g.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-non-display-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-non-display-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-non-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-u.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-uppercase-I.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-y.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-zwj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-zwnbsp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-zwnj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-should-not-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-should-not-case-fold-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-should-not-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-should-not-unicode-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-should-not-unicode-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-should-not-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-should-not-case-fold-m.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-should-not-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-should-not-unicode-case-fold-i.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-should-not-unicode-case-fold-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/u180e.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_character_class_backspace_escape.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_full_case_folding.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_identity_escape.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_brackets.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_character_class_escape.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_identity_escape.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_identity_escape_alpha.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_identity_escape_c.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_identity_escape_u.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_identity_escape_x.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_incomplete_quantifier.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_octal_escape.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_quantifiable_assertion.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/unicode_restricted_quantifier_without_atom.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/RegExp/valid-flags-y.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/String/15.5.5.5.2-1-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -23892,7 +25368,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [symbols]
   - path: test/built-ins/Symbol/species/subclassing.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, symbols]
   - path: test/built-ins/Symbol/split/cross-realm.js
     expectedClassification: unsupported-profile-feature
