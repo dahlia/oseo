@@ -8,10 +8,10 @@
  * checkout agree exactly.
  *
  * The contract is deliberately narrow. It reports code-point properties, case
- * folding, case mapping, and the ECMAScript word-character sets, and it
- * decides none of the semantics that consume them. Matching, canonicalization
- * order, and locale policy belong to the regular-expression and String units
- * that read these tables.
+ * folding, case mapping, the ECMAScript word-character sets, and the exact
+ * aliases an ECMAScript Unicode property escape admits. Matching,
+ * canonicalization order, and locale policy belong to the regular-expression
+ * and String units that read these tables.
  *
  * A code-point set is an inversion list, so a consumer may lower one straight
  * into a generated table without reshaping it. Sets are built on first use
@@ -145,12 +145,28 @@ const scriptExtensionsGroupIndices = lazy((): readonly (readonly number[])[] =>
 export const binaryPropertyNames: readonly string[] =
   Object.keys(binaryPropertySets).toSorted();
 
+/** Every exact ECMAScript spelling for a binary property name. */
+export const binaryPropertyNameAliases: readonly string[] = Object.entries(
+  propertyNameAliases,
+)
+  .filter(([, canonical]) => Object.hasOwn(binaryPropertySets, canonical))
+  .map(([name]) => name)
+  .toSorted();
+
 /** The ECMAScript properties that take a value, in ascending order. */
 export const nonBinaryPropertyNames: readonly string[] = [
   "General_Category",
   "Script",
   "Script_Extensions",
 ];
+
+/** Every exact ECMAScript spelling for a non-binary property name. */
+export const nonBinaryPropertyNameAliases: readonly string[] = Object.entries(
+  propertyNameAliases,
+)
+  .filter(([, canonical]) => nonBinaryPropertyNames.includes(canonical))
+  .map(([name]) => name)
+  .toSorted();
 
 /** Every canonical General_Category value, supercategories included. */
 export const generalCategoryValues: readonly string[] = [
@@ -159,6 +175,11 @@ export const generalCategoryValues: readonly string[] = [
     ...Object.keys(generalCategorySupercategories),
   ]),
 ].toSorted();
+
+/** Every exact ECMAScript spelling for a General_Category value. */
+export const generalCategoryValueAliases: readonly string[] = Object.keys(
+  generalCategoryAliases,
+).toSorted();
 
 /**
  * The canonical base General_Category values, in ascending order.
@@ -171,6 +192,10 @@ export const generalCategoryBaseValues: readonly string[] =
 
 /** Every canonical Script value, in ascending order. */
 export const scriptValues: readonly string[] = scriptNames.toSorted();
+
+/** Every exact ECMAScript spelling for a Script value. */
+export const scriptValueAliases: readonly string[] =
+  Object.keys(scriptAliases).toSorted();
 
 /** The base categories one canonical General_Category value covers. */
 export function generalCategoryMembers(
@@ -210,6 +235,40 @@ export function canonicalPropertyValue(
     return Object.hasOwn(scriptAliases, value)
       ? scriptAliases[value]
       : undefined;
+  }
+  return undefined;
+}
+
+/**
+ * The code-point set named by one ECMAScript Unicode property expression.
+ *
+ * A lone spelling denotes either a binary property or a
+ * `General_Category` value. A two-part spelling admits only the three
+ * non-binary properties. Matching stays exact because the canonical lookup
+ * functions above deliberately do not apply Unicode loose matching.
+ */
+export function ecma262UnicodePropertySet(
+  property: string,
+  value?: string,
+): CodePointSet | undefined {
+  const canonical = canonicalPropertyName(property);
+  if (value == null) {
+    if (canonical != null) {
+      const binary = binaryPropertySet(canonical);
+      if (binary != null) return binary;
+    }
+    const category = canonicalPropertyValue("General_Category", property);
+    return category == null ? undefined : generalCategorySet(category);
+  }
+  if (canonical == null) return undefined;
+  const canonicalValue = canonicalPropertyValue(property, value);
+  if (canonicalValue == null) return undefined;
+  if (canonical === "General_Category") {
+    return generalCategorySet(canonicalValue);
+  }
+  if (canonical === "Script") return scriptSet(canonicalValue);
+  if (canonical === "Script_Extensions") {
+    return scriptExtensionsSet(canonicalValue);
   }
   return undefined;
 }

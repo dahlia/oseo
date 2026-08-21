@@ -71,6 +71,9 @@ importers:
       '@oseo/toolchain-zig':
         specifier: workspace:*
         version: 0.1.0
+      '@oseo/unicode':
+        specifier: workspace:*
+        version: 0.1.0
 
   packages/compiler: {}
 

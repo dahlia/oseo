@@ -1,0 +1,27 @@
+group: built-ins/RegExp
+key: 3e
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - regexp-unicode-property-escapes
+        - regexp-v-flag
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/strings/RGI_Emoji_Flag_Sequence-negative-u.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

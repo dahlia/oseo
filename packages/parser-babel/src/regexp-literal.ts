@@ -93,7 +93,12 @@ export function regExpLiteral(
     });
     return undefined;
   }
-  const result = parseRegExpLiteral(literal);
+  const result =
+    context.regexpExtensions == null
+      ? parseRegExpLiteral(literal)
+      : parseRegExpLiteral(literal, {
+          extensions: context.regexpExtensions,
+        });
   const [start] = offsets(value);
   for (const error of result.errors) {
     context.diagnostics.push(

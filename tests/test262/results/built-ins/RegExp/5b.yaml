@@ -1,0 +1,54 @@
+group: built-ins/RegExp
+key: 5b
+results:
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/General_Category_-_Connector_Punctuation.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/General_Category_-_Connector_Punctuation.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/General_Category_-_Connector_Punctuation.js:117:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Ogham.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Ogham.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Ogham.js:111:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -59,6 +59,11 @@ The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
 `/** ... */` block comments contribute JSDoc hints; ordinary block and line
 comments never do.
+`createBabelFrontend` and `createBabelModuleFrontend` accept the same optional
+regular expression extension record. The adapter forwards it to the owned
+pattern parser without importing a concrete Unicode table package. The default
+frontend values configure no extension, so a composition root must supply the
+resolver for every property name it admits.
 Standalone `const`, `let`, and `var` declaration lists are converted into
 compiler-owned recursive patterns. A `const` or `let` list with more than one
 declarator becomes one owned `declaration-list` statement whose members are
@@ -112,5 +117,6 @@ The adapter keeps raw Babel shapes and conversion context in *babel.ts*.
 owns TypeScript and JSDoc hint extraction. The mutually recursive expression,
 pattern, statement, function, hoisting, and asynchronous conversions remain
 together in *convert.ts*. *modules.ts* owns import, export, and module-program
-conversion. *index.ts* only parses through Babel and composes the two public
-frontend values. These files remain package-private implementation paths.
+conversion. *index.ts* only parses through Babel and exposes the two frontend
+factories and their unconfigured default values. These files remain
+package-private implementation paths.

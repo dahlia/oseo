@@ -5,6 +5,9 @@ This package is Oseo's composition root. It provides deterministic `--dump-mir`
 and `--emit-c` modes and the asynchronous source-to-native execution workflow.
 Specialization is enabled by default. `--no-specialization` selects the same
 pipeline with the M1 generic graph and no guarded operations.
+The default source frontends receive the exact ECMA-262 Unicode property
+resolver from `@oseo/unicode` here. The Babel adapter and compiler core remain
+independent of the concrete pinned tables.
 Parser, profile, runtime, toolchain, and host failures remain owned diagnostics
 or captured native observations. Temporary-directory, runtime-asset, generated
 source, process-spawn, and cleanup failures are reported as `OSEO3001` without

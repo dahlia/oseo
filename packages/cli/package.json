@@ -38,7 +38,8 @@
     "@oseo/host": "workspace:*",
     "@oseo/parser-babel": "workspace:*",
     "@oseo/runtime-c": "workspace:*",
-    "@oseo/toolchain-zig": "workspace:*"
+    "@oseo/toolchain-zig": "workspace:*",
+    "@oseo/unicode": "workspace:*"
   },
   "engines": {
     "deno": ">=2.9",

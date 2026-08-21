@@ -8,11 +8,11 @@ answer depends on a host locale, a `wchar_t` classification routine, or a C
 library regular-expression facility, so two hosts running the same checkout
 agree exactly and a cross-compiled target agrees with the host that built it.
 
-The contract is deliberately narrow. The package supplies tables and decides
-none of the semantics that consume them. Which property escape a pattern
-admits, how canonicalization orders comparisons, and which locale a `String`
-method honors belong to the regular-expression and `String` units that read
-these tables, not here.
+The contract is deliberately narrow. The package supplies tables and resolves
+the exact property and value aliases ECMA-262 admits in a Unicode property
+escape. It decides no matching, canonicalization, or locale behavior that
+consumes a resolved set; those decisions belong to the regular-expression and
+`String` units that read these tables.
 
 
 Pinned inputs
@@ -92,6 +92,13 @@ scope. They are sequence properties rather than code-point properties, they
 need the emoji sequence files that this package does not pin, and they only
 matter to the `v` flag. The unit that admits `v`-mode class set notation owns
 them.
+
+`ecma262UnicodePropertySet` resolves the exact aliases admitted for a `p` or
+`P` escape. A lone canonical name selects a binary property or a
+`General_Category` value. A two-part expression selects `General_Category`,
+`Script`, or `Script_Extensions`. The function performs no loose matching and
+returns `undefined` for an invalid property expression, including a lone
+Script value.
 
 
 Representation

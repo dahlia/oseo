@@ -1,0 +1,255 @@
+group: built-ins/RegExp
+key: b8
+results:
+  - case:
+      async: false
+      features:
+        - String.fromCodePoint
+      flags:
+        - generated
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-negative-cases.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-negative-cases.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-negative-cases.js:153:18:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/General_Category_-_Paragraph_Separator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/General_Category_-_Paragraph_Separator.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/General_Category_-_Paragraph_Separator.js:111:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Mongolian.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Mongolian.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Mongolian.js:117:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Sinhala.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Sinhala.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Sinhala.js:124:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Sora_Sompeng.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Sora_Sompeng.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Sora_Sompeng.js:112:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Tai_Yo.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Tai_Yo.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Tai_Yo.js:113:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Khmer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Khmer.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Khmer.js:114:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Nandinagari.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Nandinagari.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Nandinagari.js:121:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_New_Tai_Lue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_New_Tai_Lue.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_New_Tai_Lue.js:114:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Newa.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Newa.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Newa.js:120:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -4476,6 +4476,42 @@ moves from 1,609 to 1,709 unsupported profile features, with no semantic,
 harness, or infrastructure failures. The suite revision and 41,091-path
 applicable inventory remain unchanged.
 
+Implemented M5b node `regexp-unicode-property-escapes` admits the six
+character class escapes and exact Unicode property escapes over the Unicode
+17.0.0 tables pinned by `@oseo/unicode`. The package exports one ECMA-262
+resolver for canonical binary property names, lone General\_Category values,
+and General\_Category, Script, or Script\_Extensions name-value pairs. The
+frontend supplies it through the owned pattern parser's extension boundary,
+so valid escapes reach the regular expression evaluation boundary and an
+invalid property expression produces an `OSEO0001` diagnostic at the escape.
+The compiler core still imports no Unicode package, and the generic matcher
+remains semantic authority for complement, Unicode traversal, and ignore-case
+closure.
+
+Fixed matcher and native String fallback evidence covers every character class
+escape, both reference hosts, both specialization policies, deliberate guard
+misses, and forced collection. Three generated domains use seeds `0x60004e00`,
+`0x60004e01`, and `0x60004e02` from the reserved block through `0x60004eff`.
+They compare class escapes and every canonical property family with the host
+engine, except that the retained empty `Hrkt` Script value uses its absence
+from the pinned Script and Script\_Extensions assignments as the oracle. They
+assert the exact owned diagnostic and span for invalid forms.
+Property domains, seeds, and ordinary case budget move from 94, 94, and 4,594
+to 97, 97, and 5,074. No override is used. The node adds no specialized
+matcher path, runtime allocation, generated-code entry point, or built-in code
+range. The runtime ABI moves to `oseo-runtime-m5-74` as the admitted semantic
+checkpoint, without changing a C layout or runtime component.
+
+All 625 paths under *test/built-ins/RegExp/CharacterClassEscapes/* and
+*test/built-ins/RegExp/property-escapes/* are reviewed. The 142 parse-negative
+paths are expected negatives; the remaining 483 retain explicit boundaries
+for the RegExp intrinsic and execution, class set notation, or other later
+nodes. The combined manifest moves from 11,991 to 12,616 paths, keeps 8,918
+passes, moves from 1,364 to 1,506 expected negatives, and moves from 1,709 to
+2,192 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path applicable inventory,
+ADR 0013 vocabulary, inventory policy, and zero-override policy are unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

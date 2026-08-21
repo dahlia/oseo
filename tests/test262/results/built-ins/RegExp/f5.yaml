@@ -1,0 +1,76 @@
+group: built-ins/RegExp
+key: f5
+results:
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Elbasan.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Elbasan.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Elbasan.js:111:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Syloti_Nagri.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Syloti_Nagri.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Syloti_Nagri.js:111:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+        - regexp-v-flag
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/strings/Basic_Emoji.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

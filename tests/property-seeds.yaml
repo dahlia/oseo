@@ -312,3 +312,7 @@ families:
     owner: tests/property/m5-regexp-matcher.property.test.ts
     start: 0x60004d00
     end: 0x60004dff
+  - family: m5-regexp-unicode-property-escapes
+    owner: tests/property/m5-regexp-unicode-property-escapes.property.test.ts
+    start: 0x60004e00
+    end: 0x60004eff

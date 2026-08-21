@@ -14,14 +14,10 @@
  */
 
 import {
-  binaryPropertySet,
-  canonicalPropertyName,
-  canonicalPropertyValue,
+  ecma262UnicodePropertySet,
   fullUppercase,
-  generalCategorySet,
   maxCodePoint,
-  scriptExtensionsSet,
-  scriptSet,
+  generalCategorySet,
   simpleCaseFolding,
 } from "../packages/unicode/src/index.ts";
 import type { CodePointSet } from "../packages/unicode/src/index.ts";
@@ -96,36 +92,7 @@ export function caseEquivalenceClasses(
 export function propertyEscapeSet(
   escape: RegExpUnicodePropertyEscape,
 ): CodePointSet | undefined {
-  const property = canonicalPropertyName(escape.property);
-  if (property == null) {
-    const category = canonicalPropertyValue(
-      "General_Category",
-      escape.property,
-    );
-    return category == null || escape.value != null
-      ? undefined
-      : generalCategorySet(category);
-  }
-  if (escape.value == null) {
-    /*
-     * A lone name is either a binary property name or a
-     * `General_Category` value, and the edition admits no spelling that
-     * is both, so trying the two in turn resolves exactly one of them.
-     */
-    const binary = binaryPropertySet(property);
-    if (binary != null) return binary;
-    const category = canonicalPropertyValue(
-      "General_Category",
-      escape.property,
-    );
-    return category == null ? undefined : generalCategorySet(category);
-  }
-  const value = canonicalPropertyValue(escape.property, escape.value);
-  if (value == null) return undefined;
-  if (property === "General_Category") return generalCategorySet(value);
-  if (property === "Script") return scriptSet(value);
-  if (property === "Script_Extensions") return scriptExtensionsSet(value);
-  return undefined;
+  return ecma262UnicodePropertySet(escape.property, escape.value);
 }
 
 /** The reviewed matcher data provider over the pinned Unicode tables. */

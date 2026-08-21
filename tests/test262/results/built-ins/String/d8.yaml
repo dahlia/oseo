@@ -27,7 +27,6 @@ results:
       passed: false
     unsupportedFeatures:
       - regexp-v-flag
-      - regexp-unicode-property-escapes
   - case:
       async: false
       features: []

@@ -50,6 +50,17 @@ const controlEscapes = new Map<string, number>([
 /** Modifier flags one inline modifier group may enable or disable. */
 const modifierFlags = new Set<string>(["i", "m", "s"]);
 
+/** Binary properties of strings admitted only by positive `v` escapes. */
+const unicodeStringProperties = new Set<string>([
+  "Basic_Emoji",
+  "Emoji_Keycap_Sequence",
+  "RGI_Emoji",
+  "RGI_Emoji_Flag_Sequence",
+  "RGI_Emoji_Modifier_Sequence",
+  "RGI_Emoji_Tag_Sequence",
+  "RGI_Emoji_ZWJ_Sequence",
+]);
+
 const noExtensions: RegExpPatternExtensions = { admitted: [] };
 
 /**
@@ -510,6 +521,18 @@ function readUnicodePropertyEscape(
     }),
   };
   if (!resolve(escape)) {
+    if (
+      state.flags.unicodeSets &&
+      !escape.negated &&
+      escape.value == null &&
+      unicodeStringProperties.has(escape.property)
+    ) {
+      fail(
+        "unsupported",
+        "A Unicode property of strings is not admitted yet.",
+        location,
+      );
+    }
     fail("invalid", "This Unicode property is not defined.", location);
   }
   return escape;

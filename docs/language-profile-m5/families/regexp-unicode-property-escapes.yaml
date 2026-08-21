@@ -1,0 +1,85 @@
+version: 1
+id: regexp-unicode-property-escapes
+title: "Regular expression Unicode property and character class escapes"
+scope:
+  - "The `d`, `D`, `s`, `S`, `w`, and `W` character class escapes use the
+    candidate edition's digit, white-space, line-terminator, and word-character
+    definitions. In Unicode ignore-case mode, word characters include the
+    code points whose pinned simple fold reaches ASCII word characters."
+  - "A `u`- or `v`-mode `\\p{...}` or `\\P{...}` escape resolves the exact
+    canonical property and value aliases admitted by ECMA-262. A lone name is
+    a binary property name or General_Category value. A name and value pair is
+    General_Category, Script, or Script_Extensions. Loose matching and a lone
+    Script value stay invalid."
+  - "The frontend supplies the owned pattern parser and generic matcher with
+    one resolver over the Unicode 17.0.0 tables pinned by `@oseo/unicode`.
+    Every admitted property therefore has one immutable inversion-list set;
+    an invalid name produces a source-located early diagnostic, and an absent
+    set is never guessed. The compiler core remains independent of Unicode
+    data."
+  - "The generic matcher remains semantic authority for set complement,
+    Unicode traversal, and ignore-case closure. No specialized matcher path,
+    generated-code entry point, runtime allocation, or built-in code range is
+    added. Existing native String fallback evidence exercises all six
+    character class escapes under both specialization policies, deliberate
+    guard misses, and forced collection; property escapes reach compiled
+    programs only after the separately owned RegExp intrinsic and literal
+    nodes land. Generated property evidence uses the host engine except for
+    the retained empty `Hrkt` Script value, whose independent oracle is its
+    absence from the pinned Script and Script_Extensions assignments."
+  - "All 625 reviewed paths under the CharacterClassEscapes and
+    property-escapes inventory roots are classified. The 142 parse-negative
+    paths are expected negatives. The remaining 483 paths retain explicit
+    RegExp intrinsic, execution, `v`-class-set, or related later-node
+    boundaries."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/regexp-matcher.test.ts
+      - tests/property/m5-regexp-unicode-property-escapes.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - packages/cli/tests/index.test.ts
+      - packages/parser-babel/tests/regexp-literal.test.ts
+      - packages/unicode/tests/tables.test.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/regexp-matcher.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-unicode-property-escapes.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/regexp-matcher.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-match-and-split.ts
+      - tests/regexp-matcher.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/cli/src/index.ts
+      - packages/compiler/src/regexp-matcher.ts
+      - packages/parser-babel/src/regexp-literal.ts
+      - packages/unicode/src/index.ts

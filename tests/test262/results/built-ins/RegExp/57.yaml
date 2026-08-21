@@ -1,0 +1,126 @@
+group: built-ins/RegExp
+key: "57"
+results:
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Marchen.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Marchen.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Marchen.js:113:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_-_Sidetic.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Sidetic.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Sidetic.js:111:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Cypriot.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Cypriot.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Cypriot.js:120:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Gujarati.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Gujarati.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Gujarati.js:128:3:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/non-binary-property-without-value-Script_Extensions.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

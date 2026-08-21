@@ -8,6 +8,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import {
+  defaultComponents,
   processResourceExhaustionDiagnosticSuffix,
   runNativeCli,
 } from "../packages/cli/src/index.ts";
@@ -34,10 +35,6 @@ import {
   fileModuleResolver,
   hashModuleSource,
 } from "../packages/host/src/index.ts";
-import {
-  babelFrontend,
-  babelModuleFrontend,
-} from "../packages/parser-babel/src/index.ts";
 import {
   classifyTest262,
   summarizeTest262,
@@ -587,7 +584,7 @@ function parseNegativeResult(
   evidence: Test262Evidence,
 ): Test262Result {
   for (const strictnessMode of testCase.strictness) {
-    const compiled = compileSource(babelFrontend, {
+    const compiled = compileSource(defaultComponents.frontend, {
       source: parseInputSource(source, strictnessMode),
       sourceId: testCase.path,
     });
@@ -684,7 +681,7 @@ async function buildEntryGraph(
     ),
   });
   const result = await buildModuleGraph(
-    babelModuleFrontend,
+    defaultComponents.moduleFrontend,
     {
       load(canonicalId, referrer) {
         return canonicalId === entryId

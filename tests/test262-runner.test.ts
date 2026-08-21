@@ -1042,6 +1042,32 @@ flags: [onlyStrict]
   assert.equal(result.observation.errorType, "SyntaxError");
 });
 
+test("uses the pinned resolver for RegExp parse negatives", async () => {
+  const source = `/*---
+features: [regexp-unicode-property-escapes]
+negative:
+  phase: parse
+  type: SyntaxError
+---*/
+const value = /\\p{ASCII=Y}/u;
+`;
+  const parsed = parseTest262Case(source, "test/regexp-negative.js", revision);
+  const executor: Test262Executor = {
+    execute(): Promise<CliResult> {
+      throw new Error("must not execute");
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set(["regexp-unicode-property-escapes"]),
+    harnesses,
+    executor,
+  );
+  assert.equal(result.classification, "expected-negative");
+  assert.equal(result.observation.errorType, "SyntaxError");
+});
+
 test("serializes reviewed manifests without volatile metadata", () => {
   const serialized = serializeTest262Manifest({
     results: [],
