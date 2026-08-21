@@ -4037,6 +4037,7 @@ and moves from 2,192 to 2,504 unsupported profile features, with no semantic,
 harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema, and zero-override policy are unchanged.
 
+
 Known gaps inside the claim
 ---------------------------
 
