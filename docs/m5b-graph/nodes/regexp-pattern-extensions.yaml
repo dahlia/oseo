@@ -15,4 +15,4 @@ inventory:
 dependencies:
   - regexp-unicode-property-escapes
 landed: false
-status: blocked
+status: ready

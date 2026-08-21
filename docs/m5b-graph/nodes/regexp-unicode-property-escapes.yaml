@@ -11,5 +11,5 @@ inventory:
 dependencies:
   - regexp-generic-matcher
   - unicode-tables
-landed: false
+landed: true
 status: ready
