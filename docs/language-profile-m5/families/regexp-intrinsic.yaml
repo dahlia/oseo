@@ -30,9 +30,9 @@ scope:
     dynamic patterns and flags throw a catchable `SyntaxError`. The reviewed
     pattern-length, capture-count, nesting, quantifier-bound, and instruction
     limits retain a source-located `OSEO2001` boundary. Unicode property
-    escapes, Unicode set and string syntax, duplicate names across disjoint
-    alternatives, and modifier groups retain source-located `OSEO2001`
-    boundaries owned by their later graph nodes."
+    escapes, Unicode set and string syntax, escaped or non-ASCII group names,
+    duplicate names across disjoint alternatives, and modifier groups retain
+    source-located `OSEO2001` boundaries owned by their later graph nodes."
   - "The collector traces each RegExp's matcher artifact and each
     artifact's source and flags. A deterministic allocation-attempt sweep
     fails every allocation in cluster publication, successful

@@ -7,6 +7,7 @@ import test from "node:test";
 import fc from "fast-check";
 
 import { cBackend } from "../../packages/backend-c/src/index.ts";
+import { runNativeCli } from "../../packages/cli/src/index.ts";
 import {
   compileSource,
   describeTarget,
@@ -42,7 +43,9 @@ interface ValidCase {
 
 interface InvalidCase {
   readonly differential: boolean;
+  readonly expected: "invalid" | "unsupported";
   readonly flags: string;
+  readonly parserExpected?: "unsupported" | "valid";
   readonly pattern: string;
 }
 
@@ -79,7 +82,7 @@ const classFreePattern = fc.oneof(
 
 const validPattern = fc.oneof(
   classFreePattern,
-  fc.constantFrom("[a-z]", "[^]"),
+  fc.constantFrom("[a-z]", "[^]", "[\\t- ]", "[\\0-\\n]"),
 );
 
 const unicodeValidPattern = fc.oneof(
@@ -119,34 +122,73 @@ const validCase = fc.boolean().chain((explicitFlags) =>
   ),
 );
 
-const invalidCase = fc.oneof(
-  fc.record({
-    differential: fc.constant(true),
-    flags: fc.constant(""),
-    pattern: fc.constantFrom("[", "(", "*", "+", "?", "a{2,1}"),
-  }),
-  fc.record({
-    differential: fc.constant(true),
-    flags: fc.constantFrom("gg", "ii", "z", "uv", "vu", "ggims"),
-    pattern: fc.constantFrom("", "a", "(?:ab)", "[a-z]"),
-  }),
+const invalidCase = fc
+  .oneof(
+    fc.record({
+      differential: fc.constant(true),
+      flags: fc.constant(""),
+      pattern: fc.constantFrom("[", "(", "*", "+", "?", "a{2,1}"),
+    }),
+    fc.record({
+      differential: fc.constant(true),
+      flags: fc.constantFrom("gg", "ii", "z", "uv", "vu", "ggims"),
+      pattern: fc.constantFrom("", "a", "(?:ab)", "[a-z]"),
+    }),
+    fc.constantFrom(
+      { differential: true, flags: "u", pattern: "\\u{110000}" },
+      { differential: true, flags: "", pattern: "[z-a]" },
+      { differential: true, flags: "u", pattern: "\\x4" },
+      { differential: true, flags: "u", pattern: "\\u123" },
+      { differential: true, flags: "u", pattern: "\\1" },
+      { differential: true, flags: "u", pattern: "\\p" },
+      { differential: true, flags: "u", pattern: "\\P" },
+      { differential: true, flags: "u", pattern: "[\\B]" },
+      { differential: true, flags: "u", pattern: "[\\d-a]" },
+      { differential: true, flags: "u", pattern: "[a-\\w]" },
+      { differential: true, flags: "u", pattern: "[\\x7a-a]" },
+      { differential: false, flags: "", pattern: "[\\B]" },
+      { differential: false, flags: "", pattern: "[\\d-a]" },
+      { differential: true, flags: "", pattern: "(?<a>x)(?<a>y)" },
+      { differential: false, flags: "", pattern: "[(?<a>]\\k<a>" },
+      { differential: true, flags: "u", pattern: "(?=a)*" },
+      { differential: true, flags: "", pattern: "\\b*" },
+      { differential: true, flags: "", pattern: "\\B{2}" },
+      { differential: true, flags: "", pattern: "[a-\\n]" },
+      { differential: false, flags: "", pattern: "(a)[\\1]" },
+      { differential: true, flags: "u", pattern: "(a)[\\1]" },
+    ),
+  )
+  .map((testCase) => ({
+    differential: testCase.differential,
+    expected: "invalid" as const,
+    flags: testCase.flags,
+    pattern: testCase.pattern,
+  }));
+
+const rejectedCase: fc.Arbitrary<InvalidCase> = fc.oneof(
+  invalidCase,
   fc.constantFrom(
-    { differential: true, flags: "u", pattern: "\\u{110000}" },
-    { differential: true, flags: "", pattern: "[z-a]" },
-    { differential: true, flags: "u", pattern: "\\x4" },
-    { differential: true, flags: "u", pattern: "\\u123" },
-    { differential: true, flags: "u", pattern: "\\1" },
-    { differential: true, flags: "u", pattern: "\\p" },
-    { differential: true, flags: "u", pattern: "\\P" },
-    { differential: true, flags: "u", pattern: "[\\B]" },
-    { differential: true, flags: "u", pattern: "[\\d-a]" },
-    { differential: true, flags: "u", pattern: "[a-\\w]" },
-    { differential: true, flags: "u", pattern: "[\\x7a-a]" },
-    { differential: false, flags: "", pattern: "[\\B]" },
-    { differential: false, flags: "", pattern: "[\\d-a]" },
-    { differential: true, flags: "", pattern: "(?<a>x)(?<a>y)" },
-    { differential: false, flags: "", pattern: "[(?<a>]\\k<a>" },
-    { differential: true, flags: "u", pattern: "(?=a)*" },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "valid" as const,
+      pattern: "(?<\\u0041>a)",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "valid" as const,
+      pattern: "\\k<A>(?<\\u0041>x)",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "unsupported" as const,
+      pattern: "\\k<é>(?<é>a)",
+    },
   ),
 );
 
@@ -332,6 +374,27 @@ async function assertNative(
   }
 }
 
+async function assertUnsupportedNative(testCase: InvalidCase): Promise<void> {
+  const pattern = JSON.stringify(testCase.pattern);
+  const flags = JSON.stringify(testCase.flags);
+  const source = `new RegExp(${pattern}, ${flags});`;
+  const native = await runNativeCli(
+    {
+      args: ["generated-m5-regexp-intrinsic-boundary.ts"],
+      source,
+      sourceId: "generated-m5-regexp-intrinsic-boundary.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(native.exitStatus, 1);
+  assert.equal(native.stdout, "");
+  assert.match(
+    native.stderr,
+    /error\[OSEO2001\]: Regular expression pattern extension/u,
+  );
+}
+
 test(
   "generated RegExp construction and lastIndex state match an oracle",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
@@ -339,6 +402,11 @@ test(
     await assertAsyncProperty(
       "RegExp construction, copying, conversion, and state agree",
       fc.asyncProperty(validCase, async (testCase) => {
+        const parsed = parseRegExpPattern({
+          flags: testCase.flags,
+          source: testCase.pattern,
+        });
+        assert.equal(parsed.parsed, true);
         await assertNative(validSource(testCase), validExpected(testCase));
       }),
       {
@@ -368,23 +436,35 @@ test(
 );
 
 test(
-  "generated invalid RegExp inputs throw catchable SyntaxError",
+  "generated rejected RegExp inputs match parser classifications",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "invalid dynamic RegExp patterns and flags remain catchable",
-      fc.asyncProperty(invalidCase, async (testCase) => {
+      "dynamic RegExp rejections match parser and boundary classifications",
+      fc.asyncProperty(rejectedCase, async (testCase) => {
         const parsed = parseRegExpPattern({
           flags: testCase.flags,
           source: testCase.pattern,
         });
-        assert.equal(parsed.parsed, false);
-        assert.ok(parsed.errors.some((error) => error.kind === "invalid"));
-        await assertNative(
-          invalidSource(testCase),
-          invalidExpected,
-          testCase.differential,
-        );
+        if (testCase.expected === "unsupported") {
+          if (testCase.parserExpected === "valid") {
+            assert.equal(parsed.parsed, true);
+          } else {
+            assert.equal(parsed.parsed, false);
+            assert.ok(
+              parsed.errors.some((error) => error.kind === "unsupported"),
+            );
+          }
+          await assertUnsupportedNative(testCase);
+        } else {
+          assert.equal(parsed.parsed, false);
+          assert.ok(parsed.errors.some((error) => error.kind === "invalid"));
+          await assertNative(
+            invalidSource(testCase),
+            invalidExpected,
+            testCase.differential,
+          );
+        }
       }),
       {
         context:
@@ -399,9 +479,9 @@ test(
         domain:
           "one unmatched delimiter, leading quantifier, reversed bound, " +
           "malformed or out-of-range escape, unresolved backreference, " +
-          "duplicate named capture, quantified assertion, class-escape " +
-          "range bound, duplicate flag, unknown flag, or mutually exclusive " +
-          "Unicode mode pair",
+          "duplicate named capture, quantified assertion, decoded class " +
+          "range bound, class backreference, Unicode group-name boundary, " +
+          "duplicate flag, unknown flag, or exclusive Unicode mode pair",
         numRuns: 6,
         profile: "M5 RegExp intrinsic invalid inputs",
         seed: 0x6000_4f01,

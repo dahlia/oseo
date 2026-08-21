@@ -56,6 +56,7 @@ typedef struct {
     size_t count;
     size_t path_count;
     OseoRegExpValidation duplicate_status;
+    bool has_unicode_name;
 } OseoRegExpNamedCaptureRegistry;
 
 static bool regexp_ascii_alpha(uint16_t unit) {
@@ -132,6 +133,39 @@ static bool regexp_group_name(
     return true;
 }
 
+static bool regexp_group_name_needs_unicode(
+    const OseoString *source,
+    size_t start
+) {
+    for (size_t index = start;
+         index < source->length && source->units[index] != '>';
+         index += 1u) {
+        if (source->units[index] > 0x7fu ||
+            (source->units[index] == '\\' &&
+             index + 1u < source->length &&
+             source->units[index + 1u] == 'u')) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool regexp_control_escape_point(
+    uint16_t escape,
+    uint32_t *point
+) {
+    switch (escape) {
+        case '0': *point = 0u; return true;
+        case 'b': *point = 0x08u; return true;
+        case 't': *point = 0x09u; return true;
+        case 'n': *point = 0x0au; return true;
+        case 'v': *point = 0x0bu; return true;
+        case 'f': *point = 0x0cu; return true;
+        case 'r': *point = 0x0du; return true;
+        default: return false;
+    }
+}
+
 static size_t regexp_name_hash(
     const OseoString *source,
     size_t start,
@@ -194,6 +228,7 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
     registry->count = 0u;
     registry->path_count = 0u;
     registry->duplicate_status = OSEO_REGEXP_VALID;
+    registry->has_unicode_name = false;
 
     size_t named_count = 0u;
     size_t path_capacity = 1u;
@@ -226,7 +261,12 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
             continue;
         }
         size_t end = 0u;
-        if (!regexp_group_name(source, index + 3u, &end)) continue;
+        if (!regexp_group_name(source, index + 3u, &end)) {
+            if (regexp_group_name_needs_unicode(source, index + 3u)) {
+                registry->has_unicode_name = true;
+            }
+            continue;
+        }
         named_count += 1u;
         index = end;
     }
@@ -536,19 +576,28 @@ static OseoRegExpValidation regexp_escape(
             return OSEO_REGEXP_INVALID;
         }
         size_t end = 0u;
-        if (!regexp_group_name(source, cursor + 2u, &end) ||
-            !regexp_named_capture_exists(
+        if (!regexp_group_name(source, cursor + 2u, &end)) {
+            return regexp_group_name_needs_unicode(source, cursor + 2u)
+                ? OSEO_REGEXP_UNSUPPORTED
+                : OSEO_REGEXP_INVALID;
+        }
+        if (!regexp_named_capture_exists(
                 named_captures,
                 source,
                 cursor + 2u,
                 end
             )) {
-            return OSEO_REGEXP_INVALID;
+            return named_captures->has_unicode_name
+                ? OSEO_REGEXP_UNSUPPORTED
+                : OSEO_REGEXP_INVALID;
         }
         *index = end;
         return OSEO_REGEXP_VALID;
     }
     if (regexp_ascii_digit(unit)) {
+        if (character_class && unit != '0') {
+            return OSEO_REGEXP_INVALID;
+        }
         if (unit == '0') {
             if (cursor + 1u < source->length &&
                 regexp_ascii_digit(source->units[cursor + 1u])) {
@@ -649,9 +698,7 @@ static OseoRegExpValidation regexp_character_class(
             uint16_t escape = source->units[escape_start + 1u];
             single = escape != 'd' && escape != 'D' && escape != 's' &&
                 escape != 'S' && escape != 'w' && escape != 'W';
-            if (escape == 'b') {
-                point = 0x08u;
-            } else if (escape == 'c') {
+            if (escape == 'c') {
                 point = source->units[escape_start + 2u] & 0x1fu;
             } else if (escape == 'x') {
                 point = 0u;
@@ -712,7 +759,8 @@ static OseoRegExpValidation regexp_character_class(
                         escaped += 6u;
                     }
                 }
-            } else if (single) {
+            } else if (!regexp_control_escape_point(escape, &point) &&
+                       single) {
                 point = source->units[escape_start + 1u];
             }
             cursor = escaped;
@@ -832,6 +880,7 @@ static OseoRegExpValidation regexp_validate_pattern(
         }
         quantified = false;
         if (unit == '\\') {
+            size_t escape_start = index;
             OseoRegExpValidation status = regexp_escape(
                 source,
                 &index,
@@ -841,7 +890,8 @@ static OseoRegExpValidation regexp_validate_pattern(
                 false
             );
             if (status != OSEO_REGEXP_VALID) return status;
-            can_quantify = true;
+            uint16_t escape = source->units[escape_start + 1u];
+            can_quantify = escape != 'b' && escape != 'B';
             continue;
         }
         if (unit == '[') {
@@ -883,7 +933,10 @@ static OseoRegExpValidation regexp_validate_pattern(
                     } else {
                         size_t end = 0u;
                         if (!regexp_group_name(source, index + 3u, &end)) {
-                            if (source->units[index + 3u] > 0x7fu) {
+                            if (regexp_group_name_needs_unicode(
+                                    source,
+                                    index + 3u
+                                )) {
                                 return OSEO_REGEXP_UNSUPPORTED;
                             }
                             return OSEO_REGEXP_INVALID;
@@ -1172,6 +1225,7 @@ static OseoResult regexp_matcher_create(
         0u,
         0u,
         OSEO_REGEXP_VALID,
+        false,
     };
     if (status == OSEO_REGEXP_VALID) {
         status = regexp_named_capture_registry_create(

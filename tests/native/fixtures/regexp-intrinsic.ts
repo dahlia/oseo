@@ -80,6 +80,8 @@ console.log(
     "u",
   ) instanceof RegExp,
   new RegExp("[𐀀-\\\\uD800\\\\uDC01]", "u") instanceof RegExp,
+  new RegExp("[\\\\t- ]") instanceof RegExp,
+  new RegExp("[\\\\0-\\\\n]") instanceof RegExp,
 );
 
 const order = [];
@@ -137,6 +139,10 @@ for (const values of [
   ["a", "gg"],
   ["a", "uv"],
   ["(?<a>x)(?<a>y)", ""],
+  ["\\\\b*", ""],
+  ["\\\\B{2}", ""],
+  ["[a-\\\\n]", ""],
+  ["(a)[\\\\1]", "u"],
 ]) {
   try {
     new RegExp(values[0], values[1]);
@@ -202,8 +208,8 @@ console.log("restore", RegExp === saved);
     specialization: {
       genericCallsDisabled: 4,
       genericCallsEnabled: 4,
-      hits: 6,
-      misses: 101,
+      hits: 14,
+      misses: 105,
       overflowMisses: 0,
     },
   },

@@ -208,6 +208,18 @@ for (const deferredRegExp of [
     source: 'new RegExp("(?i:a)");',
   },
   {
+    name: "deferred-regexp-escaped-group-name.ts",
+    source: 'new RegExp("(?<\\\\u0041>a)");',
+  },
+  {
+    name: "deferred-regexp-escaped-group-forward-reference.ts",
+    source: 'new RegExp("\\\\k<A>(?<\\\\u0041>x)");',
+  },
+  {
+    name: "deferred-regexp-unicode-group-name.ts",
+    source: 'new RegExp("\\\\k<é>(?<é>a)");',
+  },
+  {
     name: "deferred-regexp-exec.ts",
     source: 'new RegExp("a").exec("a");',
   },
@@ -240,6 +252,25 @@ for (const deferredRegExp of [
     ),
   );
 }
+
+const coreClassBackreference = await runNativeCli(
+  {
+    args: ["regexp-core-class-backreference.ts"],
+    source: `
+try {
+  new RegExp("(a)[\\\\1]");
+} catch (error) {
+  console.log(error instanceof SyntaxError);
+}
+`,
+    sourceId: "regexp-core-class-backreference.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(coreClassBackreference.exitStatus, 0);
+assert.equal(coreClassBackreference.stdout, "true\n");
+assert.equal(coreClassBackreference.stderr, "");
 
 for (const deferredPattern of [
   {
