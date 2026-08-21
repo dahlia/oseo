@@ -1,0 +1,97 @@
+group: built-ins/RegExp
+key: "82"
+results:
+  - case:
+      async: false
+      features:
+        - String.fromCodePoint
+      flags:
+        - generated
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-negative-cases.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-negative-cases.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-negative-cases.js:146:18:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-unicode-property-escapes
+        - regexp-v-flag
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/strings/RGI_Emoji_Flag_Sequence.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - regexp-unicode-property-escapes
+        - regexp-v-flag
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/generated/strings/RGI_Emoji_ZWJ_Sequence-negative-u.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - regexp-unicode-property-escapes
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/property-escapes/non-existent-property-value-Script_Extensions.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

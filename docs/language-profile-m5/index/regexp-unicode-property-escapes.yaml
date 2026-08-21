@@ -1,0 +1,3 @@
+version: 1
+id: regexp-unicode-property-escapes
+record: docs/language-profile-m5/families/regexp-unicode-property-escapes.yaml

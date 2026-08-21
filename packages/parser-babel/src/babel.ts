@@ -1,5 +1,6 @@
 import type {
   Diagnostic,
+  RegExpPatternExtensions,
   SourceInput,
   SyntaxArrayBindingPattern,
   SyntaxAssignmentPattern,
@@ -70,6 +71,7 @@ export interface ConvertContext {
   readonly input: SourceInput;
   readonly locations: SourceIndex;
   readonly receiverStack: ReceiverContext[];
+  readonly regexpExtensions: RegExpPatternExtensions | undefined;
   readonly strictStack: boolean[];
   syntheticIndex: number;
   /**

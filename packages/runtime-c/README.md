@@ -600,6 +600,13 @@ and size comparison is written so that no host addition can wrap.
 `ArrayBuffer.isView` now reports the one admitted view kind. The generated-code
 ABI gains no entry point.
 
+The `m5-74` ABI records the admitted regular expression Unicode property and
+character class escape checkpoint. The frontend resolves exact ECMA-262 names
+through the pinned Unicode 17.0.0 tables, while the existing generic matcher
+remains the semantic authority for those sets. This checkpoint changes no C
+layout, runtime component, generated-code entry point, allocation path, or
+built-in code range.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

@@ -71,15 +71,14 @@ That is 1,904 paths under the two `RegExp` roots plus 238 literal paths,
 *test/built-ins/String/prototype/* and five under class syntax use a
 regular expression without being owned by this family.
 
-None of these paths is in the reviewed subset in *tests/test262/subset.yaml*
-today, and this node adds none. The manifest's reviewed dependency-tag
-vocabulary is frozen by ADR 0013 and has no regular expression tag yet.
-PLAN-REGEXP.md adds the `regular-expressions` tag “before the first
-selected case uses it”, so admitting the tag belongs to the first node that
-selects a case, not to this one. Extending the vocabulary earlier would
-amend ADR 0013 for a tag no reviewed row could carry, and
-*tests/test262-runner.test.ts* asserts that the tag is refused until it is
-reviewed.
+The Unicode property checkpoint selects all 625 paths under
+*test/built-ins/RegExp/property-escapes/* and
+*test/built-ins/RegExp/CharacterClassEscapes/*. Of those, 142 parse-negative
+paths are expected negatives and 483 retain explicit boundaries for the
+RegExp intrinsic and execution, class set notation, or other later nodes. The
+manifest's reviewed dependency-tag vocabulary remains the one ADR 0013
+freezes, so these rows use existing tags and do not introduce a regular
+expression tag or amend the classification vocabulary.
 
 
 Flags
@@ -141,9 +140,10 @@ are generated but unreachable from the compiler core, because
 The pattern parser therefore decides ASCII itself and takes a classifier
 from its caller for anything else, which is why a group name or a
 non-unicode identity escape outside ASCII is refused rather than guessed.
-A Unicode property escape needs the same kind of caller-supplied
-resolution: admitting the escape without a resolver refuses it, so no
-property name is ever accepted unchecked.
+Unicode property escapes follow the same boundary. `@oseo/unicode` exports
+the exact ECMA-262 alias resolver, the frontend supplies it, and the compiler
+accepts no property name the resolver does not map to a pinned inversion-list
+set.
 
 
 Diagnostics Oseo reports today
@@ -194,8 +194,10 @@ The inventory's candidate roots are *test/built-ins/* and *test/language/*,
 so *test/annexB/* is outside it entirely, and the `u-invalid-` and
 `unicode_restricted_` cases inside the boundary assert exactly the
 rejections above. Whether an included path also requires accepting one of
-these constructs without `u` is unmeasured: no regular expression path is
-reviewed yet. The first node that reviews these directories owns that
-measurement, and an included path that needs Annex B acceptance
+these constructs without `u` is now measured for the 625 paths under
+*test/built-ins/RegExp/CharacterClassEscapes/* and
+*test/built-ins/RegExp/property-escapes/*. None requires that Annex B
+acceptance. The next node that reviews another RegExp directory owns the
+same measurement for its paths, and a path that needs Annex B acceptance
 classifies as an unsupported profile feature rather than silently widening
 the grammar.

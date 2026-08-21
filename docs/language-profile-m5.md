@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 81
+M5a is complete. The normative family records described below inventory 90
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 11,015 reviewed cases: 8,073 passes, 1,364
-expected negatives, and 1,578 unsupported profile features. It records no
+The current manifest contains 12,616 reviewed cases: 8,918 passes, 1,506
+expected negatives, and 2,192 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3958,6 +3958,37 @@ features, with no semantic, harness, or infrastructure failures. The suite
 revision, 41,091-path inventory, manifest schema, and zero-override policy are
 unchanged.
 
+M5b node `regexp-unicode-property-escapes` admits the six regular expression
+character class escapes and exact Unicode property escapes over the Unicode
+17.0.0 tables pinned by `@oseo/unicode`. The resolver admits canonical binary
+property names, lone General\_Category values, and General\_Category, Script, or
+Script\_Extensions name-value pairs. Loose matching and a lone Script value are
+early errors. The frontend supplies this resolver at the owned parser boundary,
+while the compiler core remains independent of the tables. The generic matcher
+continues to own complement, Unicode traversal, and ignore-case closure.
+
+The checkpoint adds no specialized matcher, runtime allocation, generated-code
+entry point, or built-in code range. Existing fixed native String fallback
+evidence covers all six class escapes under both specialization policies,
+deliberate guard misses, and forced collection. Generated differential evidence
+at seeds `0x60004e00`, `0x60004e01`, and `0x60004e02` compares the generic
+matcher with the host engine for class escapes and every canonical property
+family. The retained empty `Hrkt` Script value uses its absence from the pinned
+Script and Script\_Extensions assignments because the host rejects that alias.
+The diagnostic domain asserts the exact kind, section, message, and source
+span for invalid forms. The property ratchet moves from 94 domains, 94 seeds,
+and 4,594 ordinary cases to 97 domains, 97 seeds, and 5,074 cases. The runtime
+ABI moves to `oseo-runtime-m5-74` without changing a C layout or runtime
+component.
+
+All 625 paths under *test/built-ins/RegExp/CharacterClassEscapes/* and
+*test/built-ins/RegExp/property-escapes/* are reviewed. The 142 parse-negative
+paths are expected negatives, and 483 retain explicit later-node boundaries.
+The complete manifest reaches 12,616 cases: 8,918 passes, 1,506 expected
+negatives, and 2,192 unsupported profile features, with no semantic, harness,
+or infrastructure failures. The suite revision, inventory policy, ADR 0013
+vocabulary, and zero-override policy do not change.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3991,13 +4022,15 @@ complete. The remaining gaps retain their existing owners.
     rejected as a whole: the frontend records a literal's pattern text,
     flag text, and range as an owned value and validates it with the owned
     pattern parser, so an invalid pattern or flag set is an early error at
-    the offending text, a construct a later unit owns is refused where it
-    appears, and only a valid pattern reports one profile boundary at the
-    literal. `@oseo/compiler` now also owns a generic matcher artifact and
-    executor for that admitted grammar, which is the semantic authority a
-    later ahead-of-time lowering must reproduce, but no compiled program
-    reaches it: nothing evaluates a pattern, and no reviewed test262 path
-    covers the family yet.
+    the offending text. Unicode property escapes resolve through the pinned
+    tables, a construct a later unit owns is refused where it appears, and
+    only a valid pattern reports one profile boundary at the literal.
+    `@oseo/compiler` also owns a generic matcher artifact and executor for
+    that admitted grammar, which is the semantic authority a later
+    ahead-of-time lowering must reproduce, but no compiled program reaches
+    it: nothing evaluates a pattern. The reviewed property and character
+    class escape roots contribute 142 expected negatives and 483 explicit
+    later-node boundaries.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.

@@ -31,6 +31,62 @@ test("prints deterministic MIR and C for accepted source", () => {
   assert.match(emitted.stdout, /oseo_console_log/u);
 });
 
+test("composes the pinned Unicode property resolver", () => {
+  const accepted = runCli({
+    args: ["--dump-mir", "fixture.ts"],
+    source: "const value = /\\p{sc=Grek}/u;",
+    sourceId: "fixture.ts",
+    version: "0.0.0",
+  });
+  assert.equal(accepted.exitStatus, 1);
+  assert.match(accepted.stderr, /Regular expression evaluation/u);
+  assert.doesNotMatch(accepted.stderr, /property escape is not admitted/u);
+
+  const rejected = runCli({
+    args: ["--dump-mir", "fixture.ts"],
+    source: "const value = /\\p{Latin}/u;",
+    sourceId: "fixture.ts",
+    version: "0.0.0",
+  });
+  assert.equal(rejected.exitStatus, 1);
+  assert.match(rejected.stderr, /OSEO0001/u);
+  assert.match(rejected.stderr, /Unicode property is not defined/u);
+});
+
+test("composes the pinned resolver for module sources", async () => {
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/entry.mjs");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile() {
+      return Promise.reject(new Error("unexpected read"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/entry.mjs"],
+      source: "export default /\\p{sc=Grek}/u;",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 1);
+  assert.match(result.stderr, /Regular expression evaluation/u);
+  assert.doesNotMatch(result.stderr, /property escape is not admitted/u);
+});
+
 test("passes an explicit generic-only policy through CLI orchestration", () => {
   const source =
     "function add(left: number, right: number) { " +

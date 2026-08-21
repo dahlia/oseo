@@ -2,12 +2,31 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderDiagnostic } from "@oseo/compiler";
-import type { Diagnostic } from "@oseo/compiler";
+import type { Diagnostic, RegExpPatternExtensions } from "@oseo/compiler";
 
-import { babelFrontend } from "../src/index.ts";
+import {
+  babelFrontend,
+  createBabelFrontend,
+  createBabelModuleFrontend,
+} from "../src/index.ts";
+
+const regexpExtensions: RegExpPatternExtensions = {
+  admitted: ["unicode-property-escapes"],
+  unicodeProperty: ({ property, value }) =>
+    property === "L" ||
+    property === "ASCII" ||
+    (property === "sc" && value === "Grek"),
+};
+const configuredFrontend = createBabelFrontend({ regexpExtensions });
+const configuredModuleFrontend = createBabelModuleFrontend({
+  regexpExtensions,
+});
 
 function diagnostics(source: string): readonly Diagnostic[] {
-  const result = babelFrontend.parse({ source, sourceId: "fixture.js" });
+  const result = configuredFrontend.parse({
+    source,
+    sourceId: "fixture.js",
+  });
   assert.equal(result.parsed, false);
   return result.diagnostics;
 }
@@ -28,6 +47,58 @@ test("reports one profile boundary for a valid literal", () => {
       "outside the M5 profile.",
   );
   assert.deepEqual(diagnostic.byteRange, { end: 22, start: 10 });
+});
+
+test("validates property escapes through its configured resolver", () => {
+  const cases: readonly string[] = [
+    "const x = /\\p{L}/u;\n",
+    "const x = /\\P{sc=Grek}/u;\n",
+    "const x = /[\\p{ASCII}]/u;\n",
+  ];
+  for (const source of cases) {
+    const diagnostic = only(source);
+    assert.equal(diagnostic.code, "OSEO1001", source);
+    assert.equal(
+      diagnostic.message,
+      "Regular expression evaluation is outside the M5 profile.",
+      source,
+    );
+  }
+  const invalid = only("const x = /\\p{Latin}/u;\n");
+  assert.equal(invalid.code, "OSEO0001");
+  assert.deepEqual(invalid.byteRange, { end: 20, start: 11 });
+  assert.deepEqual(invalid.range, {
+    end: { column: 21, line: 1 },
+    start: { column: 12, line: 1 },
+  });
+});
+
+test("refuses a property escape when no resolver is configured", () => {
+  const result = babelFrontend.parse({
+    source: "const x = /\\p{L}/u;\n",
+    sourceId: "fixture.js",
+  });
+  assert.equal(result.parsed, false);
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "A Unicode property escape is not admitted yet.",
+  );
+});
+
+test("supplies the same property resolver to the Module frontend", () => {
+  const result = configuredModuleFrontend.parseModule({
+    source: "export default /\\p{L}/u;\n",
+    sourceId: "fixture.mjs",
+  });
+  assert.equal(result.parsed, false);
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "Regular expression evaluation is outside the M5 profile.",
+  );
 });
 
 test("reports an invalid literal pattern as an early error", () => {
@@ -62,11 +133,6 @@ test("locates a pattern error after a supplementary code point", () => {
 
 test("reports an unadmitted construct as a profile diagnostic", () => {
   const cases: readonly (readonly [string, string, number])[] = [
-    [
-      "const x = /\\p{L}/u;\n",
-      "A Unicode property escape is not admitted yet.",
-      11,
-    ],
     ["const x = /[a]/v;\n", "Class set notation is not admitted yet.", 11],
     [
       "const x = /(?i:a)/;\n",

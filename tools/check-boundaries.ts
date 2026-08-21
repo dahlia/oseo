@@ -24,6 +24,7 @@ interface PackageData {
 const babelParser = "@babel/parser";
 const babelParserOwner = "@oseo/parser-babel";
 const compiler = "@oseo/compiler";
+const unicode = "@oseo/unicode";
 const compilerOnly = new Set<string>([compiler]);
 const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
   ["@oseo/backend-c", compilerOnly],
@@ -36,6 +37,7 @@ const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
       babelParserOwner,
       "@oseo/runtime-c",
       "@oseo/toolchain-zig",
+      unicode,
     ]),
   ],
   [compiler, new Set()],
@@ -47,7 +49,7 @@ const allowedInternalDependencies = new Map<string, ReadonlySet<string>>([
   // The pinned Unicode tables are self-contained data. Keeping the set empty
   // is what stops the compiler core, a backend, or the runtime adapter from
   // being pulled in behind a table lookup.
-  ["@oseo/unicode", new Set()],
+  [unicode, new Set()],
 ]);
 
 interface SyntaxNode {

@@ -1,5 +1,6 @@
 import type {
   ModuleFrontendResult,
+  RegExpPatternExtensions,
   SourceInput,
   SyntaxExportEntry,
   SyntaxImportEntry,
@@ -382,6 +383,7 @@ export function moduleProgram(
 export function convertModule(
   input: SourceInput,
   file: BabelNode,
+  regexpExtensions?: RegExpPatternExtensions,
 ): ModuleFrontendResult {
   const locations = createSourceIndex(input.source);
   let parserErrors: readonly ParserError[] = [];
@@ -403,6 +405,7 @@ export function convertModule(
     input,
     locations,
     receiverStack: [],
+    regexpExtensions,
     strictStack: [],
     syntheticIndex: 0,
     thisModeStack: ["module"],

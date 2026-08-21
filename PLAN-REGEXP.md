@@ -4,12 +4,12 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1, 2, and 3 landed; intrinsic, literal,
-and probe work not started. This plan defines the M5 semantic and compilation
-boundary for ECMAScript regular expressions. It does not admit regular
-expression literals or the `RegExp` family to the active language profile,
-select one matcher strategy, or add a repository command before
-implementation evidence exists.
+Implementation status: delivery items 1, 2, and 3 and the Unicode property
+escape checkpoint landed; intrinsic, literal, and probe work not started. This
+plan defines the M5 semantic and compilation boundary for ECMAScript regular
+expressions. It does not admit regular expression literals or the `RegExp`
+family to the active language profile, select one matcher strategy, or add a
+repository command before implementation evidence exists.
 
 The owned pattern AST, parser, validator, limits, extension points, and
 structural dump live in `@oseo/compiler`, and the frontend validates a
@@ -17,8 +17,10 @@ literal's retained pattern and flag text there.
 [*docs/regexp-inventory.md*](./docs/regexp-inventory.md) is the delivery
 item 1 inventory. The generic matcher artifact and its executor live in the
 same package and are the semantic authority for the admitted grammar.
-Nothing in a compiled program reaches them yet, so a valid literal still
-reports the profile boundary and the `RegExp` family stays outside the
+The frontend resolves Unicode property escapes through the Unicode 17.0.0
+tables pinned by `@oseo/unicode`, and the matcher consumes those same sets.
+Nothing in a compiled program reaches property escapes yet, so a valid literal
+still reports the profile boundary and the `RegExp` family stays outside the
 active profile.
 
 Regular expressions are one M5 built-in family, but their implementation
@@ -167,13 +169,13 @@ or conversion can be observed.
 The owned pattern grammar covers every regular expression construct and flag in
 the candidate edition. The parser and validator implement the main-body
 grammar for every construct below except class set notation, which has no
-owned representation yet, and it recognizes and refuses that notation,
-inline modifiers, and Unicode property escapes with located `unsupported`
-errors rather than early errors. The last two are admitted through named
-extension points once a caller owns their semantics. Annex B is outside the
-claim, so a construct only Annex B admits is rejected without the `u` flag
-too, which *docs/regexp-inventory.md* lists exactly. The initial inventory
-includes:
+owned representation yet. It recognizes and refuses that notation and inline
+modifiers with located `unsupported` errors rather than early errors. Unicode
+property escapes are admitted through the parser's named extension point when
+the frontend's exact resolver finds their property set in the pinned tables;
+an invalid name is an early error at the escape. Annex B is outside the claim,
+so a construct only Annex B admits is rejected without the `u` flag too, which
+*docs/regexp-inventory.md* lists exactly. The initial inventory includes:
 
  -  alternatives, sequences, assertions, greedy and non-greedy quantifiers;
  -  character escapes, classes, class set notation, and Unicode properties;
@@ -517,13 +519,26 @@ domain lands with the matcher that consumes it.
 The invalid domain applies one mutation to a valid case and asserts the
 exact error kind, section, and span. Its mutations cover escapes, class
 ranges, quantifier bounds, a quantifier without an atom, group names,
-numbered and named references, an unadmitted property escape, an
+numbered and named references, a property escape without a resolver, an
 unadmitted class set, a repeated flag, an undefined flag, and incompatible
 `u` and `v` flags. The host is a one-directional oracle, since it
 implements Annex B and this grammar does not, so host agreement is
 required for a flag error and for a pattern error under a unicode-mode
 flag, and never for an unadmitted construct, which is valid ECMAScript
 this unit refuses on purpose.
+
+The Unicode property checkpoint adds three generated domains in reserved seed
+block `0x60004e00` through `0x60004eff`. Seed `0x60004e00` compares every
+character class escape with the host engine across Unicode and ignore-case
+modes. Seed `0x60004e01` chooses exact binary, General\_Category, Script, and
+Script\_Extensions aliases from the pinned tables and compares positive and
+negative escapes. Seed `0x60004e02` mutates canonical forms into invalid
+property expressions and asserts the owned parser's exact kind, section,
+message, and source span as well as the host's early rejection. The valid
+domains generate code points directly and retain the Unicode version, seed,
+and replay path in every failure. The host rejects the retained `Hrkt` alias,
+so that empty Script value instead uses its absence from both pinned
+assignment files as an independent oracle.
 
 The valid generator starts with a bounded candidate-edition grammar. It
 constructs alternatives, sequences, quantifiers, classes, assertions,
@@ -584,8 +599,9 @@ expected control flow, and every guarded optimization retains its generic edge.
 The reviewed test262 corpus grows by semantic dependency. It begins with
 literal early errors and object identity, then initialization and built-in
 execution, prototype methods, symbols and string integration, Unicode behavior,
-and the complete candidate-edition directories. The manifest adds a reviewed
-`regular-expressions` dependency tag before the first selected case uses it.
+and the complete candidate-edition directories. ADR 0013 freezes the current
+dependency vocabulary, so the Unicode property checkpoint selects its 625
+paths through existing dependency tags and does not amend that vocabulary.
 Unsupported results move only after every requested strictness and
 specialization variant executes.
 
@@ -604,8 +620,8 @@ Delivery order
     Extend the manifest dependency vocabulary without changing classifications.
     Landed, in [*docs/regexp-inventory.md*](./docs/regexp-inventory.md),
     except the `regular-expressions` dependency tag: ADR 0013 freezes that
-    vocabulary, no reviewed path selects a regular expression case yet, and
-    the tag lands with the first case that carries it.
+    vocabulary. The Unicode property checkpoint selects its reviewed paths
+    through existing tags instead of changing that accepted record.
 2.  Define an Oseo-owned pattern AST, parser contract, validator, and bounded
     generated pattern model. Retain literal text and flags at the frontend
     boundary without admitting execution. Landed. The parser reports one
@@ -621,24 +637,31 @@ Delivery order
     `0x60004d01`. The compiler core still links no Unicode data, so the
     builder takes case-equivalence classes, `Space_Separator`, and property
     escape sets from its caller and refuses a pattern whose facts the caller
-    did not supply. The artifact reaches no compiled program: item 4 links it
+    did not supply. The artifact reaches no compiled program: item 5 links it
     to the runtime.
-4.  Add the `RegExp` intrinsic, allocation, initialization, object state,
+4.  Resolve Unicode property escapes and character class escapes from the
+    pinned Unicode tables. Landed. The frontend and matcher share one exact
+    ECMA-262 property resolver, invalid names retain source-located early
+    diagnostics, and generated evidence at seeds `0x60004e00` through
+    `0x60004e02` compares the generic matcher with the host engine. This
+    checkpoint adds no specialized matcher, allocation, generated-code entry
+    point, or built-in code range.
+5.  Add the `RegExp` intrinsic, allocation, initialization, object state,
     built-in execution, result construction, and catchable dynamic-pattern
     errors. Trace dynamic artifacts and matcher work areas.
-5.  Add prototype methods, accessors, `RegExp.escape`, species behavior, the
+6.  Add prototype methods, accessors, `RegExp.escape`, species behavior, the
     regular expression string iterator, well-known symbol methods, and String
     method dispatch.
-6.  Compile literal patterns during the build, emit immutable descriptors, and
+7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.
-7.  Run the matcher-strategy, external-component, Unicode-table, resource, and
+8.  Run the matcher-strategy, external-component, Unicode-table, resource, and
     code-size probes. Record the selected backend and runtime split in an
     architecture decision before it becomes a later family dependency.
-8.  Add measured direct-C, automaton, string-search, or representation fast
+9.  Add measured direct-C, automaton, string-search, or representation fast
     paths one at a time. Each lands with a structural guard or applicability
     proof and generic comparison.
-9.  Expand the reviewed and generated corpus to the complete
+10. Expand the reviewed and generated corpus to the complete
     candidate-edition boundary, update the M5 profile and compatibility
     manifest, and remove the regular expression gap only when no applicable
     unsupported result remains.

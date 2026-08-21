@@ -463,6 +463,31 @@ test("delegates Unicode property resolution to the admitting caller", () => {
   assert.equal(error.message, "This Unicode property is not defined.");
 });
 
+test("distinguishes unadmitted properties of strings from early errors", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["unicode-property-escapes"],
+    unicodeProperty: () => false,
+  };
+  const unsupported = rejected("\\p{RGI_Emoji}", "v", { extensions });
+  assert.equal(unsupported.kind, "unsupported");
+  assert.equal(
+    unsupported.message,
+    "A Unicode property of strings is not admitted yet.",
+  );
+  for (const [source, flags] of [
+    ["\\p{RGI_Emoji}", "u"],
+    ["\\P{RGI_Emoji}", "v"],
+  ] as const) {
+    const error = rejected(source, flags, { extensions });
+    assert.equal(error.kind, "invalid", `${source}/${flags}`);
+    assert.equal(
+      error.message,
+      "This Unicode property is not defined.",
+      `${source}/${flags}`,
+    );
+  }
+});
+
 test("admits inline modifiers only through the extension point", () => {
   const extensions: RegExpPatternExtensions = { admitted: ["modifiers"] };
   const result = parseRegExpPattern({

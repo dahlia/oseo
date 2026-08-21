@@ -10,6 +10,7 @@ import type {
   ProcessEnvironment,
   ProcessObservation,
   ProcessRequest,
+  RegExpPatternExtensions,
   RuntimeInputProvider,
   SourceFrontend,
   TargetDescription,
@@ -33,9 +34,13 @@ import {
   fileModuleResolver,
   hashModuleSource,
 } from "@oseo/host";
-import { babelFrontend, babelModuleFrontend } from "@oseo/parser-babel";
+import {
+  createBabelFrontend,
+  createBabelModuleFrontend,
+} from "@oseo/parser-babel";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 import { zigToolchain } from "@oseo/toolchain-zig";
+import { ecma262UnicodePropertySet } from "@oseo/unicode";
 import { object, or } from "@optique/core/constructs";
 import { runParser } from "@optique/core/facade";
 import { message } from "@optique/core/message";
@@ -163,6 +168,16 @@ export interface CliResult {
   readonly stderr: string;
   readonly stdout: string;
 }
+
+/** RegExp extensions supplied at the outer Unicode composition boundary. */
+const regexpExtensions: RegExpPatternExtensions = {
+  admitted: ["unicode-property-escapes"],
+  unicodeProperty: (escape) =>
+    ecma262UnicodePropertySet(escape.property, escape.value) != null,
+};
+
+const babelFrontend = createBabelFrontend({ regexpExtensions });
+const babelModuleFrontend = createBabelModuleFrontend({ regexpExtensions });
 
 /** The concrete adapters composed by the default Oseo command line. */
 export const defaultComponents: DefaultComponents = {

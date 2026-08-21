@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   binaryPropertyNames,
+  binaryPropertyNameAliases,
   binaryPropertySet,
   canonicalCombiningClassOf,
   canonicalPropertyName,
@@ -13,21 +14,25 @@ import {
   codePointSetSize,
   conditionalCaseMappings,
   emojiVersion,
+  ecma262UnicodePropertySet,
   fullCaseFolding,
   fullLowercase,
   fullTitlecase,
   fullUppercase,
   generalCategoryBaseValues,
+  generalCategoryValueAliases,
   generalCategoryMembers,
   generalCategoryOf,
   generalCategorySet,
   generalCategoryValues,
   maxCodePoint,
+  nonBinaryPropertyNameAliases,
   nonBinaryPropertyNames,
   scriptExtensionsOf,
   scriptExtensionsSet,
   scriptOf,
   scriptSet,
+  scriptValueAliases,
   scriptValues,
   simpleCaseFolding,
   simpleLowercase,
@@ -95,6 +100,40 @@ test("property and value spellings resolve without loose matching", () => {
   assert.equal(canonicalPropertyValue("scx", "Grek"), "Greek");
   assert.equal(canonicalPropertyValue("gc", "Latin"), undefined);
   assert.equal(canonicalPropertyValue("Alphabetic", "Yes"), undefined);
+});
+
+test("ECMAScript property expressions resolve to their exact sets", () => {
+  assert.ok(binaryPropertyNameAliases.includes("Alpha"));
+  assert.ok(nonBinaryPropertyNameAliases.includes("gc"));
+  assert.ok(nonBinaryPropertyNameAliases.includes("sc"));
+  assert.ok(nonBinaryPropertyNameAliases.includes("scx"));
+  assert.ok(generalCategoryValueAliases.includes("L"));
+  assert.ok(scriptValueAliases.includes("Grek"));
+  assert.deepEqual(
+    ecma262UnicodePropertySet("Lu"),
+    generalCategorySet("Uppercase_Letter"),
+  );
+  assert.deepEqual(
+    ecma262UnicodePropertySet("ASCII"),
+    binaryPropertySet("ASCII"),
+  );
+  assert.deepEqual(
+    ecma262UnicodePropertySet("Alpha"),
+    binaryPropertySet("Alphabetic"),
+  );
+  assert.deepEqual(ecma262UnicodePropertySet("sc", "Grek"), scriptSet("Greek"));
+  assert.deepEqual(
+    ecma262UnicodePropertySet("scx", "Grek"),
+    scriptExtensionsSet("Greek"),
+  );
+  assert.deepEqual(ecma262UnicodePropertySet("sc", "Hrkt"), []);
+  assert.deepEqual(
+    ecma262UnicodePropertySet("Script_Extensions", "Katakana_Or_Hiragana"),
+    [],
+  );
+  assert.equal(ecma262UnicodePropertySet("Latin"), undefined);
+  assert.equal(ecma262UnicodePropertySet("ASCII", "Y"), undefined);
+  assert.equal(ecma262UnicodePropertySet("general_category", "Lu"), undefined);
 });
 
 test("an unknown property or value reports nothing, not an empty set", () => {

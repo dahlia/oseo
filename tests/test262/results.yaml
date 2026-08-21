@@ -5735,6 +5735,708 @@ partitions:
   - group: built-ins/Promise
     key: ff
     path: results/built-ins/Promise/ff.yaml
+  - group: built-ins/RegExp
+    key: "00"
+    path: results/built-ins/RegExp/00.yaml
+  - group: built-ins/RegExp
+    key: "01"
+    path: results/built-ins/RegExp/01.yaml
+  - group: built-ins/RegExp
+    key: "02"
+    path: results/built-ins/RegExp/02.yaml
+  - group: built-ins/RegExp
+    key: "03"
+    path: results/built-ins/RegExp/03.yaml
+  - group: built-ins/RegExp
+    key: "04"
+    path: results/built-ins/RegExp/04.yaml
+  - group: built-ins/RegExp
+    key: "05"
+    path: results/built-ins/RegExp/05.yaml
+  - group: built-ins/RegExp
+    key: "06"
+    path: results/built-ins/RegExp/06.yaml
+  - group: built-ins/RegExp
+    key: "07"
+    path: results/built-ins/RegExp/07.yaml
+  - group: built-ins/RegExp
+    key: "08"
+    path: results/built-ins/RegExp/08.yaml
+  - group: built-ins/RegExp
+    key: "09"
+    path: results/built-ins/RegExp/09.yaml
+  - group: built-ins/RegExp
+    key: 0a
+    path: results/built-ins/RegExp/0a.yaml
+  - group: built-ins/RegExp
+    key: 0b
+    path: results/built-ins/RegExp/0b.yaml
+  - group: built-ins/RegExp
+    key: 0c
+    path: results/built-ins/RegExp/0c.yaml
+  - group: built-ins/RegExp
+    key: 0d
+    path: results/built-ins/RegExp/0d.yaml
+  - group: built-ins/RegExp
+    key: 0e
+    path: results/built-ins/RegExp/0e.yaml
+  - group: built-ins/RegExp
+    key: "10"
+    path: results/built-ins/RegExp/10.yaml
+  - group: built-ins/RegExp
+    key: "12"
+    path: results/built-ins/RegExp/12.yaml
+  - group: built-ins/RegExp
+    key: "13"
+    path: results/built-ins/RegExp/13.yaml
+  - group: built-ins/RegExp
+    key: "14"
+    path: results/built-ins/RegExp/14.yaml
+  - group: built-ins/RegExp
+    key: "15"
+    path: results/built-ins/RegExp/15.yaml
+  - group: built-ins/RegExp
+    key: "16"
+    path: results/built-ins/RegExp/16.yaml
+  - group: built-ins/RegExp
+    key: "18"
+    path: results/built-ins/RegExp/18.yaml
+  - group: built-ins/RegExp
+    key: "19"
+    path: results/built-ins/RegExp/19.yaml
+  - group: built-ins/RegExp
+    key: 1a
+    path: results/built-ins/RegExp/1a.yaml
+  - group: built-ins/RegExp
+    key: 1c
+    path: results/built-ins/RegExp/1c.yaml
+  - group: built-ins/RegExp
+    key: 1d
+    path: results/built-ins/RegExp/1d.yaml
+  - group: built-ins/RegExp
+    key: 1e
+    path: results/built-ins/RegExp/1e.yaml
+  - group: built-ins/RegExp
+    key: 1f
+    path: results/built-ins/RegExp/1f.yaml
+  - group: built-ins/RegExp
+    key: "20"
+    path: results/built-ins/RegExp/20.yaml
+  - group: built-ins/RegExp
+    key: "21"
+    path: results/built-ins/RegExp/21.yaml
+  - group: built-ins/RegExp
+    key: "22"
+    path: results/built-ins/RegExp/22.yaml
+  - group: built-ins/RegExp
+    key: "23"
+    path: results/built-ins/RegExp/23.yaml
+  - group: built-ins/RegExp
+    key: "25"
+    path: results/built-ins/RegExp/25.yaml
+  - group: built-ins/RegExp
+    key: "26"
+    path: results/built-ins/RegExp/26.yaml
+  - group: built-ins/RegExp
+    key: "27"
+    path: results/built-ins/RegExp/27.yaml
+  - group: built-ins/RegExp
+    key: "28"
+    path: results/built-ins/RegExp/28.yaml
+  - group: built-ins/RegExp
+    key: "29"
+    path: results/built-ins/RegExp/29.yaml
+  - group: built-ins/RegExp
+    key: 2a
+    path: results/built-ins/RegExp/2a.yaml
+  - group: built-ins/RegExp
+    key: 2b
+    path: results/built-ins/RegExp/2b.yaml
+  - group: built-ins/RegExp
+    key: 2c
+    path: results/built-ins/RegExp/2c.yaml
+  - group: built-ins/RegExp
+    key: 2d
+    path: results/built-ins/RegExp/2d.yaml
+  - group: built-ins/RegExp
+    key: 2e
+    path: results/built-ins/RegExp/2e.yaml
+  - group: built-ins/RegExp
+    key: 2f
+    path: results/built-ins/RegExp/2f.yaml
+  - group: built-ins/RegExp
+    key: "30"
+    path: results/built-ins/RegExp/30.yaml
+  - group: built-ins/RegExp
+    key: "31"
+    path: results/built-ins/RegExp/31.yaml
+  - group: built-ins/RegExp
+    key: "33"
+    path: results/built-ins/RegExp/33.yaml
+  - group: built-ins/RegExp
+    key: "34"
+    path: results/built-ins/RegExp/34.yaml
+  - group: built-ins/RegExp
+    key: "35"
+    path: results/built-ins/RegExp/35.yaml
+  - group: built-ins/RegExp
+    key: "36"
+    path: results/built-ins/RegExp/36.yaml
+  - group: built-ins/RegExp
+    key: "37"
+    path: results/built-ins/RegExp/37.yaml
+  - group: built-ins/RegExp
+    key: "38"
+    path: results/built-ins/RegExp/38.yaml
+  - group: built-ins/RegExp
+    key: "39"
+    path: results/built-ins/RegExp/39.yaml
+  - group: built-ins/RegExp
+    key: 3a
+    path: results/built-ins/RegExp/3a.yaml
+  - group: built-ins/RegExp
+    key: 3b
+    path: results/built-ins/RegExp/3b.yaml
+  - group: built-ins/RegExp
+    key: 3c
+    path: results/built-ins/RegExp/3c.yaml
+  - group: built-ins/RegExp
+    key: 3d
+    path: results/built-ins/RegExp/3d.yaml
+  - group: built-ins/RegExp
+    key: 3e
+    path: results/built-ins/RegExp/3e.yaml
+  - group: built-ins/RegExp
+    key: 3f
+    path: results/built-ins/RegExp/3f.yaml
+  - group: built-ins/RegExp
+    key: "40"
+    path: results/built-ins/RegExp/40.yaml
+  - group: built-ins/RegExp
+    key: "42"
+    path: results/built-ins/RegExp/42.yaml
+  - group: built-ins/RegExp
+    key: "43"
+    path: results/built-ins/RegExp/43.yaml
+  - group: built-ins/RegExp
+    key: "44"
+    path: results/built-ins/RegExp/44.yaml
+  - group: built-ins/RegExp
+    key: "45"
+    path: results/built-ins/RegExp/45.yaml
+  - group: built-ins/RegExp
+    key: "46"
+    path: results/built-ins/RegExp/46.yaml
+  - group: built-ins/RegExp
+    key: "47"
+    path: results/built-ins/RegExp/47.yaml
+  - group: built-ins/RegExp
+    key: "48"
+    path: results/built-ins/RegExp/48.yaml
+  - group: built-ins/RegExp
+    key: "49"
+    path: results/built-ins/RegExp/49.yaml
+  - group: built-ins/RegExp
+    key: 4a
+    path: results/built-ins/RegExp/4a.yaml
+  - group: built-ins/RegExp
+    key: 4b
+    path: results/built-ins/RegExp/4b.yaml
+  - group: built-ins/RegExp
+    key: 4c
+    path: results/built-ins/RegExp/4c.yaml
+  - group: built-ins/RegExp
+    key: 4d
+    path: results/built-ins/RegExp/4d.yaml
+  - group: built-ins/RegExp
+    key: 4e
+    path: results/built-ins/RegExp/4e.yaml
+  - group: built-ins/RegExp
+    key: 4f
+    path: results/built-ins/RegExp/4f.yaml
+  - group: built-ins/RegExp
+    key: "50"
+    path: results/built-ins/RegExp/50.yaml
+  - group: built-ins/RegExp
+    key: "51"
+    path: results/built-ins/RegExp/51.yaml
+  - group: built-ins/RegExp
+    key: "52"
+    path: results/built-ins/RegExp/52.yaml
+  - group: built-ins/RegExp
+    key: "53"
+    path: results/built-ins/RegExp/53.yaml
+  - group: built-ins/RegExp
+    key: "54"
+    path: results/built-ins/RegExp/54.yaml
+  - group: built-ins/RegExp
+    key: "55"
+    path: results/built-ins/RegExp/55.yaml
+  - group: built-ins/RegExp
+    key: "56"
+    path: results/built-ins/RegExp/56.yaml
+  - group: built-ins/RegExp
+    key: "57"
+    path: results/built-ins/RegExp/57.yaml
+  - group: built-ins/RegExp
+    key: "58"
+    path: results/built-ins/RegExp/58.yaml
+  - group: built-ins/RegExp
+    key: "59"
+    path: results/built-ins/RegExp/59.yaml
+  - group: built-ins/RegExp
+    key: 5a
+    path: results/built-ins/RegExp/5a.yaml
+  - group: built-ins/RegExp
+    key: 5b
+    path: results/built-ins/RegExp/5b.yaml
+  - group: built-ins/RegExp
+    key: 5d
+    path: results/built-ins/RegExp/5d.yaml
+  - group: built-ins/RegExp
+    key: 5e
+    path: results/built-ins/RegExp/5e.yaml
+  - group: built-ins/RegExp
+    key: 5f
+    path: results/built-ins/RegExp/5f.yaml
+  - group: built-ins/RegExp
+    key: "60"
+    path: results/built-ins/RegExp/60.yaml
+  - group: built-ins/RegExp
+    key: "61"
+    path: results/built-ins/RegExp/61.yaml
+  - group: built-ins/RegExp
+    key: "62"
+    path: results/built-ins/RegExp/62.yaml
+  - group: built-ins/RegExp
+    key: "63"
+    path: results/built-ins/RegExp/63.yaml
+  - group: built-ins/RegExp
+    key: "65"
+    path: results/built-ins/RegExp/65.yaml
+  - group: built-ins/RegExp
+    key: "67"
+    path: results/built-ins/RegExp/67.yaml
+  - group: built-ins/RegExp
+    key: "68"
+    path: results/built-ins/RegExp/68.yaml
+  - group: built-ins/RegExp
+    key: "69"
+    path: results/built-ins/RegExp/69.yaml
+  - group: built-ins/RegExp
+    key: 6a
+    path: results/built-ins/RegExp/6a.yaml
+  - group: built-ins/RegExp
+    key: 6b
+    path: results/built-ins/RegExp/6b.yaml
+  - group: built-ins/RegExp
+    key: 6c
+    path: results/built-ins/RegExp/6c.yaml
+  - group: built-ins/RegExp
+    key: 6d
+    path: results/built-ins/RegExp/6d.yaml
+  - group: built-ins/RegExp
+    key: 6e
+    path: results/built-ins/RegExp/6e.yaml
+  - group: built-ins/RegExp
+    key: 6f
+    path: results/built-ins/RegExp/6f.yaml
+  - group: built-ins/RegExp
+    key: "70"
+    path: results/built-ins/RegExp/70.yaml
+  - group: built-ins/RegExp
+    key: "71"
+    path: results/built-ins/RegExp/71.yaml
+  - group: built-ins/RegExp
+    key: "72"
+    path: results/built-ins/RegExp/72.yaml
+  - group: built-ins/RegExp
+    key: "73"
+    path: results/built-ins/RegExp/73.yaml
+  - group: built-ins/RegExp
+    key: "74"
+    path: results/built-ins/RegExp/74.yaml
+  - group: built-ins/RegExp
+    key: "75"
+    path: results/built-ins/RegExp/75.yaml
+  - group: built-ins/RegExp
+    key: "76"
+    path: results/built-ins/RegExp/76.yaml
+  - group: built-ins/RegExp
+    key: "77"
+    path: results/built-ins/RegExp/77.yaml
+  - group: built-ins/RegExp
+    key: "78"
+    path: results/built-ins/RegExp/78.yaml
+  - group: built-ins/RegExp
+    key: 7b
+    path: results/built-ins/RegExp/7b.yaml
+  - group: built-ins/RegExp
+    key: 7c
+    path: results/built-ins/RegExp/7c.yaml
+  - group: built-ins/RegExp
+    key: 7d
+    path: results/built-ins/RegExp/7d.yaml
+  - group: built-ins/RegExp
+    key: 7e
+    path: results/built-ins/RegExp/7e.yaml
+  - group: built-ins/RegExp
+    key: "80"
+    path: results/built-ins/RegExp/80.yaml
+  - group: built-ins/RegExp
+    key: "81"
+    path: results/built-ins/RegExp/81.yaml
+  - group: built-ins/RegExp
+    key: "82"
+    path: results/built-ins/RegExp/82.yaml
+  - group: built-ins/RegExp
+    key: "84"
+    path: results/built-ins/RegExp/84.yaml
+  - group: built-ins/RegExp
+    key: "85"
+    path: results/built-ins/RegExp/85.yaml
+  - group: built-ins/RegExp
+    key: "86"
+    path: results/built-ins/RegExp/86.yaml
+  - group: built-ins/RegExp
+    key: "87"
+    path: results/built-ins/RegExp/87.yaml
+  - group: built-ins/RegExp
+    key: "89"
+    path: results/built-ins/RegExp/89.yaml
+  - group: built-ins/RegExp
+    key: 8a
+    path: results/built-ins/RegExp/8a.yaml
+  - group: built-ins/RegExp
+    key: 8c
+    path: results/built-ins/RegExp/8c.yaml
+  - group: built-ins/RegExp
+    key: 8d
+    path: results/built-ins/RegExp/8d.yaml
+  - group: built-ins/RegExp
+    key: 8e
+    path: results/built-ins/RegExp/8e.yaml
+  - group: built-ins/RegExp
+    key: 8f
+    path: results/built-ins/RegExp/8f.yaml
+  - group: built-ins/RegExp
+    key: "90"
+    path: results/built-ins/RegExp/90.yaml
+  - group: built-ins/RegExp
+    key: "91"
+    path: results/built-ins/RegExp/91.yaml
+  - group: built-ins/RegExp
+    key: "92"
+    path: results/built-ins/RegExp/92.yaml
+  - group: built-ins/RegExp
+    key: "93"
+    path: results/built-ins/RegExp/93.yaml
+  - group: built-ins/RegExp
+    key: "94"
+    path: results/built-ins/RegExp/94.yaml
+  - group: built-ins/RegExp
+    key: "95"
+    path: results/built-ins/RegExp/95.yaml
+  - group: built-ins/RegExp
+    key: "96"
+    path: results/built-ins/RegExp/96.yaml
+  - group: built-ins/RegExp
+    key: "97"
+    path: results/built-ins/RegExp/97.yaml
+  - group: built-ins/RegExp
+    key: "98"
+    path: results/built-ins/RegExp/98.yaml
+  - group: built-ins/RegExp
+    key: "99"
+    path: results/built-ins/RegExp/99.yaml
+  - group: built-ins/RegExp
+    key: 9a
+    path: results/built-ins/RegExp/9a.yaml
+  - group: built-ins/RegExp
+    key: 9b
+    path: results/built-ins/RegExp/9b.yaml
+  - group: built-ins/RegExp
+    key: 9c
+    path: results/built-ins/RegExp/9c.yaml
+  - group: built-ins/RegExp
+    key: 9d
+    path: results/built-ins/RegExp/9d.yaml
+  - group: built-ins/RegExp
+    key: 9e
+    path: results/built-ins/RegExp/9e.yaml
+  - group: built-ins/RegExp
+    key: 9f
+    path: results/built-ins/RegExp/9f.yaml
+  - group: built-ins/RegExp
+    key: a0
+    path: results/built-ins/RegExp/a0.yaml
+  - group: built-ins/RegExp
+    key: a1
+    path: results/built-ins/RegExp/a1.yaml
+  - group: built-ins/RegExp
+    key: a2
+    path: results/built-ins/RegExp/a2.yaml
+  - group: built-ins/RegExp
+    key: a3
+    path: results/built-ins/RegExp/a3.yaml
+  - group: built-ins/RegExp
+    key: a5
+    path: results/built-ins/RegExp/a5.yaml
+  - group: built-ins/RegExp
+    key: a6
+    path: results/built-ins/RegExp/a6.yaml
+  - group: built-ins/RegExp
+    key: a7
+    path: results/built-ins/RegExp/a7.yaml
+  - group: built-ins/RegExp
+    key: a8
+    path: results/built-ins/RegExp/a8.yaml
+  - group: built-ins/RegExp
+    key: a9
+    path: results/built-ins/RegExp/a9.yaml
+  - group: built-ins/RegExp
+    key: aa
+    path: results/built-ins/RegExp/aa.yaml
+  - group: built-ins/RegExp
+    key: ab
+    path: results/built-ins/RegExp/ab.yaml
+  - group: built-ins/RegExp
+    key: ac
+    path: results/built-ins/RegExp/ac.yaml
+  - group: built-ins/RegExp
+    key: ad
+    path: results/built-ins/RegExp/ad.yaml
+  - group: built-ins/RegExp
+    key: ae
+    path: results/built-ins/RegExp/ae.yaml
+  - group: built-ins/RegExp
+    key: af
+    path: results/built-ins/RegExp/af.yaml
+  - group: built-ins/RegExp
+    key: b0
+    path: results/built-ins/RegExp/b0.yaml
+  - group: built-ins/RegExp
+    key: b1
+    path: results/built-ins/RegExp/b1.yaml
+  - group: built-ins/RegExp
+    key: b2
+    path: results/built-ins/RegExp/b2.yaml
+  - group: built-ins/RegExp
+    key: b3
+    path: results/built-ins/RegExp/b3.yaml
+  - group: built-ins/RegExp
+    key: b4
+    path: results/built-ins/RegExp/b4.yaml
+  - group: built-ins/RegExp
+    key: b5
+    path: results/built-ins/RegExp/b5.yaml
+  - group: built-ins/RegExp
+    key: b6
+    path: results/built-ins/RegExp/b6.yaml
+  - group: built-ins/RegExp
+    key: b7
+    path: results/built-ins/RegExp/b7.yaml
+  - group: built-ins/RegExp
+    key: b8
+    path: results/built-ins/RegExp/b8.yaml
+  - group: built-ins/RegExp
+    key: b9
+    path: results/built-ins/RegExp/b9.yaml
+  - group: built-ins/RegExp
+    key: bb
+    path: results/built-ins/RegExp/bb.yaml
+  - group: built-ins/RegExp
+    key: bc
+    path: results/built-ins/RegExp/bc.yaml
+  - group: built-ins/RegExp
+    key: bd
+    path: results/built-ins/RegExp/bd.yaml
+  - group: built-ins/RegExp
+    key: be
+    path: results/built-ins/RegExp/be.yaml
+  - group: built-ins/RegExp
+    key: bf
+    path: results/built-ins/RegExp/bf.yaml
+  - group: built-ins/RegExp
+    key: c0
+    path: results/built-ins/RegExp/c0.yaml
+  - group: built-ins/RegExp
+    key: c1
+    path: results/built-ins/RegExp/c1.yaml
+  - group: built-ins/RegExp
+    key: c3
+    path: results/built-ins/RegExp/c3.yaml
+  - group: built-ins/RegExp
+    key: c4
+    path: results/built-ins/RegExp/c4.yaml
+  - group: built-ins/RegExp
+    key: c5
+    path: results/built-ins/RegExp/c5.yaml
+  - group: built-ins/RegExp
+    key: c6
+    path: results/built-ins/RegExp/c6.yaml
+  - group: built-ins/RegExp
+    key: c7
+    path: results/built-ins/RegExp/c7.yaml
+  - group: built-ins/RegExp
+    key: c8
+    path: results/built-ins/RegExp/c8.yaml
+  - group: built-ins/RegExp
+    key: c9
+    path: results/built-ins/RegExp/c9.yaml
+  - group: built-ins/RegExp
+    key: ca
+    path: results/built-ins/RegExp/ca.yaml
+  - group: built-ins/RegExp
+    key: cc
+    path: results/built-ins/RegExp/cc.yaml
+  - group: built-ins/RegExp
+    key: cd
+    path: results/built-ins/RegExp/cd.yaml
+  - group: built-ins/RegExp
+    key: cf
+    path: results/built-ins/RegExp/cf.yaml
+  - group: built-ins/RegExp
+    key: d0
+    path: results/built-ins/RegExp/d0.yaml
+  - group: built-ins/RegExp
+    key: d1
+    path: results/built-ins/RegExp/d1.yaml
+  - group: built-ins/RegExp
+    key: d2
+    path: results/built-ins/RegExp/d2.yaml
+  - group: built-ins/RegExp
+    key: d3
+    path: results/built-ins/RegExp/d3.yaml
+  - group: built-ins/RegExp
+    key: d4
+    path: results/built-ins/RegExp/d4.yaml
+  - group: built-ins/RegExp
+    key: d5
+    path: results/built-ins/RegExp/d5.yaml
+  - group: built-ins/RegExp
+    key: d6
+    path: results/built-ins/RegExp/d6.yaml
+  - group: built-ins/RegExp
+    key: d7
+    path: results/built-ins/RegExp/d7.yaml
+  - group: built-ins/RegExp
+    key: d8
+    path: results/built-ins/RegExp/d8.yaml
+  - group: built-ins/RegExp
+    key: d9
+    path: results/built-ins/RegExp/d9.yaml
+  - group: built-ins/RegExp
+    key: da
+    path: results/built-ins/RegExp/da.yaml
+  - group: built-ins/RegExp
+    key: db
+    path: results/built-ins/RegExp/db.yaml
+  - group: built-ins/RegExp
+    key: dc
+    path: results/built-ins/RegExp/dc.yaml
+  - group: built-ins/RegExp
+    key: dd
+    path: results/built-ins/RegExp/dd.yaml
+  - group: built-ins/RegExp
+    key: de
+    path: results/built-ins/RegExp/de.yaml
+  - group: built-ins/RegExp
+    key: df
+    path: results/built-ins/RegExp/df.yaml
+  - group: built-ins/RegExp
+    key: e0
+    path: results/built-ins/RegExp/e0.yaml
+  - group: built-ins/RegExp
+    key: e1
+    path: results/built-ins/RegExp/e1.yaml
+  - group: built-ins/RegExp
+    key: e2
+    path: results/built-ins/RegExp/e2.yaml
+  - group: built-ins/RegExp
+    key: e3
+    path: results/built-ins/RegExp/e3.yaml
+  - group: built-ins/RegExp
+    key: e4
+    path: results/built-ins/RegExp/e4.yaml
+  - group: built-ins/RegExp
+    key: e5
+    path: results/built-ins/RegExp/e5.yaml
+  - group: built-ins/RegExp
+    key: e6
+    path: results/built-ins/RegExp/e6.yaml
+  - group: built-ins/RegExp
+    key: e7
+    path: results/built-ins/RegExp/e7.yaml
+  - group: built-ins/RegExp
+    key: e8
+    path: results/built-ins/RegExp/e8.yaml
+  - group: built-ins/RegExp
+    key: e9
+    path: results/built-ins/RegExp/e9.yaml
+  - group: built-ins/RegExp
+    key: ea
+    path: results/built-ins/RegExp/ea.yaml
+  - group: built-ins/RegExp
+    key: eb
+    path: results/built-ins/RegExp/eb.yaml
+  - group: built-ins/RegExp
+    key: ec
+    path: results/built-ins/RegExp/ec.yaml
+  - group: built-ins/RegExp
+    key: ed
+    path: results/built-ins/RegExp/ed.yaml
+  - group: built-ins/RegExp
+    key: ee
+    path: results/built-ins/RegExp/ee.yaml
+  - group: built-ins/RegExp
+    key: ef
+    path: results/built-ins/RegExp/ef.yaml
+  - group: built-ins/RegExp
+    key: f0
+    path: results/built-ins/RegExp/f0.yaml
+  - group: built-ins/RegExp
+    key: f1
+    path: results/built-ins/RegExp/f1.yaml
+  - group: built-ins/RegExp
+    key: f2
+    path: results/built-ins/RegExp/f2.yaml
+  - group: built-ins/RegExp
+    key: f3
+    path: results/built-ins/RegExp/f3.yaml
+  - group: built-ins/RegExp
+    key: f4
+    path: results/built-ins/RegExp/f4.yaml
+  - group: built-ins/RegExp
+    key: f5
+    path: results/built-ins/RegExp/f5.yaml
+  - group: built-ins/RegExp
+    key: f6
+    path: results/built-ins/RegExp/f6.yaml
+  - group: built-ins/RegExp
+    key: f7
+    path: results/built-ins/RegExp/f7.yaml
+  - group: built-ins/RegExp
+    key: f8
+    path: results/built-ins/RegExp/f8.yaml
+  - group: built-ins/RegExp
+    key: f9
+    path: results/built-ins/RegExp/f9.yaml
+  - group: built-ins/RegExp
+    key: fa
+    path: results/built-ins/RegExp/fa.yaml
+  - group: built-ins/RegExp
+    key: fb
+    path: results/built-ins/RegExp/fb.yaml
+  - group: built-ins/RegExp
+    key: fd
+    path: results/built-ins/RegExp/fd.yaml
+  - group: built-ins/RegExp
+    key: fe
+    path: results/built-ins/RegExp/fe.yaml
+  - group: built-ins/RegExp
+    key: ff
+    path: results/built-ins/RegExp/ff.yaml
   - group: built-ins/String
     key: "00"
     path: results/built-ins/String/00.yaml
@@ -9511,12 +10213,12 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1364
+  expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
   passes: 8918
   semanticFailures: 0
-  unsupportedProfileFeatures: 1709
+  unsupportedProfileFeatures: 2192
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -9610,12 +10312,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 38
     - dependency: functions
-      expectedNegatives: 124
+      expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 2035
       semanticFailures: 0
-      unsupportedProfileFeatures: 563
+      unsupportedProfileFeatures: 1046
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -9855,6 +10557,13 @@ summary:
       passes: 360
       semanticFailures: 0
       unsupportedProfileFeatures: 68
+    - group: built-ins/RegExp
+      expectedNegatives: 142
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 483
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
