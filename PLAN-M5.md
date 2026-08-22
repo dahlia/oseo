@@ -4512,6 +4512,48 @@ passes, moves from 1,364 to 1,506 expected negatives, and moves from 1,709 to
 infrastructure failures. The suite revision, 41,091-path applicable inventory,
 ADR 0013 vocabulary, inventory policy, and zero-override policy are unchanged.
 
+Implemented M5b node `regexp-intrinsic` materializes the callable and
+constructible `%RegExp%` intrinsic and `%RegExp.prototype%`. Calling it uses
+the intrinsic as `newTarget` and preserves the same-constructor identity case.
+Construction retains the actual `newTarget`; `IsRegExp` observes
+`Symbol.match` before the native brand, and a regexp-like object supplies
+ordered `source` and optional `flags` property reads. Allocation reads the
+selected constructor's `prototype` before pattern and flags conversion, then
+creates one independently mutable, writable, non-enumerable, and
+non-configurable `lastIndex` data property initialized to zero.
+
+Dynamic initialization validates the admitted generic-matcher grammar and
+stores its source, decoded flags, capture count, and instruction budget in a
+separate immutable collector-owned descriptor. Invalid dynamic patterns and
+flags throw a catchable `SyntaxError`. Unicode property escapes, Unicode set
+and string syntax, modifier groups, prototype execution and accessors, symbol
+methods, String integration, and literal lowering retain explicit boundaries
+owned by later graph nodes. The collector traces each RegExp through its
+matcher descriptor to the converted source and flags. A bounded
+allocation-attempt sweep fails every allocation in intrinsic publication,
+successful construction, and catchable-SyntaxError construction, collects,
+and retries each attempt to prove cleanup, rooting, stable identity, and
+complete publication.
+
+Fixed and generated differential evidence covers Node.js, Deno, both
+specialization policies, forced collection at every safepoint, false hints,
+guard hits and misses, subclass construction, conversion order, and mutable
+`lastIndex`. The generated domains use seeds `0x60004f00` and `0x60004f01` in
+the reserved block through `0x60004fff`. The runtime ABI moves to
+`oseo-runtime-m5-75`, and built-in code range index 16 is allocated without a
+gap. No generated-code entry point, inventory policy, classification
+vocabulary, manifest schema, or override changes.
+
+All 492 paths under the node's reviewed RegExp roots are included: 111 pass
+and 381 retain explicit downstream boundaries. Sixty-nine already-reviewed
+Array, Object, and Symbol paths outside those roots move from unsupported to
+pass because they now observe the real RegExp object. The combined manifest
+reaches 13,108 paths, 9,098 passes, 1,506 expected negatives, and 2,504
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 97 to 99 domains, from 97 to 99
+seeds, and from 5,074 to 5,088 ordinary cases. The suite revision and
+41,091-path applicable inventory remain unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

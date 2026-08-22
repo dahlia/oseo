@@ -47,6 +47,7 @@ import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
+import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { arrayConstructorFixtures } =
@@ -122,6 +123,7 @@ const fixtures: readonly Fixture[] = [
   ...dataViewFixtures,
   ...expressionFixtures,
   ...receiverFixtures,
+  ...regexpIntrinsicFixtures,
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
@@ -191,6 +193,272 @@ assert.match(
   deferredRegExpFallback.stderr,
   /^deferred-regexp-fallback\.ts:1:\d+: error\[OSEO2001\]: Regular/u,
 );
+
+for (const deferredRegExp of [
+  {
+    name: "deferred-regexp-property.ts",
+    source: 'new RegExp("\\\\p{ASCII}", "u");',
+  },
+  {
+    name: "deferred-regexp-class-string.ts",
+    source: 'new RegExp("[\\\\q{ab}]", "v");',
+  },
+  {
+    name: "deferred-regexp-modifier.ts",
+    source: 'new RegExp("(?i:a)");',
+  },
+  {
+    name: "deferred-regexp-escaped-group-name.ts",
+    source: 'new RegExp("(?<\\\\u0041>a)");',
+  },
+  {
+    name: "deferred-regexp-escaped-group-forward-reference.ts",
+    source: 'new RegExp("\\\\k<A>(?<\\\\u0041>x)");',
+  },
+  {
+    name: "deferred-regexp-unicode-group-name.ts",
+    source: 'new RegExp("\\\\k<é>(?<é>a)");',
+  },
+  {
+    name: "deferred-regexp-nonascii-identity.ts",
+    source: 'new RegExp("\\\\é");',
+  },
+  {
+    name: "deferred-regexp-nonascii-class-identity.ts",
+    source: 'new RegExp("[\\\\é]");',
+  },
+  {
+    name: "deferred-regexp-exec.ts",
+    source: 'new RegExp("a").exec("a");',
+  },
+  {
+    name: "deferred-regexp-source.ts",
+    source: 'new RegExp("a").source;',
+  },
+  {
+    name: "deferred-regexp-symbol-search.ts",
+    source: 'RegExp.prototype[Symbol.search]("");',
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredRegExp.name],
+      source: deferredRegExp.source,
+      sourceId: deferredRegExp.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredRegExp.name.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: (?:RegExp|Regular expression)",
+      "u",
+    ),
+  );
+}
+
+for (const deferredSymbol of [
+  {
+    name: "deferred-regexp-symbol-match.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".match(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-match-all.ts",
+    source: `
+const regexp = new RegExp("a+", "g");
+Object.defineProperty(regexp, "flags", { value: "g" });
+regexp.toString = () => "z";
+"aaa".matchAll(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-search-fallthrough.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".search(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-split.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".split(regexp);
+`,
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredSymbol.name],
+      source: deferredSymbol.source,
+      sourceId: deferredSymbol.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredSymbol.name.replace(".", "\\.")}:\\d+:\\d+: ` +
+        "error\\[OSEO2001\\]: RegExp",
+      "u",
+    ),
+  );
+}
+
+for (const misplacedRegExpPlaceholder of [
+  {
+    name: "misplaced-regexp-placeholder-match.ts",
+    source: `
+RegExp.prototype[Symbol.match] = RegExp.prototype.exec;
+"a".match("a");
+`,
+  },
+  {
+    name: "misplaced-regexp-placeholder-match-all.ts",
+    source: `
+RegExp.prototype[Symbol.matchAll] = RegExp.prototype[Symbol.match];
+"a".matchAll("a");
+`,
+  },
+  {
+    name: "misplaced-regexp-placeholder-search.ts",
+    source: `
+RegExp.prototype[Symbol.search] = RegExp.prototype[Symbol.split];
+"a".search("a");
+`,
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [misplacedRegExpPlaceholder.name],
+      source: misplacedRegExpPlaceholder.source,
+      sourceId: misplacedRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${misplacedRegExpPlaceholder.name.replace(".", "\\.")}:` +
+        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
+      "u",
+    ),
+  );
+}
+
+for (const missingRegExpPlaceholder of [
+  {
+    name: "missing-regexp-placeholder-match.ts",
+    symbol: "match",
+    expression: '"a".match("a")',
+  },
+  {
+    name: "missing-regexp-placeholder-match-all.ts",
+    symbol: "matchAll",
+    expression: '"a".matchAll("a")',
+  },
+  {
+    name: "missing-regexp-placeholder-search.ts",
+    symbol: "search",
+    expression: '"a".search("a")',
+  },
+]) {
+  const source = `
+delete RegExp.prototype[Symbol.${missingRegExpPlaceholder.symbol}];
+${missingRegExpPlaceholder.expression};
+`;
+  const deferred = await runNativeCli(
+    {
+      args: [missingRegExpPlaceholder.name],
+      source,
+      sourceId: missingRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${missingRegExpPlaceholder.name.replace(".", "\\.")}:` +
+        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
+      "u",
+    ),
+  );
+}
+
+for (const shadowedRegExpPlaceholder of [
+  {
+    expected: "\n",
+    expression: 'console.log("a".match()[0])',
+    name: "shadowed-regexp-placeholder-match.ts",
+    symbol: "match",
+  },
+  {
+    expected: "\n",
+    expression: 'console.log("a".matchAll().next().value[0])',
+    name: "shadowed-regexp-placeholder-match-all.ts",
+    symbol: "matchAll",
+  },
+  {
+    expected: "0\n",
+    expression: 'console.log("a".search())',
+    name: "shadowed-regexp-placeholder-search.ts",
+    symbol: "search",
+  },
+]) {
+  const source = `
+Object.prototype[Symbol.${shadowedRegExpPlaceholder.symbol}] = () => 1;
+${shadowedRegExpPlaceholder.expression};
+`;
+  const native = await runNativeCli(
+    {
+      args: [shadowedRegExpPlaceholder.name],
+      source,
+      sourceId: shadowedRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(native.exitStatus, 0, native.stderr);
+  assert.equal(native.stdout, shadowedRegExpPlaceholder.expected);
+  assert.equal(native.stderr, "");
+}
+
+const coreClassBackreference = await runNativeCli(
+  {
+    args: ["regexp-core-class-backreference.ts"],
+    source: `
+try {
+  new RegExp("(a)[\\\\1]");
+} catch (error) {
+  console.log(error instanceof SyntaxError);
+}
+`,
+    sourceId: "regexp-core-class-backreference.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(coreClassBackreference.exitStatus, 0);
+assert.equal(coreClassBackreference.stdout, "true\n");
+assert.equal(coreClassBackreference.stderr, "");
 
 for (const deferredPattern of [
   {
@@ -362,6 +630,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "regexp-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -567,6 +836,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "regexp-intrinsic" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -636,6 +906,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
+            fixture.name === "regexp-intrinsic" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -822,10 +1093,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus sixteen admitted constructor
-            // property names shared by every Script, DataView being the one
+            // value-property allocations plus seventeen admitted constructor
+            // property names shared by every Script, RegExp being the one
             // this node admits.
-            assert.equal(native.counters.allocations, 32);
+            assert.equal(native.counters.allocations, 33);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

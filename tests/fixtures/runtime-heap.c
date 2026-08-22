@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 static OseoValue require_normal(OseoResult result) {
@@ -1583,6 +1584,524 @@ static void test_data_view_allocation_sweep(void) {
     }
 }
 
+typedef enum {
+    REGEXP_ALLOCATION_CLUSTER,
+    REGEXP_ALLOCATION_INSTANCE,
+    REGEXP_ALLOCATION_NAMED_CAPTURE,
+    REGEXP_ALLOCATION_SYNTAX_ERROR,
+    REGEXP_ALLOCATION_OPERATION_COUNT,
+} RegExpAllocationOperation;
+
+static void prepare_regexp_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    RegExpAllocationOperation operation
+) {
+    roots[0] = require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_OBJECT));
+    if (operation == REGEXP_ALLOCATION_CLUSTER) return;
+    roots[0] = require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_REGEXP));
+    if (operation == REGEXP_ALLOCATION_INSTANCE) {
+        roots[1] = oseo_number(12345.0);
+    } else if (operation == REGEXP_ALLOCATION_NAMED_CAPTURE) {
+        roots[1] = make_text(context, "(?<name>a)\\k<name>");
+    } else {
+        roots[1] = make_text(context, "[");
+    }
+    roots[2] = roots[0];
+    if (operation == REGEXP_ALLOCATION_SYNTAX_ERROR) {
+        roots[4] = require_normal(
+            oseo_error_intrinsic(context, OSEO_ERROR_SYNTAX)
+        );
+    }
+}
+
+static OseoResult run_regexp_allocation_operation(
+    OseoContext *context,
+    OseoValue *roots,
+    RegExpAllocationOperation operation
+) {
+    if (operation == REGEXP_ALLOCATION_CLUSTER) {
+        return oseo_intrinsic(context, OSEO_INTRINSIC_REGEXP);
+    }
+    return oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        roots[0]
+    );
+}
+
+static void assert_regexp_cluster_unpublished(const OseoContext *context) {
+    for (size_t intrinsic = OSEO_INTRINSIC_REGEXP_PROTOTYPE;
+         intrinsic <= OSEO_INTRINSIC_REGEXP_SPECIES;
+         intrinsic += 1u) {
+        assert(context->intrinsics[intrinsic] == oseo_undefined());
+    }
+}
+
+static size_t regexp_allocation_attempt_count(
+    RegExpAllocationOperation operation
+) {
+    OseoContext context;
+    OseoValue roots[6] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 6u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    prepare_regexp_allocation_operation(&context, roots, operation);
+    context.collect_every_safepoint = true;
+    oseo_context_fail_allocation_at(&context, 0u);
+    OseoResult result = run_regexp_allocation_operation(
+        &context,
+        roots,
+        operation
+    );
+    if (operation == REGEXP_ALLOCATION_SYNTAX_ERROR) {
+        assert(result.status == OSEO_STATUS_THROW);
+        assert(result.value != oseo_undefined());
+    } else {
+        roots[3] = require_normal(result);
+    }
+    size_t attempts = context.allocation_attempts;
+    assert(attempts > 0u && attempts <= 256u);
+    oseo_collect(&context);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+    return attempts;
+}
+
+static void validate_regexp_allocation_retry(
+    OseoContext *context,
+    OseoValue *roots,
+    RegExpAllocationOperation operation,
+    OseoResult result
+) {
+    if (operation == REGEXP_ALLOCATION_CLUSTER) {
+        assert(result.status == OSEO_STATUS_NORMAL);
+        assert(
+            result.value ==
+            require_normal(oseo_intrinsic(context, OSEO_INTRINSIC_REGEXP))
+        );
+        for (size_t intrinsic = OSEO_INTRINSIC_REGEXP_PROTOTYPE;
+             intrinsic <= OSEO_INTRINSIC_REGEXP_SPECIES;
+             intrinsic += 1u) {
+            assert(context->intrinsics[intrinsic] != oseo_undefined());
+        }
+        return;
+    }
+    if (operation == REGEXP_ALLOCATION_SYNTAX_ERROR) {
+        assert(result.status == OSEO_STATUS_THROW);
+        assert(result.value != oseo_undefined());
+        roots[3] = result.value;
+        assert(
+            require_normal(oseo_instanceof(context, roots[3], roots[4])) ==
+            oseo_boolean(true)
+        );
+        return;
+    }
+    assert(result.status == OSEO_STATUS_NORMAL);
+    roots[3] = result.value;
+    roots[4] = make_text(context, "lastIndex");
+    assert(
+        require_normal(oseo_object_get(context, roots[3], roots[4])) ==
+        oseo_number(0.0)
+    );
+}
+
+/*
+ * Every allocation in the RegExp cluster, successful constructor, and
+ * catchable SyntaxError path fails once. Collection follows each failure,
+ * and the same context then retries without publishing a partial intrinsic,
+ * instance, matcher artifact, or language error.
+ */
+static void test_regexp_allocation_sweep(void) {
+    for (RegExpAllocationOperation operation = REGEXP_ALLOCATION_CLUSTER;
+         operation < REGEXP_ALLOCATION_OPERATION_COUNT;
+         operation += 1) {
+        size_t attempts = regexp_allocation_attempt_count(operation);
+        for (size_t attempt = 1u; attempt <= attempts; attempt += 1u) {
+            OseoContext context;
+            OseoValue roots[6] = {
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+                oseo_undefined(),
+            };
+            OseoRootFrame frame = {NULL, roots, 6u};
+            oseo_context_init(&context, "runtime-heap.c", 14u);
+            oseo_roots_push(&context, &frame);
+            prepare_regexp_allocation_operation(&context, roots, operation);
+            OseoValue identity = roots[2];
+            context.collect_every_safepoint = true;
+            oseo_context_fail_allocation_at(&context, attempt);
+            OseoResult failed = run_regexp_allocation_operation(
+                &context,
+                roots,
+                operation
+            );
+            assert(failed.status == OSEO_STATUS_THROW);
+            assert(failed.value == oseo_undefined());
+            assert(context.has_diagnostic);
+            if (operation == REGEXP_ALLOCATION_CLUSTER) {
+                assert_regexp_cluster_unpublished(&context);
+            } else {
+                assert(
+                    require_normal(oseo_intrinsic(
+                        &context,
+                        OSEO_INTRINSIC_REGEXP
+                    )) == identity
+                );
+            }
+            oseo_collect(&context);
+            oseo_context_fail_allocation_at(&context, 0u);
+            context.has_diagnostic = false;
+            context.error_code = NULL;
+            context.error_message = NULL;
+            OseoResult retried = run_regexp_allocation_operation(
+                &context,
+                roots,
+                operation
+            );
+            validate_regexp_allocation_retry(
+                &context,
+                roots,
+                operation,
+                retried
+            );
+            oseo_collect(&context);
+            oseo_roots_pop(&context, &frame);
+            oseo_context_destroy(&context);
+        }
+    }
+}
+
+static void assert_regexp_diagnostic(
+    const uint16_t *units,
+    size_t length,
+    const char *message
+) {
+    OseoContext context;
+    OseoValue roots[3] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 3u};
+    oseo_context_init(&context, "runtime-heap.c", 15u);
+    oseo_roots_push(&context, &frame);
+    roots[0] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_REGEXP)
+    );
+    roots[1] = require_normal(
+        oseo_string_from_units(&context, units, length)
+    );
+    OseoResult result = oseo_call_function(
+        &context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        roots[0]
+    );
+    assert(result.status == OSEO_STATUS_THROW);
+    assert(result.value == oseo_undefined());
+    assert(context.has_diagnostic);
+    assert(strcmp(context.error_code, "OSEO2001") == 0);
+    assert(strcmp(context.error_message, message) == 0);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
+static uint16_t *allocate_regexp_units(size_t length) {
+    assert(length <= SIZE_MAX / sizeof(uint16_t));
+    uint16_t *units = malloc(length * sizeof(uint16_t));
+    assert(units != NULL);
+    return units;
+}
+
+/* Each reviewed dynamic-matcher limit retains an explicit OSEO2001 edge. */
+static void test_regexp_matcher_limits(void) {
+    static const char limit_message[] =
+        "Regular expression pattern exceeds the reviewed matcher limit.";
+    size_t pattern_length = ((size_t)0x100000u) + 1u;
+    uint16_t *pattern = allocate_regexp_units(pattern_length);
+    for (size_t index = 0u; index < pattern_length; index += 1u) {
+        pattern[index] = 'a';
+    }
+    assert_regexp_diagnostic(pattern, pattern_length, limit_message);
+    free(pattern);
+
+    size_t capture_count = ((size_t)0xffffu) + 1u;
+    size_t capture_length = capture_count * 2u;
+    pattern = allocate_regexp_units(capture_length);
+    for (size_t index = 0u; index < capture_count; index += 1u) {
+        pattern[index * 2u] = '(';
+        pattern[index * 2u + 1u] = ')';
+    }
+    assert_regexp_diagnostic(pattern, capture_length, limit_message);
+    free(pattern);
+
+    size_t nesting = 257u;
+    size_t nesting_length = nesting * 2u + 1u;
+    pattern = allocate_regexp_units(nesting_length);
+    for (size_t index = 0u; index < nesting; index += 1u) {
+        pattern[index] = '(';
+        pattern[nesting + 1u + index] = ')';
+    }
+    pattern[nesting] = 'a';
+    assert_regexp_diagnostic(pattern, nesting_length, limit_message);
+    free(pattern);
+
+    static const uint16_t quantifier[] = {
+        'a', '{', '9', '0', '0', '7', '1', '9', '9', '2', '5', '4',
+        '7', '4', '0', '9', '9', '2', '}',
+    };
+    assert_regexp_diagnostic(
+        quantifier,
+        sizeof(quantifier) / sizeof(quantifier[0]),
+        limit_message
+    );
+
+    capture_count = (size_t)0xffffu;
+    capture_length = capture_count * 2u;
+    size_t instruction_length = 917510u;
+    size_t literal_count = instruction_length - capture_length;
+    pattern = allocate_regexp_units(instruction_length);
+    for (size_t index = 0u; index < literal_count; index += 1u) {
+        pattern[index] = 'a';
+    }
+    for (size_t index = 0u; index < capture_count; index += 1u) {
+        size_t offset = literal_count + index * 2u;
+        pattern[offset] = '(';
+        pattern[offset + 1u] = ')';
+    }
+    assert_regexp_diagnostic(pattern, instruction_length, limit_message);
+    free(pattern);
+}
+
+static void test_regexp_duplicate_name_scale(void) {
+    static const uint16_t group[] = {'(', '?', '<', 'a', '>', 'x', ')'};
+    const size_t group_count = 20000u;
+    const size_t group_length = sizeof(group) / sizeof(group[0]);
+    size_t pattern_length = group_count * (group_length + 1u) - 1u;
+    uint16_t *pattern = allocate_regexp_units(pattern_length);
+    size_t offset = 0u;
+    for (size_t index = 0u; index < group_count; index += 1u) {
+        if (index != 0u) pattern[offset++] = '|';
+        memcpy(pattern + offset, group, sizeof(group));
+        offset += group_length;
+    }
+    assert(offset == pattern_length);
+    assert_regexp_diagnostic(
+        pattern,
+        pattern_length,
+        "Regular expression pattern extension is not admitted yet."
+    );
+    free(pattern);
+}
+
+static OseoValue *regexp_order_roots = NULL;
+static size_t regexp_order_step = 0u;
+
+static OseoResult regexp_order_dispatcher(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    size_t code_id = 0u;
+    OseoResult code = oseo_function_code_id(context, callee, &code_id);
+    if (code.status != OSEO_STATUS_NORMAL) return code;
+    if (code_id == 310u) {
+        assert(regexp_order_step == 0u);
+        regexp_order_step = 1u;
+        OseoResult prototype = oseo_object_create(context, oseo_null());
+        if (prototype.status == OSEO_STATUS_NORMAL) {
+            regexp_order_roots[7] = prototype.value;
+        }
+        return prototype;
+    }
+    if (code_id == 311u) {
+        assert(regexp_order_step == 1u);
+        regexp_order_step = 2u;
+        return (OseoResult){OSEO_STATUS_NORMAL, make_text(context, "a+")};
+    }
+    assert(code_id == 312u);
+    assert(regexp_order_step == 2u);
+    regexp_order_step = 3u;
+    return (OseoResult){OSEO_STATUS_NORMAL, make_text(context, "g")};
+}
+
+static OseoValue make_regexp_order_function(
+    OseoContext *context,
+    OseoValue environment,
+    size_t code_id,
+    const uint16_t *name,
+    size_t name_length
+) {
+    return require_normal(oseo_function_create(
+        context,
+        code_id,
+        environment,
+        name,
+        name_length,
+        0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+}
+
+/*
+ * Direct native construction supplies the observable newTarget accessor that
+ * the admitted source profile cannot spell without Reflect.construct. The
+ * prototype read must finish before pattern conversion, which must finish
+ * before flags conversion, under collection at every allocation.
+ */
+static void test_regexp_prototype_and_conversion_order(void) {
+    static const uint16_t prototype_name[] = {
+        'p', 'r', 'o', 't', 'o', 't', 'y', 'p', 'e',
+    };
+    static const uint16_t to_string_name[] = {
+        't', 'o', 'S', 't', 'r', 'i', 'n', 'g',
+    };
+    OseoContext context;
+    OseoValue roots[10] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 10u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    roots[0] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_REGEXP)
+    );
+    roots[1] = require_normal(oseo_environment_create(&context, 0u));
+    roots[2] = make_regexp_order_function(
+        &context,
+        roots[1],
+        310u,
+        prototype_name,
+        sizeof(prototype_name) / sizeof(*prototype_name)
+    );
+    roots[3] = make_regexp_order_function(
+        &context,
+        roots[1],
+        311u,
+        to_string_name,
+        sizeof(to_string_name) / sizeof(*to_string_name)
+    );
+    roots[4] = make_regexp_order_function(
+        &context,
+        roots[1],
+        312u,
+        to_string_name,
+        sizeof(to_string_name) / sizeof(*to_string_name)
+    );
+    OseoValue bind = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_FUNCTION_BIND)
+    );
+    roots[5] = require_normal(oseo_call_function(
+        &context,
+        bind,
+        roots[0],
+        0u,
+        NULL,
+        oseo_undefined()
+    ));
+    roots[6] = make_text(&context, "prototype");
+    (void)require_normal(oseo_object_define_accessor(
+        &context,
+        roots[5],
+        roots[6],
+        roots[2],
+        oseo_undefined(),
+        true,
+        false,
+        (OseoPropertyAttributes){true, true, false, true}
+    ));
+    roots[8] = require_normal(oseo_object_create(&context, oseo_null()));
+    roots[9] = require_normal(oseo_object_create(&context, oseo_null()));
+    roots[6] = make_text(&context, "toString");
+    (void)require_normal(oseo_object_set(
+        &context,
+        roots[8],
+        roots[6],
+        roots[3],
+        true
+    ));
+    (void)require_normal(oseo_object_set(
+        &context,
+        roots[9],
+        roots[6],
+        roots[4],
+        true
+    ));
+    regexp_order_roots = roots;
+    regexp_order_step = 0u;
+    oseo_context_set_function_dispatcher(&context, regexp_order_dispatcher);
+    context.collect_every_safepoint = true;
+    OseoValue arguments[2] = {roots[8], roots[9]};
+    roots[6] = require_normal(oseo_call_function(
+        &context,
+        roots[0],
+        oseo_undefined(),
+        2u,
+        arguments,
+        roots[5]
+    ));
+    assert(regexp_order_step == 3u);
+    roots[3] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_OBJECT_GET_PROTOTYPE_OF)
+    );
+    OseoValue instance = roots[6];
+    assert(
+        require_normal(oseo_call_function(
+            &context,
+            roots[3],
+            oseo_undefined(),
+            1u,
+            &instance,
+            oseo_undefined()
+        )) ==
+        roots[7]
+    );
+    roots[4] = make_text(&context, "lastIndex");
+    assert(
+        require_normal(oseo_object_get(&context, roots[6], roots[4])) ==
+        oseo_number(0.0)
+    );
+    oseo_context_set_function_dispatcher(&context, NULL);
+    regexp_order_roots = NULL;
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 /*
  * The DataView constructor revalidates its buffer after
  * OrdinaryCreateFromConstructor reads the new target's `prototype`,
@@ -2371,6 +2890,10 @@ int main(void) {
     test_bigint_allocation_sweep();
     test_data_view_allocation_sweep();
     test_data_view_prototype_revalidation();
+    test_regexp_allocation_sweep();
+    test_regexp_matcher_limits();
+    test_regexp_duplicate_name_scale();
+    test_regexp_prototype_and_conversion_order();
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);

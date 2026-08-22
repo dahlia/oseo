@@ -49,12 +49,20 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/String/prototype/match/S15.5.4.10_A1_T8.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/String/prototype/match/S15.5.4.10_A1_T8\
-        .js:91:18: error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/String/prototype/match/S15.5.4.10_A1_T8.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/match/S15.5.4.10_A1_T8.js:91:18:
+        error[OSEO2001]: RegExp prototype execution is not admitted
+        yet.\n"'
+      unsupportedCapability: regexp-prototype-execution
       passed: false
     unsupportedFeatures: []
   - case:

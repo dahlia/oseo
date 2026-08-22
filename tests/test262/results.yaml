@@ -5781,8 +5781,14 @@ partitions:
     key: 0e
     path: results/built-ins/RegExp/0e.yaml
   - group: built-ins/RegExp
+    key: 0f
+    path: results/built-ins/RegExp/0f.yaml
+  - group: built-ins/RegExp
     key: "10"
     path: results/built-ins/RegExp/10.yaml
+  - group: built-ins/RegExp
+    key: "11"
+    path: results/built-ins/RegExp/11.yaml
   - group: built-ins/RegExp
     key: "12"
     path: results/built-ins/RegExp/12.yaml
@@ -5799,6 +5805,9 @@ partitions:
     key: "16"
     path: results/built-ins/RegExp/16.yaml
   - group: built-ins/RegExp
+    key: "17"
+    path: results/built-ins/RegExp/17.yaml
+  - group: built-ins/RegExp
     key: "18"
     path: results/built-ins/RegExp/18.yaml
   - group: built-ins/RegExp
@@ -5807,6 +5816,9 @@ partitions:
   - group: built-ins/RegExp
     key: 1a
     path: results/built-ins/RegExp/1a.yaml
+  - group: built-ins/RegExp
+    key: 1b
+    path: results/built-ins/RegExp/1b.yaml
   - group: built-ins/RegExp
     key: 1c
     path: results/built-ins/RegExp/1c.yaml
@@ -5831,6 +5843,9 @@ partitions:
   - group: built-ins/RegExp
     key: "23"
     path: results/built-ins/RegExp/23.yaml
+  - group: built-ins/RegExp
+    key: "24"
+    path: results/built-ins/RegExp/24.yaml
   - group: built-ins/RegExp
     key: "25"
     path: results/built-ins/RegExp/25.yaml
@@ -5870,6 +5885,9 @@ partitions:
   - group: built-ins/RegExp
     key: "31"
     path: results/built-ins/RegExp/31.yaml
+  - group: built-ins/RegExp
+    key: "32"
+    path: results/built-ins/RegExp/32.yaml
   - group: built-ins/RegExp
     key: "33"
     path: results/built-ins/RegExp/33.yaml
@@ -5912,6 +5930,9 @@ partitions:
   - group: built-ins/RegExp
     key: "40"
     path: results/built-ins/RegExp/40.yaml
+  - group: built-ins/RegExp
+    key: "41"
+    path: results/built-ins/RegExp/41.yaml
   - group: built-ins/RegExp
     key: "42"
     path: results/built-ins/RegExp/42.yaml
@@ -5991,6 +6012,9 @@ partitions:
     key: 5b
     path: results/built-ins/RegExp/5b.yaml
   - group: built-ins/RegExp
+    key: 5c
+    path: results/built-ins/RegExp/5c.yaml
+  - group: built-ins/RegExp
     key: 5d
     path: results/built-ins/RegExp/5d.yaml
   - group: built-ins/RegExp
@@ -6014,6 +6038,9 @@ partitions:
   - group: built-ins/RegExp
     key: "65"
     path: results/built-ins/RegExp/65.yaml
+  - group: built-ins/RegExp
+    key: "66"
+    path: results/built-ins/RegExp/66.yaml
   - group: built-ins/RegExp
     key: "67"
     path: results/built-ins/RegExp/67.yaml
@@ -6069,6 +6096,12 @@ partitions:
     key: "78"
     path: results/built-ins/RegExp/78.yaml
   - group: built-ins/RegExp
+    key: "79"
+    path: results/built-ins/RegExp/79.yaml
+  - group: built-ins/RegExp
+    key: 7a
+    path: results/built-ins/RegExp/7a.yaml
+  - group: built-ins/RegExp
     key: 7b
     path: results/built-ins/RegExp/7b.yaml
   - group: built-ins/RegExp
@@ -6081,6 +6114,9 @@ partitions:
     key: 7e
     path: results/built-ins/RegExp/7e.yaml
   - group: built-ins/RegExp
+    key: 7f
+    path: results/built-ins/RegExp/7f.yaml
+  - group: built-ins/RegExp
     key: "80"
     path: results/built-ins/RegExp/80.yaml
   - group: built-ins/RegExp
@@ -6089,6 +6125,9 @@ partitions:
   - group: built-ins/RegExp
     key: "82"
     path: results/built-ins/RegExp/82.yaml
+  - group: built-ins/RegExp
+    key: "83"
+    path: results/built-ins/RegExp/83.yaml
   - group: built-ins/RegExp
     key: "84"
     path: results/built-ins/RegExp/84.yaml
@@ -6107,6 +6146,9 @@ partitions:
   - group: built-ins/RegExp
     key: 8a
     path: results/built-ins/RegExp/8a.yaml
+  - group: built-ins/RegExp
+    key: 8b
+    path: results/built-ins/RegExp/8b.yaml
   - group: built-ins/RegExp
     key: 8c
     path: results/built-ins/RegExp/8c.yaml
@@ -6243,6 +6285,9 @@ partitions:
     key: b9
     path: results/built-ins/RegExp/b9.yaml
   - group: built-ins/RegExp
+    key: ba
+    path: results/built-ins/RegExp/ba.yaml
+  - group: built-ins/RegExp
     key: bb
     path: results/built-ins/RegExp/bb.yaml
   - group: built-ins/RegExp
@@ -6263,6 +6308,9 @@ partitions:
   - group: built-ins/RegExp
     key: c1
     path: results/built-ins/RegExp/c1.yaml
+  - group: built-ins/RegExp
+    key: c2
+    path: results/built-ins/RegExp/c2.yaml
   - group: built-ins/RegExp
     key: c3
     path: results/built-ins/RegExp/c3.yaml
@@ -6288,11 +6336,17 @@ partitions:
     key: ca
     path: results/built-ins/RegExp/ca.yaml
   - group: built-ins/RegExp
+    key: cb
+    path: results/built-ins/RegExp/cb.yaml
+  - group: built-ins/RegExp
     key: cc
     path: results/built-ins/RegExp/cc.yaml
   - group: built-ins/RegExp
     key: cd
     path: results/built-ins/RegExp/cd.yaml
+  - group: built-ins/RegExp
+    key: ce
+    path: results/built-ins/RegExp/ce.yaml
   - group: built-ins/RegExp
     key: cf
     path: results/built-ins/RegExp/cf.yaml
@@ -6428,6 +6482,9 @@ partitions:
   - group: built-ins/RegExp
     key: fb
     path: results/built-ins/RegExp/fb.yaml
+  - group: built-ins/RegExp
+    key: fc
+    path: results/built-ins/RegExp/fc.yaml
   - group: built-ins/RegExp
     key: fd
     path: results/built-ins/RegExp/fd.yaml
@@ -10216,9 +10273,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 8918
+  passes: 9098
   semanticFailures: 0
-  unsupportedProfileFeatures: 2192
+  unsupportedProfileFeatures: 2504
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -10259,9 +10316,9 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 853
+      passes: 854
       semanticFailures: 0
-      unsupportedProfileFeatures: 76
+      unsupportedProfileFeatures: 75
     - dependency: control-flow
       expectedNegatives: 225
       harnessFailures: 0
@@ -10315,9 +10372,9 @@ summary:
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2035
+      passes: 2049
       semanticFailures: 0
-      unsupportedProfileFeatures: 1046
+      unsupportedProfileFeatures: 1032
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -10357,9 +10414,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5555
+      passes: 5734
       semanticFailures: 0
-      unsupportedProfileFeatures: 888
+      unsupportedProfileFeatures: 1201
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -10385,9 +10442,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 326
+      passes: 327
       semanticFailures: 0
-      unsupportedProfileFeatures: 146
+      unsupportedProfileFeatures: 145
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -10414,9 +10471,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1265
+      passes: 1279
       semanticFailures: 0
-      unsupportedProfileFeatures: 210
+      unsupportedProfileFeatures: 196
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -10547,9 +10604,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2286
+      passes: 2340
       semanticFailures: 0
-      unsupportedProfileFeatures: 426
+      unsupportedProfileFeatures: 372
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -10561,9 +10618,9 @@ summary:
       expectedNegatives: 142
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 111
       semanticFailures: 0
-      unsupportedProfileFeatures: 483
+      unsupportedProfileFeatures: 864
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
@@ -10575,9 +10632,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 20
+      passes: 21
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 14
     - group: built-ins/ThrowTypeError
       expectedNegatives: 0
       harnessFailures: 0

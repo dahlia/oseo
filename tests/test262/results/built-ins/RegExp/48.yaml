@@ -3,6 +3,52 @@ key: "48"
 results:
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/S15.10.2.7_A5_T8.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/RegExp/S15.10.2.7_A5_T8.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.2.7_A5_T8.js:87:18:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/S15.10.2.9_A1_T5.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/RegExp/S15.10.2.9_A1_T5.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.2.9_A1_T5.js:88:18:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - regexp-unicode-property-escapes
       flags: []
@@ -73,4 +119,24 @@ results:
       failedPhase: parse
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-add-remove-s.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-modifiers
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

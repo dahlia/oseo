@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twenty-nine reviewed assets in this order:
+The runtime input now lists thirty reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
@@ -28,12 +28,14 @@ The runtime input now lists twenty-nine reviewed assets in this order:
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
 *runtime\_primitive.c*, *runtime\_promise.c*,
 *runtime\_event\_loop.c*, *runtime\_map.c*,
-*runtime\_bigint\_object.c*, and *runtime\_data\_view.c*. The M5
+*runtime\_bigint\_object.c*, *runtime\_data\_view.c*, and
+*runtime\_regexp.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
-map-intrinsic, BigInt-intrinsic, and DataView units each added one
+map-intrinsic, BigInt-intrinsic, DataView, and RegExp-intrinsic units each
+added one
 component the same
 way. The M5b
 preparation unit then split the
@@ -103,6 +105,10 @@ Ownership follows the plan's target layout:
     Block one buffer owns, `isView`, the `Symbol.species` accessor, the
     `byteLength`, `detached`, `maxByteLength`, and `resizable` accessors,
     and `resize`, `slice`, `transfer`, and `transferToFixedLength`;
+ -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
+    `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
+    and flag validation, immutable matcher artifact, `Symbol.species`, and the
+    explicit prototype-execution boundary;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -276,6 +282,10 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_data_view_builtin_dispatch`          | *runtime\_data\_view.c*       |
 | `oseo_internal_data_view_intrinsic`                 | *runtime\_data\_view.c*       |
 | `oseo_internal_install_data_view_global`            | *runtime\_data\_view.c*       |
+| `oseo_internal_is_regexp`                           | *runtime\_regexp.c*           |
+| `oseo_internal_regexp_builtin_dispatch`             | *runtime\_regexp.c*           |
+| `oseo_internal_regexp_intrinsic`                    | *runtime\_regexp.c*           |
+| `oseo_internal_install_regexp_global`               | *runtime\_regexp.c*           |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
 | `oseo_internal_append_own_property`                 | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |

@@ -459,38 +459,12 @@ static size_t string_relative_position(double position, size_t length) {
     return string_clamped_position(position, length);
 }
 
-/* IsRegExp, before the RegExp heap kind itself is admitted. */
 static OseoResult string_is_regexp(
     OseoContext *context,
     OseoValue value,
     bool *regexp
 ) {
-    if (!is_object(value)) {
-        *regexp = false;
-        return normal(oseo_boolean(false));
-    }
-    OseoValue slots[2] = {value, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_well_known_symbol(
-        context,
-        OSEO_WELL_KNOWN_MATCH
-    );
-    slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[1]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        tag_of(result.value) != OSEO_TAG_UNDEFINED) {
-        *regexp = oseo_to_boolean(result.value);
-    } else if (result.status == OSEO_STATUS_NORMAL) {
-        /* No RegExp objects exist before the separately owned node lands. */
-        *regexp = false;
-    }
-    oseo_roots_pop(context, &frame);
-    return result.status == OSEO_STATUS_NORMAL
-        ? normal(oseo_boolean(*regexp))
-        : result;
+    return oseo_internal_is_regexp(context, value, regexp);
 }
 
 static OseoResult string_concat(

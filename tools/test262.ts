@@ -549,6 +549,29 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "string-prototype-method";
   }
+  if (diagnostic === "RegExp prototype execution is not admitted yet.") {
+    return "regexp-prototype-execution";
+  }
+  if (
+    diagnostic === "Regular expression pattern extension is not admitted yet."
+  ) {
+    return "regexp-pattern-extension";
+  }
+  if (
+    diagnostic ===
+    "Regular expression pattern exceeds the reviewed matcher limit."
+  ) {
+    return "regexp-matcher-limit";
+  }
+  if (diagnostic === "RegExp String dispatch is not admitted yet.") {
+    return "regexp-string-dispatch";
+  }
+  if (
+    diagnostic ===
+    "Branded RegExp String protocol fallback is not admitted yet."
+  ) {
+    return "regexp-string-dispatch";
+  }
   // The runtime ends a program at the first rejection checkpoint that
   // still holds an unhandled rejection. A case that needs the opposite
   // host policy names that boundary instead of reporting a semantic

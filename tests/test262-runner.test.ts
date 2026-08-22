@@ -920,6 +920,46 @@ null.item;
     "unsupported-profile-feature",
   );
 
+  await Promise.all(
+    [
+      [
+        "RegExp prototype execution is not admitted yet.",
+        "regexp-prototype-execution",
+      ],
+      [
+        "Regular expression pattern extension is not admitted yet.",
+        "regexp-pattern-extension",
+      ],
+      [
+        "Regular expression pattern exceeds the reviewed matcher limit.",
+        "regexp-matcher-limit",
+      ],
+      ["RegExp String dispatch is not admitted yet.", "regexp-string-dispatch"],
+      [
+        "Branded RegExp String protocol fallback is not admitted yet.",
+        "regexp-string-dispatch",
+      ],
+    ].map(async ([message, capability]) => {
+      const deferredRegExp = await executeTest262Case(
+        source,
+        parsed,
+        new Set<string>(),
+        harnesses,
+        respondStderr(
+          `test/runtime-negative.js:8:1: error[OSEO2001]: ${message}\n`,
+        ),
+      );
+      assert.equal(
+        deferredRegExp.observation.unsupportedCapability,
+        capability,
+      );
+      assert.equal(
+        deferredRegExp.classification,
+        "unsupported-profile-feature",
+      );
+    }),
+  );
+
   const descriptorMap = await executeTest262Case(
     source,
     parsed,

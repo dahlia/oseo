@@ -4,12 +4,14 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1, 2, and 3 and the Unicode property
-escape checkpoint landed; intrinsic, literal, and probe work not started. This
-plan defines the M5 semantic and compilation boundary for ECMAScript regular
-expressions. It does not admit regular expression literals or the `RegExp`
-family to the active language profile, select one matcher strategy, or add a
-repository command before implementation evidence exists.
+Implementation status: delivery items 1 through 3, the Unicode property
+escape checkpoint, and the RegExp intrinsic checkpoint landed. Literal and
+probe work has not started. This plan defines the M5 semantic and compilation
+boundary for ECMAScript regular expressions. The active language profile
+admits the callable and constructible `RegExp` intrinsic, initialization, and
+`lastIndex` state. It does not admit regular expression literals, pattern
+execution, or the prototype and String dispatch surfaces owned by later
+delivery items.
 
 The owned pattern AST, parser, validator, limits, extension points, and
 structural dump live in `@oseo/compiler`, and the frontend validates a
@@ -19,9 +21,9 @@ item 1 inventory. The generic matcher artifact and its executor live in the
 same package and are the semantic authority for the admitted grammar.
 The frontend resolves Unicode property escapes through the Unicode 17.0.0
 tables pinned by `@oseo/unicode`, and the matcher consumes those same sets.
-Nothing in a compiled program reaches property escapes yet, so a valid literal
-still reports the profile boundary and the `RegExp` family stays outside the
-active profile.
+Dynamic construction validates that grammar and retains an immutable runtime
+matcher descriptor. The executor does not reach a compiled program yet, and a
+valid literal still reports the profile boundary.
 
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
@@ -94,13 +96,11 @@ Regular expression work starts from these implemented contracts:
     processing;
  -  generic strings, arrays, objects, properties, functions, constructors,
     symbols, errors, abrupt completion, and collection have native semantics;
- -  symbol values, symbol-keyed properties, well-known symbol dispatch, and
-    generic `ToPrimitive` behavior are implemented, but the realm defines only
-    `@@iterator`, `@@toPrimitive`, `@@toStringTag`, and `@@asyncIterator`. The
-    `@@match`, `@@matchAll`, `@@replace`, `@@search`, `@@split`, and
-    `@@species` symbols do not exist yet. They are prerequisites of the
-    prototype and dispatch step below rather than entry evidence, and that
-    step cannot start until the intrinsics stream supplies them;
+ -  symbol values, symbol-keyed properties, well-known symbol dispatch, the
+    regular expression protocol symbols, `@@species`, and generic
+    `ToPrimitive` behavior are implemented. The intrinsic step consumes
+    `@@match` for `IsRegExp` and `@@species` for the constructor accessor;
+    prototype and String dispatch remain in delivery item 5;
  -  the synchronous iterator protocol supplies the basis for future
     `String.prototype.matchAll` iterator behavior;
  -  generated C and the runtime are separate backend inputs, and the runtime is
@@ -113,9 +113,10 @@ Regular expression work starts from these implemented contracts:
  -  ADR 0013 fixes ECMAScript 2025 as the candidate edition and requires every
     gap inside that boundary to remain visible.
 
-The active profile still rejects `RegExpLiteral` syntax and treats an
-unshadowed `RegExp` reference as an unknown binding. The first implementation
-change replaces those diagnostics only for the semantic surface that its tests
+The active profile still rejects `RegExpLiteral` syntax. An unshadowed
+`RegExp` reference now resolves to the intrinsic, whose callable and
+constructible initialization surface is admitted. The literal step replaces
+the remaining syntax diagnostic only for the semantic surface its tests
 actually admit.
 
 
@@ -637,8 +638,8 @@ Delivery order
     `0x60004d01`. The compiler core still links no Unicode data, so the
     builder takes case-equivalence classes, `Space_Separator`, and property
     escape sets from its caller and refuses a pattern whose facts the caller
-    did not supply. The artifact reaches no compiled program: item 5 links it
-    to the runtime.
+    did not supply. Item 5 links the artifact to dynamic construction, while
+    item 6 connects it to match execution and result construction.
 4.  Resolve Unicode property escapes and character class escapes from the
     pinned Unicode tables. Landed. The frontend and matcher share one exact
     ECMA-262 property resolver, invalid names retain source-located early
@@ -646,12 +647,16 @@ Delivery order
     `0x60004e02` compares the generic matcher with the host engine. This
     checkpoint adds no specialized matcher, allocation, generated-code entry
     point, or built-in code range.
-5.  Add the `RegExp` intrinsic, allocation, initialization, object state,
-    built-in execution, result construction, and catchable dynamic-pattern
-    errors. Trace dynamic artifacts and matcher work areas.
-6.  Add prototype methods, accessors, `RegExp.escape`, species behavior, the
-    regular expression string iterator, well-known symbol methods, and String
-    method dispatch.
+5.  Add the `RegExp` intrinsic, allocation, initialization, `lastIndex` state,
+    subclass and `newTarget` behavior, and catchable dynamic-pattern errors.
+    Trace dynamic artifacts. Landed with seeds `0x60004f00` and `0x60004f01`,
+    runtime ABI `oseo-runtime-m5-75`, and built-in range index 16. Escaped and
+    non-ASCII group names and non-ASCII identity escapes retain an `OSEO2001`
+    boundary until their Unicode identifier data is linked.
+6.  Add built-in execution and result construction, prototype methods and
+    accessors, `RegExp.escape`, the regular expression string iterator,
+    well-known symbol methods, and String method dispatch. Trace matcher work
+    areas and results.
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.

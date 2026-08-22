@@ -266,8 +266,8 @@ results:
         ritable-regexp-dollar1.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/Object/internals/DefineOwnProperty/cons\
-        istent-writable-regexp-dollar1.js:93:28: error[OSEO1001]:
-        Unknown binding 'RegExp'.\\n\""
+        istent-writable-regexp-dollar1.js:93:5: error[OSEO1001]: Unknown
+        binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

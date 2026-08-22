@@ -791,4 +791,141 @@ await Promise.reject("bad");
     bigintWidthAllocation.stderr,
     /error\[OSEO2001\].*BigInt allocation failed/u,
   );
+
+  for (const [method, shadow] of [
+    ["match", "null"],
+    ["match", "undefined"],
+    ["search", "null"],
+    ["search", "undefined"],
+    ["matchAll", "null"],
+    ["matchAll", "undefined"],
+    ["split", "null"],
+    ["split", "undefined"],
+  ] as const) {
+    const sym =
+      method === "match"
+        ? "Symbol.match"
+        : method === "search"
+          ? "Symbol.search"
+          : method === "matchAll"
+            ? "Symbol.matchAll"
+            : "Symbol.split";
+    const matchGuard = method === "matchAll" ? "r[Symbol.match] = null;\n" : "";
+    const source =
+      'const r = new RegExp("abc");\n' +
+      matchGuard +
+      `r[${sym}] = ${shadow};\n` +
+      "r.toString = function() " +
+      '{ return "xyz"; };\n' +
+      `"test".${method}(r);\n`;
+    const id = `branded-regexp-${method}-${shadow}.ts`;
+    const branded = await runNativeCli(
+      {
+        args: [id],
+        source,
+        sourceId: id,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(
+      branded.exitStatus,
+      1,
+      `branded RegExp ${method} ${shadow} ${sym}`,
+    );
+    assert.match(branded.stderr, /error\[OSEO2001\].*Branded RegExp/u);
+  }
+
+  for (const [id, source, expected] of [
+    [
+      "match-receiver",
+      'const r = new RegExp("abc");\n' +
+        "r[Symbol.match] = null;\n" +
+        "try {\n" +
+        "  String.prototype.match.call(\n" +
+        "    { toString() " +
+        '{ throw new Error("boom"); } },\n' +
+        "    r,\n" +
+        "  );\n" +
+        "} catch (e) { console.log(e.message); }\n",
+      "boom\n",
+    ],
+    [
+      "split-limit",
+      'const r = new RegExp("abc");\n' +
+        "r[Symbol.split] = null;\n" +
+        "try {\n" +
+        '  "test".split(\n' +
+        "    r,\n" +
+        "    { valueOf() " +
+        '{ throw new Error("lim"); } },\n' +
+        "  );\n" +
+        "} catch (e) { console.log(e.message); }\n",
+      "lim\n",
+    ],
+  ] as const) {
+    const coercionId = `branded-regexp-${id}-coercion.ts`;
+    const coercion = await runNativeCli(
+      {
+        args: [coercionId],
+        source,
+        sourceId: coercionId,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(
+      coercion.exitStatus,
+      0,
+      `${id} coercion precedes branded guard`,
+    );
+    assert.equal(coercion.stdout, expected);
+  }
+
+  for (const [label, pattern, error] of [
+    ["oversized reversed", "a{9007199254740993,1}", /SyntaxError/u],
+    [
+      "both oversized reversed",
+      "a{9007199254740994,9007199254740993}",
+      /SyntaxError/u,
+    ],
+    [
+      "oversized exact",
+      "a{9007199254740993}",
+      /error\[OSEO2001\].*matcher limit/u,
+    ],
+    [
+      "oversized upper",
+      "a{1,9007199254740993}",
+      /error\[OSEO2001\].*matcher limit/u,
+    ],
+    [
+      "oversized open",
+      "a{9007199254740993,}",
+      /error\[OSEO2001\].*matcher limit/u,
+    ],
+    [
+      "both oversized ordered",
+      "a{9007199254740993,9007199254740994}",
+      /error\[OSEO2001\].*matcher limit/u,
+    ],
+  ] as const) {
+    const source = `new RegExp(${JSON.stringify(pattern)});`;
+    const id = `regexp-oversized-bound-${label}.ts`;
+    const oversized = await runNativeCli(
+      {
+        args: [id],
+        source,
+        sourceId: id,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(oversized.exitStatus, 1, `oversized bound: ${label}`);
+    assert.match(
+      oversized.stderr,
+      error,
+      `oversized bound diagnostic: ${label}`,
+    );
+  }
 }

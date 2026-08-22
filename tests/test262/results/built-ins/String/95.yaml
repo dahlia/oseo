@@ -49,14 +49,19 @@ results:
       - iterator-protocol
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/String/prototype/matchAll/regexp-is-undefined-o\
-        r-null-invokes-matchAll.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/built-ins/String/prototype/matchAll/regexp-is-und\
-        efined-or-null-invokes-matchAll.js:94:1: error[OSEO1001]:
-        Unknown binding 'RegExp'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/String/prototype/matchAll/regexp-is-undefined-or-null-invokes-matchAll.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/matchAll/regexp-is-undefined-or-null-invokes-matchAll.js:99:18:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:

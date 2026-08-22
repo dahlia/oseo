@@ -357,37 +357,12 @@ static bool match_matches_at(
         ) == 0;
 }
 
-/* IsRegExp, before the RegExp heap kind itself is admitted. */
 static OseoResult match_is_regexp(
     OseoContext *context,
     OseoValue value,
     bool *regexp
 ) {
-    if (!is_object(value)) {
-        *regexp = false;
-        return normal(oseo_boolean(false));
-    }
-    OseoValue slots[2] = {value, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_well_known_symbol(
-        context,
-        OSEO_WELL_KNOWN_MATCH
-    );
-    slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[1]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        tag_of(result.value) != OSEO_TAG_UNDEFINED) {
-        *regexp = oseo_to_boolean(result.value);
-    } else if (result.status == OSEO_STATUS_NORMAL) {
-        *regexp = false;
-    }
-    oseo_roots_pop(context, &frame);
-    return result.status == OSEO_STATUS_NORMAL
-        ? normal(oseo_boolean(*regexp))
-        : result;
+    return oseo_internal_is_regexp(context, value, regexp);
 }
 
 static OseoResult string_named_property(
@@ -495,6 +470,18 @@ static size_t string_symbol_index(size_t code_id) {
     }
     if (code_id == OSEO_STRING_SEARCH_CODE_ID) return OSEO_WELL_KNOWN_SEARCH;
     return OSEO_WELL_KNOWN_SPLIT;
+}
+
+static size_t deferred_regexp_protocol_code_id(size_t code_id) {
+    if (code_id == OSEO_STRING_MATCH_CODE_ID) {
+        return OSEO_REGEXP_MATCH_DEFERRED_CODE_ID;
+    }
+    if (code_id == OSEO_STRING_MATCH_ALL_CODE_ID) {
+        return OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID;
+    }
+    /* String split has no RegExpCreate fallback and never reaches this
+     * guard. */
+    return OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID;
 }
 
 static OseoResult string_match_all_flags(
@@ -638,6 +625,76 @@ static OseoResult string_fallback_pattern(
         : oseo_internal_value_string(context, value);
 }
 
+/*
+ * The earlier String node keeps its string-only fallback until the RegExp
+ * symbol-method node can perform RegExpCreate and Invoke. The fallback is
+ * safe only while the first effective descriptor is the exact own placeholder
+ * for the applicable protocol; otherwise it would skip observable behavior.
+ */
+static OseoResult deferred_regexp_string_dispatch(
+    OseoContext *context,
+    size_t code_id
+) {
+    OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_REGEXP_PROTOTYPE
+    );
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            string_symbol_index(code_id)
+        );
+        slots[1] = result.value;
+    }
+    bool descriptor_found = false;
+    while (result.status == OSEO_STATUS_NORMAL && is_object(slots[0])) {
+        OseoValue value = oseo_undefined();
+        OseoValue getter = oseo_undefined();
+        OseoValue setter = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        if (oseo_internal_own_descriptor(
+                slots[0],
+                slots[1],
+                &value,
+                &attributes,
+                &getter,
+                &setter
+            )) {
+            bool deferred_placeholder =
+                slots[0] == context->intrinsics[
+                    OSEO_INTRINSIC_REGEXP_PROTOTYPE
+                ] &&
+                !attributes.accessor &&
+                is_function(value) &&
+                function_object(value)->code_id ==
+                    deferred_regexp_protocol_code_id(code_id);
+            if (!deferred_placeholder) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "RegExp String dispatch is not admitted yet."
+                );
+            }
+            descriptor_found = true;
+            break;
+        }
+        slots[0] = ordinary_object(slots[0])->prototype;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !descriptor_found) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "RegExp String dispatch is not admitted yet."
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult string_match_or_search(
     OseoContext *context,
     size_t code_id,
@@ -660,12 +717,24 @@ static OseoResult string_match_or_search(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = match_subject(context, receiver);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = string_fallback_pattern(
             context,
             match_argument(argument_count, arguments, 0u)
         );
         frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = deferred_regexp_string_dispatch(context, code_id);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = fallback_regexp_validate(context, frame.slots[1]);
@@ -968,12 +1037,27 @@ static OseoResult string_match_all(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = match_subject(context, receiver);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = string_fallback_pattern(
             context,
             match_argument(argument_count, arguments, 0u)
         );
         frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = deferred_regexp_string_dispatch(
+            context,
+            OSEO_STRING_MATCH_ALL_CODE_ID
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = regexp_string_iterator_create(
@@ -1053,6 +1137,15 @@ static OseoResult string_split(
         if (result.status == OSEO_STATUS_NORMAL) {
             limit = string_to_uint32(number_value(result.value));
         }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL && !separator_undefined) {
         result = oseo_internal_value_string(context, frame.slots[0]);

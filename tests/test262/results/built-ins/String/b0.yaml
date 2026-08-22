@@ -51,8 +51,8 @@ results:
       detail: "test/built-ins/String/prototype/split/separator-regexp-limit-s\
         tring-via-eval.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/String/prototype/split/separator-regexp\
-        -limit-string-via-eval.js:90:16: error[OSEO1001]: Unknown
-        binding 'RegExp'.\\n\""
+        -limit-string-via-eval.js:94:56: error[OSEO1001]: Unknown
+        binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

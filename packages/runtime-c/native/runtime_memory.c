@@ -31,6 +31,12 @@ static void trace_object(
         object->kind == OSEO_HEAP_PRIVATE_NAME) {
         return;
     }
+    if (object->kind == OSEO_HEAP_REGEXP_MATCHER) {
+        OseoRegExpMatcher *matcher = (OseoRegExpMatcher *)object;
+        mark_value(matcher->source, worklist);
+        mark_value(matcher->flags, worklist);
+        return;
+    }
     if (object->kind == OSEO_HEAP_ENVIRONMENT) {
         OseoEnvironment *environment = (OseoEnvironment *)object;
         for (size_t index = 0u; index < environment->slot_count; index += 1u) {
@@ -64,7 +70,8 @@ static void trace_object(
                object->kind == OSEO_HEAP_ARRAY_BUFFER ||
                object->kind == OSEO_HEAP_MAP ||
                object->kind == OSEO_HEAP_MAP_ITERATOR ||
-               object->kind == OSEO_HEAP_DATA_VIEW) {
+               object->kind == OSEO_HEAP_DATA_VIEW ||
+               object->kind == OSEO_HEAP_REGEXP) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -159,6 +166,8 @@ static void trace_object(
             /* A view holds no Data Block of its own; tracing its buffer
              * is what keeps that buffer's block alive. */
             mark_value(((OseoDataView *)object)->buffer, worklist);
+        } else if (object->kind == OSEO_HEAP_REGEXP) {
+            mark_value(((OseoRegExp *)object)->matcher, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -199,7 +208,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_ARRAY_BUFFER ||
         object->kind == OSEO_HEAP_MAP ||
         object->kind == OSEO_HEAP_MAP_ITERATOR ||
-        object->kind == OSEO_HEAP_DATA_VIEW) {
+        object->kind == OSEO_HEAP_DATA_VIEW ||
+        object->kind == OSEO_HEAP_REGEXP) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);

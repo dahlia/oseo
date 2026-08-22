@@ -3,6 +3,29 @@ key: "50"
 results:
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/S15.10.3.1_A2_T2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/RegExp/S15.10.3.1_A2_T2.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.3.1_A2_T2.js:92:105:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - regexp-unicode-property-escapes
       flags: []
@@ -25,5 +48,35 @@ results:
         profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/valid-flags-y.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

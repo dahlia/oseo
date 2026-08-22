@@ -101,6 +101,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_map.c"],
       ["source", "runtime_bigint_object.c"],
       ["source", "runtime_data_view.c"],
+      ["source", "runtime_regexp.c"],
     ],
   );
 });
