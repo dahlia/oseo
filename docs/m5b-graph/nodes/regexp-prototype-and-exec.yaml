@@ -25,4 +25,4 @@ dependencies:
   - object-define-property
   - regexp-intrinsic
 landed: false
-status: blocked
+status: ready
