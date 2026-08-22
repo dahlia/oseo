@@ -540,14 +540,21 @@ test("accepts an escaped and a written group name as one name", () => {
   assert.deepEqual(pattern.groupNames, ["ab"]);
 });
 
-test("rejects an identity escape outside ASCII without a classifier", () => {
-  const error = rejected("\\é", "");
-  assert.equal(error.kind, "unsupported");
-  assert.equal(
-    error.message,
-    "An identity escape outside ASCII needs Unicode identifier data that " +
-      "is not linked.",
-  );
+test("rejects identity escapes outside ASCII without a classifier", () => {
+  for (const [source, span] of [
+    ["\\é", { end: 2, start: 0 }],
+    ["[\\é]", { end: 3, start: 1 }],
+  ] as const) {
+    const error = rejected(source, "");
+    assert.equal(error.kind, "unsupported", source);
+    assert.deepEqual(error.span, span, source);
+    assert.equal(
+      error.message,
+      "An identity escape outside ASCII needs Unicode identifier data that " +
+        "is not linked.",
+      source,
+    );
+  }
 });
 
 /*

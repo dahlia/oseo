@@ -13,10 +13,11 @@ scope:
     derived prototype without changing the intrinsic's allocation path."
   - "`IsRegExp` first reads `Symbol.match`, propagating that read's abrupt
     completion, and otherwise tests the runtime's RegExp brand. A branded
-    RegExp supplies its internal source and flags when copied. Another
-    regexp-like object supplies `source` and, only when the flags argument
-    is absent, `flags` through ordered ordinary property reads. A value
-    whose `Symbol.match` is false follows ordinary pattern conversion."
+    RegExp supplies its internal source and flags when copied, including when
+    its own `Symbol.match` is false. A non-branded regexp-like object supplies
+    `source` and, only when the flags argument is absent, `flags` through
+    ordered ordinary property reads. Only a non-branded object whose
+    `Symbol.match` is false follows ordinary pattern conversion."
   - "`RegExpAlloc` runs before pattern and flags string conversion. It
     creates a collector-owned RegExp record with the selected prototype
     and defines one own `lastIndex` data property whose initial value is
@@ -31,6 +32,7 @@ scope:
     pattern-length, capture-count, nesting, quantifier-bound, and instruction
     limits retain a source-located `OSEO2001` boundary. Unicode property
     escapes, Unicode set and string syntax, escaped or non-ASCII group names,
+    non-ASCII identity escapes without linked Unicode identifier data,
     duplicate names across disjoint alternatives, and modifier groups retain
     source-located `OSEO2001` boundaries owned by their later graph nodes."
   - "The collector traces each RegExp's matcher artifact and each

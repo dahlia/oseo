@@ -189,6 +189,20 @@ const rejectedCase: fc.Arbitrary<InvalidCase> = fc.oneof(
       parserExpected: "unsupported" as const,
       pattern: "\\k<é>(?<é>a)",
     },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "unsupported" as const,
+      pattern: "\\é",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "unsupported" as const,
+      pattern: "[\\é]",
+    },
   ),
 );
 
@@ -256,6 +270,15 @@ console.log(
   RegExp(direct) === direct,
   new RegExp(direct) !== direct,
 );
+Object.defineProperty(direct, Symbol.match, { value: false });
+direct.toString = () => { throw new Error("unreachable branded conversion"); };
+const brandedCopy = RegExp(direct);
+console.log(
+  "branded false",
+  brandedCopy instanceof RegExp,
+  brandedCopy !== direct,
+  brandedCopy.lastIndex,
+);
 const order = [];
 const like = {
   get [Symbol.match]() { order.push("match"); return true; },
@@ -297,6 +320,7 @@ function validExpected(testCase: ValidCase): Observation {
       "state true [object RegExp] 0 true false false\n" +
       `write ${testCase.lastIndex}\n` +
       "identity true true\n" +
+      "branded false true true 0\n" +
       `like true ${likeOrder}\n` +
       "hint 2 x1\n",
   };
@@ -421,8 +445,9 @@ test(
               ],
         domain:
           "one admitted pattern, one unique admitted flag sequence, one " +
-          "call or explicit-flags conversion path, one signed lastIndex " +
-          "write, one false number hint, and one shape-guard miss",
+          "call or explicit-flags conversion path, one branded false-match " +
+          "copy, one signed lastIndex write, one false number hint, and one " +
+          "shape-guard miss",
         numRuns: 8,
         profile: "M5 RegExp intrinsic",
         seed: 0x6000_4f00,
@@ -480,8 +505,9 @@ test(
           "one unmatched delimiter, leading quantifier, reversed bound, " +
           "malformed or out-of-range escape, unresolved backreference, " +
           "duplicate named capture, quantified assertion, decoded class " +
-          "range bound, class backreference, Unicode group-name boundary, " +
-          "duplicate flag, unknown flag, or exclusive Unicode mode pair",
+          "range bound, class backreference, Unicode group-name or identity " +
+          "escape boundary, duplicate flag, unknown flag, or exclusive " +
+          "Unicode mode pair",
         numRuns: 6,
         profile: "M5 RegExp intrinsic invalid inputs",
         seed: 0x6000_4f01,

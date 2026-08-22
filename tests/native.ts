@@ -220,6 +220,14 @@ for (const deferredRegExp of [
     source: 'new RegExp("\\\\k<é>(?<é>a)");',
   },
   {
+    name: "deferred-regexp-nonascii-identity.ts",
+    source: 'new RegExp("\\\\é");',
+  },
+  {
+    name: "deferred-regexp-nonascii-class-identity.ts",
+    source: 'new RegExp("[\\\\é]");',
+  },
+  {
     name: "deferred-regexp-exec.ts",
     source: 'new RegExp("a").exec("a");',
   },
@@ -229,7 +237,7 @@ for (const deferredRegExp of [
   },
   {
     name: "deferred-regexp-symbol-search.ts",
-    source: "RegExp.prototype[Symbol.search];",
+    source: 'RegExp.prototype[Symbol.search]("");',
   },
 ]) {
   const deferred = await runNativeCli(
@@ -248,6 +256,62 @@ for (const deferredRegExp of [
     new RegExp(
       `^${deferredRegExp.name.replace(".", "\\.")}:1:\\d+: ` +
         "error\\[OSEO2001\\]: (?:RegExp|Regular expression)",
+      "u",
+    ),
+  );
+}
+
+for (const deferredSymbol of [
+  {
+    name: "deferred-regexp-symbol-match.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".match(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-match-all.ts",
+    source: `
+const regexp = new RegExp("a+", "g");
+Object.defineProperty(regexp, "flags", { value: "g" });
+regexp.toString = () => "z";
+"aaa".matchAll(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-search-fallthrough.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".search(regexp);
+`,
+  },
+  {
+    name: "deferred-regexp-symbol-split.ts",
+    source: `
+const regexp = new RegExp("a+");
+regexp.toString = () => "z";
+"aaa".split(regexp);
+`,
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [deferredSymbol.name],
+      source: deferredSymbol.source,
+      sourceId: deferredSymbol.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${deferredSymbol.name.replace(".", "\\.")}:\\d+:\\d+: ` +
+        "error\\[OSEO2001\\]: RegExp",
       "u",
     ),
   );

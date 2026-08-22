@@ -907,7 +907,9 @@ test("populates the realm-owned RegExp intrinsic cluster", () => {
   ]) {
     assert.match(regexpSource, new RegExp(`"${property}"`, "u"));
   }
-  assert.match(regexpSource, /OSEO_WELL_KNOWN_MATCH/u);
+  for (const symbol of ["MATCH", "MATCH_ALL", "SEARCH", "SPLIT"]) {
+    assert.match(regexpSource, new RegExp(`OSEO_WELL_KNOWN_${symbol}`, "u"));
+  }
   assert.match(regexpSource, /OSEO_WELL_KNOWN_SPECIES/u);
   assert.match(regexpSource, /regexp_prototype_from_target/u);
   assert.match(regexpSource, /regexp_allocate[\s\S]*regexp_initialize/u);

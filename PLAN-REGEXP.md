@@ -651,8 +651,8 @@ Delivery order
     subclass and `newTarget` behavior, and catchable dynamic-pattern errors.
     Trace dynamic artifacts. Landed with seeds `0x60004f00` and `0x60004f01`,
     runtime ABI `oseo-runtime-m5-75`, and built-in range index 16. Escaped and
-    non-ASCII group names retain an `OSEO2001` boundary until their Unicode
-    identifier data is linked.
+    non-ASCII group names and non-ASCII identity escapes retain an `OSEO2001`
+    boundary until their Unicode identifier data is linked.
 6.  Add built-in execution and result construction, prototype methods and
     accessors, `RegExp.escape`, the regular expression string iterator,
     well-known symbol methods, and String method dispatch. Trace matcher work

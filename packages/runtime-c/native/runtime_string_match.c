@@ -655,9 +655,9 @@ static OseoResult deferred_regexp_string_dispatch(
                 slots[0] == context->intrinsics[
                     OSEO_INTRINSIC_REGEXP_PROTOTYPE
                 ] &&
-                attributes.accessor &&
-                is_function(getter) &&
-                function_object(getter)->code_id ==
+                !attributes.accessor &&
+                is_function(value) &&
+                function_object(value)->code_id ==
                     OSEO_REGEXP_DEFERRED_CODE_ID;
             if (!deferred_placeholder) {
                 result = failure(

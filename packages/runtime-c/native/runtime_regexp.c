@@ -633,6 +633,7 @@ static OseoRegExpValidation regexp_escape(
         *index = cursor;
         return OSEO_REGEXP_VALID;
     }
+    if (!unicode && unit > 0x7fu) return OSEO_REGEXP_UNSUPPORTED;
     if (unicode || regexp_ascii_alpha(unit) || regexp_ascii_digit(unit) ||
         unit == '_' || unit == '$') {
         return OSEO_REGEXP_INVALID;
@@ -1671,35 +1672,47 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
             );
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    static const char *const deferred_symbol_methods[] = {
+        "[Symbol.match]",
+        "[Symbol.matchAll]",
+        "[Symbol.search]",
+        "[Symbol.split]",
+    };
+    static const size_t deferred_symbols[] = {
+        OSEO_WELL_KNOWN_MATCH,
+        OSEO_WELL_KNOWN_MATCH_ALL,
+        OSEO_WELL_KNOWN_SEARCH,
+        OSEO_WELL_KNOWN_SPLIT,
+    };
+    static const size_t deferred_symbol_lengths[] = {1u, 1u, 1u, 2u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 4u;
+         index += 1u) {
         result = create_regexp_builtin(
             context,
             OSEO_REGEXP_DEFERRED_CODE_ID,
-            "[Symbol.search]",
-            0u,
+            deferred_symbol_methods[index],
+            deferred_symbol_lengths[index],
             OSEO_FUNCTION_INTERNAL,
-            OSEO_FUNCTION_NAME_PREFIX_GET
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[2] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_well_known_symbol(
-            context,
-            OSEO_WELL_KNOWN_SEARCH
-        );
-        frame.slots[3] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define_accessor(
-            context,
-            frame.slots[0],
-            frame.slots[3],
-            frame.slots[2],
-            oseo_undefined(),
-            true,
-            false,
-            (OseoPropertyAttributes){true, false, false, true}
-        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_well_known_symbol(
+                context,
+                deferred_symbols[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = create_regexp_builtin(
