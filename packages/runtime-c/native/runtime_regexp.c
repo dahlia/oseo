@@ -807,6 +807,32 @@ static OseoRegExpValidation regexp_decimal_bound(
     return OSEO_REGEXP_VALID;
 }
 
+static bool regexp_bound_exceeds(
+    const OseoString *source,
+    size_t a_start,
+    size_t a_end,
+    size_t b_start,
+    size_t b_end
+) {
+    while (a_start < a_end && source->units[a_start] == '0') {
+        a_start += 1u;
+    }
+    while (b_start < b_end && source->units[b_start] == '0') {
+        b_start += 1u;
+    }
+    size_t a_len = a_end - a_start;
+    size_t b_len = b_end - b_start;
+    if (a_len != b_len) return a_len > b_len;
+    for (size_t i = 0u; i < a_len; i += 1u) {
+        if (source->units[a_start + i] !=
+            source->units[b_start + i]) {
+            return source->units[a_start + i] >
+                source->units[b_start + i];
+        }
+    }
+    return false;
+}
+
 static OseoRegExpValidation regexp_braced_quantifier(
     const OseoString *source,
     size_t *index
@@ -817,17 +843,20 @@ static OseoRegExpValidation regexp_braced_quantifier(
            regexp_ascii_digit(source->units[cursor])) {
         cursor += 1u;
     }
+    size_t minimum_end = cursor;
     uint64_t minimum = 0u;
     OseoRegExpValidation minimum_status = regexp_decimal_bound(
         source,
         minimum_start,
-        cursor,
+        minimum_end,
         &minimum
     );
-    if (minimum_status != OSEO_REGEXP_VALID) return minimum_status;
+    if (minimum_status == OSEO_REGEXP_INVALID) {
+        return OSEO_REGEXP_INVALID;
+    }
     if (cursor < source->length && source->units[cursor] == '}') {
         *index = cursor;
-        return OSEO_REGEXP_VALID;
+        return minimum_status;
     }
     if (cursor >= source->length || source->units[cursor] != ',') {
         return OSEO_REGEXP_INVALID;
@@ -849,10 +878,32 @@ static OseoRegExpValidation regexp_braced_quantifier(
             cursor,
             &maximum
         );
-        if (maximum_status != OSEO_REGEXP_VALID) return maximum_status;
-        if (minimum > maximum) {
-            return OSEO_REGEXP_INVALID;
+        bool reversed = false;
+        if (minimum_status == OSEO_REGEXP_VALID &&
+            maximum_status == OSEO_REGEXP_VALID) {
+            reversed = minimum > maximum;
+        } else if (minimum_status == OSEO_REGEXP_LIMIT &&
+                   maximum_status == OSEO_REGEXP_VALID) {
+            reversed = true;
+        } else if (minimum_status == OSEO_REGEXP_VALID &&
+                   maximum_status == OSEO_REGEXP_LIMIT) {
+            reversed = false;
+        } else {
+            reversed = regexp_bound_exceeds(
+                source,
+                minimum_start, minimum_end,
+                maximum_start, cursor
+            );
         }
+        if (reversed) return OSEO_REGEXP_INVALID;
+        if (minimum_status == OSEO_REGEXP_LIMIT ||
+            maximum_status == OSEO_REGEXP_LIMIT) {
+            *index = cursor;
+            return OSEO_REGEXP_LIMIT;
+        }
+    } else if (minimum_status == OSEO_REGEXP_LIMIT) {
+        *index = cursor;
+        return OSEO_REGEXP_LIMIT;
     }
     *index = cursor;
     return OSEO_REGEXP_VALID;

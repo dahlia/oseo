@@ -130,6 +130,14 @@ const invalidCase = fc
       pattern: fc.constantFrom("[", "(", "*", "+", "?", "a{2,1}"),
     }),
     fc.record({
+      differential: fc.constant(false),
+      flags: fc.constant(""),
+      pattern: fc.constantFrom(
+        "a{9007199254740993,1}",
+        "a{9007199254740994,9007199254740993}",
+      ),
+    }),
+    fc.record({
       differential: fc.constant(true),
       flags: fc.constantFrom("gg", "ii", "z", "uv", "vu", "ggims"),
       pattern: fc.constantFrom("", "a", "(?:ab)", "[a-z]"),

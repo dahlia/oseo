@@ -717,6 +717,15 @@ static OseoResult string_match_or_search(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = match_subject(context, receiver);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = string_fallback_pattern(
             context,
@@ -1028,6 +1037,15 @@ static OseoResult string_match_all(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = match_subject(context, receiver);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = string_fallback_pattern(
             context,
@@ -1119,6 +1137,15 @@ static OseoResult string_split(
         if (result.status == OSEO_STATUS_NORMAL) {
             limit = string_to_uint32(number_value(result.value));
         }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_regexp(match_argument(argument_count, arguments, 0u))) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Branded RegExp String protocol fallback "
+            "is not admitted yet."
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL && !separator_undefined) {
         result = oseo_internal_value_string(context, frame.slots[0]);
