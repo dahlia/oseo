@@ -120,10 +120,9 @@ results:
     observation:
       detail: 'test/built-ins/String/prototype/search/invoke-builtin-search-searcher-undef.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/search/invoke-builtin-search-searcher-undef.js:98:22:
-        error[OSEO2001]: RegExp prototype execution is not admitted
-        yet.\n"'
-      unsupportedCapability: regexp-prototype-execution
+        stderr="test/built-ins/String/prototype/search/invoke-builtin-search-searcher-undef.js:116:12:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:

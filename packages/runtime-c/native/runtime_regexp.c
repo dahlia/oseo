@@ -1459,7 +1459,8 @@ OseoResult oseo_internal_regexp_builtin_dispatch(
         );
     }
     if (code_id == OSEO_REGEXP_SPECIES_CODE_ID) return normal(receiver);
-    if (code_id == OSEO_REGEXP_DEFERRED_CODE_ID) {
+    if (code_id >= OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID &&
+        code_id <= OSEO_REGEXP_DEFERRED_CODE_ID) {
         return failure(
             context,
             "OSEO2001",
@@ -1684,13 +1685,19 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
         OSEO_WELL_KNOWN_SEARCH,
         OSEO_WELL_KNOWN_SPLIT,
     };
+    static const size_t deferred_symbol_code_ids[] = {
+        OSEO_REGEXP_MATCH_DEFERRED_CODE_ID,
+        OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID,
+        OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID,
+        OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID,
+    };
     static const size_t deferred_symbol_lengths[] = {1u, 1u, 1u, 2u};
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < 4u;
          index += 1u) {
         result = create_regexp_builtin(
             context,
-            OSEO_REGEXP_DEFERRED_CODE_ID,
+            deferred_symbol_code_ids[index],
             deferred_symbol_methods[index],
             deferred_symbol_lengths[index],
             OSEO_FUNCTION_INTERNAL,

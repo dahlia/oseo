@@ -317,6 +317,130 @@ regexp.toString = () => "z";
   );
 }
 
+for (const misplacedRegExpPlaceholder of [
+  {
+    name: "misplaced-regexp-placeholder-match.ts",
+    source: `
+RegExp.prototype[Symbol.match] = RegExp.prototype.exec;
+"a".match("a");
+`,
+  },
+  {
+    name: "misplaced-regexp-placeholder-match-all.ts",
+    source: `
+RegExp.prototype[Symbol.matchAll] = RegExp.prototype[Symbol.match];
+"a".matchAll("a");
+`,
+  },
+  {
+    name: "misplaced-regexp-placeholder-search.ts",
+    source: `
+RegExp.prototype[Symbol.search] = RegExp.prototype[Symbol.split];
+"a".search("a");
+`,
+  },
+]) {
+  const deferred = await runNativeCli(
+    {
+      args: [misplacedRegExpPlaceholder.name],
+      source: misplacedRegExpPlaceholder.source,
+      sourceId: misplacedRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${misplacedRegExpPlaceholder.name.replace(".", "\\.")}:` +
+        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
+      "u",
+    ),
+  );
+}
+
+for (const missingRegExpPlaceholder of [
+  {
+    name: "missing-regexp-placeholder-match.ts",
+    symbol: "match",
+    expression: '"a".match("a")',
+  },
+  {
+    name: "missing-regexp-placeholder-match-all.ts",
+    symbol: "matchAll",
+    expression: '"a".matchAll("a")',
+  },
+  {
+    name: "missing-regexp-placeholder-search.ts",
+    symbol: "search",
+    expression: '"a".search("a")',
+  },
+]) {
+  const source = `
+delete RegExp.prototype[Symbol.${missingRegExpPlaceholder.symbol}];
+${missingRegExpPlaceholder.expression};
+`;
+  const deferred = await runNativeCli(
+    {
+      args: [missingRegExpPlaceholder.name],
+      source,
+      sourceId: missingRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(deferred.exitStatus, 1);
+  assert.equal(deferred.stdout, "");
+  assert.match(
+    deferred.stderr,
+    new RegExp(
+      `^${missingRegExpPlaceholder.name.replace(".", "\\.")}:` +
+        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
+      "u",
+    ),
+  );
+}
+
+for (const shadowedRegExpPlaceholder of [
+  {
+    expected: "\n",
+    expression: 'console.log("a".match()[0])',
+    name: "shadowed-regexp-placeholder-match.ts",
+    symbol: "match",
+  },
+  {
+    expected: "\n",
+    expression: 'console.log("a".matchAll().next().value[0])',
+    name: "shadowed-regexp-placeholder-match-all.ts",
+    symbol: "matchAll",
+  },
+  {
+    expected: "0\n",
+    expression: 'console.log("a".search())',
+    name: "shadowed-regexp-placeholder-search.ts",
+    symbol: "search",
+  },
+]) {
+  const source = `
+Object.prototype[Symbol.${shadowedRegExpPlaceholder.symbol}] = () => 1;
+${shadowedRegExpPlaceholder.expression};
+`;
+  const native = await runNativeCli(
+    {
+      args: [shadowedRegExpPlaceholder.name],
+      source,
+      sourceId: shadowedRegExpPlaceholder.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(native.exitStatus, 0, native.stderr);
+  assert.equal(native.stdout, shadowedRegExpPlaceholder.expected);
+  assert.equal(native.stderr, "");
+}
+
 const coreClassBackreference = await runNativeCli(
   {
     args: ["regexp-core-class-backreference.ts"],

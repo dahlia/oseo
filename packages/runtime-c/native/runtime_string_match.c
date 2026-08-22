@@ -472,6 +472,18 @@ static size_t string_symbol_index(size_t code_id) {
     return OSEO_WELL_KNOWN_SPLIT;
 }
 
+static size_t deferred_regexp_protocol_code_id(size_t code_id) {
+    if (code_id == OSEO_STRING_MATCH_CODE_ID) {
+        return OSEO_REGEXP_MATCH_DEFERRED_CODE_ID;
+    }
+    if (code_id == OSEO_STRING_MATCH_ALL_CODE_ID) {
+        return OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID;
+    }
+    /* String split has no RegExpCreate fallback and never reaches this
+     * guard. */
+    return OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID;
+}
+
 static OseoResult string_match_all_flags(
     OseoContext *context,
     OseoValue regexp
@@ -615,9 +627,9 @@ static OseoResult string_fallback_pattern(
 
 /*
  * The earlier String node keeps its string-only fallback until the RegExp
- * symbol-method node can perform RegExpCreate and Invoke. Once user code
- * installs the corresponding prototype hook, continuing through that
- * fallback would silently skip the observable call.
+ * symbol-method node can perform RegExpCreate and Invoke. The fallback is
+ * safe only while the first effective descriptor is the exact own placeholder
+ * for the applicable protocol; otherwise it would skip observable behavior.
  */
 static OseoResult deferred_regexp_string_dispatch(
     OseoContext *context,
@@ -638,6 +650,7 @@ static OseoResult deferred_regexp_string_dispatch(
         );
         slots[1] = result.value;
     }
+    bool descriptor_found = false;
     while (result.status == OSEO_STATUS_NORMAL && is_object(slots[0])) {
         OseoValue value = oseo_undefined();
         OseoValue getter = oseo_undefined();
@@ -658,17 +671,25 @@ static OseoResult deferred_regexp_string_dispatch(
                 !attributes.accessor &&
                 is_function(value) &&
                 function_object(value)->code_id ==
-                    OSEO_REGEXP_DEFERRED_CODE_ID;
+                    deferred_regexp_protocol_code_id(code_id);
             if (!deferred_placeholder) {
                 result = failure(
                     context,
                     "OSEO2001",
                     "RegExp String dispatch is not admitted yet."
                 );
-                break;
             }
+            descriptor_found = true;
+            break;
         }
         slots[0] = ordinary_object(slots[0])->prototype;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !descriptor_found) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "RegExp String dispatch is not admitted yet."
+        );
     }
     oseo_roots_pop(context, &frame);
     return result;
