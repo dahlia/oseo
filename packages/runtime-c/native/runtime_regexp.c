@@ -137,17 +137,62 @@ static bool regexp_group_name_needs_unicode(
     const OseoString *source,
     size_t start
 ) {
+    bool found = false;
     for (size_t index = start;
          index < source->length && source->units[index] != '>';
          index += 1u) {
-        if (source->units[index] > 0x7fu ||
-            (source->units[index] == '\\' &&
-             index + 1u < source->length &&
-             source->units[index + 1u] == 'u')) {
-            return true;
+        if (source->units[index] > 0x7fu) {
+            found = true;
+            continue;
+        }
+        if (source->units[index] == '\\' &&
+            index + 1u < source->length &&
+            source->units[index + 1u] == 'u') {
+            if (index + 2u < source->length &&
+                source->units[index + 2u] == '{') {
+                size_t hc = index + 3u;
+                bool has_hex = false;
+                uint32_t cp = 0u;
+                while (hc < source->length &&
+                       source->units[hc] != '}') {
+                    uint16_t ch = source->units[hc];
+                    if (!regexp_hex_digit(ch)) {
+                        return false;
+                    }
+                    uint32_t dv = ch <= '9'
+                        ? (uint32_t)(ch - '0')
+                        : ch <= 'F'
+                          ? (uint32_t)(ch - 'A' + 10u)
+                          : (uint32_t)(ch - 'a' + 10u);
+                    if (cp >
+                        (UINT32_C(0x10ffff) - dv) /
+                            UINT32_C(16)) {
+                        return false;
+                    }
+                    cp = cp * UINT32_C(16) + dv;
+                    has_hex = true;
+                    hc += 1u;
+                }
+                if (!has_hex || hc >= source->length) {
+                    return false;
+                }
+                index = hc;
+                found = true;
+                continue;
+            }
+            if (index + 5u < source->length &&
+                regexp_hex_digit(source->units[index + 2u]) &&
+                regexp_hex_digit(source->units[index + 3u]) &&
+                regexp_hex_digit(source->units[index + 4u]) &&
+                regexp_hex_digit(source->units[index + 5u])) {
+                index += 5u;
+                found = true;
+                continue;
+            }
+            return false;
         }
     }
-    return false;
+    return found;
 }
 
 static bool regexp_control_escape_point(
@@ -502,10 +547,34 @@ static OseoRegExpValidation regexp_escape(
         return OSEO_REGEXP_INVALID;
     }
     if (unit == 'p' || unit == 'P') {
-        return unicode && cursor + 1u < source->length &&
-                source->units[cursor + 1u] == '{'
-            ? OSEO_REGEXP_UNSUPPORTED
-            : OSEO_REGEXP_INVALID;
+        if (!unicode || cursor + 1u >= source->length ||
+            source->units[cursor + 1u] != '{') {
+            return OSEO_REGEXP_INVALID;
+        }
+        size_t prop = cursor + 2u;
+        bool has_content = false;
+        bool has_equals = false;
+        while (prop < source->length &&
+               source->units[prop] != '}') {
+            uint16_t pc = source->units[prop];
+            if (pc == '=') {
+                if (has_equals || !has_content) {
+                    return OSEO_REGEXP_INVALID;
+                }
+                has_equals = true;
+                has_content = false;
+            } else if (regexp_ascii_alpha(pc) || pc == '_' ||
+                       (has_equals && regexp_ascii_digit(pc))) {
+                has_content = true;
+            } else {
+                return OSEO_REGEXP_INVALID;
+            }
+            prop += 1u;
+        }
+        if (!has_content || prop >= source->length) {
+            return OSEO_REGEXP_INVALID;
+        }
+        return OSEO_REGEXP_UNSUPPORTED;
     }
     if (character_class && unit == 'q') {
         return (flag_mask & OSEO_REGEXP_FLAG_V) != 0u
@@ -997,6 +1066,45 @@ static OseoRegExpValidation regexp_validate_pattern(
                     }
                 } else if (kind == 'i' || kind == 'm' || kind == 's' ||
                            kind == '-') {
+                    size_t mc = index + 2u;
+                    uint16_t add = 0u;
+                    uint16_t rem = 0u;
+                    bool removing = false;
+                    bool valid_mod = true;
+                    while (mc < source->length) {
+                        uint16_t mf = source->units[mc];
+                        if (mf == ':') break;
+                        if (mf == '-') {
+                            if (removing) {
+                                valid_mod = false;
+                                break;
+                            }
+                            removing = true;
+                            mc += 1u;
+                            continue;
+                        }
+                        uint16_t fb = 0u;
+                        if (mf == 'i') fb = OSEO_REGEXP_FLAG_I;
+                        else if (mf == 'm') fb = OSEO_REGEXP_FLAG_M;
+                        else if (mf == 's') fb = OSEO_REGEXP_FLAG_S;
+                        else { valid_mod = false; break; }
+                        uint16_t *tgt = removing ? &rem : &add;
+                        if ((*tgt & fb) != 0u) {
+                            valid_mod = false;
+                            break;
+                        }
+                        *tgt = (uint16_t)(*tgt | fb);
+                        mc += 1u;
+                    }
+                    if (!valid_mod ||
+                        mc >= source->length ||
+                        source->units[mc] != ':') {
+                        return OSEO_REGEXP_INVALID;
+                    }
+                    if ((add | rem) == 0u ||
+                        (add & rem) != 0u) {
+                        return OSEO_REGEXP_INVALID;
+                    }
                     return OSEO_REGEXP_UNSUPPORTED;
                 } else {
                     return OSEO_REGEXP_INVALID;

@@ -143,6 +143,17 @@ for (const values of [
   ["\\\\B{2}", ""],
   ["[a-\\\\n]", ""],
   ["(a)[\\\\1]", "u"],
+  ["\\\\p{", "u"],
+  ["\\\\p{}", "u"],
+  ["\\\\p{a b}", "u"],
+  ["\\\\p{=L}", "u"],
+  ["\\\\p{1=L}", "u"],
+  ["(?i)", ""],
+  ["(?ii:a)", ""],
+  ["(?i-i:a)", ""],
+  ["(?-:a)", ""],
+  ["(?<\\\\uZZZZ>a)", ""],
+  ["(?<\\\\u{110000}>a)", ""],
 ]) {
   try {
     new RegExp(values[0], values[1]);
@@ -208,7 +219,7 @@ console.log("restore", RegExp === saved);
     specialization: {
       genericCallsDisabled: 4,
       genericCallsEnabled: 4,
-      hits: 14,
+      hits: 36,
       misses: 105,
       overflowMisses: 0,
     },

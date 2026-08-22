@@ -935,6 +935,10 @@ null.item;
         "regexp-matcher-limit",
       ],
       ["RegExp String dispatch is not admitted yet.", "regexp-string-dispatch"],
+      [
+        "Branded RegExp String protocol fallback is not admitted yet.",
+        "regexp-string-dispatch",
+      ],
     ].map(async ([message, capability]) => {
       const deferredRegExp = await executeTest262Case(
         source,

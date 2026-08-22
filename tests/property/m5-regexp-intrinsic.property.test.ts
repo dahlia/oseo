@@ -164,6 +164,17 @@ const invalidCase = fc
       { differential: true, flags: "", pattern: "[a-\\n]" },
       { differential: false, flags: "", pattern: "(a)[\\1]" },
       { differential: true, flags: "u", pattern: "(a)[\\1]" },
+      { differential: true, flags: "u", pattern: "\\p{" },
+      { differential: true, flags: "u", pattern: "\\p{}" },
+      { differential: true, flags: "u", pattern: "\\p{a b}" },
+      { differential: true, flags: "u", pattern: "\\p{=L}" },
+      { differential: true, flags: "u", pattern: "\\p{1=L}" },
+      { differential: true, flags: "", pattern: "(?i)" },
+      { differential: true, flags: "", pattern: "(?ii:a)" },
+      { differential: true, flags: "", pattern: "(?i-i:a)" },
+      { differential: true, flags: "", pattern: "(?-:a)" },
+      { differential: true, flags: "", pattern: "(?<\\uZZZZ>a)" },
+      { differential: true, flags: "", pattern: "(?<\\u{110000}>a)" },
     ),
   )
   .map((testCase) => ({
@@ -210,6 +221,27 @@ const rejectedCase: fc.Arbitrary<InvalidCase> = fc.oneof(
       flags: "",
       parserExpected: "unsupported" as const,
       pattern: "[\\é]",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "u",
+      parserExpected: "unsupported" as const,
+      pattern: "\\p{Letter}",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "u",
+      parserExpected: "unsupported" as const,
+      pattern: "\\p{Script_Extensions=Greek}",
+    },
+    {
+      differential: false,
+      expected: "unsupported" as const,
+      flags: "",
+      parserExpected: "unsupported" as const,
+      pattern: "(?i:a)",
     },
   ),
 );
@@ -513,9 +545,10 @@ test(
           "one unmatched delimiter, leading quantifier, reversed bound, " +
           "malformed or out-of-range escape, unresolved backreference, " +
           "duplicate named capture, quantified assertion, decoded class " +
-          "range bound, class backreference, Unicode group-name or identity " +
-          "escape boundary, duplicate flag, unknown flag, or exclusive " +
-          "Unicode mode pair",
+          "range bound, class backreference, Unicode group-name or " +
+          "identity escape boundary, duplicate flag, unknown flag, " +
+          "exclusive Unicode mode pair, malformed property escape, " +
+          "malformed modifier group, or invalid group-name escape",
         numRuns: 6,
         profile: "M5 RegExp intrinsic invalid inputs",
         seed: 0x6000_4f01,

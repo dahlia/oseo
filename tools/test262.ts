@@ -566,6 +566,12 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   if (diagnostic === "RegExp String dispatch is not admitted yet.") {
     return "regexp-string-dispatch";
   }
+  if (
+    diagnostic ===
+    "Branded RegExp String protocol fallback is not admitted yet."
+  ) {
+    return "regexp-string-dispatch";
+  }
   // The runtime ends a program at the first rejection checkpoint that
   // still holds an unhandled rejection. A case that needs the opposite
   // host policy names that boundary instead of reporting a semantic
