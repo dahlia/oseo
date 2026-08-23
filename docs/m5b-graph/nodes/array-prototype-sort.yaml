@@ -10,5 +10,5 @@ inventory:
     - test/built-ins/Array/prototype/toSorted/
 dependencies:
   - array-prototype-copying
-landed: false
+landed: true
 status: ready
