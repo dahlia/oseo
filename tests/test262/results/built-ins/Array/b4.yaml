@@ -245,6 +245,31 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - change-array-by-copy
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/toSorted/comparefn-not-a-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: 'test/built-ins/Array/prototype/toSorted/comparefn-not-a-function.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Array/prototype/toSorted/comparefn-not-a-function.js:98:50:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

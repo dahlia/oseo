@@ -56,6 +56,8 @@ const { arrayPrototypeIterativeFixtures } =
   await import("./native/fixtures/array-prototype-iterative.ts");
 const { arrayPrototypeCopyingFixtures } =
   await import("./native/fixtures/array-prototype-copying.ts");
+const { arrayPrototypeSortFixtures } =
+  await import("./native/fixtures/array-prototype-sort.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
   await import("./native/fixtures/array-prototype-species-mapping.ts");
 const { stringPrototypeAccessFixtures } =
@@ -115,6 +117,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayConstructorFixtures,
   ...arrayPrototypeCopyingFixtures,
   ...arrayPrototypeIterativeFixtures,
+  ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
   ...classFixtures,
   ...bindingFixtures,
@@ -627,6 +630,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-sort" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
@@ -818,6 +822,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-sort" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "number-prototype" ||
@@ -903,6 +908,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
+            fixture.name === "array-prototype-sort" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
@@ -931,6 +937,7 @@ for (const fixture of selectedFixtures) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
+                fixture.name === "array-prototype-sort" ||
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||
                 fixture.name === "number-prototype"

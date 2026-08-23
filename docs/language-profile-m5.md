@@ -4037,6 +4037,56 @@ and moves from 2,192 to 2,504 unsupported profile features, with no semantic,
 harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema, and zero-override policy are unchanged.
 
+M5b node `array-prototype-sort` implements ordinary `sort` and `toSorted`
+functions on the realm-owned `%Array.prototype%` and removes `sort` from the
+unadmitted boundary table. Both reject a non-callable comparator before
+converting the receiver, so an invalid comparator throws before any `length`
+read is observable. `toSorted` reads LengthOfArrayLike and allocates its plain
+Array before reading any element, and a length above `2**32 - 1` throws a
+catchable `RangeError` there.
+
+SortIndexedProperties reads every index into one collected list before the
+first comparison. `sort` uses HasProperty before Get, so holes are skipped and
+collapse behind the sorted elements, while `toSorted` reads through holes, so
+a hole becomes an undefined element of the copy. CompareArrayElements orders
+an undefined element after every defined one without calling the comparator,
+converts a supplied comparator's result with `ToNumber` and reads `NaN` as
+`+0`, and otherwise compares the `ToString` results in code-unit order. The
+sort is stable, and the first abrupt comparison stops it before any further
+one. `sort` then writes the sorted elements back with Set and deletes the
+trailing indices with DeletePropertyOrThrow, leaving `length` unchanged, while
+`toSorted` fills the Array it already allocated. Neither method reads
+`constructor` or `Symbol.species`, so a species-bearing receiver still yields
+an ordinary Array. Every element read, comparison, write-back, and deletion
+observes the receiver at its specified step, so an accessor that appends,
+truncates, deletes, or assigns during the sort produces the specified result.
+
+Fixed native and generated differential evidence at seed `0x60005100` covers
+sparse, generic, inherited, primitive, and frozen receivers, undefined and
+hole ordering, comparator validation and coercion, abrupt completion at each
+observable step, stability across both merge shapes, accessor-driven mutation,
+copy isolation, and length coercion and limits. Both specialization policies,
+forced collection at every safepoint, false hints, deliberate guard hits and
+misses, and generic fallback are exercised. Of the 75 paths in the node's two
+inventory roots, 74 are reviewed: 55 pass and 19 retain explicit prerequisite
+boundaries for the unadmitted `Boolean` and `isNaN` globals, regular
+expression evaluation, `Reflect.construct`, resizable-buffer TypedArray views,
+and the `Array.prototype` `pop` and `reduce` methods later nodes own. The one
+omitted path builds a 2,048-element array literal, which exceeds the
+documented 32,768 root-slot native frame budget before any sorting runs; the
+fixed suite replaces its stability observation with an eleven-element ordering
+over duplicated keys. No path outside the roots changes classification.
+`stable-array-sort` and `change-array-by-copy` join the reviewed
+supported-feature list because this node admits both, and no already-reviewed
+path carries either flag. The manifest reaches 13,182 cases: 9,153 passes,
+1,506 expected negatives, and 2,523 unsupported profile features with no
+semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-76` and allocates two code IDs inside the existing Array
+range without adding a generated-code entry point or changing the graph's
+orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

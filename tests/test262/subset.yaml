@@ -28,6 +28,7 @@ supportedFeatures:
   - arrow-function
   - async-functions
   - async-iteration
+  - change-array-by-copy
   - class
   - class-fields-private
   - class-fields-private-in
@@ -61,6 +62,7 @@ supportedFeatures:
   - regexp-unicode-property-escapes
   - resizable-arraybuffer
   - rest-parameters
+  - stable-array-sort
   - Symbol
   - Symbol.asyncIterator
   - Symbol.hasInstance
@@ -4477,6 +4479,165 @@ tests:
   - path: test/built-ins/Array/prototype/some/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.4_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.4_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A1.5_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.1_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.2_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.2_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A2.2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A4_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A5_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A6_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/S15.4.4.11_A8.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/bug_596_1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/bug_596_2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/call-with-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/sort/comparefn-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/comparefn-nonfunction-call-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/sort/comparefn-resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/comparefn-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-comparefn-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-appends-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-decreases-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-deletes-predecessor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-deletes-successor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-increases-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-pops-elements.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-sets-predecessor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-getter-sets-successor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-prototype-accessors.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-prototype-element.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-appends-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-decreases-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-deletes-predecessor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-deletes-successor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-increases-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-pops-elements.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-sets-predecessor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/precise-setter-sets-successor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/resizable-buffer-default-comparator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/stability-11-elements.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/stability-5-elements.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/stability-513-elements.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A1_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -4509,6 +4670,69 @@ tests:
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/comparefn-called-after-get-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/comparefn-controls-sort.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/comparefn-default.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/comparefn-not-a-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/comparefn-stop-after-error.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/frozen-this-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/holes-not-preserved.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/ignores-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/toSorted/immutable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length-casted-to-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length-decreased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length-exceeding-array-length-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length-increased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length-tolength.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/this-value-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/this-value-nullish.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSorted/zero-or-one-element.js
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T1.js
     expectedClassification: pass

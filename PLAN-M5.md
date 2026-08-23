@@ -4554,6 +4554,59 @@ failures. The property ratchet moves from 97 to 99 domains, from 97 to 99
 seeds, and from 5,074 to 5,088 ordinary cases. The suite revision and
 41,091-path applicable inventory remain unchanged.
 
+Implemented M5b node `array-prototype-sort` gives the realm-owned
+`%Array.prototype%` ordinary `sort` and `toSorted` functions and retires the
+`sort` entry from the unadmitted boundary table. Both reject a non-callable
+comparator before converting the receiver, so no `length` read is observable
+when the comparator is invalid. `toSorted` then reads LengthOfArrayLike and
+allocates its plain Array, rejecting a length above `2**32 - 1` with a
+catchable `RangeError`, before any element is read.
+
+SortIndexedProperties reads every index into one collected list before the
+first comparison runs. `sort` checks HasProperty first, so a hole is skipped
+and collapses behind the sorted elements; `toSorted` reads through holes, so a
+hole becomes an undefined element of the copy. CompareArrayElements orders an
+undefined element after every defined one without reaching the comparator,
+converts a supplied comparator's result with `ToNumber` and reads `NaN` as
+`+0`, and otherwise compares the `ToString` results in code-unit order. One
+bottom-up merge over the collected list supplies the required stability and
+stops at the first abrupt comparison without performing another. `sort`
+publishes with Set and DeletePropertyOrThrow over the converted receiver,
+while `toSorted` fills the Array it already allocated, so neither method reads
+`constructor` or `Symbol.species`. The collected list and its merge scratch
+buffer root their own storage, so element identity survives a collection
+inside any comparator, getter, or setter. The implementation stays in
+*runtime\_array.c* because these paths share property primitives, array-like
+length reading, and collector roots with the Array intrinsic.
+
+Fixed native and generated differential evidence at seed `0x60005100` covers
+both specialization policies, forced collection at every safepoint, sparse,
+generic, inherited, and frozen receivers, undefined and hole ordering,
+comparator coercion and abrupt completion order, stability across both the
+in-place and copy-back merge passes, mutation observed through accessors
+during collection and write-back, the plain-Array copy, false hints, a
+deliberate shape-guard miss, and generic fallback. Of the 75 paths in the node
+inventory, 74 are reviewed: 55 pass and 19 retain explicit prerequisite
+boundaries for the unadmitted `Boolean` and `isNaN` globals, regular
+expression evaluation, `Reflect.construct`, resizable-buffer TypedArray
+views, and the `Array.prototype` `pop` and `reduce` methods later nodes own.
+The one omitted path builds a 2,048-element array literal, which exceeds the
+documented 32,768 root-slot native frame budget before any sorting runs; the
+fixed suite replaces its stability observation with an eleven-element ordering
+over duplicated keys. No already-reviewed path outside the roots changes
+classification. The manifest moves from 13,108 to 13,182 paths, from 9,098 to
+9,153 passes, keeps 1,506 expected negatives, and moves from 2,504 to 2,523
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. `stable-array-sort` and `change-array-by-copy` join the reviewed
+supported-feature list because this node admits both, and no already-reviewed
+path carries either flag. The property ratchet moves from 99 to 100 domains
+and seeds and from 5,088 to 5,098 ordinary cases. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-76` and allocates two
+code IDs inside the existing Array range without adding a generated-code entry
+point or changing the graph's orchestration state. The suite revision,
+41,091-path applicable inventory, ADR 0013 vocabulary, inventory policy, and
+zero-override policy are unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

@@ -320,3 +320,7 @@ families:
     owner: tests/property/m5-regexp-intrinsic.property.test.ts
     start: 0x60004f00
     end: 0x60004fff
+  - family: m5-array-prototype-sort
+    owner: tests/property/m5-array-prototype-sort.property.test.ts
+    start: 0x60005100
+    end: 0x600051ff

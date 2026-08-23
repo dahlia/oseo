@@ -362,4 +362,30 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/sort/comparefn-nonfunction-call-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: 'test/built-ins/Array/prototype/sort/comparefn-nonfunction-call-throws.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Array/prototype/sort/comparefn-nonfunction-call-throws.js:133:15:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

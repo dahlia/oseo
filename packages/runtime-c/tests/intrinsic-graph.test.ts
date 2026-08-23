@@ -159,6 +159,57 @@ test("populates Array iteration, species, and copying methods", () => {
   assert.match(arraySource, /array_join[\s\S]*toLocaleString/u);
 });
 
+test("populates Array sorting methods over one stable merge", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(\n`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["sort", "toSorted"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["SORT", "TO_SORTED"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  // The comparator is rejected before the receiver conversion, so a
+  // non-callable comparator throws before any `length` read is observable.
+  const sorting = definition("array_sorting");
+  assert.match(
+    sorting,
+    /comparator is not callable[\s\S]*oseo_internal_to_object/u,
+  );
+  // `sort` publishes through Set and DeletePropertyOrThrow, while `toSorted`
+  // fills the plain Array it allocated without reaching species allocation.
+  assert.match(sorting, /oseo_object_set/u);
+  assert.match(sorting, /oseo_object_delete/u);
+  assert.match(sorting, /create_index_property/u);
+  assert.doesNotMatch(sorting, /array_species_create/u);
+
+  // Collection reads every index before the first comparison; `sort` skips
+  // holes and `toSorted` reads through them.
+  const collection = definition("sort_indexed_properties");
+  assert.match(
+    collection,
+    /read_through_holes[\s\S]*oseo_has_property[\s\S]*oseo_object_get/u,
+  );
+  assert.match(collection, /array_sort_list_append[\s\S]*array_merge_sort/u);
+
+  // Undefined elements order without reaching the comparator, and the
+  // default comparator compares the ToString results.
+  const compare = definition("compare_array_elements");
+  assert.match(
+    compare,
+    /OSEO_TAG_UNDEFINED[\s\S]*oseo_to_string[\s\S]*oseo_less_than/u,
+  );
+  assert.match(definition("array_merge_sort"), /compare_array_elements/u);
+});
+
 test("orders Object.defineProperty conversion before descriptors", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 

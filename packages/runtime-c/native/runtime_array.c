@@ -88,6 +88,13 @@ static OseoResult array_to_string(
     OseoContext *context,
     OseoValue receiver
 );
+static OseoResult array_sorting(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool copy
+);
 
 OseoResult oseo_internal_array_builtin_dispatch(
     OseoContext *context,
@@ -184,6 +191,16 @@ OseoResult oseo_internal_array_builtin_dispatch(
     }
     if (code_id == OSEO_ARRAY_TO_STRING_CODE_ID) {
         return array_to_string(context, receiver);
+    }
+    if (code_id == OSEO_ARRAY_SORT_CODE_ID ||
+        code_id == OSEO_ARRAY_TO_SORTED_CODE_ID) {
+        return array_sorting(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_ARRAY_TO_SORTED_CODE_ID
+        );
     }
     if (code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID) {
         return failure(
@@ -1097,6 +1114,381 @@ static OseoResult array_to_string(
             NULL,
             oseo_undefined()
         );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+
+/*
+ * SortIndexedProperties collects one element per read index before any
+ * comparison runs, and neither the element count nor the comparison order
+ * is known until that loop ends, so the collected list roots its own
+ * storage and grows in place. The collector walks context->roots and reads
+ * every slot a frame declares, so a grown frame keeps its unwritten tail
+ * initialized rather than leaving it to the reallocation.
+ */
+typedef struct {
+    OseoRootFrame frame;
+    size_t capacity;
+    size_t count;
+} ArraySortList;
+
+static void array_sort_list_start(
+    OseoContext *context,
+    ArraySortList *list
+) {
+    list->frame.previous = NULL;
+    list->frame.slots = NULL;
+    list->frame.slot_count = 0u;
+    list->capacity = 0u;
+    list->count = 0u;
+    oseo_roots_push(context, &list->frame);
+}
+
+static void array_sort_list_finish(
+    OseoContext *context,
+    ArraySortList *list
+) {
+    oseo_roots_release(context, &list->frame);
+    list->capacity = 0u;
+    list->count = 0u;
+}
+
+static OseoResult array_sort_list_append(
+    OseoContext *context,
+    ArraySortList *list,
+    OseoValue value
+) {
+    if (list->count == list->capacity) {
+        if (list->capacity > SIZE_MAX / (2u * sizeof(OseoValue))) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Sorted element list is too large."
+            );
+        }
+        size_t capacity = list->capacity == 0u ? 8u : list->capacity * 2u;
+        OseoValue *slots =
+            realloc(list->frame.slots, capacity * sizeof(OseoValue));
+        if (slots == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Sorted element list allocation failed."
+            );
+        }
+        /* The reallocation preserves the initialized prefix, so publishing
+         * the new storage before the declared slot count keeps every slot
+         * the collector may read valid at every point. */
+        list->frame.slots = slots;
+        for (size_t index = list->capacity; index < capacity; index += 1u) {
+            slots[index] = oseo_undefined();
+        }
+        list->frame.slot_count = capacity;
+        list->capacity = capacity;
+    }
+    list->frame.slots[list->count] = value;
+    list->count += 1u;
+    return normal(value);
+}
+
+/*
+ * CompareArrayElements. An undefined element sorts after every defined one
+ * without reaching the comparator, a supplied comparator decides every
+ * other pair through ToNumber with NaN read as +0, and the default
+ * comparator compares the ToString results in code-unit order.
+ */
+static OseoResult compare_array_elements(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    OseoValue comparator,
+    double *order
+) {
+    *order = 0.0;
+    const bool left_undefined = tag_of(left) == OSEO_TAG_UNDEFINED;
+    const bool right_undefined = tag_of(right) == OSEO_TAG_UNDEFINED;
+    if (left_undefined || right_undefined) {
+        if (left_undefined && !right_undefined) *order = 1.0;
+        else if (right_undefined && !left_undefined) *order = -1.0;
+        return normal(oseo_number(*order));
+    }
+    OseoValue slots[4] = {left, right, comparator, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result;
+    if (tag_of(slots[2]) != OSEO_TAG_UNDEFINED) {
+        result = oseo_call_function(
+            context,
+            slots[2],
+            oseo_undefined(),
+            2u,
+            slots,
+            oseo_undefined()
+        );
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_to_number(context, slots[3]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            const double number = number_value(result.value);
+            *order = isnan(number) ? 0.0 : number;
+        }
+    } else {
+        result = oseo_to_string(context, slots[0]);
+        slots[0] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_to_string(context, slots[1]);
+            slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_less_than(context, slots[0], slots[1]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value)) {
+            *order = -1.0;
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_less_than(context, slots[1], slots[0]);
+            if (result.status == OSEO_STATUS_NORMAL &&
+                oseo_to_boolean(result.value)) {
+                *order = 1.0;
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_number(*order));
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * A bottom-up merge sort keeps equal elements in their collected order,
+ * which is the stability the sort methods require, and stops at the first
+ * abrupt comparison without performing any further one. Both buffers stay
+ * rooted for the whole sort: a merge pass only ever writes a value the
+ * source buffer still holds, so a collection during a comparator call
+ * observes every element.
+ */
+static OseoResult array_merge_sort(
+    OseoContext *context,
+    ArraySortList *list,
+    OseoValue comparator
+) {
+    const size_t count = list->count;
+    if (count < 2u) return normal(oseo_undefined());
+    OseoValue slots[1] = {comparator};
+    OseoRootFrame comparator_frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &comparator_frame);
+    OseoRootFrame scratch = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &scratch, count);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &comparator_frame);
+        return result;
+    }
+    for (size_t index = 0u; index < count; index += 1u) {
+        scratch.slots[index] = oseo_undefined();
+    }
+    OseoValue *source = list->frame.slots;
+    OseoValue *target = scratch.slots;
+    for (size_t width = 1u;
+         result.status == OSEO_STATUS_NORMAL && width < count;
+         width *= 2u) {
+        for (size_t start = 0u;
+             result.status == OSEO_STATUS_NORMAL && start < count;
+             start += 2u * width) {
+            const size_t middle =
+                count - start < width ? count : start + width;
+            const size_t end =
+                count - start < 2u * width ? count : start + 2u * width;
+            size_t left = start;
+            size_t right = middle;
+            size_t output = start;
+            while (result.status == OSEO_STATUS_NORMAL &&
+                   left < middle &&
+                   right < end) {
+                double order = 0.0;
+                result = compare_array_elements(
+                    context,
+                    source[left],
+                    source[right],
+                    slots[0],
+                    &order
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (order > 0.0) {
+                    target[output] = source[right];
+                    right += 1u;
+                } else {
+                    target[output] = source[left];
+                    left += 1u;
+                }
+                output += 1u;
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            while (left < middle) {
+                target[output] = source[left];
+                left += 1u;
+                output += 1u;
+            }
+            while (right < end) {
+                target[output] = source[right];
+                right += 1u;
+                output += 1u;
+            }
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoValue *completed = source;
+        source = target;
+        target = completed;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && source != list->frame.slots) {
+        for (size_t index = 0u; index < count; index += 1u) {
+            list->frame.slots[index] = source[index];
+        }
+    }
+    oseo_roots_release(context, &scratch);
+    oseo_roots_pop(context, &comparator_frame);
+    return result;
+}
+
+/*
+ * SortIndexedProperties. `sort` skips holes so that they collapse to the
+ * end of the receiver, while `toSorted` reads through them so that a hole
+ * becomes an undefined element of the copy.
+ */
+static OseoResult sort_indexed_properties(
+    OseoContext *context,
+    OseoValue object,
+    double length,
+    OseoValue comparator,
+    bool read_through_holes,
+    ArraySortList *list
+) {
+    OseoValue slots[3] = {object, comparator, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    for (double index = 0.0;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1.0) {
+        result = oseo_property_key(context, oseo_number(index));
+        slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!read_through_holes) {
+            result = oseo_has_property(context, slots[2], slots[0]);
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (!oseo_to_boolean(result.value)) continue;
+        }
+        result = oseo_object_get(context, slots[0], slots[2]);
+        slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = array_sort_list_append(context, list, slots[2]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_merge_sort(context, list, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Array.prototype sort and toSorted. Both reject a non-callable comparator
+ * before converting the receiver, sort the elements the receiver holds at
+ * the moment they are read, and then publish the result: `sort` writes the
+ * sorted elements back and deletes the trailing indices the collected list
+ * did not fill, while `toSorted` fills a plain Array that never consults
+ * Symbol.species.
+ */
+static OseoResult array_sorting(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool copy
+) {
+    OseoValue comparator = builtin_argument(argument_count, arguments, 0u);
+    if (tag_of(comparator) != OSEO_TAG_UNDEFINED && !is_function(comparator)) {
+        return type_error(
+            context,
+            copy
+                ? "Array.prototype.toSorted comparator is not callable."
+                : "Array.prototype.sort comparator is not callable."
+        );
+    }
+    OseoValue slots[4] = {
+        receiver,
+        comparator,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && copy) {
+        result = length > (double)UINT32_MAX
+            ? oseo_internal_throw_error(
+                  context,
+                  OSEO_ERROR_RANGE,
+                  "Invalid array length."
+              )
+            : oseo_array_create(context, (size_t)length);
+        slots[2] = result.value;
+    }
+    ArraySortList list;
+    array_sort_list_start(context, &list);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = sort_indexed_properties(
+            context,
+            slots[0],
+            length,
+            slots[1],
+            copy,
+            &list
+        );
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < list.count;
+         index += 1u) {
+        if (copy) {
+            result = create_index_property(
+                context,
+                slots[2],
+                (double)index,
+                list.frame.slots[index]
+            );
+            continue;
+        }
+        result = oseo_property_key(context, oseo_number((double)index));
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                slots[0],
+                slots[3],
+                list.frame.slots[index],
+                true
+            );
+        }
+    }
+    for (double index = (double)list.count;
+         result.status == OSEO_STATUS_NORMAL && !copy && index < length;
+         index += 1.0) {
+        result = oseo_property_key(context, oseo_number(index));
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_delete(context, slots[0], slots[3], true);
+        }
+    }
+    array_sort_list_finish(context, &list);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(copy ? slots[2] : slots[0]);
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -2164,7 +2556,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         "reduceRight",
         "reverse",
         "shift",
-        "sort",
         "splice",
         "unshift",
     };
@@ -2176,7 +2567,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         1u,
         0u,
         0u,
-        1u,
         2u,
         1u,
     };
@@ -2263,6 +2653,47 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             result = oseo_internal_ascii_string(
                 context,
                 copying_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
+    static const size_t sorting_codes[] = {
+        OSEO_ARRAY_SORT_CODE_ID,
+        OSEO_ARRAY_TO_SORTED_CODE_ID,
+    };
+    static const char *const sorting_names[] = {"sort", "toSorted"};
+    _Static_assert(
+        sizeof(sorting_codes) / sizeof(sorting_codes[0]) ==
+            sizeof(sorting_names) / sizeof(sorting_names[0]),
+        "Array sorting method tables must stay aligned."
+    );
+    const size_t sorting_count =
+        sizeof(sorting_names) / sizeof(sorting_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < sorting_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            sorting_codes[index],
+            sorting_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                sorting_names[index]
             );
             frame.slots[3] = result.value;
         }
