@@ -4171,11 +4171,12 @@ implements. Forty-two already-reviewed paths outside those roots also move
 from unsupported to pass: thirty-six `RegExp` construction cases and five
 `String.prototype.match` cases that observe a pattern executing, and one
 `typeof` case that reads an `exec` result. The complete manifest moves from
-13,108 to 13,379 paths, from 9,098 to 9,256 passes, keeps 1,506 expected
-negatives, and moves from 2,504 to 2,617 unsupported profile features, with
+13,182 to 13,453 paths, from 9,153 to 9,311 passes, keeps 1,506 expected
+negatives, and moves from 2,523 to 2,636 unsupported profile features, with
 no semantic, harness, or infrastructure failures. The suite revision,
 41,091-path inventory, manifest schema, and zero-override policy are
 unchanged.
+
 
 Known gaps inside the claim
 ---------------------------
