@@ -163,7 +163,7 @@ test("populates Array sorting methods over one stable merge", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
   const definition = (name: string): string => {
-    const opening = `static OseoResult ${name}(\n`;
+    const opening = `static OseoResult ${name}(`;
     const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
     assert.ok(begin >= 0, `${name} needs one definition`);
     const next = arraySource.indexOf("\nstatic ", begin + opening.length);
