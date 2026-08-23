@@ -1612,7 +1612,10 @@ static void prepare_regexp_allocation_operation(
     if (operation == REGEXP_ALLOCATION_INSTANCE) {
         roots[1] = oseo_number(12345.0);
     } else if (operation == REGEXP_ALLOCATION_NAMED_CAPTURE) {
-        roots[1] = make_text(context, "(?<name>a)\\k<name>");
+        roots[1] = make_text(
+            context,
+            "(?:(?<name>a)|(?<name>b))\\k<name>"
+        );
     } else {
         roots[1] = make_text(context, "[");
     }
@@ -1978,11 +1981,34 @@ static void test_regexp_duplicate_name_scale(void) {
         offset += group_length;
     }
     assert(offset == pattern_length);
-    assert_regexp_diagnostic(
-        pattern,
-        pattern_length,
-        "Regular expression pattern extension is not admitted yet."
+    OseoContext context;
+    OseoValue roots[3] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 3u};
+    oseo_context_init(&context, "runtime-heap.c", 16u);
+    oseo_roots_push(&context, &frame);
+    roots[0] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_REGEXP)
     );
+    roots[1] = require_normal(
+        oseo_string_from_units(&context, pattern, pattern_length)
+    );
+    roots[2] = require_normal(
+        oseo_call_function(
+            &context,
+            roots[0],
+            oseo_undefined(),
+            1u,
+            &roots[1],
+            roots[0]
+        )
+    );
+    oseo_collect(&context);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
     free(pattern);
 }
 
