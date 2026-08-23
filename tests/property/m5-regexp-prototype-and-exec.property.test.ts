@@ -438,6 +438,7 @@ const boundaryCase = fc.constantFrom(
 
 const duplicateNamedAlternativeCase = fc.record({
   selectFirst: fc.boolean(),
+  succeeds: fc.boolean(),
 });
 
 const host = createNodeHost();
@@ -861,28 +862,43 @@ test(
     await assertAsyncProperty(
       "groups and indices.groups select the participating duplicate",
       fc.asyncProperty(duplicateNamedAlternativeCase, async (testCase) => {
-        const input = testCase.selectFirst ? "x" : "y";
+        const capture = testCase.selectFirst ? "x" : "y";
+        const suffix = testCase.succeeds
+          ? capture
+          : testCase.selectFirst
+            ? "y"
+            : "x";
+        const input = capture + suffix;
         const source = `
-const match = new RegExp("(?<a>x)|(?<a>y)", "d").exec(
+const match = new RegExp("(?:(?<a>x)|(?<a>y))\\\\k<a>", "d").exec(
   ${JSON.stringify(input)},
 );
-const pair = match.indices.groups.a;
-console.log(
-  "duplicate",
-  match.groups.a,
-  pair[0],
-  pair[1],
-);
+if (match === null) {
+  console.log("duplicate", ${JSON.stringify(input)}, "null");
+}
+else {
+  const pair = match.indices.groups.a;
+  console.log(
+    "duplicate",
+    ${JSON.stringify(input)},
+    match.groups.a,
+    pair[0],
+    pair[1],
+  );
+}
 /** @param {number} value */
 function hinted(value) { return value + 1; }
 console.log("hint", hinted(1), hinted("x"));
 `;
+        const duplicate = testCase.succeeds
+          ? `duplicate ${input} ${capture} 0 1\n`
+          : `duplicate ${input} null\n`;
         await assertNative(
           source,
           {
             exitStatus: 0,
             stderr: "",
-            stdout: `duplicate ${input} 0 1\nhint 2 x1\n`,
+            stdout: `${duplicate}hint 2 x1\n`,
           },
           "generated-m5-regexp-duplicate-names.ts",
         );
@@ -892,7 +908,8 @@ console.log("hint", hinted(1), hinted("x"));
         domain:
           "two mutually exclusive alternatives with the same capture " +
           "name and distinct one-unit bodies, a generated choice of " +
-          "participating alternative, matchResult.groups, indices.groups, " +
+          "participating alternative, a matching or failing named " +
+          "backreference, matchResult.groups, indices.groups, " +
           "both " +
           "specialization policies, forced collection, one false number " +
           "hint, and one shape-guard miss",
@@ -901,7 +918,8 @@ console.log("hint", hinted(1), hinted("x"));
         seed: 0x6000_5003,
         sizeLimit:
           "two alternatives, two captures with one shared ASCII name, " +
-          "one-unit distinct ASCII bodies, and one branch choice",
+          "one-unit distinct ASCII bodies, one branch choice, and one " +
+          "matching or mismatching suffix",
         timeLimitMilliseconds: 180_000,
       },
     );

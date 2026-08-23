@@ -341,6 +341,9 @@ typedef struct {
     OseoRegExpClassEscape class_escape;
     uint32_t code_point;
     size_t capture;
+    size_t name_start;
+    size_t name_length;
+    bool named;
     bool negated;
 } OseoRegExpEscapeResult;
 
@@ -1006,11 +1009,11 @@ static uint32_t read_code_point(OseoRegExpCompiler *compiler) {
 }
 
 /*
- * The capture index one group name names.
+ * The first capture index one group name names.
  *
  * Names are collected before emission because a reference may precede
- * its declaration, and duplicate names are refused before this point, so
- * one name resolves to exactly one capture.
+ * its declaration. A duplicate name has more matching captures after the
+ * first, and emission preserves all of them.
  */
 static size_t lookup_group(
     const OseoRegExpCompiler *compiler,
@@ -1103,6 +1106,9 @@ static bool parse_escape(
     result->class_escape = OSEO_REGEXP_CLASS_DIGIT;
     result->code_point = 0u;
     result->capture = 0u;
+    result->name_start = 0u;
+    result->name_length = 0u;
+    result->named = false;
     result->negated = false;
     compiler->index += 1u;
     if (at_end(compiler)) {
@@ -1267,6 +1273,9 @@ static bool parse_escape(
         }
         result->kind = OSEO_REGEXP_ESCAPE_BACKREFERENCE;
         result->capture = capture;
+        result->name_start = start;
+        result->name_length = compiler->index - start - 1u;
+        result->named = true;
         return true;
     }
     if (ascii_digit(unit)) {
@@ -1669,15 +1678,32 @@ static void parse_atom(OseoRegExpCompiler *compiler, bool backward) {
                 );
                 compiler->has_ignore_case_backreference = true;
             }
-            emit(
-                compiler,
-                OSEO_REGEXP_OP_BACKREFERENCE,
-                modifiers,
-                (uint32_t)(2u * escape.capture),
-                0u,
-                0u,
-                0u
-            );
+            for (size_t capture = escape.capture;
+                 capture <= compiler->capture_count;
+                 capture += 1u) {
+                const OseoRegExpCapture *record =
+                    &compiler->captures[capture - 1u];
+                if (escape.named &&
+                    (!record->named ||
+                     record->name_length != escape.name_length ||
+                     memcmp(
+                         &compiler->names.values[record->name_offset],
+                         &compiler->source->units[escape.name_start],
+                         escape.name_length * sizeof(uint16_t)
+                     ) != 0)) {
+                    continue;
+                }
+                emit(
+                    compiler,
+                    OSEO_REGEXP_OP_BACKREFERENCE,
+                    modifiers,
+                    (uint32_t)(2u * capture),
+                    0u,
+                    0u,
+                    0u
+                );
+                if (!escape.named) break;
+            }
             return;
         }
         if (escape.kind == OSEO_REGEXP_ESCAPE_CLASS) {

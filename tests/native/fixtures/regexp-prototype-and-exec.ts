@@ -224,6 +224,22 @@ function showDuplicate(input) {
 showDuplicate("x");
 showDuplicate("y");
 
+function showDuplicateBackreference(input) {
+  const duplicate = new RegExp(
+    "(?:(?<a>x)|(?<a>y))\\\\k<a>",
+    "d",
+  ).exec(input);
+  console.log(
+    "duplicate named backreference",
+    input,
+    duplicate === null ? "null" : show(duplicate),
+  );
+}
+showDuplicateBackreference("xx");
+showDuplicateBackreference("yy");
+showDuplicateBackreference("xy");
+showDuplicateBackreference("yx");
+
 const scanned = new RegExp("a", "g");
 let scan = "";
 for (let round = 0; round < 4; round = round + 1) {
@@ -391,10 +407,10 @@ function hinted(value) {
 console.log("hints", hinted(3), hinted("miss"));
 `,
     specialization: {
-      genericCallsDisabled: 796,
-      genericCallsEnabled: 796,
-      hits: 190,
-      misses: 739,
+      genericCallsDisabled: 862,
+      genericCallsEnabled: 862,
+      hits: 206,
+      misses: 787,
       overflowMisses: 0,
     },
   },
