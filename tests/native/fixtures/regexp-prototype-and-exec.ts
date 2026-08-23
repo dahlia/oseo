@@ -211,6 +211,19 @@ for (const entry of cases) {
   );
 }
 
+function showDuplicate(input) {
+  const duplicate = new RegExp("(?<a>x)|(?<a>y)", "d").exec(input);
+  console.log(
+    "duplicate named indices",
+    input,
+    duplicate.groups.a,
+    duplicate.indices.groups.a[0],
+    duplicate.indices.groups.a[1],
+  );
+}
+showDuplicate("x");
+showDuplicate("y");
+
 const scanned = new RegExp("a", "g");
 let scan = "";
 for (let round = 0; round < 4; round = round + 1) {

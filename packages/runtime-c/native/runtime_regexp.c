@@ -417,9 +417,6 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
                     current_path
                 )) {
                 registry->duplicate_status = OSEO_REGEXP_INVALID;
-            } else if (previous_same != SIZE_MAX &&
-                       registry->duplicate_status == OSEO_REGEXP_VALID) {
-                registry->duplicate_status = OSEO_REGEXP_UNSUPPORTED;
             }
             OseoRegExpNamedCapture *record =
                 &registry->records[registry->count];
@@ -1734,6 +1731,32 @@ static OseoResult regexp_group_name_string(
     );
 }
 
+/* Whether an earlier capture with the same name participated in the match. */
+static bool regexp_earlier_named_capture_participated(
+    const OseoRegExpProgram *program,
+    const int64_t *captures,
+    size_t capture
+) {
+    const OseoRegExpCapture *record = &program->captures[capture - 1u];
+    for (size_t earlier = 1u; earlier < capture; earlier += 1u) {
+        const OseoRegExpCapture *candidate =
+            &program->captures[earlier - 1u];
+        if (!candidate->named ||
+            candidate->name_length != record->name_length ||
+            captures[2u * earlier] < 0) {
+            continue;
+        }
+        if (memcmp(
+                &program->name_units[candidate->name_offset],
+                &program->name_units[record->name_offset],
+                record->name_length * sizeof(uint16_t)
+            ) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /*
  * MakeMatchIndicesIndexPairArray (22.2.7.7).
  *
@@ -1787,6 +1810,14 @@ static OseoResult regexp_match_indices(
         }
         if (result.status != OSEO_STATUS_NORMAL || index == 0u) continue;
         if (!program->captures[index - 1u].named) continue;
+        if (captures[2u * index] < 0 &&
+            regexp_earlier_named_capture_participated(
+                program,
+                captures,
+                index
+            )) {
+            continue;
+        }
         OseoValue pair = frame.slots[2];
         result = regexp_group_name_string(context, program, index);
         OseoValue name = result.value;
@@ -1958,6 +1989,14 @@ static OseoResult regexp_builtin_exec(
         }
         if (result.status != OSEO_STATUS_NORMAL || index == 0u) continue;
         if (!program->captures[index - 1u].named) continue;
+        if (captures[2u * index] < 0 &&
+            regexp_earlier_named_capture_participated(
+                program,
+                captures,
+                index
+            )) {
+            continue;
+        }
         OseoValue captured = frame.slots[4];
         result = regexp_group_name_string(context, program, index);
         if (result.status == OSEO_STATUS_NORMAL) {

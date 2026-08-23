@@ -222,10 +222,11 @@ function patternArbitrary(
  * Resolve a raw model into one this profile admits.
  *
  * Capture indices are assigned in source order, a reference is bound to a
- * capture that exists, a duplicate group name is dropped, and a
- * quantifier is removed from any atom that already repeats. The last rule
- * keeps generated backtracking linear, so a reached execution boundary is
- * a defect rather than an ordinary case.
+ * capture that exists, and a duplicate group name is dropped because the
+ * focused alternative domain below owns valid duplicates. A quantifier is
+ * removed from any atom that already repeats. The last rule keeps generated
+ * backtracking linear, so a reached execution boundary is a defect rather
+ * than an ordinary case.
  *
  * An ignore-case backreference is replaced by an ordinary character: it is
  * the one construct whose closure can need case-folding data the runtime
@@ -434,6 +435,10 @@ const boundaryCase = fc.constantFrom(
   { flags: "iu", pattern: "(\\S)\\1" },
   { flags: "i", pattern: "([^a])\\1" },
 );
+
+const duplicateNamedAlternativeCase = fc.record({
+  selectFirst: fc.boolean(),
+});
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -843,6 +848,60 @@ test(
         profile: "M5 RegExp prototype accessors",
         seed: 0x6000_5001,
         sizeLimit: "one pattern of at most eight units and five flags",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+test(
+  "duplicate named alternatives preserve the participating capture",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "groups and indices.groups select the participating duplicate",
+      fc.asyncProperty(duplicateNamedAlternativeCase, async (testCase) => {
+        const input = testCase.selectFirst ? "x" : "y";
+        const source = `
+const match = new RegExp("(?<a>x)|(?<a>y)", "d").exec(
+  ${JSON.stringify(input)},
+);
+const pair = match.indices.groups.a;
+console.log(
+  "duplicate",
+  match.groups.a,
+  pair[0],
+  pair[1],
+);
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+console.log("hint", hinted(1), hinted("x"));
+`;
+        await assertNative(
+          source,
+          {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `duplicate ${input} 0 1\nhint 2 x1\n`,
+          },
+          "generated-m5-regexp-duplicate-names.ts",
+        );
+      }),
+      {
+        context: propertyContext(),
+        domain:
+          "two mutually exclusive alternatives with the same capture " +
+          "name and distinct one-unit bodies, a generated choice of " +
+          "participating alternative, matchResult.groups, indices.groups, " +
+          "both " +
+          "specialization policies, forced collection, one false number " +
+          "hint, and one shape-guard miss",
+        numRuns: 6,
+        profile: "M5 RegExp duplicate named alternatives",
+        seed: 0x6000_5003,
+        sizeLimit:
+          "two alternatives, two captures with one shared ASCII name, " +
+          "one-unit distinct ASCII bodies, and one branch choice",
         timeLimitMilliseconds: 180_000,
       },
     );
