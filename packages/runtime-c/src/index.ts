@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-76",
+  abiVersion: "m5-77",
   assets: [
     {
       kind: "header",
@@ -152,6 +152,11 @@ const runtimeInput: RuntimeInput = {
       kind: "source",
       name: "runtime_regexp.c",
       url: new URL("../native/runtime_regexp.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_regexp_matcher.c",
+      url: new URL("../native/runtime_regexp_matcher.c", import.meta.url),
     },
   ],
 };

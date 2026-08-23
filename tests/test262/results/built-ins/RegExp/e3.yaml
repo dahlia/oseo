@@ -98,4 +98,26 @@ results:
       failedPhase: parse
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-duplicate-named-groups
+        - regexp-match-indices
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/RegExp/prototype/exec/duplicate-named-indices-groups-properties.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-duplicate-named-groups
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

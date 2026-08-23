@@ -102,8 +102,12 @@ validated by the owned parser and reported at the offending flag.
 Intrinsic, prototype, and symbol surface
 ----------------------------------------
 
-None of this surface exists yet. It is recorded here so that each later
-node names what it adds:
+The `regexp-intrinsic` node added `%RegExp%`, `%RegExp.prototype%`, the
+constructor link, the `Symbol.species` accessor, and the `lastIndex` own
+property, and `regexp-prototype-and-exec` added `exec`, `test`, `toString`,
+and the ten prototype accessors. The rest of this surface does not exist
+yet. The complete list stays here so that each later node names what it
+adds:
 
  -  `%RegExp%`: call and construct behavior, `length`, `name`,
     `prototype`, and `RegExp.escape`, plus the `Symbol.species` accessor.

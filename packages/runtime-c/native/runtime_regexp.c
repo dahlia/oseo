@@ -1,36 +1,22 @@
 #include "runtime_internal.h"
 
 #include <limits.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
 /*
- * The RegExp constructor, initialization state, and dynamic matcher
- * artifact. Prototype execution and the pattern-extension families replace
- * the explicit boundary functions below in their own graph nodes.
+ * The RegExp constructor, initialization state, dynamic matcher artifact,
+ * built-in execution, and the prototype methods and accessors. The
+ * matcher program and its executor live in runtime_regexp_matcher.c; the
+ * well-known symbol methods and the String integration they dispatch to
+ * replace the explicit boundary functions below in their own graph nodes.
  */
 
 #define OSEO_REGEXP_PATTERN_LENGTH_LIMIT ((size_t)0x100000u)
 #define OSEO_REGEXP_CAPTURE_LIMIT ((size_t)0xffffu)
 #define OSEO_REGEXP_NESTING_LIMIT ((size_t)256u)
 #define OSEO_REGEXP_MATCHER_INSTRUCTION_LIMIT ((size_t)0x100000u)
-
-#define OSEO_REGEXP_FLAG_D ((uint16_t)1u << 0u)
-#define OSEO_REGEXP_FLAG_G ((uint16_t)1u << 1u)
-#define OSEO_REGEXP_FLAG_I ((uint16_t)1u << 2u)
-#define OSEO_REGEXP_FLAG_M ((uint16_t)1u << 3u)
-#define OSEO_REGEXP_FLAG_S ((uint16_t)1u << 4u)
-#define OSEO_REGEXP_FLAG_U ((uint16_t)1u << 5u)
-#define OSEO_REGEXP_FLAG_V ((uint16_t)1u << 6u)
-#define OSEO_REGEXP_FLAG_Y ((uint16_t)1u << 7u)
-
-typedef enum {
-    OSEO_REGEXP_VALID = 0,
-    OSEO_REGEXP_INVALID = 1,
-    OSEO_REGEXP_UNSUPPORTED = 2,
-    OSEO_REGEXP_LIMIT = 3,
-    OSEO_REGEXP_ALLOCATION_FAILURE = 4,
-} OseoRegExpValidation;
 
 typedef struct {
     size_t declaration;
@@ -982,8 +968,7 @@ static OseoRegExpValidation regexp_validate_pattern(
     const OseoString *source,
     uint16_t flag_mask,
     size_t capture_count,
-    const OseoRegExpNamedCaptureRegistry *named_captures,
-    size_t *instruction_count
+    const OseoRegExpNamedCaptureRegistry *named_captures
 ) {
     if (source->length > OSEO_REGEXP_PATTERN_LENGTH_LIMIT) {
         return OSEO_REGEXP_LIMIT;
@@ -1156,7 +1141,6 @@ static OseoRegExpValidation regexp_validate_pattern(
                 2u) {
         return OSEO_REGEXP_LIMIT;
     }
-    *instruction_count = source->length + capture_count * 2u + 1u;
     return OSEO_REGEXP_VALID;
 }
 
@@ -1394,14 +1378,12 @@ static OseoResult regexp_matcher_create(
             &named_captures
         );
     }
-    size_t instruction_count = 0u;
     if (status == OSEO_REGEXP_VALID) {
         status = regexp_validate_pattern(
             string_object(source),
             flag_mask,
             capture_count,
-            &named_captures,
-            &instruction_count
+            &named_captures
         );
     }
     if (status == OSEO_REGEXP_VALID &&
@@ -1412,6 +1394,20 @@ static OseoResult regexp_matcher_create(
     if (status != OSEO_REGEXP_VALID) {
         return regexp_validation_result(context, status);
     }
+    /*
+     * The program is compiled before the artifact is allocated. It is
+     * unmanaged memory, so building it reaches no safepoint, and a
+     * failure after it exists releases it rather than publishing an
+     * artifact that owns nothing.
+     */
+    OseoRegExpProgram *program = oseo_internal_regexp_program_build(
+        context,
+        string_object(source),
+        flag_mask,
+        capture_count,
+        &status
+    );
+    if (program == NULL) return regexp_validation_result(context, status);
     OseoValue slots[2] = {source, flags};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -1421,6 +1417,7 @@ static OseoResult regexp_matcher_create(
     );
     OseoResult result;
     if (matcher == NULL) {
+        oseo_internal_regexp_program_release(program);
         result = failure(
             context,
             "OSEO2001",
@@ -1429,14 +1426,18 @@ static OseoResult regexp_matcher_create(
     } else {
         matcher->source = slots[0];
         matcher->flags = slots[1];
+        matcher->program = program;
         matcher->capture_count = capture_count;
-        matcher->instruction_count = instruction_count;
+        matcher->instruction_count = program->instruction_count;
         matcher->flag_mask = flag_mask;
         result = oseo_internal_publish_heap(
             context,
             &matcher->header,
             OSEO_HEAP_REGEXP_MATCHER
         );
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_internal_regexp_program_release(program);
+        }
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -1592,6 +1593,942 @@ static OseoResult regexp_construct(
     return result;
 }
 
+/* ToLength's clamp: 2^53 - 1. */
+#define OSEO_REGEXP_MAX_SAFE_LENGTH 9007199254740991.0
+
+/* ToLength (7.1.20) for the `lastIndex` read built-in execution makes. */
+static OseoResult regexp_to_length(
+    OseoContext *context,
+    OseoValue value,
+    double *length
+) {
+    *length = 0.0;
+    OseoResult result = oseo_internal_to_number(context, value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (!is_number(result.value)) return normal(oseo_undefined());
+    double number = number_value(result.value);
+    /* NaN, negative zero, and every negative value clamp to zero. */
+    if (!(number > 0.0)) return normal(oseo_undefined());
+    number = floor(number);
+    *length = number > OSEO_REGEXP_MAX_SAFE_LENGTH
+        ? OSEO_REGEXP_MAX_SAFE_LENGTH
+        : number;
+    return normal(oseo_undefined());
+}
+
+/* Set(R, "lastIndex", value, true), which a read-only slot rejects. */
+static OseoResult regexp_set_last_index(
+    OseoContext *context,
+    OseoValue regexp,
+    double value
+) {
+    OseoValue slots[2] = {regexp, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "lastIndex");
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_set(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            oseo_number(value),
+            true
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* CreateDataPropertyOrThrow for one owned result-object property. */
+static OseoResult regexp_create_data_property(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value
+) {
+    return oseo_object_define(
+        context,
+        object,
+        key,
+        value,
+        (OseoPropertyAttributes){true, true, true, false}
+    );
+}
+
+static OseoResult regexp_create_named_property(
+    OseoContext *context,
+    OseoValue object,
+    const char *name,
+    OseoValue value
+) {
+    OseoValue slots[3] = {object, value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, name);
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_create_data_property(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[1]
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The half-open substring of one rooted string value. */
+static OseoResult regexp_substring(
+    OseoContext *context,
+    OseoValue subject,
+    size_t start,
+    size_t end
+) {
+    const OseoString *string = string_object(subject);
+    return oseo_internal_allocate_string(
+        context,
+        &string->units[start],
+        end - start
+    );
+}
+
+/*
+ * The two-element index pair one capture contributes to `indices`, or
+ * undefined for a capture that did not participate.
+ */
+static OseoResult regexp_index_pair(
+    OseoContext *context,
+    int64_t start,
+    int64_t end
+) {
+    if (start < 0 || end < 0) return normal(oseo_undefined());
+    OseoValue array = oseo_undefined();
+    OseoRootFrame frame = {NULL, &array, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_array_create(context, 0u);
+    array = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_append(context, array, oseo_number((double)start));
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_append(context, array, oseo_number((double)end));
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(array);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The group name of one capture as a string value. */
+static OseoResult regexp_group_name_string(
+    OseoContext *context,
+    const OseoRegExpProgram *program,
+    size_t capture
+) {
+    const OseoRegExpCapture *record = &program->captures[capture - 1u];
+    return oseo_internal_allocate_string(
+        context,
+        &program->name_units[record->name_offset],
+        record->name_length
+    );
+}
+
+/*
+ * MakeMatchIndicesIndexPairArray (22.2.7.7).
+ *
+ * The pair array mirrors the result array: element zero is the whole
+ * match, element `index` is capturing group `index`, and a named group
+ * repeats its pair on the `groups` object. Nothing here reads the input
+ * string, so a capture that did not participate needs no span.
+ */
+static OseoResult regexp_match_indices(
+    OseoContext *context,
+    const OseoRegExpProgram *program,
+    const int64_t *captures
+) {
+    OseoValue slots[3] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_array_create(context, 0u);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && program->has_group_names) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_create_named_property(
+            context,
+            frame.slots[0],
+            "groups",
+            frame.slots[1]
+        );
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index <= program->capture_count;
+         index += 1u) {
+        result = regexp_index_pair(
+            context,
+            captures[2u * index],
+            captures[2u * index + 1u]
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_array_append(
+                context,
+                frame.slots[0],
+                frame.slots[2]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL || index == 0u) continue;
+        if (!program->captures[index - 1u].named) continue;
+        OseoValue pair = frame.slots[2];
+        result = regexp_group_name_string(context, program, index);
+        OseoValue name = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoValue nested[3] = {frame.slots[1], name, pair};
+            OseoRootFrame inner = {NULL, nested, 3u};
+            oseo_roots_push(context, &inner);
+            result = regexp_create_data_property(
+                context,
+                nested[0],
+                nested[1],
+                nested[2]
+            );
+            oseo_roots_pop(context, &inner);
+        }
+        frame.slots[2] = pair;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[0]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The owned boundary a match attempt that ran out of resources reports. */
+static OseoResult regexp_execution_failure(
+    OseoContext *context,
+    OseoRegExpExecution outcome
+) {
+    if (outcome == OSEO_REGEXP_EXECUTION_ALLOCATION) {
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp matcher work area allocation failed."
+        );
+    }
+    return failure(
+        context,
+        "OSEO2001",
+        "Regular expression matching exceeds the reviewed matcher limit."
+    );
+}
+
+/*
+ * RegExpBuiltinExec (22.2.7.2).
+ *
+ * The position loop, `lastIndex` conversion and update, and the result
+ * object live here; the matcher component owns the match itself. A
+ * global or sticky pattern writes `lastIndex` through the ordinary
+ * property path, so a frozen or redefined slot is observed exactly where
+ * the edition observes it.
+ */
+static OseoResult regexp_builtin_exec(
+    OseoContext *context,
+    OseoValue regexp,
+    OseoValue subject
+) {
+    OseoValue slots[5] = {
+        regexp,
+        subject,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    double last_index = 0.0;
+    OseoResult result = regexp_get_named(
+        context,
+        frame.slots[0],
+        "lastIndex",
+        &frame.slots[2]
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_to_length(context, frame.slots[2], &last_index);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    OseoRegExpMatcher *matcher =
+        regexp_matcher_object(regexp_object(frame.slots[0])->matcher);
+    uint16_t mask = matcher->flag_mask;
+    bool global = (mask & OSEO_REGEXP_FLAG_G) != 0u;
+    bool sticky = (mask & OSEO_REGEXP_FLAG_Y) != 0u;
+    bool has_indices = (mask & OSEO_REGEXP_FLAG_D) != 0u;
+    if (!global && !sticky) last_index = 0.0;
+    const OseoRegExpProgram *program = matcher->program;
+    size_t length = string_object(frame.slots[1])->length;
+    size_t total = 2u * (program->capture_count + 1u);
+    int64_t *captures = oseo_internal_allocate_work_bytes(
+        context,
+        total * sizeof(int64_t)
+    );
+    if (captures == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp capture allocation failed."
+        );
+    }
+    OseoRegExpExecution outcome = OSEO_REGEXP_EXECUTION_UNMATCHED;
+    if (last_index <= (double)length) {
+        outcome = oseo_internal_regexp_program_search(
+            context,
+            program,
+            string_object(frame.slots[1]),
+            (size_t)last_index,
+            sticky,
+            captures
+        );
+    }
+    if (outcome == OSEO_REGEXP_EXECUTION_LIMIT ||
+        outcome == OSEO_REGEXP_EXECUTION_ALLOCATION) {
+        free(captures);
+        oseo_roots_pop(context, &frame);
+        return regexp_execution_failure(context, outcome);
+    }
+    if (outcome == OSEO_REGEXP_EXECUTION_UNMATCHED) {
+        free(captures);
+        result = normal(oseo_null());
+        if (global || sticky) {
+            OseoResult reset = regexp_set_last_index(
+                context,
+                frame.slots[0],
+                0.0
+            );
+            if (reset.status != OSEO_STATUS_NORMAL) result = reset;
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    size_t match_start = (size_t)captures[0];
+    size_t match_end = (size_t)captures[1];
+    if (global || sticky) {
+        result = regexp_set_last_index(
+            context,
+            frame.slots[0],
+            (double)match_end
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_create(context, 0u);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && program->has_group_names) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[3] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index <= program->capture_count;
+         index += 1u) {
+        frame.slots[4] = oseo_undefined();
+        if (captures[2u * index] >= 0) {
+            result = regexp_substring(
+                context,
+                frame.slots[1],
+                (size_t)captures[2u * index],
+                (size_t)captures[2u * index + 1u]
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_array_append(
+                context,
+                frame.slots[2],
+                frame.slots[4]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL || index == 0u) continue;
+        if (!program->captures[index - 1u].named) continue;
+        OseoValue captured = frame.slots[4];
+        result = regexp_group_name_string(context, program, index);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoValue nested[3] = {frame.slots[3], result.value, captured};
+            OseoRootFrame inner = {NULL, nested, 3u};
+            oseo_roots_push(context, &inner);
+            result = regexp_create_data_property(
+                context,
+                nested[0],
+                nested[1],
+                nested[2]
+            );
+            oseo_roots_pop(context, &inner);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_create_named_property(
+            context,
+            frame.slots[2],
+            "index",
+            oseo_number((double)match_start)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_create_named_property(
+            context,
+            frame.slots[2],
+            "input",
+            frame.slots[1]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_create_named_property(
+            context,
+            frame.slots[2],
+            "groups",
+            frame.slots[3]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && has_indices) {
+        result = regexp_match_indices(context, program, captures);
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = regexp_create_named_property(
+                context,
+                frame.slots[2],
+                "indices",
+                frame.slots[4]
+            );
+        }
+    }
+    free(captures);
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[2]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * RegExpExec (22.2.7.1): an overridden `exec` is called where the
+ * edition requires it, and only a branded RegExp reaches the built-in.
+ */
+static OseoResult regexp_exec_abstract(
+    OseoContext *context,
+    OseoValue regexp,
+    OseoValue subject
+) {
+    OseoValue slots[3] = {regexp, subject, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = regexp_get_named(
+        context,
+        frame.slots[0],
+        "exec",
+        &frame.slots[2]
+    );
+    if (result.status == OSEO_STATUS_NORMAL && is_function(frame.slots[2])) {
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            1u,
+            &frame.slots[1],
+            oseo_undefined()
+        );
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !is_object(result.value) &&
+            tag_of(result.value) != OSEO_TAG_NULL) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "A RegExp exec method must return an object or null."
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_regexp(frame.slots[0])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp execution requires a RegExp object receiver."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_builtin_exec(context, frame.slots[0], frame.slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_prototype_exec(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_regexp(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp.prototype.exec requires a RegExp object receiver."
+        );
+    }
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_value_string(
+        context,
+        argument_count == 0u ? oseo_undefined() : arguments[0]
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_builtin_exec(context, frame.slots[0], frame.slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_prototype_test(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_object(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp.prototype.test requires an object receiver."
+        );
+    }
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_value_string(
+        context,
+        argument_count == 0u ? oseo_undefined() : arguments[0]
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_exec_abstract(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(
+            oseo_boolean(tag_of(result.value) != OSEO_TAG_NULL)
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * EscapeRegExpPattern (22.2.6.13.1).
+ *
+ * The escaping is the smallest one that keeps `"/" + S + "/" + F` a
+ * regular expression literal with the same behavior: an unescaped `/`
+ * outside a character class is escaped, and every LineTerminator becomes
+ * its own escape sequence wherever it appears. An empty pattern becomes
+ * `(?:)`, which is the empty pattern's only literal spelling.
+ */
+static bool regexp_line_terminator(uint16_t unit) {
+    return unit == 0x0au || unit == 0x0du || unit == 0x2028u ||
+        unit == 0x2029u;
+}
+
+/* The code units one LineTerminator contributes after its backslash. */
+static size_t regexp_line_terminator_escape(uint16_t unit, uint16_t *units) {
+    if (unit == 0x0au || unit == 0x0du) {
+        units[0] = unit == 0x0au ? (uint16_t)'n' : (uint16_t)'r';
+        return 1u;
+    }
+    units[0] = 'u';
+    units[1] = '2';
+    units[2] = '0';
+    units[3] = '2';
+    units[4] = unit == 0x2028u ? (uint16_t)'8' : (uint16_t)'9';
+    return 5u;
+}
+
+/*
+ * EscapeRegExpPattern (22.2.6.13.1).
+ *
+ * The escaping is the smallest one that keeps `"/" + S + "/" + F` a
+ * regular expression literal with the same behavior: an unescaped `/`
+ * outside a character class is escaped, and every LineTerminator becomes
+ * its own escape sequence wherever it appears, reusing a backslash that
+ * already precedes it rather than adding a second one. An empty pattern
+ * becomes `(?:)`, which is the empty pattern's only literal spelling.
+ */
+static OseoResult regexp_escape_pattern(
+    OseoContext *context,
+    OseoValue source
+) {
+    const OseoString *string = string_object(source);
+    if (string->length == 0u) {
+        return oseo_internal_ascii_string(context, "(?:)");
+    }
+    uint16_t escape[5];
+    size_t extra = 0u;
+    bool rewritten = false;
+    bool character_class = false;
+    bool escaped = false;
+    for (size_t index = 0u; index < string->length; index += 1u) {
+        uint16_t unit = string->units[index];
+        if (regexp_line_terminator(unit)) {
+            /* An escaped LineTerminator keeps its length but not its
+             * text, so the rewrite is not decided by the extra count. */
+            extra += regexp_line_terminator_escape(unit, escape) - 1u;
+            if (!escaped) extra += 1u;
+            rewritten = true;
+            escaped = false;
+            continue;
+        }
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+        if (unit == '\\') {
+            escaped = true;
+        } else if (unit == '[') {
+            character_class = true;
+        } else if (unit == ']') {
+            character_class = false;
+        } else if (unit == '/' && !character_class) {
+            extra += 1u;
+            rewritten = true;
+        }
+    }
+    if (!rewritten) return normal(source);
+    if (string->length > SIZE_MAX - extra) {
+        return failure(context, "OSEO2001", "Pattern escaping is too large.");
+    }
+    /* The escaped text is one ordinary string, so an over-long result is
+     * the same catchable `RangeError` any other string length reports,
+     * decided before a staging buffer that large is requested. */
+    OseoResult length = oseo_internal_validate_string_length(
+        context,
+        string->length + extra
+    );
+    if (length.status != OSEO_STATUS_NORMAL) return length;
+    uint16_t *units = oseo_internal_allocate_work_bytes(
+        context,
+        (string->length + extra) * sizeof(uint16_t)
+    );
+    if (units == NULL) {
+        return failure(context, "OSEO2001", "Pattern escaping failed.");
+    }
+    size_t written = 0u;
+    character_class = false;
+    escaped = false;
+    for (size_t index = 0u; index < string->length; index += 1u) {
+        uint16_t unit = string->units[index];
+        if (regexp_line_terminator(unit)) {
+            size_t length = regexp_line_terminator_escape(unit, escape);
+            if (!escaped) {
+                units[written] = '\\';
+                written += 1u;
+            }
+            for (size_t offset = 0u; offset < length; offset += 1u) {
+                units[written] = escape[offset];
+                written += 1u;
+            }
+            escaped = false;
+            continue;
+        }
+        if (escaped) {
+            escaped = false;
+        } else if (unit == '\\') {
+            escaped = true;
+        } else if (unit == '[') {
+            character_class = true;
+        } else if (unit == ']') {
+            character_class = false;
+        } else if (unit == '/' && !character_class) {
+            units[written] = '\\';
+            written += 1u;
+        }
+        units[written] = unit;
+        written += 1u;
+    }
+    OseoResult result = oseo_internal_allocate_string(
+        context,
+        units,
+        written
+    );
+    free(units);
+    return result;
+}
+
+/*
+ * The answer an accessor owes a receiver without the internal slot.
+ *
+ * `%RegExp.prototype%` itself is the one such receiver the edition
+ * admits, so it reports the empty pattern or `undefined` instead of
+ * throwing. The receiver stays rooted while the realm materializes that
+ * intrinsic, because materializing it allocates.
+ */
+static OseoResult regexp_prototype_receiver(
+    OseoContext *context,
+    OseoValue receiver,
+    const char *message,
+    bool source_accessor
+) {
+    OseoValue slots[1] = {receiver};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_REGEXP_PROTOTYPE
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.value != frame.slots[0]) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                message
+            );
+        } else if (source_accessor) {
+            result = oseo_internal_ascii_string(context, "(?:)");
+        } else {
+            result = normal(oseo_undefined());
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult regexp_prototype_source(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_object(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The RegExp source accessor requires an object receiver."
+        );
+    }
+    if (!is_regexp(receiver)) {
+        return regexp_prototype_receiver(
+            context,
+            receiver,
+            "The RegExp source accessor requires a RegExp object.",
+            true
+        );
+    }
+    OseoValue source =
+        regexp_matcher_object(regexp_object(receiver)->matcher)->source;
+    OseoRootFrame frame = {NULL, &source, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = regexp_escape_pattern(context, source);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The eight flag code units, in the order `flags` prints them. */
+static const char regexp_flag_letters[] = "dgimsuvy";
+
+static const uint16_t regexp_flag_bits[] = {
+    OSEO_REGEXP_FLAG_D,
+    OSEO_REGEXP_FLAG_G,
+    OSEO_REGEXP_FLAG_I,
+    OSEO_REGEXP_FLAG_M,
+    OSEO_REGEXP_FLAG_S,
+    OSEO_REGEXP_FLAG_U,
+    OSEO_REGEXP_FLAG_V,
+    OSEO_REGEXP_FLAG_Y,
+};
+
+/*
+ * One individual flag accessor (22.2.6.4 and its neighbors).
+ *
+ * A receiver without the internal slot is a type error unless it is the
+ * prototype itself, which answers undefined so that
+ * `RegExp.prototype.flags` stays the empty string.
+ */
+static OseoResult regexp_flag_accessor(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t flag
+) {
+    if (!is_object(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A RegExp flag accessor requires an object receiver."
+        );
+    }
+    if (!is_regexp(receiver)) {
+        return regexp_prototype_receiver(
+            context,
+            receiver,
+            "A RegExp flag accessor requires a RegExp object.",
+            false
+        );
+    }
+    uint16_t mask =
+        regexp_matcher_object(regexp_object(receiver)->matcher)->flag_mask;
+    return normal(oseo_boolean((mask & regexp_flag_bits[flag]) != 0u));
+}
+
+/*
+ * The `flags` accessor (22.2.6.5), which reads the eight individual
+ * accessors through ordinary property lookup rather than the internal
+ * slot, so an overridden accessor is observed.
+ */
+static OseoResult regexp_prototype_flags(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_object(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The RegExp flags accessor requires an object receiver."
+        );
+    }
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    uint16_t units[8];
+    size_t length = 0u;
+    OseoResult result = normal(oseo_undefined());
+    static const char *const names[] = {
+        "hasIndices",
+        "global",
+        "ignoreCase",
+        "multiline",
+        "dotAll",
+        "unicode",
+        "unicodeSets",
+        "sticky",
+    };
+    for (size_t index = 0u; index < 8u; index += 1u) {
+        result = regexp_get_named(
+            context,
+            frame.slots[0],
+            names[index],
+            &frame.slots[1]
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (oseo_to_boolean(frame.slots[1])) {
+            units[length] =
+                (uint16_t)(unsigned char)regexp_flag_letters[index];
+            length += 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_allocate_string(context, units, length);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * `toString` (22.2.6.17), which reads `source` and `flags` generically
+ * so that any object carrying them stringifies.
+ */
+static OseoResult regexp_prototype_to_string(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_object(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp.prototype.toString requires an object receiver."
+        );
+    }
+    OseoValue slots[3] = {receiver, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = regexp_get_named(
+        context,
+        frame.slots[0],
+        "source",
+        &frame.slots[1]
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_value_string(context, frame.slots[1]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_get_named(
+            context,
+            frame.slots[0],
+            "flags",
+            &frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_value_string(context, frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    const OseoString *pattern = string_object(frame.slots[1]);
+    const OseoString *flags = string_object(frame.slots[2]);
+    /*
+     * `source` and `flags` are arbitrary strings here, because this
+     * method is generic. Two individually valid ones can concatenate
+     * past the maximum string length, which is the same catchable
+     * `RangeError` ordinary concatenation reports, so the length is
+     * checked before a staging buffer that large is requested.
+     */
+    if (pattern->length > SIZE_MAX - flags->length - 2u) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp stringification is too large."
+        );
+    }
+    size_t length = pattern->length + flags->length + 2u;
+    result = oseo_internal_validate_string_length(context, length);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    uint16_t *units = oseo_internal_allocate_work_bytes(
+        context,
+        length * sizeof(uint16_t)
+    );
+    if (units == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp stringification allocation failed."
+        );
+    }
+    units[0] = '/';
+    memcpy(&units[1], pattern->units, pattern->length * sizeof(uint16_t));
+    units[pattern->length + 1u] = '/';
+    memcpy(
+        &units[pattern->length + 2u],
+        flags->units,
+        flags->length * sizeof(uint16_t)
+    );
+    result = oseo_internal_allocate_string(context, units, length);
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_regexp_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1618,12 +2555,49 @@ OseoResult oseo_internal_regexp_builtin_dispatch(
         );
     }
     if (code_id == OSEO_REGEXP_SPECIES_CODE_ID) return normal(receiver);
+    if (code_id == OSEO_REGEXP_EXEC_CODE_ID) {
+        return regexp_prototype_exec(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_REGEXP_TEST_CODE_ID) {
+        return regexp_prototype_test(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_REGEXP_TO_STRING_CODE_ID) {
+        return regexp_prototype_to_string(context, receiver);
+    }
+    if (code_id == OSEO_REGEXP_FLAGS_CODE_ID) {
+        return regexp_prototype_flags(context, receiver);
+    }
+    if (code_id == OSEO_REGEXP_SOURCE_CODE_ID) {
+        return regexp_prototype_source(context, receiver);
+    }
+    if (code_id >= OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_FIRST &&
+        code_id <= OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_LAST) {
+        return regexp_flag_accessor(
+            context,
+            receiver,
+            OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_LAST - code_id
+        );
+    }
     if (code_id >= OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID &&
-        code_id <= OSEO_REGEXP_DEFERRED_CODE_ID) {
+        code_id <= OSEO_REGEXP_MATCH_DEFERRED_CODE_ID) {
+        /* The reviewed String-dispatch boundary reports one message from
+         * both sides, so a case that reaches it through the RegExp
+         * prototype and one that reaches it through String.prototype
+         * name the same owned capability. */
         return failure(
             context,
             "OSEO2001",
-            "RegExp prototype execution is not admitted yet."
+            "RegExp String dispatch is not admitted yet."
         );
     }
     return oseo_unknown_function(context, code_id);
@@ -1771,20 +2745,25 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
             method
         );
     }
-    static const char *const deferred_methods[] = {
+    static const char *const prototype_methods[] = {
         "exec",
         "test",
         "toString",
     };
-    static const size_t deferred_lengths[] = {1u, 1u, 0u};
+    static const size_t prototype_method_lengths[] = {1u, 1u, 0u};
+    static const size_t prototype_method_codes[] = {
+        OSEO_REGEXP_EXEC_CODE_ID,
+        OSEO_REGEXP_TEST_CODE_ID,
+        OSEO_REGEXP_TO_STRING_CODE_ID,
+    };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < 3u;
          index += 1u) {
         result = create_regexp_builtin(
             context,
-            OSEO_REGEXP_DEFERRED_CODE_ID,
-            deferred_methods[index],
-            deferred_lengths[index],
+            prototype_method_codes[index],
+            prototype_methods[index],
+            prototype_method_lengths[index],
             OSEO_FUNCTION_INTERNAL,
             OSEO_FUNCTION_NAME_PREFIX_NONE
         );
@@ -1793,31 +2772,42 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
             result = define_regexp_property(
                 context,
                 frame.slots[0],
-                deferred_methods[index],
+                prototype_methods[index],
                 frame.slots[2],
                 method
             );
         }
     }
-    static const char *const deferred_accessors[] = {
-        "dotAll",
+    /*
+     * The ten accessors are defined in one pass. `flags` and `source`
+     * own their own code IDs, and the eight individual flag accessors
+     * share one contiguous range in the order `flags` prints them, so an
+     * accessor's code ID names the flag it reports.
+     */
+    static const char *const prototype_accessors[] = {
         "flags",
-        "global",
+        "source",
         "hasIndices",
+        "global",
         "ignoreCase",
         "multiline",
-        "source",
-        "sticky",
+        "dotAll",
         "unicode",
         "unicodeSets",
+        "sticky",
     };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < 10u;
          index += 1u) {
+        size_t code_id = index == 0u
+            ? OSEO_REGEXP_FLAGS_CODE_ID
+            : index == 1u
+              ? OSEO_REGEXP_SOURCE_CODE_ID
+              : OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_LAST - (index - 2u);
         result = create_regexp_builtin(
             context,
-            OSEO_REGEXP_DEFERRED_CODE_ID,
-            deferred_accessors[index],
+            code_id,
+            prototype_accessors[index],
             0u,
             OSEO_FUNCTION_INTERNAL,
             OSEO_FUNCTION_NAME_PREFIX_GET
@@ -1827,7 +2817,7 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
             result = define_regexp_accessor(
                 context,
                 frame.slots[0],
-                deferred_accessors[index],
+                prototype_accessors[index],
                 frame.slots[2]
             );
         }

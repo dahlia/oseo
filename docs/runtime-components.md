@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty reviewed assets in this order:
+The runtime input now lists thirty-one reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
@@ -28,13 +28,14 @@ The runtime input now lists thirty reviewed assets in this order:
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
 *runtime\_primitive.c*, *runtime\_promise.c*,
 *runtime\_event\_loop.c*, *runtime\_map.c*,
-*runtime\_bigint\_object.c*, *runtime\_data\_view.c*, and
-*runtime\_regexp.c*. The M5
+*runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
+*runtime\_regexp.c*, and *runtime\_regexp\_matcher.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
-map-intrinsic, BigInt-intrinsic, DataView, and RegExp-intrinsic units each
+map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic, and
+RegExp-prototype-and-exec units each
 added one
 component the same
 way. The M5b
@@ -56,7 +57,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_core.c*: results, context lifecycle, diagnostics, call
     limits, frames, root-stack operations, and immediate value
     constructors;
- -  *runtime\_memory.c*: GC-managed heap allocation, publication,
+ -  *runtime\_memory.c*: GC-managed heap allocation, the unmanaged
+    work-area allocator that shares its deterministic allocation-attempt
+    counter without collecting, publication,
     tracing, collection, and destruction; [*PLAN-GC.md*](../PLAN-GC.md)
     owns the planned policy, accounting, slot, descriptor, and collector
     evolution boundaries;
@@ -107,8 +110,19 @@ Ownership follows the plan's target layout:
     and `resize`, `slice`, `transfer`, and `transferToFixedLength`;
  -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
     `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
-    and flag validation, immutable matcher artifact, `Symbol.species`, and the
-    explicit prototype-execution boundary;
+    and flag validation, immutable matcher artifact, `Symbol.species`,
+    built-in execution and its match result object, `exec`, `test`,
+    `toString`, the `source` and `flags` accessors, the eight individual
+    flag accessors, and the explicit symbol-method boundary;
+ -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the
+    pattern compiler that lowers one validated pattern into an owned
+    instruction program over a register file and the executor that runs
+    that program with an explicit backtrack stack and undo trail; it owns
+    the runtime's choice order, capture visibility, assertion and
+    lookaround behavior, backreference resolution, quantifier priority,
+    empty-progress failure, UTF-16 and code-point traversal, ignore-case
+    closure, and the reviewed instruction, register, step, backtrack, and
+    trail boundaries;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -286,6 +300,11 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_regexp_builtin_dispatch`             | *runtime\_regexp.c*           |
 | `oseo_internal_regexp_intrinsic`                    | *runtime\_regexp.c*           |
 | `oseo_internal_install_regexp_global`               | *runtime\_regexp.c*           |
+| `oseo_internal_allocate_work_bytes`                 | *runtime\_memory.c*           |
+| `oseo_internal_reallocate_work_bytes`               | *runtime\_memory.c*           |
+| `oseo_internal_regexp_program_build`                | *runtime\_regexp\_matcher.c*  |
+| `oseo_internal_regexp_program_release`              | *runtime\_regexp\_matcher.c*  |
+| `oseo_internal_regexp_program_search`               | *runtime\_regexp\_matcher.c*  |
 | `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
 | `oseo_internal_append_own_property`                 | *runtime\_descriptor.c*       |
 | `oseo_internal_own_property_index`                  | *runtime\_object.c*           |

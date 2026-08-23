@@ -120,4 +120,47 @@ results:
       passed: false
     unsupportedFeatures:
       - regexp-modifiers
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/source/value-line-terminator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/RegExp/prototype/source/value-line-terminator.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/source/value-line-term\
+        inator.js:97:10: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-v-flag
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/RegExp/prototype/unicodeSets/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -88,9 +88,8 @@ results:
       detail: 'test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-4-and-instance-is-string-hello.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-4-and-instance-is-string-hello.js:92:15:
-        error[OSEO2001]: RegExp prototype execution is not admitted
-        yet.\n"'
-      unsupportedCapability: regexp-prototype-execution
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

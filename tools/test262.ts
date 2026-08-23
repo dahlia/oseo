@@ -559,7 +559,9 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   }
   if (
     diagnostic ===
-    "Regular expression pattern exceeds the reviewed matcher limit."
+      "Regular expression pattern exceeds the reviewed matcher limit." ||
+    diagnostic ===
+      "Regular expression matching exceeds the reviewed matcher limit."
   ) {
     return "regexp-matcher-limit";
   }

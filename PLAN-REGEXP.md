@@ -5,13 +5,15 @@ Status
 ------
 
 Implementation status: delivery items 1 through 3, the Unicode property
-escape checkpoint, and the RegExp intrinsic checkpoint landed. Literal and
-probe work has not started. This plan defines the M5 semantic and compilation
-boundary for ECMAScript regular expressions. The active language profile
-admits the callable and constructible `RegExp` intrinsic, initialization, and
-`lastIndex` state. It does not admit regular expression literals, pattern
-execution, or the prototype and String dispatch surfaces owned by later
-delivery items.
+escape checkpoint, the RegExp intrinsic checkpoint, and the prototype and
+built-in execution checkpoint landed. Literal and probe work has not started.
+This plan defines the M5 semantic and compilation boundary for ECMAScript
+regular expressions. The active language profile admits the callable and
+constructible `RegExp` intrinsic, initialization, `lastIndex` state,
+built-in execution with its match result object, and the `exec`, `test`,
+`toString`, `source`, `flags`, and individual flag members of
+`RegExp.prototype`. It does not admit regular expression literals or the
+well-known symbol and String dispatch surfaces owned by later delivery items.
 
 The owned pattern AST, parser, validator, limits, extension points, and
 structural dump live in `@oseo/compiler`, and the frontend validates a
@@ -22,8 +24,10 @@ same package and are the semantic authority for the admitted grammar.
 The frontend resolves Unicode property escapes through the Unicode 17.0.0
 tables pinned by `@oseo/unicode`, and the matcher consumes those same sets.
 Dynamic construction validates that grammar and retains an immutable runtime
-matcher descriptor. The executor does not reach a compiled program yet, and a
-valid literal still reports the profile boundary.
+matcher descriptor. The runtime now compiles that descriptor into an owned
+instruction program in *runtime\_regexp\_matcher.c* and executes it, so the
+same choice, capture, Unicode, and resource behavior exists on both sides of
+the boundary. A valid literal still reports the profile boundary.
 
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
@@ -474,9 +478,11 @@ one reports a distinct `limit` outcome naming the boundary reached, over
 instruction steps, backtrack entries, and trail entries. Each boundary is
 deterministic, so the same artifact, input, and limits produce the same
 answer on every host and target, and lowering a limit can only replace an
-answer with that failure rather than with a different match. None of these
-is observable yet: the unit that adds the `RegExp` intrinsic decides what
-a reached boundary means to a program.
+answer with that failure rather than with a different match.
+
+The runtime applies the same boundaries to the program it compiles from a
+dynamic pattern, and a reached boundary is one source-located `OSEO2001`
+diagnostic rather than an observable language value.
 
 
 Optimization contract
@@ -656,7 +662,18 @@ Delivery order
 6.  Add built-in execution and result construction, prototype methods and
     accessors, `RegExp.escape`, the regular expression string iterator,
     well-known symbol methods, and String method dispatch. Trace matcher work
-    areas and results.
+    areas and results. Built-in execution, the match result object, `exec`,
+    `test`, `toString`, and the `source`, `flags`, and individual flag
+    accessors landed with seeds `0x60005000` through `0x60005002`, runtime
+    ABI `oseo-runtime-m5-77`, and the *runtime\_regexp\_matcher.c*
+    component; the artifact's program is unmanaged memory the collector
+    releases with the artifact, and execution allocates nothing managed and
+    reaches no safepoint. Simple case folding maps nothing outside ASCII
+    into ASCII except U+017F and U+212A, so the runtime resolves an ASCII
+    closure exactly and keeps an `OSEO2001` boundary for a set that meets a
+    non-ASCII class and for an ignore-case backreference in a pattern whose
+    sets can reach one. `RegExp.escape`, the string iterator, the symbol
+    methods, and String dispatch remain.
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.

@@ -81,7 +81,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
     execution:
@@ -91,14 +91,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/S15.10.4.1_A9_T3.js non-strict disabled
-        failed (1): stdout=""
-        stderr="test/built-ins/RegExp/S15.10.4.1_A9_T3.js:88:28:
-        error[OSEO2001]: RegExp prototype execution is not admitted
-        yet.\n"'
-      unsupportedCapability: regexp-prototype-execution
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -170,4 +170,25 @@ results:
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-v-flag
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/RegExp/prototype/unicodeSets/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - regexp-v-flag
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

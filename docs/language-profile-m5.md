@@ -4087,6 +4087,95 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI to
 range without adding a generated-code entry point or changing the graph's
 orchestration state.
 
+M5b node `regexp-prototype-and-exec` admits built-in regular expression
+execution and the prototype surface that reads it. `RegExp.prototype.exec`
+reads `lastIndex` through ordinary property semantics, converts it with
+`ToLength`, ignores it unless the pattern is global or sticky, and writes the
+end of the match, or zero on failure, back through an ordinary `Set` that a
+read-only slot rejects. A sticky pattern attempts one position; every other
+pattern advances one character at a time, which is one code point under `u`
+or `v`.
+
+A successful execution returns an ordinary Array holding the matched
+substring, each capture or `undefined`, `index`, `input`, a null-prototype
+`groups` object when the pattern declares a group name, and, under `d`, the
+`MakeMatchIndicesIndexPairArray` result with its own `groups` object.
+`test` dispatches through `RegExpExec`, so an overridden `exec` is called and
+a non-object, non-null result is a `TypeError`. `toString` reads `source` and
+`flags` generically. The `source` accessor returns `EscapeRegExpPattern`, so
+an empty pattern is `(?:)`, an unescaped solidus outside a class is escaped,
+and a line terminator becomes its escape sequence, reusing a backslash that
+already precedes it. The `flags` accessor
+composes the eight individual accessors through ordinary property lookup in
+the order `d`, `g`, `i`, `m`, `s`, `u`, `v`, `y`, and each individual accessor
+answers from the artifact, returns `undefined` for `%RegExp.prototype%`
+itself, and is a `TypeError` for any other receiver without the slot.
+
+The new *runtime\_regexp\_matcher.c* component compiles one validated
+pattern into an owned instruction program over a register file and executes
+it with an explicit backtrack stack and undo trail, so backtracking depth is
+data rather than native recursion. It reproduces the choice order, capture
+visibility, assertion and lookaround behavior, backreference resolution,
+quantifier priority, empty-progress failure, UTF-16 and code-point traversal,
+and canonicalization the `@oseo/compiler` matcher already owns, which is what
+makes the generic artifact one semantic authority across both. Execution
+allocates no managed memory, calls no user code, and reaches no safepoint,
+and the collector releases the program with the artifact that owns it.
+
+Ignore-case closure folds every equivalence decision into a set while the
+program is built. Simple case folding and the code-unit uppercase rule map
+nothing outside ASCII into ASCII except U+017F and U+212A, so every remaining
+class lies entirely inside or entirely outside ASCII; the runtime therefore
+resolves an ASCII closure exactly and keeps a source-located `OSEO2001`
+boundary for a set that meets a non-ASCII class it has no folding data for,
+and for a backreference under `i` in a pattern whose sets can match such a
+code point. Reaching a reviewed instruction, register, step, backtrack-entry,
+or trail-entry limit keeps the same boundary. Regular expression literals,
+well-known symbol methods, `String.prototype` dispatch, `RegExp.escape`, and
+the regular expression string iterator remain outside this node.
+
+Fixed and generated differential evidence covers both reference hosts, both
+specialization policies, forced collection at every safepoint, deliberate
+guard misses, and false hints. The generated family uses seeds `0x60005000`
+through `0x60005002` in the reserved block through `0x600050ff`; its
+execution domain keeps a structured pattern model until it prints source and
+takes its expected observation from the compiler-side matcher rather than
+from the hosts, so a disagreement is visible from three sides at once. The
+allocation-attempt sweep gains the program-construction,
+successful-execution, match-indices, and stringification paths. The matcher
+program and the executor work area are unmanaged memory, so the runtime gains
+one work-area allocator that shares the managed allocator's deterministic
+attempt counter without collecting, which is what lets the sweep fail every
+allocation those paths take. The runtime ABI moves to
+`oseo-runtime-m5-77`. The RegExp built-in code range replaces its one shared
+deferred-method ID with thirteen dedicated IDs, so the range holds nineteen
+of its two hundred fifty-six, and no generated-code entry point changes.
+
+The one deliberate divergence from both reference hosts is how a failed
+attempt advances under `u`. The edition advances by one code point, so an
+attempt that fails at a surrogate pair resumes after it, while V8 resumes
+between the pair's two code units: `/\B/u` on `"A\u{10428}"` is index 3 for
+the edition and 2 for V8, and `/(?!^)/u` on `"\u{10428}"` is 2 and 1. The
+compiler-side matcher and this runtime both produce the edition's answer, and
+*test/built-ins/RegExp/prototype/exec/u-lastindex-adv.js* backs that reading.
+Only a zero-width term can succeed at the resumed position, because V8 still
+reads a whole code point when it consumes there, so the generated execution
+domain emits no assertion or lookaround term under `u` and keeps the complete
+assertion and lookaround vocabulary everywhere else.
+
+All 271 paths in the node's reviewed RegExp prototype roots are included:
+116 pass and 155 retain explicit downstream boundaries, most of them regular
+expression literals a later node owns. The reviewed feature list gains
+`regexp-dotall` and `regexp-match-indices`, the two features this node
+implements. Forty-two already-reviewed paths outside those roots also move
+from unsupported to pass: thirty-six `RegExp` construction cases and five
+`String.prototype.match` cases that observe a pattern executing, and one
+`typeof` case that reads an `exec` result. The complete manifest moves from
+13,108 to 13,379 paths, from 9,098 to 9,256 passes, keeps 1,506 expected
+negatives, and moves from 2,504 to 2,617 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema, and zero-override policy are
+unchanged.
 
 Known gaps inside the claim
 ---------------------------

@@ -42,11 +42,11 @@ scope:
     and retries in the same context. No failed path publishes a partial
     intrinsic, wrapper, matcher, or language error."
   - "The `exec`, `test`, and `toString` properties are present with their
-    specified built-in metadata but retain an explicit execution boundary.
-    Pattern execution, result construction, prototype accessors, symbol
-    methods, String replacement integration, literal lowering, Unicode
-    property escapes, and pattern extensions remain owned by later RegExp
-    nodes."
+    specified built-in metadata. Pattern execution, result construction,
+    and the prototype accessors are owned by the `regexp-prototype-and-exec`
+    node; symbol methods, String replacement integration, literal lowering,
+    Unicode property escapes, and pattern extensions remain owned by later
+    RegExp nodes."
 owners:
   - PLAN-M5.md
   - PLAN-REGEXP.md
