@@ -704,6 +704,33 @@ policies, every species fallback, false hints, deliberate guard hits and
 misses, and collection at every safepoint. The node adds no generated-code
 entry point and moves `abiVersion` to `m5-69`.
 
+M5b node `array-prototype-sort` also remains in *runtime\_array.c* because
+sorting reuses the same ordinary property access, collector roots, and
+array-like length reading the copying methods already own. The component adds
+`sort` and `toSorted` to the materialized `%Array.prototype%` and retires the
+`sort` entry from the unadmitted boundary table.
+
+Both methods reject a non-callable comparator before converting the receiver.
+SortIndexedProperties then reads every index into one collected list, skipping
+holes for `sort` and reading through them for `toSorted`, before the first
+comparison runs. The collected list roots its own storage and grows in place,
+because the element count is unknown until the read loop ends; every slot the
+list declares to the collector stays initialized. One bottom-up merge sort over
+that list and one equally rooted scratch buffer supplies the required
+stability and stops at the first abrupt comparison. `sort` then writes the
+sorted elements back with Set and deletes the trailing indices with
+DeletePropertyOrThrow, while `toSorted` fills the plain Array it allocated
+before reading, which is why neither method reads `constructor` or
+`Symbol.species`.
+
+Fixed and generated native differential evidence covers sparse, generic, and
+frozen receivers, undefined and hole ordering, comparator coercion and abrupt
+completion, stability, mutation observed through accessors during collection
+and write-back, both specialization policies, false hints, deliberate guard
+hits and misses, and collection at every safepoint. The node adds no
+generated-code entry point, allocates its two code IDs inside the existing
+Array range, and moves `abiVersion` to `m5-76`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

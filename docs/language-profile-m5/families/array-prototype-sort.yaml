@@ -1,0 +1,67 @@
+version: 1
+id: array-prototype-sort
+title: "Array prototype sorting"
+scope:
+  - "Array.prototype sort and toSorted, including comparator validation
+    before receiver conversion, SortIndexedProperties over sparse and
+    generic receivers, hole and undefined ordering, comparator result
+    coercion, stability, abrupt completion order, mutation observability,
+    write-back and trailing deletion, and the plain-Array copy toSorted
+    allocates without consulting Symbol.species."
+  - "Reviewed standards coverage is 74 of the 75 upstream paths under
+    test/built-ins/Array/prototype/sort/ and
+    test/built-ins/Array/prototype/toSorted/. The omitted path,
+    test/built-ins/Array/prototype/sort/stability-2048-elements.js, builds a
+    2,048-element array literal that exceeds the documented 32,768 root-slot
+    native frame budget before any sorting runs, so it observes a resource
+    boundary rather than a sorting contract. Its stability contract is
+    covered instead by the eleven-element duplicated-key orderings in
+    tests/native/fixtures/array-prototype-sort.ts and by the generated
+    orderings across both merge shapes in
+    tests/property/m5-array-prototype-sort.property.test.ts."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-sort.ts
+      - tests/property/m5-array-prototype-sort.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-sort.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-sort.ts
+      - tests/property/m5-array-prototype-sort.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-sort.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-sort.ts
+      - tests/property/m5-array-prototype-sort.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-sort.ts
+      - tests/property/m5-array-prototype-sort.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

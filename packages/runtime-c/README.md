@@ -623,6 +623,23 @@ extensions and resource limits retain `OSEO2001`. Prototype execution, result
 construction, accessors, symbol methods, and String integration remain later
 RegExp nodes. The generated-code ABI gains no entry point.
 
+The `m5-76` ABI adds ordinary `sort` and `toSorted` functions to
+`%Array.prototype%` and removes `sort` from the unadmitted boundary table.
+Both reject a non-callable comparator before converting the receiver, then
+read every index into one collected list before the first comparison: `sort`
+skips holes so that they collapse behind the sorted elements, and `toSorted`
+reads through them so that a hole becomes an undefined element of the copy. An
+undefined element orders after every defined one without reaching the
+comparator, a supplied comparator decides every other pair through `ToNumber`
+with `NaN` read as `+0`, and the default comparator compares the `ToString`
+results in code-unit order. The collected list and its merge scratch buffer
+are rooted for the whole sort, so the required stability and the first abrupt
+comparison both survive collection. `sort` writes the sorted elements back and
+deletes the trailing indices, while `toSorted` fills a plain Array allocated
+before any element is read and therefore never observes `constructor` or
+`Symbol.species`. Both code IDs come from the existing Array range, and the
+generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
