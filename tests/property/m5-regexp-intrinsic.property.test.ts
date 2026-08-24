@@ -112,10 +112,14 @@ const validCase = fc.boolean().chain((explicitFlags) =>
       explicitFlags: fc.constant(explicitFlags),
       flags: fc.constant(flags),
       lastIndex: fc.integer({ max: 10_000, min: -10_000 }),
+      // A non-ASCII class under `i` needs case-folding data the runtime
+      // does not link, which the RegExp execution node owns as a located
+      // boundary, so the unicode-mode extras stay out of ignore-case
+      // cases.
       pattern:
         explicitFlags && flags.includes("v")
           ? classFreePattern
-          : explicitFlags && flags.includes("u")
+          : explicitFlags && flags.includes("u") && !flags.includes("i")
             ? unicodeValidPattern
             : validPattern,
     }),

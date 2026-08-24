@@ -50,6 +50,8 @@ import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
+const { regexpPrototypeAndExecFixtures } =
+  await import("./native/fixtures/regexp-prototype-and-exec.ts");
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
 const { arrayPrototypeIterativeFixtures } =
@@ -127,6 +129,7 @@ const fixtures: readonly Fixture[] = [
   ...expressionFixtures,
   ...receiverFixtures,
   ...regexpIntrinsicFixtures,
+  ...regexpPrototypeAndExecFixtures,
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
@@ -229,14 +232,6 @@ for (const deferredRegExp of [
   {
     name: "deferred-regexp-nonascii-class-identity.ts",
     source: 'new RegExp("[\\\\é]");',
-  },
-  {
-    name: "deferred-regexp-exec.ts",
-    source: 'new RegExp("a").exec("a");',
-  },
-  {
-    name: "deferred-regexp-source.ts",
-    source: 'new RegExp("a").source;',
   },
   {
     name: "deferred-regexp-symbol-search.ts",
@@ -635,6 +630,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
+    fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -842,6 +838,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
+    fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -913,6 +910,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
             fixture.name === "regexp-intrinsic" ||
+            fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

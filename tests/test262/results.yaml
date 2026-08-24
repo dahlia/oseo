@@ -6036,6 +6036,9 @@ partitions:
     key: "63"
     path: results/built-ins/RegExp/63.yaml
   - group: built-ins/RegExp
+    key: "64"
+    path: results/built-ins/RegExp/64.yaml
+  - group: built-ins/RegExp
     key: "65"
     path: results/built-ins/RegExp/65.yaml
   - group: built-ins/RegExp
@@ -6141,6 +6144,9 @@ partitions:
     key: "87"
     path: results/built-ins/RegExp/87.yaml
   - group: built-ins/RegExp
+    key: "88"
+    path: results/built-ins/RegExp/88.yaml
+  - group: built-ins/RegExp
     key: "89"
     path: results/built-ins/RegExp/89.yaml
   - group: built-ins/RegExp
@@ -6221,6 +6227,9 @@ partitions:
   - group: built-ins/RegExp
     key: a3
     path: results/built-ins/RegExp/a3.yaml
+  - group: built-ins/RegExp
+    key: a4
+    path: results/built-ins/RegExp/a4.yaml
   - group: built-ins/RegExp
     key: a5
     path: results/built-ins/RegExp/a5.yaml
@@ -10273,9 +10282,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 9153
+  passes: 9311
   semanticFailures: 0
-  unsupportedProfileFeatures: 2523
+  unsupportedProfileFeatures: 2636
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -10365,16 +10374,16 @@ summary:
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 269
+      passes: 270
       semanticFailures: 0
-      unsupportedProfileFeatures: 38
+      unsupportedProfileFeatures: 37
     - dependency: functions
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2104
+      passes: 2167
       semanticFailures: 0
-      unsupportedProfileFeatures: 1051
+      unsupportedProfileFeatures: 1099
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -10414,9 +10423,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5789
+      passes: 5888
       semanticFailures: 0
-      unsupportedProfileFeatures: 1220
+      unsupportedProfileFeatures: 1281
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -10442,9 +10451,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 328
+      passes: 333
       semanticFailures: 0
-      unsupportedProfileFeatures: 147
+      unsupportedProfileFeatures: 142
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -10618,16 +10627,16 @@ summary:
       expectedNegatives: 142
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 111
+      passes: 263
       semanticFailures: 0
-      unsupportedProfileFeatures: 864
+      unsupportedProfileFeatures: 983
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 581
+      passes: 586
       semanticFailures: 0
-      unsupportedProfileFeatures: 161
+      unsupportedProfileFeatures: 156
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0
@@ -10688,9 +10697,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1442
+      passes: 1443
       semanticFailures: 0
-      unsupportedProfileFeatures: 149
+      unsupportedProfileFeatures: 148
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0

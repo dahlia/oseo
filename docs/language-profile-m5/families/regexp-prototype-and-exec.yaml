@@ -1,0 +1,117 @@
+version: 1
+id: regexp-prototype-and-exec
+title: "RegExp.prototype and built-in execution"
+scope:
+  - "`RegExp.prototype.exec` performs built-in execution. It reads
+    `lastIndex` through ordinary property semantics, converts it with
+    `ToLength`, ignores it for a pattern that is neither global nor sticky,
+    and writes the end of the match, or zero on failure, back through an
+    ordinary `Set` that a read-only slot rejects. A sticky pattern attempts
+    only one position; every other pattern advances by one character, which
+    is one code point under `u` or `v` and one code unit otherwise."
+  - "A successful execution returns an ordinary Array whose element zero is
+    the matched substring and whose element `index` is capturing group
+    `index` or `undefined`. `index` and `input` are own data properties,
+    `groups` is a null-prototype object when the pattern declares a group
+    name and `undefined` otherwise, and `indices` is the
+    `MakeMatchIndicesIndexPairArray` result under `d`, including its own
+    `groups` object. Every property uses `CreateDataPropertyOrThrow`
+    attributes."
+  - "`RegExp.prototype.test` converts its argument and then dispatches
+    through `RegExpExec`, so an own or inherited callable `exec` is called
+    with the receiver and its non-object, non-null result is a `TypeError`.
+    `RegExp.prototype.toString` reads `source` and `flags` generically and
+    concatenates them, so any object carrying those properties
+    stringifies."
+  - "The `source` accessor returns `EscapeRegExpPattern` of the original
+    source: an empty pattern becomes `(?:)`, an unescaped solidus outside a
+    character class is escaped, and every LineTerminator becomes its escape
+    sequence, reusing a backslash that already precedes it rather than
+    adding a second one. The `flags` accessor reads the eight individual
+    accessors through ordinary property lookup in the order `d`, `g`, `i`,
+    `m`, `s`, `u`, `v`, `y`. Each individual accessor answers from the
+    artifact's decoded flag set, returns `undefined` for
+    `%RegExp.prototype%` itself, and throws a `TypeError` for any other
+    receiver without the internal slot."
+  - "The matcher artifact owns an immutable instruction program built from
+    the validated pattern. The program is a flat instruction array over a
+    register file with capture registers, repetition counters and
+    positions, and lookaround frames, and it reproduces the choice order,
+    capture visibility, assertion and lookaround behavior, backreference
+    resolution, quantifier priority, empty-progress failure, UTF-16 and
+    code-point traversal, and canonicalization that `@oseo/compiler` owns.
+    Execution uses an explicit backtrack stack and undo trail rather than
+    native recursion, allocates no managed memory, calls no user code, and
+    reaches no safepoint."
+  - "Building or executing a program reports a source-located `OSEO2001`
+    boundary when it reaches a reviewed instruction, register, step,
+    backtrack-entry, or trail-entry limit. An ignore-case pattern whose
+    closure would need case-folding data the runtime does not link keeps
+    the same boundary: that is a set holding a non-ASCII code point whose
+    equivalence class is unknown, or a backreference under `i` in a pattern
+    whose sets can match such a code point. Every other ignore-case
+    decision is folded into a set while the program is built."
+  - "The collector owns the program through the artifact that holds it, so
+    a collected artifact releases it exactly once. The matcher program and
+    the executor work area are unmanaged memory their owner releases, and
+    both take it through the same deterministic allocation-attempt counter
+    the managed allocator uses, so one sweep fails every allocation in
+    program construction, successful execution, result construction, match
+    indices, and stringification once, collects, and retries in the same
+    context. A reached failure releases what it had already taken and
+    returns the owned `OSEO2001` boundary."
+  - "Well-known symbol methods, `String.prototype` dispatch,
+    `RegExp.escape`, the regular expression string iterator, and
+    ahead-of-time literal lowering remain owned by later RegExp nodes."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/property/m5-regexp-prototype-and-exec.property.test.ts
+      - tests/regexp-matcher-data.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-prototype-and-exec.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/fixtures/runtime-heap.c
+      - tests/native.ts
+      - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/property/m5-regexp-prototype-and-exec.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-prototype-and-exec.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/property/m5-regexp-prototype-and-exec.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/property/m5-regexp-prototype-and-exec.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_regexp.c
+      - packages/runtime-c/native/runtime_regexp_matcher.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/symbols.test.ts

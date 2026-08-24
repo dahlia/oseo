@@ -226,6 +226,12 @@ static void destroy_heap_object(OseoHeapObject *object) {
         }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);
+    } else if (object->kind == OSEO_HEAP_REGEXP_MATCHER) {
+        /* The compiled program is unmanaged memory this artifact alone
+         * owns, so its lifetime ends with the artifact. */
+        oseo_internal_regexp_program_release(
+            ((OseoRegExpMatcher *)object)->program
+        );
     }
     free(object);
 }
@@ -288,6 +294,28 @@ void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size) {
         return NULL;
     }
     return malloc(size);
+}
+
+void *oseo_internal_allocate_work_bytes(OseoContext *context, size_t size) {
+    context->allocation_attempts += 1u;
+    if (context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at) {
+        return NULL;
+    }
+    return malloc(size);
+}
+
+void *oseo_internal_reallocate_work_bytes(
+    OseoContext *context,
+    void *block,
+    size_t size
+) {
+    context->allocation_attempts += 1u;
+    if (context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at) {
+        return NULL;
+    }
+    return realloc(block, size);
 }
 
 OseoResult oseo_internal_publish_heap(

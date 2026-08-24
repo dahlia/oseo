@@ -1589,8 +1589,17 @@ typedef enum {
     REGEXP_ALLOCATION_INSTANCE,
     REGEXP_ALLOCATION_NAMED_CAPTURE,
     REGEXP_ALLOCATION_SYNTAX_ERROR,
+    REGEXP_ALLOCATION_EXEC,
+    REGEXP_ALLOCATION_EXEC_INDICES,
+    REGEXP_ALLOCATION_TO_STRING,
     REGEXP_ALLOCATION_OPERATION_COUNT,
 } RegExpAllocationOperation;
+
+static bool regexp_allocation_uses_method(RegExpAllocationOperation op) {
+    return op == REGEXP_ALLOCATION_EXEC ||
+        op == REGEXP_ALLOCATION_EXEC_INDICES ||
+        op == REGEXP_ALLOCATION_TO_STRING;
+}
 
 static void prepare_regexp_allocation_operation(
     OseoContext *context,
@@ -1603,7 +1612,10 @@ static void prepare_regexp_allocation_operation(
     if (operation == REGEXP_ALLOCATION_INSTANCE) {
         roots[1] = oseo_number(12345.0);
     } else if (operation == REGEXP_ALLOCATION_NAMED_CAPTURE) {
-        roots[1] = make_text(context, "(?<name>a)\\k<name>");
+        roots[1] = make_text(
+            context,
+            "(?:(?<name>a)|(?<name>b))\\k<name>"
+        );
     } else {
         roots[1] = make_text(context, "[");
     }
@@ -1613,6 +1625,31 @@ static void prepare_regexp_allocation_operation(
             oseo_error_intrinsic(context, OSEO_ERROR_SYNTAX)
         );
     }
+    if (!regexp_allocation_uses_method(operation)) return;
+    /*
+     * Execution and stringification need a constructed instance and the
+     * method they call, so both are prepared before the sweep starts
+     * failing allocations: only the operation itself is under test.
+     */
+    roots[3] = make_text(context, "(?<pair>a+)(b*)");
+    roots[4] = make_text(
+        context,
+        operation == REGEXP_ALLOCATION_EXEC_INDICES ? "d" : ""
+    );
+    roots[5] = require_normal(
+        oseo_call_function(context, roots[0], oseo_undefined(), 2u,
+                           &roots[3], roots[0])
+    );
+    roots[3] = oseo_undefined();
+    roots[4] = oseo_undefined();
+    roots[6] = make_text(
+        context,
+        operation == REGEXP_ALLOCATION_TO_STRING ? "toString" : "exec"
+    );
+    roots[6] = require_normal(
+        oseo_object_get(context, roots[5], roots[6])
+    );
+    roots[1] = make_text(context, "xaabby");
 }
 
 static OseoResult run_regexp_allocation_operation(
@@ -1622,6 +1659,16 @@ static OseoResult run_regexp_allocation_operation(
 ) {
     if (operation == REGEXP_ALLOCATION_CLUSTER) {
         return oseo_intrinsic(context, OSEO_INTRINSIC_REGEXP);
+    }
+    if (regexp_allocation_uses_method(operation)) {
+        return oseo_call_function(
+            context,
+            roots[6],
+            roots[5],
+            operation == REGEXP_ALLOCATION_TO_STRING ? 0u : 1u,
+            &roots[1],
+            oseo_undefined()
+        );
     }
     return oseo_call_function(
         context,
@@ -1645,7 +1692,8 @@ static size_t regexp_allocation_attempt_count(
     RegExpAllocationOperation operation
 ) {
     OseoContext context;
-    OseoValue roots[6] = {
+    OseoValue roots[7] = {
+        oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
@@ -1653,7 +1701,7 @@ static size_t regexp_allocation_attempt_count(
         oseo_undefined(),
         oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, roots, 6u};
+    OseoRootFrame frame = {NULL, roots, 7u};
     oseo_context_init(&context, "runtime-heap.c", 14u);
     oseo_roots_push(&context, &frame);
     prepare_regexp_allocation_operation(&context, roots, operation);
@@ -1671,7 +1719,12 @@ static size_t regexp_allocation_attempt_count(
         roots[3] = require_normal(result);
     }
     size_t attempts = context.allocation_attempts;
-    assert(attempts > 0u && attempts <= 256u);
+    /*
+     * The RegExp operations reach further than the other sweeps: the
+     * matcher compiles a program and the executor grows a work area, and
+     * both are unmanaged allocations the same counter now covers.
+     */
+    assert(attempts > 0u && attempts <= 2048u);
     oseo_collect(&context);
     oseo_roots_pop(&context, &frame);
     oseo_context_destroy(&context);
@@ -1707,6 +1760,30 @@ static void validate_regexp_allocation_retry(
         );
         return;
     }
+    if (regexp_allocation_uses_method(operation)) {
+        assert(result.status == OSEO_STATUS_NORMAL);
+        roots[3] = result.value;
+        if (operation == REGEXP_ALLOCATION_TO_STRING) {
+            assert(!oseo_value_is_object(roots[3]));
+            return;
+        }
+        assert(oseo_value_is_object(roots[3]));
+        roots[4] = make_text(context, "index");
+        assert(
+            require_normal(oseo_object_get(context, roots[3], roots[4])) ==
+            oseo_number(1.0)
+        );
+        roots[4] = make_text(
+            context,
+            operation == REGEXP_ALLOCATION_EXEC_INDICES ? "indices" : "groups"
+        );
+        assert(
+            oseo_value_is_object(
+                require_normal(oseo_object_get(context, roots[3], roots[4]))
+            )
+        );
+        return;
+    }
     assert(result.status == OSEO_STATUS_NORMAL);
     roots[3] = result.value;
     roots[4] = make_text(context, "lastIndex");
@@ -1717,10 +1794,11 @@ static void validate_regexp_allocation_retry(
 }
 
 /*
- * Every allocation in the RegExp cluster, successful constructor, and
- * catchable SyntaxError path fails once. Collection follows each failure,
- * and the same context then retries without publishing a partial intrinsic,
- * instance, matcher artifact, or language error.
+ * Every allocation in the RegExp cluster, successful constructor,
+ * catchable SyntaxError, built-in execution, match-indices, and
+ * stringification paths fails once. Collection follows each failure, and
+ * the same context then retries without publishing a partial intrinsic,
+ * instance, matcher artifact, result object, or language error.
  */
 static void test_regexp_allocation_sweep(void) {
     for (RegExpAllocationOperation operation = REGEXP_ALLOCATION_CLUSTER;
@@ -1729,7 +1807,8 @@ static void test_regexp_allocation_sweep(void) {
         size_t attempts = regexp_allocation_attempt_count(operation);
         for (size_t attempt = 1u; attempt <= attempts; attempt += 1u) {
             OseoContext context;
-            OseoValue roots[6] = {
+            OseoValue roots[7] = {
+                oseo_undefined(),
                 oseo_undefined(),
                 oseo_undefined(),
                 oseo_undefined(),
@@ -1737,7 +1816,7 @@ static void test_regexp_allocation_sweep(void) {
                 oseo_undefined(),
                 oseo_undefined(),
             };
-            OseoRootFrame frame = {NULL, roots, 6u};
+            OseoRootFrame frame = {NULL, roots, 7u};
             oseo_context_init(&context, "runtime-heap.c", 14u);
             oseo_roots_push(&context, &frame);
             prepare_regexp_allocation_operation(&context, roots, operation);
@@ -1902,11 +1981,34 @@ static void test_regexp_duplicate_name_scale(void) {
         offset += group_length;
     }
     assert(offset == pattern_length);
-    assert_regexp_diagnostic(
-        pattern,
-        pattern_length,
-        "Regular expression pattern extension is not admitted yet."
+    OseoContext context;
+    OseoValue roots[3] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 3u};
+    oseo_context_init(&context, "runtime-heap.c", 16u);
+    oseo_roots_push(&context, &frame);
+    roots[0] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_REGEXP)
     );
+    roots[1] = require_normal(
+        oseo_string_from_units(&context, pattern, pattern_length)
+    );
+    roots[2] = require_normal(
+        oseo_call_function(
+            &context,
+            roots[0],
+            oseo_undefined(),
+            1u,
+            &roots[1],
+            roots[0]
+        )
+    );
+    oseo_collect(&context);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
     free(pattern);
 }
 

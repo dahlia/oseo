@@ -640,6 +640,22 @@ before any element is read and therefore never observes `constructor` or
 `Symbol.species`. Both code IDs come from the existing Array range, and the
 generated-code ABI gains no entry point.
 
+The `m5-77` ABI adds the *runtime\_regexp\_matcher.c* component and admits
+built-in regular expression execution. The new component compiles one
+validated pattern into an owned instruction program over a register file and
+executes it with an explicit backtrack stack and undo trail, so backtracking
+depth is data rather than native recursion and every owned boundary is
+deterministic. `RegExp.prototype.exec` performs the specified `lastIndex`
+conversion, position loop, and update and builds the match result with
+`index`, `input`, `groups`, and optional `indices`; `test` dispatches through
+an overridden `exec`; `toString` reads `source` and `flags` generically; and
+the `source`, `flags`, and eight individual flag accessors answer from the
+artifact. The matcher artifact gains an owned program pointer the collector
+releases with the artifact, and the RegExp built-in code range replaces its
+one shared deferred-method ID with thirteen dedicated IDs, so nineteen of its
+two hundred fifty-six IDs are occupied. The generated-code ABI gains no entry
+point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
