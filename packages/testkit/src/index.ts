@@ -84,8 +84,8 @@ export type Test262ExecutionMode = "module" | "script";
 export type Test262FailurePhase = "parse" | "resolution" | "runtime";
 
 /**
- * Reviewed semantic dependency tags frozen by ADR 0013. Any other value is
- * a validation error until a reviewed change to that record admits it.
+ * Reviewed semantic dependency tags admitted by ADR 0013. Any other value
+ * is a validation error until a reviewed change to that record admits it.
  */
 export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "abrupt-completion",
@@ -110,6 +110,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "object-properties",
   "promise-settlement",
   "property-enumeration",
+  "regular-expressions",
   "rest-parameters",
   "symbols",
   "timers",

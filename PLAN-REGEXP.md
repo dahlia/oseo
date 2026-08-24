@@ -606,11 +606,12 @@ expected control flow, and every guarded optimization retains its generic edge.
 The reviewed test262 corpus grows by semantic dependency. It begins with
 literal early errors and object identity, then initialization and built-in
 execution, prototype methods, symbols and string integration, Unicode behavior,
-and the complete candidate-edition directories. ADR 0013 freezes the current
-dependency vocabulary, so the Unicode property checkpoint selects its 625
-paths through existing dependency tags and does not amend that vocabulary.
-Unsupported results move only after every requested strictness and
-specialization variant executes.
+and the complete candidate-edition directories. ADR 0013's dependency
+vocabulary is extensible through a reviewed amendment to that record, and one
+now admits the `regular-expressions` tag. The Unicode property checkpoint
+still selects its 625 paths through existing dependency tags; moving reviewed
+rows onto the new tag is a separate reviewed change. Unsupported results move
+only after every requested strictness and specialization variant executes.
 
 Native evidence runs on Linux AMD64 and macOS AArch64. AArch64 Linux
 compile-links and exposes static matcher artifacts and generated control flow
@@ -624,11 +625,18 @@ Delivery order
 
 1.  Inventory the ECMAScript 2025 clauses, test262 directories, flags,
     prototypes, symbol hooks, Unicode inputs, and current parser diagnostics.
-    Extend the manifest dependency vocabulary without changing classifications.
-    Landed, in [*docs/regexp-inventory.md*](./docs/regexp-inventory.md),
-    except the `regular-expressions` dependency tag: ADR 0013 freezes that
-    vocabulary. The Unicode property checkpoint selects its reviewed paths
-    through existing tags instead of changing that accepted record.
+    Extend the manifest dependency vocabulary without changing
+    classifications. The inventory landed in
+    [*docs/regexp-inventory.md*](./docs/regexp-inventory.md). The vocabulary
+    extension did not land with it, and this item was marked complete while
+    the `regular-expressions` tag was still absent from both ADR 0013 and the
+    enforced set in *packages/testkit/src/index.ts*. A reviewed amendment to
+    ADR 0013 now admits the tag and the enforced set carries it, which
+    completes the item. No reviewed row carries the tag yet, so no
+    classification moved. Whether the reviewed RegExp rows that currently
+    carry `functions` or `object-properties` gain the tag is a separate
+    reviewed change, and ADR 0013 records that they gain it alongside those
+    tags rather than exchanging one for another.
 2.  Define an Oseo-owned pattern AST, parser contract, validator, and bounded
     generated pattern model. Retain literal text and flags at the frontend
     boundary without admitting execution. Landed. The parser reports one

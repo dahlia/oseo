@@ -140,7 +140,7 @@ test("requires sorted and unique reviewed paths", () => {
   );
 });
 
-test("requires reviewed dependency tags from the frozen vocabulary", () => {
+test("admits only reviewed dependency tags from the vocabulary", () => {
   assert.throws(
     () =>
       parseReviewedSubset(
@@ -152,6 +152,20 @@ test("requires reviewed dependency tags from the frozen vocabulary", () => {
       ),
     /at least one dependency tag/u,
   );
+  const admitted = parseReviewedSubset(
+    JSON.stringify({
+      suiteRevision: revision,
+      supportedFeatures: [],
+      tests: [
+        {
+          dependencies: ["regular-expressions"],
+          expectedClassification: "pass",
+          path: "test/a.js",
+        },
+      ],
+    }),
+  );
+  assert.deepEqual(admitted.tests[0]?.dependencies, ["regular-expressions"]);
   assert.throws(
     () =>
       parseReviewedSubset(
@@ -160,14 +174,14 @@ test("requires reviewed dependency tags from the frozen vocabulary", () => {
           supportedFeatures: [],
           tests: [
             {
-              dependencies: ["regular-expressions"],
+              dependencies: ["regular-expression"],
               expectedClassification: "pass",
               path: "test/a.js",
             },
           ],
         }),
       ),
-    /unreviewed dependency tag/u,
+    /unreviewed dependency tag regular-expression\./u,
   );
   assert.throws(
     () =>
