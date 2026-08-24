@@ -7,4 +7,4 @@ delivers: "Compiles literal patterns during the build into immutable
 dependencies:
   - regexp-prototype-and-exec
 landed: false
-status: blocked
+status: ready

@@ -24,5 +24,5 @@ dependencies:
   - array-constructor
   - object-define-property
   - regexp-intrinsic
-landed: false
+landed: true
 status: ready
