@@ -75,10 +75,12 @@ The Unicode property checkpoint selects all 625 paths under
 *test/built-ins/RegExp/property-escapes/* and
 *test/built-ins/RegExp/CharacterClassEscapes/*. Of those, 142 parse-negative
 paths are expected negatives and 483 retain explicit boundaries for the
-RegExp intrinsic and execution, class set notation, or other later nodes. The
-manifest's reviewed dependency-tag vocabulary remains the one ADR 0013
-freezes, so these rows use existing tags and do not introduce a regular
-expression tag or amend the classification vocabulary.
+RegExp intrinsic and execution, class set notation, or other later nodes.
+ADR 0013's reviewed dependency-tag vocabulary is extensible through a reviewed
+amendment to that record, and one now admits `regular-expressions`. These rows
+keep the existing tags they were reviewed under, because admitting a tag moves
+no reviewed row; retagging them is a separate reviewed change, and neither
+change touches the classification vocabulary.
 
 
 Flags

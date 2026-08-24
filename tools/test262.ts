@@ -174,7 +174,7 @@ export interface ParsedTest262Case {
 
 /**
  * One reviewed path, the classification it must retain, and the reviewed
- * semantic dependency tags frozen by ADR 0013.
+ * semantic dependency tags ADR 0013 admits.
  */
 export interface ReviewedTest262Entry {
   readonly dependencies: readonly string[];

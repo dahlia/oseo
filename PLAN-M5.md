@@ -4289,9 +4289,10 @@ passes, 1,364 expected negatives, and 1,603 unsupported profile features; the
 regenerated with the new message, and no classification, phase, or capability
 moves. The runtime ABI does not move, and *docs/regexp-inventory.md* records
 the clause, directory, flag, prototype, symbol, Unicode, and diagnostic
-inventory that delivery item 1 requires. The reviewed `regular-expressions`
-dependency tag is not added: ADR 0013 freezes that vocabulary, and
-PLAN-REGEXP.md adds the tag with the first reviewed case that carries it.
+inventory that delivery item 1 requires. This node adds no reviewed
+`regular-expressions` dependency tag. ADR 0013's vocabulary is extensible
+through a reviewed amendment to that record, and a later amendment admits the
+tag and adds it to the enforced set without moving any reviewed row.
 
 Implemented M5b node `regexp-generic-matcher` adds the generic matcher
 artifact and executor that

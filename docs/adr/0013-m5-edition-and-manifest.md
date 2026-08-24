@@ -246,6 +246,30 @@ initialization that collects the unbound argument suffix into a fresh array.
 resumption behavior, and the generator objects and prototype methods that
 drive them.
 
+Seven further tags entered the enforced vocabulary in
+*packages/testkit/src/index.ts* with the M5a semantic units that needed them,
+and none of those changes amended this record. This amendment adopts them as
+reviewed vocabulary without moving any classification: `object-literals`
+identifies object literal expressions and their property definition forms;
+`classes` identifies class declarations and expressions and the definitions in
+a class body; `property-enumeration` identifies the `for-in` statement and the
+property enumeration order it observes; `async-iteration` identifies
+asynchronous iterator acquisition, stepping, and closing, including the
+`for-await-of` statement; `bigint-primitive` identifies exact BigInt values
+with their operators and conversions; `array-buffer` identifies the
+`ArrayBuffer` intrinsic and its byte storage; and `data-view` identifies the
+`DataView` intrinsic and the element access it performs over that storage. A
+change that adds a tag to the enforced set amends this record in the same
+change, so the enforced set and this record stay in agreement.
+
+The M5b regular expression work extends the vocabulary with
+`regular-expressions` for pattern syntax and early errors, the `RegExp`
+intrinsic and its prototype, matcher execution and match result construction,
+and the well-known symbol methods that dispatch to them. The tag is admitted
+before any reviewed row carries it, so admitting it moves no count. Whether
+the reviewed RegExp rows that currently carry `functions` or
+`object-properties` move to it is a separate reviewed change.
+
 
 Alternatives considered
 -----------------------
