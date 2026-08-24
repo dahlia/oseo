@@ -633,9 +633,10 @@ Delivery order
     enforced set in *packages/testkit/src/index.ts*. A reviewed amendment to
     ADR 0013 now admits the tag and the enforced set carries it, which
     completes the item. No reviewed row carries the tag yet, so no
-    classification moved; whether the reviewed RegExp rows that currently
-    carry `functions` or `object-properties` move to it is a separate
-    reviewed change.
+    classification moved. Whether the reviewed RegExp rows that currently
+    carry `functions` or `object-properties` gain the tag is a separate
+    reviewed change, and ADR 0013 records that they gain it alongside those
+    tags rather than exchanging one for another.
 2.  Define an Oseo-owned pattern AST, parser contract, validator, and bounded
     generated pattern model. Retain literal text and flags at the frontend
     boundary without admitting execution. Landed. The parser reports one

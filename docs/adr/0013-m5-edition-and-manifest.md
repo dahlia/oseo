@@ -268,7 +268,11 @@ intrinsic and its prototype, matcher execution and match result construction,
 and the well-known symbol methods that dispatch to them. The tag is admitted
 before any reviewed row carries it, so admitting it moves no count. Whether
 the reviewed RegExp rows that currently carry `functions` or
-`object-properties` move to it is a separate reviewed change.
+`object-properties` gain this tag is a separate reviewed change. When they do,
+they gain it alongside the tags they already carry rather than exchanging one
+for another. The tagging rule above names every operation a case exercises, so
+a case that builds a pattern and calls a function exercises both, and dropping
+either tag would understate what the row covers.
 
 
 Alternatives considered
