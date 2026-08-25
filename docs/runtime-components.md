@@ -72,9 +72,11 @@ Ownership follows the plan's target layout:
     %String.prototype%, and the `fromCharCode`, `fromCodePoint`, and
     `raw` statics;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`,
-    `matchAll`, `search`, and `split` well-known-symbol dispatch and their
-    String fallback algorithms, including the admitted fixed-width regular
-    expression atoms and the dedicated RegExp String iterator;
+    `matchAll`, `search`, `split`, `replace`, and `replaceAll`
+    well-known-symbol dispatch and their String fallback algorithms,
+    including the admitted fixed-width regular expression atoms, the
+    dedicated RegExp String iterator, and the GetSubstitution replacement
+    template both replacement methods share;
  -  *runtime\_object.c*: ordinary object creation and layout, the
     property vector and its growth, own-property lookup and removal,
     cell-backed property recognition, shape identifiers and the

@@ -107,9 +107,12 @@ Intrinsic, prototype, and symbol surface
 The `regexp-intrinsic` node added `%RegExp%`, `%RegExp.prototype%`, the
 constructor link, the `Symbol.species` accessor, and the `lastIndex` own
 property, and `regexp-prototype-and-exec` added `exec`, `test`, `toString`,
-and the ten prototype accessors. The rest of this surface does not exist
-yet. The complete list stays here so that each later node names what it
-adds:
+the ten prototype accessors, and the deferred `@@match`, `@@matchAll`,
+`@@search`, and `@@split` placeholders; `string-prototype-replace` added the
+`@@replace` placeholder beside them. `string-prototype-match-and-split`
+already owns `%RegExpStringIteratorPrototype%`. The rest of this surface does
+not exist yet. The complete list stays here so that each later node names
+what it adds:
 
  -  `%RegExp%`: call and construct behavior, `length`, `name`,
     `prototype`, and `RegExp.escape`, plus the `Symbol.species` accessor.
@@ -120,12 +123,18 @@ adds:
  -  Instances: the `lastIndex` own data property, writable and neither
     enumerable nor configurable.
  -  `%RegExpStringIteratorPrototype%`: `next` and `Symbol.toStringTag`.
+    Both exist. `regexp-symbol-methods` extends the object with the results
+    a real `@@matchAll` yields rather than creating it.
  -  Well-known symbol hooks: `@@match`, `@@matchAll`, `@@replace`,
-    `@@search`, `@@split`, and `@@species`. The realm defines none of
-    them today; `well-known-symbols` owns adding them, and
-    `regexp-symbol-methods` owns the methods keyed by them.
-    `string-prototype-match-and-split` already dispatches through the
-    first five when a receiver defines them.
+    `@@search`, `@@split`, and `@@species`. `%RegExp%` carries the real
+    `@@species` accessor. `%RegExp.prototype%` carries the other five as
+    deferred placeholder methods with their specified names, lengths, and
+    descriptors: calling one reports the owned boundary that
+    `regexp-symbol-methods` replaces with the real method.
+    `string-prototype-match-and-split` and `string-prototype-replace`
+    dispatch through all five when a receiver defines them, so a RegExp
+    operand reaches that boundary through GetMethod instead of falling
+    through to a String approximation.
 
 
 Unicode inputs

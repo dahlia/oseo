@@ -35,6 +35,33 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - String.prototype.replaceAll
+        - Symbol.replace
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-before-tostring.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: 'test/built-ins/String/prototype/replaceAll/searchValue-replacer-before-tostring.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/replaceAll/searchValue-replacer-before-tostring.js:103:19:
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

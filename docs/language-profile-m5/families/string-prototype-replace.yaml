@@ -1,0 +1,74 @@
+version: 1
+id: string-prototype-replace
+title: "String prototype replacement methods"
+scope:
+  - "String.prototype.replace and replaceAll, including receiver coercion,
+    Symbol.replace dispatch for an Object operand, functional and String
+    replacers, GetSubstitution replacement tokens, replaceAll's IsRegExp and
+    global-flag requirement, its nonoverlapping match list and empty-search
+    advancement, and the receiver, search, and replacer conversion order."
+  - "Both methods observe an operand only when it is an Object, so a
+    primitive search value reaches no Symbol.replace lookup, IsRegExp
+    observation, or flags read. The pinned Node.js host still performs that
+    lookup, so the reviewed test262 cases under the node's inventory roots
+    carry the observation instead of the fixed differential fixture."
+  - "GetSubstitution runs with an empty capture list and an undefined
+    named-capture object, which is what both callers supply. `$$`, `` $` ``,
+    `$&`, and `$'` substitute; `$1` through `$99` and `$<name>` have no
+    referent and copy their reference text unchanged."
+  - "RegExp objects, their patterns and flags, and the Symbol.replace method
+    a RegExp supplies remain owned by the regexp nodes. This node gives
+    %RegExp.prototype% the deferred Symbol.replace placeholder that the
+    other four String protocol symbols already had, so a RegExp operand
+    reaches that owned boundary through GetMethod instead of falling through
+    to the String search admitted here. Reviewed cases that need a real
+    RegExp replacement keep an explicit prerequisite boundary rather than
+    receiving a literal approximation."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-replace.ts
+      - tests/property/m5-string-prototype-replace.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-replace.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-replace.ts
+      - tests/property/m5-string-prototype-replace.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-string-prototype-replace.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-replace.ts
+      - tests/property/m5-string-prototype-replace.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-replace.ts
+      - tests/property/m5-string-prototype-replace.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_regexp.c
+      - packages/runtime-c/native/runtime_string.c
+      - packages/runtime-c/native/runtime_string_match.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

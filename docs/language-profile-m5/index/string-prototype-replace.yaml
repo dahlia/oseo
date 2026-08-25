@@ -1,0 +1,3 @@
+version: 1
+id: string-prototype-replace
+record: docs/language-profile-m5/families/string-prototype-replace.yaml

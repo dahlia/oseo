@@ -22,6 +22,7 @@ supportedFeatures:
   - String.prototype.endsWith
   - String.prototype.includes
   - String.prototype.matchAll
+  - String.prototype.replaceAll
   - align-detached-buffer-semantics-with-web-reality
   - array-grouping
   - arraybuffer-transfer
@@ -25389,6 +25390,306 @@ tests:
   - path: test/built-ins/String/prototype/matchAll/toString-this-val.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/15.5.4.11-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A12.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T10.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T11.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T12.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T13.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T14.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T15.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T16.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T17.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T9.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T10.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T9.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A5_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-on-bigint-primitive.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/cstm-replace-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/regexp-capture-by-index.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/regexp-prototype-replace-v-u-flag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/replaceValue-evaluation-order-regexp-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/replaceValue-evaluation-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/tostring-this-throws-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replace/tostring-this-throws-toprimitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-bigint-primitive.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-boolean-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-number-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-string-primitive.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x0024.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x0026.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x0027.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x003C.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x0060.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024N.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024NN.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceAll.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-call-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-call-each-match-position.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-call-matching-empty.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-call-skip-no-match.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-call-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-fn-skip-toString.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-value-replaces-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/replaceValue-value-tostring.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-empty-string-this-empty-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-empty-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-flags-no-g-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-flags-null-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-flags-toString-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-get-flags-abrupt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-isRegExp-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call-fn.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-before-tostring.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-call-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-call.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-method-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/searchValue-tostring-regexp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/this-is-null-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/this-is-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/this-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/String/prototype/replaceAll/this-tostring.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A1.1_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]

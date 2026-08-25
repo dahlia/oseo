@@ -6957,6 +6957,9 @@ partitions:
     key: "98"
     path: results/built-ins/String/98.yaml
   - group: built-ins/String
+    key: "99"
+    path: results/built-ins/String/99.yaml
+  - group: built-ins/String
     key: 9a
     path: results/built-ins/String/9a.yaml
   - group: built-ins/String
@@ -7098,6 +7101,9 @@ partitions:
     key: cb
     path: results/built-ins/String/cb.yaml
   - group: built-ins/String
+    key: cc
+    path: results/built-ins/String/cc.yaml
+  - group: built-ins/String
     key: cd
     path: results/built-ins/String/cd.yaml
   - group: built-ins/String
@@ -7118,6 +7124,9 @@ partitions:
   - group: built-ins/String
     key: d3
     path: results/built-ins/String/d3.yaml
+  - group: built-ins/String
+    key: d4
+    path: results/built-ins/String/d4.yaml
   - group: built-ins/String
     key: d5
     path: results/built-ins/String/d5.yaml
@@ -10282,9 +10291,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 9311
+  passes: 9365
   semanticFailures: 0
-  unsupportedProfileFeatures: 2636
+  unsupportedProfileFeatures: 2682
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -10318,7 +10327,7 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 234
+      passes: 236
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: classes
@@ -10381,9 +10390,9 @@ summary:
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2167
+      passes: 2221
       semanticFailures: 0
-      unsupportedProfileFeatures: 1099
+      unsupportedProfileFeatures: 1145
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -10423,9 +10432,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5888
+      passes: 5942
       semanticFailures: 0
-      unsupportedProfileFeatures: 1281
+      unsupportedProfileFeatures: 1327
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -10451,9 +10460,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 333
+      passes: 387
       semanticFailures: 0
-      unsupportedProfileFeatures: 142
+      unsupportedProfileFeatures: 188
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -10634,9 +10643,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 586
+      passes: 640
       semanticFailures: 0
-      unsupportedProfileFeatures: 156
+      unsupportedProfileFeatures: 202
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0

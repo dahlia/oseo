@@ -1,6 +1,7 @@
 #include "runtime_internal.h"
 
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 /*
@@ -469,6 +470,10 @@ static size_t string_symbol_index(size_t code_id) {
         return OSEO_WELL_KNOWN_MATCH_ALL;
     }
     if (code_id == OSEO_STRING_SEARCH_CODE_ID) return OSEO_WELL_KNOWN_SEARCH;
+    if (code_id == OSEO_STRING_REPLACE_CODE_ID ||
+        code_id == OSEO_STRING_REPLACE_ALL_CODE_ID) {
+        return OSEO_WELL_KNOWN_REPLACE;
+    }
     return OSEO_WELL_KNOWN_SPLIT;
 }
 
@@ -484,10 +489,30 @@ static size_t deferred_regexp_protocol_code_id(size_t code_id) {
     return OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID;
 }
 
-static OseoResult string_match_all_flags(
+/* The two methods whose operand must name a global RegExp when it is one. */
+static bool string_requires_global_flags(size_t code_id) {
+    return code_id == OSEO_STRING_MATCH_ALL_CODE_ID ||
+        code_id == OSEO_STRING_REPLACE_ALL_CODE_ID;
+}
+
+/* The methods that forward a second argument to their symbol method. */
+static bool string_forwards_second_argument(size_t code_id) {
+    return code_id == OSEO_STRING_SPLIT_CODE_ID ||
+        code_id == OSEO_STRING_REPLACE_CODE_ID ||
+        code_id == OSEO_STRING_REPLACE_ALL_CODE_ID;
+}
+
+/*
+ * The `flags` observation String.prototype.matchAll and replaceAll share
+ * once IsRegExp reports true for their operand: the value must be
+ * object-coercible and its String form must contain `g`.
+ */
+static OseoResult string_require_global_flags(
     OseoContext *context,
+    size_t code_id,
     OseoValue regexp
 ) {
+    bool match_all = code_id == OSEO_STRING_MATCH_ALL_CODE_ID;
     OseoValue slots[3] = {regexp, oseo_undefined(), oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
@@ -501,7 +526,9 @@ static OseoResult string_match_all_flags(
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "String.prototype.matchAll flags are nullish."
+            match_all
+                ? "String.prototype.matchAll flags are nullish."
+                : "String.prototype.replaceAll flags are nullish."
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -521,7 +548,9 @@ static OseoResult string_match_all_flags(
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_TYPE,
-                "String.prototype.matchAll requires a global RegExp."
+                match_all
+                    ? "String.prototype.matchAll requires a global RegExp."
+                    : "String.prototype.replaceAll requires a global RegExp."
             );
         }
     }
@@ -561,11 +590,19 @@ static OseoResult string_protocol_method(
     );
     frame.slots[3] = oseo_undefined();
     bool regexp = false;
-    if (code_id == OSEO_STRING_MATCH_ALL_CODE_ID &&
-        !is_nullish(frame.slots[1])) {
+    /*
+     * Every one of these methods observes its operand only when the operand
+     * is an Object, so a primitive never reaches IsRegExp, the `flags` read,
+     * or the symbol lookup.
+     */
+    if (string_requires_global_flags(code_id) && is_object(frame.slots[1])) {
         result = match_is_regexp(context, frame.slots[1], &regexp);
         if (result.status == OSEO_STATUS_NORMAL && regexp) {
-            result = string_match_all_flags(context, frame.slots[1]);
+            result = string_require_global_flags(
+                context,
+                code_id,
+                frame.slots[1]
+            );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL &&
@@ -594,9 +631,8 @@ static OseoResult string_protocol_method(
                 "String symbol protocol method is not callable."
             );
         } else {
-            size_t call_count = code_id == OSEO_STRING_SPLIT_CODE_ID
-                ? 2u
-                : 1u;
+            size_t call_count =
+                string_forwards_second_argument(code_id) ? 2u : 1u;
             OseoValue call_arguments[2] = {
                 frame.slots[0],
                 frame.slots[2],
@@ -1226,6 +1262,310 @@ static OseoResult string_split(
 }
 
 
+/*
+ * String.prototype.replace and replaceAll build their result in one
+ * component-local UTF-16 buffer. The buffer is plain host memory rather
+ * than a heap value, so a functional replacer may collect between matches
+ * without invalidating the partial result; every OseoString pointer is
+ * re-derived after each step that can allocate.
+ */
+typedef struct {
+    uint16_t *units;
+    size_t length;
+    size_t capacity;
+} OseoReplaceBuilder;
+
+static OseoResult replace_builder_append(
+    OseoContext *context,
+    OseoReplaceBuilder *builder,
+    const uint16_t *units,
+    size_t length
+) {
+    if (length == 0u) return normal(oseo_undefined());
+    if (length > SIZE_MAX - builder->length) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
+    size_t required = builder->length + length;
+    OseoResult valid = oseo_internal_validate_string_length(
+        context,
+        required
+    );
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (required > builder->capacity) {
+        size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
+        while (capacity < required) {
+            if (capacity > OSEO_MAX_STRING_LENGTH / 2u) {
+                capacity = required;
+                break;
+            }
+            capacity *= 2u;
+        }
+        uint16_t *grown = realloc(
+            builder->units,
+            capacity * sizeof(uint16_t)
+        );
+        if (grown == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "String replacement allocation failed."
+            );
+        }
+        builder->units = grown;
+        builder->capacity = capacity;
+    }
+    memcpy(
+        builder->units + builder->length,
+        units,
+        length * sizeof(uint16_t)
+    );
+    builder->length = required;
+    return normal(oseo_undefined());
+}
+
+static void replace_builder_release(OseoReplaceBuilder *builder) {
+    free(builder->units);
+    builder->units = NULL;
+    builder->length = 0u;
+    builder->capacity = 0u;
+}
+
+/*
+ * GetSubstitution (22.1.3.19.1) for the two callers this component owns.
+ * Both supply an empty capture list and an undefined named-capture object,
+ * so `$$`, `` $` ``, `$&`, and `$'` substitute while `$1` through `$99` and
+ * `$<name>` have no referent and copy their reference text unchanged.
+ *
+ * A digit reference copies only `$` and its first digit. The specification
+ * copies `$` and both digits when a two-digit index is not greater than the
+ * capture count, which an empty capture list reaches only for `$00`; either
+ * length leaves the same remaining text unscanned for further references
+ * and produces the same result, because the copied text is literal.
+ *
+ * The RegExp nodes that introduce real captures extend this operation with
+ * the capture and named-capture arguments rather than replacing it.
+ */
+static OseoResult replace_substitution(
+    OseoContext *context,
+    OseoReplaceBuilder *builder,
+    OseoValue subject,
+    OseoValue matched,
+    size_t position,
+    OseoValue replacement
+) {
+    OseoValue slots[3] = {subject, matched, replacement};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    size_t index = 0u;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        const OseoString *pattern = string_object(slots[2]);
+        if (index >= pattern->length) break;
+        uint16_t unit = pattern->units[index];
+        if (unit != UINT16_C(0x24) || index + 1u >= pattern->length) {
+            result = replace_builder_append(context, builder, &unit, 1u);
+            index += 1u;
+            continue;
+        }
+        uint16_t next = pattern->units[index + 1u];
+        if (next == UINT16_C(0x24)) {
+            uint16_t dollar = UINT16_C(0x24);
+            result = replace_builder_append(context, builder, &dollar, 1u);
+            index += 2u;
+            continue;
+        }
+        if (next == UINT16_C(0x26)) {
+            const OseoString *match = string_object(slots[1]);
+            result = replace_builder_append(
+                context,
+                builder,
+                match->units,
+                match->length
+            );
+            index += 2u;
+            continue;
+        }
+        if (next == UINT16_C(0x60)) {
+            const OseoString *string = string_object(slots[0]);
+            result = replace_builder_append(
+                context,
+                builder,
+                string->units,
+                position
+            );
+            index += 2u;
+            continue;
+        }
+        if (next == UINT16_C(0x27)) {
+            const OseoString *string = string_object(slots[0]);
+            size_t tail = position + string_object(slots[1])->length;
+            if (tail > string->length) tail = string->length;
+            result = replace_builder_append(
+                context,
+                builder,
+                string->units + tail,
+                string->length - tail
+            );
+            index += 2u;
+            continue;
+        }
+        bool reference = (next >= UINT16_C(0x30) && next <= UINT16_C(0x39)) ||
+            next == UINT16_C(0x3c);
+        size_t copied = reference ? 2u : 1u;
+        result = replace_builder_append(
+            context,
+            builder,
+            pattern->units + index,
+            copied
+        );
+        index += copied;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * String.prototype.replace (22.1.3.19) and replaceAll (22.1.3.20). The two
+ * share one body: `replace` stops after the first match, while `replaceAll`
+ * continues from each match end and advances by one code unit for an empty
+ * search string. Neither converts a callable replacer, and a String
+ * replacer is converted before the subject is searched.
+ */
+static OseoResult string_replace(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    bool all = code_id == OSEO_STRING_REPLACE_ALL_CODE_ID;
+    bool dispatched = false;
+    OseoResult result = string_protocol_method(
+        context,
+        code_id,
+        receiver,
+        argument_count,
+        arguments,
+        &dispatched
+    );
+    if (result.status != OSEO_STATUS_NORMAL || dispatched) return result;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 0: subject, 1: search string, 2: replacer, 3: replacement text */
+    frame.slots[2] = match_argument(argument_count, arguments, 1u);
+    result = match_subject(context, receiver);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_value_string(
+            context,
+            match_argument(argument_count, arguments, 0u)
+        );
+        frame.slots[1] = result.value;
+    }
+    bool functional = is_function(frame.slots[2]);
+    if (result.status == OSEO_STATUS_NORMAL && !functional) {
+        result = oseo_internal_value_string(context, frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    size_t position = 0u;
+    bool found = result.status == OSEO_STATUS_NORMAL &&
+        string_find(frame.slots[0], frame.slots[1], 0u, &position);
+    if (result.status != OSEO_STATUS_NORMAL || !found) {
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(frame.slots[0]);
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    size_t search_length = string_object(frame.slots[1])->length;
+    size_t advance = search_length == 0u ? 1u : search_length;
+    size_t consumed = 0u;
+    OseoReplaceBuilder builder = {NULL, 0u, 0u};
+    while (result.status == OSEO_STATUS_NORMAL && found) {
+        /*
+         * The replacer runs before the preceding subject slice is staged.
+         * The specification computes the replacement and only then builds
+         * the concatenation, so a staged slice that would exceed the
+         * runtime's string ceiling must not suppress this match's call.
+         */
+        if (functional) {
+            OseoValue call_arguments[3] = {
+                frame.slots[1],
+                oseo_number((double)position),
+                frame.slots[0],
+            };
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                oseo_undefined(),
+                3u,
+                call_arguments,
+                oseo_undefined()
+            );
+            frame.slots[3] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_value_string(context, frame.slots[3]);
+                frame.slots[3] = result.value;
+            }
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            const OseoString *subject = string_object(frame.slots[0]);
+            result = replace_builder_append(
+                context,
+                &builder,
+                subject->units + consumed,
+                position - consumed
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL && functional) {
+            const OseoString *text = string_object(frame.slots[3]);
+            result = replace_builder_append(
+                context,
+                &builder,
+                text->units,
+                text->length
+            );
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = replace_substitution(
+                context,
+                &builder,
+                frame.slots[0],
+                frame.slots[1],
+                position,
+                frame.slots[2]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        consumed = position + search_length;
+        found = all && string_find(
+            frame.slots[0],
+            frame.slots[1],
+            position + advance,
+            &position
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoString *subject = string_object(frame.slots[0]);
+        result = replace_builder_append(
+            context,
+            &builder,
+            subject->units + consumed,
+            subject->length - consumed
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_allocate_string(
+            context,
+            builder.units,
+            builder.length
+        );
+    }
+    replace_builder_release(&builder);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_string_protocol_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1257,6 +1597,16 @@ OseoResult oseo_internal_string_protocol_dispatch(
     if (code_id == OSEO_STRING_SPLIT_CODE_ID) {
         return string_split(
             context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_STRING_REPLACE_CODE_ID ||
+        code_id == OSEO_STRING_REPLACE_ALL_CODE_ID) {
+        return string_replace(
+            context,
+            code_id,
             receiver,
             argument_count,
             arguments

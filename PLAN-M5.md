@@ -17,21 +17,22 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 11,015
-reviewed cases: 8,073 passes, 1,364 expected negatives, and 1,578 unsupported
-profile features with no semantic, harness, or infrastructure failures.
+honest unsupported classifications. The current reviewed manifest records
+13,553 reviewed cases: 9,365 passes, 1,506 expected negatives, and 2,682
+unsupported profile features with no semantic, harness, or infrastructure
+failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
 and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 81 indexed records in the normative
+M5a is complete. The 94 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 8,073
-passes across 11,015 paths, and the property inventory records 86 domains, 86
-seeds, and an ordinary case budget of 3,534.
+the M5b and M5c dependency order below. The reviewed manifest now records 9,365
+passes across 13,553 paths, and the property inventory records 106 domains,
+106 seeds, and an ordinary case budget of 5,146.
 
 
 M5a implementation history
@@ -4607,6 +4608,79 @@ code IDs inside the existing Array range without adding a generated-code entry
 point or changing the graph's orchestration state. The suite revision,
 41,091-path applicable inventory, ADR 0013 vocabulary, inventory policy, and
 zero-override policy are unchanged.
+
+Implemented M5b node `string-prototype-replace` gives the materialized
+`%String.prototype%` ordinary `replace` and `replaceAll` functions and
+removes `replace` from the unadmitted-method placeholder list, which never
+covered `replaceAll` because that name had no own property at all. Both
+methods observe their search operand only when it is an Object: an Object
+receives `Symbol.replace` through GetMethod, and a callable method is
+called with the original receiver and the original replacer as exactly two
+arguments. `replaceAll` first performs `IsRegExp` on an Object operand,
+requires an object-coercible `flags` value containing `g` for a true
+`@@match` result, and only then looks the method up. A primitive operand,
+a missing operand, and a nullish `@@replace` method all take the String
+fallback. This node also gives `%RegExp.prototype%` the deferred
+`@@replace` placeholder that already stood for the four other String
+protocol symbols, so a RegExp operand reaches the owned
+`regexp-symbol-methods` boundary through GetMethod instead of falling
+through to the code-unit search admitted here.
+
+The fallback converts the receiver, then the search value, then a
+non-callable replacer, in that order, and searches UTF-16 code units.
+`replace` substitutes the first occurrence; `replaceAll` collects
+nonoverlapping occurrences, advancing by one code unit when the search
+string is empty, so an empty search inserts the replacement before every
+code unit and once after the last. A callable replacer is never converted
+and receives the matched text, its position, and the whole subject, with
+its result converted through `ToString`. A String replacer goes through
+GetSubstitution, where `$$`, `` $` ``, `$&`, and `$'` substitute. Because
+both callers supply an empty capture list and an undefined named-capture
+object, `$1` through `$99` and `$<name>` have no referent and copy their
+reference text unchanged; the RegExp nodes that introduce captures extend
+that operation rather than replacing it.
+
+Restricting the operand observation to Objects is the current
+specification, and the pinned test262 revision asserts it directly in
+*cstm-replace-on-number-primitive.js*,
+*cstm-replaceall-on-number-primitive.js*, and their BigInt counterparts,
+all four of which pass now that `bigint-intrinsic` has landed. The pinned
+Node.js host still performs the older unconditional lookup while the pinned
+Deno host does not, so the two reference hosts disagree; that observation
+stays with the reviewed test262 cases instead of the fixed differential
+fixture, which requires both hosts to agree. The same choice already
+governs `string-prototype-match-and-split`.
+
+Fixed native and generated differential evidence at seeds `0x60005200` and
+`0x60005201` covers primitive, wrapper, and generic receivers, both symbol
+dispatches, a null and a non-callable method, an abrupt method getter,
+every GetSubstitution reference form against subjects that themselves
+contain `$`, functional replacers with their arguments and abrupt results,
+empty searches and empty subjects, overlapping candidates, lone
+surrogates, `replaceAll`'s IsRegExp and `flags` observations including
+their abrupt forms, `replace`'s absence of those observations, nullish and
+Symbol receivers, both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, and generic
+fallback.
+
+Of the 100 paths under the node's two inventory roots, all are reviewed:
+54 pass and 46 retain explicit prerequisite boundaries. Thirty-eight of
+those build a regular expression, four need the unadmitted `Boolean`
+wrapper receiver, two need the `Function` constructor, and two need
+`Reflect.construct`. The reviewed RegExp rows keep the `functions` and
+`object-properties` tags they earn rather than gaining
+`regular-expressions`, which stays with the deferred cross-family
+retagging that `regexp-symbol-methods` owns. No previously reviewed path
+changes classification, because no reviewed case outside those roots calls
+either method or declares the `String.prototype.replaceAll` feature this
+change admits. The manifest moves from 13,453 to 13,553 paths and from
+9,311 to 9,365 passes, keeps 1,506 expected negatives, and moves from
+2,636 to 2,682 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The admitted runtime checkpoint moves the runtime
+ABI to `oseo-runtime-m5-78` without adding a generated-code entry point or
+changing the graph's orchestration state. The String built-in code range
+gains two IDs for the two methods, and the RegExp range gains a twentieth
+for the deferred `[Symbol.replace]` placeholder.
 
 
 Ahead-of-time challenge boundary
