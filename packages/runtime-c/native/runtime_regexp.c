@@ -2627,7 +2627,7 @@ OseoResult oseo_internal_regexp_builtin_dispatch(
             OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_LAST - code_id
         );
     }
-    if (code_id >= OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID &&
+    if (code_id >= OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID &&
         code_id <= OSEO_REGEXP_MATCH_DEFERRED_CODE_ID) {
         /* The reviewed String-dispatch boundary reports one message from
          * both sides, so a case that reaches it through the RegExp
@@ -2864,24 +2864,27 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
     static const char *const deferred_symbol_methods[] = {
         "[Symbol.match]",
         "[Symbol.matchAll]",
+        "[Symbol.replace]",
         "[Symbol.search]",
         "[Symbol.split]",
     };
     static const size_t deferred_symbols[] = {
         OSEO_WELL_KNOWN_MATCH,
         OSEO_WELL_KNOWN_MATCH_ALL,
+        OSEO_WELL_KNOWN_REPLACE,
         OSEO_WELL_KNOWN_SEARCH,
         OSEO_WELL_KNOWN_SPLIT,
     };
     static const size_t deferred_symbol_code_ids[] = {
         OSEO_REGEXP_MATCH_DEFERRED_CODE_ID,
         OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID,
+        OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID,
         OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID,
         OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID,
     };
-    static const size_t deferred_symbol_lengths[] = {1u, 1u, 1u, 2u};
+    static const size_t deferred_symbol_lengths[] = {1u, 1u, 2u, 1u, 2u};
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 4u;
+         result.status == OSEO_STATUS_NORMAL && index < 5u;
          index += 1u) {
         result = create_regexp_builtin(
             context,

@@ -63,7 +63,8 @@ results:
       detail: 'test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x003C.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/replaceAll/getSubstitution-0x0024-0x003C.js:138:16:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -87,13 +88,20 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/String/prototype/replaceAll/searchValue-replace\
-        r-RegExp-call-fn.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/String/prototype/replaceAll/searchValue\
-        -replacer-RegExp-call-fn.js:113:18: error[OSEO1001]: Unknown
-        binding 'RegExp'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call-fn.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call-fn.js:115:20:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:

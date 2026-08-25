@@ -17,9 +17,13 @@ scope:
     `$&`, and `$'` substitute; `$1` through `$99` and `$<name>` have no
     referent and copy their reference text unchanged."
   - "RegExp objects, their patterns and flags, and the Symbol.replace method
-    a RegExp supplies remain owned by the regexp nodes. Reviewed cases that
-    need one keep an explicit prerequisite boundary rather than receiving a
-    literal approximation."
+    a RegExp supplies remain owned by the regexp nodes. This node gives
+    %RegExp.prototype% the deferred Symbol.replace placeholder that the
+    other four String protocol symbols already had, so a RegExp operand
+    reaches that owned boundary through GetMethod instead of falling through
+    to the String search admitted here. Reviewed cases that need a real
+    RegExp replacement keep an explicit prerequisite boundary rather than
+    receiving a literal approximation."
 owners:
   - PLAN-M5.md
 evidence:
@@ -64,6 +68,7 @@ evidence:
     status: covered
     references:
       - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_regexp.c
       - packages/runtime-c/native/runtime_string.c
       - packages/runtime-c/native/runtime_string_match.c
       - packages/runtime-c/tests/intrinsic-graph.test.ts

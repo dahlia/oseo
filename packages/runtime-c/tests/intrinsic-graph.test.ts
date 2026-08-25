@@ -606,6 +606,7 @@ test("populates the realm-owned String intrinsic cluster", () => {
   const bindingSource = sources.get("runtime_binding.c") ?? "";
   const stringSource = sources.get("runtime_string.c") ?? "";
   const matchSource = sources.get("runtime_string_match.c") ?? "";
+  const regexpSource = sources.get("runtime_regexp.c") ?? "";
   const memorySource = sources.get("runtime_memory.c") ?? "";
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
   const primitiveSource = sources.get("runtime_primitive.c") ?? "";
@@ -714,6 +715,15 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.doesNotMatch(header, /oseo_string_replace/u);
   // The unadmitted-method placeholder no longer covers either name.
   assert.doesNotMatch(stringSource, /unadmitted_names\[\] = \{[^}]*"replace"/u);
+  // %RegExp.prototype% carries the deferred [Symbol.replace] placeholder, so
+  // a RegExp operand reaches the owned boundary through GetMethod instead of
+  // falling through to the String search this node admits.
+  assert.match(
+    regexpSource,
+    /deferred_symbol_methods\[\] = \{[^}]*"\[Symbol\.replace\]"/u,
+  );
+  assert.match(regexpSource, /OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID/u);
 });
 
 test("populates the realm-owned Map intrinsic cluster", () => {

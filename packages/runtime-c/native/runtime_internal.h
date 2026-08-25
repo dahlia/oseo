@@ -526,6 +526,8 @@
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 17u)
 #define OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 18u)
+#define OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID \
+    (OSEO_REGEXP_CODE_ID_RANGE_LAST - 19u)
 
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)

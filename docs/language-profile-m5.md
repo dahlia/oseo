@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 91
+M5a is complete. The normative family records described below inventory 94
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 12,616 reviewed cases: 8,918 passes, 1,506
-expected negatives, and 2,192 unsupported profile features. It records no
+The current manifest contains 13,553 reviewed cases: 9,365 passes, 1,506
+expected negatives, and 2,682 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4187,7 +4187,11 @@ receiver and the original replacer as exactly two arguments. `replaceAll`
 first applies `IsRegExp` to an Object operand and, for a true `@@match`
 result, requires an object-coercible `flags` value containing `g` before the
 lookup. A primitive operand, a missing operand, and a nullish method take
-the String fallback.
+the String fallback. `%RegExp.prototype%` gains the deferred
+`Symbol.replace` placeholder that already stood for the four other String
+protocol symbols, so a RegExp operand reaches the owned
+`regexp-symbol-methods` boundary through GetMethod rather than the
+code-unit search this node admits.
 
 The fallback converts the receiver, then the search value, then a
 non-callable replacer, and matches UTF-16 code units. `replace` substitutes
@@ -4210,8 +4214,8 @@ lookup while the pinned Deno host does not, so that observation is carried
 by the reviewed test262 cases rather than by a fixed differential fixture,
 which requires both reference hosts to agree.
 
-Fixed native and generated differential evidence at seeds `0x60004b00` and
-`0x60004b01` covers primitive, wrapper, and generic receivers, both symbol
+Fixed native and generated differential evidence at seeds `0x60005200` and
+`0x60005201` covers primitive, wrapper, and generic receivers, both symbol
 dispatches, null, non-callable, and abruptly read methods, every
 GetSubstitution reference form against subjects that contain `$`,
 functional replacers with their arguments and abrupt results, empty
@@ -4221,17 +4225,23 @@ searches and subjects, overlapping candidates, lone surrogates,
 both specialization policies, forced collection at every safepoint, false
 hints, deliberate shape-guard misses, and generic fallback.
 
-All 100 paths under the node's two inventory roots are reviewed: 52 pass and
-48 retain explicit prerequisite boundaries for RegExp objects and patterns,
-the `Function` constructor, `Reflect.construct`, and unadmitted wrapper
-receivers. No previously reviewed path changes classification. The combined
-manifest reaches 11,464 cases: 8,449 passes, 1,364 expected negatives, and
-1,651 unsupported profile features with no semantic, harness, or
+All 100 paths under the node's two inventory roots are reviewed: 54 pass and
+46 retain explicit prerequisite boundaries. Thirty-eight build a regular
+expression, four need the unadmitted `Boolean` wrapper receiver, two need
+the `Function` constructor, and two need `Reflect.construct`. Those RegExp
+rows keep the `functions` and `object-properties` tags they earn instead of
+gaining `regular-expressions`, which stays with the deferred cross-family
+retagging `regexp-symbol-methods` owns. No previously reviewed path changes
+classification. The manifest moves from 13,453 to 13,553 cases and from
+9,311 to 9,365 passes, keeps 1,506 expected negatives, and moves from 2,636
+to 2,682 unsupported profile features, with no semantic, harness, or
 infrastructure failures. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, and zero-override policy are unchanged. The admitted
-runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-72` without
+runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-78` without
 adding a generated-code entry point or changing the graph's orchestration
-state.
+state. The String built-in code range gains two IDs for the two methods, and
+the RegExp range gains a twentieth for the deferred `[Symbol.replace]`
+placeholder.
 
 
 Known gaps inside the claim
@@ -4262,10 +4272,17 @@ complete. The remaining gaps retain their existing owners.
     delivery items 8 through 10.
  -  Regular expression allocation, initialization, `lastIndex`, dynamic
     validation, and intrinsic identity are admitted by the M5b
-    `regexp-intrinsic` node as recorded above. Matching, prototype accessors
-    and methods, symbol and String integration, and ahead-of-time literal
-    compilation remain outside the admitted profile and are owned by
-    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). Literal syntax is no longer
+    `regexp-intrinsic` node, and matching, result construction, `exec`,
+    `test`, `toString`, and the ten prototype accessors by
+    `regexp-prototype-and-exec`, both as recorded above. What remains
+    outside the admitted profile is the pattern grammar this edition still
+    defers, the real well-known symbol methods, `RegExp.escape`, and
+    ahead-of-time literal compilation, all owned by
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). `%RegExp.prototype%` carries
+    `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split` as
+    deferred placeholders, so a String protocol method reaches one owned
+    boundary through GetMethod rather than approximating a pattern; the
+    `regexp-symbol-methods` node replaces them. Literal syntax is no longer
     rejected as a whole: the frontend records a literal's pattern text,
     flag text, and range as an owned value and validates it with the owned
     pattern parser, so an invalid pattern or flag set is an early error at
@@ -4275,8 +4292,9 @@ complete. The remaining gaps retain their existing owners.
     `@oseo/compiler` also owns a generic matcher artifact and executor for
     that admitted grammar, which is the semantic authority a later
     ahead-of-time lowering must reproduce. Dynamic construction reaches its
-    admitted validation and artifact boundary, but no pattern executes until
-    the next RegExp node connects that artifact to result construction. The
+    admitted validation and artifact boundary, and `regexp-prototype-and-exec`
+    connected that artifact to built-in execution and result construction; a
+    regular expression literal still reports its own boundary. The
     reviewed property and character class escape roots contribute 142 expected
     negatives and 483 explicit later-node boundaries.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,

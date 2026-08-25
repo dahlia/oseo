@@ -680,8 +680,16 @@ Delivery order
     into ASCII except U+017F and U+212A, so the runtime resolves an ASCII
     closure exactly and keeps an `OSEO2001` boundary for a set that meets a
     non-ASCII class and for an ignore-case backreference in a pattern whose
-    sets can reach one. `RegExp.escape`, the string iterator, the symbol
-    methods, and String dispatch remain.
+    sets can reach one. That node also gave `%RegExp.prototype%` deferred
+    `@@match`, `@@matchAll`, `@@search`, and `@@split` placeholders, and
+    `string-prototype-replace` added the `@@replace` placeholder beside
+    them, so a RegExp operand reaches the owned boundary through GetMethod
+    rather than a String approximation. The regular expression string
+    iterator is already materialized: `string-prototype-match-and-split`
+    owns `%RegExpStringIteratorPrototype%`, its `next`, and its
+    `Symbol.toStringTag`, and `regexp-symbol-methods` extends that object
+    with the results a real `@@matchAll` yields. `RegExp.escape`, the real
+    symbol methods, and String dispatch remain.
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.

@@ -86,7 +86,8 @@ results:
       detail: 'test/built-ins/String/prototype/replace/S15.5.4.11_A1_T16.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/replace/S15.5.4.11_A1_T16.js:85:12:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

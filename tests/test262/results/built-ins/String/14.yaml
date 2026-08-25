@@ -53,7 +53,8 @@ results:
       detail: 'test/built-ins/String/prototype/replaceAll/searchValue-get-flags-abrupt.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/replaceAll/searchValue-get-flags-abrupt.js:116:11:
-        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+        error[OSEO1001]: Regular expression evaluation is outside the M5
+        profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

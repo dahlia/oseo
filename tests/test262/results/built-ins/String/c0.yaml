@@ -80,13 +80,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/String/prototype/replaceAll/searchValue-replace\
-        r-RegExp-call.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/String/prototype/replaceAll/searchValue\
-        -replacer-RegExp-call.js:104:18: error[OSEO1001]: Unknown
-        binding 'RegExp'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call.js:106:20:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -129,6 +129,7 @@ function substitute(
   const result: number[] = [];
   let index = 0;
   while (index < template.length) {
+    // SAFETY: index is below template.length, so the element exists.
     const unit = template[index] as number;
     const next = template[index + 1];
     if (unit !== 0x24 || next == null) {
@@ -181,11 +182,30 @@ function replaceModel(
   return result;
 }
 
+/**
+ * The independent model's prediction of one native run: the process exit
+ * status and the exact text each stream must carry.
+ */
+interface ExpectedObservation {
+  readonly exitStatus: number;
+  readonly stderr: string;
+  readonly stdout: string;
+}
+
+/**
+ * A functional-replacer pass: the replaced code units and the call log the
+ * replacer itself must have written while producing them.
+ */
+interface FunctionalModel {
+  readonly log: string;
+  readonly result: readonly number[];
+}
+
 /** The functional-replacer call log a replaceAll pass must produce. */
 function functionalModel(
   subject: readonly number[],
   search: readonly number[],
-): { readonly log: string; readonly result: readonly number[] } {
+): FunctionalModel {
   const calls: string[] = [];
   const result: number[] = [];
   const advance = search.length === 0 ? 1 : search.length;
@@ -277,11 +297,7 @@ console.log("guard", render(hinted(subject)));
 `;
 }
 
-function expectedObservation(testCase: ReplaceCase): {
-  readonly exitStatus: number;
-  readonly stderr: string;
-  readonly stdout: string;
-} {
+function expectedObservation(testCase: ReplaceCase): ExpectedObservation {
   const subject = testCase.subjectUnits;
   const search = testCase.searchUnits;
   const template = unitsOf(testCase.template.join(""));
@@ -520,11 +536,9 @@ try {
 `;
 }
 
-function expectedOperandObservation(testCase: OperandCase): {
-  readonly exitStatus: number;
-  readonly stderr: string;
-  readonly stdout: string;
-} {
+function expectedOperandObservation(
+  testCase: OperandCase,
+): ExpectedObservation {
   const units = testCase.subjectUnits;
   const reads = testCase.all ? (testCase.operand === "plain" ? 1 : 2) : 0;
   let stdout: string;

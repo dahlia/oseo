@@ -25514,8 +25514,8 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/cstm-replace-on-bigint-primitive.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [functions, object-properties, symbols]
+    expectedClassification: pass
+    dependencies: [bigint-primitive, functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/cstm-replace-on-boolean-primitive.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
@@ -25556,8 +25556,8 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-bigint-primitive.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [functions, object-properties, symbols]
+    expectedClassification: pass
+    dependencies: [bigint-primitive, functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replaceAll/cstm-replaceall-on-boolean-primitive.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
