@@ -117,7 +117,7 @@ jobs:
 
   test_native_support:
     name: >-
-      native support (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
+      native support (${{ matrix.platform.target }}, ${{ matrix.shard }}/6)
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
@@ -132,6 +132,9 @@ jobs:
           - 1
           - 2
           - 3
+          - 4
+          - 5
+          - 6
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -141,7 +144,7 @@ jobs:
         run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --test-shard=${{ matrix.shard }}/3 tests/property/*.property.test.ts
+          --test-shard=${{ matrix.shard }}/6 tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -149,7 +152,7 @@ jobs:
         with:
           name: >-
             ${{ format(
-            'native-support-diagnostics-{0}-{1}-of-3',
+            'native-support-diagnostics-{0}-{1}-of-6',
             matrix.platform.target,
             matrix.shard) }}
           path: ${{ runner.temp }}/oseo-native-*

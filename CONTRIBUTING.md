@@ -347,13 +347,22 @@ gate. CI partitions the native component by file through Node.js:
 
 ~~~~ sh
 mise run test:property:extended:native:shard \
-  --test-shard=1/3 tests/property/*.property.test.ts
+  --test-shard=1/6 tests/property/*.property.test.ts
 ~~~~
 
 Indices are one-based. Run every index for the same total and exact property
 file set on each matching host. The unsharded tasks remain the local gates, and
 `mise run test262:update` always regenerates the complete manifest without
 sharding.
+
+Node.js assigns files to shards by position, not by cost, so which files a
+shard receives changes whenever the property file set does, and how evenly the
+cost lands is accidental rather than chosen. The total is therefore sized so
+that an unlucky partition still finishes well inside the job timeout: measure
+the per-file cost of an unsharded `mise run test:property:extended:native` run,
+and raise the total whenever the slowest host's slowest shard stops leaving
+room for the corpus to keep growing. Raising it costs almost nothing, because
+the shards share one fixed amount of work.
 
 
 Package manifests and versions
