@@ -10,5 +10,5 @@ inventory:
     - test/built-ins/String/prototype/replaceAll/
 dependencies:
   - string-prototype-match-and-split
-landed: false
+landed: true
 status: ready

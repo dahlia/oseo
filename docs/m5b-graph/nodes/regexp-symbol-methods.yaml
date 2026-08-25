@@ -20,4 +20,4 @@ dependencies:
   - string-prototype-match-and-split
   - string-prototype-replace
 landed: false
-status: blocked
+status: ready
