@@ -332,3 +332,7 @@ families:
     owner: tests/property/m5-string-prototype-replace.property.test.ts
     start: 0x60005200
     end: 0x600052ff
+  - family: m5-generic-string-coercion
+    owner: tests/property/m5-generic-string-coercion.property.test.ts
+    start: 0x60005300
+    end: 0x600053ff

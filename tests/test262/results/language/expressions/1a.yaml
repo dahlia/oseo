@@ -48,7 +48,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-dflt-obj-\
         ptrn-prop-ary.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-prop-ary.js:126:5: error[OSEO1001]: Unknown binding
+        flt-obj-ptrn-prop-ary.js:140:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

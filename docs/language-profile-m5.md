@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 94
+M5a is complete. The normative family records described below inventory 95
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -753,43 +753,37 @@ current evidence assessment. Those live only in the indexed records above.
     cases under the AggregateError, Error, and NativeErrors inventory roots
     pin the standards surface.
  -  Generic `ToPrimitive` for object operands, implementing
-    `OrdinaryToPrimitive` without well-known symbols: user-reachable
-    `valueOf` and `toString` run in hint order with the receiver, an
-    object result falls through to the next method, and an object with
-    neither convertible method throws a catchable `TypeError`. Objects
-    on the realm-owned intrinsic prototype chain reach the materialized
-    `Object.prototype` methods through ordinary lookup. Arrays retain a
-    deferred conversion selected by intrinsic identity until their own method
-    node lands: the receiver-sensitive `Object.prototype.toString` tags
-    (`"[object Array]"`, `"[object Function]"`, `"[object Error]"`
-    through the internal error brand, and `"[object Object]"`,
-    including promises whose well-known-symbol tag is unreachable) and
-    the `join`-based array
-    text with element `ToString`, nullish holes as empty elements,
-    honored user `join` overrides, cyclic references rendered as empty
-    elements, and nesting bounded by the deterministic call-depth
-    budget. An object inheriting the virtual function conversion
-    without being callable throws the catchable `TypeError` that
-    `Function.prototype.toString` requires. A user `Symbol.toPrimitive`
-    method, reachable once the program has touched the `Symbol`
-    intrinsic, is dispatched first with the specification hint string;
-    a non-callable non-nullish method and an object result throw
-    catchable `TypeError` instances. The conversion feeds numeric
-    coercion, string conversion, addition with the default hint on both
-    operands before the string test, relational comparison with the number hint
-    in source order, loose equality, property keys, `console.log`, error
-    message and `Error.prototype.toString` conversion, and `setTimeout` delays
-    through one shared implementation, replacing both the former unsupported
-    object-coercion boundary and the timer-only ad-hoc conversion. Deliberate
-    Function text uses the frontend-retained source for user code and the
-    native-function form for built-ins and bound functions. Deliberate
-    boundary: converting a promise without a user-supplied method to text stays
-    an owned unsupported diagnostic until its well-known-symbol tag is
-    reachable; purely numeric function and promise conversion produces `NaN`
-    without materializing text, because each applicable string is non-numeric.
+    `OrdinaryToPrimitive`: user-reachable `valueOf` and `toString` run in
+    hint order with the receiver, an object result falls through to the next
+    method, and an object with neither convertible method throws a catchable
+    `TypeError`. Whichever method the ordinary lookup finds is the one
+    called, so an object whose nearest `toString` is the materialized
+    `%Object.prototype.toString%` renders through that function's builtinTag
+    and `Symbol.toStringTag` composition. Arrays retain a deferred
+    conversion selected by intrinsic identity rather than by calling the
+    materialized `Array.prototype.toString` the `array-prototype-copying`
+    node admitted: the `join`-based array text with element `ToString`,
+    nullish
+    holes as empty elements, honored user `join` overrides, cyclic
+    references rendered as empty elements, and nesting bounded by the
+    deterministic call-depth budget. An object inheriting
+    `Function.prototype.toString` without being callable throws the
+    catchable `TypeError` that method requires. A user `Symbol.toPrimitive`
+    method, reachable once the program has touched the `Symbol` intrinsic,
+    is dispatched first with the specification hint string; a non-callable
+    non-nullish method and an object result throw catchable `TypeError`
+    instances. The conversion feeds numeric coercion, string conversion,
+    addition with the default hint on both operands before the string test,
+    relational comparison with the number hint in source order, loose
+    equality, property keys, `console.log`, error message and
+    `Error.prototype.toString` conversion, and `setTimeout` delays through
+    one shared implementation, replacing both the former unsupported
+    object-coercion boundary and the timer-only ad-hoc conversion.
+    Deliberate Function text uses the frontend-retained source for user code
+    and the native-function form for built-ins and bound functions.
     `@@toPrimitive` dispatch is implemented by the symbols unit. Native
-    differential fixtures,
-    runtime C fixtures, and reviewed test262 cases cover the conversion.
+    differential fixtures, runtime C fixtures, and reviewed test262 cases
+    cover the conversion.
  -  `%Object.prototype%` is the realm-owned default prototype of ordinary
     objects. Its own `hasOwnProperty`, `isPrototypeOf`,
     `propertyIsEnumerable`, `toString`, `toLocaleString`, `valueOf`, and
@@ -4243,6 +4237,59 @@ state. The String built-in code range gains two IDs for the two methods, and
 the RegExp range gains a twentieth for the deferred `[Symbol.replace]`
 placeholder.
 
+M5b node `generic-string-coercion` routes `ToString` for an arbitrary object
+through the materialized `%Object.prototype.toString%`, `@@toPrimitive`, and
+`@@toStringTag`. OrdinaryToPrimitive reads `valueOf` and `toString` with the
+ordinary property lookup and calls whichever function it finds, so the
+conversion no longer selects a private text substitute by intrinsic
+prototype identity. The two retired substitutes were a virtual
+receiver-sensitive tag text and a function-and-promise unsupported
+diagnostic with a purely numeric shortcut to `NaN`.
+
+A promise therefore renders as `[object Promise]` through its prototype's
+`@@toStringTag`, and its numeric conversion materializes that text before
+`ToNumber`, so a `@@toStringTag` getter is observed. An object inheriting
+`%Function.prototype.toString%` without being callable reaches that method's
+own `TypeError`. A replaced `%Object.prototype.toString%` was already called
+through the ordinary lookup; deleting it is newly observable, because an
+object left with neither convertible method throws the specified catchable
+`TypeError`.
+
+Array text keeps the deferred conversion selected by intrinsic identity,
+which the Array prototype nodes own; measuring it against the reference
+hosts while retiring the substitutes above found one unchanged divergence
+they still own, a cyclic array-like whose `length` accessor is observed once
+rather than twice because the deferred path detects the cycle before reading
+it. Two receivers still report an owned prerequisite boundary from inside
+`%Object.prototype.toString%` rather than from the conversion: generator
+functions and generator objects, whose intrinsic reflection
+`function-intrinsic-chains` owns, and `Boolean` and `Symbol` wrappers, whose
+prototype methods `boolean-intrinsic` and `symbol-intrinsic` own.
+
+Fixed native and generated differential evidence at seed `0x60005300` covers
+`@@toPrimitive` dispatch with each hint string and its non-callable,
+object-result, and abrupt rejections, an explicit null method, hint order
+and fallthrough, an object with neither convertible method, a null-prototype
+receiver, `@@toStringTag` in own, inherited, non-string, getter, abrupt, and
+builtin-shadowing forms, every admitted builtinTag receiver, deleted and
+replaced default methods, `Object.prototype.toLocaleString` over the same
+receivers, both specialization policies, false hints, deliberate shape-guard
+misses, generic fallback, and collection forced at every safepoint.
+
+The node declares no test262 inventory root, because every applicable
+upstream path its behavior reaches is already reviewed: the 41 paths under
+*test/built-ins/Object/prototype/toString/* and the two each under
+*test/built-ins/Symbol/toPrimitive/* and
+*test/built-ins/Symbol/toStringTag/*. No previously reviewed path changes
+classification, and the manifest keeps 13,553 cases with 9,365 passes, 1,506
+expected negatives, and 2,682 unsupported profile features, with no
+semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
+to `oseo-runtime-m5-79` without adding a generated-code entry point, a
+built-in code ID, or a translation unit, and without changing the graph's
+orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -4463,11 +4510,12 @@ complete. The remaining gaps retain their existing owners.
     remain unsupported because that include depends on the unadmitted
     `Math.pow` intrinsic. The reviewed
     *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
-    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and its
-    `assert.throwsAsync` reports a constructor mismatch without composing a
-    message from the observed value, because this profile does not admit
-    `globalThis`. Owner: the standards harness
-    expansion in [*PLAN-M5.md*](../PLAN-M5.md).
+    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, because this
+    profile does not admit `globalThis`. Its `assert.throwsAsync` reports a
+    constructor mismatch without composing a message from the observed value,
+    so a rejection whose `constructor` is missing or exotic cannot replace
+    the mismatch report with a thrown conversion. Owner: the standards
+    harness expansion in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host
     contract tolerates one. Cases that deliberately leave a rejection
@@ -4520,8 +4568,11 @@ two documented ways. Harness sources are assembled into the compiled
 source, so in module cases they become module-scoped bindings instead of
 globals; a case whose fixtures need harness globals or whose bindings
 collide with harness names stays out of the reviewed subset. The reviewed
-`$DONE` prints the bare failure marker because the profile has no generic
-string coercion for arbitrary failure values yet.
+`$DONE` now composes the upstream failure detail, because generic string
+coercion renders an ordinary object failure value; it guards that
+composition and falls back to the bare marker for a Symbol and for any
+object whose conversion completes abruptly, rather than replacing a case's
+failure report with a thrown conversion.
 
 A newly supported feature moves tests out of `unsupported-profile-feature`
 only after every applicable variant executes. A changed upstream revision is

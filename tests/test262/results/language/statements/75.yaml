@@ -24,7 +24,7 @@ results:
         op-id-trailing-comma.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-id-trailing-comma.js:122:5: error[OSEO1001]: Unknown
+        -ptrn-prop-id-trailing-comma.js:136:5: error[OSEO1001]: Unknown
         binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

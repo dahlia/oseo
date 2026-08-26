@@ -46,7 +46,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-obj-ptrn-p\
         rop-obj.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-prop-obj.js:126:5: error[OSEO1001]: Unknown binding
+        j-ptrn-prop-obj.js:140:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

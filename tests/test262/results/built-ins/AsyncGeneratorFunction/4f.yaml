@@ -30,7 +30,7 @@ results:
     observation:
       detail: 'test/built-ins/AsyncGeneratorFunction/invoked-as-function-multiple-arguments.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorFunction/invoked-as-function-multiple-arguments.js:103:30:
+        stderr="test/built-ins/AsyncGeneratorFunction/invoked-as-function-multiple-arguments.js:117:30:
         error[OSEO2001]: Generator intrinsic reflection is not admitted
         yet.\n"'
       unsupportedCapability: generator-intrinsics

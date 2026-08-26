@@ -260,7 +260,7 @@ results:
       detail: 'test/language/expressions/optional-chaining/member-expression-async-identifier.js
         non-strict disabled failed (1):
         stdout="Test262:AsyncTestComplete\n"
-        stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:206:19:
+        stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:221:19:
         error[OSEO2001]: Unhandled promise rejection.\n"'
       unsupportedCapability: unhandled-rejection-policy
       passed: false

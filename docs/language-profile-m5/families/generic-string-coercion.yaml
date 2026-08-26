@@ -1,0 +1,83 @@
+version: 1
+id: generic-string-coercion
+title: "Generic string coercion"
+scope:
+  - "ToPrimitive over an arbitrary object: the @@toPrimitive dispatch with
+    the specification hint string, then OrdinaryToPrimitive reading valueOf
+    and toString with the ordinary property lookup and calling whichever
+    method the lookup finds in hint order. A non-callable non-nullish
+    @@toPrimitive and an object result from it throw catchable TypeError
+    instances, a null or undefined method falls through, a non-callable
+    valueOf or toString is skipped, an object result falls through to the
+    next method, and an object with neither convertible method throws a
+    catchable TypeError."
+  - "Whichever method the lookup finds is the one called, so a user own or
+    inherited method answers where the receiver has one, and a receiver
+    whose nearest toString is the realm-owned %Object.prototype.toString%
+    reaches that materialized function and renders through its builtinTag
+    and @@toStringTag composition. Promises, ordinary objects, Map,
+    ArrayBuffer, DataView, and
+    every other receiver reaching that method now produce their specified
+    text instead of the retired unsupported diagnostic, and a numeric
+    conversion of such a receiver materializes the same text before ToNumber
+    rather than shortcutting to NaN."
+  - "The retired private substitutes were a virtual receiver-sensitive tag
+    text and a function-and-promise unsupported diagnostic, both selected by
+    intrinsic prototype identity. Deleting, replacing, or shadowing
+    %Object.prototype.toString% or %Object.prototype.valueOf% is therefore
+    observable: the deleted pair throws the specified TypeError instead of
+    reporting a private tag."
+  - "Array text keeps the deferred conversion selected by intrinsic
+    identity, which honors a user join and shares the conversion cycle
+    stack; the Array prototype nodes own it. Two receivers still report an
+    owned prerequisite boundary from inside %Object.prototype.toString%
+    rather than from the conversion: generator functions and generator
+    objects, whose intrinsic reflection function-intrinsic-chains owns, and
+    Boolean and Symbol wrappers, whose prototype methods boolean-intrinsic
+    and symbol-intrinsic own."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/generic-string-coercion.ts
+      - tests/property/m5-generic-string-coercion.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/generic-string-coercion.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/generic-string-coercion.ts
+      - tests/property/m5-generic-string-coercion.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-generic-string-coercion.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/generic-string-coercion.ts
+      - tests/property/m5-generic-string-coercion.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/generic-string-coercion.ts
+      - tests/property/m5-generic-string-coercion.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_object_builtin.c
+      - packages/runtime-c/native/runtime_primitive.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
