@@ -194,9 +194,10 @@ static double math_imul(double left, double right) {
 }
 
 /*
- * The realm's xorshift128+ draw. The state is two fixed nonzero words
- * the context seeds, so the sequence is uniform, reproducible, and
- * identical on every supported target.
+ * The realm's xorshift128+ draw. The state is the two words the context
+ * mixed from this realm's initialization ordinal, so the sequence is
+ * uniform, identical on every supported target, and distinct from every
+ * other realm's.
  */
 static double math_random(OseoContext *context) {
     uint64_t first = context->random_state[0];

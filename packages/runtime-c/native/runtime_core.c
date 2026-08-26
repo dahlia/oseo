@@ -1,6 +1,7 @@
 #include "runtime_internal.h"
 
 #include <math.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,36 @@
  * Results, context lifecycle, diagnostics, call limits, frames,
  * root-stack operations, and immediate value constructors.
  */
+
+/*
+ * How many realms this process has initialized. ECMA-262 requires the
+ * Math.random of one realm to produce a sequence distinct from every
+ * other realm's, and this runtime takes no host entropy, so the realms
+ * count themselves: realm N of a run seeds from ordinal N, so a host
+ * that initializes its realms in one order observes the same sequences
+ * on every run and every target while no two realms share one. The
+ * counter is atomic so that a host initializing contexts on separate
+ * threads would still read distinct ordinals without a data race, which
+ * is all atomicity buys: it does not order those threads, so such a host
+ * would keep distinctness and lose the fixed ordinal each realm gets.
+ * Relaxed order is enough because an ordinal only has to be distinct,
+ * not ordered against any other memory.
+ */
+static _Atomic uint64_t realm_ordinal;
+
+/*
+ * One SplitMix64 output over `state`, which the call advances. The mix
+ * is a bijection over the whole 64-bit state, so consecutive ordinals
+ * scatter into unrelated and pairwise distinct seed words rather than
+ * into adjacent xorshift128+ states, and every multiplication here wraps
+ * as unsigned arithmetic defines.
+ */
+static uint64_t seed_word(uint64_t *state) {
+    uint64_t word = (*state += UINT64_C(0x9e3779b97f4a7c15));
+    word = (word ^ (word >> 30u)) * UINT64_C(0xbf58476d1ce4e5b9);
+    word = (word ^ (word >> 27u)) * UINT64_C(0x94d049bb133111eb);
+    return word ^ (word >> 31u);
+}
 
 void oseo_context_init(
     OseoContext *context,
@@ -59,13 +90,20 @@ void oseo_context_init(
     context->rejection_handled_count = 0u;
     context->unhandled_rejection_count = 0u;
     /*
-     * Two fixed nonzero words seed the realm's Math.random generator.
-     * A xorshift128+ state must never be all zero, and this runtime
-     * takes no host entropy, so the sequence is uniform and the same
-     * on every run and every target.
+     * The realm's Math.random state, mixed from the realm's own
+     * initialization ordinal rather than from host entropy, so distinct
+     * realms start from distinct states and draw distinct sequences that
+     * are uniform and the same on every run and every target. The low
+     * bit of the second word is set because a xorshift128+ state must
+     * never be all zero.
      */
-    context->random_state[0] = UINT64_C(0x853c49e6748fea9b);
-    context->random_state[1] = UINT64_C(0xda3e39cb94b95bdb);
+    uint64_t seed = atomic_fetch_add_explicit(
+        &realm_ordinal,
+        UINT64_C(1),
+        memory_order_relaxed
+    );
+    context->random_state[0] = seed_word(&seed);
+    context->random_state[1] = seed_word(&seed) | UINT64_C(1);
     context->clock_milliseconds = 0u;
     context->next_timer_id = 1u;
     context->next_timer_order = 0u;

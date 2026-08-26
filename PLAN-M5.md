@@ -4826,14 +4826,22 @@ exactly specified cases directly and the approximated ones through bounded
 identities; recording a permitted last-place difference as a semantic
 requirement would make the reviewed evidence depend on a specific libm.
 
-`Math.random` draws from a realm-owned xorshift128+ generator seeded from
-two fixed nonzero words. ECMA-262 leaves the strategy to the
-implementation, and this runtime keeps every other observable schedule
-reproducible, including its logical timer clock, so the sequence is
-uniform and identical on every run and every supported target rather than
-seeded from host entropy. Introducing an entropy source is a host
-capability decision no current node owns, and nothing in the pinned suite
-observes the difference.
+`Math.random` draws from a realm-owned xorshift128+ generator whose two
+state words the realm mixes from its own initialization ordinal, meaning
+the number of realms the process had already initialized. ECMA-262 leaves
+the strategy to the implementation but requires the `Math.random` of one
+realm to produce a sequence distinct from every other realm's, and this
+runtime keeps every other observable schedule reproducible, including its
+logical timer clock, so realm N of a run seeds from ordinal N: a host that
+initializes its realms in one order draws the same pairwise distinct
+sequences on every run and every supported target rather than seeding from
+host entropy. The ordinal counter is atomic, so a host that initialized two
+realms on separate threads would still give each its own ordinal without a
+data race, but atomicity does not order the two, so that host would keep
+distinctness and give up the fixed assignment of ordinal to realm. No
+current host initializes realms concurrently. Introducing an entropy source
+is a host capability decision no current node owns, and nothing in the
+pinned suite observes the difference.
 
 The runtime gains one component, *runtime\_math.c*, and one built-in code
 range whose thirty-six IDs count down from the range last in the same
@@ -4859,7 +4867,12 @@ approximated identities, the pseudorandom range, both specialization
 policies, collection forced at every safepoint, false hints, deliberate
 shape-guard misses, generic fallback, and the global-object write, delete,
 restore, assignment-target, and strict missing-property sequences the
-replaceable binding admits.
+replaceable binding admits. One native C fixture initializes three realms
+in a single process and observes that their `Math.random` sequences differ
+pairwise while every draw stays inside `[0, 1)`, which the fixed seeding
+this node replaced could not satisfy; the fixture prints those draws and
+its driver runs the executable twice on the matching native target to
+observe the two runs agreeing.
 
 Of the 317 paths under the node's inventory root, 316 are reviewed: 280
 pass and 36 retain the explicit `Reflect.construct` prerequisite their

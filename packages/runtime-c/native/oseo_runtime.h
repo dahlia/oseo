@@ -383,9 +383,10 @@ struct OseoContext {
     size_t unhandled_rejection_count;
     /*
      * The realm's Math.random source. ECMA-262 leaves the strategy to
-     * the implementation, and this runtime keeps every observable
-     * schedule reproducible, so the generator is a xorshift128+ state
-     * seeded from fixed nonzero constants rather than host entropy.
+     * the implementation but requires distinct realms to draw distinct
+     * sequences, and this runtime keeps every observable schedule
+     * reproducible, so the generator is a xorshift128+ state seeded from
+     * the realm's own initialization ordinal rather than host entropy.
      */
     uint64_t random_state[2];
     uint64_t clock_milliseconds;

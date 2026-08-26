@@ -10,6 +10,8 @@ scope:
     argument conversion order, and the exact results the edition specifies
     for signed zeroes, infinities, NaN, and the exactly determined
     operations."
+  - "The realm-owned Math.random source, meaning its [0, 1) range and the
+    requirement that distinct realms draw distinct sequences."
 owners:
   - PLAN-M5.md
 evidence:
@@ -21,6 +23,7 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/fixtures/runtime-heap.c
       - tests/native/fixtures/math-namespace.ts
   forced-collection:
     status: covered

@@ -22,7 +22,7 @@ const zigNativeTarget =
       ? "aarch64-macos"
       : undefined;
 
-function run(command: string, args: readonly string[]): void {
+function run(command: string, args: readonly string[]): string {
   const result = spawnSync(command, args, {
     cwd: root,
     encoding: "utf8",
@@ -38,6 +38,7 @@ function run(command: string, args: readonly string[]): void {
       `stderr: ${result.stderr ?? ""}`,
     ].join("\n"),
   );
+  return result.stdout ?? "";
 }
 
 test(
@@ -65,7 +66,15 @@ test(
         "-o",
         executable,
       ]);
-      run(executable, []);
+      const draws = run(executable, []);
+      /*
+       * The fixture prints the Math.random draws of the three realms it
+       * initializes. A realm seeds from its initialization ordinal
+       * rather than from host entropy, so a second run of the same
+       * executable on the same target prints exactly the same draws.
+       */
+      assert.match(draws, /^realm 0 draw 0 [0-9a-f]{16}$/mu);
+      assert.equal(run(executable, []), draws);
       run("zig", [
         "cc",
         "-target",

@@ -130,9 +130,11 @@ Ownership follows the plan's target layout:
     trail boundaries;
  -  *runtime\_math.c*: the `Math` namespace object, its eight value
     properties, its `Symbol.toStringTag`, the thirty-six function
-    properties of 21.3.2, and the realm's `Math.random` source. It owns no
-    numeric conversion of its own: `ToNumber`, `ToUint32`, and
-    Number::exponentiate stay with *runtime\_primitive.c*;
+    properties of 21.3.2, and the realm's `Math.random` draw, whose
+    xorshift128+ state *runtime\_core.c* seeds from the realm's
+    initialization ordinal. It owns no numeric conversion of its own:
+    `ToNumber`, `ToUint32`, and Number::exponentiate stay with
+    *runtime\_primitive.c*;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single

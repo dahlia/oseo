@@ -1,7 +1,9 @@
 #include "oseo_runtime.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -2614,6 +2616,101 @@ static void test_data_view_prototype_revalidation(void) {
     }
 }
 
+/*
+ * ECMA-262 requires the Math.random functions created for distinct
+ * realms to produce distinct sequences from successive calls, and the
+ * initialization ordinal each realm mixes into its seed is the only
+ * thing separating them here, so three realms initialized in one process
+ * disagree pairwise while every draw stays inside [0, 1). Printing the
+ * draws is the reproducibility half of the contract: a realm reads its
+ * ordinal rather than host entropy, so the test driver runs this
+ * executable twice and compares the two printed sequences.
+ */
+static void test_realm_random_sequences(void) {
+    OseoValue draws[3][8];
+    const size_t realm_count = sizeof(draws) / sizeof(draws[0]);
+    const size_t draw_count = sizeof(draws[0]) / sizeof(draws[0][0]);
+    for (size_t realm = 0u; realm < realm_count; realm += 1u) {
+        OseoContext context;
+        OseoValue roots[4] = {
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+        };
+        OseoRootFrame frame = {NULL, roots, 4u};
+        oseo_context_init(&context, "runtime-heap.c", 14u);
+        oseo_roots_push(&context, &frame);
+        roots[0] = require_normal(oseo_environment_create(&context, 0u));
+        /* The realm reaches Math through its installed global object. */
+        roots[1] = require_normal(oseo_global_object_create(
+            &context,
+            roots[0],
+            0u,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            0u,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        ));
+        roots[2] = make_text(&context, "Math");
+        roots[1] = require_normal(
+            oseo_object_get(&context, roots[1], roots[2])
+        );
+        roots[2] = make_text(&context, "random");
+        roots[3] = require_normal(
+            oseo_object_get(&context, roots[1], roots[2])
+        );
+        for (size_t index = 0u; index < draw_count; index += 1u) {
+            OseoValue drawn = require_normal(oseo_call_function(
+                &context,
+                roots[3],
+                roots[1],
+                0u,
+                NULL,
+                oseo_undefined()
+            ));
+            assert(oseo_to_boolean(require_normal(
+                oseo_less_equal(&context, oseo_number(0.0), drawn)
+            )));
+            assert(oseo_to_boolean(require_normal(
+                oseo_less_than(&context, drawn, oseo_number(1.0))
+            )));
+            /* Every draw is a Number, so its bits are its identity. */
+            draws[realm][index] = drawn;
+        }
+        oseo_roots_pop(&context, &frame);
+        oseo_context_destroy(&context);
+    }
+    for (size_t realm = 1u; realm < realm_count; realm += 1u) {
+        for (size_t earlier = 0u; earlier < realm; earlier += 1u) {
+            bool differs = false;
+            for (size_t index = 0u; index < draw_count; index += 1u) {
+                if (draws[realm][index] != draws[earlier][index]) {
+                    differs = true;
+                }
+            }
+            assert(differs);
+        }
+    }
+    for (size_t realm = 0u; realm < realm_count; realm += 1u) {
+        for (size_t index = 0u; index < draw_count; index += 1u) {
+            printf(
+                "realm %zu draw %zu %016" PRIx64 "\n",
+                realm,
+                index,
+                (uint64_t)draws[realm][index]
+            );
+        }
+    }
+}
+
 static void test_string_length_limit(OseoContext *context) {
     OseoResult result = oseo_string_from_units(
         context,
@@ -3042,6 +3139,7 @@ int main(void) {
     test_regexp_matcher_limits();
     test_regexp_duplicate_name_scale();
     test_regexp_prototype_and_conversion_order();
+    test_realm_random_sequences();
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);
