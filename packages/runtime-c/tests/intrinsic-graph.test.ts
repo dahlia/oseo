@@ -307,6 +307,32 @@ test("collects every defineProperties descriptor before mutation", () => {
   assert.doesNotMatch(deferred[1] ?? "", /defineProperties/u);
 });
 
+test("creates over the shared defineProperties collection", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  // The prototype check precedes the properties read, an undefined
+  // properties argument returns the fresh object directly, and any other
+  // value flows through the one ObjectDefineProperties body the plural
+  // define entry point owns.
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      String.raw`OseoResult oseo_object_builtin_create\([\s\S]*` +
+        "Object\\.create requires an object or null prototype[\\s\\S]*" +
+        String.raw`oseo_object_create\(context, prototype\)[\s\S]*` +
+        String.raw`object_define_properties\(context, 2u, define_arguments\)`,
+      "u",
+    ),
+  );
+  assert.doesNotMatch(objectBuiltins, /unsupported in M3/u);
+  assert.match(objectBuiltins, /OSEO_OBJECT_CREATE_CODE_ID[\s\S]*"create"/u);
+  const deferred = objectBuiltins.match(
+    /deferred_static_names\[\] = \{([^}]*)\}/u,
+  );
+  assert.ok(deferred != null, "deferred Object statics");
+  assert.doesNotMatch(deferred[1] ?? "", /"create"/u);
+});
+
 test("owns Object integrity transitions and queries", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 

@@ -531,9 +531,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   if (diagnostic === "Object static method is not admitted in this M5b node.") {
     return "object-static-method";
   }
-  if (diagnostic === "Object.create descriptor maps are unsupported in M3.") {
-    return "object-create-descriptor-map";
-  }
   if (
     diagnostic === "Promise static method is not admitted in this M5b node."
   ) {

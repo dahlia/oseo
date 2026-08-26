@@ -349,6 +349,48 @@ export async function runNativeScenario2(
     }
   }
 
+  const createModuleEntry = [
+    root,
+    "tests/fixtures/object-create-module/entry.mjs",
+  ].join("/");
+  const createModuleReferences = [
+    await host.run({
+      args: [createModuleEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", createModuleEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of createModuleReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeCreateModule = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            createModuleEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeCreateModule.exitStatus, 0, nativeCreateModule.stderr);
+      assert.equal(nativeCreateModule.stderr, "");
+      for (const reference of createModuleReferences) {
+        assert.equal(nativeCreateModule.stdout, reference.stdout);
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const objectStaticMutationEntry = [
     root,
     "tests/fixtures/object-static-mutation/entry.mjs",

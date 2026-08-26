@@ -1044,6 +1044,286 @@ console.log(
 `,
   },
   {
+    name: "object-create",
+    nonStrictScript: true,
+    source: `
+const metadata = Object.getOwnPropertyDescriptor(Object, "create");
+console.log(
+  "metadata",
+  Object.create.name,
+  Object.create.length,
+  metadata.writable,
+  metadata.enumerable,
+  metadata.configurable,
+);
+for (const prototype of [undefined, true, 1, "text", Symbol("proto"), 1n]) {
+  try {
+    Object.create(prototype);
+  } catch (error) {
+    console.log("bad prototype", typeof prototype, error instanceof TypeError);
+  }
+}
+try {
+  Object.create();
+} catch (error) {
+  console.log("missing prototype", error instanceof TypeError);
+}
+let poisonedReads = 0;
+try {
+  Object.create(7, {
+    get poisoned() {
+      poisonedReads = poisonedReads + 1;
+      return { value: 1 };
+    },
+  });
+} catch (error) {
+  console.log("prototype first", error instanceof TypeError, poisonedReads);
+}
+const bare = Object.create(null);
+console.log(
+  "null prototype",
+  Object.getPrototypeOf(bare),
+  "toString" in bare,
+  Object.isExtensible(bare),
+);
+bare.added = 1;
+console.log("null prototype write", bare.added, Object.keys(bare).length);
+const base = { inherited: 2, shadowed: "base" };
+const child = Object.create(base);
+console.log(
+  "object prototype",
+  Object.getPrototypeOf(child) === base,
+  child.inherited,
+  child.shadowed,
+  Object.keys(child).length,
+);
+child.shadowed = "child";
+console.log("shadowing", child.shadowed, base.shadowed);
+console.log(
+  "distinct results",
+  Object.create(base) === Object.create(base),
+  Object.create(base, undefined) !== child,
+  Object.getPrototypeOf(Object.create(base, undefined)) === base,
+);
+const arrayPrototype = [7, 8];
+const fromArray = Object.create(arrayPrototype);
+console.log(
+  "array prototype",
+  Object.getPrototypeOf(fromArray) === arrayPrototype,
+  fromArray[0],
+  fromArray.length,
+);
+function FunctionPrototype() {
+  return 9;
+}
+const fromFunction = Object.create(FunctionPrototype);
+console.log(
+  "function prototype",
+  Object.getPrototypeOf(fromFunction) === FunctionPrototype,
+  typeof fromFunction,
+  fromFunction.length,
+);
+try {
+  Object.create({}, null);
+} catch (error) {
+  console.log("null properties", error instanceof TypeError);
+}
+const primitiveProps = Object.create(base, true);
+console.log(
+  "boolean properties",
+  Object.keys(primitiveProps).length,
+  Object.getPrototypeOf(Object.create(null, 7)),
+  Object.keys(Object.create(base, Symbol("props"))).length,
+);
+try {
+  Object.create({}, "ab");
+} catch (error) {
+  console.log("string properties", error instanceof TypeError);
+}
+console.log(
+  "empty string properties",
+  Object.keys(Object.create(base, "")).length,
+);
+const order = [];
+const symbolKey = Symbol("ordered");
+const orderedProps = {
+  beta: {
+    get enumerable() { order.push("beta enumerable"); return true; },
+    get configurable() { order.push("beta configurable"); return true; },
+    get value() { order.push("beta value"); return 1; },
+    get writable() { order.push("beta writable"); return true; },
+  },
+  2: {
+    get value() { order.push("2 value"); return 2; },
+  },
+  alpha: {
+    get get() { order.push("alpha get"); return undefined; },
+    get set() { order.push("alpha set"); return undefined; },
+  },
+  0: {
+    get value() { order.push("0 value"); return 0; },
+  },
+};
+Object.defineProperty(orderedProps, symbolKey, {
+  enumerable: true,
+  value: { get value() { order.push("symbol value"); return 3; } },
+});
+Object.defineProperty(orderedProps, "hidden", {
+  enumerable: false,
+  value: { get value() { order.push("hidden value"); return 4; } },
+});
+const ordered = Object.create(base, orderedProps);
+console.log("order", order.length);
+for (let index = 0; index < order.length; index = index + 1) {
+  console.log("read", order[index]);
+}
+console.log(
+  "ordered",
+  ordered[0],
+  ordered[2],
+  ordered.beta,
+  ordered.alpha,
+  ordered[symbolKey],
+  "hidden" in ordered,
+  ordered.inherited,
+);
+const defaultsTarget = Object.create(null, { bare: {} });
+const defaults = Object.getOwnPropertyDescriptor(defaultsTarget, "bare");
+console.log(
+  "defaults",
+  defaults.value,
+  defaults.writable,
+  defaults.enumerable,
+  defaults.configurable,
+);
+const inheritedProps = Object.create({
+  inherited: { value: 5, enumerable: true },
+});
+inheritedProps.own = { value: 6, enumerable: true };
+const inheritedTarget = Object.create(null, inheritedProps);
+console.log(
+  "inherited skipped",
+  inheritedTarget.own,
+  "inherited" in inheritedTarget,
+);
+let stored = 0;
+const accessorTarget = Object.create(base, {
+  paired: {
+    get: function () { return stored + 10; },
+    set: function (value) { stored = value; },
+    enumerable: true,
+    configurable: true,
+  },
+  setterOnly: {
+    set: function (value) { stored = value * 2; },
+  },
+});
+accessorTarget.paired = 7;
+console.log("accessor pair", accessorTarget.paired, stored);
+accessorTarget.setterOnly = 4;
+console.log(
+  "setter only",
+  accessorTarget.setterOnly,
+  stored,
+  Object.getOwnPropertyDescriptor(accessorTarget, "setterOnly").get,
+);
+const collectLog = [];
+try {
+  Object.create(base, {
+    first: { value: 1 },
+    get second() {
+      collectLog.push("second");
+      throw new RangeError("collection");
+    },
+    third: { value: 3 },
+  });
+} catch (error) {
+  console.log(
+    "collection abrupt",
+    error.name,
+    error.message,
+    collectLog[0],
+    collectLog.length,
+  );
+}
+try {
+  Object.create(base, { first: { value: 1 }, second: 2 });
+} catch (error) {
+  console.log("non-object descriptor", error instanceof TypeError);
+}
+try {
+  Object.create(base, { first: { get: null } });
+} catch (error) {
+  console.log("invalid getter", error instanceof TypeError);
+}
+try {
+  Object.create(base, {
+    first: { value: 1, set: function () {} },
+  });
+} catch (error) {
+  console.log("mixed descriptor", error instanceof TypeError);
+}
+function mappedProps(first, second) {
+  const out = Object.create(null, arguments);
+  first = { value: 99 };
+  return out;
+}
+const mapped = mappedProps(
+  { value: 13, enumerable: true },
+  { value: 14 },
+);
+console.log(
+  "mapped properties",
+  mapped[0],
+  mapped[1],
+  Object.getPrototypeOf(mapped),
+);
+const arrayProps = [
+  { value: 11, enumerable: true },
+  { value: 12, enumerable: true },
+];
+const fromArrayProps = Object.create(base, arrayProps);
+console.log(
+  "array properties",
+  fromArrayProps[0],
+  fromArrayProps[1],
+  "length" in fromArrayProps,
+);
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+const original = Object.create;
+let turn = 0;
+while (turn < 3) {
+  const guarded = Object.create(null, {
+    value: { value: hinted(turn === 1 ? "x" : turn) },
+  });
+  console.log("guard", guarded.value);
+  if (turn === 0) Object.createMarker = true;
+  turn = turn + 1;
+}
+console.log("identity", Object.create === original);
+const chain = { depth: 0 };
+let cursor = chain;
+for (let index = 0; index < 24; index = index + 1) {
+  cursor = Object.create(cursor, {
+    ["item" + index]: {
+      configurable: true,
+      enumerable: index % 2 === 0,
+      value: { index },
+      writable: true,
+    },
+  });
+}
+console.log(
+  "collection",
+  cursor.item23.index,
+  cursor.item0.index,
+  cursor.depth,
+  Object.keys(cursor).length,
+);
+`,
+  },
+  {
     name: "object-descriptor-queries",
     nonStrictScript: true,
     source: `
