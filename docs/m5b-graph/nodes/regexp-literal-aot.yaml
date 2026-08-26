@@ -7,4 +7,10 @@ delivers: "Compiles literal patterns during the build into immutable
 dependencies:
   - regexp-prototype-and-exec
 landed: false
-status: ready
+status: parked
+reason: "The reviewed positive separator-regexp.js case uses Annex B-only
+  non-unicode escapes. The frozen manifest schema cannot classify its
+  compile rejection as the required named unsupported capability; the
+  schema-preserving correction belongs to regexp-pattern-ast's parser error
+  taxonomy, outside this node. Resume after that taxonomy distinguishes the
+  Annex B profile boundary."
