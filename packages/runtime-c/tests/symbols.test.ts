@@ -103,6 +103,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_data_view.c"],
       ["source", "runtime_regexp.c"],
       ["source", "runtime_regexp_matcher.c"],
+      ["source", "runtime_math.c"],
     ],
   );
 });

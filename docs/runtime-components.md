@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-one reviewed assets in this order:
+The runtime input now lists thirty-two reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
@@ -29,13 +29,14 @@ The runtime input now lists thirty-one reviewed assets in this order:
 *runtime\_primitive.c*, *runtime\_promise.c*,
 *runtime\_event\_loop.c*, *runtime\_map.c*,
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
-*runtime\_regexp.c*, and *runtime\_regexp\_matcher.c*. The M5
+*runtime\_regexp.c*, *runtime\_regexp\_matcher.c*, and
+*runtime\_math.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
-map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic, and
-RegExp-prototype-and-exec units each
+map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
+RegExp-prototype-and-exec, and Math-namespace units each
 added one
 component the same
 way. The M5b
@@ -127,6 +128,11 @@ Ownership follows the plan's target layout:
     empty-progress failure, UTF-16 and code-point traversal, ignore-case
     closure, and the reviewed instruction, register, step, backtrack, and
     trail boundaries;
+ -  *runtime\_math.c*: the `Math` namespace object, its eight value
+    properties, its `Symbol.toStringTag`, the thirty-six function
+    properties of 21.3.2, and the realm's `Math.random` source. It owns no
+    numeric conversion of its own: `ToNumber`, `ToUint32`, and
+    Number::exponentiate stay with *runtime\_primitive.c*;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -256,7 +262,8 @@ one.
 
 ### Internal helpers
 
-One hundred and twenty helpers cross a translation-unit boundary. Each uses
+One hundred and twenty-five helpers cross a translation-unit
+boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -275,6 +282,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_number_builtin_dispatch`             | *runtime\_number.c*           |
 | `oseo_internal_number_intrinsic`                    | *runtime\_number.c*           |
 | `oseo_internal_install_number_global`               | *runtime\_number.c*           |
+| `oseo_internal_math_builtin_dispatch`               | *runtime\_math.c*             |
+| `oseo_internal_math_intrinsic`                      | *runtime\_math.c*             |
+| `oseo_internal_install_math_global`                 | *runtime\_math.c*             |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
@@ -344,6 +354,8 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_promise_method_function`             | *runtime\_promise.c*          |
 | `oseo_internal_string_is_ascii`                     | *runtime\_string.c*           |
 | `oseo_internal_to_number`                           | *runtime\_primitive.c*        |
+| `oseo_internal_number_exponentiate`                 | *runtime\_primitive.c*        |
+| `oseo_internal_number_to_uint32`                    | *runtime\_primitive.c*        |
 | `oseo_internal_to_primitive`                        | *runtime\_primitive.c*        |
 | `oseo_internal_to_object`                           | *runtime\_object\_builtin.c*  |
 | `oseo_internal_to_object_for_property`              | *runtime\_object\_builtin.c*  |

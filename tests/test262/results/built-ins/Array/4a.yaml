@@ -22,8 +22,8 @@ results:
       detail: "test/built-ins/Array/prototype/concat/Array.prototype.concat_s\
         mall-typed-array.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/concat/Array.prototype.\
-        concat_small-typed-array.js:122:12: error[OSEO1001]: Unknown
-        binding 'Math'.\\n\""
+        concat_small-typed-array.js:124:3: error[OSEO1001]: Unknown
+        binding 'Uint8Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

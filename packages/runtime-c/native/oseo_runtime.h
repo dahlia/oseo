@@ -277,7 +277,8 @@ typedef enum {
     OSEO_INTRINSIC_REGEXP_PROTOTYPE = 162,
     OSEO_INTRINSIC_REGEXP = 163,
     OSEO_INTRINSIC_REGEXP_SPECIES = 164,
-    OSEO_INTRINSIC_COUNT = 165,
+    OSEO_INTRINSIC_MATH = 165,
+    OSEO_INTRINSIC_COUNT = 166,
 } OseoIntrinsic;
 
 typedef struct {
@@ -380,6 +381,13 @@ struct OseoContext {
     size_t collections;
     size_t rejection_handled_count;
     size_t unhandled_rejection_count;
+    /*
+     * The realm's Math.random source. ECMA-262 leaves the strategy to
+     * the implementation, and this runtime keeps every observable
+     * schedule reproducible, so the generator is a xorshift128+ state
+     * seeded from fixed nonzero constants rather than host entropy.
+     */
+    uint64_t random_state[2];
     uint64_t clock_milliseconds;
     uint64_t next_timer_id;
     uint64_t next_timer_order;

@@ -162,6 +162,41 @@ test("reads the replaceable Number value through its global property", () => {
   );
 });
 
+test("reads the replaceable Math value through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof Math, Math.max(Math.PI, 1));",
+    sourceId: "math-namespace.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Math" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Math"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /read \*missing intrinsic:Math\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete Math;",
+    sourceId: "delete-math.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["Math"\]/u);
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { Math = 1; }",
+    sourceId: "with-math-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'Math' through a with fallback/u,
+  );
+});
+
 test("reads the replaceable Array value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source: "console.log(typeof Array, Array(2), Array.of(4));",

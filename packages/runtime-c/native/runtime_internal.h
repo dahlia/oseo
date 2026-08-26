@@ -529,6 +529,22 @@
 #define OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 19u)
 
+#define OSEO_MATH_CODE_ID_RANGE_INDEX ((size_t)17u)
+#define OSEO_MATH_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_MATH_CODE_ID_RANGE_INDEX)
+#define OSEO_MATH_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_MATH_CODE_ID_RANGE_INDEX)
+/*
+ * The Math function properties keep one dense order, so a code ID is
+ * the range last minus that function's index in `math_functions` and
+ * the dispatch needs no separate table. The first and last IDs bound
+ * the range the builder and the dispatcher both walk.
+ */
+#define OSEO_MATH_FUNCTION_COUNT ((size_t)36u)
+#define OSEO_MATH_FUNCTION_CODE_ID_LAST OSEO_MATH_CODE_ID_RANGE_LAST
+#define OSEO_MATH_FUNCTION_CODE_ID_FIRST \
+    (OSEO_MATH_CODE_ID_RANGE_LAST - (OSEO_MATH_FUNCTION_COUNT - 1u))
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1621,6 +1637,15 @@ OseoResult oseo_internal_number_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_math_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_internal_array_buffer_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -2186,7 +2211,21 @@ OseoResult oseo_internal_install_number_global(
     OseoContext *context,
     OseoValue global
 );
+/* The realm's lazily created Math namespace object. */
+OseoResult oseo_internal_math_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_math_global(
+    OseoContext *context,
+    OseoValue global
+);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
+/*
+ * Number::exponentiate over two already converted Numbers, 6.1.6.1.3.
+ * The `**` operator and Math.pow share it so the two cases where C
+ * `pow` disagrees with the specification are decided in one place.
+ */
+double oseo_internal_number_exponentiate(double base, double exponent);
+/* ToUint32 over an already converted Number, 7.1.7. */
+uint32_t oseo_internal_number_to_uint32(double number);
 /*
  * ToIndex(value), 7.1.22, reporting the admitted integer through
  * `index`. `description` is the complete RangeError message a rejected

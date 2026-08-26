@@ -75,6 +75,8 @@ const { stringPrototypeReplaceFixtures } =
   await import("./native/fixtures/string-prototype-replace.ts");
 const { genericStringCoercionFixtures } =
   await import("./native/fixtures/generic-string-coercion.ts");
+const { mathNamespaceFixtures } =
+  await import("./native/fixtures/math-namespace.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -148,6 +150,7 @@ const fixtures: readonly Fixture[] = [
   ...stringPrototypeMatchAndSplitFixtures,
   ...stringPrototypeReplaceFixtures,
   ...numberPrototypeFixtures,
+  ...mathNamespaceFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -645,6 +648,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
+    fixture.name === "math-namespace" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -721,6 +725,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
+    fixture.name === "math-namespace" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -1113,10 +1118,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus seventeen admitted constructor
-            // property names shared by every Script, RegExp being the one
-            // this node admits.
-            assert.equal(native.counters.allocations, 33);
+            // value-property allocations plus eighteen admitted standard
+            // global property names shared by every Script, the Math
+            // namespace being the one this node adds.
+            assert.equal(native.counters.allocations, 34);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

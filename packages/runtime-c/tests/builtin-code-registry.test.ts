@@ -33,6 +33,7 @@ const components = [
   "BIGINT",
   "DATA_VIEW",
   "REGEXP",
+  "MATH",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

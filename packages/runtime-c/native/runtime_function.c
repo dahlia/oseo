@@ -160,6 +160,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_REGEXP_CODE_ID_RANGE_FIRST,
      OSEO_REGEXP_CODE_ID_RANGE_LAST,
      oseo_internal_regexp_builtin_dispatch},
+    {OSEO_MATH_CODE_ID_RANGE_FIRST,
+     OSEO_MATH_CODE_ID_RANGE_LAST,
+     oseo_internal_math_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {

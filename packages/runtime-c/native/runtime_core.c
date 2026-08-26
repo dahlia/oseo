@@ -58,6 +58,14 @@ void oseo_context_init(
     context->collections = 0u;
     context->rejection_handled_count = 0u;
     context->unhandled_rejection_count = 0u;
+    /*
+     * Two fixed nonzero words seed the realm's Math.random generator.
+     * A xorshift128+ state must never be all zero, and this runtime
+     * takes no host entropy, so the sequence is uniform and the same
+     * on every run and every target.
+     */
+    context->random_state[0] = UINT64_C(0x853c49e6748fea9b);
+    context->random_state[1] = UINT64_C(0xda3e39cb94b95bdb);
     context->clock_milliseconds = 0u;
     context->next_timer_id = 1u;
     context->next_timer_order = 0u;

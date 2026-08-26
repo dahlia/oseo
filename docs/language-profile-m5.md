@@ -4464,6 +4464,110 @@ generated-code ABI entry point, `oseo_regexp_literal`, and no built-in code
 ID. The suite revision, 41,091-path inventory, manifest schema and
 vocabulary, and the manifest's zero-override policy are unchanged.
 
+M5b node `math-namespace` materializes the `Math` namespace object. It is an
+ordinary object whose `[[Prototype]]` is the realm's `%Object.prototype%`,
+and the global object binds it as a writable, non-enumerable, configurable
+property, so a program may replace or delete `Math` exactly as it may
+replace `Number` or `String`. It is not a function: it has neither
+`[[Call]]` nor `[[Construct]]`, calling it throws a `TypeError`, and its
+`Symbol.toStringTag` is the non-writable, non-enumerable, configurable
+string `"Math"`, so `Object.prototype.toString` reports `[object Math]`.
+None of its function properties is a constructor either, so `new Math.abs(1)`
+throws a `TypeError` before any argument is converted.
+
+The eight value properties `E`, `LN10`, `LN2`, `LOG10E`, `LOG2E`, `PI`,
+`SQRT1_2`, and `SQRT2` are non-writable, non-enumerable, and
+non-configurable, and each holds the Number value closest to the constant it
+names. The thirty-six function properties of 21.3.2 are writable,
+non-enumerable, and configurable ordinary built-in functions with their
+specified names and lengths: `abs`, `acos`, `acosh`, `asin`, `asinh`,
+`atan`, `atanh`, `atan2`, `cbrt`, `ceil`, `clz32`, `cos`, `cosh`, `exp`,
+`expm1`, `f16round`, `floor`, `fround`, `hypot`, `imul`, `log`, `log1p`,
+`log10`, `log2`, `max`, `min`, `pow`, `random`, `round`, `sign`, `sin`,
+`sinh`, `sqrt`, `tan`, `tanh`, and `trunc`. `Math.sumPrecise` belongs to a
+later edition than the one [ADR 0013](./adr/0013-m5-edition-and-manifest.md)
+pins and is not added.
+
+Every function converts its arguments with `ToNumber` in argument order and
+propagates the first abrupt conversion without converting the arguments
+after it, so a `Symbol` operand throws a `TypeError` and a throwing
+`valueOf` is observed exactly once. A missing argument converts `undefined`,
+which is `NaN` for the unary operations, and `Math.max`, `Math.min`, and
+`Math.hypot` convert every argument they receive before comparing any of
+them.
+
+The exactly determined operations produce exactly the specified Number.
+`Math.round` returns the closest integral Number and breaks a tie toward
+positive infinity, so `Math.round(-2.5)` is `-2`, `Math.round(-0.2)` is
+`-0`, and `Math.round(0.49999999999999994)` is `+0`. `Math.ceil`,
+`Math.floor`, `Math.trunc`, `Math.abs`, `Math.sign`, `Math.sqrt`,
+`Math.cbrt`, `Math.min`, `Math.max`, `Math.fround`, and `Math.f16round`
+preserve the specified signed zero, and `Math.max` treats `+0` as larger
+than `-0` while `Math.min` treats it as smaller. `Math.max` and `Math.min`
+report `NaN` whenever any converted argument is `NaN`, while `Math.hypot`
+reports `+∞` for an infinite argument even when another is `NaN`.
+`Math.pow` follows Number::exponentiate rather than the host C library, so a
+`NaN` exponent is `NaN` even for a base of one and a base of exactly one or
+minus one with an infinite exponent is `NaN`. `Math.fround` and
+`Math.f16round` round to binary32 and binary16 with ties to even over exact
+integer arithmetic on the operand's own encoding, so no narrowing floating
+conversion happens and an operand that rounds past the format's largest
+finite value becomes an infinity. `Math.clz32` and `Math.imul` read their
+operands through `ToUint32` and report the exact counted and wrapped
+results.
+
+The remaining operations are the ones ECMA-262 marks
+implementation-approximated, so this profile commits to their specified
+special values, their argument conversion, and their sign behavior rather
+than to a digit-exact result. On the supported native targets they are the
+host C library's correspondingly named operations, which agree with the
+reference hosts to within one unit in the last place; the differential
+fixtures assert the specified exact cases directly and the approximated ones
+through bounded identities so a permitted last-place difference is not
+recorded as a semantic requirement.
+
+`Math.random` returns a Number in `[0, 1)` drawn from a realm-owned
+xorshift128+ generator seeded from two fixed nonzero words. ECMA-262 leaves
+the strategy to the implementation, and this runtime keeps every other
+observable schedule reproducible, including its logical timer clock, so the
+sequence is uniform and identical on every run and every supported target
+rather than seeded from host entropy. A later host-capability decision owns
+introducing an entropy source; nothing in the pinned suite observes the
+difference.
+
+Fixed native and generated differential evidence at property seed
+`0x60005300` covers the namespace identity, prototype, and tag, every
+descriptor class, every function's name and length, the specified signed
+zeroes, infinities, and `NaN` results, exact square roots, powers,
+logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
+binary16 rounding at and past the format boundaries, `ToUint32` wrapping,
+argument conversion order, abrupt conversion, `Symbol` operands, bounded
+approximated identities, the pseudorandom range, both specialization
+policies, collection forced at every safepoint, false hints, deliberate
+shape-guard misses, generic fallback, and the global-object write, delete,
+restore, assignment-target, and strict missing-property sequences the
+replaceable binding admits.
+
+All 317 paths under the node's inventory root are accounted for and 316 are
+reviewed: 280 pass and 36 retain the explicit `Reflect.construct`
+prerequisite their `isConstructor.js` include needs.
+*test/built-ins/Math/sqrt/results.js* stays outside the reviewed subset
+because its thousand-entry nested array literal exceeds the runtime's
+reviewed active frame-slot budget, an existing resource boundary this node
+does not own. The reviewed `nans.js` harness include also becomes available,
+because `Math.pow` was its only unadmitted dependency. Ninety-one previously
+reviewed paths outside the root move from `unsupported-profile-feature` to
+`pass`: eighty-nine read `Math` while probing an unrelated contract, and two
+are the _Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases the
+new include unblocks. No previously reviewed path loses a pass. The manifest
+moves from 13,553 to 13,869 cases and from 9,365 to 9,736 passes, keeps
+1,506 expected negatives, and moves from 2,682 to 2,627 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves
+the runtime ABI to `oseo-runtime-m5-79` without adding a generated-code
+entry point or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -4680,13 +4784,13 @@ complete. The remaining gaps retain their existing owners.
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
-    *asyncHelpers.js*, *compareArray.js*, *propertyHelper.js*, and the
-    `checkSequence` portion of *promiseHelper.js*. Cases in the reviewed
+    *asyncHelpers.js*, *compareArray.js*, *nans.js*, *propertyHelper.js*,
+    and the `checkSequence` portion of *promiseHelper.js*. *nans.js*
+    joined that list with the `math-namespace` node, whose `Math.pow`
+    intrinsic was its only unadmitted dependency. Cases in the reviewed
     function inventory that need *nativeFunctionMatcher.js* or
     *wellKnownIntrinsicObjects.js* classify as unsupported until those
-    includes have reviewed implementations. Cases that need *nans.js* also
-    remain unsupported because that include depends on the unadmitted
-    `Math.pow` intrinsic. The reviewed
+    includes have reviewed implementations. The reviewed
     *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
     `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, because this
     profile does not admit `globalThis`. Its `assert.throwsAsync` reports a

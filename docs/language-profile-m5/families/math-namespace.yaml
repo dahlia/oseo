@@ -1,0 +1,57 @@
+version: 1
+id: math-namespace
+title: "Math namespace object"
+scope:
+  - "The realm-owned Math namespace object, its ordinary [[Prototype]], its
+    replaceable global-object property, and its Symbol.toStringTag."
+  - "The eight value properties Math.E, Math.LN10, Math.LN2, Math.LOG10E,
+    Math.LOG2E, Math.PI, Math.SQRT1_2, and Math.SQRT2."
+  - "The thirty-six function properties of 21.3.2, their names, lengths,
+    argument conversion order, and the exact results the edition specifies
+    for signed zeroes, infinities, NaN, and the exactly determined
+    operations."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/math-namespace.ts
+      - tests/property/m5-math-namespace.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/math-namespace.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/math-namespace.ts
+      - tests/property/m5-math-namespace.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-math-namespace.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/math-namespace.ts
+      - tests/property/m5-math-namespace.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/math-namespace.ts
+      - tests/property/m5-math-namespace.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
