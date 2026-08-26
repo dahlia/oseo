@@ -48,7 +48,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-obj-ptrn-p\
         rop-ary-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-prop-ary-init.js:128:5: error[OSEO1001]: Unknown binding
+        j-ptrn-prop-ary-init.js:142:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

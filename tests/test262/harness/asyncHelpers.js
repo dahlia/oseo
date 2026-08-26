@@ -5,8 +5,7 @@
 // profile has no `globalThis` binding, and the runner inserts the reviewed
 // `$DONE` harness only for asynchronous cases, so this adaptation probes the
 // binding with `typeof` instead. The reviewed harness reports a failure
-// through `$DONE`, so it does not need the upstream string coercion of the
-// rejection value.
+// through `$DONE`, which composes the failure detail itself.
 function asyncTest(testFunc) {
   if (typeof $DONE !== "function") {
     throw new Test262Error("asyncTest called without async flag");
@@ -32,9 +31,11 @@ function asyncTest(testFunc) {
 // Upstream `assert.throwsAsync` renders the constructor name into its failure
 // message. The reviewed harness compares the rejection value's constructor
 // identity and throws a `Test262Error` without composing a message from the
-// observed value, because the admitted profile has no generic string
-// coercion. A rejection carrying a different constructor with the same name
-// is therefore reported as an ordinary constructor mismatch.
+// observed value: a rejection whose `constructor` is missing or exotic would
+// otherwise replace the mismatch report with a thrown conversion. A rejection
+// carrying a different constructor with the same name is therefore reported
+// as an ordinary constructor mismatch. The reviewed `$DONE` carries the
+// failure detail the runner records.
 assert.throwsAsync = function (expectedErrorConstructor, func, message) {
   return new Promise(function (resolve) {
     const fail = function (detail) {

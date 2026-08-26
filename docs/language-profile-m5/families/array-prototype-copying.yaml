@@ -7,6 +7,17 @@ scope:
     order, Symbol.isConcatSpreadable, ArraySpeciesCreate, recursive flattening,
     cycles, locale argument forwarding, locale result coercion, and abrupt
     completion."
+  - "One divergence from the reference hosts is known and unfixed. Generic
+    ToPrimitive still reaches Array text through a deferred conversion this
+    family owns, selected by intrinsic prototype identity rather than by
+    calling the materialized toString, and that conversion tests its cycle
+    stack before reading the nested receiver's length. A cyclic array-like
+    inheriting %Array.prototype% through an accessor length therefore
+    observes that accessor once where Node.js and Deno observe it twice.
+    The evidence below covers observable access order and cycles
+    separately, not their interaction, so it does not currently reach this
+    case. Measured by generic-string-coercion and reproducible on its parent
+    commit."
 owners:
   - PLAN-M5.md
 evidence:

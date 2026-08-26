@@ -72,6 +72,8 @@ const { numberPrototypeFixtures } =
   await import("./native/fixtures/number-prototype.ts");
 const { stringPrototypeReplaceFixtures } =
   await import("./native/fixtures/string-prototype-replace.ts");
+const { genericStringCoercionFixtures } =
+  await import("./native/fixtures/generic-string-coercion.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -129,6 +131,7 @@ const fixtures: readonly Fixture[] = [
   ...bigintIntrinsicFixtures,
   ...dataViewFixtures,
   ...expressionFixtures,
+  ...genericStringCoercionFixtures,
   ...receiverFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpPrototypeAndExecFixtures,
@@ -652,6 +655,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
+    fixture.name === "generic-string-coercion" ||
     fixture.name === "number-prototype"
   ) {
     const enabledText = printMir(enabledMir);
@@ -826,6 +830,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
+    fixture.name === "generic-string-coercion" ||
     fixture.name === "number-prototype" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "delete-strict" ||
@@ -934,6 +939,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-prototype-search-and-slice" ||
             fixture.name === "string-prototype-match-and-split" ||
             fixture.name === "string-prototype-replace" ||
+            fixture.name === "generic-string-coercion" ||
             fixture.name === "number-prototype"
           ) {
             assert.ok(native.counters.collections > 0);
@@ -942,6 +948,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
                 fixture.name === "array-prototype-sort" ||
+                fixture.name === "generic-string-coercion" ||
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||
                 fixture.name === "number-prototype"

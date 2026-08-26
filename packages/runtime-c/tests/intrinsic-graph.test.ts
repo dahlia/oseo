@@ -609,7 +609,6 @@ test("populates the realm-owned String intrinsic cluster", () => {
   const regexpSource = sources.get("runtime_regexp.c") ?? "";
   const memorySource = sources.get("runtime_memory.c") ?? "";
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
-  const primitiveSource = sources.get("runtime_primitive.c") ?? "";
 
   for (const intrinsic of [
     "STRING_PROTOTYPE",
@@ -698,7 +697,10 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.doesNotMatch(objectBuiltins, /define_string_wrapper_properties/u);
   // Object.prototype.toString reads the [[StringData]] brand instead of
   // reporting a plain object.
-  assert.match(primitiveSource, /oseo_internal_string_data/u);
+  assert.match(
+    objectBuiltins,
+    /object_builtin_tag[\s\S]*primitive_data[\s\S]*return "String"/u,
+  );
   // replace and replaceAll dispatch through Symbol.replace, share the
   // GetSubstitution body, and reach the functional replacer through the
   // ordinary call path rather than a generated-code entry point.
@@ -1014,6 +1016,50 @@ test("populates the realm-owned RegExp intrinsic cluster", () => {
     new RegExp(
       String.raw`OSEO_HEAP_REGEXP\)[\s\S]*mark_value\(` +
         String.raw`\(\(OseoRegExp \*\)object\)->matcher`,
+      "u",
+    ),
+  );
+});
+
+test("routes generic string coercion through the realm-owned methods", () => {
+  const primitiveSource = sources.get("runtime_primitive.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+  // The first occurrence is the forward declaration the mutually
+  // recursive conversion pair needs, so the body is the last one.
+  const opening = "static OseoResult to_primitive_value(";
+  const begin = primitiveSource.lastIndexOf(opening);
+  assert.ok(begin >= 0, "to_primitive_value needs one definition");
+  const next = primitiveSource.indexOf("\nOseoResult ", begin);
+  const conversion = primitiveSource.slice(begin, next < 0 ? undefined : next);
+
+  // OrdinaryToPrimitive reads each method with the ordinary property
+  // lookup and calls whatever it finds, so a receiver whose nearest
+  // toString is %Object.prototype.toString% reaches that function.
+  assert.match(
+    conversion,
+    new RegExp(
+      String.raw`OSEO_WELL_KNOWN_TO_PRIMITIVE[\s\S]*oseo_object_get` +
+        String.raw`[\s\S]*oseo_call_function`,
+      "u",
+    ),
+  );
+
+  // No private text substitute may shadow the materialized methods: the
+  // retired virtual tag helper, its intrinsic-kind selector, and the
+  // function and promise diagnostic with its numeric shortcut are gone,
+  // and the conversion no longer branches on the found method's identity.
+  assert.doesNotMatch(primitiveSource, /default_object_tag_text/u);
+  assert.doesNotMatch(primitiveSource, /DefaultConversionKind/u);
+  assert.doesNotMatch(primitiveSource, /Function and promise text/u);
+  assert.doesNotMatch(conversion, /OSEO_INTRINSIC_OBJECT_TO_STRING/u);
+
+  // The tag itself stays one composition of builtinTag with a string
+  // @@toStringTag inside Object.prototype.toString.
+  assert.match(
+    objectBuiltins,
+    new RegExp(
+      String.raw`object_prototype_to_string[\s\S]*` +
+        String.raw`OSEO_WELL_KNOWN_TO_STRING_TAG[\s\S]*object_tag_text`,
       "u",
     ),
   );

@@ -57,7 +57,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/dflt-obj-ptrn-p\
         rop-id-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/dflt-ob\
-        j-ptrn-prop-id-init.js:122:5: error[OSEO1001]: Unknown binding
+        j-ptrn-prop-id-init.js:136:5: error[OSEO1001]: Unknown binding
         'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -23,7 +23,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/obj-ptrn-prop-ar\
         y.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/obj-ptrn\
-        -prop-ary.js:125:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
+        -prop-ary.js:139:5: error[OSEO1001]: Unknown binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

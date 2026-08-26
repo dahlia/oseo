@@ -23,7 +23,7 @@ results:
       detail: "test/language/expressions/async-generator/dstr/named-ary-ptrn-\
         elem-obj-prop-id.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-a\
-        ry-ptrn-elem-obj-prop-id.js:130:5: error[OSEO1001]: Unknown
+        ry-ptrn-elem-obj-prop-id.js:144:5: error[OSEO1001]: Unknown
         binding 'u'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

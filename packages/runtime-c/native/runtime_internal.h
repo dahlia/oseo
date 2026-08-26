@@ -546,16 +546,14 @@
 #define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)13u)
 
 /*
- * The preferred-type hint passed to the generic ToPrimitive. The
- * numeric variant orders methods like the number hint but belongs to
- * consumers that immediately apply ToNumber, so unsupported function
- * and promise text degrades to NaN instead of a diagnostic.
+ * The preferred-type hint passed to the generic ToPrimitive. It is the
+ * specification's PreferredType with its three values, and the hint
+ * string a @@toPrimitive method receives names the same three.
  */
 typedef enum {
     OSEO_TO_PRIMITIVE_DEFAULT = 0,
     OSEO_TO_PRIMITIVE_NUMBER = 1,
     OSEO_TO_PRIMITIVE_STRING = 2,
-    OSEO_TO_PRIMITIVE_NUMERIC = 3,
 } OseoToPrimitiveHint;
 
 typedef enum {

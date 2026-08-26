@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 94 indexed records in the normative
+M5a is complete. The 95 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records 9,365
-passes across 13,553 paths, and the property inventory records 106 domains,
-106 seeds, and an ordinary case budget of 5,146.
+passes across 13,553 paths, and the property inventory records 107 domains,
+107 seeds, and an ordinary case budget of 5,158.
 
 
 M5a implementation history
@@ -4681,6 +4681,82 @@ ABI to `oseo-runtime-m5-78` without adding a generated-code entry point or
 changing the graph's orchestration state. The String built-in code range
 gains two IDs for the two methods, and the RegExp range gains a twentieth
 for the deferred `[Symbol.replace]` placeholder.
+
+Implemented M5b node `generic-string-coercion` routes `ToString` for an
+arbitrary object through the materialized `%Object.prototype.toString%`,
+`@@toPrimitive`, and `@@toStringTag`, and retires the two private text
+substitutes the conversion still selected by intrinsic prototype identity.
+The first was a virtual receiver-sensitive tag text used whenever the
+prototype chain reached a realm-owned prototype but the lookup found no
+`toString`; the second was a
+`Function and promise text conversion is unsupported` diagnostic, with a purely
+numeric shortcut to `NaN`, used whenever the found `toString` was
+`%Object.prototype.toString%` and the nearest intrinsic prototype was
+`%Function.prototype%` or `%Promise.prototype%`. Both predate
+`object-prototype` and `well-known-symbols`, which together made the real
+method and the real tag reachable.
+
+OrdinaryToPrimitive now reads `valueOf` and `toString` with the ordinary
+property lookup and calls whichever function it finds. A promise therefore
+renders as `[object Promise]` through its prototype's `@@toStringTag`
+instead of reporting the retired diagnostic, and its numeric conversion
+materializes that text before `ToNumber` rather than shortcutting, so a
+`@@toStringTag` getter on the receiver is observed. An object inheriting
+`%Function.prototype.toString%` without being callable reaches that
+method's own `TypeError` instead of a reconstructed one. A replaced
+`%Object.prototype.toString%` was already called through the ordinary
+lookup; what is newly observable is deleting it, or deleting
+`%Object.prototype.valueOf%` alongside it, because the deleted pair now
+throws the specified `TypeError` where the virtual tag text used to answer.
+
+Array text keeps the deferred conversion selected by intrinsic identity.
+The Array prototype nodes own it because it honors a user `join` and shares
+the conversion's cycle stack, and this node changes neither. Measuring that
+path against the reference hosts while retiring the substitutes above found
+one divergence it still owns, unchanged by this node and reproducible on the
+parent commit: a cyclic array-like inheriting `%Array.prototype%` observes
+its `length` accessor once rather than twice, because the deferred path
+detects the cycle before reading the nested receiver's length. Two receivers
+still report an owned prerequisite boundary from inside
+`%Object.prototype.toString%` rather than from the conversion:
+`function-intrinsic-chains` owns generator function and generator object
+reflection, and `boolean-intrinsic` and `symbol-intrinsic` own the
+placeholder wrapper prototype methods a `Boolean` or `Symbol` wrapper
+reaches.
+
+The reviewed *doneprintHandle.js* harness stops printing the bare failure
+marker and composes the upstream failure detail, because an ordinary object
+failure value now renders. It guards that composition and falls back to the
+bare marker for a Symbol and for any object whose conversion completes
+abruptly, so a conversion cannot replace a case's failure report. The
+*asyncHelpers.js* `assert.throwsAsync` adaptation keeps comparing
+constructor identity without composing a message from the observed value;
+that is now a robustness choice against a missing or exotic `constructor`
+rather than a coercion boundary.
+
+Fixed native and generated differential evidence at seed `0x60005300`
+covers `@@toPrimitive` dispatch with each hint string and its non-callable,
+object-result, and abrupt rejections, an explicit null method, hint order
+and fallthrough for `valueOf` and `toString`, an object with neither
+convertible method, a null-prototype receiver, `@@toStringTag` in own,
+inherited, non-string, getter, abrupt, and builtin-shadowing forms, every
+builtinTag receiver the profile admits, deleted and replaced default
+methods, `Object.prototype.toLocaleString` over the same receivers, both
+specialization policies, false hints, deliberate shape-guard misses,
+generic fallback, and collection forced at every safepoint.
+
+The node declares no test262 inventory root. Every applicable upstream path
+its behavior reaches is already reviewed: all 41 under
+*test/built-ins/Object/prototype/toString/* by `object-prototype`, and the
+two each under *test/built-ins/Symbol/toPrimitive/* and
+*test/built-ins/Symbol/toStringTag/* by `well-known-symbols`. No previously
+reviewed path changes classification, and the manifest keeps 13,553 paths
+with 9,365 passes, 1,506 expected negatives, and 2,682 unsupported profile
+features. Growing the reviewed subset inside the families this admits stays
+with the `reviewed-subset-growth` backlog lane. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-79` without adding a
+generated-code entry point, a built-in code ID, or a translation unit, and
+without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

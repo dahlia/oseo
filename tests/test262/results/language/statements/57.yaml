@@ -231,7 +231,7 @@ results:
     observation:
       detail: 'test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js:132:16:
+        stderr="test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js:146:16:
         error[OSEO2001]: Object static method is not admitted in this
         M5b node.\n"'
       unsupportedCapability: object-static-method

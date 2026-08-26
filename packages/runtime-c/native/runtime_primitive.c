@@ -270,7 +270,7 @@ OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
         OseoResult primitive = to_primitive_value(
             context,
             value,
-            OSEO_TO_PRIMITIVE_NUMERIC,
+            OSEO_TO_PRIMITIVE_NUMBER,
             NULL
         );
         if (primitive.status != OSEO_STATUS_NORMAL) return primitive;
@@ -631,18 +631,14 @@ static bool conversion_property_exists(
 }
 
 /*
- * The deferred default toString is selected by the first materialized
- * intrinsic prototype on the chain.
+ * The one remaining deferred default toString is Array text, and the
+ * Array prototype nodes still own it. It applies when %Array.prototype%
+ * is the nearest materialized intrinsic prototype on the chain: a nearer
+ * realm-owned prototype means some other owner's method answers, and no
+ * realm-owned prototype at all means the ordinary lookup found a user
+ * method that happens to be Array's.
  */
-typedef enum {
-    OSEO_CONVERSION_NONE = 0,
-    OSEO_CONVERSION_OBJECT = 1,
-    OSEO_CONVERSION_ARRAY = 2,
-    OSEO_CONVERSION_FUNCTION = 3,
-    OSEO_CONVERSION_PROMISE = 4,
-} DefaultConversionKind;
-
-static DefaultConversionKind default_conversion_kind(
+static bool conversion_reaches_array_prototype(
     OseoContext *context,
     OseoValue value
 ) {
@@ -650,75 +646,19 @@ static DefaultConversionKind default_conversion_kind(
     while (is_object(current)) {
         if (current ==
             context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]) {
-            return OSEO_CONVERSION_ARRAY;
+            return true;
         }
         if (current ==
-            context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE]) {
-            return OSEO_CONVERSION_FUNCTION;
-        }
-        if (current ==
-            context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE]) {
-            return OSEO_CONVERSION_PROMISE;
-        }
-        if (current ==
-            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
-            return OSEO_CONVERSION_OBJECT;
+                context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] ||
+            current ==
+                context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] ||
+            current ==
+                context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
+            return false;
         }
         current = ordinary_object(current)->prototype;
     }
-    return OSEO_CONVERSION_NONE;
-}
-
-/*
- * The virtual Object.prototype.toString is receiver sensitive: arrays
- * and callables keep their built-in tags, a branded error renders as
- * an Error, and a promise without a reachable well-known-symbol tag
- * renders as an ordinary object.
- */
-static OseoResult default_object_tag_text(
-    OseoContext *context,
-    OseoValue value
-) {
-    static const uint16_t object_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'O', 'b', 'j', 'e', 'c', 't', ']'
-    };
-    static const uint16_t array_tag_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'A', 'r', 'r', 'a', 'y', ']'
-    };
-    static const uint16_t function_tag_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'F', 'u', 'n', 'c', 't', 'i', 'o', 'n', ']'
-    };
-    static const uint16_t error_tag_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'E', 'r', 'r', 'o', 'r', ']'
-    };
-    static const uint16_t number_tag_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'N', 'u', 'm', 'b', 'e', 'r', ']'
-    };
-    static const uint16_t string_tag_units[] = {
-        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
-        'S', 't', 'r', 'i', 'n', 'g', ']'
-    };
-    if (is_array(value)) {
-        return oseo_string_from_units(context, array_tag_units, 14u);
-    }
-    if (is_function(value)) {
-        return oseo_string_from_units(context, function_tag_units, 17u);
-    }
-    if (ordinary_object(value)->error_data) {
-        return oseo_string_from_units(context, error_tag_units, 14u);
-    }
-    if (ordinary_object(value)->number_data) {
-        return oseo_string_from_units(context, number_tag_units, 15u);
-    }
-    if (oseo_internal_string_data(value)) {
-        return oseo_string_from_units(context, string_tag_units, 15u);
-    }
-    return oseo_string_from_units(context, object_units, 15u);
+    return false;
 }
 
 static bool conversion_is_ancestor(
@@ -966,12 +906,15 @@ static OseoResult default_array_text(
 }
 
 /*
- * The generic ToPrimitive over OrdinaryToPrimitive: user-reachable
- * valueOf and toString run in hint order, and objects on a
- * intrinsic-prototype chain fall back to the deferred Object.prototype,
- * Array.prototype, and wrapper conversions. Function and promise text needs
- * Function.prototype.toString or well-known symbols, so it stays an owned
- * unsupported boundary.
+ * The generic ToPrimitive over OrdinaryToPrimitive: @@toPrimitive is
+ * dispatched first, then valueOf and toString are read with the ordinary
+ * property lookup and called in hint order. Whichever method the lookup
+ * finds is the one called, so an arbitrary object whose nearest toString
+ * is %Object.prototype.toString% reaches that materialized function and
+ * renders through its builtinTag and @@toStringTag composition rather than
+ * through a private text substitute. Array text keeps its deferred
+ * conversion, which honors a user `join` and shares this call's cycle
+ * stack.
  */
 static OseoResult to_primitive_value(
     OseoContext *context,
@@ -1067,65 +1010,13 @@ static OseoResult to_primitive_value(
         );
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (!conversion_property_exists(frame.slots[0], frame.slots[1])) {
-            /* The deferred Object.prototype.valueOf returns the
-             * object, so a missing valueOf falls through to the next
-             * method. */
-            if (!trying_to_string) continue;
-            DefaultConversionKind kind =
-                default_conversion_kind(context, frame.slots[0]);
-            if (kind == OSEO_CONVERSION_NONE) continue;
-            if (kind == OSEO_CONVERSION_ARRAY) {
-                result = default_array_text(
-                    context,
-                    frame.slots[0],
-                    previous
-                );
-                if (result.status != OSEO_STATUS_NORMAL) break;
-                if (is_object(result.value)) continue;
-                converted = true;
-                break;
-            }
-            if (kind == OSEO_CONVERSION_FUNCTION &&
-                !is_function(frame.slots[0])) {
-                result = oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "Function.prototype.toString requires a function "
-                    "receiver."
-                );
-                break;
-            }
-            if (kind == OSEO_CONVERSION_FUNCTION ||
-                kind == OSEO_CONVERSION_PROMISE) {
-                if (hint == OSEO_TO_PRIMITIVE_NUMERIC) {
-                    /* Every function source and promise tag string is
-                     * non-numeric, so a consumer that immediately
-                     * applies ToNumber observes only NaN. */
-                    result = normal(oseo_number(NAN));
-                    converted = true;
-                    break;
-                }
-                result = failure(
-                    context,
-                    "OSEO2001",
-                    "Function and promise text conversion is unsupported."
-                );
-                break;
-            }
-            result = default_object_tag_text(context, frame.slots[0]);
-            if (result.status != OSEO_STATUS_NORMAL) break;
-            converted = true;
-            break;
-        }
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         if (!is_function(frame.slots[2])) continue;
         OseoFunction *method = function_object(frame.slots[2]);
         if (trying_to_string &&
-            default_conversion_kind(context, frame.slots[0]) ==
-                OSEO_CONVERSION_ARRAY &&
+            conversion_reaches_array_prototype(context, frame.slots[0]) &&
             (method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
              method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID) &&
             oseo_internal_string_is_ascii(
@@ -1141,39 +1032,6 @@ static OseoResult to_primitive_value(
             converted = !is_object(result.value);
             if (converted) break;
             continue;
-        }
-        /* A later prototype node still owns each nearer default method.
-         * Reaching Object.prototype.toString through that empty prototype
-         * must not bypass the existing behavior-preserving fallback. */
-        if (trying_to_string &&
-            frame.slots[2] ==
-                context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING]) {
-            DefaultConversionKind kind =
-                default_conversion_kind(context, frame.slots[0]);
-            if (kind == OSEO_CONVERSION_FUNCTION &&
-                !is_function(frame.slots[0])) {
-                result = oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "Function.prototype.toString requires a function "
-                    "receiver."
-                );
-                break;
-            }
-            if (kind == OSEO_CONVERSION_FUNCTION ||
-                kind == OSEO_CONVERSION_PROMISE) {
-                if (hint == OSEO_TO_PRIMITIVE_NUMERIC) {
-                    result = normal(oseo_number(NAN));
-                    converted = true;
-                } else {
-                    result = failure(
-                        context,
-                        "OSEO2001",
-                        "Function and promise text conversion is unsupported."
-                    );
-                }
-                break;
-            }
         }
         result = oseo_call_function(
             context,
@@ -1464,7 +1322,7 @@ OseoResult oseo_to_numeric(OseoContext *context, OseoValue value) {
     OseoResult primitive = to_primitive_value(
         context,
         value,
-        OSEO_TO_PRIMITIVE_NUMERIC,
+        OSEO_TO_PRIMITIVE_NUMBER,
         NULL
     );
     if (primitive.status != OSEO_STATUS_NORMAL) return primitive;

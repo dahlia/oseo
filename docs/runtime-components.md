@@ -459,6 +459,25 @@ covers descriptors, prototype identity, both specialization policies,
 deliberate shape-guard misses, and forced collection. The node reviews only
 its declared `%Object.prototype%` test262 inventory root.
 
+M5b node `generic-string-coercion` connects that materialized method to the
+conversion. *runtime\_primitive.c* keeps ownership of `ToPrimitive` and
+retires the two private text substitutes it selected by intrinsic prototype
+identity: a virtual receiver-sensitive tag text and a function-and-promise
+unsupported diagnostic. OrdinaryToPrimitive now reads `valueOf` and
+`toString` with the ordinary property lookup and calls whichever function it
+finds, so `%Object.prototype.toString%` composes every tag from one owner
+and a deleted or replaced default is observable. Array text keeps its
+deferred conversion, which the Array prototype nodes own because it honors a
+user `join` and shares the conversion cycle stack.
+
+Fixed and generated native differential evidence covers `@@toPrimitive`
+dispatch and its rejections, hint order and fallthrough, `@@toStringTag`
+in own, inherited, non-string, getter, and shadowing forms, every builtinTag
+receiver, deleted and replaced default methods, both specialization
+policies, deliberate shape-guard misses, generic fallback, and collection
+forced at every safepoint. The node adds no component, no internal helper,
+and no generated-code entry point, and moves `abiVersion` to `m5-79`.
+
 ### Object constructor evidence
 
 M5b node `object-constructor` makes the realm-owned `Object` identity callable
@@ -632,9 +651,9 @@ property beside the `Object`, `Number`, and `Promise` ones through
 `oseo_internal_install_string_global`.
 
 The materialized value adds no generated-code entry point; `abiVersion` moves
-to `m5-62` for the expanded intrinsic table. The shared primitive component
-reads the `[[StringData]]` brand through `oseo_internal_string_data`, so
-`Object.prototype.toString` reports `[object String]` for a wrapper. Fixed and
+to `m5-62` for the expanded intrinsic table. `Object.prototype.toString` reads
+the `[[StringData]]` brand in the Object statics component, so it reports
+`[object String]` for a wrapper. Fixed and
 generated native differential evidence covers both specialization policies,
 false hints, deliberate guard misses, generic fallback, lone surrogates,
 astral code points, coercion order, and collection forced at every safepoint.

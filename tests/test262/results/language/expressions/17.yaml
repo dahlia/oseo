@@ -108,7 +108,7 @@ results:
         ptrn-prop-ary-init.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-d\
-        flt-obj-ptrn-prop-ary-init.js:128:5: error[OSEO1001]: Unknown
+        flt-obj-ptrn-prop-ary-init.js:142:5: error[OSEO1001]: Unknown
         binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -250,7 +250,7 @@ results:
         private-async-method.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/class/elements/private-metho\
-        ds/prod-private-async-method.js:173:21: error[OSEO1001]: Unknown
+        ds/prod-private-async-method.js:187:21: error[OSEO1001]: Unknown
         binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

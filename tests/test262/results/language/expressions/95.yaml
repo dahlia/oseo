@@ -57,7 +57,7 @@ results:
         prop-id-trailing-comma.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/async-generator/dstr/named-o\
-        bj-ptrn-prop-id-trailing-comma.js:123:5: error[OSEO1001]:
+        bj-ptrn-prop-id-trailing-comma.js:137:5: error[OSEO1001]:
         Unknown binding 'x'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

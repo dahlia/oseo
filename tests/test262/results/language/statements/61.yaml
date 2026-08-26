@@ -282,7 +282,7 @@ results:
       detail: "test/language/statements/for-await-of/async-gen-dstr-let-obj-p\
         trn-prop-ary-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-await-of/async-gen-dstr-l\
-        et-obj-ptrn-prop-ary-init.js:146:7: error[OSEO1001]: Unknown
+        et-obj-ptrn-prop-ary-init.js:160:7: error[OSEO1001]: Unknown
         binding 'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

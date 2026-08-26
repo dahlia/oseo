@@ -57,7 +57,7 @@ results:
       detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
         op-obj-init.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
-        -ptrn-prop-obj-init.js:127:5: error[OSEO1001]: Unknown binding
+        -ptrn-prop-obj-init.js:141:5: error[OSEO1001]: Unknown binding
         'w'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
