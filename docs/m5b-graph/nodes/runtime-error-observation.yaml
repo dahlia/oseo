@@ -8,4 +8,4 @@ dependencies:
   - error-aggregate-and-options
   - generic-string-coercion
 landed: false
-status: blocked
+status: ready
