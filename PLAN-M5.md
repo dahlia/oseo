@@ -4758,6 +4758,33 @@ checkpoint moves the runtime ABI to `oseo-runtime-m5-79` without adding a
 generated-code entry point, a built-in code ID, or a translation unit, and
 without changing the graph's orchestration state.
 
+Implemented M5b node `object-create` completes `Object.create` over the
+ObjectDefineProperties body the collection checkpoint already landed. The
+prototype check precedes every read of the properties argument, so a
+prototype that is neither an object nor null throws before a poisoned
+properties getter can run, an undefined properties argument returns the
+fresh null- or object-prototype object directly, and any other properties
+value flows through the one collection body `Object.defineProperties`
+owns, so conversion, ordering, and abrupt completions behave identically
+over the freshly created target. An abrupt collection discards the fresh
+object, and definitions on it cannot fail. The M3 descriptor-map
+rejection and its `object-create-descriptor-map` dependency observation
+retire, which also lets `Object.create(...values)` spread calls reach the
+admitted contract. Fixed native and generated differential evidence at
+seed `0x60005400` covers null, object, and invalid prototypes, entries,
+undefined, and null properties arguments, module namespace properties and
+prototype arguments, both specialization policies, forced collection,
+false hints, deliberate shape-guard misses, and generic fallback. All 320
+paths under the node's inventory root are reviewed: 267 pass and 53
+retain explicit prerequisite boundaries for the unadmitted `Boolean`,
+`Date`, `JSON`, and `Math` globals, the deferred
+`Object.getOwnPropertyNames` static, and `Reflect.construct`. The
+previously reviewed for-in shadowing-order case moves from unsupported to
+pass. The manifest moves to 13,872 paths with 9,632 passes, 1,506
+expected negatives, and 2,734 unsupported profile features. The admitted
+checkpoint moves the runtime ABI to `oseo-runtime-m5-80` without changing
+the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

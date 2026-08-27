@@ -37,6 +37,50 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Object/create/15.2.3.5-4-140.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/create/15.2.3.5-4-140.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/create/15.2.3.5-4-140.js:88:23:
+        error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/create/15.2.3.5-4-199.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/create/15.2.3.5-4-199.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/create/15.2.3.5-4-199.js:87:1:
+        error[OSEO1001]: Unknown binding 'JSON'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-214.js
       strictness:
         - non-strict

@@ -1437,22 +1437,46 @@ static OseoResult define_ascii_value(
     );
 }
 
+/*
+ * Object.create (20.1.2.2). The prototype check precedes every read of
+ * the properties argument, so a non-object non-null prototype throws
+ * before a poisoned properties getter can run. An undefined properties
+ * argument returns the fresh object directly; any other value flows
+ * through the ObjectDefineProperties body `Object.defineProperties`
+ * owns, so descriptor collection, ordering, and abrupt completions
+ * behave identically over the freshly created target.
+ */
 OseoResult oseo_object_builtin_create(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    if (argument_count > 1u) {
-        return failure(
+    OseoValue prototype = builtin_argument(argument_count, arguments, 0u);
+    if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
+        return type_error(
             context,
-            "OSEO2001",
-            "Object.create descriptor maps are unsupported in M3."
+            "Object.create requires an object or null prototype."
         );
     }
-    return oseo_object_create(
-        context,
-        builtin_argument(argument_count, arguments, 0u)
-    );
+    OseoValue properties = builtin_argument(argument_count, arguments, 1u);
+    if (tag_of(properties) == OSEO_TAG_UNDEFINED) {
+        return oseo_object_create(context, prototype);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = properties;
+    result = oseo_object_create(context, prototype);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[1] = result.value;
+        const OseoValue define_arguments[2] = {
+            frame.slots[1],
+            frame.slots[0],
+        };
+        result = object_define_properties(context, 2u, define_arguments);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 /*

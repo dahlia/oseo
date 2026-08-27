@@ -1,0 +1,3 @@
+version: 1
+id: object-create
+record: docs/language-profile-m5/families/object-create.yaml

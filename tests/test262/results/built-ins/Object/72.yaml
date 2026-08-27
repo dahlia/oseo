@@ -29,6 +29,58 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Object/create/15.2.3.5-4-142.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/create/15.2.3.5-4-142.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/create/15.2.3.5-4-142.js:88:19:
+        error[OSEO1001]: Unknown binding 'Math'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/create/15.2.3.5-4-37.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/Object/create/15.2.3.5-4-37.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/Object/create/15.2.3.5-4-37.js:89:2:
+        error[OSEO2001]: Object static method is not admitted in this
+        M5b node.\n"'
+      unsupportedCapability: object-static-method
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/defineProperty/15.2.3.6-3-15.js
       strictness:
         - non-strict

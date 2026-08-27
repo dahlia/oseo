@@ -920,8 +920,10 @@ current evidence assessment. Those live only in the indexed records above.
     this representation, and `new Promise` is one of those ordinary
     constructions; invocations without spread retain fixed positional
     arguments. Dynamic arity does not bypass admitted
-    intrinsic contracts, so `Object.create(...values)` still rejects a
-    descriptor-map argument. A spread preceding a later top-level await point
+    intrinsic contracts, so `Object.create(...values)` reaches the same
+    prototype validation and descriptor collection the M5b `object-create`
+    node admits for fixed positional
+    arguments. A spread preceding a later top-level await point
     retains the accumulated argument list in the traced module continuation.
     Native differential fixtures, generated Node, Deno, and
     native properties under both specialization policies and forced collection,
@@ -4289,6 +4291,53 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-79` without adding a generated-code entry point, a
 built-in code ID, or a translation unit, and without changing the graph's
 orchestration state.
+
+M5b node `object-create` completes `Object.create` over the
+ObjectDefineProperties body the collection checkpoint already landed. The
+prototype check precedes every read of the properties argument, so a
+prototype that is neither an object nor null throws a `TypeError` before a
+poisoned properties getter can run, and the fresh object is created with
+exactly the requested null or object prototype, including array, function,
+and module namespace prototypes. An undefined or absent properties
+argument returns the fresh object directly. Any other properties value
+flows through the one ObjectDefineProperties body `Object.defineProperties`
+owns: ToObject precedes the own enumerable key walk, so a nullish
+properties argument throws and a primitive is read through the wrapper it
+converts to, each kept descriptor is read with Get and converts through
+the shared ToPropertyDescriptor body in ordinary own-key order, and the
+whole collection pass completes before the first definition. Definitions
+on the fresh extensible target cannot fail, so an abrupt collection is the
+only abrupt completion, and it discards the created object with the thrown
+error. Object, array, mapped arguments, and module namespace properties
+arguments keep the compatibility rules the collection checkpoint recorded,
+a namespace reading each descriptor through its binding cells. The M3
+descriptor-map rejection and its `object-create-descriptor-map` dependency
+observation retire, so call and constructor spread now reach the same
+admitted contract with dynamic arity.
+
+Fixed native and generated differential evidence at property seed
+`0x60005400` covers null, object, and invalid prototypes ahead of entries,
+undefined, and null properties arguments, every independently optional
+descriptor field, seven admitted value families, abrupt getters, mixed and
+non-object descriptors at each collection position, module namespace
+properties and prototype arguments, both specialization policies, false
+hints, deliberate shape-guard misses, generic fallback, forced collection
+at every safepoint, and a collection-pressure loop over twenty-four
+chained creations. All 320 paths under the node's inventory root are
+reviewed: 267 pass and 53 retain explicit prerequisite boundaries.
+Forty-eight need the unadmitted `Boolean`, `Date`, `JSON`, and `Math`
+globals, four need the deferred `Object.getOwnPropertyNames` static, and
+one needs `Reflect.construct`. The previously reviewed
+`test/language/statements/for-in/order-enumerable-shadowed.js` moves from
+unsupported to pass because its only blocker was the retired
+descriptor-map rejection. The manifest moves from 13,553 to 13,872 cases
+and from 9,365 to 9,632 passes, keeps 1,506 expected negatives, and moves
+from 2,682 to 2,734 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-80` without adding a generated-code entry point or
+changing the graph's orchestration state.
 
 
 Known gaps inside the claim

@@ -336,3 +336,7 @@ families:
     owner: tests/property/m5-generic-string-coercion.property.test.ts
     start: 0x60005300
     end: 0x600053ff
+  - family: m5-object-create
+    owner: tests/property/m5-object-create.property.test.ts
+    start: 0x60005400
+    end: 0x600054ff

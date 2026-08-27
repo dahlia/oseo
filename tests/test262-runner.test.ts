@@ -973,22 +973,6 @@ null.item;
       );
     }),
   );
-
-  const descriptorMap = await executeTest262Case(
-    source,
-    parsed,
-    new Set<string>(),
-    harnesses,
-    respondStderr(
-      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
-        "Object.create descriptor maps are unsupported in M3.\n",
-    ),
-  );
-  assert.equal(
-    descriptorMap.observation.unsupportedCapability,
-    "object-create-descriptor-map",
-  );
-  assert.equal(descriptorMap.classification, "unsupported-profile-feature");
 });
 
 test("keeps user-thrown runtime-boundary text as a failure", async () => {

@@ -38,6 +38,28 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Object/create/15.2.3.5-4-118.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/create/15.2.3.5-4-118.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/create/15.2.3.5-4-118.js:87:19:
+        error[OSEO1001]: Unknown binding 'Date'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-176.js
       strictness:
         - non-strict

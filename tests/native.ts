@@ -151,28 +151,22 @@ const fixtures: readonly Fixture[] = [
   ...asyncGeneratorFixtures,
 ];
 
-const descriptorMapCompilation = compileSource(babelFrontend, {
-  source: "Object.create(null, { item: { value: 3 } });",
-  sourceId: "object-create-descriptor-map.ts",
-});
-assert.deepEqual(descriptorMapCompilation.diagnostics, []);
-assert(descriptorMapCompilation.mir != null, "descriptor map MIR");
-
+// Dynamic arity reaches the same admitted Object.create contract as fixed
+// positional arguments, so a spread descriptor map defines its properties.
 const spreadDescriptorMap = await runNativeCli(
   {
     args: ["spread-descriptor-map.ts"],
-    source: "Object.create(...[null, { item: { value: 3 } }]);",
+    source:
+      "const created = Object.create(...[null, { item: { value: 3 } }]);\n" +
+      "console.log(created.item, Object.getPrototypeOf(created));",
     sourceId: "spread-descriptor-map.ts",
     version: "0.1.0",
   },
   host,
 );
-assert.equal(spreadDescriptorMap.exitStatus, 1);
-assert.equal(spreadDescriptorMap.stdout, "");
-assert.match(
-  spreadDescriptorMap.stderr,
-  /error\[OSEO2001\].*descriptor maps are unsupported/u,
-);
+assert.equal(spreadDescriptorMap.exitStatus, 0, spreadDescriptorMap.stderr);
+assert.equal(spreadDescriptorMap.stdout, "3 null\n");
+assert.equal(spreadDescriptorMap.stderr, "");
 
 const deferredStringTrim = await runNativeCli(
   {
@@ -640,6 +634,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
+    fixture.name === "object-create" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
@@ -730,6 +725,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
+    fixture.name === "object-create" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
@@ -924,6 +920,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
+            fixture.name === "object-create" ||
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
