@@ -9,5 +9,5 @@ inventory:
     - test/built-ins/Object/create/
 dependencies:
   - object-define-properties
-landed: false
+landed: true
 status: ready
