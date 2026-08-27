@@ -263,11 +263,11 @@ results:
     dependencies:
       - object-properties
     observation:
-      detail: 'test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js:128:10:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/Object/prototype/toString/symbol-tag-override-i\
+        nstances.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-ov\
+        erride-instances.js:116:14: error[OSEO1001]: Unknown binding
+        'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

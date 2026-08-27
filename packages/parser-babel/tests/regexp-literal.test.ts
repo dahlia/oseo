@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderDiagnostic } from "@oseo/compiler";
-import type { Diagnostic, RegExpPatternExtensions } from "@oseo/compiler";
+import type {
+  Diagnostic,
+  RegExpMatcherProgram,
+  RegExpMatcherUnicodeData,
+  RegExpPatternExtensions,
+  SyntaxExpression,
+  SyntaxProgram,
+} from "@oseo/compiler";
 
 import {
   babelFrontend,
@@ -17,10 +24,39 @@ const regexpExtensions: RegExpPatternExtensions = {
     property === "ASCII" ||
     (property === "sc" && value === "Grek"),
 };
-const configuredFrontend = createBabelFrontend({ regexpExtensions });
+
+/**
+ * A stand-in for the pinned tables, small enough to read.
+ *
+ * The package links no Unicode data of its own, so a test supplies the
+ * same facts the command line takes from `@oseo/unicode`. Only the
+ * characters these cases name have to be right: the artifact builder owns
+ * every ECMAScript decision made from them.
+ */
+const unicodeData: RegExpMatcherUnicodeData = {
+  caseEquivalenceClasses: () => [
+    [0x41, 0x61],
+    [0x42, 0x62],
+    [0x43, 0x63],
+  ],
+  propertySet: ({ property, value }) => {
+    if (property === "L") return [0x41, 0x5b, 0x61, 0x7b];
+    if (property === "ASCII") return [0x00, 0x80];
+    if (property === "sc" && value === "Grek") return [0x3b1, 0x3ca];
+    return undefined;
+  },
+  spaceSeparators: [0x20, 0x21],
+};
+
+const configuredFrontend = createBabelFrontend({
+  regexpExtensions,
+  regexpUnicodeData: unicodeData,
+});
 const configuredModuleFrontend = createBabelModuleFrontend({
   regexpExtensions,
+  regexpUnicodeData: unicodeData,
 });
+const dataFreeFrontend = createBabelFrontend({ regexpExtensions });
 
 function diagnostics(source: string): readonly Diagnostic[] {
   const result = configuredFrontend.parse({
@@ -39,30 +75,66 @@ function only(source: string): Diagnostic {
   return first;
 }
 
-test("reports one profile boundary for a valid literal", () => {
-  const diagnostic = only("const x = /a[b-c]+/giu;\n");
-  assert.equal(
-    renderDiagnostic(diagnostic),
-    "fixture.js:1:11: error[OSEO1001]: Regular expression evaluation is " +
-      "outside the M5 profile.",
-  );
-  assert.deepEqual(diagnostic.byteRange, { end: 22, start: 10 });
+/**
+ * The initializer of `const x = <literal>;`, which every accepted case
+ * below writes, so a test reads one artifact without a tree walk.
+ */
+function initializer(program: SyntaxProgram): SyntaxExpression {
+  const statement = program.body[0];
+  assert(statement != null);
+  assert(statement.kind === "const");
+  return statement.initializer;
+}
+
+function artifact(source: string): RegExpMatcherProgram {
+  const result = configuredFrontend.parse({ source, sourceId: "fixture.js" });
+  assert.deepEqual(result.diagnostics, [], source);
+  assert.equal(result.parsed, true, source);
+  assert(result.program != null);
+  const expression = initializer(result.program);
+  assert.equal(expression.kind, "regexp", source);
+  assert(expression.kind === "regexp");
+  return expression.matcher;
+}
+
+test("compiles a valid literal into an immutable artifact", () => {
+  const program = artifact("const x = /a[b-c]+/giu;\n");
+  assert.equal(program.kind, "matcher");
+  assert.equal(program.source, "a[b-c]+");
+  assert.equal(program.flags.text, "giu");
+  assert.equal(program.flags.global, true);
+  assert.equal(program.flags.ignoreCase, true);
+  assert.equal(program.unicodeMode, true);
+  assert.ok(program.instructions.length > 0);
+  assert.equal(Object.isFrozen(program), true);
+  assert.equal(Object.isFrozen(program.instructions), true);
 });
 
-test("validates property escapes through its configured resolver", () => {
+test("retains capture metadata a later accessor reports", () => {
+  const program = artifact("const x = /(?<a>x)(y)\\k<a>/;\n");
+  assert.deepEqual([...program.groupNames], ["a"]);
+  assert.deepEqual(
+    program.captures.map((capture) => capture.name),
+    ["a", undefined],
+  );
+});
+
+test("compiles two equal literals into two separate artifacts", () => {
+  const first = artifact("const x = /a/g;\n");
+  const second = artifact("const x = /a/g;\n");
+  assert.notEqual(first, second);
+  assert.deepEqual(first.instructions, second.instructions);
+});
+
+test("resolves property escapes through its configured resolver", () => {
   const cases: readonly string[] = [
     "const x = /\\p{L}/u;\n",
     "const x = /\\P{sc=Grek}/u;\n",
     "const x = /[\\p{ASCII}]/u;\n",
   ];
   for (const source of cases) {
-    const diagnostic = only(source);
-    assert.equal(diagnostic.code, "OSEO1001", source);
-    assert.equal(
-      diagnostic.message,
-      "Regular expression evaluation is outside the M5 profile.",
-      source,
-    );
+    const program = artifact(source);
+    assert.ok(program.sets.length > 0, source);
   }
   const invalid = only("const x = /\\p{Latin}/u;\n");
   assert.equal(invalid.code, "OSEO0001");
@@ -87,18 +159,38 @@ test("refuses a property escape when no resolver is configured", () => {
   );
 });
 
-test("supplies the same property resolver to the Module frontend", () => {
+test("reports the boundary when the pinned data is not supplied", () => {
+  const cases: readonly (readonly [string, string])[] = [
+    [
+      "const x = /a/i;\n",
+      "An ignore-case pattern needs case folding data that is not linked.",
+    ],
+    [
+      "const x = /\\s/;\n",
+      "A whitespace class escape needs Unicode category data that is not " +
+        "linked.",
+    ],
+    [
+      "const x = /\\p{L}/u;\n",
+      "A Unicode property escape needs property data that is not linked.",
+    ],
+  ];
+  for (const [source, message] of cases) {
+    const result = dataFreeFrontend.parse({ source, sourceId: "fixture.js" });
+    assert.equal(result.parsed, false, source);
+    assert.equal(result.diagnostics.length, 1, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.equal(result.diagnostics[0]?.message, message, source);
+  }
+});
+
+test("supplies the same composition to the Module frontend", () => {
   const result = configuredModuleFrontend.parseModule({
     source: "export default /\\p{L}/u;\n",
     sourceId: "fixture.mjs",
   });
-  assert.equal(result.parsed, false);
-  assert.equal(result.diagnostics.length, 1);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    result.diagnostics[0]?.message,
-    "Regular expression evaluation is outside the M5 profile.",
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.equal(result.parsed, true);
 });
 
 test("reports an invalid literal pattern as an early error", () => {
@@ -161,7 +253,7 @@ test("reports a literal that follows admitted syntax", () => {
   );
 });
 
-test("rejects a literal wherever an expression is admitted", () => {
+test("admits a literal wherever an expression is admitted", () => {
   const sources: readonly string[] = [
     "console.log(/a/);\n",
     "const x = { p: /a/ };\n",
@@ -169,12 +261,8 @@ test("rejects a literal wherever an expression is admitted", () => {
     "function f() {\n  return /a/;\n}\n",
   ];
   for (const source of sources) {
-    const diagnostic = only(source);
-    assert.equal(diagnostic.code, "OSEO1001", source);
-    assert.equal(
-      diagnostic.message,
-      "Regular expression evaluation is outside the M5 profile.",
-      source,
-    );
+    const result = configuredFrontend.parse({ source, sourceId: "fixture.js" });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.equal(result.parsed, true, source);
   }
 });

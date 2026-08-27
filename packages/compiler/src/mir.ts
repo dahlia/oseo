@@ -1,4 +1,5 @@
 import type { ErrorIntrinsicName } from "./hir.ts";
+import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
 import type { SourceRange } from "./source.ts";
 import type {
   BinaryOperator,
@@ -147,6 +148,7 @@ export interface MirOperation {
     | "function-intrinsic"
     | "iterator-intrinsic"
     | "template-object"
+    | "regexp-literal"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
@@ -209,6 +211,13 @@ export interface MirOperation {
   readonly templateCooked?: readonly (string | undefined)[];
   /** Raw strings paired with `templateCooked`. */
   readonly templateRaw?: readonly string[];
+  /**
+   * The immutable matcher artifact one regular expression literal
+   * compiled to during the build. A backend emits it as generated data;
+   * evaluating the operation allocates a fresh object over it rather than
+   * compiling a pattern.
+   */
+  readonly regexpProgram?: RegExpMatcherProgram;
   readonly checkedResult?: number;
   readonly abruptTarget?: MirControlTarget;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";

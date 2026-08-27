@@ -49,13 +49,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/String/prototype/replace/S15.5.4.11_A3_T3.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/replace/S15.5.4.11_A3_T3.js:86:12:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/String/prototype/replace/S15.5.4.11_A3_T3.js:90:5:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:
@@ -78,9 +84,10 @@ results:
     observation:
       detail: 'test/built-ins/String/prototype/split/separator-regexp.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/split/separator-regexp.js:104:31:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+        stderr="test/built-ins/String/prototype/split/separator-regexp.js:133:32:
+        error[OSEO1001]: A named backreference in a pattern that
+        declares no group name is admitted only by Annex B, which is
+        outside the profile.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

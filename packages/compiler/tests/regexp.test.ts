@@ -284,10 +284,10 @@ test("reports each early error with its exact message and span", () => {
       ],
       ["\\", "u", "A pattern cannot end with a backslash.", 0, 1],
       ["\\a", "u", "This identity escape is not allowed.", 0, 2],
-      ["\\_", "", "This identity escape is not allowed.", 0, 2],
+      ["\\_", "u", "This identity escape is not allowed.", 0, 2],
       [
         "\\01",
-        "",
+        "u",
         "A legacy octal escape is outside the candidate edition.",
         0,
         3,
@@ -331,6 +331,121 @@ test("reports each early error with its exact message and span", () => {
     assert.equal(error.kind, "invalid", source);
     assert.equal(error.message, message, source);
     assert.deepEqual(error.span, { end, start }, source);
+  }
+});
+
+/*
+ * Annex B is outside the candidate claim, so a construct only Annex B
+ * admits is rejected in every mode. Which rejection it is depends on the
+ * flag set: `u` and `v` never admitted the construct, so the edition
+ * itself requires the early error, while without them the text is one a
+ * web browser accepts and the rejection is this profile's own boundary.
+ */
+test("separates an Annex B boundary from an edition early error", () => {
+  const cases: readonly (readonly [string, string, string])[] = [
+    ["\\c", "A control escape needs an ASCII letter.", "A control escape"],
+    ["\\01", "A legacy octal escape is outside the candidate edition.", "A"],
+    ["\\x", "A hexadecimal escape needs two hexadecimal digits.", "An"],
+    ["\\u", "A Unicode escape needs four hexadecimal digits.", "An"],
+    ["\\_", "This identity escape is not allowed.", "This identity escape"],
+    ["[\\k]", "This identity escape is not allowed.", "This identity escape"],
+    ["[\\d-a]", "A character class range bound cannot be a class escape.", "A"],
+    ["]", "This character must be escaped.", "This unescaped character"],
+    ["}", "This character must be escaped.", "This unescaped character"],
+    ["a{", "An unescaped brace is not a pattern character.", "An unescaped"],
+    ["(?=a)*", "An assertion cannot be quantified.", "A quantified lookahead"],
+    ["\\2", "This backreference names no capturing group.", "A backreference"],
+    ["\\k<n>", "This named backreference names no capturing group.", "A named"],
+  ];
+  for (const [source, editionMessage, subject] of cases) {
+    const boundary = rejected(source, "");
+    assert.equal(boundary.kind, "unsupported", source);
+    assert.ok(boundary.message.startsWith(subject), source);
+    assert.equal(
+      boundary.message.endsWith(
+        "is admitted only by Annex B, which is outside the profile.",
+      ),
+      true,
+      source,
+    );
+    const early = rejected(source, "u");
+    assert.equal(early.kind, "invalid", source);
+    assert.equal(early.message, editionMessage, source);
+    /*
+     * Both report the construct that was rejected, so both start at it.
+     * They can end apart: `\k<n>` stops at the escape without a group
+     * specifier, where the grammar never reads the name that follows.
+     */
+    assert.equal(early.span.start, boundary.span.start, source);
+  }
+});
+
+/*
+ * Whether a pattern declares a group name decides how `\k` reads, so the
+ * scan that answers it must see `(?<` as an introducer only where the
+ * grammar does. A class member, an escaped parenthesis, and a lookbehind
+ * are all ordinary text there.
+ */
+test("finds a group specifier without mistaking text for one", () => {
+  const references: readonly string[] = [
+    "[(?<a]\\k",
+    "\\(?<a\\k",
+    "(?<=a)\\k",
+    "(?<!a)\\k",
+    "[(?<a]\\k<n>",
+    // The grammar never enters its named-reference production here, so
+    // the shape of the text after the escape is never looked at.
+    "\\k<@>",
+    "\\k<1>",
+    "\\k< >",
+    "\\k<>",
+    // Many references share one scan, so the answer holds at any length.
+    "\\k<n>".repeat(64),
+  ];
+  for (const source of references) {
+    const error = rejected(source, "");
+    assert.equal(error.kind, "unsupported", source);
+    assert.ok(error.message.includes("Annex B"), source);
+  }
+  const declared: readonly string[] = [
+    "(?<a>x)[(?<b]\\k",
+    "(?<a>x)[\\k]",
+    "(?<a>x)\\k",
+    "(?<a>x)\\k<b>",
+    "(?<a>x)\\k<@>",
+  ];
+  for (const source of declared) {
+    const error = rejected(source, "");
+    assert.equal(error.kind, "invalid", source);
+  }
+});
+
+/*
+ * Annex B quantifies a lookahead alone, and it reads `\k` as an identity
+ * escape only in a pattern that declares no group name, so these keep the
+ * edition's early error in every mode.
+ */
+test("keeps a rejection Annex B shares as an edition early error", () => {
+  const cases: readonly (readonly [string, string])[] = [
+    ["(?<=a)*", "An assertion cannot be quantified."],
+    ["(?<!a)*", "An assertion cannot be quantified."],
+    ["^*", "An assertion cannot be quantified."],
+    ["\\b*", "An assertion cannot be quantified."],
+    ["(?<a>x)[\\k]", "This identity escape is not allowed."],
+    ["(?<a>x)\\k<b>", "This named backreference names no capturing group."],
+    ["a)", "This character must be escaped."],
+    ["(a", "A group is unterminated."],
+    ["[z-a]", "A character class range is out of order."],
+    ["a{2,1}", "A quantifier's lower bound is above its upper bound."],
+    ["*a", "A quantifier has no atom to repeat."],
+    ["\\", "A pattern cannot end with a backslash."],
+  ];
+  for (const [source, message] of cases) {
+    for (const flags of ["", "u"]) {
+      const error = rejected(source, flags);
+      assert.equal(error.kind, "invalid", `/${source}/${flags}`);
+      assert.equal(error.message, message, `/${source}/${flags}`);
+    }
   }
 });
 

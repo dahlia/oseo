@@ -6,7 +6,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { cBackend } from "../packages/backend-c/src/index.ts";
-import { runNativeCli } from "../packages/cli/src/index.ts";
+import { defaultComponents, runNativeCli } from "../packages/cli/src/index.ts";
 import {
   compileSource,
   describeTarget,
@@ -14,7 +14,6 @@ import {
   targetForExecutionHost,
 } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
-import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import {
   assertMatchingObservations,
@@ -50,6 +49,8 @@ import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
+const { regexpLiteralAotFixtures } =
+  await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpPrototypeAndExecFixtures } =
   await import("./native/fixtures/regexp-prototype-and-exec.ts");
 const { arrayConstructorFixtures } =
@@ -134,6 +135,7 @@ const fixtures: readonly Fixture[] = [
   ...genericStringCoercionFixtures,
   ...receiverFixtures,
   ...regexpIntrinsicFixtures,
+  ...regexpLiteralAotFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...generatorFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
@@ -582,7 +584,7 @@ for (const fixture of selectedFixtures) {
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
   const disabledCompilation = compileSource(
-    babelFrontend,
+    defaultComponents.frontend,
     {
       source: fixture.source,
       sourceId: `${fixture.name}.ts`,
@@ -590,7 +592,7 @@ for (const fixture of selectedFixtures) {
     { observeSpecialization: true, specialization: "disabled" },
   );
   const enabledCompilation = compileSource(
-    babelFrontend,
+    defaultComponents.frontend,
     {
       source: fixture.source,
       sourceId: `${fixture.name}.ts`,
@@ -630,6 +632,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
+    fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
@@ -844,6 +847,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
+    fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
@@ -916,6 +920,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
             fixture.name === "regexp-intrinsic" ||
+            fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||

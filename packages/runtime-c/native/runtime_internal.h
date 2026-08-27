@@ -917,6 +917,21 @@ typedef struct {
     OseoValue object;
 } OseoTemplateCacheEntry;
 
+/*
+ * One realm-local ahead-of-time literal artifact, keyed by its generated
+ * descriptor. The entry is what makes every evaluation of one literal
+ * share one immutable matcher while allocating a fresh object.
+ *
+ * The entries form an open-addressed table whose capacity is a power of
+ * two, and a null `literal` marks an unused slot. Keying by address makes
+ * one evaluation's lookup independent of how many literal sites the
+ * program has, which a linear scan would make quadratic in that count.
+ */
+typedef struct {
+    const OseoRegExpLiteral *literal;
+    OseoValue matcher;
+} OseoRegExpLiteralCacheEntry;
+
 /* Which instance element one class constructor record describes. */
 typedef enum {
     OSEO_CLASS_ELEMENT_FIELD = 0,
@@ -1084,17 +1099,6 @@ typedef struct {
     bool track_length;
 } OseoDataView;
 
-/* The normalized RegExp flag set, shared by the constructor, the
- * prototype accessors, and the matcher. */
-#define OSEO_REGEXP_FLAG_D ((uint16_t)1u << 0u)
-#define OSEO_REGEXP_FLAG_G ((uint16_t)1u << 1u)
-#define OSEO_REGEXP_FLAG_I ((uint16_t)1u << 2u)
-#define OSEO_REGEXP_FLAG_M ((uint16_t)1u << 3u)
-#define OSEO_REGEXP_FLAG_S ((uint16_t)1u << 4u)
-#define OSEO_REGEXP_FLAG_U ((uint16_t)1u << 5u)
-#define OSEO_REGEXP_FLAG_V ((uint16_t)1u << 6u)
-#define OSEO_REGEXP_FLAG_Y ((uint16_t)1u << 7u)
-
 /*
  * The outcome of validating or compiling one dynamic pattern.
  *
@@ -1110,102 +1114,6 @@ typedef enum {
     OSEO_REGEXP_ALLOCATION_FAILURE = 4,
 } OseoRegExpValidation;
 
-/* One matcher instruction opcode. runtime_regexp_matcher.c owns the
- * program these build into and is the runtime's semantic authority for
- * choice order, captures, assertions, and Unicode traversal. */
-typedef enum {
-    OSEO_REGEXP_OP_ACCEPT = 0,
-    OSEO_REGEXP_OP_FAIL = 1,
-    OSEO_REGEXP_OP_CONSUME = 2,
-    OSEO_REGEXP_OP_EDGE = 3,
-    OSEO_REGEXP_OP_BOUNDARY = 4,
-    OSEO_REGEXP_OP_SAVE = 5,
-    OSEO_REGEXP_OP_FORK = 6,
-    OSEO_REGEXP_OP_JUMP = 7,
-    OSEO_REGEXP_OP_REPEAT = 8,
-    OSEO_REGEXP_OP_REPEAT_INIT = 9,
-    OSEO_REGEXP_OP_REPEAT_ENTER = 10,
-    OSEO_REGEXP_OP_REPEAT_END = 11,
-    OSEO_REGEXP_OP_LOOK_START = 12,
-    OSEO_REGEXP_OP_LOOK_END = 13,
-    OSEO_REGEXP_OP_BACKREFERENCE = 14,
-} OseoRegExpOpcode;
-
-/* Per-instruction modifiers. `END_EDGE` distinguishes `$` from `^`. */
-#define OSEO_REGEXP_INSTRUCTION_BACKWARD ((uint8_t)0x01u)
-#define OSEO_REGEXP_INSTRUCTION_NEGATED ((uint8_t)0x02u)
-#define OSEO_REGEXP_INSTRUCTION_GREEDY ((uint8_t)0x04u)
-#define OSEO_REGEXP_INSTRUCTION_MULTILINE ((uint8_t)0x08u)
-#define OSEO_REGEXP_INSTRUCTION_IGNORE_CASE ((uint8_t)0x10u)
-#define OSEO_REGEXP_INSTRUCTION_END_EDGE ((uint8_t)0x20u)
-
-/*
- * One matcher instruction.
- *
- * The four operands are opcode-specific: a set index, a register slot, a
- * program address, a repetition-bound index, or a backreference slot
- * range. Keeping them uniform makes the program one flat array a later
- * ahead-of-time lowering can consume without reshaping.
- */
-typedef struct {
-    uint8_t opcode;
-    uint8_t modifiers;
-    uint32_t operands[4];
-} OseoRegExpInstruction;
-
-/*
- * One quantifier's repetition metadata, held out of line so an
- * instruction stays four 32-bit operands wide. `clear_from` through
- * `clear_to` is the capture register range each iteration resets, which
- * is empty when the quantified atom encloses no capturing group.
- */
-typedef struct {
-    uint64_t minimum;
-    uint64_t maximum;
-    uint32_t clear_from;
-    uint32_t clear_to;
-} OseoRegExpRepeat;
-
-/* One capturing group's optional name, as a span of `name_units`. */
-typedef struct {
-    uint32_t name_offset;
-    uint32_t name_length;
-    bool named;
-} OseoRegExpCapture;
-
-/*
- * One immutable compiled matcher program.
- *
- * Every array is a single owned allocation reachable only through the
- * artifact that holds it, so publication transfers ownership and
- * destruction releases it. The program holds no managed value and no
- * mutable field, so equal programs could be shared while each evaluation
- * still owns its object identity and `lastIndex`.
- *
- * Register 0 and 1 hold the whole match and registers `2 * index` and
- * `2 * index + 1` hold capturing group `index`. The remaining registers
- * are repetition counters, repetition positions, and lookaround frames.
- */
-typedef struct {
-    OseoRegExpInstruction *instructions;
-    size_t instruction_count;
-    /* Concatenated inversion lists; set `index` is the half-open range
-     * `set_offsets[index]` through `set_offsets[index + 1]`. */
-    uint32_t *set_boundaries;
-    uint32_t *set_offsets;
-    size_t set_count;
-    OseoRegExpRepeat *repeats;
-    size_t repeat_count;
-    uint16_t *name_units;
-    size_t name_unit_count;
-    OseoRegExpCapture *captures;
-    size_t capture_count;
-    size_t registers;
-    bool unicode_mode;
-    bool ignore_case;
-    bool has_group_names;
-} OseoRegExpProgram;
-
 /* The outcome of one match attempt over one program. */
 typedef enum {
     OSEO_REGEXP_EXECUTION_MATCHED = 0,
@@ -1215,11 +1123,14 @@ typedef enum {
 } OseoRegExpExecution;
 
 /*
- * One immutable matcher artifact produced from a dynamic pattern. The
+ * One immutable matcher artifact over one compiled program. The
  * generic matcher consumes UTF-16 source and the normalized flag mask;
  * keeping both as traced values makes the artifact independent from the
  * RegExp wrapper that owns it and lets a later executor allocate only its
- * mutable work area. `program` is native memory this artifact alone owns.
+ * mutable work area. `program` is native memory this artifact alone
+ * owns unless `owns_program` is false, which is how every artifact
+ * built from one ahead-of-time literal descriptor shares its static
+ * program.
  */
 typedef struct {
     OseoHeapObject header;
@@ -1229,6 +1140,7 @@ typedef struct {
     size_t capture_count;
     size_t instruction_count;
     uint16_t flag_mask;
+    bool owns_program;
 } OseoRegExpMatcher;
 
 /*

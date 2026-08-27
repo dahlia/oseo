@@ -135,13 +135,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/String/prototype/split/argument-is-regexp-l-and-instance-is-string-hello.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/split/argument-is-regexp-l-and-instance-is-string-hello.js:90:12:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/String/prototype/split/argument-is-regexp-l-and-instance-is-string-hello.js:92:15:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:

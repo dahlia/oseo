@@ -158,6 +158,12 @@ function printHirExpression(expression: HirExpression): string {
             : "";
     return `${prefix}${expression.digits}n`;
   }
+  if (expression.kind === "regexp") {
+    return (
+      `regexp /${expression.matcher.source}/${expression.matcher.flags.text}` +
+      ` (${expression.matcher.instructions.length} instructions)`
+    );
+  }
   if (expression.kind === "number") return numberText(expression.value);
   if (expression.kind === "boolean") return String(expression.value);
   if (expression.kind === "unary") {

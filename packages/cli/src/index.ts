@@ -50,6 +50,14 @@ import { argument, flag, option } from "@optique/core/primitives";
 import { defineProgram } from "@optique/core/program";
 import { choice, string as stringValue } from "@optique/core/valueparser";
 
+import { unicodeMatcherData } from "./regexp-unicode.ts";
+
+export {
+  caseEquivalenceClasses,
+  propertyEscapeSet,
+  unicodeMatcherData,
+} from "./regexp-unicode.ts";
+
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
 ): Properties | { [Key in keyof Properties]?: never } {
@@ -176,8 +184,14 @@ const regexpExtensions: RegExpPatternExtensions = {
     ecma262UnicodePropertySet(escape.property, escape.value) != null,
 };
 
-const babelFrontend = createBabelFrontend({ regexpExtensions });
-const babelModuleFrontend = createBabelModuleFrontend({ regexpExtensions });
+const babelFrontend = createBabelFrontend({
+  regexpExtensions,
+  regexpUnicodeData: unicodeMatcherData,
+});
+const babelModuleFrontend = createBabelModuleFrontend({
+  regexpExtensions,
+  regexpUnicodeData: unicodeMatcherData,
+});
 
 /** The concrete adapters composed by the default Oseo command line. */
 export const defaultComponents: DefaultComponents = {

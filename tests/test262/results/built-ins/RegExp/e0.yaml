@@ -19,11 +19,12 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-positive-cases.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-positive-cases.js:150:18:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/CharacterClassEscapes/character-class-wo\
+        rd-class-escape-positive-cases.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
+        class-word-class-escape-positive-cases.js:137:13:
+        error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

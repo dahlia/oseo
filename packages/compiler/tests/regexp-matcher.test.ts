@@ -589,6 +589,46 @@ test("reports an owned execution limit rather than a wrong match", () => {
   assert.equal(defaultRegExpExecutionLimits.steps, 0x100_0000);
 });
 
+/*
+ * A backreference to a duplicated group name is the one instruction a
+ * native lowering writes more than once, so the reviewed step limit has
+ * to bound the candidates rather than the artifact's array length. The
+ * limit therefore has to be able to cut through one expansion.
+ */
+test("charges one step per candidate of a duplicate-name reference", () => {
+  const program = built("(?:(?<a>x)|(?<a>y))\\k<a>", "");
+  const single = built("(?<a>x)\\k<a>", "");
+  const request = { program, startIndex: 0, text: "yy" } as const;
+  const matched = matchRegExpMatcher(request);
+  assert.equal(matched.outcome, "matched");
+  const one = matchRegExpMatcher({
+    program: single,
+    startIndex: 0,
+    text: "xx",
+  });
+  assert.equal(one.outcome, "matched");
+  // The duplicated name adds a second candidate, and its alternation
+  // adds the fork and jump that separate the two groups.
+  assert.equal(matched.steps, one.steps + 4);
+  for (let steps = 1; steps < matched.steps; steps += 1) {
+    const limited = matchRegExpMatcher({
+      limits: { ...defaultRegExpExecutionLimits, steps },
+      program,
+      startIndex: 0,
+      text: "yy",
+    });
+    assert.equal(limited.outcome, "limit", `steps=${steps}`);
+    assert.equal(limited.steps, steps, `steps=${steps}`);
+  }
+  const exact = matchRegExpMatcher({
+    limits: { ...defaultRegExpExecutionLimits, steps: matched.steps },
+    program,
+    startIndex: 0,
+    text: "yy",
+  });
+  assert.equal(exact.outcome, "matched");
+});
+
 test("reports the same work for the same artifact, input, and limits", () => {
   const program = built("(a|aa)+b", "");
   const request = { program, startIndex: 0, text: "aaaaaaac" } as const;

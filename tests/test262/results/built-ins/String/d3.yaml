@@ -102,13 +102,20 @@ results:
       - iterator-protocol
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js:101:16:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js:101:3:
+        error[OSEO2001]: Branded RegExp String protocol fallback is not
+        admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:
@@ -159,13 +166,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/String/prototype/replace/S15.5.4.11_A2_T3.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/replace/S15.5.4.11_A2_T3.js:88:12:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/String/prototype/replace/S15.5.4.11_A2_T3.js:92:5:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -1,5 +1,6 @@
 import type {
   Diagnostic,
+  RegExpMatcherUnicodeData,
   RegExpPatternExtensions,
   SourceInput,
   SyntaxArrayBindingPattern,
@@ -66,12 +67,28 @@ export interface ReceiverContext {
   readonly superProperty: SuperPropertyContext;
 }
 
+/**
+ * The owned language extensions and pinned data a composition root
+ * supplies to the frontend.
+ *
+ * Both fields are Unicode facts the compiler core links no data for, so
+ * the outer boundary that owns the pinned tables passes them in. Without
+ * `regexpUnicodeData` a literal whose artifact needs a case-equivalence
+ * class or a property set reports the profile boundary rather than
+ * matching against a guess.
+ */
+export interface ConvertOptions {
+  readonly regexpExtensions?: RegExpPatternExtensions;
+  readonly regexpUnicodeData?: RegExpMatcherUnicodeData;
+}
+
 export interface ConvertContext {
   readonly diagnostics: Diagnostic[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;
   readonly receiverStack: ReceiverContext[];
   readonly regexpExtensions: RegExpPatternExtensions | undefined;
+  readonly regexpUnicodeData: RegExpMatcherUnicodeData | undefined;
   readonly strictStack: boolean[];
   syntheticIndex: number;
   /**

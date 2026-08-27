@@ -403,6 +403,11 @@ export interface RegExpMatcherUnicodeData {
  * not describe.
  */
 export interface RegExpMatcherLimits {
+  /**
+   * The lowered instruction count, which charges a backreference to a
+   * duplicated group name once per candidate capture because that is
+   * what a native encoding writes for it.
+   */
   readonly instructions: number;
   readonly registers: number;
 }
@@ -487,6 +492,17 @@ interface Builder {
   readonly unicodeMode: boolean;
   readonly unicodeSets: boolean;
   classes: readonly (readonly number[])[] | undefined;
+  /**
+   * How many instructions a native encoding of this artifact needs.
+   *
+   * Every instruction is one except a backreference to a duplicated group
+   * name, which a lowering writes as one instruction per candidate
+   * capture because at most one of them can have participated. Charging
+   * that expansion here is what keeps the reviewed instruction limit a
+   * bound on the storage a later native lowering has to describe rather
+   * than on this array's length alone.
+   */
+  lowered: number;
   registers: number;
   wordSet: number | undefined;
 }
@@ -505,13 +521,18 @@ function emit(
   instruction: RegExpMatcherInstruction,
   span: RegExpSpan,
 ): void {
-  if (builder.instructions.length >= builder.limits.instructions) {
+  const cost =
+    instruction.kind === "backreference"
+      ? Math.max(instruction.slots.length, 1)
+      : 1;
+  if (builder.lowered + cost > builder.limits.instructions) {
     refuse(
       "limit",
       "A pattern needs more matcher instructions than the reviewed limit.",
       span,
     );
   }
+  builder.lowered += cost;
   builder.instructions.push(instruction);
 }
 
@@ -1152,6 +1173,7 @@ export function buildRegExpMatcher(
     ignoreCase: flags.ignoreCase,
     instructions: [],
     limits,
+    lowered: 0,
     multiline: flags.multiline,
     registers: 2 * (pattern.captures.length + 1),
     setIndices: new Map(),

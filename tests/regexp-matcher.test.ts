@@ -22,6 +22,7 @@ import {
   compileSource,
   matchRegExpMatcher,
   parseRegExpPattern,
+  printMir,
   searchRegExpMatcher,
 } from "../packages/compiler/src/index.ts";
 import type {
@@ -29,7 +30,7 @@ import type {
   RegExpMatcherProgram,
   RegExpPatternExtensions,
 } from "../packages/compiler/src/index.ts";
-import { babelFrontend } from "../packages/parser-babel/src/index.ts";
+import { defaultComponents } from "../packages/cli/src/index.ts";
 import {
   caseInsensitiveUnicodeWordCharacters,
   codePointSetHas,
@@ -425,18 +426,26 @@ test("keeps the matcher independent of the specialization policy", () => {
   ];
   const rendered = policies.map((options) => {
     const result = compileSource(
-      babelFrontend,
+      defaultComponents.frontend,
       { source, sourceId: "regexp.js" },
       options,
     );
-    return result.diagnostics.map(
-      (diagnostic) => `${diagnostic.code} ${diagnostic.message}`,
-    );
+    assert.deepEqual(result.diagnostics, []);
+    const mir = result.mir;
+    if (mir == null) throw new Error("an accepted source lowers to MIR");
+    return printMir(mir)
+      .split("\n")
+      .filter((line) => line.includes("regexp literal"))
+      .map((line) => line.trim());
   });
+  // The literal compiles to one artifact whatever the policy selects, so
+  // adding or removing a hint cannot change the pattern it matches.
   assert.deepEqual(rendered[0], rendered[1]);
-  assert.deepEqual(rendered[0], [
-    "OSEO1001 Regular expression evaluation is outside the M5 profile.",
-  ]);
+  assert.equal(rendered[0]?.length, 1);
+  assert.match(
+    rendered[0]?.[0] ?? "",
+    /regexp literal \/\(a\|ab\)\+c\/giu with \d+ instructions/u,
+  );
   const first = observe("(a|ab)+c", "giu", "aababc");
   const second = observe("(a|ab)+c", "giu", "aababc");
   assert.deepEqual(first, second);

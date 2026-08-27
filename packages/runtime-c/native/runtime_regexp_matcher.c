@@ -2465,15 +2465,31 @@ static bool is_line_terminator(int64_t character) {
 /*
  * The canonical form of one input character under `i`.
  *
- * The program build refuses a pattern whose sets can reach a character
- * whose equivalence class is unknown, so every character a capture can
- * hold is covered exactly here, and a character outside these classes is
- * its own canonical form for every comparison this rule can decide.
+ * An ahead-of-time literal descriptor carries the complete table its
+ * build computed from the pinned Unicode data, so the search decides
+ * every character exactly. Without that table the runtime answers from
+ * the rule it links, and the program build refuses a pattern whose sets
+ * can reach a character whose equivalence class that rule cannot decide,
+ * so every character a capture can hold is covered either way.
  */
 static uint32_t canonicalize(
     const OseoRegExpProgram *program,
     uint32_t character
 ) {
+    if (program->canonical_count > 0u) {
+        size_t low = 0u;
+        size_t high = program->canonical_count;
+        while (low < high) {
+            size_t middle = low + (high - low) / 2u;
+            uint32_t candidate = program->canonical_characters[middle];
+            if (candidate == character) {
+                return program->canonical_values[middle];
+            }
+            if (candidate < character) low = middle + 1u;
+            else high = middle;
+        }
+        return character;
+    }
     if (character >= 0x61u && character <= 0x7au) return character - 32u;
     if (program->unicode_mode) {
         if (character == 0x17fu) return 0x53u;

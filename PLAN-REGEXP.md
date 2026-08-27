@@ -4,16 +4,17 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1 through 3, the Unicode property
+Implementation status: delivery items 1 through 3 and 7, the Unicode property
 escape checkpoint, the RegExp intrinsic checkpoint, and the prototype and
-built-in execution checkpoint landed. Literal and probe work has not started.
+built-in execution checkpoint landed. Probe work has not started.
 This plan defines the M5 semantic and compilation boundary for ECMAScript
 regular expressions. The active language profile admits the callable and
 constructible `RegExp` intrinsic, initialization, `lastIndex` state,
-built-in execution with its match result object, and the `exec`, `test`,
+built-in execution with its match result object, the `exec`, `test`,
 `toString`, `source`, `flags`, and individual flag members of
-`RegExp.prototype`. It does not admit regular expression literals or the
-well-known symbol and String dispatch surfaces owned by later delivery items.
+`RegExp.prototype`, and regular expression literals compiled ahead of time.
+It does not admit the well-known symbol and String dispatch surfaces owned
+by later delivery items.
 
 The owned pattern AST, parser, validator, limits, extension points, and
 structural dump live in `@oseo/compiler`, and the frontend validates a
@@ -27,7 +28,10 @@ Dynamic construction validates that grammar and retains an immutable runtime
 matcher descriptor. The runtime now compiles that descriptor into an owned
 instruction program in *runtime\_regexp\_matcher.c* and executes it, so the
 same choice, capture, Unicode, and resource behavior exists on both sides of
-the boundary. A valid literal still reports the profile boundary.
+the boundary. A literal no longer reports a boundary: the build compiles it
+to the same artifact, the C backend writes that artifact as generated data,
+and evaluating the literal allocates a fresh object over one shared
+immutable artifact.
 
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
@@ -117,11 +121,10 @@ Regular expression work starts from these implemented contracts:
  -  ADR 0013 fixes ECMAScript 2025 as the candidate edition and requires every
     gap inside that boundary to remain visible.
 
-The active profile still rejects `RegExpLiteral` syntax. An unshadowed
-`RegExp` reference now resolves to the intrinsic, whose callable and
-constructible initialization surface is admitted. The literal step replaces
-the remaining syntax diagnostic only for the semantic surface its tests
-actually admit.
+The active profile admits `RegExpLiteral` syntax. An unshadowed `RegExp`
+reference resolves to the intrinsic, whose callable and constructible
+initialization surface is admitted, and a literal reaches the same matching
+semantics through an artifact the build compiled.
 
 
 Semantic boundary
@@ -137,9 +140,17 @@ The frontend records the literal pattern text, flag text, and source range
 without retaining a bootstrap-parser node. It validates the flag set and
 pattern grammar for the candidate edition before HIR construction. Invalid
 literal patterns are early errors at their original source location. That
-much is implemented: `parseRegExpLiteral` consumes the owned record, and a
-rejected pattern reports `OSEO0001` at the offending text inside the
-literal while a valid one reports the profile boundary at the literal.
+is implemented: `parseRegExpLiteral` consumes the owned record, a rejected
+pattern reports `OSEO0001` at the offending text inside the literal, and a
+valid one is compiled to its immutable matcher artifact at the same point.
+A pattern whose artifact the build cannot produce, because it reaches an
+owned limit or needs a Unicode fact the composition root did not supply,
+reports the profile boundary at the offending text instead. A construct
+only Annex B admits reports that boundary too, and only without `u` or
+`v`, because those flag sets never admitted it and their rejection is the
+early error the edition itself requires. That keeps ADR 0013's rule that a
+reviewed case depending on Annex B stays unsupported rather than becoming
+a failure.
 
 Each evaluation allocates a distinct initialized `RegExp` object. Repeated
 evaluation of one source occurrence and evaluation of two equal occurrences
@@ -274,6 +285,19 @@ Identical immutable artifacts may be deduplicated within a linked program.
 Deduplication keys include every edition, Unicode, flag, compiler-option, and
 matcher-format fact that can change behavior. Object allocation and identity
 are never deduplicated.
+
+This path now exists in its first measured form. The frontend compiles each
+literal to the artifact once, the C backend writes that artifact as static
+generated data in the layout *oseo\_runtime.h* declares, and one
+generated-code entry point, `oseo_regexp_literal`, takes a descriptor and
+returns a fresh object over the realm's one immutable artifact for it. The
+selected form is serialized instructions in generated data rather than
+direct C, which is the form the runtime's executor already consumes, so
+both compilation paths run one executor and no measurement is needed to
+justify a second one yet. Deduplication is still limited to what one
+descriptor reaches: two source occurrences of one pattern emit two
+descriptors. Direct C lowering and cross-occurrence deduplication remain
+delivery items 8 and 9.
 
 ### Dynamic pattern path
 
@@ -693,6 +717,14 @@ Delivery order
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.
+    Landed, in the M5b `regexp-literal-aot` node. The frontend compiles a
+    literal to the artifact and the C backend writes it as generated data
+    the runtime's executor consumes, so a literal parses and compiles no
+    pattern at run time while every evaluation still allocates its own
+    object and `lastIndex`. A descriptor may carry the complete
+    `Canonicalize` table its build computed, which is what lets a literal
+    admit an ignore-case closure over a non-ASCII class and a Unicode
+    property escape that the runtime's own pattern compiler still refuses.
 8.  Run the matcher-strategy, external-component, Unicode-table, resource, and
     code-size probes. Record the selected backend and runtime split in an
     architecture decision before it becomes a later family dependency.

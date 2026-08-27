@@ -36,6 +36,9 @@ void oseo_context_init(
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
+    context->regexp_literal_cache = NULL;
+    context->regexp_literal_cache_count = 0u;
+    context->regexp_literal_cache_capacity = 0u;
     context->array_string_stack = NULL;
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
@@ -109,6 +112,10 @@ void oseo_context_destroy(OseoContext *context) {
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
+    free(context->regexp_literal_cache);
+    context->regexp_literal_cache = NULL;
+    context->regexp_literal_cache_count = 0u;
+    context->regexp_literal_cache_capacity = 0u;
     context->array_string_stack = NULL;
     context->timer_head = oseo_undefined();
     oseo_collect(context);

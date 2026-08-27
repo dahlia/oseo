@@ -115,7 +115,9 @@ Ownership follows the plan's target layout:
     and flag validation, immutable matcher artifact, `Symbol.species`,
     built-in execution and its match result object, `exec`, `test`,
     `toString`, the `source` and `flags` accessors, the eight individual
-    flag accessors, and the explicit symbol-method boundary;
+    flag accessors, the ahead-of-time literal entry point with the
+    realm-local artifact cache its descriptors key, and the explicit
+    symbol-method boundary;
  -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the
     pattern compiler that lowers one validated pattern into an owned
     instruction program over a register file and the executor that runs
@@ -234,6 +236,23 @@ reuses Number coercion, arithmetic, property-key conversion, property reads,
 and checked binding or property writes. A member step retains one raw key value
 and invokes the existing coercibility check before converting separately for
 its read and write.
+Regular expression literals add one generated-code ABI entry point,
+`oseo_regexp_literal`, owned by *runtime\_regexp.c*. Its argument is an
+`OseoRegExpLiteral` descriptor of generated data: the written pattern and flag
+text, the normalized flag mask, and the compiled matcher program the build
+produced, whose instruction, set, repetition, capture, name, and
+canonicalization layout *oseo\_runtime.h* declares because the build now
+writes it. The entry point parses and compiles nothing; it takes the realm's
+one immutable artifact for that descriptor, from a realm-local table
+addressed by the descriptor's own address, and returns a fresh RegExp object
+over it whose own `lastIndex` starts at zero. The table reserves the slot
+through the work-area allocator before the artifact exists, so the
+allocation-attempt sweep covers its growth and the insertion afterwards
+cannot fail.
+Deciding whether an artifact owns its program is what keeps the collector from
+freeing generated data: an artifact built from a dynamic pattern owns its
+program and releases it, while an artifact over a literal descriptor borrows
+one.
 
 ### Internal helpers
 

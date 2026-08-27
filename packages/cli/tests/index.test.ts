@@ -38,9 +38,9 @@ test("composes the pinned Unicode property resolver", () => {
     sourceId: "fixture.ts",
     version: "0.0.0",
   });
-  assert.equal(accepted.exitStatus, 1);
-  assert.match(accepted.stderr, /Regular expression evaluation/u);
-  assert.doesNotMatch(accepted.stderr, /property escape is not admitted/u);
+  assert.equal(accepted.exitStatus, 0);
+  assert.equal(accepted.stderr, "");
+  assert.match(accepted.stdout, /regexp-literal/u);
 
   const rejected = runCli({
     args: ["--dump-mir", "fixture.ts"],
@@ -82,9 +82,9 @@ test("composes the pinned resolver for module sources", async () => {
     },
     host,
   );
-  assert.equal(result.exitStatus, 1);
-  assert.match(result.stderr, /Regular expression evaluation/u);
-  assert.doesNotMatch(result.stderr, /property escape is not admitted/u);
+  assert.equal(result.exitStatus, 0);
+  assert.equal(result.stderr, "");
+  assert.match(result.stdout, /regexp-literal/u);
 });
 
 test("passes an explicit generic-only policy through CLI orchestration", () => {
