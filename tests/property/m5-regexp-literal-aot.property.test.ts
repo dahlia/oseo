@@ -807,46 +807,50 @@ test(
   },
 );
 
-test("generated invalid literals stay early errors", async () => {
-  await assertAsyncProperty(
-    "a rejected literal fails the build with one located diagnostic",
-    fc.asyncProperty(rejectedCase, async (testCase) => {
-      const source = `const value = ${testCase.text};\n`;
-      const native = await runNativeCli(
-        {
-          args: ["generated-m5-regexp-literal-invalid.ts"],
-          source,
-          sourceId: "generated-m5-regexp-literal-invalid.ts",
-          version: "0.1.0",
-        },
-        host,
-      );
-      assert.equal(native.exitStatus, 1);
-      assert.equal(native.stdout, "");
-      assert.match(
-        native.stderr,
-        /^generated-m5-regexp-literal-invalid\.ts:1:\d+: /u,
-      );
-      assert.match(native.stderr, /error\[OSEO0001\]: /u);
-      assert.ok(
-        native.stderr.includes(testCase.message),
-        `${testCase.text}: ${native.stderr}`,
-      );
-    }),
-    {
-      context: propertyContext(),
-      domain:
-        "one literal carrying a single controlled defect the owned " +
-        "pattern parser owns: an unterminated group, an inverted " +
-        "quantifier bound, a quantifier with no atom, an inverted class " +
-        "range, an undeclared group name, an undefined Unicode " +
-        "property, a backreference that names no group, or a duplicate " +
-        "group name two alternatives cannot separate",
-      numRuns: 8,
-      profile: "M5 RegExp literal early errors",
-      seed: 0x6000_5502,
-      sizeLimit: "one literal of at most sixteen units and two flags",
-      timeLimitMilliseconds: 180_000,
-    },
-  );
-});
+test(
+  "generated invalid literals stay early errors",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "a rejected literal fails the build with one located diagnostic",
+      fc.asyncProperty(rejectedCase, async (testCase) => {
+        const source = `const value = ${testCase.text};\n`;
+        const native = await runNativeCli(
+          {
+            args: ["generated-m5-regexp-literal-invalid.ts"],
+            source,
+            sourceId: "generated-m5-regexp-literal-invalid.ts",
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(native.exitStatus, 1);
+        assert.equal(native.stdout, "");
+        assert.match(
+          native.stderr,
+          /^generated-m5-regexp-literal-invalid\.ts:1:\d+: /u,
+        );
+        assert.match(native.stderr, /error\[OSEO0001\]: /u);
+        assert.ok(
+          native.stderr.includes(testCase.message),
+          `${testCase.text}: ${native.stderr}`,
+        );
+      }),
+      {
+        context: propertyContext(),
+        domain:
+          "one literal carrying a single controlled defect the owned " +
+          "pattern parser owns: an unterminated group, an inverted " +
+          "quantifier bound, a quantifier with no atom, an inverted class " +
+          "range, an undeclared group name, an undefined Unicode " +
+          "property, a backreference that names no group, or a duplicate " +
+          "group name two alternatives cannot separate",
+        numRuns: 8,
+        profile: "M5 RegExp literal early errors",
+        seed: 0x6000_5502,
+        sizeLimit: "one literal of at most sixteen units and two flags",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
