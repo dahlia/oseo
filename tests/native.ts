@@ -59,6 +59,8 @@ const { arrayPrototypeIterativeFixtures } =
   await import("./native/fixtures/array-prototype-iterative.ts");
 const { arrayPrototypeCopyingFixtures } =
   await import("./native/fixtures/array-prototype-copying.ts");
+const { arrayPrototypeReductionFixtures } =
+  await import("./native/fixtures/array-prototype-reduction.ts");
 const { arrayPrototypeSortFixtures } =
   await import("./native/fixtures/array-prototype-sort.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
@@ -126,6 +128,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayConstructorFixtures,
   ...arrayPrototypeCopyingFixtures,
   ...arrayPrototypeIterativeFixtures,
+  ...arrayPrototypeReductionFixtures,
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
   ...classFixtures,
@@ -630,6 +633,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
@@ -830,6 +834,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
@@ -920,6 +925,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
+            fixture.name === "array-prototype-reduction" ||
             fixture.name === "array-prototype-sort" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
@@ -954,6 +960,7 @@ for (const fixture of selectedFixtures) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
+                fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||
                 fixture.name === "map-intrinsic" ||

@@ -210,6 +210,46 @@ test("populates Array sorting methods over one stable merge", () => {
   assert.match(definition("array_merge_sort"), /compare_array_elements/u);
 });
 
+test("populates Array reduction methods over one accumulator loop", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["reduce", "reduceRight"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["REDUCE", "REDUCE_RIGHT"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  // Receiver conversion and the length read precede the callable check,
+  // and the empty-without-initial TypeError follows both.
+  const reduction = definition("array_reduction");
+  assert.match(
+    reduction,
+    /oseo_internal_to_object[\s\S]*array_like_length[\s\S]*not callable/u,
+  );
+  assert.match(reduction, /not callable[\s\S]*needs an initial value/u);
+  // Present elements travel the shared HasProperty/Get path, and the
+  // callback receives four arguments with an undefined this value.
+  assert.match(
+    reduction,
+    /oseo_has_property[\s\S]*oseo_object_get[\s\S]*oseo_call_function/u,
+  );
+  assert.match(reduction, /4u,/u);
+  // Both methods return the rooted accumulator without allocating a
+  // result array, so no species or constructor read is reachable.
+  assert.doesNotMatch(reduction, /array_species_create/u);
+  // One shared loop flips traversal direction for reduceRight.
+  assert.match(reduction, /from_right \? length - 1\.0 : 0\.0/u);
+});
+
 test("orders Object.defineProperty conversion before descriptors", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 

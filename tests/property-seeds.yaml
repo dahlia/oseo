@@ -348,3 +348,7 @@ families:
     owner: tests/property/m5-math-namespace.property.test.ts
     start: 0x60005600
     end: 0x600056ff
+  - family: m5-array-prototype-reduction
+    owner: tests/property/m5-array-prototype-reduction.property.test.ts
+    start: 0x60005700
+    end: 0x600057ff

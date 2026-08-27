@@ -656,6 +656,20 @@ one shared deferred-method ID with thirteen dedicated IDs, so nineteen of its
 two hundred fifty-six IDs are occupied. The generated-code ABI gains no entry
 point.
 
+The `m5-83` ABI adds ordinary `reduce` and `reduceRight` functions to
+`%Array.prototype%` and removes both from the unadmitted boundary table. One
+accumulator loop serves both methods: the receiver is converted and its
+length read before the callable check, `reduce` visits ascending indices and
+`reduceRight` descending ones over the shared HasProperty/Get path, and holes
+are skipped. Initial-value presence follows the argument count, a missing
+initial value is replaced by the first present element in traversal order,
+and a traversal that ends without an accumulator throws a catchable
+TypeError. The callback receives the accumulator, element, index, and
+converted receiver with an undefined this value, and the accumulator stays
+rooted across user code. Neither method allocates a result array, so no
+`constructor` or `Symbol.species` read is reachable. Both code IDs come from
+the existing Array range, and the generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
