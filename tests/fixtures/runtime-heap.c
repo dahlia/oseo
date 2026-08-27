@@ -2711,6 +2711,77 @@ static void test_realm_random_sequences(void) {
     }
 }
 
+/*
+ * `OSEO_INTRINSIC_MATH` is part of the public runtime header, so an
+ * embedder may ask a realm for the namespace object directly instead of
+ * reading it off the global. That request materializes the namespace on
+ * its own in a realm that has no global object yet, and in a realm whose
+ * global installation already filled the slot it hands back that same
+ * object rather than a second one, so the identity a caller observes
+ * does not depend on how the realm was brought up.
+ */
+static void test_math_intrinsic_api(bool install_global) {
+    OseoContext context;
+    OseoValue roots[4] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 4u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    if (install_global) {
+        roots[0] = require_normal(oseo_environment_create(&context, 0u));
+        roots[1] = require_normal(oseo_global_object_create(
+            &context,
+            roots[0],
+            0u,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            0u,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        ));
+        roots[2] = make_text(&context, "Math");
+        roots[1] = require_normal(
+            oseo_object_get(&context, roots[1], roots[2])
+        );
+        assert(roots[1] != oseo_undefined());
+    } else {
+        assert(context.intrinsics[OSEO_INTRINSIC_MATH] == oseo_undefined());
+    }
+    roots[0] = require_normal(
+        oseo_intrinsic(&context, OSEO_INTRINSIC_MATH)
+    );
+    assert(roots[0] != oseo_undefined());
+    assert(context.intrinsics[OSEO_INTRINSIC_MATH] == roots[0]);
+    /* Repeating the request never publishes a second namespace object. */
+    assert(
+        require_normal(oseo_intrinsic(&context, OSEO_INTRINSIC_MATH)) ==
+            roots[0]
+    );
+    /* An installed global binds that same object rather than a copy. */
+    if (install_global) assert(roots[1] == roots[0]);
+    /*
+     * The value is the namespace itself and not an empty stand-in, and a
+     * Number's bits are its identity, so Math.PI is compared directly.
+     */
+    roots[2] = make_text(&context, "PI");
+    roots[3] = require_normal(
+        oseo_object_get(&context, roots[0], roots[2])
+    );
+    assert(roots[3] == oseo_number(3.1415926535897932));
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 static void test_string_length_limit(OseoContext *context) {
     OseoResult result = oseo_string_from_units(
         context,
@@ -3140,6 +3211,8 @@ int main(void) {
     test_regexp_duplicate_name_scale();
     test_regexp_prototype_and_conversion_order();
     test_realm_random_sequences();
+    test_math_intrinsic_api(false);
+    test_math_intrinsic_api(true);
     test_string_length_limit(&context);
     test_this_value(&context, frame.slots);
     test_global_object_bindings(&context, frame.slots);

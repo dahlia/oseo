@@ -487,10 +487,17 @@ test("populates the realm-owned Number intrinsic cluster", () => {
 test("populates the realm-owned Math namespace object", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
   const mathSource = sources.get("runtime_math.c") ?? "";
 
   assert.match(header, /OSEO_INTRINSIC_MATH/u);
   assert.match(bindingSource, /oseo_internal_install_math_global/u);
+  // The enum member is public, so a direct `oseo_intrinsic` request
+  // reaches the same materialization the global installation uses.
+  assert.match(
+    functionSource,
+    /OSEO_INTRINSIC_MATH\)[\s\S]{0,40}oseo_internal_math_intrinsic/u,
+  );
   for (const property of [
     "E",
     "LN10",

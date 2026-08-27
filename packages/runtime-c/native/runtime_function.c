@@ -1040,6 +1040,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_REGEXP_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_REGEXP_SPECIES) {
         materialized = oseo_internal_regexp_intrinsic(context);
+    } else if (intrinsic == OSEO_INTRINSIC_MATH) {
+        materialized = oseo_internal_math_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
