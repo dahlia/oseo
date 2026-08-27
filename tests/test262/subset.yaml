@@ -11669,7 +11669,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-100.js
     expectedClassification: pass
@@ -11726,7 +11726,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-117.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-118.js
     expectedClassification: unsupported-profile-feature
@@ -11807,7 +11807,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-142.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-143.js
     expectedClassification: unsupported-profile-feature
@@ -11897,7 +11897,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-170.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-171.js
     expectedClassification: unsupported-profile-feature
@@ -11978,7 +11978,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-196.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-197.js
     expectedClassification: unsupported-profile-feature
@@ -12062,7 +12062,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-221.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-222.js
     expectedClassification: unsupported-profile-feature
@@ -12158,7 +12158,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-251.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-252.js
     expectedClassification: unsupported-profile-feature
@@ -12257,7 +12257,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-284.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-285.js
     expectedClassification: unsupported-profile-feature
@@ -12365,7 +12365,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-33.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-34.js
     expectedClassification: unsupported-profile-feature
@@ -12467,7 +12467,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-64.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-65.js
     expectedClassification: unsupported-profile-feature
@@ -12545,7 +12545,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-89.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-9.js
     expectedClassification: pass

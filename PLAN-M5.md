@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-13,553 reviewed cases: 9,365 passes, 1,506 expected negatives, and 2,682
+14,188 reviewed cases: 10,014 passes, 1,506 expected negatives, and 2,668
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 95 indexed records in the normative
+M5a is complete. The 97 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 9,365
-passes across 13,553 paths, and the property inventory records 107 domains,
-107 seeds, and an ordinary case budget of 5,158.
+the M5b and M5c dependency order below. The reviewed manifest now records
+10,014 passes across 14,188 paths, and the property inventory records 109
+domains, 109 seeds, and an ordinary case budget of 5,182.
 
 
 M5a implementation history
@@ -4813,8 +4813,8 @@ tie toward positive infinity and its `-0` window, the signed zeroes
 `fround`, and `f16round` preserve, the `NaN` and infinity precedence in
 `max`, `min`, and `hypot`, Number::exponentiate for `pow`, the
 ties-to-even binary32 and binary16 rounding `fround` and `f16round`
-perform over exact integer arithmetic on the operand's own encoding, and
-the `ToUint32` readings `clz32` and `imul` report.
+perform over exact binary64 scaling of the operand, and the `ToUint32`
+readings `clz32` and `imul` report.
 
 The remaining operations are the ones ECMA-262 marks
 implementation-approximated. This profile commits to their special values,
@@ -4851,13 +4851,13 @@ from file-local helpers in *runtime\_primitive.c* to two internal helpers
 that the `**` operator and `Math` now share, which keeps the two cases
 where C `pow` disagrees with the specification decided in one place.
 
-The reviewed `nans.js` harness include becomes available with this node,
+The reviewed *nans.js* harness include becomes available with this node,
 because its only unadmitted dependency was `Math.pow`. Removing it from
 the unavailable-include set promotes the two reviewed
 _Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases.
 
 Fixed native and generated differential evidence at property seed
-`0x60005300` covers the namespace identity, prototype, and tag, every
+`0x60005500` covers the namespace identity, prototype, and tag, every
 descriptor class, every function's name and length, the specified signed
 zeroes, infinities, and `NaN` results, exact square roots, powers,
 logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
@@ -4876,14 +4876,23 @@ observe the two runs agreeing.
 
 Of the 317 paths under the node's inventory root, 316 are reviewed: 280
 pass and 36 retain the explicit `Reflect.construct` prerequisite their
-`isConstructor.js` include needs. The remaining path,
+*isConstructor.js* include needs. The remaining path,
 *test/built-ins/Math/sqrt/results.js*, stays outside the reviewed subset:
 its thousand-entry nested array literal exceeds the runtime's reviewed
 active frame-slot budget, an existing resource boundary this node does not
-own. Ninety-one previously reviewed paths outside the root change
-classification from `unsupported-profile-feature` to `pass`, eighty-nine
+own. One hundred and two previously reviewed paths outside the root change
+classification from `unsupported-profile-feature` to `pass`, one hundred
 because they read `Math` while probing an unrelated contract and two
-because the `nans.js` include became available.
+because the *nans.js* include became available. Eleven of the hundred are
+the _Object/create/15.2.3.5-4-\*.js_ cases that pass the `Math` object
+itself as a `Properties` argument, which `object-create` reviewed as
+unsupported while `Math` was absent. No previously reviewed path loses a
+pass. The manifest moves from 13,872 to 14,188 paths and from 9,632
+to 10,014 passes, keeps 1,506 expected negatives, and moves from 2,734 to
+2,668 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The admitted runtime checkpoint moves the runtime
+ABI to `oseo-runtime-m5-81` without adding a generated-code entry point or
+changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

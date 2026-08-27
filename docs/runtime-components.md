@@ -264,7 +264,7 @@ one.
 
 ### Internal helpers
 
-One hundred and twenty-five helpers cross a translation-unit
+One hundred and forty-four helpers cross a translation-unit
 boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -405,6 +405,16 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_map_intrinsic`                       | *runtime\_map.c*              |
 | `oseo_internal_install_map_global`                  | *runtime\_map.c*              |
 | `oseo_internal_same_value_zero`                     | *runtime\_descriptor.c*       |
+| `oseo_internal_array_intrinsic`                     | *runtime\_array.c*            |
+| `oseo_internal_install_array_global`                | *runtime\_array.c*            |
+| `oseo_internal_to_array_length`                     | *runtime\_array.c*            |
+| `oseo_internal_array_buffer_builtin_dispatch`       | *runtime\_array\_buffer.c*    |
+| `oseo_internal_array_buffer_intrinsic`              | *runtime\_array\_buffer.c*    |
+| `oseo_internal_array_buffer_release`                | *runtime\_array\_buffer.c*    |
+| `oseo_internal_install_array_buffer_global`         | *runtime\_array\_buffer.c*    |
+| `oseo_internal_object_define_data`                  | *runtime\_descriptor.c*       |
+| `oseo_internal_virtual_string_iterator_descriptor`  | *runtime\_descriptor.c*       |
+| `oseo_internal_primitive_wrapper_prototype`         | *runtime\_object\_builtin.c*  |
 
 ### Documented component cycles
 

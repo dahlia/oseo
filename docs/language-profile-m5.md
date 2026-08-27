@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 13,553 reviewed cases: 9,365 passes, 1,506
-expected negatives, and 2,682 unsupported profile features. It records no
+The current manifest contains 14,188 reviewed cases: 10,014 passes, 1,506
+expected negatives, and 2,668 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -162,11 +162,11 @@ current evidence assessment. Those live only in the indexed records above.
     source-located rejection: the realm binds that name to a real
     value, so `"undefined"` would misreport it, the same boundary
     the Unit 8.1b identifier delete records. A name the profile has
-    since materialized, such as `Object`, `Number`, `Promise`, or
-    `String`, reads the realm global object's property instead. The same
+    since materialized, such as `Object`, `Number`, `Promise`, `String`,
+    or `Math`, reads the realm global object's property instead. The same
     rule covers every
     other global name ECMA-262 clause 19 requires of the pinned
-    ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
+    ECMAScript 2025 realm, such as `JSON`, `Array`, `eval`, and
     `globalThis`: an unshadowed `typeof` of one stays a source-located
     rejection until the profile admits the name as a value, so the fold
     answers `"undefined"` only for a name no conforming realm of the
@@ -4510,9 +4510,9 @@ reports `+∞` for an infinite argument even when another is `NaN`.
 `NaN` exponent is `NaN` even for a base of one and a base of exactly one or
 minus one with an infinite exponent is `NaN`. `Math.fround` and
 `Math.f16round` round to binary32 and binary16 with ties to even over exact
-integer arithmetic on the operand's own encoding, so no narrowing floating
-conversion happens and an operand that rounds past the format's largest
-finite value becomes an infinity. `Math.clz32` and `Math.imul` read their
+binary64 scaling of the operand, so no narrowing floating conversion happens
+and an operand that rounds past the format's largest finite value becomes an
+infinity. `Math.clz32` and `Math.imul` read their
 operands through `ToUint32` and report the exact counted and wrapped
 results.
 
@@ -4544,7 +4544,7 @@ host-capability decision owns introducing an entropy source; nothing in the
 pinned suite observes the difference.
 
 Fixed native and generated differential evidence at property seed
-`0x60005300` covers the namespace identity, prototype, and tag, every
+`0x60005500` covers the namespace identity, prototype, and tag, every
 descriptor class, every function's name and length, the specified signed
 zeroes, infinities, and `NaN` results, exact square roots, powers,
 logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
@@ -4562,22 +4562,26 @@ target to observe the two runs agreeing.
 
 All 317 paths under the node's inventory root are accounted for and 316 are
 reviewed: 280 pass and 36 retain the explicit `Reflect.construct`
-prerequisite their `isConstructor.js` include needs.
+prerequisite their *isConstructor.js* include needs.
 *test/built-ins/Math/sqrt/results.js* stays outside the reviewed subset
 because its thousand-entry nested array literal exceeds the runtime's
 reviewed active frame-slot budget, an existing resource boundary this node
-does not own. The reviewed `nans.js` harness include also becomes available,
-because `Math.pow` was its only unadmitted dependency. Ninety-one previously
-reviewed paths outside the root move from `unsupported-profile-feature` to
-`pass`: eighty-nine read `Math` while probing an unrelated contract, and two
-are the _Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases the
-new include unblocks. No previously reviewed path loses a pass. The manifest
-moves from 13,553 to 13,869 cases and from 9,365 to 9,736 passes, keeps
-1,506 expected negatives, and moves from 2,682 to 2,627 unsupported profile
-features, with no semantic, harness, or infrastructure failures. The suite
-revision, 41,091-path inventory, manifest schema and vocabulary, and
+does not own. The reviewed *nans.js* harness include also becomes available,
+because `Math.pow` was its only unadmitted dependency. One hundred and two
+previously reviewed paths outside the root move from
+`unsupported-profile-feature` to `pass`: one hundred read `Math` while
+probing an unrelated contract, and two are the
+_Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases the new
+include unblocks. Eleven of the hundred are the
+_Object/create/15.2.3.5-4-\*.js_ cases that pass the `Math` object itself as
+a `Properties` argument, which `object-create` reviewed as unsupported
+while `Math` was absent. No previously reviewed path loses a pass. The
+manifest moves from 13,872 to 14,188 cases and from 9,632 to 10,014 passes,
+keeps 1,506 expected negatives, and moves from 2,734 to 2,668 unsupported
+profile features, with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged. The admitted runtime checkpoint moves
-the runtime ABI to `oseo-runtime-m5-79` without adding a generated-code
+the runtime ABI to `oseo-runtime-m5-81` without adding a generated-code
 entry point or changing the graph's orchestration state.
 
 
