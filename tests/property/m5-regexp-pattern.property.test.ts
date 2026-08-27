@@ -822,12 +822,29 @@ const mutations: readonly MutationModel[] = [
    * 65,536 is above the reviewed capture limit, so the reference names no
    * group whatever the generated model captures.
    */
-  suffix("unresolved backreference", "\\65536", (length) =>
-    patternError("invalid", length, length + 6),
+  suffix("unresolved backreference", "\\65536", (length, unicode) =>
+    patternError(unicode ? "invalid" : "unsupported", length, length + 6),
   ),
-  suffix("unresolved named reference", "\\k<absent>", (length) =>
-    patternError("invalid", length, length + 10),
-  ),
+  /*
+   * Annex B reads `\k` as an identity escape only in a pattern that
+   * declares no group name. A generated model that declares one is parsed
+   * with the grammar's named-reference parameter in every mode, so its
+   * unresolved reference is the early error the edition requires.
+   */
+  {
+    apply: (source, flags) => [`${source}\\k<absent>`, flags],
+    expect: (source, flags) => {
+      // Without a group specifier the grammar never reads the name, so
+      // the boundary names the escape rather than the text after it.
+      const named = unicodeMode(flags) || /\(\?<[^=!]/u.test(source);
+      return patternError(
+        named ? "invalid" : "unsupported",
+        source.length,
+        source.length + (named ? 10 : 2),
+      );
+    },
+    label: "unresolved named reference",
+  },
   suffix(
     "reversed class range",
     "[z-a]",
@@ -837,18 +854,18 @@ const mutations: readonly MutationModel[] = [
   suffix("invalid group name", "(?<0bad>x)", (length) =>
     patternError("invalid", length + 3, length + 4),
   ),
-  suffix("unescaped close bracket", "]", (length) =>
-    patternError("invalid", length, length + 1),
+  suffix("unescaped close bracket", "]", (length, unicode) =>
+    patternError(unicode ? "invalid" : "unsupported", length, length + 1),
   ),
   suffix("code point above the range", "\\u{110000}", (length, unicode) =>
     unicode
       ? patternError("invalid", length, length + 10)
-      : patternError("invalid", length, length + 2),
+      : patternError("unsupported", length, length + 2),
   ),
   suffix("unadmitted property escape", "\\p{L}", (length, unicode) =>
     unicode
       ? patternError("unsupported", length, length + 5)
-      : patternError("invalid", length, length + 2),
+      : patternError("unsupported", length, length + 2),
   ),
   suffix(
     "unadmitted class set notation",
@@ -920,14 +937,13 @@ test("one mutation of a generated pattern fails at the exact phase", () => {
         assert.equal(error.section, expected.section, label);
         assert.deepEqual(error.span, expected.span, label);
         /*
-         * The host implements Annex B and this grammar does not, so it
-         * agrees about a rejected pattern only under a unicode-mode flag.
-         * It never agrees about an unadmitted construct, which is valid
-         * ECMAScript that this unit refuses on purpose.
+         * The taxonomy carries host agreement now. An invalid rejection is
+         * the early error the edition itself requires, so every conforming
+         * implementation reports it. An unsupported one is either text
+         * only Annex B admits, which the host accepts, or a construct this
+         * unit refuses on purpose.
          */
-        const hostAgrees =
-          expected.section === "flags" ||
-          (expected.kind === "invalid" && unicodeMode(flags));
+        const hostAgrees = expected.kind === "invalid";
         if (!hostAgrees) return;
         assert.throws(() => new RegExp(mutated, flags), SyntaxError, label);
       },

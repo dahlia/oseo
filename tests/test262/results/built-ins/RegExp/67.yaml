@@ -48,11 +48,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Syriac.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Syriac.js:129:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Syriac.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Syriac.js:104:22: error[OSEO1001]: Unknown
+        binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

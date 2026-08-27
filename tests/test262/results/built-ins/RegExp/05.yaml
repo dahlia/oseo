@@ -18,11 +18,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Balinese.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Balinese.js:112:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Bali\
+        nese.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Balinese.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

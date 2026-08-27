@@ -12,17 +12,24 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/S15.10.2.7_A1_T6.js non-strict disabled
-        failed (1): stdout=""
-        stderr="test/built-ins/RegExp/S15.10.2.7_A1_T6.js:87:18:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -35,17 +42,24 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/S15.10.2.7_A2_T3.js non-strict disabled
-        failed (1): stdout=""
-        stderr="test/built-ins/RegExp/S15.10.2.7_A2_T3.js:87:18:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -94,11 +108,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Ideographic.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Ideographic.js:132:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Ideographic.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Ideog\
+        raphic.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -119,11 +133,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Newa.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Newa.js:112:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Newa\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Newa.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -144,11 +158,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Tagalog.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Tagalog.js:113:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Taga\
+        log.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Tagalog.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -169,11 +183,12 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Egyptian_Hieroglyphs.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Egyptian_Hieroglyphs.js:112:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Egyptian_Hieroglyphs.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Egyptian_Hieroglyphs.js:104:22: error[OSEO1001]:
+        Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -194,11 +209,12 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Old_North_Arabian.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Old_North_Arabian.js:111:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Old_North_Arabian.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Old_North_Arabian.js:104:22: error[OSEO1001]:
+        Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -219,11 +235,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Tai_Le.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Tai_Le.js:117:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Tai_Le.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Tai_Le.js:104:22: error[OSEO1001]: Unknown
+        binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -13,6 +13,7 @@ import type {
 } from "@oseo/compiler";
 
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
+import { encodeRegExpProgram } from "./regexp-program.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -346,6 +347,177 @@ function emitConstant(
       ),
     );
   }
+}
+
+/**
+ * Emit one ahead-of-time compiled regular expression literal.
+ *
+ * Every array here is generated data the build already produced, so
+ * evaluating the operation parses no pattern and compiles no program: it
+ * allocates a fresh object over the realm's one immutable artifact for
+ * this descriptor, which is what keeps repeated evaluation from sharing
+ * `lastIndex`.
+ */
+function emitRegExpLiteral(state: EmitState, operation: MirOperation): void {
+  const program = operation.regexpProgram;
+  if (program == null) {
+    throw new Error(`MIR regexp-literal %${operation.id} has no artifact.`);
+  }
+  const encoded = encodeRegExpProgram(program);
+  const suffix = String(operation.id);
+  const comma = renderC(emittedC.common.commaSpace);
+  const nothing = renderC(emittedC.common.nullPointer);
+  const count = (value: number): string =>
+    renderC(emittedC.regexpLiteral.unsignedValue, value);
+  const declare = (
+    fragment: readonly [string, string, string],
+    name: string,
+    values: readonly string[],
+  ): string => {
+    if (values.length === 0) return nothing;
+    line(state, renderC(fragment, name, values.join(comma)));
+    return name;
+  };
+  const sourceUnits = declare(
+    emittedC.regexpLiteral.uint16ArrayDeclaration,
+    `regexp_source_units_${suffix}`,
+    encoded.sourceUnits.map(count),
+  );
+  const flagUnits = declare(
+    emittedC.regexpLiteral.uint16ArrayDeclaration,
+    `regexp_flag_units_${suffix}`,
+    encoded.flagUnits.map(count),
+  );
+  const instructions = declare(
+    emittedC.regexpLiteral.instructionArrayDeclaration,
+    `regexp_instructions_${suffix}`,
+    encoded.instructions.map((instruction) =>
+      renderC(
+        emittedC.regexpLiteral.instructionValue,
+        instruction.opcode,
+        instruction.modifiers,
+        instruction.operands[0],
+        instruction.operands[1],
+        instruction.operands[2],
+        instruction.operands[3],
+      ),
+    ),
+  );
+  // A set the pattern can never match, such as `[^\s\S]`, contributes no
+  // boundary, so a program whose every set is empty would otherwise point
+  // at nothing. The matcher still indexes the array to answer that the set
+  // holds nothing, and forming even a zero offset from a null pointer is
+  // undefined, so an array that names any set keeps one element.
+  const boundaries =
+    encoded.setBoundaries.length === 0 && encoded.setOffsets.length > 1
+      ? [0]
+      : encoded.setBoundaries;
+  const setBoundaries = declare(
+    emittedC.regexpLiteral.uint32ArrayDeclaration,
+    `regexp_set_boundaries_${suffix}`,
+    boundaries.map(count),
+  );
+  const setOffsets = declare(
+    emittedC.regexpLiteral.uint32ArrayDeclaration,
+    `regexp_set_offsets_${suffix}`,
+    encoded.setOffsets.map(count),
+  );
+  const repeats = declare(
+    emittedC.regexpLiteral.repeatArrayDeclaration,
+    `regexp_repeats_${suffix}`,
+    encoded.repeats.map((repeat) =>
+      renderC(
+        emittedC.regexpLiteral.repeatValue,
+        renderC(emittedC.regexpLiteral.unsignedLongValue, repeat.minimum),
+        repeat.maximum == null
+          ? renderC(emittedC.regexpLiteral.unboundedValue)
+          : renderC(emittedC.regexpLiteral.unsignedLongValue, repeat.maximum),
+        repeat.clearFrom,
+        repeat.clearTo,
+      ),
+    ),
+  );
+  const nameUnits = declare(
+    emittedC.regexpLiteral.uint16ArrayDeclaration,
+    `regexp_name_units_${suffix}`,
+    encoded.nameUnits.map(count),
+  );
+  const captures = declare(
+    emittedC.regexpLiteral.captureArrayDeclaration,
+    `regexp_captures_${suffix}`,
+    encoded.captures.map((capture) =>
+      renderC(
+        emittedC.regexpLiteral.captureValue,
+        capture.nameOffset,
+        capture.nameLength,
+        renderC(
+          capture.named
+            ? emittedC.common.trueValue
+            : emittedC.common.falseValue,
+        ),
+      ),
+    ),
+  );
+  const canonicalCharacters = declare(
+    emittedC.regexpLiteral.uint32ArrayDeclaration,
+    `regexp_canonical_characters_${suffix}`,
+    encoded.canonicalCharacters.map(count),
+  );
+  const canonicalValues = declare(
+    emittedC.regexpLiteral.uint32ArrayDeclaration,
+    `regexp_canonical_values_${suffix}`,
+    encoded.canonicalValues.map(count),
+  );
+  const flag = (value: boolean): string =>
+    renderC(value ? emittedC.common.trueValue : emittedC.common.falseValue);
+  const programName = `regexp_program_${suffix}`;
+  line(
+    state,
+    renderC(
+      emittedC.regexpLiteral.programDeclaration,
+      programName,
+      [
+        instructions,
+        count(encoded.instructions.length),
+        setBoundaries,
+        setOffsets,
+        count(Math.max(encoded.setOffsets.length - 1, 0)),
+        repeats,
+        count(encoded.repeats.length),
+        nameUnits,
+        count(encoded.nameUnits.length),
+        captures,
+        count(encoded.captures.length),
+        count(encoded.registers),
+        canonicalCharacters,
+        canonicalValues,
+        count(encoded.canonicalCharacters.length),
+        flag(encoded.unicodeMode),
+        flag(encoded.ignoreCase),
+        flag(encoded.hasGroupNames),
+      ].join(comma),
+    ),
+  );
+  const literalName = `regexp_literal_${suffix}`;
+  line(
+    state,
+    renderC(
+      emittedC.regexpLiteral.literalDeclaration,
+      literalName,
+      [
+        sourceUnits,
+        count(encoded.sourceUnits.length),
+        flagUnits,
+        count(encoded.flagUnits.length),
+        renderC(emittedC.regexpLiteral.programAddress, programName),
+        count(encoded.flagMask),
+      ].join(comma),
+    ),
+  );
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, renderC(emittedC.regexpLiteral.resultAssign, literalName));
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitTemplateObject(state: EmitState, operation: MirOperation): void {
@@ -2828,6 +3000,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitArgumentListOperation(state, operation);
   } else if (operation.kind === "template-object") {
     emitTemplateObject(state, operation);
+  } else if (operation.kind === "regexp-literal") {
+    emitRegExpLiteral(state, operation);
   } else if (
     operation.kind === "array-append" ||
     operation.kind === "array-append-hole" ||

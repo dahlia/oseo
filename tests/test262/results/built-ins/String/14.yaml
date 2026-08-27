@@ -44,18 +44,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/String/prototype/replaceAll/searchValue-get-flags-abrupt.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/replaceAll/searchValue-get-flags-abrupt.js:116:11:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

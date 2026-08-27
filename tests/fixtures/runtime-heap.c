@@ -1589,11 +1589,52 @@ typedef enum {
     REGEXP_ALLOCATION_INSTANCE,
     REGEXP_ALLOCATION_NAMED_CAPTURE,
     REGEXP_ALLOCATION_SYNTAX_ERROR,
+    REGEXP_ALLOCATION_LITERAL,
     REGEXP_ALLOCATION_EXEC,
     REGEXP_ALLOCATION_EXEC_INDICES,
     REGEXP_ALLOCATION_TO_STRING,
     REGEXP_ALLOCATION_OPERATION_COUNT,
 } RegExpAllocationOperation;
+
+/*
+ * One ahead-of-time literal descriptor, written the way the C backend
+ * emits `/(a)b/g`.
+ *
+ * The program is generated data an artifact only borrows, so the sweep
+ * proves that a failure anywhere in the literal path publishes no partial
+ * artifact and frees nothing the next attempt still needs.
+ */
+static uint16_t literal_source_units[] = {40u, 97u, 41u, 98u};
+static uint16_t literal_flag_units[] = {103u};
+static OseoRegExpInstruction literal_instructions[] = {
+    {OSEO_REGEXP_OP_SAVE, 0u, {0u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_SAVE, 0u, {2u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_CONSUME, 0u, {0u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_SAVE, 0u, {3u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_CONSUME, 0u, {1u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_SAVE, 0u, {1u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_ACCEPT, 0u, {0u, 0u, 0u, 0u}},
+    {OSEO_REGEXP_OP_FAIL, 0u, {0u, 0u, 0u, 0u}},
+};
+static uint32_t literal_set_boundaries[] = {97u, 98u, 98u, 99u};
+static uint32_t literal_set_offsets[] = {0u, 2u, 4u};
+static OseoRegExpCapture literal_captures[] = {{0u, 0u, false}};
+static OseoRegExpProgram literal_program = {
+    literal_instructions, 8u,
+    literal_set_boundaries, literal_set_offsets, 2u,
+    NULL, 0u,
+    NULL, 0u,
+    literal_captures, 1u,
+    4u,
+    NULL, NULL, 0u,
+    false, false, false,
+};
+static const OseoRegExpLiteral literal_descriptor = {
+    literal_source_units, 4u,
+    literal_flag_units, 1u,
+    &literal_program,
+    OSEO_REGEXP_FLAG_G,
+};
 
 static bool regexp_allocation_uses_method(RegExpAllocationOperation op) {
     return op == REGEXP_ALLOCATION_EXEC ||
@@ -1616,7 +1657,7 @@ static void prepare_regexp_allocation_operation(
             context,
             "(?:(?<name>a)|(?<name>b))\\k<name>"
         );
-    } else {
+    } else if (operation != REGEXP_ALLOCATION_LITERAL) {
         roots[1] = make_text(context, "[");
     }
     roots[2] = roots[0];
@@ -1659,6 +1700,10 @@ static OseoResult run_regexp_allocation_operation(
 ) {
     if (operation == REGEXP_ALLOCATION_CLUSTER) {
         return oseo_intrinsic(context, OSEO_INTRINSIC_REGEXP);
+    }
+    if (operation == REGEXP_ALLOCATION_LITERAL) {
+        (void)roots;
+        return oseo_regexp_literal(context, &literal_descriptor);
     }
     if (regexp_allocation_uses_method(operation)) {
         return oseo_call_function(
@@ -1795,7 +1840,8 @@ static void validate_regexp_allocation_retry(
 
 /*
  * Every allocation in the RegExp cluster, successful constructor,
- * catchable SyntaxError, built-in execution, match-indices, and
+ * catchable SyntaxError, ahead-of-time literal, built-in execution,
+ * match-indices, and
  * stringification paths fails once. Collection follows each failure, and
  * the same context then retries without publishing a partial intrinsic,
  * instance, matcher artifact, result object, or language error.

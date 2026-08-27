@@ -1,3 +1,4 @@
+import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
 import type {
   ByteRange,
   Diagnostic,
@@ -180,6 +181,33 @@ export type SyntaxArrayElement =
   | SyntaxArraySpreadElement
   | SyntaxExpression
   | undefined;
+
+/**
+ * One regular expression literal retained at the frontend boundary.
+ *
+ * The frontend records the written pattern text, flag text, and source
+ * range instead of retaining a bootstrap-parser node, so the owned parser
+ * is the only reader of regular expression syntax.
+ */
+export interface RegExpLiteralSyntax extends LocatedSyntax {
+  readonly flags: string;
+  readonly kind: "regexp-literal";
+  readonly pattern: string;
+}
+
+/**
+ * One regular expression literal the frontend already compiled.
+ *
+ * The literal's pattern is parsed and lowered to an immutable matcher
+ * artifact during the build, so no owned pattern tree and no
+ * bootstrap-parser node survives here. `matcher` retains the written
+ * pattern and flag text, so `source`, `flags`, and `toString` never
+ * reconstruct them from the artifact's instructions.
+ */
+export interface SyntaxRegExpLiteralExpression extends LocatedSyntax {
+  readonly kind: "regexp";
+  readonly matcher: RegExpMatcherProgram;
+}
 
 /**
  * One template object argument synthesized for a tagged template call.
@@ -550,6 +578,7 @@ export type SyntaxExpression =
       readonly kind: "bigint";
       readonly radix: 2 | 8 | 10 | 16;
     })
+  | SyntaxRegExpLiteralExpression
   | (LocatedSyntax & {
       readonly kind: "number";
       readonly value: number;

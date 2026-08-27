@@ -18,11 +18,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Imperial_Aramaic.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Imperial_Aramaic.js:112:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Impe\
+        rial_Aramaic.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Imperial_Aramaic.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -68,11 +68,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Ethiopic.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Ethiopic.js:147:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Ethi\
+        opic.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Ethiopic.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -93,11 +93,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Telugu.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Telugu.js:123:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Telu\
+        gu.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Telugu.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

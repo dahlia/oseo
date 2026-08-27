@@ -1280,59 +1280,70 @@ static void regexp_initialize_ordinary(
     object->generator = NULL;
 }
 
-/* RegExpAlloc, including the non-enumerable own lastIndex property. */
+/*
+ * RegExpAlloc over a resolved prototype, including the non-enumerable
+ * own lastIndex property. Construction resolves the prototype from its
+ * new target; an ahead-of-time literal takes %RegExp.prototype% directly,
+ * which is what GetPrototypeFromConstructor reaches for %RegExp% because
+ * its `prototype` property is neither writable nor configurable.
+ */
+static OseoResult regexp_allocate_from(
+    OseoContext *context,
+    OseoValue prototype
+) {
+    OseoValue slots[2] = {prototype, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    OseoRegExp *regexp =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*regexp));
+    if (regexp == NULL) {
+        result = failure(context, "OSEO2001", "RegExp allocation failed.");
+    } else {
+        regexp_initialize_ordinary(context, &regexp->ordinary, frame.slots[0]);
+        regexp->matcher = oseo_undefined();
+        result = oseo_internal_publish_heap(
+            context,
+            &regexp->ordinary.header,
+            OSEO_HEAP_REGEXP
+        );
+        frame.slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "lastIndex");
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            oseo_number(0.0),
+            (OseoPropertyAttributes){false, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* RegExpAlloc for the constructor, which resolves its own prototype. */
 static OseoResult regexp_allocate(
     OseoContext *context,
     OseoValue new_target
 ) {
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = new_target;
-    result = regexp_prototype_from_target(
+    OseoValue slots[2] = {new_target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = regexp_prototype_from_target(
         context,
         frame.slots[0],
         &frame.slots[1]
     );
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoRegExp *regexp =
-            oseo_internal_allocate_heap_bytes(context, sizeof(*regexp));
-        if (regexp == NULL) {
-            result = failure(
-                context,
-                "OSEO2001",
-                "RegExp allocation failed."
-            );
-        } else {
-            regexp_initialize_ordinary(
-                context,
-                &regexp->ordinary,
-                frame.slots[1]
-            );
-            regexp->matcher = oseo_undefined();
-            result = oseo_internal_publish_heap(
-                context,
-                &regexp->ordinary.header,
-                OSEO_HEAP_REGEXP
-            );
-            frame.slots[1] = result.value;
-        }
+        result = regexp_allocate_from(context, frame.slots[1]);
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_ascii_string(context, "lastIndex");
-        frame.slots[2] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
-            context,
-            frame.slots[1],
-            frame.slots[2],
-            oseo_number(0.0),
-            (OseoPropertyAttributes){false, false, true, false}
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
-    oseo_roots_release(context, &frame);
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -1427,6 +1438,7 @@ static OseoResult regexp_matcher_create(
         matcher->capture_count = capture_count;
         matcher->instruction_count = program->instruction_count;
         matcher->flag_mask = flag_mask;
+        matcher->owns_program = true;
         result = oseo_internal_publish_heap(
             context,
             &matcher->header,
@@ -1479,6 +1491,211 @@ static OseoResult regexp_initialize(
         result.value = frame.slots[0];
     }
     oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * The table slot one literal descriptor owns.
+ *
+ * Open addressing over a power-of-two table keeps the search bounded by
+ * the cluster around one address rather than by how many literal sites
+ * the program has. The table is never full, so the walk always reaches
+ * either the descriptor or the empty slot it would occupy.
+ */
+static size_t regexp_literal_slot(
+    const OseoRegExpLiteralCacheEntry *cache,
+    size_t capacity,
+    const OseoRegExpLiteral *literal
+) {
+    uintptr_t bits = (uintptr_t)literal;
+    size_t mask = capacity - 1u;
+    size_t index = (size_t)((bits >> 4u) ^ (bits >> 12u)) & mask;
+    while (cache[index].literal != NULL &&
+           cache[index].literal != literal) {
+        index = (index + 1u) & mask;
+    }
+    return index;
+}
+
+/*
+ * Reserve room for one more artifact before any of it is published.
+ *
+ * The table grows through the work-area allocator, so the deterministic
+ * allocation-attempt sweep fails this allocation like every other one the
+ * literal path takes. Reserving before the artifact exists is what lets
+ * the insertion afterwards be infallible: an artifact this realm has
+ * published is always the one every later evaluation of that literal
+ * finds.
+ */
+static OseoResult regexp_literal_cache_reserve(OseoContext *context) {
+    OseoRegExpLiteralCacheEntry *cache = context->regexp_literal_cache;
+    size_t capacity = context->regexp_literal_cache_capacity;
+    if (cache != NULL && (context->regexp_literal_cache_count + 1u) * 2u <=
+        capacity) {
+        return normal(oseo_undefined());
+    }
+    size_t grown = capacity == 0u ? 8u : capacity * 2u;
+    if (grown < capacity || grown > SIZE_MAX / sizeof(*cache)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp literal cache is too large."
+        );
+    }
+    OseoRegExpLiteralCacheEntry *table = oseo_internal_allocate_work_bytes(
+        context,
+        grown * sizeof(*table)
+    );
+    if (table == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "RegExp literal cache allocation failed."
+        );
+    }
+    /*
+     * An all-zero representation is not portably a null pointer, and the
+     * probe reads `literal` to find an empty slot, so every slot is
+     * initialized rather than cleared.
+     */
+    for (size_t index = 0u; index < grown; index += 1u) {
+        table[index].literal = NULL;
+        table[index].matcher = oseo_undefined();
+    }
+    for (size_t index = 0u; index < capacity; index += 1u) {
+        if (cache[index].literal == NULL) continue;
+        table[regexp_literal_slot(table, grown, cache[index].literal)] =
+            cache[index];
+    }
+    free(cache);
+    context->regexp_literal_cache = table;
+    context->regexp_literal_cache_capacity = grown;
+    return normal(oseo_undefined());
+}
+
+/*
+ * The realm's immutable matcher artifact for one literal descriptor.
+ *
+ * The program the descriptor names was compiled during the build, so this
+ * only wraps it with the source and flag strings the `source`, `flags`,
+ * and `toString` behavior reports. Nothing here parses or compiles a
+ * pattern, and the artifact holds no per-evaluation state.
+ */
+static OseoResult regexp_literal_matcher(
+    OseoContext *context,
+    const OseoRegExpLiteral *literal
+) {
+    OseoRegExpLiteralCacheEntry *cache = context->regexp_literal_cache;
+    if (cache != NULL) {
+        size_t found = regexp_literal_slot(
+            cache,
+            context->regexp_literal_cache_capacity,
+            literal
+        );
+        if (cache[found].literal == literal) {
+            return normal(cache[found].matcher);
+        }
+    }
+    OseoResult result = regexp_literal_cache_reserve(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_string_from_units(
+        context,
+        literal->source_units,
+        literal->source_length
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_string_from_units(
+            context,
+            literal->flag_units,
+            literal->flag_length
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoRegExpMatcher *matcher = oseo_internal_allocate_heap_bytes(
+            context,
+            sizeof(*matcher)
+        );
+        if (matcher == NULL) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "RegExp matcher allocation failed."
+            );
+        } else {
+            matcher->source = frame.slots[0];
+            matcher->flags = frame.slots[1];
+            matcher->program = literal->program;
+            matcher->capture_count = literal->program->capture_count;
+            matcher->instruction_count =
+                literal->program->instruction_count;
+            matcher->flag_mask = literal->flag_mask;
+            matcher->owns_program = false;
+            result = oseo_internal_publish_heap(
+                context,
+                &matcher->header,
+                OSEO_HEAP_REGEXP_MATCHER
+            );
+        }
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /*
+         * The reservation above guarantees an empty slot, and nothing
+         * between it and here inserts, so this cannot fail or displace
+         * another descriptor.
+         */
+        cache = context->regexp_literal_cache;
+        size_t slot = regexp_literal_slot(
+            cache,
+            context->regexp_literal_cache_capacity,
+            literal
+        );
+        cache[slot].literal = literal;
+        cache[slot].matcher = frame.slots[2];
+        context->regexp_literal_cache_count += 1u;
+        result = normal(frame.slots[2]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_regexp_literal(
+    OseoContext *context,
+    const OseoRegExpLiteral *literal
+) {
+    if (literal == NULL || literal->program == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Invalid regular expression literal."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = regexp_literal_matcher(context, literal);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_REGEXP_PROTOTYPE
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_allocate_from(context, frame.slots[1]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        regexp_object(frame.slots[1])->matcher = frame.slots[0];
+        result = normal(frame.slots[1]);
+    }
+    oseo_roots_release(context, &frame);
     return result;
 }
 

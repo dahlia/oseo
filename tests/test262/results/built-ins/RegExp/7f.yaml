@@ -36,11 +36,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12.js:88:12:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12\
+        .js:87:44: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

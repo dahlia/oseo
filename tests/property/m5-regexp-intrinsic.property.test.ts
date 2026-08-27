@@ -45,7 +45,7 @@ interface InvalidCase {
   readonly differential: boolean;
   readonly expected: "invalid" | "unsupported";
   readonly flags: string;
-  readonly parserExpected?: "unsupported" | "valid";
+  readonly parserExpected?: "invalid" | "unsupported" | "valid";
   readonly pattern: string;
 }
 
@@ -126,7 +126,25 @@ const validCase = fc.boolean().chain((explicitFlags) =>
   ),
 );
 
-const invalidCase = fc
+/*
+ * Rejections only Annex B admits.
+ *
+ * The host implements Annex B, so it accepts every pattern here and can
+ * never confirm the rejection. The dynamic constructor still throws the
+ * `SyntaxError` the edition requires for a pattern it cannot compile,
+ * while the build-time parser reports this claim's own profile boundary,
+ * which is the difference `parserExpected` records.
+ */
+const annexBRejection = fc
+  .constantFrom("[\\B]", "[\\d-a]", "[(?<a>]\\k<a>", "(a)[\\1]")
+  .map((pattern) => ({
+    differential: false,
+    flags: "",
+    parserExpected: "unsupported" as const,
+    pattern,
+  }));
+
+const editionRejection = fc
   .oneof(
     fc.record({
       differential: fc.constant(true),
@@ -158,15 +176,11 @@ const invalidCase = fc
       { differential: true, flags: "u", pattern: "[\\d-a]" },
       { differential: true, flags: "u", pattern: "[a-\\w]" },
       { differential: true, flags: "u", pattern: "[\\x7a-a]" },
-      { differential: false, flags: "", pattern: "[\\B]" },
-      { differential: false, flags: "", pattern: "[\\d-a]" },
       { differential: true, flags: "", pattern: "(?<a>x)(?<a>y)" },
-      { differential: false, flags: "", pattern: "[(?<a>]\\k<a>" },
       { differential: true, flags: "u", pattern: "(?=a)*" },
       { differential: true, flags: "", pattern: "\\b*" },
       { differential: true, flags: "", pattern: "\\B{2}" },
       { differential: true, flags: "", pattern: "[a-\\n]" },
-      { differential: false, flags: "", pattern: "(a)[\\1]" },
       { differential: true, flags: "u", pattern: "(a)[\\1]" },
       { differential: true, flags: "u", pattern: "\\p{" },
       { differential: true, flags: "u", pattern: "\\p{}" },
@@ -183,8 +197,18 @@ const invalidCase = fc
   )
   .map((testCase) => ({
     differential: testCase.differential,
+    flags: testCase.flags,
+    parserExpected: "invalid" as const,
+    pattern: testCase.pattern,
+  }));
+
+const invalidCase = fc
+  .oneof(annexBRejection, editionRejection)
+  .map((testCase) => ({
+    differential: testCase.differential,
     expected: "invalid" as const,
     flags: testCase.flags,
+    parserExpected: testCase.parserExpected,
     pattern: testCase.pattern,
   }));
 
@@ -527,7 +551,11 @@ test(
           await assertUnsupportedNative(testCase);
         } else {
           assert.equal(parsed.parsed, false);
-          assert.ok(parsed.errors.some((error) => error.kind === "invalid"));
+          const kind =
+            testCase.parserExpected === "unsupported"
+              ? "unsupported"
+              : "invalid";
+          assert.ok(parsed.errors.some((error) => error.kind === kind));
           await assertNative(
             invalidSource(testCase),
             invalidExpected,

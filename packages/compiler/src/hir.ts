@@ -1,3 +1,4 @@
+import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
   AssignmentOperator,
@@ -450,6 +451,16 @@ export interface HirArraySpreadElement extends LocatedSyntax {
 export type HirArrayElement = HirArraySpreadElement | HirExpression | undefined;
 
 /**
+ * One resolved regular expression literal. The matcher artifact the
+ * frontend compiled contains no binding, so resolution preserves the
+ * owned frontend data unchanged.
+ */
+export interface HirRegExpLiteral extends LocatedSyntax {
+  readonly kind: "regexp";
+  readonly matcher: RegExpMatcherProgram;
+}
+
+/**
  * One resolved template object argument. Its strings contain no bindings,
  * so resolution preserves the owned frontend data unchanged.
  */
@@ -896,6 +907,7 @@ export type HirExpression =
       readonly kind: "bigint";
       readonly radix: 2 | 8 | 10 | 16;
     })
+  | HirRegExpLiteral
   | (LocatedSyntax & {
       readonly kind: "number";
       readonly value: number;

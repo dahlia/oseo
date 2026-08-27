@@ -18,11 +18,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Warang_Citi.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Warang_Citi.js:113:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Wara\
+        ng_Citi.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Warang_Citi.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -41,11 +41,10 @@ results:
     dependencies:
       - object-properties
     observation:
-      detail: 'test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T14.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T14.js:87:18:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T14.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T14\
+        .js:87:35: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

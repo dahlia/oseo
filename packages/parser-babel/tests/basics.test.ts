@@ -1182,7 +1182,7 @@ test("rejects every binding position that declares this", () => {
   assert.deepEqual(keyNamedThis.diagnostics, []);
 
   const unsupportedDefault = compileSource(babelFrontend, {
-    source: "var [first = /pattern/] = [];",
+    source: "var [first = /[a]/v] = [];",
     sourceId: "this-binding.ts",
   });
   assert.equal(unsupportedDefault.diagnostics.length, 1);

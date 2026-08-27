@@ -165,21 +165,26 @@ Diagnostics Oseo reports today
 ------------------------------
 
 A regular expression literal reaches the owned parser at the frontend
-boundary. Nothing evaluates it, so every literal still ends in a
-diagnostic, but which one is now a decided property of the pattern rather
-than of the literal:
+boundary and, when the pattern parses, the owned matcher builder right
+after it. A literal the build compiles evaluates; every other one ends in
+a diagnostic that is a decided property of the pattern rather than of the
+literal:
 
-| Condition                       | Code       | Location                              |
-| ------------------------------- | ---------- | ------------------------------------- |
-| Invalid pattern or flag text    | `OSEO0001` | the offending text inside the literal |
-| A construct a later node admits | `OSEO1001` | the construct inside the literal      |
-| An owned parser limit           | `OSEO1001` | the construct that reaches the limit  |
-| A valid, admitted pattern       | `OSEO1001` | the whole literal                     |
+| Condition                         | Code       | Location                              |
+| --------------------------------- | ---------- | ------------------------------------- |
+| Invalid pattern or flag text      | `OSEO0001` | the offending text inside the literal |
+| A construct only Annex B admits   | `OSEO1001` | the construct inside the literal      |
+| A construct a later node admits   | `OSEO1001` | the construct inside the literal      |
+| An owned parser or matcher limit  | `OSEO1001` | the construct that reaches the limit  |
+| A Unicode fact that is not linked | `OSEO1001` | the construct that needs it           |
+| A valid, admitted pattern         | none       | it compiles ahead of time             |
 
 The bootstrap parser still rejects a duplicate or unknown flag before the
 owned parser sees the literal, so those two produce `OSEO0001` at the
-parse stage with the bootstrap message. An unshadowed `RegExp` reference
-remains an unknown binding, which `regexp-intrinsic` changes.
+parse stage with the bootstrap message. The unlinked-Unicode row is a
+composition boundary rather than a grammar one: `@oseo/compiler` links no
+Unicode data, so a composition root that supplies none cannot compile an
+ignore-case pattern, a `\s` escape, or a property escape.
 
 
 Pattern grammar acceptance
@@ -193,17 +198,40 @@ a deliberate, measured divergence from a web browser:
  -  an identity escape over an `ID_Continue` character, such as `\a`
     or `\_`;
  -  a legacy octal escape, such as `\01`;
- -  a quantified assertion, such as `(?=a)*`;
+ -  a control escape without an ASCII letter, such as `\c`;
+ -  an incomplete hexadecimal or Unicode escape, such as `\x` or `\u`,
+    including `\u{...}` without `u` or `v`;
+ -  a quantified lookahead, such as `(?=a)*`;
  -  an unescaped `]` or `}`, and a `{` that starts no quantifier;
- -  an out-of-order or class-escape bound character class range, such as
-    `[z-a]` or `[\d-a]`;
- -  a backreference or named backreference that names no group; and
- -  `\u{...}` without `u` or `v`.
+ -  a class-escape bound character class range, such as `[\d-a]`;
+ -  a backreference that names no group; and
+ -  a named backreference in a pattern that declares no group name, such
+    as `\k<x>`, `\k`, or `\ka`.
 
-Under `u` and `v` the host engines agree with these rejections, which is
-what the generated invalid domain at seed `0x60004a01` asserts. Without
-`u` a host accepts several of them, so the host is a one-directional
-oracle there.
+Which diagnostic a rejection reports follows from that list. Under `u` and
+`v` Annex B never applied, so the rejection is the early error the edition
+itself requires and reports `OSEO0001`. Without them the text is one a web
+browser accepts, so the rejection is this claim's own boundary and reports
+`OSEO1001` naming Annex B. The generated invalid domain at seed
+`0x60004a01` asserts that split, and it uses the reported kind to decide
+when the host engines are a sound oracle: they agree with every
+`OSEO0001` rejection and with none of the Annex B ones.
+
+A rejection Annex B shares stays an early error in both modes. A
+quantified lookbehind, edge assertion, or word boundary, an out-of-order
+class range such as `[z-a]`, an unmatched `)`, a malformed group name such
+as `(?<>x)`, a named backreference in a pattern that does declare a group
+name, and `\k` inside a class when that pattern declares a group name are
+all rejected by a web browser too.
+
+The parser reports the first defect it reaches, so the split is exact for
+a pattern whose only defect is the reported construct. A pattern that is
+also malformed for a reason Annex B shares, such as `/a(]/`, reports the
+Annex B boundary it reaches first even though a web browser rejects that
+pattern for its unterminated group. The one-directional oracle condition
+holds without that qualification: a sweep of 74,052 short patterns over
+the grammar's own alphabet found no pattern this parser calls invalid that
+a web browser accepts.
 
 The inventory's candidate roots are *test/built-ins/* and *test/language/*,
 so *test/annexB/* is outside it entirely, and the `u-invalid-` and

@@ -227,11 +227,14 @@ static void destroy_heap_object(OseoHeapObject *object) {
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);
     } else if (object->kind == OSEO_HEAP_REGEXP_MATCHER) {
-        /* The compiled program is unmanaged memory this artifact alone
-         * owns, so its lifetime ends with the artifact. */
-        oseo_internal_regexp_program_release(
-            ((OseoRegExpMatcher *)object)->program
-        );
+        /* A dynamic pattern's compiled program is unmanaged memory this
+         * artifact alone owns, so its lifetime ends with the artifact.
+         * An ahead-of-time literal's program is static generated data
+         * this artifact only borrows. */
+        OseoRegExpMatcher *matcher = (OseoRegExpMatcher *)object;
+        if (matcher->owns_program) {
+            oseo_internal_regexp_program_release(matcher->program);
+        }
     }
     free(object);
 }
@@ -265,6 +268,13 @@ void oseo_collect(OseoContext *context) {
          index < context->template_cache_count;
          index += 1u) {
         mark_value(template_cache[index].object, &worklist);
+    }
+    OseoRegExpLiteralCacheEntry *regexp_cache = context->regexp_literal_cache;
+    for (size_t index = 0u;
+         index < context->regexp_literal_cache_capacity;
+         index += 1u) {
+        if (regexp_cache[index].literal == NULL) continue;
+        mark_value(regexp_cache[index].matcher, &worklist);
     }
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {

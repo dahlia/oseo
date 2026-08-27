@@ -14,7 +14,6 @@ import {
   type RegExpErrorSection,
   type RegExpExtensionPoint,
   type RegExpFlags,
-  type RegExpLiteralSyntax,
   type RegExpModifierFlag,
   type RegExpPattern,
   type RegExpPatternError,
@@ -28,6 +27,7 @@ import {
   type RegExpTerm,
   type RegExpUnicodePropertyEscape,
 } from "./regexp.ts";
+import type { RegExpLiteralSyntax } from "./syntax.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -109,6 +109,16 @@ interface ParseState {
   readonly captures: RegExpCapture[];
   readonly extensions: RegExpPatternExtensions;
   readonly flags: RegExpFlags;
+  /**
+   * Whether the pattern text declares a group name.
+   *
+   * The grammar sets its named-reference parameter exactly when the
+   * pattern holds a GroupSpecifier, and Annex B reads `\k` as an identity
+   * escape only without one. A reference can precede the declaration that
+   * decides this, so the whole text answers it once before parsing rather
+   * than each reference rescanning what it cannot see yet.
+   */
+  readonly groupNameDeclared: boolean;
   readonly limits: RegExpPatternLimits;
   readonly namedGroups: NamedGroupRecord[];
   /**
@@ -137,6 +147,55 @@ function fail(
   section: RegExpErrorSection = "pattern",
 ): never {
   throw new PatternFailure({ kind, message, section, span: location });
+}
+
+/**
+ * Describe a construct that only Annex B admits.
+ *
+ * ADR 0013 places Annex B outside the candidate claim, so the construct is
+ * rejected in every mode. Under `u` or `v` Annex B never applied, so the
+ * rejection is the early error the edition itself requires and reports as
+ * invalid text. Without them the text is one a web browser accepts, so the
+ * rejection is this claim's own boundary rather than a defect, and it
+ * reports the profile code instead. Measurement then records an excluded
+ * optional section where it would otherwise record a parse failure.
+ */
+function annexBMessage(subject: string): string {
+  const tail = "is admitted only by Annex B, which is outside the profile.";
+  return `${subject} ${tail}`;
+}
+
+function annexBError(
+  state: ParseState,
+  invalidMessage: string,
+  subject: string,
+  location: RegExpSpan,
+): RegExpPatternError {
+  return state.unicodeMode
+    ? {
+        kind: "invalid",
+        message: invalidMessage,
+        section: "pattern",
+        span: location,
+      }
+    : {
+        kind: "unsupported",
+        message: annexBMessage(subject),
+        section: "pattern",
+        span: location,
+      };
+}
+
+/** Reject a construct that only Annex B admits, keeping its span. */
+function refuseAnnexB(
+  state: ParseState,
+  invalidMessage: string,
+  subject: string,
+  location: RegExpSpan,
+): never {
+  throw new PatternFailure(
+    annexBError(state, invalidMessage, subject, location),
+  );
 }
 
 function admits(state: ParseState, point: RegExpExtensionPoint): boolean {
@@ -285,10 +344,13 @@ function readUnicodeEscape(
   }
   const value = readHexValue(state, 4);
   if (value < 0) {
-    fail("invalid", "A Unicode escape needs four hexadecimal digits.", {
-      end: state.index,
-      start,
-    });
+    // A group name always uses the unicode form, so only a character
+    // escape in a pattern without `u` or `v` reaches Annex B's identity
+    // escape here.
+    const location = { end: state.index, start };
+    const message = "A Unicode escape needs four hexadecimal digits.";
+    if (unicodeSyntax) fail("invalid", message, location);
+    refuseAnnexB(state, message, "An incomplete Unicode escape", location);
   }
   if (
     unicodeSyntax &&
@@ -333,19 +395,22 @@ function readCharacterEscape(state: ParseState, start: number): number {
       letter == null ||
       !((letter >= "a" && letter <= "z") || (letter >= "A" && letter <= "Z"))
     ) {
-      fail("invalid", "A control escape needs an ASCII letter.", {
-        end: state.index + 1,
-        start,
-      });
+      refuseAnnexB(
+        state,
+        "A control escape needs an ASCII letter.",
+        "A control escape without an ASCII letter",
+        { end: state.index + 1, start },
+      );
     }
     state.index += 2;
     return letter.charCodeAt(0) % 32;
   }
   if (character === "0") {
     if (isDecimalDigit(at(state, 1))) {
-      fail(
-        "invalid",
+      refuseAnnexB(
+        state,
         "A legacy octal escape is outside the candidate edition.",
+        "A legacy octal escape",
         { end: state.index + 2, start },
       );
     }
@@ -356,10 +421,12 @@ function readCharacterEscape(state: ParseState, start: number): number {
     state.index += 1;
     const value = readHexValue(state, 2);
     if (value < 0) {
-      fail("invalid", "A hexadecimal escape needs two hexadecimal digits.", {
-        end: state.index,
-        start,
-      });
+      refuseAnnexB(
+        state,
+        "A hexadecimal escape needs two hexadecimal digits.",
+        "An incomplete hexadecimal escape",
+        { end: state.index, start },
+      );
     }
     return value;
   }
@@ -379,6 +446,9 @@ function readCharacterEscape(state: ParseState, start: number): number {
     return escaped.value;
   }
   const location = { end: state.index, start };
+  if (escaped.value === 0x6b && state.groupNameDeclared) {
+    fail("invalid", "This identity escape is not allowed.", location);
+  }
   if (
     identifierProperty(
       state,
@@ -388,7 +458,12 @@ function readCharacterEscape(state: ParseState, start: number): number {
       location,
     )
   ) {
-    fail("invalid", "This identity escape is not allowed.", location);
+    refuseAnnexB(
+      state,
+      "This identity escape is not allowed.",
+      "This identity escape",
+      location,
+    );
   }
   return escaped.value;
 }
@@ -538,7 +613,47 @@ function readUnicodePropertyEscape(
   return escape;
 }
 
-/** Read one `<name>` group specifier after its introducer. */
+/**
+ * Whether the pattern text holds a GroupSpecifier.
+ *
+ * The scan skips an escape and the inside of a character class, where
+ * `(?<` is ordinary text rather than an introducer, and it excludes the
+ * two lookbehind introducers that share the first three characters.
+ */
+function scanForGroupName(source: string): boolean {
+  let insideClass = false;
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    if (character === "\\") {
+      index += 1;
+      continue;
+    }
+    if (insideClass) {
+      if (character === "]") insideClass = false;
+      continue;
+    }
+    if (character === "[") {
+      insideClass = true;
+      continue;
+    }
+    if (character !== "(") continue;
+    if (source[index + 1] !== "?" || source[index + 2] !== "<") continue;
+    const next = source[index + 3];
+    if (next !== "=" && next !== "!") return true;
+  }
+  return false;
+}
+
+/**
+ * Read one `<name>` group specifier after its introducer.
+ *
+ * Both spellings that reach this reader parse with the grammar's
+ * named-reference production active: a declaration is a group specifier
+ * by construction, and a `\k` reference reaches it only where the pattern
+ * declares a group name or carries `u` or `v`. A malformed name is
+ * therefore the edition's own early error rather than an Annex B
+ * boundary.
+ */
 function readGroupName(state: ParseState, start: number): string {
   if (!eat(state, "<")) {
     fail("invalid", "A group name must be enclosed in angle brackets.", {
@@ -656,13 +771,11 @@ function parseCharacterClass(state: ParseState): RegExpCharacterClass {
       const low = classItemValue(first);
       const high = classItemValue(second);
       if (low == null || high == null) {
-        fail(
-          "invalid",
+        refuseAnnexB(
+          state,
           "A character class range bound cannot be a class escape.",
-          {
-            end: state.index,
-            start: first.span.start,
-          },
+          "A class escape as a character class range bound",
+          { end: state.index, start: first.span.start },
         );
       }
       if (low.value > high.value) {
@@ -728,6 +841,22 @@ function parseAtomEscape(state: ParseState, start: number): RegExpAtom {
   }
   if (character === "k") {
     state.index += 1;
+    /*
+     * Without a group specifier and without `u` or `v` the grammar never
+     * enters its named-reference production, so Annex B reads the escape
+     * as an identity escape whatever follows it. Reading a group name
+     * here instead would report the shape of text the grammar never
+     * looked at.
+     */
+    if (!state.unicodeMode && !state.groupNameDeclared) {
+      fail(
+        "unsupported",
+        annexBMessage(
+          "A named backreference in a pattern that declares no group name",
+        ),
+        span(start, state.index),
+      );
+    }
     const name = readGroupName(state, start);
     const location = span(start, state.index);
     state.namedReferences.push({ name, span: location });
@@ -872,19 +1001,26 @@ function parseAtom(state: ParseState): RegExpAtom {
     });
   }
   if (character === "{") {
-    fail(
-      "invalid",
-      bracedQuantifierFollows(state)
-        ? "A quantifier has no atom to repeat."
-        : "An unescaped brace is not a pattern character.",
+    if (bracedQuantifierFollows(state)) {
+      fail("invalid", "A quantifier has no atom to repeat.", {
+        end: start + 1,
+        start,
+      });
+    }
+    refuseAnnexB(
+      state,
+      "An unescaped brace is not a pattern character.",
+      "An unescaped brace",
       { end: start + 1, start },
     );
   }
   if (character === "]" || character === "}") {
-    fail("invalid", "This character must be escaped.", {
-      end: start + 1,
-      start,
-    });
+    refuseAnnexB(
+      state,
+      "This character must be escaped.",
+      "This unescaped character",
+      { end: start + 1, start },
+    );
   }
   return readCharacter(state);
 }
@@ -1000,10 +1136,12 @@ function parseQuantifier(state: ParseState): RegExpQuantifier | undefined {
     const braced = readBracedQuantifier(state);
     if (braced == null) {
       state.index = start;
-      fail("invalid", "An unescaped brace is not a pattern character.", {
-        end: start + 1,
-        start,
-      });
+      refuseAnnexB(
+        state,
+        "An unescaped brace is not a pattern character.",
+        "An unescaped brace",
+        { end: start + 1, start },
+      );
     }
     bounds = validateQuantifierBounds(state, braced, start);
   }
@@ -1080,6 +1218,10 @@ function parseTerm(state: ParseState): RegExpTerm {
  * Reject a quantifier applied to an assertion. The candidate edition
  * admits a quantified assertion only through Annex B, which is outside
  * the claim, so the quantifier is an error rather than a repetition.
+ *
+ * Annex B quantifies a lookahead alone. An edge assertion, a word
+ * boundary, and a lookbehind are unquantifiable in every mode, so only a
+ * lookahead reports this claim's own boundary.
  */
 function rejectQuantifier(state: ParseState, term: RegExpTerm): RegExpTerm {
   const character = at(state, 0);
@@ -1089,10 +1231,12 @@ function rejectQuantifier(state: ParseState, term: RegExpTerm): RegExpTerm {
     character === "?" ||
     (character === "{" && bracedQuantifierFollows(state));
   if (quantified) {
-    fail("invalid", "An assertion cannot be quantified.", {
-      end: state.index + 1,
-      start: state.index,
-    });
+    const location = { end: state.index + 1, start: state.index };
+    const message = "An assertion cannot be quantified.";
+    if (term.kind !== "lookaround" || term.direction !== "ahead") {
+      fail("invalid", message, location);
+    }
+    refuseAnnexB(state, message, "A quantified lookahead", location);
   }
   return term;
 }
@@ -1281,12 +1425,16 @@ function validate(state: ParseState): readonly RegExpPatternError[] {
   const total = state.captures.length;
   for (const reference of state.backreferences) {
     if (reference.index > total) {
-      errors.push({
-        kind: "invalid",
-        message: "This backreference names no capturing group.",
-        section: "pattern",
-        span: reference.span,
-      });
+      // Annex B reads a decimal escape past the capture count as a legacy
+      // octal or identity escape rather than as a reference.
+      errors.push(
+        annexBError(
+          state,
+          "This backreference names no capturing group.",
+          "A backreference that names no capturing group",
+          reference.span,
+        ),
+      );
     }
   }
   errors.push(...duplicateNameErrors(state.namedGroups));
@@ -1297,6 +1445,11 @@ function validate(state: ParseState): readonly RegExpPatternError[] {
     indices.push(capture.index);
     indexByName.set(capture.name, indices);
   }
+  /*
+   * A reference reaches validation only where the grammar's
+   * named-reference production was active, so a name it does not declare
+   * is an early error a web browser reports too.
+   */
   for (const reference of state.namedReferences) {
     if (indexByName.has(reference.name)) continue;
     errors.push({
@@ -1358,6 +1511,7 @@ export function parseRegExpPattern(
       disjunctionCount: 0,
       extensions: input.extensions ?? noExtensions,
       flags,
+      groupNameDeclared: scanForGroupName(input.source),
       index: 0,
       limits,
       namedGroups: [],

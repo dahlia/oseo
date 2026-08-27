@@ -75,20 +75,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
       - iterator-protocol
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-throws.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-throws.js:96:15:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -138,13 +145,19 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/String/prototype/search/S15.5.4.12_A2_T5.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/search/S15.5.4.12_A2_T5.js:88:14:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/String/prototype/search/S15.5.4.12_A2_T5.js:92:5:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

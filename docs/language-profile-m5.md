@@ -4339,6 +4339,131 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-80` without adding a generated-code entry point or
 changing the graph's orchestration state.
 
+M5b node `regexp-literal-aot` admits regular expression literals. A literal
+is an expression wherever the grammar admits one, and its pattern is parsed
+and compiled during the build to the immutable `@oseo/compiler` matcher
+artifact that `regexp-generic-matcher` already established as the family's
+semantic authority. Nothing about the pattern is read at run time: no
+pattern tree, bootstrap-parser node, or pattern text survives as something
+to be parsed. An invalid pattern or flag set stays an ECMA-262 early error
+at the offending text, and a pattern whose artifact the build cannot
+produce, because it reaches an owned instruction or register limit or needs
+a Unicode fact the composition root did not supply, reports the profile
+boundary at the same text.
+
+Evaluating a literal allocates a fresh RegExp object whose prototype is
+`%RegExp.prototype%`, which is what GetPrototypeFromConstructor reaches for
+`%RegExp%` because its `prototype` property is neither writable nor
+configurable, and whose own `lastIndex` is a writable, non-enumerable,
+non-configurable data property starting at zero. Repeated evaluation of one
+occurrence and evaluation of two equal occurrences never share object
+identity or mutable state. The realm keeps one immutable matcher artifact
+per descriptor, so equal evaluations share compiled instructions, sets,
+repetition records, group names, and pattern text without sharing anything
+observable. Two source occurrences of one pattern still emit two
+descriptors: object allocation and identity are never deduplicated.
+
+The C backend writes the compiled artifact as generated data, and its
+layout is generated-code ABI declared in *oseo\_runtime.h*: the instruction
+array, the concatenated inversion lists and their offsets, the repetition
+table, the capture and group-name tables, the written pattern and flag
+text, and the normalized flag mask. One entry point, `oseo_regexp_literal`,
+takes that descriptor and returns the fresh object, and the runtime's
+matcher executes the descriptor with the same executor a dynamic pattern
+reaches. Both compilation paths therefore run one choice order, capture
+visibility, assertion and lookaround behavior, backreference resolution,
+quantifier priority, empty-progress failure, and UTF-16 and code-point
+traversal. A backreference to a duplicated group name expands to one
+instruction per candidate capture, which is the shape the runtime's own
+pattern compiler emits.
+
+A descriptor may carry the complete `Canonicalize` table its build computed
+from the pinned Unicode tables, and does so exactly when the pattern
+compares two input characters under `i`, which is only a backreference;
+every other ignore-case decision is folded into a set while the artifact is
+built. A literal therefore admits an ignore-case pattern whose closure
+reaches a non-ASCII equivalence class, and it resolves Unicode property
+escapes, both of which the runtime's own pattern compiler still refuses
+with the documented `OSEO2001` boundary because it links no folding or
+property data. Those are differences in profile reach, not in matching:
+where both paths admit a pattern they produce the same match state, and the
+generated evidence compares them case by case.
+
+`@oseo/compiler` still links no Unicode data. The command line is the
+composition root that supplies the two `Canonicalize` rules, the
+`Space_Separator` set, and the property-escape lookup to the frontend, so a
+literal compiled by a build and one compiled by a test describe the same
+pinned release. A composition that supplies none cannot compile an
+ignore-case pattern, a `\s` escape, or a property escape, and reports the
+profile boundary rather than matching against a guess.
+
+Fixed native and generated differential evidence at seeds `0x60005500`
+through `0x60005502` covers literal and constructor compilation of one
+generated pattern side by side, repeated evaluation with per-object
+`lastIndex`, the written text the `source`, `flags`, and `toString`
+behavior reports, match indices, global and sticky iteration, controlled
+early errors, both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, and generic
+fallback. The allocation-attempt sweep gains the literal path, so every
+allocation it takes, including the realm cache's own table, fails once,
+collects, and retries in the same context without publishing a partial
+artifact or object. The cache reserves its slot before the artifact
+exists, and it is addressed by descriptor rather than scanned, so one
+evaluation's lookup does not grow with the number of literal sites. Structural
+evidence in *tests/regexp-literal-aot.test.ts* proves that the artifact reaches
+MIR, that the descriptor and its arrays are generated data, that no run-time
+pattern construction is emitted, and that the canonicalization table appears
+exactly where a comparison needs it.
+
+The node declares no inventory root, so it promotes reviewed paths rather
+than adding any. Three hundred eighty-one already-reviewed paths move from
+unsupported to pass because a literal was the only thing they were waiting
+for: 346 under *test/built-ins/RegExp/*, 27 String cases spread over
+`endsWith`, `includes`, `match`, `matchAll`, `replace`, `replaceAll`,
+`search`, `split`, and `startsWith`, which reach the owned boundary,
+observe `IsRegExp`, or merely evaluate a literal argument before a
+receiver error, three `Function.prototype` and three `Array.prototype`
+cases that pass a regular expression as a non-callable argument, one
+`Object.prototype.toString` case, and one module case that writes a
+literal in a `for await` head.
+
+Admitting literals also settled which diagnostic an Annex B rejection
+reports, because a rejected literal is now the difference between a
+program that builds and one that does not.
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md) places Annex B outside
+the claim and requires a case inside the boundary that depends on it to be
+reported as unsupported with the section named, never as a failure and
+never dropped. The owned pattern parser now reports a construct only Annex
+B admits as the profile boundary rather than as invalid text, and only
+without `u` or `v`, because those flag sets never admitted the construct
+and their rejection is the early error the edition itself requires. The
+rule covers an identity escape over an `ID_Continue` character, a legacy
+octal escape, a control escape without an ASCII letter, an incomplete
+hexadecimal or Unicode escape, a quantified lookahead, an unescaped `]`,
+`}`, or `{`, a class-escape bound class range, a backreference that names
+no group, and a named backreference in a pattern that declares no group
+name. A rejection Annex B shares, such as a quantified lookbehind, an
+out-of-order class range, a named backreference in a pattern that does
+declare a group name, or `\k` inside a class when that pattern declares a
+group name, stays an early error in both modes.
+
+That split makes the reported kind the record of whether a host engine
+agrees, so the generated invalid pattern domain now uses it to decide when
+the reference hosts are a sound oracle instead of asking whether a
+unicode-mode flag is set. It also keeps
+*test/built-ins/String/prototype/split/separator-regexp.js* classified as
+unsupported: four of its thirty-seven literals, `/\XA0/`, `/\X/`,
+`/\x/`, and `/\k<x>/`, parse only under Annex B, and the case now
+reports that boundary instead of turning into a parse rejection.
+
+The manifest keeps 13,872 paths, moves from 9,632 to 10,013 passes, keeps
+1,506 expected negatives, and moves from 2,734 to 2,353 unsupported
+profile features, with no semantic, harness, or infrastructure failures.
+The runtime ABI moves to `oseo-runtime-m5-81`. The node adds one
+generated-code ABI entry point, `oseo_regexp_literal`, and no built-in code
+ID. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, and the manifest's zero-override policy are unchanged.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -4370,29 +4495,33 @@ complete. The remaining gaps retain their existing owners.
     validation, and intrinsic identity are admitted by the M5b
     `regexp-intrinsic` node, and matching, result construction, `exec`,
     `test`, `toString`, and the ten prototype accessors by
-    `regexp-prototype-and-exec`, both as recorded above. What remains
+    `regexp-prototype-and-exec`, and ahead-of-time literal compilation by
+    `regexp-literal-aot`, all as recorded above. What remains
     outside the admitted profile is the pattern grammar this edition still
     defers, the real well-known symbol methods, `RegExp.escape`, and
-    ahead-of-time literal compilation, all owned by
+    matcher backend selection, all owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). `%RegExp.prototype%` carries
     `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split` as
     deferred placeholders, so a String protocol method reaches one owned
     boundary through GetMethod rather than approximating a pattern; the
-    `regexp-symbol-methods` node replaces them. Literal syntax is no longer
-    rejected as a whole: the frontend records a literal's pattern text,
-    flag text, and range as an owned value and validates it with the owned
-    pattern parser, so an invalid pattern or flag set is an early error at
-    the offending text. Unicode property escapes resolve through the pinned
-    tables, a construct a later unit owns is refused where it appears, and
-    only a valid pattern reports one profile boundary at the literal.
-    `@oseo/compiler` also owns a generic matcher artifact and executor for
-    that admitted grammar, which is the semantic authority a later
-    ahead-of-time lowering must reproduce. Dynamic construction reaches its
+    `regexp-symbol-methods` node replaces them. Literal syntax is admitted:
+    the frontend records a literal's pattern text, flag text, and range as
+    an owned value, validates it with the owned pattern parser so an
+    invalid pattern or flag set is an early error at the offending text,
+    and compiles it to the immutable matcher artifact `@oseo/compiler`
+    owns, which the C backend writes as generated data. Unicode property
+    escapes resolve through the pinned tables, and a construct a later unit
+    owns is refused where it appears.
+    That artifact and its executor are the semantic authority both
+    compilation paths reproduce. Dynamic construction reaches its
     admitted validation and artifact boundary, and `regexp-prototype-and-exec`
-    connected that artifact to built-in execution and result construction; a
-    regular expression literal still reports its own boundary. The
-    reviewed property and character class escape roots contribute 142 expected
-    negatives and 483 explicit later-node boundaries.
+    connected that artifact to built-in execution and result construction.
+    The runtime's own pattern compiler still refuses an ignore-case closure
+    over a non-ASCII class and a Unicode property escape, so a dynamic
+    pattern reaches those through the documented `OSEO2001` boundary while
+    a literal compiles them; that is profile reach, not matching behavior.
+    The reviewed property and character class escape roots contribute 142
+    expected negatives and their remaining explicit later-node boundaries.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.

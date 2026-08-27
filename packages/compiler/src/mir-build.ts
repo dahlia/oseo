@@ -3697,6 +3697,36 @@ function lowerExpression(
     }
     return id;
   }
+  if (expression.kind === "regexp") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "regular expression literal allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail:
+        `regexp literal /${expression.matcher.source}/` +
+        `${expression.matcher.flags.text} with ` +
+        `${expression.matcher.instructions.length} instructions`,
+      id,
+      kind: "regexp-literal",
+      range: expression.range,
+      regexpProgram: expression.matcher,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "template-object") {
     appendMirMetadata(
       builder,

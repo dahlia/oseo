@@ -1,0 +1,132 @@
+version: 1
+id: regexp-literal-aot
+title: "Ahead-of-time literal compilation"
+scope:
+  - "A regular expression literal is an admitted expression wherever the
+    grammar admits one. The frontend parses its pattern once during the
+    build and compiles it to the immutable `@oseo/compiler` matcher
+    artifact, which is the family's semantic authority, so no pattern
+    tree, bootstrap-parser node, or pattern text reaches a run as
+    something to be read. An invalid pattern or flag set stays an
+    ECMA-262 early error at the offending text, and a pattern whose
+    artifact the build cannot produce, because it reaches an owned
+    instruction or register limit or needs a Unicode fact the composition
+    root did not supply, reports the profile boundary at the same text."
+  - "Evaluating a literal allocates a fresh RegExp object whose prototype
+    is `%RegExp.prototype%`, which is what GetPrototypeFromConstructor
+    reaches for `%RegExp%` because its `prototype` property is neither
+    writable nor configurable, and whose own `lastIndex` is a writable,
+    non-enumerable, non-configurable data property starting at zero.
+    Repeated evaluation of one occurrence and evaluation of two equal
+    occurrences never share object identity or mutable state. The realm
+    keeps one immutable matcher artifact per descriptor, so equal
+    evaluations share compiled instructions, sets, repetition records,
+    group names, and pattern text without sharing anything observable."
+  - "The C backend writes the compiled artifact as generated data: the
+    instruction array, the concatenated inversion lists and their offsets,
+    the repetition table, the capture and group-name tables, the written
+    pattern and flag text, and the normalized flag mask. That encoding is
+    generated-code ABI, declared in *oseo_runtime.h*, and the runtime's
+    matcher executes it with the same executor a dynamic pattern reaches,
+    so both compilation paths share one choice order, capture visibility,
+    assertion and lookaround behavior, backreference resolution,
+    quantifier priority, empty-progress failure, and UTF-16 and
+    code-point traversal. A backreference to a duplicated group name
+    expands to one instruction per candidate capture, which is the same
+    shape the runtime's own pattern compiler emits."
+  - "An ahead-of-time descriptor may carry the complete `Canonicalize`
+    table its build computed from the pinned Unicode tables, and does so
+    exactly when the pattern compares two input characters under `i`,
+    which is only a backreference. Every other ignore-case decision is
+    folded into a set while the artifact is built. A literal therefore
+    admits an ignore-case pattern whose closure reaches a non-ASCII
+    equivalence class, which the runtime's own pattern compiler still
+    refuses with the documented `OSEO2001` boundary because it links no
+    folding data. A literal likewise resolves Unicode property escapes,
+    which the runtime pattern compiler does not. Both differences are
+    profile reach, not matching behavior: where both paths admit a
+    pattern they produce the same match state."
+  - "Object allocation and identity are never deduplicated: two source
+    occurrences of one pattern emit two descriptors and reach two
+    artifacts. Sharing is limited to what a run cannot observe."
+  - "Every allocation the literal path takes participates in the
+    deterministic allocation-attempt counter, including the realm cache's
+    own table, so one sweep fails the cache growth, the two strings, the
+    artifact, the object, and its `lastIndex` property once, collects, and
+    retries in the same context. A reached failure returns the owned
+    `OSEO2001` boundary and publishes no partial artifact. The cache
+    reserves its slot before the artifact exists, so an artifact this
+    realm published is always the one a later evaluation finds. The cache
+    is addressed by descriptor rather than scanned, so one evaluation's
+    lookup does not grow with the number of literal sites a program
+    has."
+  - "The composition root supplies the pinned Unicode facts the artifact
+    builder cannot derive: the two `Canonicalize` rules, the
+    `Space_Separator` set, and the property-escape lookup. Without them a
+    literal that needs one reports the profile boundary rather than
+    matching against a guess, which is what keeps `@oseo/compiler` free of
+    linked Unicode data."
+  - "Annex B stays outside the claim, so a literal that only Annex B
+    admits is rejected. Admitting literals settled which diagnostic that
+    rejection reports: the owned pattern parser reports the profile
+    boundary rather than invalid text, and only without `u` or `v`, since
+    those flag sets never admitted the construct. ADR 0013's requirement
+    that a case depending on Annex B stay unsupported with the section
+    named therefore holds without dropping a reviewed path."
+  - "Well-known symbol methods, `String.prototype` dispatch,
+    `RegExp.escape`, the pattern grammar this edition still defers, and
+    matcher backend selection remain owned by later RegExp nodes."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/regexp-literal-aot.ts
+      - tests/property/m5-regexp-literal-aot.property.test.ts
+      - packages/cli/src/regexp-unicode.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-literal-aot.ts
+      - packages/parser-babel/tests/regexp-literal.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/fixtures/runtime-heap.c
+      - tests/native.ts
+      - tests/native/fixtures/regexp-literal-aot.ts
+      - tests/property/m5-regexp-literal-aot.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-literal-aot.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-literal-aot.ts
+      - tests/property/m5-regexp-literal-aot.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-literal-aot.ts
+      - tests/property/m5-regexp-literal-aot.property.test.ts
+      - tests/regexp-matcher.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - tests/regexp-literal-aot.test.ts
+      - packages/backend-c/src/regexp-program.ts
+      - packages/runtime-c/native/oseo_runtime.h
+      - packages/runtime-c/native/runtime_regexp.c
+      - packages/runtime-c/tests/symbols.test.ts

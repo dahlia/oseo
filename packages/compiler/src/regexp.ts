@@ -1,5 +1,3 @@
-import type { LocatedSyntax } from "./syntax.ts";
-
 /**
  * A half-open span of UTF-16 code units inside one pattern or flag text.
  *
@@ -364,17 +362,4 @@ export interface RegExpPatternResult {
   readonly errors: readonly RegExpPatternError[];
   readonly parsed: boolean;
   readonly pattern?: RegExpPattern;
-}
-
-/**
- * One regular expression literal retained at the frontend boundary.
- *
- * The frontend records the written pattern text, flag text, and source
- * range instead of retaining a bootstrap-parser node, so the owned parser
- * is the only reader of regular expression syntax.
- */
-export interface RegExpLiteralSyntax extends LocatedSyntax {
-  readonly flags: string;
-  readonly kind: "regexp-literal";
-  readonly pattern: string;
 }

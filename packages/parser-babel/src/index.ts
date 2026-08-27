@@ -1,19 +1,21 @@
 import { parse as parseBabel } from "@babel/parser";
 import type {
   ModuleSourceFrontend,
-  RegExpPatternExtensions,
   SourceFrontend,
   SourceInput,
 } from "@oseo/compiler";
-import { node, type ConvertContext, type ParserError } from "./babel.ts";
+import {
+  node,
+  type ConvertContext,
+  type ConvertOptions,
+  type ParserError,
+} from "./babel.ts";
 import { program } from "./convert.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule } from "./modules.ts";
 
 /** Configuration supplied by a composition root to both Babel frontends. */
-export interface BabelFrontendOptions {
-  readonly regexpExtensions?: RegExpPatternExtensions;
-}
+export type BabelFrontendOptions = ConvertOptions;
 
 /** Create a Babel Script frontend with caller-owned language extensions. */
 export function createBabelFrontend(
@@ -55,6 +57,7 @@ export function createBabelFrontend(
           locations,
           receiverStack: [],
           regexpExtensions: options.regexpExtensions,
+          regexpUnicodeData: options.regexpUnicodeData,
           strictStack: [],
           syntheticIndex: 0,
           thisModeStack: ["global"],
@@ -108,7 +111,7 @@ export function createBabelModuleFrontend(
           }),
         );
         if (file == null) throw new Error("Babel returned a non-node result.");
-        return convertModule(input, file, options.regexpExtensions);
+        return convertModule(input, file, options);
       } catch (error) {
         // SAFETY: Babel errors expose the optional offsets read below.
         const value = error as ParserError;

@@ -1,0 +1,3 @@
+version: 1
+id: regexp-literal-aot
+record: docs/language-profile-m5/families/regexp-literal-aot.yaml

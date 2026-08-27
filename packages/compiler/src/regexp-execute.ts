@@ -274,39 +274,75 @@ function pop(machine: Machine): number {
   return address;
 }
 
-/** Match one backreference, or report that the path fails. */
+/**
+ * The outcome of one backreference, with the steps a lowering charges.
+ *
+ * A lowering writes one instruction per candidate capture, so `steps` is
+ * how many of those a native program executes: every candidate when the
+ * reference succeeds, because a capture that did not participate matches
+ * the empty string, and only the candidates up to and including the one
+ * that failed otherwise. `limited` reports that the step budget ran out
+ * before a candidate could run, which is where a lowered program stops.
+ * Charging that here is what keeps the artifact's reviewed step limit a
+ * bound on the lowered program rather than on this array's length.
+ */
+interface BackreferenceAttempt {
+  readonly limited: boolean;
+  readonly matched: boolean;
+  readonly steps: number;
+}
+
+/**
+ * Match one backreference, or report that the path fails.
+ *
+ * The candidates run one at a time, in the order a lowering writes them,
+ * and `allowed` is how many of them the remaining step budget admits, so
+ * a request with one step left reads one candidate rather than the whole
+ * list. A candidate whose capture did not participate matches the empty
+ * string; the edition lets at most one of them participate, and running
+ * each in turn is what makes that a consequence rather than an
+ * assumption.
+ */
 function matchBackreference(
   machine: Machine,
   slots: readonly number[],
   backward: boolean,
   ignoreCase: boolean,
-): boolean {
-  let start = unset;
-  let end = unset;
-  for (const slot of slots) {
-    const from = machine.registers[slot] ?? unset;
-    const to = machine.registers[slot + 1] ?? unset;
-    if (from === unset || to === unset) continue;
-    start = from;
-    end = to;
-  }
-  if (start === unset || end === unset) return true;
-  const length = end - start;
-  const target = backward ? machine.index - length : machine.index;
-  if (target < 0 || target + length > machine.text.length) return false;
+  allowed: number,
+): BackreferenceAttempt {
+  const total = Math.max(slots.length, 1);
   const table = ignoreCase ? machine.program.canonicalization : undefined;
-  let source = start;
-  let compared = target;
-  while (source < end) {
-    const width = widthAt(machine.text, source, machine.unicodeMode);
-    const left = characterAt(machine.text, source, machine.unicodeMode);
-    const right = characterAt(machine.text, compared, machine.unicodeMode);
-    if (canonicalize(table, left) !== canonicalize(table, right)) return false;
-    source += width;
-    compared += width;
+  for (let candidate = 0; candidate < total; candidate += 1) {
+    if (candidate >= allowed) {
+      return { limited: true, matched: false, steps: allowed };
+    }
+    const refused = { limited: false, matched: false, steps: candidate + 1 };
+    const slot = slots[candidate];
+    if (slot == null) continue;
+    const start = machine.registers[slot] ?? unset;
+    const end = machine.registers[slot + 1] ?? unset;
+    if (start === unset || end === unset) continue;
+    const length = end - start;
+    const target = backward ? machine.index - length : machine.index;
+    if (target < 0 || target + length > machine.text.length) return refused;
+    let source = start;
+    let compared = target;
+    let equal = true;
+    while (source < end) {
+      const width = widthAt(machine.text, source, machine.unicodeMode);
+      const left = characterAt(machine.text, source, machine.unicodeMode);
+      const right = characterAt(machine.text, compared, machine.unicodeMode);
+      if (canonicalize(table, left) !== canonicalize(table, right)) {
+        equal = false;
+        break;
+      }
+      source += width;
+      compared += width;
+    }
+    if (!equal) return refused;
+    machine.index = backward ? target : target + length;
   }
-  machine.index = backward ? target : target + length;
-  return true;
+  return { limited: false, matched: true, steps: total };
 }
 
 function matchesBoundary(machine: Machine, set: RegExpMatcherSet): boolean {
@@ -510,16 +546,21 @@ export function matchRegExpMatcher(
         failed = true;
       } else address = instruction.exit;
     } else if (instruction.kind === "backreference") {
-      if (
-        matchBackreference(
-          machine,
-          instruction.slots,
-          instruction.backward,
-          instruction.ignoreCase,
-        )
-      ) {
-        address += 1;
-      } else failed = true;
+      // The loop already charged the first candidate, so the budget is
+      // that one plus whatever the step limit still admits.
+      const attempt = matchBackreference(
+        machine,
+        instruction.slots,
+        instruction.backward,
+        instruction.ignoreCase,
+        machine.limits.steps - machine.steps + 1,
+      );
+      machine.steps += attempt.steps - 1;
+      if (attempt.limited) {
+        return { limit: "steps", outcome: "limit", steps: machine.steps };
+      }
+      if (attempt.matched) address += 1;
+      else failed = true;
     } else failed = true;
     if (failed) {
       const resumed = pop(machine);

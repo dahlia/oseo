@@ -1,8 +1,9 @@
-import { parseRegExpLiteral } from "@oseo/compiler";
+import { buildRegExpMatcher, parseRegExpLiteral } from "@oseo/compiler";
 import type {
   Diagnostic,
   RegExpLiteralSyntax,
   RegExpPatternError,
+  SyntaxRegExpLiteralExpression,
 } from "@oseo/compiler";
 
 import {
@@ -72,17 +73,23 @@ function diagnosticFor(
 }
 
 /**
- * Validate one regular expression literal and report its boundary.
+ * Validate one regular expression literal and compile it ahead of time.
  *
  * An invalid pattern or flag set is an ECMA-262 early error, so it is
  * reported at the offending text with the parse-rejection code. A
- * pattern this profile cannot evaluate is reported once at the literal,
- * because the syntax is valid and only its evaluation is unavailable.
+ * pattern whose matcher artifact this build cannot produce, because it
+ * reaches an owned limit or needs a Unicode fact the composition root did
+ * not supply, reports the profile boundary at the same text rather than
+ * matching against a guess.
+ *
+ * A literal that compiles carries its immutable artifact from here. The
+ * pattern is never parsed or compiled again: evaluating the expression
+ * only allocates a fresh object with its own `lastIndex`.
  */
 export function regExpLiteral(
   context: ConvertContext,
   value: BabelNode,
-): undefined {
+): SyntaxRegExpLiteralExpression | undefined {
   const literal = regExpLiteralSyntax(context, value);
   if (literal == null) {
     context.diagnostics.push({
@@ -100,17 +107,25 @@ export function regExpLiteral(
           extensions: context.regexpExtensions,
         });
   const [start] = offsets(value);
-  for (const error of result.errors) {
-    context.diagnostics.push(
-      diagnosticFor(context.input, context.locations, start, literal, error),
-    );
-  }
-  if (result.errors.length > 0) return undefined;
-  context.diagnostics.push({
+  const report = (errors: readonly RegExpPatternError[]): undefined => {
+    for (const error of errors) {
+      context.diagnostics.push(
+        diagnosticFor(context.input, context.locations, start, literal, error),
+      );
+    }
+    return undefined;
+  };
+  if (result.pattern == null) return report(result.errors);
+  const built =
+    context.regexpUnicodeData == null
+      ? buildRegExpMatcher(result.pattern)
+      : buildRegExpMatcher(result.pattern, {
+          unicodeData: context.regexpUnicodeData,
+        });
+  if (built.program == null) return report(built.errors);
+  return {
     ...location(context, value),
-    code: "OSEO1001",
-    message: "Regular expression evaluation is outside the M5 profile.",
-    sourceId: context.input.sourceId,
-  });
-  return undefined;
+    kind: "regexp",
+    matcher: built.program,
+  };
 }

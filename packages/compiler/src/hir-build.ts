@@ -1207,6 +1207,7 @@ function resolveExpression(
     expression.kind === "new-target" ||
     expression.kind === "null" ||
     expression.kind === "number" ||
+    expression.kind === "regexp" ||
     expression.kind === "string" ||
     expression.kind === "this" ||
     expression.kind === "undefined"

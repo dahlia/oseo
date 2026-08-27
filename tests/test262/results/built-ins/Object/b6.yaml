@@ -318,11 +318,12 @@ results:
     dependencies:
       - object-properties
     observation:
-      detail: 'test/built-ins/Object/internals/DefineOwnProperty/consistent-value-regexp-dollar1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Object/internals/DefineOwnProperty/consistent-value-regexp-dollar1.js:102:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/Object/internals/DefineOwnProperty/consistent-v\
+        alue-regexp-dollar1.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/Object/internals/DefineOwnProperty/cons\
+        istent-value-regexp-dollar1.js:95:1: error[OSEO1001]: Unknown
+        binding 'Reflect'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -221,9 +221,10 @@ results:
     observation:
       detail: 'test/language/expressions/optional-chaining/member-expression.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/member-expression.js:116:24:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+        stderr="test/language/expressions/optional-chaining/member-expression.js:145:12:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

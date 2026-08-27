@@ -12,17 +12,24 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/S15.10.2.6_A3_T9.js non-strict disabled
-        failed (1): stdout=""
-        stderr="test/built-ins/RegExp/S15.10.2.6_A3_T9.js:89:18:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -69,13 +76,20 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/RegExp/lookahead-quantifier-match-groups.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/lookahead-quantifier-match-groups.js:110:33:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
+        stderr="test/built-ins/RegExp/lookahead-quantifier-match-groups.js:110:21:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
     unsupportedFeatures: []
   - case:
@@ -95,11 +109,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Pattern_White_Space.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Pattern_White_Space.js:116:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Pattern_White\
+        _Space.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Patte\
+        rn_White_Space.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -120,11 +134,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Greek.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Greek.js:147:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Gree\
+        k.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Greek.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -145,11 +159,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_-_Tibetan.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_-_Tibetan.js:117:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tibe\
+        tan.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Tibetan.js:104:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -170,11 +184,11 @@ results:
     dependencies:
       - functions
     observation:
-      detail: 'test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Gurmukhi.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Gurmukhi.js:130:3:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Gurmukhi.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Gurmukhi.js:104:22: error[OSEO1001]: Unknown
+        binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -193,11 +207,10 @@ results:
     dependencies:
       - object-properties
     observation:
-      detail: 'test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.js:89:12:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
+      detail: "test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.\
+        js:123:18: error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -212,16 +225,23 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/regexp-class-chars.js non-strict disabled
-        failed (1): stdout=""
-        stderr="test/built-ins/RegExp/regexp-class-chars.js:100:8:
-        error[OSEO1001]: Regular expression evaluation is outside the M5
-        profile.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
