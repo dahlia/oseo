@@ -12,9 +12,9 @@ usage: "One record per node lives in docs/m5b-graph/nodes. Take a node whose
   takes when no node is ready, in the order listed."
 summary:
   nodes: 86
-  ready: 65
+  ready: 66
   blocked: 0
-  parked: 21
+  parked: 20
 serializationPoints:
   - path: packages/runtime-c/src/index.ts
     note: "Carries abiVersion, which every admitted checkpoint bumps. One
