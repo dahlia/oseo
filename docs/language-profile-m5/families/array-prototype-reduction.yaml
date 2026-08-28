@@ -1,0 +1,65 @@
+version: 1
+id: array-prototype-reduction
+title: "Array prototype reduction"
+scope:
+  - "Array.prototype reduce and reduceRight, including receiver conversion
+    and length reading before callable validation, the empty-traversal
+    TypeError, initial-value presence by argument count, accumulator
+    seeding from the first present element in traversal order, ascending
+    and descending index traversal, hole skipping over the shared
+    HasProperty/Get path, callback argument order with an undefined this
+    value, abrupt completion order, and mutation observed during the
+    snapshot-length loop."
+  - "Reviewed standards coverage is all 520 upstream paths under
+    test/built-ins/Array/prototype/reduce/ and
+    test/built-ins/Array/prototype/reduceRight/: 494 pass and 26 retain
+    explicit prerequisite boundaries for the unadmitted Boolean, Date,
+    and JSON globals, Reflect.construct, TypedArray receivers,
+    resizable-buffer harness support, and the dynamic ReferenceError an
+    unreferenced callback binding requires."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-reduction.ts
+      - tests/property/m5-array-prototype-reduction.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-reduction.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-reduction.ts
+      - tests/property/m5-array-prototype-reduction.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-reduction.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-reduction.ts
+      - tests/property/m5-array-prototype-reduction.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-reduction.ts
+      - tests/property/m5-array-prototype-reduction.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

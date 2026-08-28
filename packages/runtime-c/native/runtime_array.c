@@ -95,6 +95,13 @@ static OseoResult array_sorting(
     const OseoValue *arguments,
     bool copy
 );
+static OseoResult array_reduction(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool from_right
+);
 
 OseoResult oseo_internal_array_builtin_dispatch(
     OseoContext *context,
@@ -200,6 +207,16 @@ OseoResult oseo_internal_array_builtin_dispatch(
             argument_count,
             arguments,
             code_id == OSEO_ARRAY_TO_SORTED_CODE_ID
+        );
+    }
+    if (code_id == OSEO_ARRAY_REDUCE_CODE_ID ||
+        code_id == OSEO_ARRAY_REDUCE_RIGHT_CODE_ID) {
+        return array_reduction(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_ARRAY_REDUCE_RIGHT_CODE_ID
         );
     }
     if (code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID) {
@@ -2552,8 +2569,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         "indexOf",
         "lastIndexOf",
         "pop",
-        "reduce",
-        "reduceRight",
         "reverse",
         "shift",
         "splice",
@@ -2563,8 +2578,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         1u,
         1u,
         0u,
-        1u,
-        1u,
         0u,
         0u,
         2u,
@@ -2694,6 +2707,47 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             result = oseo_internal_ascii_string(
                 context,
                 sorting_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
+    static const size_t reduction_codes[] = {
+        OSEO_ARRAY_REDUCE_CODE_ID,
+        OSEO_ARRAY_REDUCE_RIGHT_CODE_ID,
+    };
+    static const char *const reduction_names[] = {"reduce", "reduceRight"};
+    _Static_assert(
+        sizeof(reduction_codes) / sizeof(reduction_codes[0]) ==
+            sizeof(reduction_names) / sizeof(reduction_names[0]),
+        "Array reduction method tables must stay aligned."
+    );
+    const size_t reduction_count =
+        sizeof(reduction_names) / sizeof(reduction_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < reduction_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            reduction_codes[index],
+            reduction_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                reduction_names[index]
             );
             frame.slots[3] = result.value;
         }
@@ -2962,6 +3016,100 @@ static OseoResult array_iteration(
         } else {
             result = normal(oseo_undefined());
         }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Array.prototype reduce and reduceRight share one accumulator loop over
+ * the shared HasProperty/Get path. reduce visits ascending indices and
+ * reduceRight descending ones. A missing initial value is replaced by the
+ * first present element in that traversal order, and a traversal that
+ * ends without one throws a TypeError. The receiver, callback, and
+ * accumulator stay rooted across user code and forced collection.
+ */
+static OseoResult array_reduction(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool from_right
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
+    frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_function(frame.slots[1])) {
+        result = type_error(context, "Array callback is not callable.");
+    }
+    bool has_accumulator = argument_count >= 2u;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        length == 0.0 &&
+        !has_accumulator) {
+        result = type_error(
+            context,
+            "Reduce of an empty array needs an initial value."
+        );
+    }
+    double index = from_right ? length - 1.0 : 0.0;
+    while (result.status == OSEO_STATUS_NORMAL &&
+           (from_right ? index >= 0.0 : index < length)) {
+        result = oseo_property_key(context, oseo_number(index));
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_has_property(
+                context,
+                frame.slots[3],
+                frame.slots[0]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (oseo_to_boolean(result.value)) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[3]
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (has_accumulator) {
+                frame.slots[4] = frame.slots[2];
+                frame.slots[5] = result.value;
+                frame.slots[6] = oseo_number(index);
+                frame.slots[7] = frame.slots[0];
+                result = oseo_call_function(
+                    context,
+                    frame.slots[1],
+                    oseo_undefined(),
+                    4u,
+                    &frame.slots[4],
+                    oseo_undefined()
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+            } else {
+                has_accumulator = true;
+            }
+            frame.slots[2] = result.value;
+        }
+        index += from_right ? -1.0 : 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !has_accumulator) {
+        result = type_error(
+            context,
+            "Reduce of an empty array needs an initial value."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(frame.slots[2]);
     }
     oseo_roots_release(context, &frame);
     return result;

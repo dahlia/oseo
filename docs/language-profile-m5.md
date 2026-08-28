@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 95
+M5a is complete. The normative family records described below inventory 99
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 14,188 reviewed cases: 10,398 passes, 1,506
-expected negatives, and 2,284 unsupported profile features. It records no
+The current manifest contains 14,708 reviewed cases: 10,895 passes, 1,506
+expected negatives, and 2,307 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4586,6 +4586,58 @@ suite revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged. The admitted runtime checkpoint moves
 the runtime ABI to `oseo-runtime-m5-82` without adding a generated-code
 entry point or changing the graph's orchestration state.
+
+M5b node `array-prototype-reduction` implements ordinary `reduce` and
+`reduceRight` functions on the realm-owned `%Array.prototype%` and removes
+both from the unadmitted boundary table. Each method converts its receiver
+with `ToObject` and reads LengthOfArrayLike before validating the callback,
+so a `length` read on the receiver is observable even when the callback is
+not callable, and a non-callable callback then throws a `TypeError`. When the
+traversal is empty and no initial value is supplied, the same check ordering
+ends in a `TypeError` after the callable check.
+
+One accumulator loop serves both methods. `reduce` visits ascending indices
+from zero and `reduceRight` descending indices from the snapshot length minus
+one. Every index passes HasProperty before Get, so holes are skipped and
+inherited entries participate, and both reads observe the receiver live, so
+an element deleted, assigned, or added below the snapshot length during
+traversal produces the specified result while indices at or above the
+snapshot stay unvisited. Initial-value presence follows the argument count,
+so an explicit `undefined` initial value seeds the accumulator. Without an
+initial value, the first present element in traversal order seeds the
+accumulator without a callback invocation, and a traversal that ends without
+one throws a `TypeError`. The callback receives the accumulator, element,
+index, and converted receiver with an undefined `this` value, its result
+becomes the next accumulator, and its abrupt completion or an abrupt
+`length`, element, or coercion read stops the loop at that step. Neither
+method allocates a result array, so no `constructor` or `Symbol.species`
+read is reachable.
+
+Fixed native and generated differential evidence at seed `0x60005700` covers
+sparse, generic, inherited, primitive, and frozen receivers, both traversal
+orders, accumulator seeding, initial-value presence by argument count, the
+empty-traversal `TypeError`, callback argument order and receiver identity,
+length coercion and clamping, mutation during the snapshot-length loop,
+abrupt completion at each observable step, both specialization policies,
+forced collection at every safepoint, false hints, deliberate shape-guard
+misses, and generic fallback. All 520 paths under the node's two inventory
+roots are reviewed: 494 pass and 26 retain explicit prerequisite boundaries.
+Fourteen need the unadmitted `Boolean`, `Date`, or `JSON` globals,
+two need `Reflect.construct`, two need TypedArray receivers, six need
+resizable-buffer harness support, and two expect the dynamic
+`ReferenceError` an unreferenced callback binding requires, which the
+profile reports as a source-located diagnostic instead. Three sort
+stability paths outside the roots change classification from
+`unsupported-profile-feature` to `pass` because their final observation
+reduces the sorted result, which this node admits. The manifest moves from
+14,188 to 14,708 cases and from 10,398 to 10,895 passes, keeps 1,506 expected
+negatives, and moves from 2,284 to 2,307 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
+to `oseo-runtime-m5-83` and allocates two code IDs inside the existing Array
+range without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 
 Known gaps inside the claim

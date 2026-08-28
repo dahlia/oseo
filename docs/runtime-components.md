@@ -814,6 +814,33 @@ hits and misses, and collection at every safepoint. The node adds no
 generated-code entry point, allocates its two code IDs inside the existing
 Array range, and moves `abiVersion` to `m5-76`.
 
+M5b node `array-prototype-reduction` also remains in *runtime\_array.c*
+because both methods reuse the ordinary property access, collector roots, and
+array-like length reading the iterative methods already own. The component
+adds `reduce` and `reduceRight` to the materialized `%Array.prototype%` and
+retires both entries from the unadmitted boundary table.
+
+One accumulator loop serves both methods: `reduce` visits ascending indices
+and `reduceRight` descending ones over the shared HasProperty/Get path, so
+holes are skipped and inherited entries participate. The receiver is
+converted and its length read before the callable check, initial-value
+presence follows the argument count rather than an undefined test, a missing
+initial value is replaced by the first present element in traversal order,
+and a traversal that ends without an accumulator throws a TypeError. The
+callback receives the accumulator, element, index, and converted receiver
+with an undefined this value, and the receiver, callback, and accumulator
+stay rooted across user code, so element and accumulator identity survive a
+collection inside any callback or accessor.
+
+Fixed and generated native differential evidence covers sparse, generic,
+inherited, primitive, and frozen receivers, both traversal orders,
+accumulator seeding, the empty-traversal TypeError, callback argument order,
+abrupt completion at each observable step, mutation during the
+snapshot-length loop, both specialization policies, false hints, deliberate
+guard hits and misses, and collection at every safepoint. The node adds no
+generated-code entry point, allocates its two code IDs inside the existing
+Array range, and moves `abiVersion` to `m5-83`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in
