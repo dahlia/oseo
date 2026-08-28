@@ -484,6 +484,76 @@ test("populates the realm-owned Number intrinsic cluster", () => {
   assert.match(numberSource, /number_data/u);
 });
 
+test("populates the realm-owned Math namespace object", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const mathSource = sources.get("runtime_math.c") ?? "";
+
+  assert.match(header, /OSEO_INTRINSIC_MATH/u);
+  assert.match(bindingSource, /oseo_internal_install_math_global/u);
+  // The enum member is public, so a direct `oseo_intrinsic` request
+  // reaches the same materialization the global installation uses.
+  assert.match(
+    functionSource,
+    /OSEO_INTRINSIC_MATH\)[\s\S]{0,40}oseo_internal_math_intrinsic/u,
+  );
+  for (const property of [
+    "E",
+    "LN10",
+    "LN2",
+    "LOG10E",
+    "LOG2E",
+    "PI",
+    "SQRT1_2",
+    "SQRT2",
+    "abs",
+    "acos",
+    "acosh",
+    "asin",
+    "asinh",
+    "atan",
+    "atanh",
+    "atan2",
+    "cbrt",
+    "ceil",
+    "clz32",
+    "cos",
+    "cosh",
+    "exp",
+    "expm1",
+    "f16round",
+    "floor",
+    "fround",
+    "hypot",
+    "imul",
+    "log",
+    "log1p",
+    "log10",
+    "log2",
+    "max",
+    "min",
+    "pow",
+    "random",
+    "round",
+    "sign",
+    "sin",
+    "sinh",
+    "sqrt",
+    "tan",
+    "tanh",
+    "trunc",
+  ]) {
+    assert.match(mathSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The namespace is an ordinary object, so it never becomes a function
+  // and its methods share the one dense code-ID range.
+  assert.match(mathSource, /oseo_object_create\(context, frame\.slots\[0\]\)/u);
+  assert.match(mathSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(mathSource, /OSEO_MATH_FUNCTION_CODE_ID_LAST - operation/u);
+  assert.doesNotMatch(mathSource, /OSEO_FUNCTION_ORDINARY/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

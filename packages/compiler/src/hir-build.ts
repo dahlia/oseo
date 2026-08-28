@@ -205,6 +205,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Infinity" ||
     name === "Iterator" ||
     name === "Map" ||
+    name === "Math" ||
     name === "NaN" ||
     name === "Number" ||
     name === "Object" ||

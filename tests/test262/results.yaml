@@ -3659,6 +3659,552 @@ partitions:
   - group: built-ins/MapIteratorPrototype
     key: f8
     path: results/built-ins/MapIteratorPrototype/f8.yaml
+  - group: built-ins/Math
+    key: "00"
+    path: results/built-ins/Math/00.yaml
+  - group: built-ins/Math
+    key: "01"
+    path: results/built-ins/Math/01.yaml
+  - group: built-ins/Math
+    key: "03"
+    path: results/built-ins/Math/03.yaml
+  - group: built-ins/Math
+    key: "04"
+    path: results/built-ins/Math/04.yaml
+  - group: built-ins/Math
+    key: "05"
+    path: results/built-ins/Math/05.yaml
+  - group: built-ins/Math
+    key: "06"
+    path: results/built-ins/Math/06.yaml
+  - group: built-ins/Math
+    key: "07"
+    path: results/built-ins/Math/07.yaml
+  - group: built-ins/Math
+    key: "08"
+    path: results/built-ins/Math/08.yaml
+  - group: built-ins/Math
+    key: 0a
+    path: results/built-ins/Math/0a.yaml
+  - group: built-ins/Math
+    key: 0b
+    path: results/built-ins/Math/0b.yaml
+  - group: built-ins/Math
+    key: 0c
+    path: results/built-ins/Math/0c.yaml
+  - group: built-ins/Math
+    key: 0f
+    path: results/built-ins/Math/0f.yaml
+  - group: built-ins/Math
+    key: "11"
+    path: results/built-ins/Math/11.yaml
+  - group: built-ins/Math
+    key: "12"
+    path: results/built-ins/Math/12.yaml
+  - group: built-ins/Math
+    key: "13"
+    path: results/built-ins/Math/13.yaml
+  - group: built-ins/Math
+    key: "15"
+    path: results/built-ins/Math/15.yaml
+  - group: built-ins/Math
+    key: "18"
+    path: results/built-ins/Math/18.yaml
+  - group: built-ins/Math
+    key: 1b
+    path: results/built-ins/Math/1b.yaml
+  - group: built-ins/Math
+    key: 1d
+    path: results/built-ins/Math/1d.yaml
+  - group: built-ins/Math
+    key: 1e
+    path: results/built-ins/Math/1e.yaml
+  - group: built-ins/Math
+    key: 1f
+    path: results/built-ins/Math/1f.yaml
+  - group: built-ins/Math
+    key: "20"
+    path: results/built-ins/Math/20.yaml
+  - group: built-ins/Math
+    key: "21"
+    path: results/built-ins/Math/21.yaml
+  - group: built-ins/Math
+    key: "24"
+    path: results/built-ins/Math/24.yaml
+  - group: built-ins/Math
+    key: "25"
+    path: results/built-ins/Math/25.yaml
+  - group: built-ins/Math
+    key: "26"
+    path: results/built-ins/Math/26.yaml
+  - group: built-ins/Math
+    key: "27"
+    path: results/built-ins/Math/27.yaml
+  - group: built-ins/Math
+    key: "28"
+    path: results/built-ins/Math/28.yaml
+  - group: built-ins/Math
+    key: "29"
+    path: results/built-ins/Math/29.yaml
+  - group: built-ins/Math
+    key: 2a
+    path: results/built-ins/Math/2a.yaml
+  - group: built-ins/Math
+    key: 2b
+    path: results/built-ins/Math/2b.yaml
+  - group: built-ins/Math
+    key: 2c
+    path: results/built-ins/Math/2c.yaml
+  - group: built-ins/Math
+    key: 2d
+    path: results/built-ins/Math/2d.yaml
+  - group: built-ins/Math
+    key: 2e
+    path: results/built-ins/Math/2e.yaml
+  - group: built-ins/Math
+    key: 2f
+    path: results/built-ins/Math/2f.yaml
+  - group: built-ins/Math
+    key: "30"
+    path: results/built-ins/Math/30.yaml
+  - group: built-ins/Math
+    key: "31"
+    path: results/built-ins/Math/31.yaml
+  - group: built-ins/Math
+    key: "33"
+    path: results/built-ins/Math/33.yaml
+  - group: built-ins/Math
+    key: "35"
+    path: results/built-ins/Math/35.yaml
+  - group: built-ins/Math
+    key: "36"
+    path: results/built-ins/Math/36.yaml
+  - group: built-ins/Math
+    key: "38"
+    path: results/built-ins/Math/38.yaml
+  - group: built-ins/Math
+    key: "39"
+    path: results/built-ins/Math/39.yaml
+  - group: built-ins/Math
+    key: 3a
+    path: results/built-ins/Math/3a.yaml
+  - group: built-ins/Math
+    key: 3c
+    path: results/built-ins/Math/3c.yaml
+  - group: built-ins/Math
+    key: 3d
+    path: results/built-ins/Math/3d.yaml
+  - group: built-ins/Math
+    key: "40"
+    path: results/built-ins/Math/40.yaml
+  - group: built-ins/Math
+    key: "43"
+    path: results/built-ins/Math/43.yaml
+  - group: built-ins/Math
+    key: "44"
+    path: results/built-ins/Math/44.yaml
+  - group: built-ins/Math
+    key: "45"
+    path: results/built-ins/Math/45.yaml
+  - group: built-ins/Math
+    key: "46"
+    path: results/built-ins/Math/46.yaml
+  - group: built-ins/Math
+    key: "47"
+    path: results/built-ins/Math/47.yaml
+  - group: built-ins/Math
+    key: "48"
+    path: results/built-ins/Math/48.yaml
+  - group: built-ins/Math
+    key: 4a
+    path: results/built-ins/Math/4a.yaml
+  - group: built-ins/Math
+    key: 4b
+    path: results/built-ins/Math/4b.yaml
+  - group: built-ins/Math
+    key: 4c
+    path: results/built-ins/Math/4c.yaml
+  - group: built-ins/Math
+    key: 4e
+    path: results/built-ins/Math/4e.yaml
+  - group: built-ins/Math
+    key: "50"
+    path: results/built-ins/Math/50.yaml
+  - group: built-ins/Math
+    key: "51"
+    path: results/built-ins/Math/51.yaml
+  - group: built-ins/Math
+    key: "53"
+    path: results/built-ins/Math/53.yaml
+  - group: built-ins/Math
+    key: "54"
+    path: results/built-ins/Math/54.yaml
+  - group: built-ins/Math
+    key: "56"
+    path: results/built-ins/Math/56.yaml
+  - group: built-ins/Math
+    key: "57"
+    path: results/built-ins/Math/57.yaml
+  - group: built-ins/Math
+    key: "59"
+    path: results/built-ins/Math/59.yaml
+  - group: built-ins/Math
+    key: 5a
+    path: results/built-ins/Math/5a.yaml
+  - group: built-ins/Math
+    key: 5c
+    path: results/built-ins/Math/5c.yaml
+  - group: built-ins/Math
+    key: 5d
+    path: results/built-ins/Math/5d.yaml
+  - group: built-ins/Math
+    key: 5e
+    path: results/built-ins/Math/5e.yaml
+  - group: built-ins/Math
+    key: 5f
+    path: results/built-ins/Math/5f.yaml
+  - group: built-ins/Math
+    key: "62"
+    path: results/built-ins/Math/62.yaml
+  - group: built-ins/Math
+    key: "63"
+    path: results/built-ins/Math/63.yaml
+  - group: built-ins/Math
+    key: "65"
+    path: results/built-ins/Math/65.yaml
+  - group: built-ins/Math
+    key: "66"
+    path: results/built-ins/Math/66.yaml
+  - group: built-ins/Math
+    key: "67"
+    path: results/built-ins/Math/67.yaml
+  - group: built-ins/Math
+    key: 6c
+    path: results/built-ins/Math/6c.yaml
+  - group: built-ins/Math
+    key: 6d
+    path: results/built-ins/Math/6d.yaml
+  - group: built-ins/Math
+    key: 6e
+    path: results/built-ins/Math/6e.yaml
+  - group: built-ins/Math
+    key: 6f
+    path: results/built-ins/Math/6f.yaml
+  - group: built-ins/Math
+    key: "70"
+    path: results/built-ins/Math/70.yaml
+  - group: built-ins/Math
+    key: "71"
+    path: results/built-ins/Math/71.yaml
+  - group: built-ins/Math
+    key: "72"
+    path: results/built-ins/Math/72.yaml
+  - group: built-ins/Math
+    key: "75"
+    path: results/built-ins/Math/75.yaml
+  - group: built-ins/Math
+    key: "76"
+    path: results/built-ins/Math/76.yaml
+  - group: built-ins/Math
+    key: "77"
+    path: results/built-ins/Math/77.yaml
+  - group: built-ins/Math
+    key: "78"
+    path: results/built-ins/Math/78.yaml
+  - group: built-ins/Math
+    key: "79"
+    path: results/built-ins/Math/79.yaml
+  - group: built-ins/Math
+    key: 7b
+    path: results/built-ins/Math/7b.yaml
+  - group: built-ins/Math
+    key: 7d
+    path: results/built-ins/Math/7d.yaml
+  - group: built-ins/Math
+    key: 7e
+    path: results/built-ins/Math/7e.yaml
+  - group: built-ins/Math
+    key: 7f
+    path: results/built-ins/Math/7f.yaml
+  - group: built-ins/Math
+    key: "80"
+    path: results/built-ins/Math/80.yaml
+  - group: built-ins/Math
+    key: "81"
+    path: results/built-ins/Math/81.yaml
+  - group: built-ins/Math
+    key: "83"
+    path: results/built-ins/Math/83.yaml
+  - group: built-ins/Math
+    key: "84"
+    path: results/built-ins/Math/84.yaml
+  - group: built-ins/Math
+    key: "85"
+    path: results/built-ins/Math/85.yaml
+  - group: built-ins/Math
+    key: "86"
+    path: results/built-ins/Math/86.yaml
+  - group: built-ins/Math
+    key: "87"
+    path: results/built-ins/Math/87.yaml
+  - group: built-ins/Math
+    key: "88"
+    path: results/built-ins/Math/88.yaml
+  - group: built-ins/Math
+    key: "89"
+    path: results/built-ins/Math/89.yaml
+  - group: built-ins/Math
+    key: 8a
+    path: results/built-ins/Math/8a.yaml
+  - group: built-ins/Math
+    key: 8d
+    path: results/built-ins/Math/8d.yaml
+  - group: built-ins/Math
+    key: 8e
+    path: results/built-ins/Math/8e.yaml
+  - group: built-ins/Math
+    key: 8f
+    path: results/built-ins/Math/8f.yaml
+  - group: built-ins/Math
+    key: "90"
+    path: results/built-ins/Math/90.yaml
+  - group: built-ins/Math
+    key: "93"
+    path: results/built-ins/Math/93.yaml
+  - group: built-ins/Math
+    key: "96"
+    path: results/built-ins/Math/96.yaml
+  - group: built-ins/Math
+    key: "98"
+    path: results/built-ins/Math/98.yaml
+  - group: built-ins/Math
+    key: 9a
+    path: results/built-ins/Math/9a.yaml
+  - group: built-ins/Math
+    key: 9c
+    path: results/built-ins/Math/9c.yaml
+  - group: built-ins/Math
+    key: 9d
+    path: results/built-ins/Math/9d.yaml
+  - group: built-ins/Math
+    key: a0
+    path: results/built-ins/Math/a0.yaml
+  - group: built-ins/Math
+    key: a1
+    path: results/built-ins/Math/a1.yaml
+  - group: built-ins/Math
+    key: a2
+    path: results/built-ins/Math/a2.yaml
+  - group: built-ins/Math
+    key: a3
+    path: results/built-ins/Math/a3.yaml
+  - group: built-ins/Math
+    key: a4
+    path: results/built-ins/Math/a4.yaml
+  - group: built-ins/Math
+    key: a5
+    path: results/built-ins/Math/a5.yaml
+  - group: built-ins/Math
+    key: a6
+    path: results/built-ins/Math/a6.yaml
+  - group: built-ins/Math
+    key: a7
+    path: results/built-ins/Math/a7.yaml
+  - group: built-ins/Math
+    key: a8
+    path: results/built-ins/Math/a8.yaml
+  - group: built-ins/Math
+    key: a9
+    path: results/built-ins/Math/a9.yaml
+  - group: built-ins/Math
+    key: aa
+    path: results/built-ins/Math/aa.yaml
+  - group: built-ins/Math
+    key: ae
+    path: results/built-ins/Math/ae.yaml
+  - group: built-ins/Math
+    key: af
+    path: results/built-ins/Math/af.yaml
+  - group: built-ins/Math
+    key: b0
+    path: results/built-ins/Math/b0.yaml
+  - group: built-ins/Math
+    key: b1
+    path: results/built-ins/Math/b1.yaml
+  - group: built-ins/Math
+    key: b2
+    path: results/built-ins/Math/b2.yaml
+  - group: built-ins/Math
+    key: b3
+    path: results/built-ins/Math/b3.yaml
+  - group: built-ins/Math
+    key: b4
+    path: results/built-ins/Math/b4.yaml
+  - group: built-ins/Math
+    key: b6
+    path: results/built-ins/Math/b6.yaml
+  - group: built-ins/Math
+    key: b8
+    path: results/built-ins/Math/b8.yaml
+  - group: built-ins/Math
+    key: b9
+    path: results/built-ins/Math/b9.yaml
+  - group: built-ins/Math
+    key: ba
+    path: results/built-ins/Math/ba.yaml
+  - group: built-ins/Math
+    key: bc
+    path: results/built-ins/Math/bc.yaml
+  - group: built-ins/Math
+    key: bd
+    path: results/built-ins/Math/bd.yaml
+  - group: built-ins/Math
+    key: be
+    path: results/built-ins/Math/be.yaml
+  - group: built-ins/Math
+    key: bf
+    path: results/built-ins/Math/bf.yaml
+  - group: built-ins/Math
+    key: c1
+    path: results/built-ins/Math/c1.yaml
+  - group: built-ins/Math
+    key: c2
+    path: results/built-ins/Math/c2.yaml
+  - group: built-ins/Math
+    key: c3
+    path: results/built-ins/Math/c3.yaml
+  - group: built-ins/Math
+    key: c5
+    path: results/built-ins/Math/c5.yaml
+  - group: built-ins/Math
+    key: c6
+    path: results/built-ins/Math/c6.yaml
+  - group: built-ins/Math
+    key: c7
+    path: results/built-ins/Math/c7.yaml
+  - group: built-ins/Math
+    key: c8
+    path: results/built-ins/Math/c8.yaml
+  - group: built-ins/Math
+    key: ca
+    path: results/built-ins/Math/ca.yaml
+  - group: built-ins/Math
+    key: cb
+    path: results/built-ins/Math/cb.yaml
+  - group: built-ins/Math
+    key: ce
+    path: results/built-ins/Math/ce.yaml
+  - group: built-ins/Math
+    key: cf
+    path: results/built-ins/Math/cf.yaml
+  - group: built-ins/Math
+    key: d1
+    path: results/built-ins/Math/d1.yaml
+  - group: built-ins/Math
+    key: d2
+    path: results/built-ins/Math/d2.yaml
+  - group: built-ins/Math
+    key: d3
+    path: results/built-ins/Math/d3.yaml
+  - group: built-ins/Math
+    key: d9
+    path: results/built-ins/Math/d9.yaml
+  - group: built-ins/Math
+    key: da
+    path: results/built-ins/Math/da.yaml
+  - group: built-ins/Math
+    key: db
+    path: results/built-ins/Math/db.yaml
+  - group: built-ins/Math
+    key: dd
+    path: results/built-ins/Math/dd.yaml
+  - group: built-ins/Math
+    key: de
+    path: results/built-ins/Math/de.yaml
+  - group: built-ins/Math
+    key: df
+    path: results/built-ins/Math/df.yaml
+  - group: built-ins/Math
+    key: e0
+    path: results/built-ins/Math/e0.yaml
+  - group: built-ins/Math
+    key: e2
+    path: results/built-ins/Math/e2.yaml
+  - group: built-ins/Math
+    key: e5
+    path: results/built-ins/Math/e5.yaml
+  - group: built-ins/Math
+    key: e6
+    path: results/built-ins/Math/e6.yaml
+  - group: built-ins/Math
+    key: e7
+    path: results/built-ins/Math/e7.yaml
+  - group: built-ins/Math
+    key: e8
+    path: results/built-ins/Math/e8.yaml
+  - group: built-ins/Math
+    key: e9
+    path: results/built-ins/Math/e9.yaml
+  - group: built-ins/Math
+    key: ea
+    path: results/built-ins/Math/ea.yaml
+  - group: built-ins/Math
+    key: eb
+    path: results/built-ins/Math/eb.yaml
+  - group: built-ins/Math
+    key: ec
+    path: results/built-ins/Math/ec.yaml
+  - group: built-ins/Math
+    key: ed
+    path: results/built-ins/Math/ed.yaml
+  - group: built-ins/Math
+    key: ee
+    path: results/built-ins/Math/ee.yaml
+  - group: built-ins/Math
+    key: ef
+    path: results/built-ins/Math/ef.yaml
+  - group: built-ins/Math
+    key: f0
+    path: results/built-ins/Math/f0.yaml
+  - group: built-ins/Math
+    key: f1
+    path: results/built-ins/Math/f1.yaml
+  - group: built-ins/Math
+    key: f2
+    path: results/built-ins/Math/f2.yaml
+  - group: built-ins/Math
+    key: f3
+    path: results/built-ins/Math/f3.yaml
+  - group: built-ins/Math
+    key: f4
+    path: results/built-ins/Math/f4.yaml
+  - group: built-ins/Math
+    key: f5
+    path: results/built-ins/Math/f5.yaml
+  - group: built-ins/Math
+    key: f6
+    path: results/built-ins/Math/f6.yaml
+  - group: built-ins/Math
+    key: f7
+    path: results/built-ins/Math/f7.yaml
+  - group: built-ins/Math
+    key: f8
+    path: results/built-ins/Math/f8.yaml
+  - group: built-ins/Math
+    key: fb
+    path: results/built-ins/Math/fb.yaml
+  - group: built-ins/Math
+    key: fc
+    path: results/built-ins/Math/fc.yaml
+  - group: built-ins/Math
+    key: fd
+    path: results/built-ins/Math/fd.yaml
+  - group: built-ins/Math
+    key: fe
+    path: results/built-ins/Math/fe.yaml
+  - group: built-ins/Math
+    key: ff
+    path: results/built-ins/Math/ff.yaml
   - group: built-ins/NaN
     key: "41"
     path: results/built-ins/NaN/41.yaml
@@ -10291,9 +10837,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 10013
+  passes: 10398
   semanticFailures: 0
-  unsupportedProfileFeatures: 2353
+  unsupportedProfileFeatures: 2284
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -10334,9 +10880,9 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 854
+      passes: 855
       semanticFailures: 0
-      unsupportedProfileFeatures: 75
+      unsupportedProfileFeatures: 74
     - dependency: control-flow
       expectedNegatives: 225
       harnessFailures: 0
@@ -10383,16 +10929,16 @@ summary:
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 270
+      passes: 271
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 36
     - dependency: functions
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2278
+      passes: 2307
       semanticFailures: 0
-      unsupportedProfileFeatures: 1088
+      unsupportedProfileFeatures: 1102
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -10432,9 +10978,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6555
+      passes: 6936
       semanticFailures: 0
-      unsupportedProfileFeatures: 1033
+      unsupportedProfileFeatures: 968
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -10460,9 +11006,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 409
+      passes: 413
       semanticFailures: 0
-      unsupportedProfileFeatures: 166
+      unsupportedProfileFeatures: 163
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -10489,9 +11035,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1337
+      passes: 1354
       semanticFailures: 0
-      unsupportedProfileFeatures: 212
+      unsupportedProfileFeatures: 195
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -10597,6 +11143,13 @@ summary:
       passes: 11
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/Math
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 280
+      semanticFailures: 0
+      unsupportedProfileFeatures: 36
     - group: built-ins/NaN
       expectedNegatives: 0
       harnessFailures: 0
@@ -10622,9 +11175,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2607
+      passes: 2682
       semanticFailures: 0
-      unsupportedProfileFeatures: 424
+      unsupportedProfileFeatures: 349
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -10636,16 +11189,16 @@ summary:
       expectedNegatives: 142
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 609
+      passes: 614
       semanticFailures: 0
-      unsupportedProfileFeatures: 637
+      unsupportedProfileFeatures: 632
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 667
+      passes: 673
       semanticFailures: 0
-      unsupportedProfileFeatures: 175
+      unsupportedProfileFeatures: 169
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0
@@ -10706,9 +11259,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1443
+      passes: 1444
       semanticFailures: 0
-      unsupportedProfileFeatures: 148
+      unsupportedProfileFeatures: 147
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -10776,6 +11329,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1207
+      passes: 1208
       semanticFailures: 0
-      unsupportedProfileFeatures: 89
+      unsupportedProfileFeatures: 88

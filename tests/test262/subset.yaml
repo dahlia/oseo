@@ -448,7 +448,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-1-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-1-9.js
     expectedClassification: unsupported-profile-feature
@@ -604,7 +604,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/of/return-a-new-array-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/of/return-abrupt-from-contructor.js
     expectedClassification: pass
@@ -859,7 +859,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -1084,7 +1084,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-15.js
     expectedClassification: unsupported-profile-feature
@@ -1396,7 +1396,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-20.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-21.js
     expectedClassification: unsupported-profile-feature
@@ -1498,7 +1498,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -1732,7 +1732,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-15.js
     expectedClassification: unsupported-profile-feature
@@ -2098,7 +2098,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-21.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-22.js
     expectedClassification: unsupported-profile-feature
@@ -2353,7 +2353,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -2575,7 +2575,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-15.js
     expectedClassification: unsupported-profile-feature
@@ -2980,7 +2980,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -3211,7 +3211,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-15.js
     expectedClassification: unsupported-profile-feature
@@ -3556,7 +3556,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-non-array-invalid-len.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-non-array.js
     expectedClassification: pass
@@ -3766,7 +3766,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-non-array-invalid-len.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-non-array.js
     expectedClassification: pass
@@ -3841,7 +3841,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-11.js
     expectedClassification: unsupported-profile-feature
@@ -4072,7 +4072,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-15.js
     expectedClassification: unsupported-profile-feature
@@ -4384,7 +4384,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-20.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-21.js
     expectedClassification: unsupported-profile-feature
@@ -9409,6 +9409,954 @@ tests:
   - path: test/built-ins/MapIteratorPrototype/next/this-not-object-throw-values.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Math/E/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/E/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LN10/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LN10/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LN2/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LN2/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LOG10E/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LOG10E/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LOG2E/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/LOG2E/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/PI/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/PI/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/SQRT1_2/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/SQRT1_2/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/SQRT2/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/SQRT2/value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols]
+  - path: test/built-ins/Math/abs/S15.8.2.1_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/S15.8.2.1_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/S15.8.2.1_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/absolute-value.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/abs/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/abs/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/S15.8.2.2_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/S15.8.2.2_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/S15.8.2.2_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/S15.8.2.2_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acos/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/acos/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/arg-is-infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/arg-is-one.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/nan-returns.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/acosh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/acosh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/S15.8.2.3_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/S15.8.2.3_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/S15.8.2.3_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/S15.8.2.3_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/S15.8.2.3_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asin/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/asin/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asinh/asinh-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asinh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asinh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/asinh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/asinh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/S15.8.2.4_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/S15.8.2.4_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/S15.8.2.4_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/atan/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/S15.8.2.5_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atan2/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/atan2/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atanh/atanh-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atanh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atanh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/atanh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/atanh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cbrt/cbrt-specialValues.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cbrt/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cbrt/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cbrt/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/cbrt/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/S15.8.2.6_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/ceil/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/ceil/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/Math.clz32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/Math.clz32_1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/Math.clz32_2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/int32bit.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/nan.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/clz32/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/clz32/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/S15.8.2.7_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/S15.8.2.7_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/S15.8.2.7_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/S15.8.2.7_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/S15.8.2.7_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cos/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/cos/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cosh/cosh-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cosh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cosh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/cosh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/cosh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/S15.8.2.8_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/S15.8.2.8_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/S15.8.2.8_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/S15.8.2.8_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/S15.8.2.8_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/exp/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/exp/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/expm1/expm1-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/expm1/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/expm1/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/expm1/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/expm1/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/f16round/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/f16round/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/f16round/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/f16round/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/f16round/value-conversion.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/S15.8.2.9_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/floor/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/floor/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/Math.fround_Infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/Math.fround_NaN.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/Math.fround_Zero.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/fround/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/ties.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/fround/value-convertion.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_Infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_InfinityNaN.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_NaN.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_NegInfinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_NoArgs.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_Success_2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_ToNumberErr.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/hypot/Math.hypot_Zero_2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/hypot/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/hypot/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/imul/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/imul/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/imul/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/imul/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/imul/results.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/S15.8.2.10_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/S15.8.2.10_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/S15.8.2.10_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/S15.8.2.10_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/S15.8.2.10_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/log/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log10/Log10-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log10/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log10/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log10/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/log10/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log1p/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log1p/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log1p/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/log1p/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log1p/specific-results.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log2/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log2/log2-basicTests.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log2/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/log2/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/log2/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/15.8.2.11-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/Math.max_each-element-coerced.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/max/S15.8.2.11_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/S15.8.2.11_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/S15.8.2.11_A4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/max/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/max/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/max/zeros.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/15.8.2.12-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/Math.min_each-element-coerced.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/min/S15.8.2.12_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/S15.8.2.12_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/S15.8.2.12_A4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/min/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/min/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/min/zeros.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A23.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/applying-the-exp-operator_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/int32_min-exponent.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/pow/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/pow/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/proto.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/random/S15.8.2.14_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/random/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/random/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/random/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/random/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/S15.8.2.15_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/round/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/round/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sign/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sign/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sign/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/sign/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sign/sign-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/S15.8.2.16_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/S15.8.2.16_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/S15.8.2.16_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/sin/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sin/zero.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sinh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sinh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sinh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/sinh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sinh/sinh-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/S15.8.2.17_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/S15.8.2.17_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/S15.8.2.17_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/S15.8.2.17_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/S15.8.2.17_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sqrt/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/sqrt/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/S15.8.2.18_A1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/S15.8.2.18_A2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/S15.8.2.18_A3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/S15.8.2.18_A4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/S15.8.2.18_A5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tan/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/tan/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tanh/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tanh/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tanh/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/tanh/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/tanh/tanh-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_Infinity.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_NaN.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_NegDecimal.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_PosDecimal.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_Success.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/Math.trunc_Zero.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Math/trunc/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/trunc-sampleTests.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/trunc/trunc-specialVals.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/NaN/15.1.1.1-0.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -10721,7 +11669,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-100.js
     expectedClassification: pass
@@ -10778,7 +11726,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-117.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-118.js
     expectedClassification: unsupported-profile-feature
@@ -10859,7 +11807,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-142.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-143.js
     expectedClassification: unsupported-profile-feature
@@ -10949,7 +11897,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-170.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-171.js
     expectedClassification: unsupported-profile-feature
@@ -11030,7 +11978,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-196.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-197.js
     expectedClassification: unsupported-profile-feature
@@ -11114,7 +12062,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-221.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-222.js
     expectedClassification: unsupported-profile-feature
@@ -11210,7 +12158,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-251.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-252.js
     expectedClassification: unsupported-profile-feature
@@ -11309,7 +12257,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-284.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-285.js
     expectedClassification: unsupported-profile-feature
@@ -11417,7 +12365,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-33.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-34.js
     expectedClassification: unsupported-profile-feature
@@ -11519,7 +12467,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-64.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-65.js
     expectedClassification: unsupported-profile-feature
@@ -11597,7 +12545,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-89.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-9.js
     expectedClassification: pass
@@ -11675,7 +12623,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-12.js
     expectedClassification: unsupported-profile-feature
@@ -11753,7 +12701,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-13.js
     expectedClassification: unsupported-profile-feature
@@ -11807,7 +12755,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-102.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-103.js
     expectedClassification: unsupported-profile-feature
@@ -11897,7 +12845,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-130.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-131.js
     expectedClassification: unsupported-profile-feature
@@ -11978,7 +12926,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-156.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-157.js
     expectedClassification: unsupported-profile-feature
@@ -12059,7 +13007,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-181.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-182.js
     expectedClassification: unsupported-profile-feature
@@ -12149,7 +13097,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-209.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-21.js
     expectedClassification: pass
@@ -12242,7 +13190,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-24.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-240.js
     expectedClassification: pass
@@ -12257,7 +13205,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-244.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-245.js
     expectedClassification: unsupported-profile-feature
@@ -12383,7 +13331,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-49.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-5.js
     expectedClassification: pass
@@ -12473,7 +13421,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-77.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-78.js
     expectedClassification: unsupported-profile-feature
@@ -12779,7 +13727,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-17.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-170.js
     expectedClassification: pass
@@ -13769,7 +14717,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-116.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-117.js
     expectedClassification: unsupported-profile-feature
@@ -13871,10 +14819,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-144-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-144.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-145-1.js
     expectedClassification: unsupported-profile-feature
@@ -13988,10 +14936,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-170-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-170.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-171-1.js
     expectedClassification: unsupported-profile-feature
@@ -14084,7 +15032,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-195.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-196.js
     expectedClassification: unsupported-profile-feature
@@ -14192,10 +15140,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-223-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-223.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-224-1.js
     expectedClassification: unsupported-profile-feature
@@ -14315,10 +15263,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-253-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-253.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-254-1.js
     expectedClassification: unsupported-profile-feature
@@ -14414,10 +15362,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-38-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-38.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-39-1.js
     expectedClassification: unsupported-profile-feature
@@ -14513,7 +15461,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-63.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-64.js
     expectedClassification: unsupported-profile-feature
@@ -14618,10 +15566,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-91-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-91.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-92-1.js
     expectedClassification: unsupported-profile-feature
@@ -15776,7 +16724,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-38.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-380.js
     expectedClassification: pass
@@ -15878,7 +16826,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-411.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-412.js
     expectedClassification: pass
@@ -16541,7 +17489,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-587.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-588.js
     expectedClassification: pass
@@ -17297,46 +18245,46 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-100.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-101.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-102.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-103.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-104.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-105.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-106.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-107.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-108.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-109.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-110.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-111.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-112.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-113.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-114.js
     expectedClassification: unsupported-profile-feature
@@ -17540,7 +18488,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-184.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-185.js
     expectedClassification: pass
@@ -17603,28 +18551,28 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-202.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-203.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-204.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-205.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-206.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-207.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-208.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-209.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-21.js
     expectedClassification: pass
@@ -17954,16 +18902,16 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-96.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-97.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-98.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-99.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/length.js
     expectedClassification: pass
@@ -18011,7 +18959,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/primitive-numbers.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/primitive-strings.js
     expectedClassification: pass
@@ -18140,7 +19088,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-9.js
     expectedClassification: unsupported-profile-feature
@@ -18164,10 +19112,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/internals/DefineOwnProperty/nan-equivalence-define-own-property-reassign.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/internals/DefineOwnProperty/nan-equivalence-define-own-property-reconfigure.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/is-a-constructor.js
     expectedClassification: unsupported-profile-feature
@@ -18338,7 +19286,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-9.js
     expectedClassification: unsupported-profile-feature
@@ -18446,7 +19394,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-15.js
     expectedClassification: unsupported-profile-feature
@@ -18551,7 +19499,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-15.js
     expectedClassification: unsupported-profile-feature
@@ -24104,7 +25052,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T13.js
     expectedClassification: pass
@@ -24164,7 +25112,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A2_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A2_T3.js
     expectedClassification: pass
@@ -24236,7 +25184,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T8.js
     expectedClassification: pass
@@ -24560,7 +25508,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T13.js
     expectedClassification: pass
@@ -24623,7 +25571,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A2_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A2_T3.js
     expectedClassification: pass
@@ -25082,7 +26030,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/15.5.5.5.2-3-5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/15.5.5.5.2-3-6.js
     expectedClassification: pass
@@ -25091,7 +26039,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/15.5.5.5.2-3-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/15.5.5.5.2-7-1.js
     expectedClassification: pass
@@ -27002,7 +27950,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-1-math-pow-2-32-1-instance-is-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-1-void-0-instance-is-number.js
     expectedClassification: pass
@@ -27149,7 +28097,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/instance-is-math.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/instance-is-new-string.js
     expectedClassification: pass
@@ -27191,7 +28139,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-number-limit-math-pow-2-32-1-instance-is-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-override-tostring-limit-override-valueof-throws.js
     expectedClassification: pass
@@ -27422,7 +28370,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/substring/S15.5.4.15_A3_T9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/substring/S15.5.4.15_A6.js
     expectedClassification: pass
@@ -35341,7 +36289,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/string.js
     expectedClassification: unsupported-profile-feature
@@ -37786,7 +38734,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/invalid-extends.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/definition/methods-async-super-call-body.js
     expectedClassification: pass

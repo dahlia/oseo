@@ -370,6 +370,7 @@ export function intrinsicGlobalKind(
     name === "Function" ||
     name === "Iterator" ||
     name === "Map" ||
+    name === "Math" ||
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||

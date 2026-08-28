@@ -328,8 +328,8 @@ results:
       detail: "test/built-ins/Object/prototype/toString/symbol-tag-non-str-bu\
         iltin.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-no\
-        n-str-builtin.js:97:23: error[OSEO1001]: Unknown binding
-        'Math'.\\n\""
+        n-str-builtin.js:100:8: error[OSEO1001]: Unknown binding
+        'JSON'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

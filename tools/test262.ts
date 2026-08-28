@@ -115,6 +115,7 @@ const detachArrayBufferHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/detachArrayBuffer.js",
 );
+const nansHarnessPath = join(repositoryRoot, "tests/test262/harness/nans.js");
 const nativeErrorsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/nativeErrors.js",
@@ -152,7 +153,6 @@ const reviewedExecutionPoolLimit = Math.min(
 );
 const reviewedExecutionRetryLimit = 1;
 const unavailableHarnessIncludes = new Set([
-  "nans.js",
   // The resizable-buffer utilities build every TypedArray constructor at
   // load time, so no case that includes them can execute before a view
   // kind is admitted.
@@ -1393,6 +1393,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
         "detachArrayBuffer.js",
         await readFile(detachArrayBufferHarnessPath, "utf8"),
       ],
+      ["nans.js", await readFile(nansHarnessPath, "utf8")],
       ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],

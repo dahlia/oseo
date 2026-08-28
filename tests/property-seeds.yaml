@@ -344,3 +344,7 @@ families:
     owner: tests/property/m5-regexp-literal-aot.property.test.ts
     start: 0x60005500
     end: 0x600055ff
+  - family: m5-math-namespace
+    owner: tests/property/m5-math-namespace.property.test.ts
+    start: 0x60005600
+    end: 0x600056ff

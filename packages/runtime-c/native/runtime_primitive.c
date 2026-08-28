@@ -1172,9 +1172,7 @@ static OseoResult numeric_binary(
     else if (operator == '*') value = left_value * right_value;
     else if (operator == '%') value = fmod(left_value, right_value);
     else if (operator == 'e') {
-        if (isnan(right_value)) value = NAN;
-        else if (fabs(left_value) == 1.0 && isinf(right_value)) value = NAN;
-        else value = pow(left_value, right_value);
+        value = oseo_internal_number_exponentiate(left_value, right_value);
     }
     else value = left_value / right_value;
     oseo_roots_pop(context, &frame);
@@ -1348,8 +1346,19 @@ OseoResult oseo_exponentiate(
     return numeric_binary(context, left, right, 'e');
 }
 
-/* The modular 32-bit patterns shared by ToInt32 and ToUint32. */
-static uint32_t uint32_bits(double number) {
+double oseo_internal_number_exponentiate(double base, double exponent) {
+    /*
+     * Number::exponentiate differs from C `pow` in exactly two cases:
+     * a NaN exponent is NaN even for a base of one, and a base of
+     * exactly one or minus one with an infinite exponent is NaN rather
+     * than one. Every other case agrees, so the library result stands.
+     */
+    if (isnan(exponent)) return NAN;
+    if (fabs(base) == 1.0 && isinf(exponent)) return NAN;
+    return pow(base, exponent);
+}
+
+uint32_t oseo_internal_number_to_uint32(double number) {
     if (!isfinite(number) || number == 0.0) return 0u;
     double wrapped = fmod(trunc(number), 4294967296.0);
     if (wrapped < 0.0) wrapped += 4294967296.0;
@@ -1414,8 +1423,10 @@ static OseoResult int32_binary(
         oseo_roots_pop(context, &frame);
         return result;
     }
-    uint32_t left_bits = uint32_bits(number_value(slots[0]));
-    uint32_t right_bits = uint32_bits(number_value(slots[1]));
+    uint32_t left_bits =
+        oseo_internal_number_to_uint32(number_value(slots[0]));
+    uint32_t right_bits =
+        oseo_internal_number_to_uint32(number_value(slots[1]));
     if (operator == '&') {
         converted = normal(oseo_number(int32_number(left_bits & right_bits)));
         oseo_roots_pop(context, &frame);
@@ -1509,7 +1520,7 @@ OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value) {
         oseo_roots_pop(context, &frame);
         return result;
     }
-    uint32_t bits = ~uint32_bits(number_value(number.value));
+    uint32_t bits = ~oseo_internal_number_to_uint32(number_value(number.value));
     return normal(oseo_number(int32_number(bits)));
 }
 

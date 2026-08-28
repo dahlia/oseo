@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-13,553 reviewed cases: 9,365 passes, 1,506 expected negatives, and 2,682
+14,188 reviewed cases: 10,398 passes, 1,506 expected negatives, and 2,284
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 95 indexed records in the normative
+M5a is complete. The 98 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 9,365
-passes across 13,553 paths, and the property inventory records 107 domains,
-107 seeds, and an ordinary case budget of 5,158.
+the M5b and M5c dependency order below. The reviewed manifest now records
+10,398 passes across 14,188 paths, and the property inventory records 112
+domains, 112 seeds, and an ordinary case budget of 5,204.
 
 
 M5a implementation history
@@ -4784,6 +4784,118 @@ pass. The manifest moves to 13,872 paths with 9,632 passes, 1,506
 expected negatives, and 2,734 unsupported profile features. The admitted
 checkpoint moves the runtime ABI to `oseo-runtime-m5-80` without changing
 the graph's orchestration state.
+
+Implemented M5b node `math-namespace` materializes the `Math` namespace
+object. `Math` is an ordinary object whose `[[Prototype]]` is the realm's
+`%Object.prototype%`, and the global object binds it as a writable,
+non-enumerable, configurable property, so the compiler treats it as a
+property-owned replaceable intrinsic exactly as it treats `Number` and
+`String`. It is not a function: it has neither `[[Call]]` nor
+`[[Construct]]`, and its `Symbol.toStringTag` is the non-writable,
+non-enumerable, configurable string `"Math"`. None of its function
+properties is a constructor either, so a `new` on one throws a `TypeError`
+before any argument is converted.
+
+The eight value properties of 21.3.1 are non-writable, non-enumerable, and
+non-configurable, and the thirty-six function properties of 21.3.2 are
+writable, non-enumerable, configurable built-in functions with their
+specified names and lengths. `Math.sumPrecise` belongs to a later edition
+than the one ADR 0013 pins and is not added; the pinned applicable
+inventory already excludes its ten upstream paths.
+
+Every function converts its arguments with `ToNumber` in argument order and
+propagates the first abrupt conversion without converting the arguments
+after it. `Math.max`, `Math.min`, and `Math.hypot` convert their whole
+argument list before comparing any of it. The exactly determined
+operations produce exactly the specified Number, including `Math.round`'s
+tie toward positive infinity and its `-0` window, the signed zeroes
+`ceil`, `floor`, `trunc`, `abs`, `sign`, `sqrt`, `cbrt`, `min`, `max`,
+`fround`, and `f16round` preserve, the `NaN` and infinity precedence in
+`max`, `min`, and `hypot`, Number::exponentiate for `pow`, the
+ties-to-even binary32 and binary16 rounding `fround` and `f16round`
+perform over exact binary64 scaling of the operand, and the `ToUint32`
+readings `clz32` and `imul` report.
+
+The remaining operations are the ones ECMA-262 marks
+implementation-approximated. This profile commits to their special values,
+argument conversion, and sign behavior rather than to a digit-exact
+result, and on the supported native targets they are the host C library's
+correspondingly named operations. Those agree with the reference hosts to
+within one unit in the last place, so the differential fixtures assert the
+exactly specified cases directly and the approximated ones through bounded
+identities; recording a permitted last-place difference as a semantic
+requirement would make the reviewed evidence depend on a specific libm.
+
+`Math.random` draws from a realm-owned xorshift128+ generator whose two
+state words the realm mixes from its own initialization ordinal, meaning
+the number of realms the process had already initialized. ECMA-262 leaves
+the strategy to the implementation but requires the `Math.random` of one
+realm to produce a sequence distinct from every other realm's, and this
+runtime keeps every other observable schedule reproducible, including its
+logical timer clock, so realm N of a run seeds from ordinal N: a host that
+initializes its realms in one order draws the same pairwise distinct
+sequences on every run and every supported target rather than seeding from
+host entropy. The ordinal counter is atomic, so a host that initialized two
+realms on separate threads would still give each its own ordinal without a
+data race, but atomicity does not order the two, so that host would keep
+distinctness and give up the fixed assignment of ordinal to realm. No
+current host initializes realms concurrently. Introducing an entropy source
+is a host capability decision no current node owns, and nothing in the
+pinned suite observes the difference.
+
+The runtime gains one component, *runtime\_math.c*, and one built-in code
+range whose thirty-six IDs count down from the range last in the same
+order the namespace creates its function properties, so the dispatch reads
+an index rather than a table. `ToUint32` and Number::exponentiate move
+from file-local helpers in *runtime\_primitive.c* to two internal helpers
+that the `**` operator and `Math` now share, which keeps the two cases
+where C `pow` disagrees with the specification decided in one place.
+
+The reviewed *nans.js* harness include becomes available with this node,
+because its only unadmitted dependency was `Math.pow`. Removing it from
+the unavailable-include set promotes the two reviewed
+_Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases.
+
+Fixed native and generated differential evidence at property seed
+`0x60005600` covers the namespace identity, prototype, and tag, every
+descriptor class, every function's name and length, the specified signed
+zeroes, infinities, and `NaN` results, exact square roots, powers,
+logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
+binary16 rounding at and past the format boundaries, `ToUint32` wrapping,
+argument conversion order, abrupt conversion, `Symbol` operands, bounded
+approximated identities, the pseudorandom range, both specialization
+policies, collection forced at every safepoint, false hints, deliberate
+shape-guard misses, generic fallback, and the global-object write, delete,
+restore, assignment-target, and strict missing-property sequences the
+replaceable binding admits. One native C fixture initializes three realms
+in a single process and observes that their `Math.random` sequences differ
+pairwise while every draw stays inside `[0, 1)`, which the fixed seeding
+this node replaced could not satisfy; the fixture prints those draws and
+its driver runs the executable twice on the matching native target to
+observe the two runs agreeing.
+
+Of the 317 paths under the node's inventory root, 316 are reviewed: 280
+pass and 36 retain the explicit `Reflect.construct` prerequisite their
+*isConstructor.js* include needs. The remaining path,
+*test/built-ins/Math/sqrt/results.js*, stays outside the reviewed subset:
+its thousand-entry nested array literal exceeds the runtime's reviewed
+active frame-slot budget, an existing resource boundary this node does not
+own. One hundred and five previously reviewed paths outside the root change
+classification from `unsupported-profile-feature` to `pass`, one hundred
+and three because they read `Math` while probing an unrelated contract and
+two because the *nans.js* include became available. Eleven of the hundred
+and three are the _Object/create/15.2.3.5-4-\*.js_ cases that pass the
+`Math` object itself as a `Properties` argument, which `object-create`
+reviewed as unsupported while `Math` was absent, and five are
+_RegExp.prototype.exec_ and _RegExp.prototype.test_ cases that read `Math`
+for a match subject or a `lastIndex` value, which `regexp-literal-aot`
+reviewed as unsupported for the same reason. No previously reviewed path
+loses a pass. The manifest moves from 13,872 to 14,188 paths and from
+10,013 to 10,398 passes, keeps 1,506 expected negatives, and moves from
+2,353 to 2,284 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The admitted runtime checkpoint moves the runtime
+ABI to `oseo-runtime-m5-82` without adding a generated-code entry point or
+changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

@@ -1,0 +1,3 @@
+version: 1
+id: math-namespace
+record: docs/language-profile-m5/families/math-namespace.yaml
