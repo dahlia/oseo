@@ -83,58 +83,147 @@ jobs:
           if-no-files-found: warn
 
   test_test262:
-    name: test262 (${{ matrix.platform.target }}, ${{ matrix.shard }}/5)
-    runs-on: ${{ matrix.platform.os }}
-    timeout-minutes: 60
+    name: >-
+      test262 (${{ matrix.target }},
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        platform:
+        include:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
+            shard: 1
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 2
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 3
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 4
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 5
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 6
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 7
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 8
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 9
+            total: 10
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 10
+            total: 10
           - os: macos-15
             target: macos-aarch64
-        shard:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
+            shard: 1
+            total: 5
+          - os: macos-15
+            target: macos-aarch64
+            shard: 2
+            total: 5
+          - os: macos-15
+            target: macos-aarch64
+            shard: 3
+            total: 5
+          - os: macos-15
+            target: macos-aarch64
+            shard: 4
+            total: 5
+          - os: macos-15
+            target: macos-aarch64
+            shard: 5
+            total: 5
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
-      - run: mise run test:test262 --shard ${{ matrix.shard }}/5
+      - run: >-
+          mise run test:test262
+          --shard ${{ matrix.shard }}/${{ matrix.total }}
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: test262-${{ matrix.platform.target }}-${{ matrix.shard }}-of-5
+          name: >-
+            ${{ format(
+            'test262-{0}-{1}-of-{2}',
+            matrix.target,
+            matrix.shard,
+            matrix.total) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
   test_native_support:
     name: >-
-      native support (${{ matrix.platform.target }}, ${{ matrix.shard }}/6)
-    runs-on: ${{ matrix.platform.os }}
-    timeout-minutes: 60
+      native support (${{ matrix.target }},
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        platform:
+        include:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
+            shard: 1
+            total: 4
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 2
+            total: 4
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 3
+            total: 4
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 4
+            total: 4
           - os: macos-15
             target: macos-aarch64
-        shard:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
+            shard: 1
+            total: 6
+          - os: macos-15
+            target: macos-aarch64
+            shard: 2
+            total: 6
+          - os: macos-15
+            target: macos-aarch64
+            shard: 3
+            total: 6
+          - os: macos-15
+            target: macos-aarch64
+            shard: 4
+            total: 6
+          - os: macos-15
+            target: macos-aarch64
+            shard: 5
+            total: 6
+          - os: macos-15
+            target: macos-aarch64
+            shard: 6
+            total: 6
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -144,7 +233,8 @@ jobs:
         run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --test-shard=${{ matrix.shard }}/6 tests/property/*.property.test.ts
+          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+          tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -152,9 +242,10 @@ jobs:
         with:
           name: >-
             ${{ format(
-            'native-support-diagnostics-{0}-{1}-of-6',
-            matrix.platform.target,
-            matrix.shard) }}
+            'native-support-diagnostics-{0}-{1}-of-{2}',
+            matrix.target,
+            matrix.shard,
+            matrix.total) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
