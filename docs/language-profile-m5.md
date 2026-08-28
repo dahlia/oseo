@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 14,188 reviewed cases: 10,014 passes, 1,506
-expected negatives, and 2,668 unsupported profile features. It records no
+The current manifest contains 14,188 reviewed cases: 10,398 passes, 1,506
+expected negatives, and 2,284 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4544,7 +4544,7 @@ host-capability decision owns introducing an entropy source; nothing in the
 pinned suite observes the difference.
 
 Fixed native and generated differential evidence at property seed
-`0x60005500` covers the namespace identity, prototype, and tag, every
+`0x60005600` covers the namespace identity, prototype, and tag, every
 descriptor class, every function's name and length, the specified signed
 zeroes, infinities, and `NaN` results, exact square roots, powers,
 logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
@@ -4567,21 +4567,24 @@ prerequisite their *isConstructor.js* include needs.
 because its thousand-entry nested array literal exceeds the runtime's
 reviewed active frame-slot budget, an existing resource boundary this node
 does not own. The reviewed *nans.js* harness include also becomes available,
-because `Math.pow` was its only unadmitted dependency. One hundred and two
-previously reviewed paths outside the root move from
-`unsupported-profile-feature` to `pass`: one hundred read `Math` while
-probing an unrelated contract, and two are the
+because `Math.pow` was its only unadmitted dependency. One hundred and
+five previously reviewed paths outside the root move from
+`unsupported-profile-feature` to `pass`: one hundred and three read `Math`
+while probing an unrelated contract, and two are the
 _Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases the new
-include unblocks. Eleven of the hundred are the
+include unblocks. Eleven of the hundred and three are the
 _Object/create/15.2.3.5-4-\*.js_ cases that pass the `Math` object itself as
 a `Properties` argument, which `object-create` reviewed as unsupported
-while `Math` was absent. No previously reviewed path loses a pass. The
-manifest moves from 13,872 to 14,188 cases and from 9,632 to 10,014 passes,
-keeps 1,506 expected negatives, and moves from 2,734 to 2,668 unsupported
+while `Math` was absent, and five are _RegExp.prototype.exec_ and
+_RegExp.prototype.test_ cases that read `Math` for a match subject or a
+`lastIndex` value, which `regexp-literal-aot` reviewed as unsupported for
+the same reason. No previously reviewed path loses a pass. The manifest
+moves from 13,872 to 14,188 cases and from 10,013 to 10,398 passes, keeps
+1,506 expected negatives, and moves from 2,353 to 2,284 unsupported
 profile features, with no semantic, harness, or infrastructure failures. The
 suite revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged. The admitted runtime checkpoint moves
-the runtime ABI to `oseo-runtime-m5-81` without adding a generated-code
+the runtime ABI to `oseo-runtime-m5-82` without adding a generated-code
 entry point or changing the graph's orchestration state.
 
 

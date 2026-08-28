@@ -25052,7 +25052,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A1_T13.js
     expectedClassification: pass
@@ -25184,7 +25184,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/exec/S15.10.6.2_A4_T8.js
     expectedClassification: pass
@@ -25508,7 +25508,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/test/S15.10.6.3_A1_T13.js
     expectedClassification: pass
