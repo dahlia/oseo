@@ -10,5 +10,5 @@ inventory:
     - test/built-ins/Array/prototype/reduceRight/
 dependencies:
   - array-prototype-iterative
-landed: false
+landed: true
 status: ready
