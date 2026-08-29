@@ -352,3 +352,7 @@ families:
     owner: tests/property/m5-array-prototype-reduction.property.test.ts
     start: 0x60005700
     end: 0x600057ff
+  - family: m5-string-prototype-case
+    owner: tests/property/m5-string-prototype-case.property.test.ts
+    start: 0x60005800
+    end: 0x600058ff

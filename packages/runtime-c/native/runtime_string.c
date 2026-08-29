@@ -1,4 +1,5 @@
 #include "runtime_internal.h"
+#include "runtime_unicode_tables.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -13,7 +14,9 @@
  * name reaches this unit through the internal header. The same unit
  * owns the realm's `String` constructor, %String.prototype%, the String
  * exotic objects `new String` creates, and the `fromCharCode`,
- * `fromCodePoint`, and `raw` statics.
+ * `fromCodePoint`, and `raw` statics. Case conversion, trimming,
+ * normalization, and deterministic locale comparison read only the pinned
+ * tables in the generated runtime Unicode header.
  */
 
 OseoResult oseo_internal_validate_string_length(
@@ -301,6 +304,727 @@ static void string_builder_release(OseoStringBuilder *builder) {
     builder->units = NULL;
     builder->length = 0u;
     builder->capacity = 0u;
+}
+
+typedef struct {
+    uint32_t *values;
+    size_t length;
+    size_t capacity;
+} OseoCodePointBuilder;
+
+static OseoValue string_builtin_argument(
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t index
+);
+
+static OseoResult string_method_subject(
+    OseoContext *context,
+    OseoValue receiver
+);
+
+static OseoResult code_point_builder_reserve(
+    OseoContext *context,
+    OseoCodePointBuilder *builder,
+    size_t additional
+) {
+    if (additional > SIZE_MAX - builder->length) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
+    size_t required = builder->length + additional;
+    if (required <= builder->capacity) return normal(oseo_undefined());
+    size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
+    while (capacity < required) {
+        if (capacity > SIZE_MAX / 2u) {
+            capacity = required;
+            break;
+        }
+        capacity *= 2u;
+    }
+    if (capacity > SIZE_MAX / sizeof(uint32_t)) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
+    uint32_t *values = realloc(
+        builder->values,
+        capacity * sizeof(uint32_t)
+    );
+    if (values == NULL) {
+        return failure(context, "OSEO2001", "String allocation failed.");
+    }
+    builder->values = values;
+    builder->capacity = capacity;
+    return normal(oseo_undefined());
+}
+
+static OseoResult code_point_builder_append(
+    OseoContext *context,
+    OseoCodePointBuilder *builder,
+    uint32_t value
+) {
+    OseoResult result = code_point_builder_reserve(context, builder, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    builder->values[builder->length] = value;
+    builder->length += 1u;
+    return result;
+}
+
+static void code_point_builder_release(OseoCodePointBuilder *builder) {
+    free(builder->values);
+    builder->values = NULL;
+    builder->length = 0u;
+    builder->capacity = 0u;
+}
+
+static uint32_t string_next_code_point(
+    const OseoString *string,
+    size_t *cursor
+) {
+    uint16_t first = string->units[*cursor];
+    *cursor += 1u;
+    if (first < UINT16_C(0xd800) || first > UINT16_C(0xdbff) ||
+        *cursor >= string->length) return first;
+    uint16_t second = string->units[*cursor];
+    if (second < UINT16_C(0xdc00) || second > UINT16_C(0xdfff)) return first;
+    *cursor += 1u;
+    return UINT32_C(0x10000) +
+        ((uint32_t)(first - UINT16_C(0xd800)) << 10u) +
+        (uint32_t)(second - UINT16_C(0xdc00));
+}
+
+static OseoResult code_points_from_string(
+    OseoContext *context,
+    const OseoString *string,
+    OseoCodePointBuilder *builder
+) {
+    OseoResult result = code_point_builder_reserve(
+        context,
+        builder,
+        string->length
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    size_t cursor = 0u;
+    while (cursor < string->length) {
+        builder->values[builder->length] = string_next_code_point(
+            string,
+            &cursor
+        );
+        builder->length += 1u;
+    }
+    return result;
+}
+
+static OseoResult string_from_code_points(
+    OseoContext *context,
+    const OseoCodePointBuilder *builder
+) {
+    OseoStringBuilder units = {NULL, 0u, 0u};
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < builder->length;
+         index += 1u) {
+        uint32_t code_point = builder->values[index];
+        if (code_point <= UINT32_C(0xffff)) {
+            result = string_builder_append_unit(
+                context,
+                &units,
+                (uint16_t)code_point
+            );
+        } else {
+            uint32_t value = code_point - UINT32_C(0x10000);
+            result = string_builder_append_unit(
+                context,
+                &units,
+                (uint16_t)(UINT32_C(0xd800) + (value >> 10u))
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = string_builder_append_unit(
+                    context,
+                    &units,
+                    (uint16_t)(UINT32_C(0xdc00) +
+                        (value & UINT32_C(0x3ff)))
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_allocate_string(
+            context,
+            units.units,
+            units.length
+        );
+    }
+    string_builder_release(&units);
+    return result;
+}
+
+static const OseoUnicodeMapping *unicode_mapping_find(
+    const OseoUnicodeMapping *mappings,
+    size_t count,
+    uint32_t code_point
+) {
+    size_t low = 0u;
+    size_t high = count;
+    while (low < high) {
+        size_t middle = low + (high - low) / 2u;
+        uint32_t candidate = mappings[middle].code_point;
+        if (candidate < code_point) low = middle + 1u;
+        else high = middle;
+    }
+    return low < count && mappings[low].code_point == code_point
+        ? &mappings[low]
+        : NULL;
+}
+
+static uint8_t unicode_combining_class(uint32_t code_point) {
+    size_t count = sizeof(oseo_unicode_combining_classes) /
+        sizeof(oseo_unicode_combining_classes[0]);
+    size_t low = 0u;
+    size_t high = count;
+    while (low < high) {
+        size_t middle = low + (high - low) / 2u;
+        if (oseo_unicode_combining_classes[middle].start <= code_point) {
+            low = middle + 1u;
+        } else {
+            high = middle;
+        }
+    }
+    return low == 0u ? 0u : oseo_unicode_combining_classes[low - 1u].value;
+}
+
+static bool unicode_set_has(
+    const uint32_t *boundaries,
+    size_t count,
+    uint32_t code_point
+) {
+    size_t low = 0u;
+    size_t high = count;
+    while (low < high) {
+        size_t middle = low + (high - low) / 2u;
+        if (boundaries[middle] <= code_point) low = middle + 1u;
+        else high = middle;
+    }
+    return (low & 1u) != 0u;
+}
+
+static bool unicode_cased(uint32_t code_point) {
+    return unicode_set_has(
+        oseo_unicode_cased,
+        sizeof(oseo_unicode_cased) / sizeof(oseo_unicode_cased[0]),
+        code_point
+    );
+}
+
+static bool unicode_case_ignorable(uint32_t code_point) {
+    return unicode_set_has(
+        oseo_unicode_case_ignorable,
+        sizeof(oseo_unicode_case_ignorable) /
+            sizeof(oseo_unicode_case_ignorable[0]),
+        code_point
+    );
+}
+
+static bool unicode_final_sigma(
+    const OseoCodePointBuilder *subject,
+    size_t index
+) {
+    bool preceded = false;
+    size_t cursor = index;
+    while (cursor > 0u) {
+        cursor -= 1u;
+        uint32_t code_point = subject->values[cursor];
+        if (unicode_case_ignorable(code_point)) continue;
+        preceded = unicode_cased(code_point);
+        break;
+    }
+    if (!preceded) return false;
+    for (cursor = index + 1u; cursor < subject->length; cursor += 1u) {
+        uint32_t code_point = subject->values[cursor];
+        if (unicode_case_ignorable(code_point)) continue;
+        return !unicode_cased(code_point);
+    }
+    return true;
+}
+
+static OseoResult string_convert_case(
+    OseoContext *context,
+    OseoValue receiver,
+    bool uppercase
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[1] = result.value;
+    OseoCodePointBuilder input = {NULL, 0u, 0u};
+    OseoCodePointBuilder output = {NULL, 0u, 0u};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = code_points_from_string(
+            context,
+            string_object(frame.slots[1]),
+            &input
+        );
+    }
+    const OseoUnicodeMapping *mappings = uppercase
+        ? oseo_unicode_uppercase
+        : oseo_unicode_lowercase;
+    size_t mapping_count = uppercase
+        ? sizeof(oseo_unicode_uppercase) /
+            sizeof(oseo_unicode_uppercase[0])
+        : sizeof(oseo_unicode_lowercase) /
+            sizeof(oseo_unicode_lowercase[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < input.length;
+         index += 1u) {
+        uint32_t code_point = input.values[index];
+        if (!uppercase && code_point == UINT32_C(0x3a3) &&
+            unicode_final_sigma(&input, index)) {
+            result = code_point_builder_append(
+                context,
+                &output,
+                UINT32_C(0x3c2)
+            );
+            continue;
+        }
+        const OseoUnicodeMapping *mapping = unicode_mapping_find(
+            mappings,
+            mapping_count,
+            code_point
+        );
+        if (mapping == NULL) {
+            result = code_point_builder_append(context, &output, code_point);
+            continue;
+        }
+        for (size_t item = 0u;
+             result.status == OSEO_STATUS_NORMAL && item < mapping->length;
+             item += 1u) {
+            result = code_point_builder_append(
+                context,
+                &output,
+                oseo_unicode_mapping_values[mapping->offset + item]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_from_code_points(context, &output);
+    }
+    code_point_builder_release(&input);
+    code_point_builder_release(&output);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static bool string_trim_code_unit(uint16_t unit) {
+    return unit == UINT16_C(0x0009) || unit == UINT16_C(0x000a) ||
+        unit == UINT16_C(0x000b) || unit == UINT16_C(0x000c) ||
+        unit == UINT16_C(0x000d) || unit == UINT16_C(0x0020) ||
+        unit == UINT16_C(0x00a0) || unit == UINT16_C(0x1680) ||
+        (unit >= UINT16_C(0x2000) && unit <= UINT16_C(0x200a)) ||
+        unit == UINT16_C(0x2028) || unit == UINT16_C(0x2029) ||
+        unit == UINT16_C(0x202f) || unit == UINT16_C(0x205f) ||
+        unit == UINT16_C(0x3000) || unit == UINT16_C(0xfeff);
+}
+
+static OseoResult string_trim(
+    OseoContext *context,
+    OseoValue receiver,
+    bool trim_start,
+    bool trim_end
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoString *subject = string_object(frame.slots[1]);
+        size_t start = 0u;
+        size_t end = subject->length;
+        if (trim_start) {
+            while (start < end && string_trim_code_unit(
+                subject->units[start])) start += 1u;
+        }
+        if (trim_end) {
+            while (end > start && string_trim_code_unit(
+                subject->units[end - 1u])) end -= 1u;
+        }
+        result = oseo_internal_allocate_string(
+            context,
+            start == 0u ? subject->units : subject->units + start,
+            end - start
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult normalize_append_decomposed(
+    OseoContext *context,
+    OseoCodePointBuilder *output,
+    uint32_t code_point
+) {
+    return code_point_builder_append(context, output, code_point);
+}
+
+/*
+ * Stably order each non-starter run after decomposition. Counting the fixed
+ * canonical-combining-class range keeps one descending run linear instead of
+ * shifting its already appended suffix once for every code point.
+ */
+static OseoResult normalize_order(
+    OseoContext *context,
+    OseoCodePointBuilder *output
+) {
+    if (output->length < 2u) return normal(oseo_undefined());
+    uint8_t prior = unicode_combining_class(output->values[0]);
+    bool requires_ordering = false;
+    for (size_t index = 1u; index < output->length; index += 1u) {
+        uint8_t combining = unicode_combining_class(output->values[index]);
+        if (combining != 0u && prior > combining) {
+            requires_ordering = true;
+            break;
+        }
+        prior = combining;
+    }
+    if (!requires_ordering) return normal(oseo_undefined());
+    OseoCodePointBuilder ordered = {NULL, 0u, 0u};
+    OseoResult result = code_point_builder_reserve(
+        context,
+        &ordered,
+        output->length
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    ordered.length = output->length;
+    size_t run_start = 0u;
+    while (run_start < output->length) {
+        if (unicode_combining_class(output->values[run_start]) == 0u) {
+            ordered.values[run_start] = output->values[run_start];
+            run_start += 1u;
+            continue;
+        }
+        size_t counts[256] = {0u};
+        size_t run_end = run_start;
+        while (run_end < output->length) {
+            uint8_t combining = unicode_combining_class(
+                output->values[run_end]
+            );
+            if (combining == 0u) break;
+            counts[combining] += 1u;
+            run_end += 1u;
+        }
+        size_t offset = run_start;
+        for (size_t combining = 1u; combining < 256u; combining += 1u) {
+            size_t count = counts[combining];
+            counts[combining] = offset;
+            offset += count;
+        }
+        for (size_t index = run_start; index < run_end; index += 1u) {
+            uint8_t combining = unicode_combining_class(
+                output->values[index]
+            );
+            ordered.values[counts[combining]] = output->values[index];
+            counts[combining] += 1u;
+        }
+        run_start = run_end;
+    }
+    memcpy(
+        output->values,
+        ordered.values,
+        output->length * sizeof(*output->values)
+    );
+    code_point_builder_release(&ordered);
+    return normal(oseo_undefined());
+}
+
+static OseoResult normalize_decompose(
+    OseoContext *context,
+    OseoCodePointBuilder *output,
+    uint32_t code_point,
+    bool compatibility
+) {
+    const uint32_t s_base = UINT32_C(0xac00);
+    const uint32_t l_base = UINT32_C(0x1100);
+    const uint32_t v_base = UINT32_C(0x1161);
+    const uint32_t t_base = UINT32_C(0x11a7);
+    const uint32_t l_count = UINT32_C(19);
+    const uint32_t v_count = UINT32_C(21);
+    const uint32_t t_count = UINT32_C(28);
+    const uint32_t n_count = v_count * t_count;
+    const uint32_t s_count = l_count * n_count;
+    if (code_point >= s_base && code_point < s_base + s_count) {
+        uint32_t index = code_point - s_base;
+        OseoResult result = normalize_append_decomposed(
+            context,
+            output,
+            l_base + index / n_count
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normalize_append_decomposed(
+                context,
+                output,
+                v_base + (index % n_count) / t_count
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL && index % t_count != 0u) {
+            result = normalize_append_decomposed(
+                context,
+                output,
+                t_base + index % t_count
+            );
+        }
+        return result;
+    }
+    const OseoUnicodeMapping *mapping = NULL;
+    if (compatibility) {
+        mapping = unicode_mapping_find(
+            oseo_unicode_compat_decomposition,
+            sizeof(oseo_unicode_compat_decomposition) /
+                sizeof(oseo_unicode_compat_decomposition[0]),
+            code_point
+        );
+    }
+    if (mapping == NULL) {
+        mapping = unicode_mapping_find(
+            oseo_unicode_canonical_decomposition,
+            sizeof(oseo_unicode_canonical_decomposition) /
+                sizeof(oseo_unicode_canonical_decomposition[0]),
+            code_point
+        );
+    }
+    if (mapping == NULL) {
+        return normalize_append_decomposed(context, output, code_point);
+    }
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < mapping->length;
+         index += 1u) {
+        result = normalize_decompose(
+            context,
+            output,
+            oseo_unicode_mapping_values[mapping->offset + index],
+            compatibility
+        );
+    }
+    return result;
+}
+
+static uint32_t normalize_compose_pair(uint32_t first, uint32_t second) {
+    const uint32_t s_base = UINT32_C(0xac00);
+    const uint32_t l_base = UINT32_C(0x1100);
+    const uint32_t v_base = UINT32_C(0x1161);
+    const uint32_t t_base = UINT32_C(0x11a7);
+    const uint32_t l_count = UINT32_C(19);
+    const uint32_t v_count = UINT32_C(21);
+    const uint32_t t_count = UINT32_C(28);
+    const uint32_t n_count = v_count * t_count;
+    const uint32_t s_count = l_count * n_count;
+    if (first >= l_base && first < l_base + l_count &&
+        second >= v_base && second < v_base + v_count) {
+        return s_base + ((first - l_base) * v_count +
+            (second - v_base)) * t_count;
+    }
+    if (first >= s_base && first < s_base + s_count &&
+        (first - s_base) % t_count == 0u && second > t_base &&
+        second < t_base + t_count) {
+        return first + second - t_base;
+    }
+    size_t count = sizeof(oseo_unicode_compositions) /
+        sizeof(oseo_unicode_compositions[0]);
+    size_t low = 0u;
+    size_t high = count;
+    while (low < high) {
+        size_t middle = low + (high - low) / 2u;
+        OseoUnicodeComposition candidate = oseo_unicode_compositions[middle];
+        if (candidate.first < first ||
+            (candidate.first == first && candidate.second < second)) {
+            low = middle + 1u;
+        } else {
+            high = middle;
+        }
+    }
+    if (low < count && oseo_unicode_compositions[low].first == first &&
+        oseo_unicode_compositions[low].second == second) {
+        return oseo_unicode_compositions[low].composite;
+    }
+    return 0u;
+}
+
+static void normalize_compose(OseoCodePointBuilder *output) {
+    if (output->length < 2u) return;
+    size_t result_length = 1u;
+    size_t starter_index = 0u;
+    uint32_t starter = output->values[0];
+    uint8_t prior_combining = unicode_combining_class(starter);
+    for (size_t index = 1u; index < output->length; index += 1u) {
+        uint32_t code_point = output->values[index];
+        uint8_t combining = unicode_combining_class(code_point);
+        uint32_t composite = 0u;
+        if (prior_combining < combining || prior_combining == 0u) {
+            composite = normalize_compose_pair(starter, code_point);
+        }
+        if (composite != 0u) {
+            output->values[starter_index] = composite;
+            starter = composite;
+            continue;
+        }
+        output->values[result_length] = code_point;
+        if (combining == 0u) {
+            starter_index = result_length;
+            starter = code_point;
+        }
+        result_length += 1u;
+        prior_combining = combining;
+    }
+    output->length = result_length;
+}
+
+static OseoResult normalize_subject(
+    OseoContext *context,
+    OseoValue subject,
+    bool compatibility,
+    bool compose
+) {
+    OseoCodePointBuilder input = {NULL, 0u, 0u};
+    OseoCodePointBuilder output = {NULL, 0u, 0u};
+    OseoResult result = code_points_from_string(
+        context,
+        string_object(subject),
+        &input
+    );
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < input.length;
+         index += 1u) {
+        result = normalize_decompose(
+            context,
+            &output,
+            input.values[index],
+            compatibility
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normalize_order(context, &output);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && compose) {
+        normalize_compose(&output);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_from_code_points(context, &output);
+    }
+    code_point_builder_release(&input);
+    code_point_builder_release(&output);
+    return result;
+}
+
+static OseoResult string_normalize(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = string_builtin_argument(argument_count, arguments, 0u);
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[2] = result.value;
+    bool compatibility = false;
+    bool compose = true;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[1]) != OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_value_string(context, frame.slots[1]);
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            if (oseo_internal_string_is_ascii(frame.slots[1], "NFC")) {
+                compatibility = false;
+                compose = true;
+            } else if (oseo_internal_string_is_ascii(
+                frame.slots[1], "NFD")) {
+                compatibility = false;
+                compose = false;
+            } else if (oseo_internal_string_is_ascii(
+                frame.slots[1], "NFKC")) {
+                compatibility = true;
+                compose = true;
+            } else if (oseo_internal_string_is_ascii(
+                frame.slots[1], "NFKD")) {
+                compatibility = true;
+                compose = false;
+            } else {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_RANGE,
+                    "Invalid Unicode normalization form."
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normalize_subject(
+            context,
+            frame.slots[2],
+            compatibility,
+            compose
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult string_locale_compare(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = string_builtin_argument(argument_count, arguments, 0u);
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_value_string(context, frame.slots[1]);
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normalize_subject(context, frame.slots[2], false, false);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normalize_subject(context, frame.slots[3], false, false);
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoString *left = string_object(frame.slots[2]);
+        const OseoString *right = string_object(frame.slots[3]);
+        size_t common = left->length < right->length
+            ? left->length
+            : right->length;
+        int comparison = 0;
+        for (size_t index = 0u; index < common; index += 1u) {
+            if (left->units[index] < right->units[index]) {
+                comparison = -1;
+                break;
+            }
+            if (left->units[index] > right->units[index]) {
+                comparison = 1;
+                break;
+            }
+        }
+        double order = comparison < 0 ||
+            (comparison == 0 && left->length < right->length)
+            ? -1.0
+            : comparison > 0 ||
+                (comparison == 0 && left->length > right->length)
+                ? 1.0
+                : 0.0;
+        result = normal(oseo_number(order));
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 /* ToUint16 (7.1.7) over an already converted Number. */
@@ -1000,6 +1724,40 @@ OseoResult oseo_internal_string_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_STRING_LOWERCASE_CODE_ID ||
+        code_id == OSEO_STRING_UPPERCASE_CODE_ID) {
+        return string_convert_case(
+            context,
+            receiver,
+            code_id == OSEO_STRING_UPPERCASE_CODE_ID
+        );
+    }
+    if (code_id == OSEO_STRING_TRIM_CODE_ID ||
+        code_id == OSEO_STRING_TRIM_START_CODE_ID ||
+        code_id == OSEO_STRING_TRIM_END_CODE_ID) {
+        return string_trim(
+            context,
+            receiver,
+            code_id != OSEO_STRING_TRIM_END_CODE_ID,
+            code_id != OSEO_STRING_TRIM_START_CODE_ID
+        );
+    }
+    if (code_id == OSEO_STRING_NORMALIZE_CODE_ID) {
+        return string_normalize(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_STRING_LOCALE_COMPARE_CODE_ID) {
+        return string_locale_compare(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_STRING_MATCH_CODE_ID ||
         code_id == OSEO_STRING_MATCH_ALL_CODE_ID ||
         code_id == OSEO_STRING_SEARCH_CODE_ID ||
@@ -1160,43 +1918,6 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
             true
         );
     }
-    static const char *const unadmitted_names[] = {
-        "localeCompare",
-        "toLocaleLowerCase",
-        "toLocaleUpperCase",
-        "toLowerCase",
-        "toUpperCase",
-        "trim",
-    };
-    static const size_t unadmitted_lengths[] = {
-        1u,
-        0u,
-        0u,
-        0u,
-        0u,
-        0u,
-    };
-    for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 6u;
-         index += 1u) {
-        result = create_string_function(
-            context,
-            OSEO_STRING_UNADMITTED_METHOD_CODE_ID,
-            unadmitted_names[index],
-            unadmitted_lengths[index],
-            OSEO_FUNCTION_INTERNAL
-        );
-        frame.slots[1] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = define_string_property(
-                context,
-                frame.slots[0],
-                unadmitted_names[index],
-                frame.slots[1],
-                (OseoPropertyAttributes){true, false, true, false}
-            );
-        }
-    }
     static const size_t access_codes[] = {
         OSEO_STRING_AT_CODE_ID,
         OSEO_STRING_CHAR_AT_CODE_ID,
@@ -1218,6 +1939,15 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         OSEO_STRING_SPLIT_CODE_ID,
         OSEO_STRING_REPLACE_CODE_ID,
         OSEO_STRING_REPLACE_ALL_CODE_ID,
+        OSEO_STRING_LOCALE_COMPARE_CODE_ID,
+        OSEO_STRING_LOWERCASE_CODE_ID,
+        OSEO_STRING_UPPERCASE_CODE_ID,
+        OSEO_STRING_LOWERCASE_CODE_ID,
+        OSEO_STRING_UPPERCASE_CODE_ID,
+        OSEO_STRING_TRIM_CODE_ID,
+        OSEO_STRING_TRIM_START_CODE_ID,
+        OSEO_STRING_TRIM_END_CODE_ID,
+        OSEO_STRING_NORMALIZE_CODE_ID,
     };
     static const char *const access_names[] = {
         "at",
@@ -1240,14 +1970,25 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         "split",
         "replace",
         "replaceAll",
+        "localeCompare",
+        "toLocaleLowerCase",
+        "toLocaleUpperCase",
+        "toLowerCase",
+        "toUpperCase",
+        "trim",
+        "trimStart",
+        "trimEnd",
+        "normalize",
     };
     static const size_t access_lengths[] = {
         1u, 1u, 1u, 1u, 0u, 0u, 1u,
         1u, 1u, 1u, 1u, 1u, 2u, 2u,
         1u, 1u, 1u, 2u, 2u, 2u,
+        1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 20u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < sizeof(access_codes) / sizeof(access_codes[0]);
          index += 1u) {
         result = create_string_function(
             context,

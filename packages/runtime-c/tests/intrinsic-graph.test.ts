@@ -769,8 +769,10 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "indexOf",
     "lastIndexOf",
     "length",
+    "localeCompare",
     "match",
     "matchAll",
+    "normalize",
     "raw",
     "replace",
     "replaceAll",
@@ -780,12 +782,21 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "startsWith",
     "String",
     "substring",
+    "toLocaleLowerCase",
+    "toLocaleUpperCase",
+    "toLowerCase",
     "toString",
+    "toUpperCase",
     "trim",
+    "trimEnd",
+    "trimStart",
     "valueOf",
   ]) {
     assert.match(stringSource, new RegExp(`"${property}"`, "u"));
   }
+  assert.match(stringSource, /static OseoResult normalize_order\(/u);
+  assert.match(stringSource, /size_t counts\[256\] = \{0u\}/u);
+  assert.doesNotMatch(stringSource, /normalize_append_ordered/u);
   // The constructor is an ordinary constructible function reached through
   // the realm's own global property.
   assert.match(stringSource, /OSEO_STRING_CONSTRUCTOR_CODE_ID/u);
@@ -809,6 +820,13 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_SPLIT_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_REPLACE_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_REPLACE_ALL_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_LOCALE_COMPARE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_LOWERCASE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_UPPERCASE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_TRIM_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_TRIM_START_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_TRIM_END_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_NORMALIZE_CODE_ID/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT/u);
   assert.match(internalHeader, /bool regexp_string_iterator;/u);

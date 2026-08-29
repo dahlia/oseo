@@ -17,6 +17,7 @@ import {
   parseSpecialCasingFile,
   parseUcdEntries,
   parseUnicodeDataFile,
+  renderRuntimeTablesHeader,
   renderTablesModule,
   verifyPinnedInput,
 } from "../tools/unicode-tables.ts";
@@ -263,6 +264,7 @@ const unicodeDataLine = (
   upper = "",
   lower = "",
   combiningClass = "0",
+  decomposition = "",
 ): string =>
   [
     codePoint,
@@ -270,7 +272,7 @@ const unicodeDataLine = (
     category,
     combiningClass,
     "L",
-    "",
+    decomposition,
     "",
     "",
     "",
@@ -287,15 +289,40 @@ test("UnicodeData ranges, mirroring, and case mappings parse", () => {
     [
       unicodeDataLine("0028", "LEFT PARENTHESIS", "Ps", "Y"),
       unicodeDataLine("0041", "LATIN CAPITAL LETTER A", "Lu", "N", "", "0061"),
+      unicodeDataLine(
+        "00C5",
+        "LATIN CAPITAL LETTER A WITH RING ABOVE",
+        "Lu",
+        "N",
+        "",
+        "",
+        "0",
+        "0041 030A",
+      ),
       unicodeDataLine("0300", "COMBINING GRAVE", "Mn", "N", "", "", "230"),
       unicodeDataLine("3400", "<CJK Ideograph Extension A, First>", "Lo"),
       unicodeDataLine("4DBF", "<CJK Ideograph Extension A, Last>", "Lo"),
+      unicodeDataLine(
+        "FB03",
+        "LATIN SMALL LIGATURE FFI",
+        "Ll",
+        "N",
+        "",
+        "",
+        "0",
+        "<compat> 0066 0066 0069",
+      ),
     ].join("\n"),
   );
   assert.deepEqual(parsed.categories.get("Lo"), [0x3400, 0x4dc0]);
   assert.deepEqual(parsed.bidiMirrored, [0x28, 0x29]);
   assert.equal(parsed.simpleLowercase.get(0x41), 0x61);
   assert.equal(parsed.simpleUppercase.get(0x41), undefined);
+  assert.deepEqual(parsed.canonicalDecomposition.get(0xc5), [0x41, 0x30a]);
+  assert.deepEqual(
+    parsed.compatibilityDecomposition.get(0xfb03),
+    [0x66, 0x66, 0x69],
+  );
   assert.deepEqual(parsed.combiningClasses.get(230), [
     { end: 0x300, start: 0x300 },
   ]);
@@ -363,6 +390,38 @@ test("a broken UnicodeData structure fails generation", () => {
         unicodeDataLine("0300", "A", "Mn", "N", "", "", "255"),
       ),
     /bad combining class 255/u,
+  );
+  assert.throws(
+    () =>
+      parseUnicodeDataFile(
+        unicodeDataLine(
+          "00A0",
+          "NO-BREAK SPACE",
+          "Zs",
+          "N",
+          "",
+          "",
+          "0",
+          "<noBreak 0020",
+        ),
+      ),
+    /bad decomposition tag <noBreak/u,
+  );
+  assert.throws(
+    () =>
+      parseUnicodeDataFile(
+        unicodeDataLine(
+          "00A0",
+          "NO-BREAK SPACE",
+          "Zs",
+          "N",
+          "",
+          "",
+          "0",
+          "<noBreak>",
+        ),
+      ),
+    /empty decomposition mapping/u,
   );
 });
 
@@ -504,6 +563,15 @@ test("generation is deterministic and matches what is committed", async () => {
     first.source,
     "packages/unicode/src/tables.ts is stale; run mise run unicode:update.",
   );
+  const runtimeCommitted = await readFile(
+    join(repositoryRoot, "packages/runtime-c/native/runtime_unicode_tables.h"),
+    "utf8",
+  );
+  assert.equal(
+    runtimeCommitted,
+    first.runtimeSource,
+    "runtime_unicode_tables.h is stale; run mise run unicode:update.",
+  );
   assert.equal(first.summary.unicodeVersion, "17.0.0");
   assert.equal(first.summary.binaryProperties, binaryProperties.length);
 });
@@ -534,6 +602,10 @@ test("the rendered module is a pure function of its tables", async () => {
   );
   const tables = buildUnicodeTables(manifest, contents);
   assert.equal(renderTablesModule(tables), renderTablesModule(tables));
+  assert.equal(
+    renderRuntimeTablesHeader(tables),
+    renderRuntimeTablesHeader(tables),
+  );
   assert.equal(tables.generalCategoryNames.length, 30);
   assert.equal(
     new Set(tables.generalCategoryNames).size,

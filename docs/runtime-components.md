@@ -17,8 +17,9 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-two reviewed assets in this order:
-*oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
+The runtime input now lists thirty-three reviewed assets in this order:
+*oseo\_runtime.h*, *runtime\_internal.h*,
+*runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
 *runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
@@ -71,7 +72,10 @@ Ownership follows the plan's target layout:
     canonical array-index recognition, and the own properties a String
     exotic object exposes, together with the `String` constructor,
     %String.prototype%, and the `fromCharCode`, `fromCodePoint`, and
-    `raw` statics;
+    `raw` statics, together with the prototype case conversions, locale case
+    forms, trimming methods, Unicode normalization, and deterministic locale
+    comparison. *runtime\_unicode\_tables.h* is its generated, package-private
+    view of the pinned Unicode data;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`,
     `matchAll`, `search`, `split`, `replace`, and `replaceAll`
     well-known-symbol dispatch and their String fallback algorithms,
@@ -745,15 +749,33 @@ precedes position conversion, and the three predicate methods perform
 search methods clamp their converted positions, while `slice` applies relative
 negative indices and `substring` clamps and swaps its endpoints.
 
-The `localeCompare`, `match`, `replace`, `search`, `split`,
-`toLocaleLowerCase`, `toLocaleUpperCase`, `toLowerCase`, `toUpperCase`, and
-`trim` methods remain source-located M5b boundaries. Fixed and generated native
-differential evidence covers generic receivers, `@@match`, conversion order,
-abrupt conversions, UTF-16 edge cases, both specialization policies, generic
+The `match`, `replace`, `search`, and `split` methods remain source-located M5b
+boundaries at this checkpoint. Fixed and generated native differential
+evidence covers generic receivers, `@@match`, conversion order, abrupt
+conversions, UTF-16 edge cases, both specialization policies, generic
 fallback, and collection at every safepoint. The node reviews all 253 paths
 under its declared inventory roots, with 217 passes and 36 explicit
 prerequisite boundaries. It adds no generated-code entry point and moves
 `abiVersion` to `m5-65`.
+
+M5b node `string-prototype-case` keeps the same component ownership and adds
+ordinary and locale lower- and uppercase conversion, trimming, normalization,
+and deterministic locale comparison. The generated
+*runtime\_unicode\_tables.h* asset derives case maps, normalization data,
+combining classes, and contextual case properties from the same pinned inputs
+as `@oseo/unicode`; *runtime\_string.c* is its only consumer. The runtime never
+consults host locale state, a C library classifier, or host Unicode data.
+
+Fixed and generated native differential evidence covers full and contextual
+case mapping, the ECMAScript trim set, canonical and compatibility
+normalization including Hangul, canonical comparison, generic conversion and
+abrupt completion, both specialization policies, false hints, deliberate
+shape-guard misses, generic fallback, and collection at every safepoint. All
+312 declared inventory paths are reviewed, with 290 passes and 22 explicit
+prerequisite boundaries: nine `Reflect.construct`, nine Boolean-wrapper
+intrinsic, and four dynamic `eval`. The node adds no generated-code entry point,
+allocates seven code IDs inside the existing String range, adds the one
+generated header asset, and moves `abiVersion` to `m5-84`.
 
 M5b node `array-prototype-species-mapping` keeps ownership in
 *runtime\_array.c* and adds ordinary `filter` and `map` functions to the

@@ -76,11 +76,21 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/RegExp/character-class-escape-non-whitespace-u180e.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/character-class-escape-non-whitespace-u180e.js:94:3:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
-    unsupportedFeatures:
-      - u180e
+    unsupportedFeatures: []
   - case:
       async: false
       features:

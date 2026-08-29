@@ -69,6 +69,8 @@ const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 const { stringPrototypeSearchAndSliceFixtures } =
   await import("./native/fixtures/string-prototype-search-and-slice.ts");
+const { stringPrototypeCaseFixtures } =
+  await import("./native/fixtures/string-prototype-case.ts");
 const { stringPrototypeMatchAndSplitFixtures } =
   await import("./native/fixtures/string-prototype-match-and-split.ts");
 const { numberPrototypeFixtures } =
@@ -150,6 +152,7 @@ const fixtures: readonly Fixture[] = [
   ...stringFixtures.stringIntrinsicFixtures,
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
+  ...stringPrototypeCaseFixtures,
   ...stringPrototypeMatchAndSplitFixtures,
   ...stringPrototypeReplaceFixtures,
   ...numberPrototypeFixtures,
@@ -175,22 +178,6 @@ const spreadDescriptorMap = await runNativeCli(
 assert.equal(spreadDescriptorMap.exitStatus, 0, spreadDescriptorMap.stderr);
 assert.equal(spreadDescriptorMap.stdout, "3 null\n");
 assert.equal(spreadDescriptorMap.stderr, "");
-
-const deferredStringTrim = await runNativeCli(
-  {
-    args: ["deferred-string-trim.ts"],
-    source: '"".trim();',
-    sourceId: "deferred-string-trim.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(deferredStringTrim.exitStatus, 1);
-assert.equal(deferredStringTrim.stdout, "");
-assert.match(
-  deferredStringTrim.stderr,
-  /^deferred-string-trim\.ts:1:\d+: error\[OSEO2001\]: String prototype/u,
-);
 
 const deferredRegExpFallback = await runNativeCli(
   {
@@ -658,6 +645,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
+    fixture.name === "string-prototype-case" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
@@ -832,6 +820,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
     fixture.name === "string-prototype-access" ||
+    fixture.name === "string-prototype-case" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-reduction" ||
@@ -949,6 +938,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "promise-intrinsic" ||
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||
+            fixture.name === "string-prototype-case" ||
             fixture.name === "string-prototype-search-and-slice" ||
             fixture.name === "string-prototype-match-and-split" ||
             fixture.name === "string-prototype-replace" ||

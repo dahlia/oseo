@@ -1,12 +1,13 @@
 /**
- * Generate and verify the pinned Unicode tables owned by `@oseo/unicode`.
+ * Generate and verify the pinned Unicode tables shared with the C runtime.
  *
  * The generator reads only the reviewed Unicode Character Database copies
  * under *packages/unicode/data*. It never contacts the network, never reads
  * host locale state, and never consults a C library classification routine,
  * so the tables a checkout produces depend on nothing but its own reviewed
  * bytes. `mise run check:unicode-tables` regenerates them in memory and fails
- * when the checked-in module differs; `mise run unicode:update` writes it.
+ * when either checked-in output differs; `mise run unicode:update` writes the
+ * TypeScript module and the C runtime header together.
  */
 
 import { createHash } from "node:crypto";
@@ -48,6 +49,10 @@ const packageDirectory = "packages/unicode";
 const packageRoot = join(repositoryRoot, packageDirectory);
 const manifestName = "data/manifest.yaml";
 const tablesPath = join(packageRoot, "src/tables.ts");
+const runtimeTablesPath = join(
+  repositoryRoot,
+  "packages/runtime-c/native/runtime_unicode_tables.h",
+);
 
 /** The Unicode properties ECMAScript exposes without a value. */
 export interface BinaryPropertySources {
@@ -406,8 +411,10 @@ export function collectPropertySets(
 /** The parts of *UnicodeData.txt* the tables depend on. */
 export interface UnicodeDataFile {
   readonly bidiMirrored: CodePointSet;
+  readonly canonicalDecomposition: ReadonlyMap<number, readonly number[]>;
   readonly categories: ReadonlyMap<string, CodePointSet>;
   readonly combiningClasses: ReadonlyMap<number, readonly CodePointRange[]>;
+  readonly compatibilityDecomposition: ReadonlyMap<number, readonly number[]>;
   readonly simpleLowercase: ReadonlyMap<number, number>;
   readonly simpleTitlecase: ReadonlyMap<number, number>;
   readonly simpleUppercase: ReadonlyMap<number, number>;
@@ -438,6 +445,8 @@ export function parseUnicodeDataFile(source: string): UnicodeDataFile {
   const categoryRanges = new Map<string, CodePointRange[]>();
   const combining = new Map<number, CodePointRange[]>();
   const mirrored: CodePointRange[] = [];
+  const canonicalDecomposition = new Map<number, readonly number[]>();
+  const compatibilityDecomposition = new Map<number, readonly number[]>();
   const lowercase = new Map<number, number>();
   const titlecase = new Map<number, number>();
   const uppercase = new Map<number, number>();
@@ -519,6 +528,25 @@ export function parseUnicodeDataFile(source: string): UnicodeDataFile {
     }
     if (mirrorFlag === "Y") mirrored.push({ end: codePoint, start });
     if (start !== codePoint) continue;
+    const decomposition = (fields[5] ?? "").trim();
+    if (decomposition !== "") {
+      const tokens = decomposition.split(" ");
+      const first = tokens[0] ?? "";
+      const tagged = first.startsWith("<");
+      if (tagged && !/^<[^<> ]+>$/u.test(first)) {
+        throw new Error(`${where}: bad decomposition tag ${first}.`);
+      }
+      const mapping = (tagged ? tokens.slice(1) : tokens).map((token) =>
+        codePointValue(token, `UnicodeData.txt:${line}`),
+      );
+      if (mapping.length === 0) {
+        throw new Error(`${where}: empty decomposition mapping.`);
+      }
+      (tagged ? compatibilityDecomposition : canonicalDecomposition).set(
+        codePoint,
+        mapping,
+      );
+    }
     const mappings: readonly [number, Map<number, number>][] = [
       [12, uppercase],
       [13, lowercase],
@@ -540,8 +568,10 @@ export function parseUnicodeDataFile(source: string): UnicodeDataFile {
   }
   return {
     bidiMirrored: codePointSetFromRanges(mirrored),
+    canonicalDecomposition,
     categories,
     combiningClasses: combining,
+    compatibilityDecomposition,
     simpleLowercase: lowercase,
     simpleTitlecase: titlecase,
     simpleUppercase: uppercase,
@@ -785,10 +815,13 @@ export const basicWordCharacters: CodePointSet = codePointSetFromRanges([
 /** Every generated table, before encoding. */
 export interface UnicodeTables {
   readonly binaryPropertySets: ReadonlyMap<string, CodePointSet>;
+  readonly canonicalDecomposition: ReadonlyMap<number, readonly number[]>;
   readonly caseInsensitiveWordCharacters: CodePointSet;
   readonly combiningClassPartition: CodePointPartition;
   readonly combiningClassValues: readonly number[];
   readonly conditionalCaseMappings: readonly ConditionalCaseMapping[];
+  readonly compositionExclusions: CodePointSet;
+  readonly compatibilityDecomposition: ReadonlyMap<number, readonly number[]>;
   readonly fullCaseFolding: ReadonlyMap<number, readonly number[]>;
   readonly fullLowercase: ReadonlyMap<number, readonly number[]>;
   readonly fullTitlecase: ReadonlyMap<number, readonly number[]>;
@@ -1043,6 +1076,16 @@ export function buildUnicodeTables(
     new Set([baseCategories.indexOf(unassigned)]),
   );
   binaryPropertySets.set("Assigned", complementCodePointSet(unassignedSet));
+  const normalizationProperties = collectPropertySets(
+    parseUcdEntries(
+      requireContents(contents, "DerivedNormalizationProps.txt"),
+      "DerivedNormalizationProps.txt",
+    ),
+    "DerivedNormalizationProps.txt",
+    ["Full_Composition_Exclusion"],
+  );
+  const compositionExclusions =
+    normalizationProperties.get("Full_Composition_Exclusion") ?? [];
   const codePointCount = maxCodePoint + 1;
   for (const property of binaryProperties) {
     const set = binaryPropertySets.get(property);
@@ -1076,10 +1119,13 @@ export function buildUnicodeTables(
 
   return {
     binaryPropertySets,
+    canonicalDecomposition: unicodeData.canonicalDecomposition,
     caseInsensitiveWordCharacters,
     combiningClassPartition,
     combiningClassValues,
     conditionalCaseMappings: specialCasing.conditional,
+    compositionExclusions,
+    compatibilityDecomposition: unicodeData.compatibilityDecomposition,
     emojiVersion: manifest.emojiVersion,
     fullCaseFolding: caseFolding.full,
     fullLowercase: differingSequences(
@@ -1449,6 +1495,193 @@ export function renderTablesModule(tables: UnicodeTables): string {
   ].join("\n")}`;
 }
 
+interface RuntimeMapping {
+  readonly codePoint: number;
+  readonly length: number;
+  readonly offset: number;
+}
+
+function runtimeMappings(
+  values: number[],
+  simple: ReadonlyMap<number, number>,
+  full: ReadonlyMap<number, readonly number[]>,
+): readonly RuntimeMapping[] {
+  const codePoints = new Set([...simple.keys(), ...full.keys()]);
+  return [...codePoints]
+    .toSorted((left, right) => left - right)
+    .map((codePoint) => {
+      const sequence = full.get(codePoint) ?? [
+        simple.get(codePoint) ?? codePoint,
+      ];
+      const offset = values.length;
+      values.push(...sequence);
+      return { codePoint, length: sequence.length, offset };
+    });
+}
+
+function runtimeSequences(
+  values: number[],
+  mappings: ReadonlyMap<number, readonly number[]>,
+): readonly RuntimeMapping[] {
+  return [...mappings]
+    .toSorted(([left], [right]) => left - right)
+    .map(([codePoint, sequence]) => {
+      const offset = values.length;
+      values.push(...sequence);
+      return { codePoint, length: sequence.length, offset };
+    });
+}
+
+function cHex(value: number): string {
+  return `UINT32_C(0x${value.toString(16)})`;
+}
+
+function cNumberLines(values: readonly number[]): string {
+  const lines: string[] = [];
+  let current = "  ";
+  for (const value of values) {
+    const token = `${cHex(value)},`;
+    if (`${current} ${token}`.length > lineLimit) {
+      lines.push(current.trimEnd());
+      current = `  ${token}`;
+    } else {
+      current += current.trim() === "" ? token : ` ${token}`;
+    }
+  }
+  if (current.trim() !== "") lines.push(current.trimEnd());
+  return lines.join("\n");
+}
+
+function cMappingLines(mappings: readonly RuntimeMapping[]): string {
+  return mappings
+    .map(
+      ({ codePoint, length, offset }) =>
+        `  {${cHex(codePoint)}, UINT32_C(${offset}), UINT8_C(${length})},`,
+    )
+    .join("\n");
+}
+
+/** Render the C runtime's compact view of the same pinned Unicode tables. */
+export function renderRuntimeTablesHeader(tables: UnicodeTables): string {
+  const values: number[] = [];
+  const lower = runtimeMappings(
+    values,
+    tables.simpleLowercase,
+    tables.fullLowercase,
+  );
+  const upper = runtimeMappings(
+    values,
+    tables.simpleUppercase,
+    tables.fullUppercase,
+  );
+  const canonical = runtimeSequences(values, tables.canonicalDecomposition);
+  const compatibility = runtimeSequences(
+    values,
+    tables.compatibilityDecomposition,
+  );
+  const compositions = [...tables.canonicalDecomposition]
+    .filter(([composite, sequence]) => {
+      return (
+        sequence.length === 2 &&
+        !codePointSetHas(tables.compositionExclusions, composite) &&
+        partitionValueAt(tables.combiningClassPartition, sequence[0] ?? 0) ===
+          tables.combiningClassValues.indexOf(0)
+      );
+    })
+    .map(([composite, sequence]) => ({
+      composite,
+      first: sequence[0] ?? 0,
+      second: sequence[1] ?? 0,
+    }))
+    .toSorted((left, right) =>
+      left.first === right.first
+        ? left.second - right.second
+        : left.first - right.first,
+    );
+  const ccc = tables.combiningClassPartition.boundaries.map((start, index) => ({
+    start,
+    value:
+      tables.combiningClassValues[
+        tables.combiningClassPartition.values[index] ?? 0
+      ] ?? 0,
+  }));
+  const cased = tables.binaryPropertySets.get("Cased") ?? [];
+  const caseIgnorable = tables.binaryPropertySets.get("Case_Ignorable") ?? [];
+  return `${[
+    "/* Generated by mise run unicode:update. Do not edit by hand. */",
+    "/* Unicode data is licensed in ../UNICODE-LICENSE.txt. */",
+    "#ifndef OSEO_RUNTIME_UNICODE_TABLES_H",
+    "#define OSEO_RUNTIME_UNICODE_TABLES_H",
+    "",
+    "#include <stddef.h>",
+    "#include <stdint.h>",
+    "",
+    "typedef struct {",
+    "    uint32_t code_point;",
+    "    uint32_t offset;",
+    "    uint8_t length;",
+    "} OseoUnicodeMapping;",
+    "",
+    "typedef struct {",
+    "    uint32_t start;",
+    "    uint8_t value;",
+    "} OseoUnicodeClassRange;",
+    "",
+    "typedef struct {",
+    "    uint32_t first;",
+    "    uint32_t second;",
+    "    uint32_t composite;",
+    "} OseoUnicodeComposition;",
+    "",
+    "static const uint32_t oseo_unicode_mapping_values[] = {",
+    cNumberLines(values),
+    "};",
+    "",
+    "static const OseoUnicodeMapping oseo_unicode_lowercase[] = {",
+    cMappingLines(lower),
+    "};",
+    "",
+    "static const OseoUnicodeMapping oseo_unicode_uppercase[] = {",
+    cMappingLines(upper),
+    "};",
+    "",
+    "static const OseoUnicodeMapping",
+    "oseo_unicode_canonical_decomposition[] = {",
+    cMappingLines(canonical),
+    "};",
+    "",
+    "static const OseoUnicodeMapping oseo_unicode_compat_decomposition[] = {",
+    cMappingLines(compatibility),
+    "};",
+    "",
+    "static const OseoUnicodeComposition oseo_unicode_compositions[] = {",
+    compositions
+      .map(
+        ({ composite, first, second }) =>
+          `  {${cHex(first)}, ${cHex(second)}, ${cHex(composite)}},`,
+      )
+      .join("\n"),
+    "};",
+    "",
+    "static const OseoUnicodeClassRange oseo_unicode_combining_classes[] = {",
+    ccc
+      .map(({ start, value }) => `  {${cHex(start)}, UINT8_C(${value})},`)
+      .join("\n"),
+    "};",
+    "",
+    "static const uint32_t oseo_unicode_cased[] = {",
+    cNumberLines(cased),
+    "};",
+    "",
+    "static const uint32_t oseo_unicode_case_ignorable[] = {",
+    cNumberLines(caseIgnorable),
+    "};",
+    "",
+    "#endif",
+    "",
+  ].join("\n")}`;
+}
+
 /** A summary of one generation run, for the task's console output. */
 export interface UnicodeTableSummary {
   readonly binaryProperties: number;
@@ -1461,6 +1694,7 @@ export interface UnicodeTableSummary {
 
 /** Read, verify, and build the tables from the reviewed pinned inputs. */
 export async function generateUnicodeTables(root: string): Promise<{
+  readonly runtimeSource: string;
   readonly source: string;
   readonly summary: UnicodeTableSummary;
 }> {
@@ -1488,6 +1722,7 @@ export async function generateUnicodeTables(root: string): Promise<{
   const tables = buildUnicodeTables(manifest, contents);
   const source = renderTablesModule(tables);
   return {
+    runtimeSource: renderRuntimeTablesHeader(tables),
     source,
     summary: {
       binaryProperties: tables.binaryPropertySets.size,
@@ -1502,14 +1737,25 @@ export async function generateUnicodeTables(root: string): Promise<{
 
 async function main(): Promise<void> {
   const update = process.argv.includes("--update");
-  const { source, summary } = await generateUnicodeTables(repositoryRoot);
+  const { runtimeSource, source, summary } =
+    await generateUnicodeTables(repositoryRoot);
   if (update) {
     await writeFile(tablesPath, source, "utf8");
+    await writeFile(runtimeTablesPath, runtimeSource, "utf8");
   } else {
     const existing = await readFile(tablesPath, "utf8").catch(() => undefined);
     if (existing !== source) {
       throw new Error(
         "packages/unicode/src/tables.ts is stale. Run " +
+          "mise run unicode:update to regenerate it from the pinned inputs.",
+      );
+    }
+    const runtimeExisting = await readFile(runtimeTablesPath, "utf8").catch(
+      () => undefined,
+    );
+    if (runtimeExisting !== runtimeSource) {
+      throw new Error(
+        "packages/runtime-c/native/runtime_unicode_tables.h is stale. Run " +
           "mise run unicode:update to regenerate it from the pinned inputs.",
       );
     }

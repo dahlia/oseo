@@ -23,6 +23,8 @@ supportedFeatures:
   - String.prototype.includes
   - String.prototype.matchAll
   - String.prototype.replaceAll
+  - String.prototype.trimEnd
+  - String.prototype.trimStart
   - align-detached-buffer-semantics-with-web-reality
   - array-grouping
   - arraybuffer-transfer
@@ -66,6 +68,7 @@ supportedFeatures:
   - resizable-arraybuffer
   - rest-parameters
   - stable-array-sort
+  - string-trimming
   - Symbol
   - Symbol.asyncIterator
   - Symbol.hasInstance
@@ -82,6 +85,7 @@ supportedFeatures:
   - Symbol.unscopables
   - template
   - top-level-await
+  - u180e
   - well-known-symbols
 tests:
   - path: test/built-ins/AggregateError/cause-property.js
@@ -12218,7 +12222,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A2_U180E.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A30.js
     expectedClassification: pass
@@ -12233,13 +12237,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A3_T1_U180E.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A3_T2.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A3_T2_U180E.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/S9.3.1_A4_T1.js
     expectedClassification: pass
@@ -28627,6 +28631,45 @@ tests:
   - path: test/built-ins/String/prototype/lastIndexOf/this-value-not-obj-coercible.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/15.5.4.9_3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/15.5.4.9_CE.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A1_T2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/S15.5.4.9_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/localeCompare/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T10.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
@@ -28855,6 +28898,48 @@ tests:
   - path: test/built-ins/String/prototype/matchAll/toString-this-val.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/String/prototype/normalize/form-is-not-valid-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/normalize.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-abrupt-from-form-as-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-abrupt-from-form.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-abrupt-from-this-as-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-normalized-string-from-coerced-form.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-normalized-string-using-default-parameter.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/return-normalized-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/this-is-null-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/normalize/this-is-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/String/prototype/replace/15.5.4.11-1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
@@ -29959,6 +30044,258 @@ tests:
   - path: test/built-ins/String/prototype/substring/this-value-tostring-throws-toprimitive.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/Final_Sigma_U180E.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/special_casing.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/special_casing_conditional.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/supplementary_plane.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/special_casing.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/supplementary_plane.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/Final_Sigma_U180E.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/special_casing.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/special_casing_conditional.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/supplementary_plane.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/this-value-tostring-throws-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toLowerCase/this-value-tostring-throws-toprimitive.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/String/prototype/toString/length.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -29978,6 +30315,609 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/toString/string-primitive.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A2_T1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/special_casing.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/supplementary_plane.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toUpperCase/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-0-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-0-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-1-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-15.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-17.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-23.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-24.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-25.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-26.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-27.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-30.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-31.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-33.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-34.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-35.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-36.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-37.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-38.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-39.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-40.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-41.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-42.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-43.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-44.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-45.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-46.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-47.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-49.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-50.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-51.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-2-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-7.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-3-9.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-1.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-10.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-11.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-12.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-13.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-14.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-16.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-18.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-19.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-2.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-20.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-21.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-22.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-24.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-27.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-28.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-29.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-30.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-32.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-34.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-35.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-36.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-37.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-38.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-39.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-4.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-40.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-41.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-42.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-43.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-44.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-45.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-46.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-47.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-48.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-49.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-5.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-50.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-51.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-52.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-53.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-54.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-55.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-56.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-57.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-58.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-59.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-6.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-60.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/15.5.4.20-4-8.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trim/u180e.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-boolean.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-line-terminator.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-cannot-convert-to-primitive-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-toprimitive-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-toprimitive-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-toprimitive-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-toprimitive-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-tostring-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-tostring-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-tostring-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-tostring-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-valueof-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-valueof-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-valueof-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-object-valueof-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-symbol-typeerror.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimEnd/this-value-whitespace.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-boolean.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-line-terminator.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-number.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-cannot-convert-to-primitive-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-toprimitive-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-toprimitive-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-toprimitive-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-toprimitive-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-tostring-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-tostring-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-tostring-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-tostring-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-valueof-call-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-valueof-meth-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-valueof-meth-priority.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-object-valueof-returns-object-err.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-symbol-typeerror.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/trimStart/this-value-whitespace.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/valueOf/length.js
