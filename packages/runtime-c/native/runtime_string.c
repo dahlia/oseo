@@ -659,28 +659,82 @@ static OseoResult string_trim(
     return result;
 }
 
-static OseoResult normalize_append_ordered(
+static OseoResult normalize_append_decomposed(
     OseoContext *context,
     OseoCodePointBuilder *output,
     uint32_t code_point
 ) {
-    OseoResult result = code_point_builder_append(
+    return code_point_builder_append(context, output, code_point);
+}
+
+/*
+ * Stably order each non-starter run after decomposition. Counting the fixed
+ * canonical-combining-class range keeps one descending run linear instead of
+ * shifting its already appended suffix once for every code point.
+ */
+static OseoResult normalize_order(
+    OseoContext *context,
+    OseoCodePointBuilder *output
+) {
+    if (output->length < 2u) return normal(oseo_undefined());
+    uint8_t prior = unicode_combining_class(output->values[0]);
+    bool requires_ordering = false;
+    for (size_t index = 1u; index < output->length; index += 1u) {
+        uint8_t combining = unicode_combining_class(output->values[index]);
+        if (combining != 0u && prior > combining) {
+            requires_ordering = true;
+            break;
+        }
+        prior = combining;
+    }
+    if (!requires_ordering) return normal(oseo_undefined());
+    OseoCodePointBuilder ordered = {NULL, 0u, 0u};
+    OseoResult result = code_point_builder_reserve(
         context,
-        output,
-        code_point
+        &ordered,
+        output->length
     );
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    uint8_t combining = unicode_combining_class(code_point);
-    if (combining == 0u) return result;
-    size_t index = output->length - 1u;
-    while (index > 0u) {
-        uint8_t prior = unicode_combining_class(output->values[index - 1u]);
-        if (prior == 0u || prior <= combining) break;
-        output->values[index] = output->values[index - 1u];
-        index -= 1u;
+    ordered.length = output->length;
+    size_t run_start = 0u;
+    while (run_start < output->length) {
+        if (unicode_combining_class(output->values[run_start]) == 0u) {
+            ordered.values[run_start] = output->values[run_start];
+            run_start += 1u;
+            continue;
+        }
+        size_t counts[256] = {0u};
+        size_t run_end = run_start;
+        while (run_end < output->length) {
+            uint8_t combining = unicode_combining_class(
+                output->values[run_end]
+            );
+            if (combining == 0u) break;
+            counts[combining] += 1u;
+            run_end += 1u;
+        }
+        size_t offset = run_start;
+        for (size_t combining = 1u; combining < 256u; combining += 1u) {
+            size_t count = counts[combining];
+            counts[combining] = offset;
+            offset += count;
+        }
+        for (size_t index = run_start; index < run_end; index += 1u) {
+            uint8_t combining = unicode_combining_class(
+                output->values[index]
+            );
+            ordered.values[counts[combining]] = output->values[index];
+            counts[combining] += 1u;
+        }
+        run_start = run_end;
     }
-    output->values[index] = code_point;
-    return result;
+    memcpy(
+        output->values,
+        ordered.values,
+        output->length * sizeof(*output->values)
+    );
+    code_point_builder_release(&ordered);
+    return normal(oseo_undefined());
 }
 
 static OseoResult normalize_decompose(
@@ -700,20 +754,20 @@ static OseoResult normalize_decompose(
     const uint32_t s_count = l_count * n_count;
     if (code_point >= s_base && code_point < s_base + s_count) {
         uint32_t index = code_point - s_base;
-        OseoResult result = normalize_append_ordered(
+        OseoResult result = normalize_append_decomposed(
             context,
             output,
             l_base + index / n_count
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = normalize_append_ordered(
+            result = normalize_append_decomposed(
                 context,
                 output,
                 v_base + (index % n_count) / t_count
             );
         }
         if (result.status == OSEO_STATUS_NORMAL && index % t_count != 0u) {
-            result = normalize_append_ordered(
+            result = normalize_append_decomposed(
                 context,
                 output,
                 t_base + index % t_count
@@ -739,7 +793,7 @@ static OseoResult normalize_decompose(
         );
     }
     if (mapping == NULL) {
-        return normalize_append_ordered(context, output, code_point);
+        return normalize_append_decomposed(context, output, code_point);
     }
     OseoResult result = normal(oseo_undefined());
     for (size_t index = 0u;
@@ -847,6 +901,9 @@ static OseoResult normalize_subject(
             input.values[index],
             compatibility
         );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normalize_order(context, &output);
     }
     if (result.status == OSEO_STATUS_NORMAL && compose) {
         normalize_compose(&output);

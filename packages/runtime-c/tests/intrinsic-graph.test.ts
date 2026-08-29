@@ -794,6 +794,9 @@ test("populates the realm-owned String intrinsic cluster", () => {
   ]) {
     assert.match(stringSource, new RegExp(`"${property}"`, "u"));
   }
+  assert.match(stringSource, /static OseoResult normalize_order\(/u);
+  assert.match(stringSource, /size_t counts\[256\] = \{0u\}/u);
+  assert.doesNotMatch(stringSource, /normalize_append_ordered/u);
   // The constructor is an ordinary constructible function reached through
   // the realm's own global property.
   assert.match(stringSource, /OSEO_STRING_CONSTRUCTOR_CODE_ID/u);

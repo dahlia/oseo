@@ -46,6 +46,11 @@ interface NormalizationCase {
   readonly nfkd: string;
 }
 
+interface CombiningMark {
+  readonly combiningClass: number;
+  readonly value: string;
+}
+
 interface StringCaseTestCase {
   readonly caseTokens: readonly CaseToken[];
   readonly content: string;
@@ -127,6 +132,40 @@ const normalizationCases: readonly NormalizationCase[] = [
   },
 ];
 
+const combiningMarks: readonly CombiningMark[] = [
+  { combiningClass: 1, value: "\u0334" },
+  { combiningClass: 220, value: "\u0323" },
+  { combiningClass: 230, value: "\u0300" },
+  { combiningClass: 230, value: "\u0301" },
+  { combiningClass: 232, value: "\u0315" },
+];
+
+const normalizationArbitrary: fc.Arbitrary<NormalizationCase> = fc.oneof(
+  fc.constantFrom(...normalizationCases),
+  fc
+    .array(fc.constantFrom(...combiningMarks), { maxLength: 32 })
+    .map((marks) => {
+      const ordered = marks
+        .map((mark, index) => ({ index, mark }))
+        .toSorted(
+          (left, right) =>
+            left.mark.combiningClass - right.mark.combiningClass ||
+            left.index - right.index,
+        )
+        .map(({ mark }) => mark.value)
+        .join("");
+      const input = "q" + marks.map((mark) => mark.value).join("");
+      const normalized = "q" + ordered;
+      return {
+        input,
+        nfc: normalized,
+        nfd: normalized,
+        nfkc: normalized,
+        nfkd: normalized,
+      };
+    }),
+);
+
 const trimCharacters = [
   "\u0009",
   "\u000a",
@@ -149,7 +188,7 @@ const testCaseArbitrary: fc.Arbitrary<StringCaseTestCase> = fc.record({
     })
     .map((values) => values.join("")),
   leftTrim: fc.array(fc.constantFrom(...trimCharacters), { maxLength: 4 }),
-  normalization: fc.constantFrom(...normalizationCases),
+  normalization: normalizationArbitrary,
   receiver: fc.constantFrom<ReceiverKind>("primitive", "wrapper", "object"),
   rightTrim: fc.array(fc.constantFrom(...trimCharacters), { maxLength: 4 }),
 });
@@ -383,7 +422,8 @@ test(
           "range, weighted toward ASCII, expanding, Greek contextual, " +
           "Unicode 17, supplementary, and unpaired-surrogate mappings; " +
           "zero to four leading and trailing ECMAScript whitespace code " +
-          "points; five canonical or compatibility normalization examples; " +
+          "points; five fixed normalization examples or zero to 32 pinned " +
+          "combining marks with an independent stable-order oracle; " +
           "primitive, wrapper, and generic receivers; both specialization " +
           "policies, a false hint, and a deliberate prototype-shape miss",
         numRuns: 8,
@@ -391,10 +431,69 @@ test(
         seed: 0x6000_5800,
         sizeLimit:
           "at most four case tokens, nine content code units, eight trim " +
-          "code points, one normalization example, nine method observations, " +
-          "two hint classes, and one prototype shape change",
+          "code points, one fixed normalization example or a 32-mark " +
+          "canonical-ordering run, nine method observations, two hint " +
+          "classes, and one prototype shape change",
         timeLimitMilliseconds: 180_000,
       },
+    );
+  },
+);
+
+test(
+  "orders a long adversarial combining run within the native gate budget",
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+    timeout: 60_000,
+  },
+  async () => {
+    const cycle = "\u0315\u0301\u0300\u0323\u0334";
+    const subject = "q" + cycle.repeat(11_400);
+    const source = `
+const subject = ${JSON.stringify(subject)};
+const normalized = subject.normalize("NFD");
+console.log(
+  "long normalize",
+  normalized.length === 57001,
+  normalized.charCodeAt(0) === 0x71,
+  normalized.charCodeAt(1) === 0x334,
+  normalized.charCodeAt(11400) === 0x334,
+  normalized.charCodeAt(11401) === 0x323,
+  normalized.charCodeAt(22800) === 0x323,
+  normalized.charCodeAt(22801) === 0x301,
+  normalized.charCodeAt(22802) === 0x300,
+  normalized.charCodeAt(45600) === 0x300,
+  normalized.charCodeAt(45601) === 0x315,
+  normalized.charCodeAt(57000) === 0x315,
+);
+console.log("long compare", subject.localeCompare(subject) === 0);
+`;
+    const expected = {
+      exitStatus: 0,
+      stderr: "",
+      stdout:
+        "long normalize true true true true true true true true true " +
+        "true true\nlong compare true\n",
+    };
+    assertMatchingObservations([expected, ...(await references(source))]);
+    const compiled = compileSource(
+      babelFrontend,
+      { source, sourceId: "adversarial-string-normalization.ts" },
+      { specialization: "disabled" },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compiled.mir,
+        operation: "execute",
+        runtime: cRuntimeProvider,
+        target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+        toolchain: zigToolchain,
+      },
+      (native) => assertMatchingObservations([expected, native]),
     );
   },
 );
