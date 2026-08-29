@@ -74,6 +74,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
     [
       ["header", "oseo_runtime.h"],
       ["header", "runtime_internal.h"],
+      ["header", "runtime_unicode_tables.h"],
       ["source", "runtime_core.c"],
       ["source", "runtime_memory.c"],
       ["source", "runtime_binding.c"],
@@ -113,10 +114,14 @@ test("keeps the internal header out of the generated-code boundary", () => {
   assert.deepEqual(quotedIncludes(publicHeader.source), []);
   assert.deepEqual(quotedIncludes(internalHeader.source), ["oseo_runtime.h"]);
   for (const source of sources) {
+    const expected =
+      source.name === "runtime_string.c"
+        ? ["runtime_internal.h", "runtime_unicode_tables.h"]
+        : ["runtime_internal.h"];
     assert.deepEqual(
       quotedIncludes(source.source),
-      ["runtime_internal.h"],
-      `${source.name} must include only the internal runtime header`,
+      expected,
+      `${source.name} must include only reviewed runtime headers`,
     );
   }
 });

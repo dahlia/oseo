@@ -670,6 +670,26 @@ rooted across user code. Neither method allocates a result array, so no
 `constructor` or `Symbol.species` read is reachable. Both code IDs come from
 the existing Array range, and the generated-code ABI gains no entry point.
 
+The `m5-84` ABI adds ordinary `toLowerCase`, `toUpperCase`,
+`toLocaleLowerCase`, `toLocaleUpperCase`, `trim`, `trimStart`, `trimEnd`,
+`normalize`, and `localeCompare` functions to `%String.prototype%`. Every
+function rejects a nullish receiver before shared string conversion. Case
+conversion decodes UTF-16, preserves unpaired surrogates, and applies the full
+locale-insensitive Unicode 17.0.0 mappings, including contextual final sigma.
+The locale forms deliberately use the same pinned default mapping instead of
+consulting process locale state.
+
+Trimming owns the exact ECMAScript WhiteSpace and LineTerminator set.
+Normalization owns canonical and compatibility decomposition, combining-class
+ordering, composition exclusions, and algorithmic Hangul for `NFC`, `NFD`,
+`NFKC`, and `NFKD`. Locale comparison normalizes both converted operands to
+`NFD` before deterministic UTF-16 code-unit ordering, so canonically
+equivalent strings compare equal on every target. The Unicode generator emits
+the package-private *runtime\_unicode\_tables.h* asset beside the TypeScript
+tables from the same reviewed inputs, and the package includes the Unicode
+permission notice. Seven code IDs in the existing String range dispatch the
+nine function objects. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

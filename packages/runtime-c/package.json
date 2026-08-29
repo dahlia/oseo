@@ -18,7 +18,8 @@
   "files": [
     "dist",
     "native",
-    "README.md"
+    "README.md",
+    "UNICODE-LICENSE.txt"
   ],
   "type": "module",
   "sideEffects": false,

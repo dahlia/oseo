@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-14,708 reviewed cases: 10,895 passes, 1,506 expected negatives, and 2,307
+15,020 reviewed cases: 11,188 passes, 1,506 expected negatives, and 2,326
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 99 indexed records in the normative
+M5a is complete. The 100 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-10,895 passes across 14,708 paths, and the property inventory records 113
-domains, 113 seeds, and an ordinary case budget of 5,214.
+11,188 passes across 15,020 paths, and the property inventory records 114
+domains, 114 seeds, and an ordinary case budget of 5,222.
 
 
 M5a implementation history
@@ -4951,6 +4951,49 @@ existing Array range without adding a generated-code entry point or
 changing the graph's orchestration state. The suite revision, 41,091-path
 applicable inventory, ADR 0013 vocabulary, inventory policy, and
 zero-override policy are unchanged.
+
+Implemented M5b node `string-prototype-case` adds `toLowerCase`,
+`toUpperCase`, both locale case forms, `trim`, `trimStart`, `trimEnd`,
+`normalize`, and `localeCompare` to the realm-owned `%String.prototype%`.
+Every method applies `RequireObjectCoercible` and the shared `ToString`, with
+receiver conversion preceding the normalization form or comparison operand.
+The case methods use the full locale-insensitive Unicode 17.0.0 mappings,
+including expansions, supplementary code points, unpaired-surrogate
+preservation, and contextual final sigma over the pinned `Cased` and
+`Case_Ignorable` properties. The locale forms deliberately use that same
+host-independent default mapping.
+
+Trimming uses the exact ECMAScript WhiteSpace and LineTerminator set.
+Normalization admits `NFC`, `NFD`, `NFKC`, and `NFKD`, including recursive
+decomposition, canonical combining-class order, composition exclusions, and
+algorithmic Hangul handling, with `NFC` as the default and `RangeError` for
+another converted form. `localeCompare` normalizes both operands to `NFD`
+before a deterministic UTF-16 code-unit comparison, so canonically equivalent
+strings compare equal without importing host locale state.
+
+The pinned Unicode generator emits one compact C runtime header beside its
+existing TypeScript module and verifies both outputs from the same reviewed
+inputs. The runtime package ships the Unicode permission notice. Seven new
+IDs in the existing String range dispatch the nine function objects, because
+the ordinary and locale case forms share their respective conversion bodies.
+No generated-code entry point or public runtime layout changes.
+
+Fixed and generated native differential evidence at seed `0x60005800` covers
+case mappings across the full generated Unicode domain, trim inclusions and
+exclusions, all four normalization forms, canonical comparison, generic
+receivers, conversion order, abrupt completion, method metadata, both
+specialization policies, false hints, deliberate shape-guard misses, generic
+fallback, collection at every safepoint, and the AArch64 Linux cross-link.
+All 312 paths under the nine inventory roots are reviewed: 290 pass and 22
+retain explicit prerequisite boundaries. Nine need `Reflect.construct` for
+their *isConstructor.js* include, nine need the unadmitted Boolean wrapper
+intrinsic, and four need dynamic `eval`. Three Number conversion paths outside
+the roots move from `unsupported-profile-feature` to `pass` because admitting
+the `u180e` feature exposes their already-correct conversion result. The
+manifest moves from 14,708 to 15,020 paths and from 10,895 to 11,188 passes,
+keeps 1,506 expected negatives, and moves from 2,307 to 2,326 unsupported
+profile features, with no failures. The checkpoint moves the runtime ABI to
+`oseo-runtime-m5-84` without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

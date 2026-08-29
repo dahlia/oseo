@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-83",
+  abiVersion: "m5-84",
   assets: [
     {
       kind: "header",
@@ -12,6 +12,11 @@ const runtimeInput: RuntimeInput = {
       kind: "header",
       name: "runtime_internal.h",
       url: new URL("../native/runtime_internal.h", import.meta.url),
+    },
+    {
+      kind: "header",
+      name: "runtime_unicode_tables.h",
+      url: new URL("../native/runtime_unicode_tables.h", import.meta.url),
     },
     {
       kind: "source",

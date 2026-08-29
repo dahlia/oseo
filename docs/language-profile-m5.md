@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 99
+M5a is complete. The normative family records described below inventory 100
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 14,708 reviewed cases: 10,895 passes, 1,506
-expected negatives, and 2,307 unsupported profile features. It records no
+The current manifest contains 15,020 reviewed cases: 11,188 passes, 1,506
+expected negatives, and 2,326 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4638,6 +4638,85 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-83` and allocates two code IDs inside the existing Array
 range without adding a generated-code entry point or changing the graph's
 orchestration state.
+
+
+String prototype case conversion and normalization
+--------------------------------------------------
+
+M5b node `string-prototype-case` adds `toLowerCase`, `toUpperCase`,
+`toLocaleLowerCase`, `toLocaleUpperCase`, `trim`, `trimStart`, `trimEnd`,
+`normalize`, and `localeCompare` to the realm-owned `%String.prototype%`.
+Every method first rejects a nullish receiver and then applies the shared
+`ToString`, so String primitives, String wrappers, and generic receivers use
+one conversion path and preserve the first abrupt completion. `normalize`
+converts its optional form after the receiver, and `localeCompare` converts
+its comparison operand after the receiver.
+
+Case conversion decodes UTF-16 into code points, preserves unpaired
+surrogates, and applies the full locale-insensitive mappings from the pinned
+Unicode 17.0.0 data. It includes expanding mappings and the contextual
+`Final_Sigma` rule over the pinned `Cased` and `Case_Ignorable` properties.
+The two locale methods deliberately use that same pinned default mapping.
+They do not consult a process locale, C library classification routine, or
+host Unicode implementation, so every supported target observes the same
+answer.
+
+Trimming uses exactly the ECMAScript union of WhiteSpace and LineTerminator.
+It includes the byte-order mark and excludes U+180E and U+200B. `trim`
+removes both ends, while `trimStart` and `trimEnd` leave the opposite end
+unchanged. Normalization recursively applies canonical or compatibility
+decomposition, canonical combining-class order, composition exclusions, and
+algorithmic Hangul decomposition and composition from the pinned tables.
+The default is `NFC`; the admitted forms are `NFC`, `NFD`, `NFKC`, and
+`NFKD`, and every other converted form throws `RangeError`.
+
+`localeCompare` first normalizes both converted operands to `NFD`, then
+compares their UTF-16 code units and returns `-1`, `0`, or `1`. This profile
+choice preserves the required equality of canonically equivalent strings and
+antisymmetry while keeping ordering independent of host locale state. A later
+internationalization unit can replace that deterministic base comparison
+without making this node depend on an unreviewed host collator.
+
+The Unicode generator now emits
+*packages/runtime-c/native/runtime\_unicode\_tables.h* together with the
+existing TypeScript table module. Both outputs are pure functions of the same
+reviewed inputs, and the ordinary Unicode-table check rejects drift in either
+one. The C header carries compact case maps, decomposition and composition
+maps, combining classes, and contextual case-property sets. It is a reviewed
+runtime asset rather than a generated-code entry point, and the runtime
+package ships the Unicode permission notice beside it. Seven IDs in the
+existing String built-in range dispatch the nine methods because each locale
+case form has its own function object but shares the corresponding pinned
+lowercase or uppercase body.
+
+Fixed native and generated differential evidence at property seed
+`0x60005800` covers ASCII, expanding, contextual, Unicode 17,
+supplementary-plane, and unpaired-surrogate case mappings; the complete
+ECMAScript trim set and its exclusions; every normalization form, combining
+mark ordering, compatibility mappings, and Hangul; canonical comparison;
+receiver and operand conversion order; abrupt conversion; method descriptors
+and constructor rejection; both specialization policies; false hints;
+deliberate shape-guard misses; generic fallback; and collection forced at
+every safepoint. The generated oracle decodes case answers through
+`@oseo/unicode` independently of the C header, and the same source executes
+unchanged under Node.js, Deno, and the native runtime. The fixed native lane
+also retains the AArch64 Linux cross-link.
+
+All 312 paths under the node's nine inventory roots are reviewed: 290 pass
+and 22 retain explicit prerequisite boundaries. Nine need
+`Reflect.construct` for their *isConstructor.js* include, nine need the
+unadmitted Boolean wrapper intrinsic, and four need dynamic `eval`. No
+previously reviewed path loses a pass. Three Number conversion paths outside
+the roots move from `unsupported-profile-feature` to `pass` because admitting
+the `u180e` feature exposes their already-correct conversion result. The
+manifest moves from 14,708 to 15,020 cases and from 10,895 to 11,188 passes,
+keeps 1,506 expected negatives, and moves from 2,307 to 2,326 unsupported
+profile features, with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary,
+target-parity policy, and zero-override policy are unchanged. The admitted
+runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-84` without
+adding a generated-code entry point or changing the graph's orchestration
+state.
 
 
 Known gaps inside the claim
