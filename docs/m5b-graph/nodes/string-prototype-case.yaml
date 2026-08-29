@@ -18,5 +18,5 @@ inventory:
 dependencies:
   - string-prototype-access
   - unicode-tables
-landed: false
+landed: true
 status: ready
