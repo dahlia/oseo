@@ -162,6 +162,7 @@ export interface MirOperation {
     | "home-object-bind"
     | "initialize"
     | "instance-elements-init"
+    | "is-object"
     | "iterator-close"
     | "iterator-close-result"
     | "iterator-close-start"

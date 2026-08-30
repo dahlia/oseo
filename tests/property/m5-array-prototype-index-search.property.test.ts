@@ -37,6 +37,8 @@ type EntryKind =
 type SearchKind = Exclude<EntryKind, "hole"> | "fresh";
 type IndexMethod = "at" | "includes" | "indexOf" | "lastIndexOf";
 type ReceiverKind = "array" | "object";
+type UnscopablesMode = "array" | "blocked" | "falsey" | "non-object";
+type UnscopableMethod = "at" | "includes";
 
 interface IndexSearchCase {
   readonly entries: readonly EntryKind[];
@@ -44,6 +46,8 @@ interface IndexSearchCase {
   readonly method: IndexMethod;
   readonly receiver: ReceiverKind;
   readonly search: SearchKind;
+  readonly unscopableMethod: UnscopableMethod;
+  readonly unscopablesMode: UnscopablesMode;
 }
 
 const indexValues = [
@@ -94,6 +98,13 @@ const caseArbitrary: fc.Arbitrary<IndexSearchCase> = fc.record({
     "zero",
     "fresh",
   ),
+  unscopableMethod: fc.constantFrom<UnscopableMethod>("at", "includes"),
+  unscopablesMode: fc.constantFrom<UnscopablesMode>(
+    "array",
+    "blocked",
+    "falsey",
+    "non-object",
+  ),
 });
 
 const host = createNodeHost();
@@ -128,6 +139,20 @@ function printCase(testCase: IndexSearchCase): string {
     testCase.method === "at"
       ? String(testCase.index)
       : `${expressions[testCase.search]}, ${String(testCase.index)}`;
+  const withObject =
+    testCase.unscopablesMode === "array"
+      ? "[]"
+      : `{ ${testCase.unscopableMethod}: "inner" }`;
+  const unscopables =
+    testCase.unscopablesMode === "array"
+      ? ""
+      : `environment[Symbol.unscopables] = ${
+          testCase.unscopablesMode === "blocked"
+            ? `{ ${testCase.unscopableMethod}: true }`
+            : testCase.unscopablesMode === "falsey"
+              ? `{ ${testCase.unscopableMethod}: 0 }`
+              : "1"
+        };`;
   return `
 const shared = { name: "shared" };
 const other = { name: "other" };
@@ -150,6 +175,12 @@ else if (${
   console.log("result", String(result), "reciprocal", String(1 / result));
 }
 else console.log("result", String(result));
+var ${testCase.unscopableMethod} = "outer";
+const environment = ${withObject};
+${unscopables}
+with (environment) {
+  console.log("with", ${testCase.unscopableMethod});
+}
 /** @param {string} value */
 function hinted(value) { return value.charAt(0); }
 console.log("hint", hinted("hit"));
@@ -237,8 +268,14 @@ function expected(testCase: IndexSearchCase): string {
         testCase.method === "includes" ? String(found >= 0) : String(found);
     }
   }
+  const withResult =
+    testCase.unscopablesMode === "array" ||
+    testCase.unscopablesMode === "blocked"
+      ? "outer"
+      : "inner";
   return [
     `result ${rendered}`,
+    `with ${withResult}`,
     "hint h",
     "false hint m",
     "guard g",
@@ -361,13 +398,14 @@ test(
           "object identities; matching or fresh search values; and finite " +
           "or infinite integer and fractional positive and negative relative " +
           "indices, plus false " +
-          "hints and a deliberate shape-guard miss",
+          "hints, at or includes with an inherited or custom unscopables " +
+          "record, and a deliberate shape-guard miss",
         numRuns: 12,
         profile: "M5 Array prototype index search",
         seed: 0x6000_5900,
         sizeLimit:
-          "at most seven source indices, one method result, and eight hint " +
-          "or guard observations",
+          "at most seven source indices, one method result, one with-binding " +
+          "result, and eight hint or guard observations",
         timeLimitMilliseconds: 180_000,
       },
     );

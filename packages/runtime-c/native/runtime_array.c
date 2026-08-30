@@ -2876,6 +2876,65 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[2] = result.value;
+    }
+    static const char *const unscopable_names[] = {
+        "at",
+        "copyWithin",
+        "entries",
+        "fill",
+        "find",
+        "findIndex",
+        "findLast",
+        "findLastIndex",
+        "flat",
+        "flatMap",
+        "includes",
+        "keys",
+        "toReversed",
+        "toSorted",
+        "toSpliced",
+        "values",
+    };
+    const size_t unscopable_count =
+        sizeof(unscopable_names) / sizeof(unscopable_names[0]);
+    const OseoPropertyAttributes unscopable = {true, true, true, false};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < unscopable_count;
+         index += 1u) {
+        result = oseo_internal_ascii_string(
+            context,
+            unscopable_names[index]
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[2],
+                frame.slots[3],
+                oseo_boolean(true),
+                unscopable
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_UNSCOPABLES
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[3],
+            frame.slots[2],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(frame.slots[1]);
         if (context->observe_specialization) {
             context->allocations = entry_allocations;

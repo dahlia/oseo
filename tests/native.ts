@@ -663,6 +663,13 @@ for (const fixture of selectedFixtures) {
     assert.doesNotMatch(printMir(disabledMir), /guard-(?:object|shape)/u);
   }
 
+  if (fixture.name === "array-prototype-index-search") {
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /is-object IsObject/u);
+      assert.match(text, /property-get property-get/u);
+    }
+  }
+
   if (fixture.name === "object-literal-prototype-setter") {
     assert.match(printMir(enabledMir), /guard-smi/u);
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
@@ -968,6 +975,9 @@ for (const fixture of selectedFixtures) {
               }
               assert.ok(native.counters.guardMisses > 0);
             }
+          }
+          if (fixture.name === "array-prototype-index-search") {
+            assert.match(native.emittedC, /oseo_value_is_object/u);
           }
           if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);

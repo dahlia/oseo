@@ -27,6 +27,73 @@ for (const name of ["at", "includes", "indexOf", "lastIndexOf"]) {
   }
 }
 
+const unscopables = Array.prototype[Symbol.unscopables];
+const unscopablesDescriptor = Object.getOwnPropertyDescriptor(
+  Array.prototype,
+  Symbol.unscopables,
+);
+console.log(
+  "unscopables descriptor",
+  Object.getPrototypeOf(unscopables) === null,
+  unscopablesDescriptor.writable,
+  unscopablesDescriptor.enumerable,
+  unscopablesDescriptor.configurable,
+);
+console.log(
+  "unscopables entries",
+  Object.keys(unscopables).join(","),
+  unscopables.at,
+  unscopables.includes,
+);
+var at = "outer at";
+var includes = "outer includes";
+with ([]) {
+  console.log("array with", at, includes);
+}
+
+var scoped = "outer";
+const blockedOrder = [];
+const blockedEnvironment = { scoped: "inner" };
+Object.defineProperty(blockedEnvironment, Symbol.unscopables, {
+  get() {
+    blockedOrder.push("unscopables");
+    return {
+      get scoped() {
+        blockedOrder.push("blocked");
+        return true;
+      },
+    };
+  },
+});
+with (blockedEnvironment) {
+  console.log("blocked with", scoped, blockedOrder.join(","));
+}
+const falseyEnvironment = {
+  scoped: "inner",
+  [Symbol.unscopables]: { scoped: 0 },
+};
+with (falseyEnvironment) {
+  console.log("falsey with", scoped);
+}
+const primitiveEnvironment = {
+  scoped: "inner",
+  [Symbol.unscopables]: 1,
+};
+with (primitiveEnvironment) {
+  console.log("primitive with", scoped);
+}
+var deleted = "outer";
+const deletedEnvironment = { deleted: "inner" };
+Object.defineProperty(deletedEnvironment, Symbol.unscopables, {
+  get() {
+    delete deletedEnvironment.deleted;
+    return null;
+  },
+});
+with (deletedEnvironment) {
+  console.log("deleted during unscopables", String(deleted));
+}
+
 const equality = [NaN, -0];
 const shared = { label: "shared" };
 equality[2] = shared;
