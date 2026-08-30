@@ -5051,6 +5051,60 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 generator range without adding a generated-code entry point or changing the
 graph's orchestration state.
 
+M5b node `regexp-pattern-extensions` admits the candidate-edition pattern
+surface that had remained behind the RegExp syntax boundary. Unicode `v`
+classes now support nested union, intersection, and subtraction, finite
+`\q{...}` string alternatives, and all seven properties of strings assembled
+from the pinned Unicode 17.0 emoji sequence inputs. Inline modifier groups
+scope `i`, `m`, and `s` over their body and restore the enclosing state when
+they finish. Named groups and backreferences accept pinned Unicode identifier
+names, and literals admit positive and negative lookbehind, match indices with
+`d`, and dotAll matching with `s`.
+
+The generic matcher remains the semantic authority. Finite strings lower to
+shared-prefix tries made from its existing ordered branch and consume
+instructions, while class-set characters stay normalized inversion lists;
+neither adds a matcher ABI or a host regular-expression dependency. Sharing
+prefixes keeps the complete `RGI_Emoji` artifact bounded, and the active native
+frame ceiling moves from 32,768 to 65,536 slots so the reviewed 3,953-element
+Test262 corpus can enter its generated top-level frame. A literal receives the
+Unicode data at the command-line composition boundary and compiles ahead of
+time. The dynamic C compiler admits modifier groups, but retains the
+source-located `OSEO2001` boundary for Unicode properties and class sets
+because it deliberately does not link the generated Unicode tables.
+
+Fixed native and generated differential evidence at property seed
+`0x60005d00` covers class-set intersection and subtraction, finite strings,
+properties of strings, nested modifier scope, Unicode named captures and
+backreferences, lookbehind, match indices, and dotAll. The fixed fixture runs
+with both specialization policies, exercises the generated matcher artifact,
+deliberately misses the `exec` property-call shape guard so the generic path
+answers, and forces collection at every safepoint. The generated oracle is the
+host candidate-edition RegExp implementation, while Unicode sequence answers
+come only from the pinned files and the independently decoded
+`@oseo/unicode` tables.
+
+All 255 paths in the node's six inventory roots are reviewed: 205 pass and 50
+retain explicit prerequisite boundaries. All four dotAll paths and all seventy
+modifier paths pass. Lookbehind contributes two passes and fifteen
+boundaries, match indices eleven passes and three boundaries, and named groups
+four passes and thirty-two boundaries. All 114 UnicodeSets cases pass through
+the reviewed property-of-strings and extended-character-class harness helpers,
+including the Unicode 17.0 `RGI_Emoji` corpus. Seventy-eight previously
+reviewed paths move from
+`unsupported-profile-feature` to `pass`: one duplicate-named-group syntax
+case, twenty-two modifier early-error cases, and fifty-five modifier
+arithmetic syntax cases. Nineteen more previously reviewed property-string,
+duplicate-group, execution, flags, and UnicodeSets prototype cases pass, and
+fifty property-string and UnicodeSets early errors become reviewed expected
+negatives. The manifest moves from 15,020 to 15,275 cases and from 11,188 to
+11,490 passes, moves from 1,506 to 1,556 expected negatives, and moves from
+2,326 to 2,229 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The runtime checkpoint moves to
+`oseo-runtime-m5-89`; the node adds no generated-code entry point, built-in
+code ID, intrinsic number, fixed allocation, or matcher instruction, and it
+does not change the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------

@@ -111,6 +111,10 @@ const compareIteratorHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareIterator.js",
 );
+const deepEqualHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/deepEqual.js",
+);
 const detachArrayBufferHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/detachArrayBuffer.js",
@@ -1642,6 +1646,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
         "compareIterator.js",
         await readFile(compareIteratorHarnessPath, "utf8"),
       ],
+      ["deepEqual.js", await readFile(deepEqualHarnessPath, "utf8")],
       [
         "detachArrayBuffer.js",
         await readFile(detachArrayBufferHarnessPath, "utf8"),

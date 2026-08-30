@@ -83,3 +83,15 @@ files:
     url: https://www.unicode.org/Public/17.0.0/ucd/emoji/emoji-data.txt
     bytes: 107324
     sha256: 2cb2bb9455cda83e8481541ecf5b6dfda66a3bb89efa3fa7c5297eccf607b72b
+  - name: emoji-sequences.txt
+    path: data/ucd/emoji-sequences.txt
+    header: emoji
+    url: https://www.unicode.org/Public/17.0.0/emoji/emoji-sequences.txt
+    bytes: 194868
+    sha256: 12cc8267dc33cbd11ed32bcf6fc5dc2ad9c7a77bae1bdfba2f41b1b9b3ead8dd
+  - name: emoji-zwj-sequences.txt
+    path: data/ucd/emoji-zwj-sequences.txt
+    header: emoji
+    url: https://www.unicode.org/Public/17.0.0/emoji/emoji-zwj-sequences.txt
+    bytes: 277215
+    sha256: 5b25441daed2322b068c5e70cda522946a4f0274df864445a1965a92e5fc5cad

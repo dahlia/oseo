@@ -1,0 +1,83 @@
+version: 1
+id: regexp-pattern-extensions
+title: "Regular expression pattern extensions"
+scope:
+  - "The ECMAScript 2025 regular expression grammar for Unicode class set
+    union, intersection, and subtraction; finite string disjunctions; and
+    the seven properties of strings derived from the pinned Unicode 17.0
+    emoji sequence files. The generic matcher lowers finite strings to
+    shared-prefix tries made from its existing ordered consume and branch
+    instructions, so string matching adds no host regular expression
+    dependency or matcher ABI."
+  - "Inline modifier groups add or remove `i`, `m`, and `s` only while
+    their body is built. Nested groups restore their enclosing flag state,
+    and word-boundary sets are cached separately for ignore-case and plain
+    scopes. The runtime's dynamic pattern compiler implements the same
+    modifier scoping."
+  - "Named capturing groups and backreferences, including Unicode
+    identifier names supplied by the pinned ID_Start and ID_Continue
+    tables; positive and negative lookbehind; the `d` match-indices flag;
+    and the `s` dotAll flag are admitted together with the class-set and
+    modifier grammar whose inventory roots exercise their combinations."
+  - "A literal receives pinned Unicode code-point and string-property data
+    at the command-line composition boundary and compiles ahead of time.
+    The dynamic pattern compiler deliberately retains its located profile
+    boundary for Unicode property escapes and class sets because the C
+    runtime does not link those tables. Dynamic modifier groups need no
+    Unicode table and are admitted."
+  - "The generic matcher remains the semantic authority. Both native
+    specialization policies execute the same generated matcher artifact,
+    and a failed property-call shape guard reaches the ordinary generic
+    call while collection is forced at every safepoint."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/regexp-pattern-extensions.ts
+      - tests/property/m5-regexp-pattern-extensions.property.test.ts
+      - tests/regexp-matcher.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-pattern-extensions.ts
+      - packages/compiler/tests/regexp.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-pattern-extensions.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-pattern-extensions.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-pattern-extensions.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-pattern-extensions.ts
+      - tests/regexp-matcher.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/deepEqual.js
+      - tests/test262/harness/regExpUtils.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tools/test262.ts
+  structural:
+    status: covered
+    references:
+      - packages/compiler/src/regexp-parse.ts
+      - packages/compiler/src/regexp-matcher.ts
+      - packages/runtime-c/native/runtime_regexp_matcher.c
+      - packages/unicode/src/tables.ts

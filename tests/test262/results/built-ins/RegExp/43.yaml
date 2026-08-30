@@ -4,6 +4,38 @@ results:
   - case:
       async: false
       features:
+        - regexp-lookbehind
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/RegExp/lookBehind/alternations.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/RegExp/lookBehind/alternations.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/lookBehind/alternations.js:107:21:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-unicode-property-escapes
       flags: []
       includes:
@@ -21,7 +53,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lisu\
         .js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Lisu.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Lisu.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -47,7 +79,7 @@ results:
         ions_-_Imperial_Aramaic.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Imperial_Aramaic.js:104:22: error[OSEO1001]:
+        t_Extensions_-_Imperial_Aramaic.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -117,6 +149,37 @@ results:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/regexp-modifiers/add-multiline-does-not-affect-ignoreCase-flag.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

@@ -112,7 +112,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lyci\
         an.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Lycian.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Lycian.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -138,7 +138,7 @@ results:
         ions_-_Old_Persian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Old_Persian.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Old_Persian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

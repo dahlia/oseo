@@ -330,6 +330,13 @@ export interface UcdEntry {
   readonly start: number;
 }
 
+/** One reviewed emoji-sequence data line. */
+export interface EmojiSequenceEntry {
+  readonly line: number;
+  readonly property: string;
+  readonly sequences: readonly (readonly number[])[];
+}
+
 function codePointValue(token: string, description: string): number {
   if (!/^[0-9A-F]{4,6}$/u.test(token)) {
     throw new Error(`${description} is not a code point: ${token}`);
@@ -378,6 +385,57 @@ export function parseUcdEntries(
       throw new Error(`${name}:${line}: range end precedes its start.`);
     }
     entries.push({ end, fields: rest, line, start });
+  }
+  return entries;
+}
+
+/** Parse an emoji sequence file, expanding its single-code-point ranges. */
+export function parseEmojiSequenceEntries(
+  source: string,
+  name: string,
+): readonly EmojiSequenceEntry[] {
+  const entries: EmojiSequenceEntry[] = [];
+  for (const [index, raw] of source.split("\n").entries()) {
+    const line = index + 1;
+    const trimmed = (raw.split("#")[0] ?? "").trim();
+    if (trimmed === "") continue;
+    const fields = trimmed.split(";").map((field) => field.trim());
+    if (fields.length < 2) {
+      throw new Error(`${name}:${line}: a data line needs a property.`);
+    }
+    const sourceSequence = fields[0] ?? "";
+    const property = fields[1] ?? "";
+    if (property === "") {
+      throw new Error(`${name}:${line}: an emoji property must not be empty.`);
+    }
+    const range = sourceSequence.split("..");
+    let sequences: readonly (readonly number[])[];
+    if (range.length === 2) {
+      const start = codePointValue(range[0] ?? "", `${name}:${line}`);
+      const end = codePointValue(range[1] ?? "", `${name}:${line}`);
+      if (end < start) {
+        throw new Error(`${name}:${line}: range end precedes its start.`);
+      }
+      sequences = Array.from({ length: end - start + 1 }, (_, offset) => [
+        start + offset,
+      ]);
+    } else {
+      if (range.length !== 1) {
+        throw new Error(`${name}:${line}: malformed code-point range.`);
+      }
+      const tokens = sourceSequence
+        .split(/\s+/u)
+        .filter((token) => token !== "");
+      if (tokens.length === 0) {
+        throw new Error(
+          `${name}:${line}: an emoji sequence must not be empty.`,
+        );
+      }
+      sequences = [
+        tokens.map((token) => codePointValue(token, `${name}:${line}`)),
+      ];
+    }
+    entries.push({ line, property, sequences });
   }
   return entries;
 }
@@ -841,6 +899,10 @@ export interface UnicodeTables {
   readonly scriptExtensionsPartition: CodePointPartition;
   readonly scriptNames: readonly string[];
   readonly scriptPartition: CodePointPartition;
+  readonly stringPropertySequences: ReadonlyMap<
+    string,
+    readonly (readonly number[])[]
+  >;
   readonly simpleCaseFolding: ReadonlyMap<number, number>;
   readonly simpleLowercase: ReadonlyMap<number, number>;
   readonly simpleTitlecase: ReadonlyMap<number, number>;
@@ -899,6 +961,21 @@ function assignmentsFromSets(
     }
   }
   return assignments;
+}
+
+function normalizeSequences(
+  sequences: readonly (readonly number[])[],
+): readonly (readonly number[])[] {
+  return [
+    ...new Map(
+      sequences.map((sequence) => [sequence.join(" "), sequence]),
+    ).values(),
+  ].toSorted((left, right) => {
+    if (left.length !== right.length) return right.length - left.length;
+    const leftKey = left.join(" ");
+    const rightKey = right.join(" ");
+    return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+  });
 }
 
 /** Build every table from the reviewed pinned inputs. */
@@ -1117,6 +1194,41 @@ export function buildUnicodeTables(
     codePointSetFromRanges(foldedIntoWord),
   );
 
+  const stringProperties = new Map<string, (readonly number[])[]>();
+  for (const name of ["emoji-sequences.txt", "emoji-zwj-sequences.txt"]) {
+    for (const entry of parseEmojiSequenceEntries(
+      requireContents(contents, name),
+      name,
+    )) {
+      const sequences = stringProperties.get(entry.property) ?? [];
+      sequences.push(...entry.sequences);
+      stringProperties.set(entry.property, sequences);
+    }
+  }
+  const stringPropertySequences = new Map<
+    string,
+    readonly (readonly number[])[]
+  >();
+  for (const [name, sequences] of stringProperties) {
+    stringPropertySequences.set(name, normalizeSequences(sequences));
+  }
+  const rgiComponents = [
+    "Basic_Emoji",
+    "Emoji_Keycap_Sequence",
+    "RGI_Emoji_Flag_Sequence",
+    "RGI_Emoji_Modifier_Sequence",
+    "RGI_Emoji_Tag_Sequence",
+    "RGI_Emoji_ZWJ_Sequence",
+  ];
+  const rgiSequences = rgiComponents.flatMap((name) => {
+    const sequences = stringProperties.get(name);
+    if (sequences == null) {
+      throw new Error(`The pinned emoji inputs do not define ${name}.`);
+    }
+    return sequences;
+  });
+  stringPropertySequences.set("RGI_Emoji", normalizeSequences(rgiSequences));
+
   return {
     binaryPropertySets,
     canonicalDecomposition: unicodeData.canonicalDecomposition,
@@ -1161,6 +1273,7 @@ export function buildUnicodeTables(
     scriptExtensionsPartition,
     scriptNames: scriptValues.canonical,
     scriptPartition,
+    stringPropertySequences,
     simpleCaseFolding: caseFolding.simple,
     simpleLowercase: unicodeData.simpleLowercase,
     simpleTitlecase: unicodeData.simpleTitlecase,
@@ -1308,6 +1421,18 @@ export function renderTablesModule(tables: UnicodeTables): string {
   const groups = tables.scriptExtensionsGroups.map((indices) =>
     indices.map((index) => index.toString(36)).join(" "),
   );
+  const stringPropertyEntries = [...tables.stringPropertySequences]
+    .toSorted(([left], [right]) => (left < right ? -1 : 1))
+    .map(
+      ([name, sequences]) =>
+        `  ${quote(name)}: ${stringList(
+          sequences.map((sequence) =>
+            sequence.map((codePoint) => codePoint.toString(36)).join(" "),
+          ),
+          2,
+        )},`,
+    )
+    .join("\n");
   return `${[
     "// Generated by mise run unicode:update. Do not edit by hand.",
     "//",
@@ -1425,6 +1550,15 @@ export function renderTablesModule(tables: UnicodeTables): string {
     "",
     "export const binaryPropertySets: BinaryPropertySetTable =",
     `  ${encodedRecord(binaryEntries)};`,
+    "",
+    "/** One encoded sequence list per ECMAScript string property. */",
+    "export interface StringPropertySequenceTable {",
+    "  readonly [name: string]: readonly string[];",
+    "}",
+    "",
+    "export const stringPropertySequences: StringPropertySequenceTable = {",
+    stringPropertyEntries,
+    "};",
     "",
     "/** Simple case folding, as the C and S statuses of CaseFolding.txt. */",
     `export const simpleCaseFolding: string = ${wrapEncoded(
@@ -1688,6 +1822,7 @@ export interface UnicodeTableSummary {
   readonly bytes: number;
   readonly generalCategories: number;
   readonly scripts: number;
+  readonly stringProperties: number;
   readonly unicodeVersion: string;
   readonly wordCharacters: number;
 }
@@ -1729,6 +1864,7 @@ export async function generateUnicodeTables(root: string): Promise<{
       bytes: Buffer.byteLength(source, "utf8"),
       generalCategories: tables.generalCategoryNames.length,
       scripts: tables.scriptNames.length,
+      stringProperties: tables.stringPropertySequences.size,
       unicodeVersion: tables.unicodeVersion,
       wordCharacters: codePointSetSize(tables.caseInsensitiveWordCharacters),
     },
@@ -1765,7 +1901,8 @@ async function main(): Promise<void> {
       `version=${summary.unicodeVersion} ` +
       `binary-properties=${summary.binaryProperties} ` +
       `general-categories=${summary.generalCategories} ` +
-      `scripts=${summary.scripts} bytes=${summary.bytes}`,
+      `scripts=${summary.scripts} ` +
+      `string-properties=${summary.stringProperties} bytes=${summary.bytes}`,
   );
 }
 

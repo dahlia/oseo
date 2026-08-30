@@ -53,6 +53,8 @@ const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpPrototypeAndExecFixtures } =
   await import("./native/fixtures/regexp-prototype-and-exec.ts");
+const { regexpPatternExtensionFixtures } =
+  await import("./native/fixtures/regexp-pattern-extensions.ts");
 const { arrayConstructorFixtures } =
   await import("./native/fixtures/array-constructor.ts");
 const { arrayPrototypeIterativeFixtures } =
@@ -153,6 +155,7 @@ const fixtures: readonly Fixture[] = [
   ...receiverFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
+  ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...regexpSymbolMethodsFixtures,
   ...generatorFixtures,
@@ -200,10 +203,6 @@ for (const deferredRegExp of [
   {
     name: "deferred-regexp-class-string.ts",
     source: 'new RegExp("[\\\\q{ab}]", "v");',
-  },
-  {
-    name: "deferred-regexp-modifier.ts",
-    source: 'new RegExp("(?i:a)");',
   },
   {
     name: "deferred-regexp-escaped-group-name.ts",
@@ -572,6 +571,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
+    fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "object-constructor" ||
@@ -804,6 +804,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "data-view" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
+    fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
@@ -880,6 +881,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "data-view" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||
+            fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||

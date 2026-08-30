@@ -23,7 +23,7 @@ results:
         rd-class-escape-negative-cases.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
-        class-word-class-escape-negative-cases.js:137:13:
+        class-word-class-escape-negative-cases.js:173:13:
         error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -79,7 +79,7 @@ results:
         ory_-_Paragraph_Separator.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Paragraph_Separator.js:104:22: error[OSEO1001]:
+        al_Category_-_Paragraph_Separator.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -104,7 +104,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Mong\
         olian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Mongolian.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Mongolian.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -129,7 +129,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Sinh\
         ala.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Sinhala.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Sinhala.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -154,7 +154,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Sora\
         _Sompeng.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Sora_Sompeng.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Sora_Sompeng.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -179,7 +179,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tai_\
         Yo.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Tai_Yo.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Tai_Yo.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -204,7 +204,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Khmer.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Khmer.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Khmer.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -230,7 +230,7 @@ results:
         ions_-_Nandinagari.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Nandinagari.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Nandinagari.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -256,7 +256,7 @@ results:
         ions_-_New_Tai_Lue.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_New_Tai_Lue.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_New_Tai_Lue.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -281,7 +281,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Newa.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Newa.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Newa.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -386,17 +386,59 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/RegExp/regexp-modifiers/nesting-dotAll-does-not-affect-alternatives-outside.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/RegExp/syntax-err-arithmetic-modifiers-reverse-other-code-point-combining-i.js
       strictness:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - regexp-modifiers
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

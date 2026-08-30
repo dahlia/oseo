@@ -51,7 +51,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Mro.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Mro.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Mro.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -76,7 +76,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Variation_Sel\
         ector.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Varia\
-        tion_Selector.js:104:22: error[OSEO1001]: Unknown binding
+        tion_Selector.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

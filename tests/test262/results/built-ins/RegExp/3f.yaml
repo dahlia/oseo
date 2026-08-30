@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Changes_When_\
         Uppercased.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Chang\
-        es_When_Uppercased.js:104:22: error[OSEO1001]: Unknown binding
+        es_When_Uppercased.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -46,7 +46,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Grapheme_Base\
         .js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Graph\
-        eme_Base.js:104:22: error[OSEO1001]: Unknown binding
+        eme_Base.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

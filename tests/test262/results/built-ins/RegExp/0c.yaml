@@ -64,6 +64,36 @@ results:
   - case:
       async: false
       features:
+        - regexp-lookbehind
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/lookBehind/do-not-backtrack.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/RegExp/lookBehind/do-not-backtrack.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/lookBehind/do-not-backtrack.js:100:18:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-unicode-property-escapes
       flags: []
       includes:
@@ -81,7 +111,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Beng\
         ali.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Bengali.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Bengali.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -101,14 +131,14 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -178,12 +208,12 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

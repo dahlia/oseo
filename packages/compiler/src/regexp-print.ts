@@ -104,6 +104,12 @@ function printTerm(term: RegExpTerm, indent: string): string {
   if (term.kind === "backreference") {
     return `${indent}backreference ${term.index}\n`;
   }
+  if (term.kind === "class-set") {
+    return (
+      `${indent}class-set ${term.operation}` +
+      `${term.negated ? " negated" : ""}\n`
+    );
+  }
   return `${indent}backreference ${term.name} -> ${term.indices.join(",")}\n`;
 }
 

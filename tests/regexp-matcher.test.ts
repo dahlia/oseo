@@ -41,12 +41,15 @@ import {
 import {
   caseEquivalenceClasses,
   propertyEscapeSet,
+  stringPropertyEscapeSet,
   unicodeMatcherData,
 } from "./regexp-matcher-data.ts";
 
 const propertyExtensions: RegExpPatternExtensions = {
-  admitted: ["unicode-property-escapes"],
-  unicodeProperty: (escape) => propertyEscapeSet(escape) != null,
+  admitted: ["class-set-notation", "modifiers", "unicode-property-escapes"],
+  unicodeProperty: (escape) =>
+    propertyEscapeSet(escape) != null ||
+    stringPropertyEscapeSet(escape) != null,
 };
 
 function artifact(source: string, flags: string): RegExpMatcherProgram {
@@ -255,6 +258,40 @@ test("records a strictly increasing canonicalization table", () => {
       }
       assert.ok((table.canonical[offset] ?? -1) < character);
     }
+  }
+});
+
+test("matches class-set operations and pinned properties of strings", () => {
+  for (const [source, input] of [
+    ["^[[a-c]&&[b-d]]$", "b"],
+    ["^[[a-c]--[b]]$", "c"],
+    ["^[\\q{ab|cd}x]$", "ab"],
+    ["^\\p{Emoji_Keycap_Sequence}$", "9\ufe0f\u20e3"],
+    ["^\\p{RGI_Emoji}$", "👨‍👩‍👧"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, "v", input),
+      hostObserve(source, "v", input),
+    );
+  }
+  assert.equal(observe("^[[a-c]&&[b-d]]$", "v", "a"), undefined);
+  assert.equal(observe("^[[a-c]--[b]]$", "v", "b"), undefined);
+  assert.equal(artifact("^\\p{RGI_Emoji}+$", "v").instructions.length, 10_173);
+});
+
+test("folds class-set operands before v-mode set operations", () => {
+  for (const [source, flags, input] of [
+    ["[^a]", "iv", "a"],
+    ["[a&&A]", "iv", "a"],
+    ["[[a-z]--A]", "iv", "a"],
+    ["[\\q{AB}--\\q{ab}]", "iv", "AB"],
+    ["[\\q{|a}]", "v", "a"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, flags, input),
+      hostObserve(source, flags, input),
+      `/${source}/${flags} on ${input}`,
+    );
   }
 });
 

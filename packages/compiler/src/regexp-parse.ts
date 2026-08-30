@@ -6,6 +6,8 @@ import {
   type RegExpCapture,
   type RegExpCharacter,
   type RegExpCharacterClass,
+  type RegExpClassSetOperand,
+  type RegExpClassStringDisjunction,
   type RegExpClassEscape,
   type RegExpClassEscapeSet,
   type RegExpClassItem,
@@ -26,6 +28,7 @@ import {
   type RegExpSpan,
   type RegExpTerm,
   type RegExpUnicodePropertyEscape,
+  type RegExpUnicodeClassSet,
 } from "./regexp.ts";
 import type { RegExpLiteralSyntax } from "./syntax.ts";
 
@@ -60,6 +63,28 @@ const unicodeStringProperties = new Set<string>([
   "RGI_Emoji_Tag_Sequence",
   "RGI_Emoji_ZWJ_Sequence",
 ]);
+
+/** Characters that must be escaped inside a Unicode class set. */
+const classSetSyntaxCharacters = new Set<string>("(){}[/-|");
+
+/** Punctuators reserved when two equal copies occur in a class set. */
+const classSetReservedDoublePunctuators = new Set<string>(
+  "!#$%&*+,.:;<=>?@^`~",
+);
+
+function readClassSetCharacterEscape(state: ParseState, start: number): number {
+  const character = at(state, 0);
+  if (
+    character != null &&
+    ((state.unicodeMode && character === "-") ||
+      (state.flags.unicodeSets &&
+        classSetReservedDoublePunctuators.has(character)))
+  ) {
+    state.index += 1;
+    return character.codePointAt(0) ?? 0;
+  }
+  return readCharacterEscape(state, start);
+}
 
 const noExtensions: RegExpPatternExtensions = { admitted: [] };
 
@@ -595,6 +620,17 @@ function readUnicodePropertyEscape(
       return { value: second };
     }),
   };
+  if (
+    !state.flags.unicodeSets &&
+    escape.value == null &&
+    unicodeStringProperties.has(escape.property)
+  ) {
+    fail(
+      "invalid",
+      "A Unicode property of strings requires the v flag.",
+      location,
+    );
+  }
   if (!resolve(escape)) {
     if (
       state.flags.unicodeSets &&
@@ -744,16 +780,244 @@ function classItemValue(item: RegExpClassItem): RegExpCharacter | undefined {
   return item.kind === "character" ? item : undefined;
 }
 
-function parseCharacterClass(state: ParseState): RegExpCharacterClass {
+function parseClassStringDisjunction(
+  state: ParseState,
+): RegExpClassStringDisjunction {
   const start = state.index;
-  state.index += 1;
-  if (state.flags.unicodeSets) {
+  state.index += 3;
+  const strings: RegExpCharacter[][] = [];
+  let characters: RegExpCharacter[] = [];
+  for (;;) {
+    if (done(state)) {
+      fail("invalid", "A class string disjunction is unterminated.", {
+        end: state.index,
+        start,
+      });
+    }
+    if (eat(state, "|") || at(state, 0) === "}") {
+      strings.push(characters);
+      characters = [];
+      if (eat(state, "}")) break;
+      continue;
+    }
+    const characterStart = state.index;
+    let value: number;
+    if (eat(state, "\\")) {
+      if (eat(state, "b")) {
+        value = 0x08;
+      } else {
+        value = readClassSetCharacterEscape(state, characterStart);
+      }
+    } else {
+      validateClassSetCharacter(state);
+      value = readCharacter(state).value;
+    }
+    characters.push({
+      kind: "character",
+      span: span(characterStart, state.index),
+      value,
+    });
+  }
+  return {
+    kind: "class-strings",
+    span: span(start, state.index),
+    strings,
+  };
+}
+
+function validateClassSetCharacter(state: ParseState): void {
+  const firstCharacter = at(state, 0);
+  if (
+    firstCharacter == null ||
+    firstCharacter === "]" ||
+    state.source.startsWith("&&", state.index) ||
+    state.source.startsWith("--", state.index)
+  ) {
     fail(
-      "unsupported",
-      "Class set notation is not admitted yet.",
-      span(start, state.index),
+      "invalid",
+      "A class set operator needs an operand.",
+      span(state.index, Math.min(state.index + 2, state.source.length)),
     );
   }
+  if (classSetSyntaxCharacters.has(firstCharacter)) {
+    fail(
+      "invalid",
+      "A class set syntax character must be escaped.",
+      span(state.index, state.index + 1),
+    );
+  }
+  if (
+    firstCharacter === at(state, 1) &&
+    classSetReservedDoublePunctuators.has(firstCharacter)
+  ) {
+    fail(
+      "invalid",
+      "A doubled class set punctuator must be escaped.",
+      span(state.index, state.index + 2),
+    );
+  }
+}
+
+function parseClassSetOperand(state: ParseState): RegExpClassSetOperand {
+  if (at(state, 0) === "[") return parseUnicodeClassSet(state);
+  if (state.source.startsWith("\\q{", state.index)) {
+    return parseClassStringDisjunction(state);
+  }
+  validateClassSetCharacter(state);
+  const first = parseClassAtom(state);
+  if (
+    first.kind === "character" &&
+    at(state, 0) === "-" &&
+    at(state, 1) !== "-" &&
+    at(state, 1) !== "]" &&
+    at(state, 1) != null
+  ) {
+    state.index += 1;
+    if (at(state, 0) === "[") {
+      fail(
+        "invalid",
+        "A nested class set cannot be a range bound.",
+        span(first.span.start, state.index + 1),
+      );
+    }
+    validateClassSetCharacter(state);
+    const second = parseClassAtom(state);
+    if (second.kind !== "character" || first.value > second.value) {
+      fail("invalid", "A character class range is invalid.", {
+        end: state.index,
+        start: first.span.start,
+      });
+    }
+    return {
+      end: second,
+      kind: "range",
+      span: span(first.span.start, state.index),
+      start: first,
+    };
+  }
+  return first;
+}
+
+function classSetOperandMayContainStrings(
+  operand: RegExpClassSetOperand,
+): boolean {
+  if (operand.kind === "class-strings") {
+    return operand.strings.some((characters) => characters.length !== 1);
+  }
+  if (operand.kind === "unicode-property") {
+    return (
+      !operand.negated &&
+      operand.value == null &&
+      unicodeStringProperties.has(operand.property)
+    );
+  }
+  if (operand.kind !== "class-set") return false;
+  if (operand.operation === "union") {
+    return operand.operands.some(classSetOperandMayContainStrings);
+  }
+  if (operand.operation === "intersection") {
+    return (
+      operand.operands.length > 0 &&
+      operand.operands.every(classSetOperandMayContainStrings)
+    );
+  }
+  const first = operand.operands[0];
+  return first != null && classSetOperandMayContainStrings(first);
+}
+
+function parseUnicodeClassSet(state: ParseState): RegExpUnicodeClassSet {
+  const start = state.index;
+  state.index += 1;
+  const negated = eat(state, "^");
+  const operands: RegExpClassSetOperand[] = [];
+  if (at(state, 0) !== "]") operands.push(parseClassSetOperand(state));
+  let operation: RegExpUnicodeClassSet["operation"] = "union";
+  if (state.source.startsWith("&&", state.index)) {
+    operation = "intersection";
+  } else if (state.source.startsWith("--", state.index)) {
+    operation = "subtraction";
+  }
+  if (operation !== "union" && operands[0]?.kind === "range") {
+    fail(
+      "invalid",
+      "A class set range cannot be an intersection or subtraction operand.",
+      operands[0].span,
+    );
+  }
+  while (!done(state) && at(state, 0) !== "]") {
+    if (operation === "intersection") {
+      if (!state.source.startsWith("&&", state.index)) {
+        fail("invalid", "A class set mixes its operators.", {
+          end: state.index + 1,
+          start: state.index,
+        });
+      }
+      state.index += 2;
+      if (at(state, 0) === "&") {
+        fail(
+          "invalid",
+          "A class set operator needs an operand.",
+          span(state.index - 2, state.index + 1),
+        );
+      }
+    } else if (operation === "subtraction") {
+      if (!state.source.startsWith("--", state.index)) {
+        fail("invalid", "A class set mixes its operators.", {
+          end: state.index + 1,
+          start: state.index,
+        });
+      }
+      state.index += 2;
+    }
+    const operand = parseClassSetOperand(state);
+    if (operation !== "union" && operand.kind === "range") {
+      fail(
+        "invalid",
+        "A class set range cannot be an intersection or subtraction " +
+          "operand.",
+        operand.span,
+      );
+    }
+    operands.push(operand);
+  }
+  if (!eat(state, "]")) {
+    fail("invalid", "A character class is unterminated.", {
+      end: state.index,
+      start,
+    });
+  }
+  const classSet: RegExpUnicodeClassSet = {
+    kind: "class-set",
+    negated,
+    operands,
+    operation,
+    span: span(start, state.index),
+  };
+  if (negated && classSetOperandMayContainStrings(classSet)) {
+    fail(
+      "invalid",
+      "A negated character class may contain strings.",
+      classSet.span,
+    );
+  }
+  return classSet;
+}
+
+function parseCharacterClass(
+  state: ParseState,
+): RegExpCharacterClass | RegExpUnicodeClassSet {
+  const start = state.index;
+  if (state.flags.unicodeSets) {
+    if (!admits(state, "class-set-notation")) {
+      fail(
+        "unsupported",
+        "Class set notation is not admitted yet.",
+        span(start, start + 1),
+      );
+    }
+    return parseUnicodeClassSet(state);
+  }
+  state.index += 1;
   const negated = eat(state, "^");
   const items: RegExpClassItem[] = [];
   for (;;) {
@@ -809,10 +1073,6 @@ function parseClassAtom(state: ParseState): RegExpClassItem {
     state.index += 1;
     return { kind: "character", span: span(start, state.index), value: 8 };
   }
-  if (state.unicodeMode && at(state, 0) === "-") {
-    state.index += 1;
-    return { kind: "character", span: span(start, state.index), value: 0x2d };
-  }
   const classEscape = readClassEscape(state, start);
   if (classEscape != null) return classEscape;
   const property = readUnicodePropertyEscape(state, start);
@@ -820,7 +1080,7 @@ function parseClassAtom(state: ParseState): RegExpClassItem {
   return {
     kind: "character",
     span: span(start, state.index),
-    value: readCharacterEscape(state, start),
+    value: readClassSetCharacterEscape(state, start),
   };
 }
 

@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Bugi\
         nese.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Buginese.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Buginese.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -46,7 +46,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Javanese.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Javanese.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Javanese.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -72,7 +72,7 @@ results:
         ions_-_Khitan_Small_Script.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Khitan_Small_Script.js:104:22: error[OSEO1001]:
+        t_Extensions_-_Khitan_Small_Script.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

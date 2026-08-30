@@ -4,6 +4,7 @@ import {
   type RegExpAtom,
   type RegExpCapture,
   type RegExpCharacterClass,
+  type RegExpClassSetOperand,
   type RegExpClassEscapeSet,
   type RegExpClassItem,
   type RegExpDisjunction,
@@ -16,6 +17,7 @@ import {
   type RegExpSpan,
   type RegExpTerm,
   type RegExpUnicodePropertyEscape,
+  type RegExpUnicodeClassSet,
 } from "./regexp.ts";
 
 function includePropertiesWhen<const Properties extends object>(
@@ -104,6 +106,42 @@ function setComplement(set: RegExpMatcherSet): RegExpMatcherSet {
   }
   if (position < codePointLimit) boundaries.push(position, codePointLimit);
   return boundaries;
+}
+
+function combineSets(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+  include: (inLeft: boolean, inRight: boolean) => boolean,
+): RegExpMatcherSet {
+  const points = [...new Set([0, ...left, ...right, codePointLimit])].toSorted(
+    (first, second) => first - second,
+  );
+  const result: number[] = [];
+  let included = false;
+  for (let index = 0; index + 1 < points.length; index += 1) {
+    const point = points[index] ?? 0;
+    const next = include(setHas(left, point), setHas(right, point));
+    if (next !== included) result.push(point);
+    included = next;
+  }
+  if (included) result.push(codePointLimit);
+  return result;
+}
+
+/** The intersection of two inversion lists. */
+function setIntersection(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+): RegExpMatcherSet {
+  return combineSets(left, right, (inLeft, inRight) => inLeft && inRight);
+}
+
+/** The members of the first inversion list absent from the second. */
+function setDifference(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+): RegExpMatcherSet {
+  return combineSets(left, right, (inLeft, inRight) => inLeft && !inRight);
 }
 
 /** Build a normalized inversion list from unsorted inclusive ranges. */
@@ -391,6 +429,9 @@ export interface RegExpMatcherUnicodeData {
   readonly propertySet?: (
     escape: RegExpUnicodePropertyEscape,
   ) => RegExpMatcherSet | undefined;
+  readonly stringPropertySet?: (
+    escape: RegExpUnicodePropertyEscape,
+  ) => readonly (readonly number[])[] | undefined;
   readonly spaceSeparators?: RegExpMatcherSet;
 }
 
@@ -480,18 +521,18 @@ const unplacedLabel = -1;
  */
 interface Builder {
   readonly addresses: number[];
-  readonly dotAll: boolean;
   readonly failLabel: number;
-  readonly ignoreCase: boolean;
   readonly instructions: RegExpMatcherInstruction[];
   readonly limits: RegExpMatcherLimits;
-  readonly multiline: boolean;
   readonly setIndices: Map<string, number>;
   readonly sets: RegExpMatcherSet[];
   readonly unicodeData: RegExpMatcherUnicodeData;
   readonly unicodeMode: boolean;
   readonly unicodeSets: boolean;
+  caseRepresentatives: ReadonlyMap<number, number> | undefined;
   classes: readonly (readonly number[])[] | undefined;
+  dotAll: boolean;
+  ignoreCase: boolean;
   /**
    * How many instructions a native encoding of this artifact needs.
    *
@@ -503,8 +544,9 @@ interface Builder {
    * than on this array's length alone.
    */
   lowered: number;
+  multiline: boolean;
   registers: number;
-  wordSet: number | undefined;
+  readonly wordSets: Map<boolean, number>;
 }
 
 function newLabel(builder: Builder): number {
@@ -614,6 +656,25 @@ function closeSet(
   return added.length === 0 ? set : setUnion(set, setOfRanges(added));
 }
 
+/** Map each cased character to one stable representative of its class. */
+function caseRepresentatives(
+  builder: Builder,
+  span: RegExpSpan,
+): ReadonlyMap<number, number> {
+  const cached = builder.caseRepresentatives;
+  if (cached != null) return cached;
+  const representatives = new Map<number, number>();
+  for (const members of caseClasses(builder, span)) {
+    const representative = members.reduce(
+      (lowest, member) => Math.min(lowest, member),
+      members[0] ?? 0,
+    );
+    for (const member of members) representatives.set(member, representative);
+  }
+  builder.caseRepresentatives = representatives;
+  return representatives;
+}
+
 /**
  * The `WordCharacters` of this pattern.
  *
@@ -686,6 +747,127 @@ function propertyEscapeSet(
   return setComplement(resolved);
 }
 
+interface ClassValue {
+  readonly characters: RegExpMatcherSet;
+  readonly strings: readonly (readonly number[])[];
+}
+
+function normalizeClassValue(value: ClassValue): ClassValue {
+  let characters = value.characters;
+  const strings: readonly (readonly number[])[] = value.strings.filter(
+    (sequence) => {
+      const character = sequence.length === 1 ? sequence[0] : undefined;
+      if (character == null) return true;
+      characters = setUnion(characters, setOfRange(character, character));
+      return false;
+    },
+  );
+  const unique = new Map(
+    strings.map((sequence) => [sequence.join(","), sequence]),
+  );
+  return { characters, strings: [...unique.values()] };
+}
+
+function propertyEscapeClassValue(
+  builder: Builder,
+  escape: RegExpUnicodePropertyEscape,
+): ClassValue {
+  const characters = builder.unicodeData.propertySet?.(escape);
+  if (characters != null) {
+    return { characters: propertyEscapeSet(builder, escape), strings: [] };
+  }
+  const strings = builder.unicodeData.stringPropertySet?.(escape);
+  if (strings == null || escape.negated) {
+    refuse(
+      "unsupported",
+      "A Unicode property of strings needs data that is not linked.",
+      escape.span,
+    );
+  }
+  return normalizeClassValue({ characters: [], strings });
+}
+
+function classSetOperandValue(
+  builder: Builder,
+  operand: RegExpClassSetOperand,
+): ClassValue {
+  let value: ClassValue;
+  if (operand.kind === "class-set") {
+    value = classSetValue(builder, operand);
+  } else if (operand.kind === "class-strings") {
+    value = normalizeClassValue({
+      characters: [],
+      strings: operand.strings.map((characters) =>
+        characters.map((character) => character.value),
+      ),
+    });
+  } else if (operand.kind === "unicode-property") {
+    value = propertyEscapeClassValue(builder, operand);
+  } else {
+    value = { characters: classItemSet(builder, operand), strings: [] };
+  }
+  if (!builder.unicodeSets || !builder.ignoreCase) return value;
+  const representatives = caseRepresentatives(builder, operand.span);
+  return normalizeClassValue({
+    characters: closeSet(builder, value.characters, operand.span),
+    strings: value.strings.map((sequence) =>
+      sequence.map((character) => representatives.get(character) ?? character),
+    ),
+  });
+}
+
+function classValueUnion(left: ClassValue, right: ClassValue): ClassValue {
+  return normalizeClassValue({
+    characters: setUnion(left.characters, right.characters),
+    strings: [...left.strings, ...right.strings],
+  });
+}
+
+function classValueIntersection(
+  left: ClassValue,
+  right: ClassValue,
+): ClassValue {
+  const rightStrings = new Set(right.strings.map((value) => value.join(",")));
+  return {
+    characters: setIntersection(left.characters, right.characters),
+    strings: left.strings.filter((value) => rightStrings.has(value.join(","))),
+  };
+}
+
+function classValueDifference(left: ClassValue, right: ClassValue): ClassValue {
+  const rightStrings = new Set(right.strings.map((value) => value.join(",")));
+  return {
+    characters: setDifference(left.characters, right.characters),
+    strings: left.strings.filter((value) => !rightStrings.has(value.join(","))),
+  };
+}
+
+function classSetValue(
+  builder: Builder,
+  node: RegExpUnicodeClassSet,
+): ClassValue {
+  let value: ClassValue = { characters: [], strings: [] };
+  for (const [index, operand] of node.operands.entries()) {
+    const next = classSetOperandValue(builder, operand);
+    if (index === 0 || node.operation === "union") {
+      value = classValueUnion(value, next);
+    } else if (node.operation === "intersection") {
+      value = classValueIntersection(value, next);
+    } else {
+      value = classValueDifference(value, next);
+    }
+  }
+  if (!node.negated) return value;
+  if (value.strings.length > 0) {
+    refuse(
+      "unsupported",
+      "A negated class set cannot contain strings.",
+      node.span,
+    );
+  }
+  return { characters: setComplement(value.characters), strings: [] };
+}
+
 /** The raw set one class member names, before the class is closed. */
 function classItemSet(
   builder: Builder,
@@ -742,11 +924,142 @@ function characterAtomSet(
     );
   }
   if (atom.kind === "unicode-property") {
+    if (
+      builder.unicodeData.propertySet?.(atom) == null &&
+      builder.unicodeData.stringPropertySet?.(atom) != null
+    ) {
+      return undefined;
+    }
     return closeSet(builder, propertyEscapeSet(builder, atom), atom.span);
   }
+  if (atom.kind === "class-set") return undefined;
   if (atom.kind !== "character-class") return undefined;
   const closed = closeSet(builder, characterClassSet(builder, atom), atom.span);
   return atom.negated ? setComplement(closed) : closed;
+}
+
+function emitClassValueBranch(
+  builder: Builder,
+  sequence: readonly number[] | RegExpMatcherSet,
+  characters: boolean,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  if (characters) {
+    const closed = closeSet(builder, sequence, span);
+    emit(
+      builder,
+      { backward, kind: "consume", set: internSet(builder, closed) },
+      span,
+    );
+    return;
+  }
+  const ordered = backward ? sequence.toReversed() : sequence;
+  for (const character of ordered) {
+    const closed = closeSet(builder, setOfRange(character, character), span);
+    emit(
+      builder,
+      { backward, kind: "consume", set: internSet(builder, closed) },
+      span,
+    );
+  }
+}
+
+interface ClassStringTrie {
+  readonly children: Map<number, ClassStringTrie>;
+  terminal: boolean;
+}
+
+function classStringTrie(
+  sequences: readonly (readonly number[])[],
+  backward: boolean,
+): ClassStringTrie {
+  const root: ClassStringTrie = { children: new Map(), terminal: false };
+  for (const source of sequences.toSorted(
+    (first, second) => second.length - first.length,
+  )) {
+    const sequence = backward ? source.toReversed() : source;
+    let node = root;
+    for (const character of sequence) {
+      const child: ClassStringTrie = node.children.get(character) ?? {
+        children: new Map(),
+        terminal: false,
+      };
+      node.children.set(character, child);
+      node = child;
+    }
+    node.terminal = true;
+  }
+  return root;
+}
+
+function emitClassAlternatives(
+  builder: Builder,
+  branches: readonly (() => void)[],
+  span: RegExpSpan,
+): void {
+  if (branches.length === 0) return;
+  const end = newLabel(builder);
+  for (const [index, branch] of branches.entries()) {
+    if (index + 1 === branches.length) {
+      branch();
+      break;
+    }
+    const preferred = newLabel(builder);
+    const next = newLabel(builder);
+    emit(builder, { alternative: next, kind: "fork", preferred }, span);
+    placeLabel(builder, preferred);
+    branch();
+    emit(builder, { kind: "jump", target: end }, span);
+    placeLabel(builder, next);
+  }
+  placeLabel(builder, end);
+}
+
+function emitClassStringTrie(
+  builder: Builder,
+  node: ClassStringTrie,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  const branches: (() => void)[] = [...node.children].map(
+    ([character, child]) =>
+      () => {
+        emitClassValueBranch(builder, [character], false, backward, span);
+        emitClassStringTrie(builder, child, backward, span);
+      },
+  );
+  if (node.terminal) branches.push(() => undefined);
+  emitClassAlternatives(builder, branches, span);
+}
+
+function buildClassValue(
+  builder: Builder,
+  value: ClassValue,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  if (value.strings.length === 0 && value.characters.length === 0) {
+    emitClassValueBranch(builder, [], true, backward, span);
+    return;
+  }
+  const branches: (() => void)[] = [];
+  const nonEmptyStrings = value.strings.filter(
+    (sequence) => sequence.length > 0,
+  );
+  if (nonEmptyStrings.length > 0) {
+    const trie = classStringTrie(nonEmptyStrings, backward);
+    branches.push(() => emitClassStringTrie(builder, trie, backward, span));
+  }
+  if (value.characters.length > 0) {
+    branches.push(() =>
+      emitClassValueBranch(builder, value.characters, true, backward, span),
+    );
+  }
+  if (value.strings.some((sequence) => sequence.length === 0)) {
+    branches.push(() => undefined);
+  }
+  emitClassAlternatives(builder, branches, span);
 }
 
 /** The lowest and highest capture index one atom encloses. */
@@ -801,6 +1114,19 @@ function buildAtom(
     );
     return;
   }
+  if (atom.kind === "class-set") {
+    buildClassValue(builder, classSetValue(builder, atom), backward, atom.span);
+    return;
+  }
+  if (atom.kind === "unicode-property") {
+    buildClassValue(
+      builder,
+      propertyEscapeClassValue(builder, atom),
+      backward,
+      atom.span,
+    );
+    return;
+  }
   if (atom.kind === "capturing-group") {
     const start = 2 * atom.index;
     const end = start + 1;
@@ -814,11 +1140,21 @@ function buildAtom(
     return;
   }
   if (atom.kind === "modifier-group") {
-    refuse(
-      "unsupported",
-      "An inline modifier group has no matcher lowering yet.",
-      atom.span,
-    );
+    const dotAll = builder.dotAll;
+    const ignoreCase = builder.ignoreCase;
+    const multiline = builder.multiline;
+    builder.dotAll =
+      atom.enabled.includes("s") || (dotAll && !atom.disabled.includes("s"));
+    builder.ignoreCase =
+      atom.enabled.includes("i") ||
+      (ignoreCase && !atom.disabled.includes("i"));
+    builder.multiline =
+      atom.enabled.includes("m") || (multiline && !atom.disabled.includes("m"));
+    buildDisjunction(builder, atom.body, backward);
+    builder.dotAll = dotAll;
+    builder.ignoreCase = ignoreCase;
+    builder.multiline = multiline;
+    return;
   }
   if (atom.kind === "backreference" || atom.kind === "named-backreference") {
     const slots =
@@ -910,8 +1246,9 @@ function buildAssertion(builder: Builder, term: RegExpEdgeAssertion): void {
     return;
   }
   const set =
-    builder.wordSet ?? internSet(builder, wordCharacters(builder, term.span));
-  builder.wordSet = set;
+    builder.wordSets.get(builder.ignoreCase) ??
+    internSet(builder, wordCharacters(builder, term.span));
+  builder.wordSets.set(builder.ignoreCase, set);
   emit(
     builder,
     {
@@ -1167,6 +1504,7 @@ export function buildRegExpMatcher(
   const flags = pattern.flags;
   const builder: Builder = {
     addresses: [unplacedLabel],
+    caseRepresentatives: undefined,
     classes: undefined,
     dotAll: flags.dotAll,
     failLabel: 0,
@@ -1181,7 +1519,7 @@ export function buildRegExpMatcher(
     unicodeData: options.unicodeData ?? {},
     unicodeMode: regExpUnicodeMode(flags),
     unicodeSets: flags.unicodeSets,
-    wordSet: undefined,
+    wordSets: new Map(),
   };
   const whole: RegExpSpan = { end: pattern.source.length, start: 0 };
   try {

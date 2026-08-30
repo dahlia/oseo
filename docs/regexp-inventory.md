@@ -141,16 +141,16 @@ Unicode inputs
 --------------
 
 `@oseo/unicode` pins one reviewed copy of the Unicode Character Database
-for Unicode 17.0.0 and generates `General_Category`, `Script`,
-`Script_Extensions`, every binary property in table 70 of ECMA-262, simple
-and full case folding, the simple and unconditional full case mappings, and
-both ECMAScript word-character sets. Sets are inversion lists.
+for Unicode 17.0.0 and the Unicode 17.0 emoji sequence and ZWJ sequence
+files. It generates `General_Category`, `Script`, `Script_Extensions`, every
+binary property in table 70 of ECMA-262, the seven ECMAScript properties of
+strings, simple and full case folding, the simple and unconditional full
+case mappings, and both ECMAScript word-character sets. Code-point sets are
+inversion lists, and string properties are ordered lists of code-point
+sequences.
 
-Two inputs are missing for the complete family. Properties of strings,
-which only the `v` flag needs, are sequence rather than code-point
-properties and need emoji sequence files that package does not pin; the
-unit that admits class set notation owns them. `ID_Start` and `ID_Continue`
-are generated but unreachable from the compiler core, because
+`ID_Start` and `ID_Continue` are generated but unreachable from the compiler
+core, because
 *tools/check-boundaries.ts* gives `@oseo/compiler` no package dependencies.
 The pattern parser therefore decides ASCII itself and takes a classifier
 from its caller for anything else, which is why a group name or a
@@ -178,6 +178,13 @@ literal:
 | An owned parser or matcher limit  | `OSEO1001` | the construct that reaches the limit  |
 | A Unicode fact that is not linked | `OSEO1001` | the construct that needs it           |
 | A valid, admitted pattern         | none       | it compiles ahead of time             |
+
+Class set notation, properties of strings, inline modifiers, Unicode group
+names, named groups, lookbehind, match indices, and dotAll matching are
+admitted for literals. The dynamic C pattern compiler admits inline
+modifiers and the code-point grammar it already owns, but it links no pinned
+Unicode tables, so a dynamic property escape or class set retains its located
+`OSEO2001` profile boundary rather than matching from incomplete data.
 
 The bootstrap parser still rejects a duplicate or unknown flag before the
 owned parser sees the literal, so those two produce `OSEO0001` at the

@@ -51,11 +51,21 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/String/prototype/replace/regexp-prototype-replace-v-u-flag.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/replace/regexp-prototype-replace-v-u-flag.js:87:10:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
   - case:
       async: false
       features:

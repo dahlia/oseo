@@ -11,5 +11,6 @@
 export {
   caseEquivalenceClasses,
   propertyEscapeSet,
+  stringPropertyEscapeSet,
   unicodeMatcherData,
 } from "../packages/cli/src/index.ts";

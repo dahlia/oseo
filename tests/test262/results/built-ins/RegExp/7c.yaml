@@ -51,7 +51,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/ID_Continue.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/ID_Co\
-        ntinue.js:104:22: error[OSEO1001]: Unknown binding
+        ntinue.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -76,7 +76,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Meet\
         ei_Mayek.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Meetei_Mayek.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Meetei_Mayek.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -101,7 +101,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/XID_Continue.\
         js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/XID_C\
-        ontinue.js:104:22: error[OSEO1001]: Unknown binding
+        ontinue.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

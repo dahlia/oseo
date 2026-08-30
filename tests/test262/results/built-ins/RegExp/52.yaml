@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Extender.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Exten\
-        der.js:104:22: error[OSEO1001]: Unknown binding
+        der.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

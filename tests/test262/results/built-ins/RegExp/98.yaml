@@ -64,6 +64,38 @@ results:
   - case:
       async: false
       features:
+        - regexp-lookbehind
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/RegExp/lookBehind/back-references.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/RegExp/lookBehind/back-references.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/lookBehind/back-references.js:107:21:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-unicode-property-escapes
       flags: []
       includes:
@@ -81,7 +113,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lati\
         n.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Latin.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Latin.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

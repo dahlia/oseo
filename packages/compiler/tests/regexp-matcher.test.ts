@@ -359,6 +359,29 @@ test("evaluates a lookbehind body from right to left", () => {
   assert.deepEqual(search("(?<=(a+))b", "", "aaab"), ["b", "aaa"]);
 });
 
+test("scopes inline modifiers to their group", () => {
+  const parsed = parseRegExpPattern({
+    extensions: { admitted: ["modifiers"] },
+    flags: "",
+    source: "(?i:a)(?-i:B)(?s:.)(?-s:.)\\n(?m:^x$)",
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const result = buildRegExpMatcher(pattern, {
+    unicodeData: asciiUnicodeData,
+  });
+  assert.deepEqual(result.errors, []);
+  const program = result.program;
+  if (program == null) throw new Error("a built artifact is present");
+  const matched = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: "aB\nq\nx\n",
+  });
+  assert.equal(matched.outcome, "matched");
+});
+
 test("matches a backreference, including one that never participated", () => {
   assert.deepEqual(search("(a)\\1", "", "aa"), ["aa", "a"]);
   assert.deepEqual(search("(a)?\\1b", "", "b"), ["b", null]);
@@ -435,22 +458,6 @@ test("advances a search by one character unless the pattern is sticky", () => {
   assert.equal(found("", "", "ab", 2), "2:");
   assert.equal(found("a", "", "aa", 3), "unmatched");
   assert.equal(found("b", "u", "a\u{1F600}b"), "3:b");
-});
-
-test("refuses a construct whose matcher semantics this unit lacks", () => {
-  const modifiers = refused(
-    "(?i:a)",
-    "u",
-    { unicodeData: asciiUnicodeData },
-    { admitted: ["modifiers"] },
-  );
-  assert.equal(modifiers.kind, "unsupported");
-  assert.equal(modifiers.section, "pattern");
-  assert.deepEqual(modifiers.span, { end: 6, start: 0 });
-  assert.equal(
-    modifiers.message,
-    "An inline modifier group has no matcher lowering yet.",
-  );
 });
 
 test("refuses a pattern whose Unicode facts the caller did not supply", () => {

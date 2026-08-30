@@ -142,7 +142,7 @@ results:
         ions_-_Old_Sogdian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Old_Sogdian.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Old_Sogdian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -141,7 +141,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Alphabetic.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Alpha\
-        betic.js:104:22: error[OSEO1001]: Unknown binding
+        betic.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -166,7 +166,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Mandaic.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Mandaic.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Mandaic.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

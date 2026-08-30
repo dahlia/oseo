@@ -1087,7 +1087,7 @@ static OseoRegExpValidation regexp_validate_pattern(
                         (add & rem) != 0u) {
                         return OSEO_REGEXP_INVALID;
                     }
-                    return OSEO_REGEXP_UNSUPPORTED;
+                    index = mc;
                 } else {
                     return OSEO_REGEXP_INVALID;
                 }

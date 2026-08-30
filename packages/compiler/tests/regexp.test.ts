@@ -195,6 +195,10 @@ test("records class items, ranges, and class escapes", () => {
     term.items.map((item) => item.kind),
     ["range", "class-escape", "character", "character"],
   );
+  assert.equal(
+    accepted("[\\-a]", "u").body.alternatives[0]?.terms[0]?.kind,
+    "character-class",
+  );
 });
 
 test("prints the owned model rather than the written text", () => {
@@ -589,17 +593,17 @@ test("distinguishes unadmitted properties of strings from early errors", () => {
     unsupported.message,
     "A Unicode property of strings is not admitted yet.",
   );
-  for (const [source, flags] of [
-    ["\\p{RGI_Emoji}", "u"],
-    ["\\P{RGI_Emoji}", "v"],
+  for (const [source, flags, message] of [
+    [
+      "\\p{RGI_Emoji}",
+      "u",
+      "A Unicode property of strings requires the v flag.",
+    ],
+    ["\\P{RGI_Emoji}", "v", "This Unicode property is not defined."],
   ] as const) {
     const error = rejected(source, flags, { extensions });
     assert.equal(error.kind, "invalid", `${source}/${flags}`);
-    assert.equal(
-      error.message,
-      "This Unicode property is not defined.",
-      `${source}/${flags}`,
-    );
+    assert.equal(error.message, message, `${source}/${flags}`);
   }
 });
 
@@ -623,6 +627,94 @@ test("admits inline modifiers only through the extension point", () => {
   ];
   for (const [source, message] of cases) {
     const error = rejected(source, "u", { extensions });
+    assert.equal(error.kind, "invalid", source);
+    assert.equal(error.message, message, source);
+  }
+});
+
+test("admits Unicode class sets only through the extension point", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation", "unicode-property-escapes"],
+    unicodeProperty: (escape) => escape.property === "RGI_Emoji",
+  };
+  const result = parseRegExpPattern({
+    extensions,
+    flags: "v",
+    source: "[[a-c]--[b]]",
+  });
+  assert.equal(result.parsed, true);
+  const term = result.pattern?.body.alternatives[0]?.terms[0];
+  assert.equal(term?.kind, "class-set");
+  if (term?.kind !== "class-set") return;
+  assert.equal(term.operation, "subtraction");
+  assert.equal(term.operands.length, 2);
+  assert.equal(
+    parseRegExpPattern({
+      extensions,
+      flags: "v",
+      source: "[\\q{xy|z}\\p{RGI_Emoji}]",
+    }).parsed,
+    true,
+  );
+  for (const source of ["[\\&]", "[\\!]", "[\\q{\\-|\\&}]", "[\\q{\\b}]"]) {
+    assert.equal(
+      parseRegExpPattern({ extensions, flags: "v", source }).parsed,
+      true,
+      source,
+    );
+  }
+
+  const unsupported = rejected("[a&&b]", "v");
+  assert.equal(unsupported.kind, "unsupported");
+  assert.equal(unsupported.message, "Class set notation is not admitted yet.");
+
+  const strings = rejected("[^\\q{ab}]", "v", { extensions });
+  assert.equal(strings.kind, "invalid");
+  assert.equal(
+    strings.message,
+    "A negated character class may contain strings.",
+  );
+  const unicodeModeString = rejected("\\p{RGI_Emoji}", "u", {
+    extensions,
+  });
+  assert.equal(unicodeModeString.kind, "invalid");
+  assert.equal(
+    unicodeModeString.message,
+    "A Unicode property of strings requires the v flag.",
+  );
+  assert.equal(
+    parseRegExpPattern({
+      extensions,
+      flags: "v",
+      source: "[^\\q{ab}&&_]",
+    }).parsed,
+    true,
+  );
+  for (const [source, message] of [
+    ["[|]", "A class set syntax character must be escaped."],
+    ["[!!]", "A doubled class set punctuator must be escaped."],
+    ["[&&a]", "A class set operator needs an operand."],
+    ["[a&&&]", "A class set operator needs an operand."],
+    ["[a-[]", "A nested class set cannot be a range bound."],
+    [
+      "[a-b&&c]",
+      "A class set range cannot be an intersection or subtraction operand.",
+    ],
+    [
+      "[a&&b-c]",
+      "A class set range cannot be an intersection or subtraction operand.",
+    ],
+    [
+      "[a-b--c]",
+      "A class set range cannot be an intersection or subtraction operand.",
+    ],
+    ["[\\q{a-b}]", "A class set syntax character must be escaped."],
+    ["[\\q{(}]", "A class set syntax character must be escaped."],
+    ["[\\q{[}]", "A class set syntax character must be escaped."],
+    ["[\\q{]}]", "A class set operator needs an operand."],
+    ["[\\q{&&}]", "A class set operator needs an operand."],
+  ] as const) {
+    const error = rejected(source, "v", { extensions });
     assert.equal(error.kind, "invalid", source);
     assert.equal(error.message, message, source);
   }

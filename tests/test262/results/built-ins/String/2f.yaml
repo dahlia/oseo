@@ -19,11 +19,22 @@ results:
       - functions
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/String/prototype/match/duplicate-named-groups-properties.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/match/duplicate-named-groups-properties.js:96:26:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
       passed: false
-    unsupportedFeatures:
-      - regexp-duplicate-named-groups
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

@@ -23,7 +23,7 @@ results:
         itespace-class-escape-negative-cases.js non-strict disabled
         failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
-        class-whitespace-class-escape-negative-cases.js:137:13:
+        class-whitespace-class-escape-negative-cases.js:173:13:
         error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -100,7 +100,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lepc\
         ha.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Lepcha.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Lepcha.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -125,7 +125,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tirh\
         uta.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Tirhuta.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Tirhuta.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

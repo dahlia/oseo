@@ -1,0 +1,3 @@
+version: 1
+id: regexp-pattern-extensions
+record: docs/language-profile-m5/families/regexp-pattern-extensions.yaml

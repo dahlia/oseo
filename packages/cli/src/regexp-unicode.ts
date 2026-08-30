@@ -18,6 +18,7 @@
  */
 
 import {
+  ecma262UnicodeStringPropertySet,
   ecma262UnicodePropertySet,
   fullUppercase,
   maxCodePoint,
@@ -98,9 +99,18 @@ export function propertyEscapeSet(
   return ecma262UnicodePropertySet(escape.property, escape.value);
 }
 
+/** The code-point sequences one string property escape names, or undefined. */
+export function stringPropertyEscapeSet(
+  escape: RegExpUnicodePropertyEscape,
+): readonly (readonly number[])[] | undefined {
+  if (escape.value != null || escape.negated) return undefined;
+  return ecma262UnicodeStringPropertySet(escape.property);
+}
+
 /** The reviewed matcher data provider over the pinned Unicode tables. */
 export const unicodeMatcherData: RegExpMatcherUnicodeData = {
   caseEquivalenceClasses,
   propertySet: propertyEscapeSet,
   spaceSeparators: generalCategorySet("Space_Separator") ?? [],
+  stringPropertySet: stringPropertyEscapeSet,
 };

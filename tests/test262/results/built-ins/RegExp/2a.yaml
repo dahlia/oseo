@@ -4,6 +4,40 @@ results:
   - case:
       async: false
       features:
+        - regexp-duplicate-named-groups
+      flags: []
+      includes:
+        - compareArray.js
+        - compareIterator.js
+      mode: script
+      path: test/built-ins/RegExp/named-groups/duplicate-names-matchall.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+        - compareIterator.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/RegExp/named-groups/duplicate-names-matchall.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/named-groups/duplicate-names-matchall.js:123:17:
+        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
+      unsupportedCapability: regexp-string-dispatch
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-unicode-property-escapes
       flags: []
       includes:
@@ -21,7 +55,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Khud\
         awadi.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Khudawadi.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Khudawadi.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
