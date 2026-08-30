@@ -690,6 +690,16 @@ tables from the same reviewed inputs, and the package includes the Unicode
 permission notice. Seven code IDs in the existing String range dispatch the
 nine function objects. The generated-code ABI gains no entry point.
 
+The `m5-85` ABI adds ordinary `at`, `includes`, `indexOf`, and `lastIndexOf`
+functions to `%Array.prototype%` and retires the two deferred search entries.
+All four convert the receiver, snapshot its array-like length, and apply a
+relative index. `indexOf` and `lastIndexOf` traverse present properties in
+opposite directions and compare with strict equality. `includes` reads through
+holes and uses SameValueZero, while `at` performs one direct Get or returns
+undefined out of range. The receiver and searched value stay rooted across
+conversion and property access. All four code IDs come from the existing Array
+range, and the generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

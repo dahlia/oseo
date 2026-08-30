@@ -25,5 +25,4 @@ results:
       passed: false
     unsupportedFeatures:
       - Reflect
-      - Array.prototype.includes
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

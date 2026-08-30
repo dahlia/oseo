@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 100
+M5a is complete. The normative family records described below inventory 101
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 15,020 reviewed cases: 11,188 passes, 1,506
-expected negatives, and 2,326 unsupported profile features. It records no
+The current manifest contains 15,462 reviewed cases: 11,604 passes, 1,506
+expected negatives, and 2,352 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4638,6 +4638,52 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-83` and allocates two code IDs inside the existing Array
 range without adding a generated-code entry point or changing the graph's
 orchestration state.
+
+M5b node `array-prototype-index-search` implements ordinary `at`, `includes`,
+`indexOf`, and `lastIndexOf` functions on the realm-owned
+`%Array.prototype%` and retires the two deferred search entries from the
+unadmitted boundary table. Each method converts its receiver and snapshots
+LengthOfArrayLike before converting its relative index. The three search
+methods skip that conversion when the length is zero; `at` still performs it.
+Positive relative indices count from zero, negative indices add the snapshot
+length, and omitted `lastIndexOf` starts at the last index while an explicit
+`undefined` starts at zero.
+
+`indexOf` and `lastIndexOf` visit present properties through HasProperty then
+Get and use strict equality, so they skip holes and do not find `NaN`.
+`includes` and `at` perform Get directly, so a hole is observed as
+`undefined`; `includes` uses SameValueZero and therefore finds `NaN`, while
+`at` returns the value at one relative index or `undefined` when it is out of
+range. All four methods are generic, include inherited elements, and observe
+property mutation live below the snapshot length. The receiver and searched
+value remain rooted across index conversion and property access, so identity
+survives collection at either user-code boundary.
+
+Fixed native and generated differential evidence at seed `0x60005900` covers
+a 12-case ordinary budget over zero-to-seven-entry sparse Arrays and ordinary
+array-like objects, stable and fresh object identities, `NaN`, signed zero,
+strings, undefined, bounded numbers, and finite and infinite relative
+indices. Its independent oracle models strict equality, SameValueZero, hole
+treatment, and each search direction. The evidence also covers metadata,
+generic and inherited receivers, observable conversion and access order,
+live mutation, abrupt completion, both specialization policies, collection
+forced at every safepoint, false hints, deliberate shape-guard misses, and
+generic fallback. All 442 paths under the four inventory roots are reviewed:
+414 pass and 28 retain explicit prerequisite boundaries. The root split is
+11 pass and two unsupported for `at`, 25 and five for `includes`, 191 and ten
+for `indexOf`, and 187 and eleven for `lastIndexOf`. Twelve unsupported paths
+require the resizable ArrayBuffer harness, three require `Proxy`, three
+require `Reflect.construct`, eight require the unadmitted Boolean, Date, or
+JSON intrinsics, one requires `isNaN`, and one requires dynamic `eval`. Two
+String-prototype index-search paths outside the roots move from
+`unsupported-profile-feature` to `pass` because the Array search methods
+satisfy their observations. The manifest moves from 15,020 to 15,462 cases
+and from 11,188 to 11,604 passes, keeps 1,506 expected negatives, and moves
+from 2,326 to 2,352 unsupported profile features, with no failures. The
+admitted runtime checkpoint moves
+the runtime ABI to `oseo-runtime-m5-85`, allocates four code IDs inside the
+existing Array range, and adds no generated-code entry point or graph-state
+change.
 
 
 String prototype case conversion and normalization
