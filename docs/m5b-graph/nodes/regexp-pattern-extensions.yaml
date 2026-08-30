@@ -15,8 +15,4 @@ inventory:
 dependencies:
   - regexp-unicode-property-escapes
 landed: false
-status: parked
-reason: "Mandatory Fable cross-review did not finish cleanly after five
-  round trips for the root-review corrections to exact v-mode class-string
-  semantics. The uncommitted six-file correction and passing gates remain in
-  worktree m5b-regexp-extensions for a later reviewer."
+status: ready
