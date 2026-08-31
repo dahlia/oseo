@@ -12,5 +12,5 @@ inventory:
     - test/built-ins/Array/prototype/lastIndexOf/
 dependencies:
   - array-constructor
-landed: false
+landed: true
 status: ready
