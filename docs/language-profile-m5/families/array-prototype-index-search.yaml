@@ -7,6 +7,10 @@ scope:
     conversion, ascending and descending search, inherited elements,
     hole treatment, strict equality, SameValueZero, and abrupt completion
     order."
+  - "The realm-owned Array.prototype Symbol.unscopables data property,
+    including its descriptor, null-prototype value, and complete edition name
+    set. The with-statement family exclusively owns the dynamic name-lookup
+    behavior that consumes this record."
   - "Reviewed standards coverage is every upstream path under
     test/built-ins/Array/prototype/at/,
     test/built-ins/Array/prototype/includes/,
@@ -15,7 +19,11 @@ scope:
     442 paths: 414 pass and 28 remain unsupported at explicit prerequisite
     boundaries. The root split is at 11/2, includes 25/5, indexOf 191/10,
     and lastIndexOf 187/11 for pass/unsupported. Two already-reviewed String
-    index-search paths outside the roots move from unsupported to pass."
+    index-search paths outside the roots move from unsupported to pass. The
+    four Array prototype Symbol.unscopables standards paths remain assigned
+    to the array-prototype-iterators graph node; this record's fixed evidence
+    covers the already-installed descriptor and name set without changing
+    that reviewed inventory ownership."
 owners:
   - PLAN-M5.md
 evidence:
