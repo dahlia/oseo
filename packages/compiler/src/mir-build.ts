@@ -947,6 +947,24 @@ interface LoweredWithReference {
   readonly property: number;
 }
 
+/** Keep semantic `IsObject` distinct from a removable specialization guard. */
+function lowerIsObject(
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [value],
+    detail: "IsObject",
+    id,
+    kind: "is-object",
+    range,
+  });
+  return id;
+}
+
 /**
  * Resolve one identifier reference against its active `with` objects.
  * The chosen object is fixed before an assignment evaluates its right
@@ -980,16 +998,63 @@ function lowerWithReference(
       reference.range,
       builder,
     );
-    const propertyBlock = createMirBlock(builder);
+    const unscopablesBlock = createMirBlock(builder);
     const nextBlock = createMirBlock(builder);
     builder.current.terminator = {
       kind: "branch",
       test: found,
       whenFalse: nextBlock.id,
-      whenTrue: propertyBlock.id,
+      whenTrue: unscopablesBlock.id,
     };
-    builder.current = propertyBlock;
-    propertyBlock.terminator = {
+    builder.current = unscopablesBlock;
+    const symbolIntrinsic = lowerExpression(
+      { kind: "symbol-intrinsic", range: reference.range },
+      builder,
+    );
+    const unscopablesName = lowerPropertyKey(
+      {
+        kind: "string",
+        range: reference.range,
+        value: "unscopables",
+      },
+      builder,
+    );
+    const unscopablesSymbol = lowerPropertyRead(
+      symbolIntrinsic,
+      unscopablesName,
+      reference.range,
+      builder,
+    );
+    const unscopables = lowerPropertyRead(
+      object,
+      unscopablesSymbol,
+      reference.range,
+      builder,
+    );
+    const isObject = lowerIsObject(unscopables, reference.range, builder);
+    const blockedBlock = createMirBlock(builder);
+    const selectedBlock = createMirBlock(builder);
+    builder.current.terminator = {
+      kind: "branch",
+      test: isObject,
+      whenFalse: selectedBlock.id,
+      whenTrue: blockedBlock.id,
+    };
+    builder.current = blockedBlock;
+    const blocked = lowerPropertyRead(
+      unscopables,
+      key,
+      reference.range,
+      builder,
+    );
+    builder.current.terminator = {
+      kind: "branch",
+      test: blocked,
+      whenFalse: selectedBlock.id,
+      whenTrue: nextBlock.id,
+    };
+    builder.current = selectedBlock;
+    selectedBlock.terminator = {
       kind: "jump",
       target: joinBlock.id,
       values: [object, found],

@@ -1,0 +1,72 @@
+version: 1
+id: array-prototype-index-search
+title: "Array prototype index search"
+scope:
+  - "Array.prototype at, includes, indexOf, and lastIndexOf, including
+    receiver conversion, array-like length snapshots, relative-index
+    conversion, ascending and descending search, inherited elements,
+    hole treatment, strict equality, SameValueZero, and abrupt completion
+    order."
+  - "The realm-owned Array.prototype Symbol.unscopables data property,
+    including its descriptor, null-prototype value, and complete edition name
+    set. The with-statement family exclusively owns the dynamic name-lookup
+    behavior that consumes this record."
+  - "Reviewed standards coverage is every upstream path under
+    test/built-ins/Array/prototype/at/,
+    test/built-ins/Array/prototype/includes/,
+    test/built-ins/Array/prototype/indexOf/, and
+    test/built-ins/Array/prototype/lastIndexOf/. The reviewed roots contain
+    442 paths: 414 pass and 28 remain unsupported at explicit prerequisite
+    boundaries. The root split is at 11/2, includes 25/5, indexOf 191/10,
+    and lastIndexOf 187/11 for pass/unsupported. Two already-reviewed String
+    index-search paths outside the roots move from unsupported to pass. The
+    four Array prototype Symbol.unscopables standards paths remain assigned
+    to the array-prototype-iterators graph node; this record's fixed evidence
+    covers the already-installed descriptor and name set without changing
+    that reviewed inventory ownership."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-index-search.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-index-search.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

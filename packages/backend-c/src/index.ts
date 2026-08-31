@@ -2000,7 +2000,7 @@ function propertyCacheName(operation: MirOperation): string {
   return renderC(emittedC.propertyCacheName.propertyCache, operation.cacheId);
 }
 
-function emitGuardObject(state: EmitState, operation: MirOperation): void {
+function emitObjectTest(state: EmitState, operation: MirOperation): void {
   const object = operationArgument(operation, 0);
   state.scalarKinds.set(operation.id, "boolean");
   line(
@@ -2936,8 +2936,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitUnary(state, operation);
   } else if (operation.kind === "binary") {
     emitBinary(state, operation);
-  } else if (operation.kind === "guard-object") {
-    emitGuardObject(state, operation);
+  } else if (
+    operation.kind === "guard-object" ||
+    operation.kind === "is-object"
+  ) {
+    emitObjectTest(state, operation);
   } else if (operation.kind === "guard-shape") {
     emitPropertyCacheGuard(state, operation);
   } else if (operation.kind === "guard-smi") {

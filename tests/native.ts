@@ -61,6 +61,8 @@ const { arrayPrototypeCopyingFixtures } =
   await import("./native/fixtures/array-prototype-copying.ts");
 const { arrayPrototypeReductionFixtures } =
   await import("./native/fixtures/array-prototype-reduction.ts");
+const { arrayPrototypeIndexSearchFixtures } =
+  await import("./native/fixtures/array-prototype-index-search.ts");
 const { arrayPrototypeSortFixtures } =
   await import("./native/fixtures/array-prototype-sort.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
@@ -130,6 +132,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayConstructorFixtures,
   ...arrayPrototypeCopyingFixtures,
   ...arrayPrototypeIterativeFixtures,
+  ...arrayPrototypeIndexSearchFixtures,
   ...arrayPrototypeReductionFixtures,
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
@@ -620,6 +623,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-index-search" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "array-prototype-species-mapping" ||
@@ -657,6 +661,13 @@ for (const fixture of selectedFixtures) {
     assert.match(enabledText, /guard-shape/u);
     assert.match(enabledText, /property-get generic/u);
     assert.doesNotMatch(printMir(disabledMir), /guard-(?:object|shape)/u);
+  }
+
+  if (fixture.name === "array-prototype-index-search") {
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /is-object IsObject/u);
+      assert.match(text, /property-get property-get/u);
+    }
   }
 
   if (fixture.name === "object-literal-prototype-setter") {
@@ -823,6 +834,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-case" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
+    fixture.name === "array-prototype-index-search" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "string-prototype-search-and-slice" ||
@@ -914,6 +926,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
+            fixture.name === "array-prototype-index-search" ||
             fixture.name === "array-prototype-reduction" ||
             fixture.name === "array-prototype-sort" ||
             fixture.name === "array-prototype-species-mapping" ||
@@ -950,6 +963,7 @@ for (const fixture of selectedFixtures) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
+                fixture.name === "array-prototype-index-search" ||
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||
@@ -961,6 +975,9 @@ for (const fixture of selectedFixtures) {
               }
               assert.ok(native.counters.guardMisses > 0);
             }
+          }
+          if (fixture.name === "array-prototype-index-search") {
+            assert.match(native.emittedC, /oseo_value_is_object/u);
           }
           if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);

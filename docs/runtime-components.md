@@ -863,6 +863,28 @@ guard hits and misses, and collection at every safepoint. The node adds no
 generated-code entry point, allocates its two code IDs inside the existing
 Array range, and moves `abiVersion` to `m5-83`.
 
+M5b node `array-prototype-index-search` also remains in *runtime\_array.c*
+because relative-index search reuses the ordinary property access,
+array-like length conversion, and collector roots the other Array methods
+own. The component adds `at`, `includes`, `indexOf`, and `lastIndexOf` to the
+materialized `%Array.prototype%` and retires the two deferred search entries.
+
+All four methods convert the receiver and snapshot its length before relative
+index conversion. `indexOf` and `lastIndexOf` traverse present properties in
+opposite directions through HasProperty then Get and compare with strict
+equality. `includes` reads through holes and uses SameValueZero, while `at`
+performs one direct Get or returns undefined out of range. The receiver and
+searched value remain rooted across conversion and property access, so generic
+and inherited receivers, live mutation, and identity survive collection.
+
+Fixed and generated native differential evidence covers strict equality,
+SameValueZero, sparse and generic receivers, both search directions, relative
+indices and infinities, observable ordering, mutation, abrupt completion, both
+specialization policies, false hints, deliberate guard hits and misses,
+generic fallback, and collection at every safepoint. The node adds no
+generated-code entry point, allocates four code IDs inside the existing Array
+range, and moves `abiVersion` to `m5-85`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

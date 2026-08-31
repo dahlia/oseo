@@ -356,3 +356,7 @@ families:
     owner: tests/property/m5-string-prototype-case.property.test.ts
     start: 0x60005800
     end: 0x600058ff
+  - family: m5-array-prototype-index-search
+    owner: tests/property/m5-array-prototype-index-search.property.test.ts
+    start: 0x60005900
+    end: 0x600059ff

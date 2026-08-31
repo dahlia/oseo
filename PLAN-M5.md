@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-15,020 reviewed cases: 11,188 passes, 1,506 expected negatives, and 2,326
+15,462 reviewed cases: 11,604 passes, 1,506 expected negatives, and 2,352
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 100 indexed records in the normative
+M5a is complete. The 101 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-11,188 passes across 15,020 paths, and the property inventory records 114
-domains, 114 seeds, and an ordinary case budget of 5,222.
+11,604 passes across 15,462 paths, and the property inventory records 115
+domains, 115 seeds, and an ordinary case budget of 5,234.
 
 
 M5a implementation history
@@ -4994,6 +4994,51 @@ manifest moves from 14,708 to 15,020 paths and from 10,895 to 11,188 passes,
 keeps 1,506 expected negatives, and moves from 2,307 to 2,326 unsupported
 profile features, with no failures. The checkpoint moves the runtime ABI to
 `oseo-runtime-m5-84` without changing the graph's orchestration state.
+
+Implemented M5b node `array-prototype-index-search` gives the realm-owned
+`%Array.prototype%` ordinary `at`, `includes`, `indexOf`, and `lastIndexOf`
+functions and retires the two deferred search entries from the unadmitted
+boundary table. Each method converts its receiver and snapshots
+LengthOfArrayLike before its relative-index conversion. The three search
+methods skip that conversion for an empty receiver, while `at` still performs
+it. Positive indices count from zero, negative indices add the snapshot
+length, and omitted `lastIndexOf` starts at the final index while explicit
+`undefined` converts to zero.
+
+`indexOf` and `lastIndexOf` traverse present properties through HasProperty
+then Get and use strict equality, so they skip holes and do not find `NaN`.
+`includes` and `at` use Get directly, so holes read as `undefined`, and
+`includes` uses SameValueZero so it finds `NaN`; `at` reads one relative index
+or returns `undefined` out of range. All four methods are generic, include
+inherited values, and observe mutation live below the snapshot length. They
+stay in *runtime\_array.c* because they share the Array intrinsic's property
+primitives, length conversion, and collector roots, and the receiver and
+searched value remain rooted across every user-code boundary.
+
+Fixed native and generated differential evidence at seed `0x60005900` covers
+a 12-case ordinary budget over sparse Arrays and ordinary array-like objects
+with zero through seven entries, stable and fresh object identities, `NaN`,
+signed zero, strings, undefined, bounded numbers, finite and infinite relative
+indices, and an independent strict-equality/SameValueZero oracle. It also
+covers metadata, inherited and primitive receivers, observable ordering, live
+mutation, abrupt completion, both specialization policies, collection forced
+at every safepoint, false hints, deliberate shape-guard misses, and generic
+fallback. All 442 paths under the four inventory roots are reviewed: 414 pass
+and 28 retain explicit prerequisite boundaries. Twelve require the resizable
+ArrayBuffer harness, three require `Proxy`, three require `Reflect.construct`,
+eight require the unadmitted Boolean, Date, or JSON intrinsics, one requires
+`isNaN`, and one requires dynamic `eval`. Two String-prototype index-search
+paths outside the roots move from `unsupported-profile-feature` to `pass`
+because the Array search methods satisfy their observations. The manifest
+moves from 15,020 to 15,462 paths and from 11,188 to 11,604 passes, keeps 1,506
+expected negatives, and moves from 2,326 to 2,352 unsupported profile
+features, with no failures. The property ratchet moves from 114 to 115
+domains and seeds and from 5,222 to 5,234 ordinary cases. The admitted runtime
+checkpoint moves the ABI to `oseo-runtime-m5-85`, allocates four code IDs
+inside the existing Array range, and adds no generated-code entry point or
+graph-state change. The reviewed test262 revision, 41,091-path applicable
+inventory, ADR 0013 vocabulary, inventory policy, and zero-override policy
+are unchanged.
 
 
 Ahead-of-time challenge boundary

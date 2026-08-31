@@ -14,7 +14,7 @@ manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
 M5a is complete. The normative
-[*M5 language profile*](./docs/language-profile-m5.md) records all 99 admitted
+[*M5 language profile*](./docs/language-profile-m5.md) records all 101 admitted
 families and their evidence assessments. M5b and M5c remain open.
 
 The macOS AArch64 native execution work accepted by

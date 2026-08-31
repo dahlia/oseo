@@ -2,7 +2,11 @@ version: 1
 id: with-statement
 title: "With statements"
 scope:
-  - "Non-strict with object environments and dynamic name lookup."
+  - "Non-strict with object environments and dynamic name lookup, including
+    Symbol.unscopables lookup, object-only blocking records, truthy blocking,
+    mutation during lookup, and abrupt completion order. This family owns the
+    dynamic lookup contract; intrinsic unscopables objects remain with their
+    owning built-in families."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,30 +14,37 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
   forced-collection:
-    status: omitted
-    reason: "Reachability is inherited from ordinary references."
-    replacements:
-      - tests/native/fixtures/bindings.ts
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
   generated:
-    status: omitted
-    reason: "Fixed fixtures enumerate hits, misses, and abrupt lookup."
-    replacements:
-      - tests/native/fixtures/bindings.ts
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-index-search.property.test.ts
   guard-fallback:
-    status: omitted
-    reason: "The family owns no specialized path or family-specific guard."
-    replacements:
-      - tests/native/fixtures/bindings.ts
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
   specialization:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-array-prototype-index-search.property.test.ts
   standards:
     status: covered
     references:
@@ -43,3 +54,6 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/statements.test.ts
+      - packages/compiler/src/mir-build.ts
+      - packages/compiler/src/mir.ts
+      - packages/backend-c/src/index.ts

@@ -250,6 +250,43 @@ test("populates Array reduction methods over one accumulator loop", () => {
   assert.match(reduction, /from_right \? length - 1\.0 : 0\.0/u);
 });
 
+test("populates Array index search methods with both comparisons", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["at", "includes", "indexOf", "lastIndexOf"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["AT", "INCLUDES", "INDEX_OF", "LAST_INDEX_OF"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  const search = definition("array_index_search");
+  const relativeIndexPattern = new RegExp(
+    "oseo_internal_to_object[\\s\\S]*array_like_length" +
+      "[\\s\\S]*array_integer_or_infinity",
+    "u",
+  );
+  assert.match(search, relativeIndexPattern);
+  assert.match(search, /oseo_has_property[\s\S]*oseo_object_get/u);
+  assert.match(search, /oseo_internal_same_value_zero/u);
+  assert.match(search, /oseo_strict_equal/u);
+  assert.match(search, /length - 1\.0/u);
+
+  const at = definition("array_at");
+  assert.match(at, relativeIndexPattern);
+  assert.match(at, /length \+ relative/u);
+  assert.match(at, /oseo_object_get/u);
+  assert.doesNotMatch(at, /oseo_has_property/u);
+});
+
 test("orders Object.defineProperty conversion before descriptors", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 
