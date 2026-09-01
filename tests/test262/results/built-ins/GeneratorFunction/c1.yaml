@@ -18,21 +18,13 @@ results:
     dependencies:
       - dynamic-source
       - generators
-    execution:
-      harnessIncludes:
-        - base.js
-        - propertyHelper.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
       detail: 'test/built-ins/GeneratorFunction/instance-prototype.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/GeneratorFunction/instance-prototype.js:358:25:
-        error[OSEO2001]: Generator intrinsic reflection is not admitted
-        yet.\n"'
-      unsupportedCapability: generator-intrinsics
+        stderr="test/built-ins/GeneratorFunction/instance-prototype.js:360:16:
+        error[OSEO1001]: GeneratorFunction compiles source text at run
+        time, which is outside the admitted profile.\n"'
+      unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

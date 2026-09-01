@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-15,462 reviewed cases: 11,604 passes, 1,506 expected negatives, and 2,352
+15,515 reviewed cases: 11,690 passes, 1,506 expected negatives, and 2,319
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 101 indexed records in the normative
+M5a is complete. The 102 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-11,604 passes across 15,462 paths, and the property inventory records 115
-domains, 115 seeds, and an ordinary case budget of 5,234.
+11,690 passes across 15,515 paths, and the property inventory records 116
+domains, 116 seeds, and an ordinary case budget of 5,246.
 
 
 M5a implementation history
@@ -5039,6 +5039,56 @@ inside the existing Array range, and adds no generated-code entry point or
 graph-state change. The reviewed test262 revision, 41,091-path applicable
 inventory, ADR 0013 vocabulary, inventory policy, and zero-override policy
 are unchanged.
+
+Implemented M5b node `function-intrinsic-chains` materializes
+`%GeneratorFunction%`, `%AsyncFunction%`, and `%AsyncGeneratorFunction%` as
+realm-owned intrinsic values, together with `%GeneratorFunction.prototype%`
+and `%AsyncFunction.prototype%`. Each constructor is an ordinary built-in
+whose `[[Prototype]]` is `%Function%`, with the specified `name`, `length`,
+and non-configurable `prototype`; each prototype object is an ordinary
+non-callable object below `%Function.prototype%` with no own `length` or
+`name`. Every `constructor`, `prototype`, and `Symbol.toStringTag` link is an
+ordinary own property defined where ECMA-262 places it, and
+`%GeneratorPrototype%` gains the `constructor` and `Symbol.toStringTag` it
+was missing. The synchronous generator intrinsics are created as one cluster
+for the same circularity reason the asynchronous cluster already was.
+
+A generator, asynchronous, asynchronous arrow, and asynchronous generator
+function inherits from the prototype object of its own kind in every
+syntactic form, so `Object.getPrototypeOf` and `Object.prototype.toString`
+reach these chains through ordinary reads. The owned `generator-intrinsics`
+reflection boundary those two operations carried is removed, and a replaced
+link is observed rather than a synthesized brand. Calling or constructing one
+of the three constructors stays outside the profile under
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md); each entry point
+reports its own source-located `OSEO1001` diagnostic.
+`%AsyncFromSyncIteratorPrototype%` stays an unreachable internal record,
+because ECMA-262 never exposes an AsyncFromSyncIterator object to a program. A
+generator object also takes its `[[Prototype]]` from the function's `prototype`
+where EvaluateBody reads it, after FunctionDeclarationInstantiation, rather
+than at the earlier point the prologue has to allocate its traced record.
+
+Fixed and generated native differential evidence at seed `0x60005a00` covers
+every kind in every admitted form, the complete descriptor set, chain depth
+and identity, string tags, generator instance chains, `instanceof`, link
+replacement, the three dynamic-source diagnostics, both specialization
+policies, false hints, deliberate shape-guard misses, generic fallback,
+collection at every safepoint, and the AArch64 Linux cross-link.
+All 215 paths under the seven inventory roots are accounted for and 209 are
+reviewed: 173 pass and 36 retain explicit prerequisite boundaries. Twenty-four
+keep the ADR 0016 dynamic-source dependency, six need `Reflect.construct`,
+five need `cross-realm` and `Reflect`, and one expects the dynamic
+`ReferenceError` an unresolved global requires. The six remaining paths are
+the recorded `PromiseResolve` constructor-read cases owned elsewhere. Four
+reviewed paths outside the roots move to `pass`: two reached the retired
+reflection boundary and two observe the corrected EvaluateBody read order.
+The manifest moves from 15,462 to 15,515 paths and from 11,604 to 11,690
+passes, keeps 1,506 expected negatives, and moves from 2,352 to 2,319
+unsupported profile features, with no failures. The property ratchet moves
+from 115 to 116 domains and seeds and from 5,234 to 5,246 ordinary cases. The
+checkpoint moves the runtime ABI to `oseo-runtime-m5-86` and allocates two
+code IDs inside the existing generator range without changing the graph's
+orchestration state.
 
 
 Ahead-of-time challenge boundary

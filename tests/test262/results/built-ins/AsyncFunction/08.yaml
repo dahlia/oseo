@@ -1,0 +1,27 @@
+group: built-ins/AsyncFunction
+key: "08"
+results:
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+      flags: []
+      includes:
+        - isConstructor.js
+        - wellKnownIntrinsicObjects.js
+      mode: script
+      path: test/built-ins/AsyncFunction/is-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

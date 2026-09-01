@@ -371,6 +371,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*           |
 | `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*           |
 | `oseo_internal_generator_prototype`                 | *runtime\_generator.c*        |
+| `oseo_internal_generator_function_intrinsic`        | *runtime\_generator.c*        |
+| `oseo_internal_async_function_intrinsic`            | *runtime\_generator.c*        |
+| `oseo_internal_generator_created`                   | *runtime\_generator.c*        |
 | `oseo_internal_async_generator_prototype`           | *runtime\_generator.c*        |
 | `oseo_internal_async_generator_intrinsic`           | *runtime\_generator.c*        |
 | `oseo_internal_async_generator_awaited`             | *runtime\_async\_generator.c* |

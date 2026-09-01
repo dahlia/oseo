@@ -4765,6 +4765,120 @@ adding a generated-code entry point or changing the graph's orchestration
 state.
 
 
+Generator and asynchronous function intrinsic chains
+----------------------------------------------------
+
+M5b node `function-intrinsic-chains` materializes `%GeneratorFunction%`,
+`%AsyncFunction%`, and `%AsyncGeneratorFunction%` as realm-owned intrinsic
+values together with `%GeneratorFunction.prototype%` and
+`%AsyncFunction.prototype%`. Each constructor is an ordinary built-in
+function whose `[[Prototype]]` is `%Function%`, whose `name` is its own
+intrinsic name, whose `length` is 1, and whose `prototype` is the matching
+prototype object with the specified non-writable, non-enumerable,
+non-configurable attributes. Each prototype object is an ordinary
+non-callable object whose `[[Prototype]]` is `%Function.prototype%` and
+which carries no own `length` or `name`.
+
+Every link between these objects is an ordinary own property with the
+specified non-writable, non-enumerable, configurable attributes, defined on
+the object ECMA-262 places it on rather than synthesized by a property read.
+`%GeneratorFunction.prototype%` carries `constructor`, `prototype`, and a
+`Symbol.toStringTag` of `"GeneratorFunction"`; `%AsyncFunction.prototype%`
+carries `constructor` and a `Symbol.toStringTag` of `"AsyncFunction"` and
+deliberately no `prototype`, because an asynchronous function is not a
+constructor. `%GeneratorPrototype%` now carries `constructor` and a
+`Symbol.toStringTag` of `"Generator"` beside its existing `next`, `return`,
+and `throw`. The three synchronous generator intrinsics are created as one
+cluster, the way the asynchronous generator cluster already was, because
+their links are circular and a program must never observe a
+`%GeneratorPrototype%` whose `constructor` is still missing.
+
+A generator function, an asynchronous function, an asynchronous arrow
+function, and an asynchronous generator function each inherit from the
+prototype object of its own kind, in every syntactic form: declaration,
+expression, arrow, object method, class method, and static class method.
+`Object.getPrototypeOf` and `Object.prototype.toString` therefore reach these
+chains through ordinary reads, and the owned `generator-intrinsics`
+reflection boundary those two operations carried is removed. A program that
+replaces a link observes the replacement: detaching a generator function's
+`[[Prototype]]` makes it report `[object Function]`, replacing a generator
+function's `prototype` gives its generators that object's chain, and
+redefining a kind prototype's `Symbol.toStringTag` retags every function of
+that kind.
+
+Calling or constructing any of the three constructors stays outside the
+profile under [ADR 0016](./adr/0016-dynamic-source-boundary.md), because it
+compiles source text that became known only at run time. Each entry point
+reports its own source-located `OSEO1001` diagnostic naming itself, which is
+the same boundary `%Function%` already carries. The three constructors exist
+as intrinsic values so that the chains above them are complete; nothing
+approximates their behavior.
+
+A generator object takes its `[[Prototype]]` from the function's
+`prototype` at the point EvaluateBody reads it, which is after
+FunctionDeclarationInstantiation. The prologue has to allocate the
+generator record before it instantiates parameters, because a parameter is
+initialized into the record's collector-traced slots, so the read is
+completed when the call returns instead. That is the first moment the
+object reaches the program, so the relink is unobservable, and a parameter
+initializer that replaces its own function's `prototype` now selects the
+object the specification selects. A `prototype` replaced before the call is
+honored, and one replaced after the call does not reach an object already
+created. This makes the two reviewed
+_async-generator/generator-created-after-decl-inst.js_ cases pass. The
+reflection boundary this node removes had masked them, and the reference
+hosts still report the earlier read, so the differential fixtures do not
+cover this ordering and the reviewed test262 cases own it instead.
+
+`%AsyncFromSyncIteratorPrototype%` is not materialized, and this is a
+deliberate representation choice rather than a gap in observable behavior.
+ECMA-262 never hands an AsyncFromSyncIterator object to a program: the
+wrapper exists only inside a `for await` head and a delegating `yield*`, so
+no `Object.getPrototypeOf` route reaches it. Oseo keeps it as an unreachable
+internal record with no prototype and no own properties, and the reviewed
+_test/built-ins/AsyncFromSyncIteratorPrototype/_ paths exercise the
+operational contract that record implements.
+
+Fixed native and generated differential evidence at property seed
+`0x60005a00` covers every function kind in every admitted syntactic form,
+the complete descriptor set of each constructor and prototype object, the
+chain depth and identity a walk through `Object.getPrototypeOf` observes,
+the `Symbol.toStringTag` each object reports, the instance chain a generator
+object exposes, `instanceof` through each constructor, link replacement,
+both specialization policies, false hints, deliberate shape-guard misses,
+generic fallback, and collection forced at every safepoint. The three
+dynamic-source diagnostics are proved as fixed native observations, because
+a rejected program produces a host diagnostic rather than a catchable throw.
+The fixed native lane also retains the AArch64 Linux cross-link.
+
+All 215 paths under the node's seven inventory roots are accounted for and
+209 are reviewed: 173 pass and 36 retain explicit prerequisite boundaries.
+Twenty-four reach one of the three constructors and keep the ADR 0016
+dynamic-source dependency, six need `Reflect.construct` for their
+*isConstructor.js* include, five need `cross-realm` and `Reflect`, and
+*AsyncFunction/is-not-a-global.js* expects the runtime `ReferenceError` an
+unresolved global name produces, which this profile reports as a
+source-located diagnostic instead. The six paths that stay outside the
+reviewed subset are the already-recorded `PromiseResolve` constructor-read
+cases owned by the intrinsics and built-in objects stream. No previously
+reviewed path loses a pass. Four reviewed paths outside the roots move from
+`unsupported-profile-feature` to `pass`:
+*Object/prototype/toString/symbol-tag-generators-builtin.js* and
+*async-generator/default-proto.js* reached the retired reflection boundary,
+and the two *async-generator/generator-created-after-decl-inst.js* cases
+observe the EvaluateBody read order this node corrects. The manifest moves
+from 15,462 to 15,515 cases and from 11,604 to 11,690 passes, keeps 1,506
+expected negatives, and moves from 2,352 to 2,319 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The
+property inventory moves from 115 to 116 domains and seeds and from 5,234 to
+5,246 ordinary cases. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, target-parity policy, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-86` and allocates two code IDs inside the existing
+generator range without adding a generated-code entry point or changing the
+graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -4935,23 +5049,13 @@ complete. The remaining gaps retain their existing owners.
     cases and *test/built-ins/Promise/resolve/arg-uniq-ctor.js*. `Promise`
     is now a materialized intrinsic value, so only the `constructor` read
     itself remains. Owner: the intrinsics and built-in objects stream.
- -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
-    materialized. `Object.getPrototypeOf` is admitted, but reflecting a
-    generator function or generator object reports the explicit
-    `generator-intrinsics` boundary until their graph nodes land. Creating a
-    generator function dynamically also remains behind
-    [ADR 0016](./adr/0016-dynamic-source-boundary.md), so the reviewed
-    *test/built-ins/GeneratorFunction/* cases retain their owned unsupported
-    classifications. There is no `GeneratorFunction` global binding in
-    ECMAScript, so this profile does not add one. Owner: the intrinsics and
-    built-in objects stream.
- -  `Object`, `Object.getPrototypeOf`, and `Promise` are admitted, but
-    generator intrinsic reflection retains the explicit boundary above.
-    Reviewed *test/built-ins/AsyncGeneratorPrototype/* and
-    *test/built-ins/AsyncIteratorPrototype/* cases that require those routes
-    remain `unsupported-profile-feature` under the matching
-    `generator-intrinsics` or `dynamic-source` prerequisite. Owner:
-    the intrinsics and built-in objects stream.
+ -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
+    exposes an AsyncFromSyncIterator object to a program, so no
+    `Object.getPrototypeOf` route reaches it and the unreachable internal
+    record this profile uses instead is not observably different. The gap is
+    a representation choice, not a behavior difference, and it would become
+    real only if a later edition exposed the wrapper. Owner: the intrinsics
+    and built-in objects stream.
  -  `Promise.allSettled` and `Promise.any` are own properties of `%Promise%`
     with their specified names and lengths, but calling either reports the
     owned `promise-static-method` diagnostic instead of combining.

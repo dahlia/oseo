@@ -17,20 +17,13 @@ results:
     dependencies:
       - dynamic-source
       - generators
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
       detail: 'test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js:87:25:
-        error[OSEO2001]: Generator intrinsic reflection is not admitted
-        yet.\n"'
-      unsupportedCapability: generator-intrinsics
+        stderr="test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js:89:9:
+        error[OSEO1001]: GeneratorFunction compiles source text at run
+        time, which is outside the admitted profile.\n"'
+      unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
   - case:

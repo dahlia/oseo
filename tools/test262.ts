@@ -525,9 +525,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "primitive-wrapper-prototype";
   }
-  if (diagnostic === "Generator intrinsic reflection is not admitted yet.") {
-    return "generator-intrinsics";
-  }
   if (diagnostic === "Object static method is not admitted in this M5b node.") {
     return "object-static-method";
   }

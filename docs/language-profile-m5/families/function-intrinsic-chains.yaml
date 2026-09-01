@@ -1,0 +1,50 @@
+version: 1
+id: function-intrinsic-chains
+title: "Generator and asynchronous function intrinsic chains"
+scope:
+  - "%GeneratorFunction%, %AsyncGeneratorFunction%, %AsyncFunction%, their
+    prototype objects, and the generator and asynchronous generator
+    prototype chains reachable through Object.getPrototypeOf."
+owners:
+  - PLAN-M5.md
+  - docs/adr/0016-dynamic-source-boundary.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/function-intrinsic-chains.ts
+      - tests/property/m5-function-intrinsic-chains.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/function-intrinsic-chains.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-function-intrinsic-chains.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-function-intrinsic-chains.property.test.ts
+      - tests/property-seeds.yaml
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native/fixtures/function-intrinsic-chains.ts
+      - tests/native.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-function-intrinsic-chains.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
