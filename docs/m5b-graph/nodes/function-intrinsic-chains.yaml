@@ -24,5 +24,5 @@ dependencies:
   - iterator-intrinsic
   - object-constructor
   - promise-intrinsic
-landed: false
+landed: true
 status: ready
