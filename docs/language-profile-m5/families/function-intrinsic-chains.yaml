@@ -5,6 +5,10 @@ scope:
   - "%GeneratorFunction%, %AsyncGeneratorFunction%, %AsyncFunction%, their
     prototype objects, and the generator and asynchronous generator
     prototype chains reachable through Object.getPrototypeOf."
+  - "The order those objects create their own properties in, which
+    OrdinaryOwnPropertyKeys reports for their non-index string keys to a
+    program that reads the own descriptor record or makes a configurable
+    link enumerable."
 owners:
   - PLAN-M5.md
   - docs/adr/0016-dynamic-source-boundary.md

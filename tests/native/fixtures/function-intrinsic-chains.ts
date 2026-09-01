@@ -425,3 +425,129 @@ asyncSteps.next().then((step) => {
 `,
   },
 ];
+
+/*
+ * The order the realm creates the function-intrinsic properties in.
+ * OrdinaryOwnPropertyKeys reports non-index string keys in creation
+ * order, and every key here is one, so the order is observable as soon as
+ * a program makes one of the configurable links enumerable, and without
+ * that through the own descriptor record. The reference hosts own the
+ * expected order, so the fixture prints every affected object's complete
+ * own string-key list rather than one asserted sequence.
+ */
+export const functionIntrinsicKeyOrderFixtures: readonly Fixture[] = [
+  {
+    name: "function-intrinsic-key-order",
+    source: `
+function* generatorDeclaration(first) { yield first; }
+async function asyncDeclaration(first) { return first; }
+async function* asyncGeneratorDeclaration(first) { yield first; }
+
+const generatorFunctionPrototype =
+  Object.getPrototypeOf(generatorDeclaration);
+const generatorFunction = generatorFunctionPrototype.constructor;
+const generatorPrototype = generatorFunctionPrototype.prototype;
+const asyncFunctionPrototype = Object.getPrototypeOf(asyncDeclaration);
+const asyncFunction = asyncFunctionPrototype.constructor;
+const asyncGeneratorFunctionPrototype =
+  Object.getPrototypeOf(asyncGeneratorDeclaration);
+const asyncGeneratorFunction = asyncGeneratorFunctionPrototype.constructor;
+const asyncGeneratorPrototype = asyncGeneratorFunctionPrototype.prototype;
+
+/*
+ * Every own string key an object carries, whatever its attributes, in
+ * creation order. The descriptor record names each one as an ordinary
+ * own enumerable property in the same order.
+ */
+function ownKeys(object) {
+  return Object.keys(Object.getOwnPropertyDescriptors(object)).join(",");
+}
+
+/* The attributes each affected link carries, as one compact word. */
+function attributes(object, key) {
+  const descriptor = Object.getOwnPropertyDescriptor(object, key);
+  if (descriptor === undefined) return key + "=absent";
+  return key +
+    "=" +
+    (descriptor.writable ? "w" : "-") +
+    (descriptor.enumerable ? "e" : "-") +
+    (descriptor.configurable ? "c" : "-");
+}
+
+/*
+ * The same order read the way a program lacking
+ * Object.getOwnPropertyNames reads it: every configurable link becomes
+ * enumerable, and Object.keys and a for-in walk then report it. A
+ * redefinition that changes only the enumerable attribute must leave the
+ * key where it was created.
+ */
+const candidates = [
+  "length",
+  "name",
+  "prototype",
+  "constructor",
+  "next",
+  "return",
+  "throw",
+];
+
+function enumerableKeys(object) {
+  for (const candidate of candidates) {
+    const descriptor = Object.getOwnPropertyDescriptor(object, candidate);
+    if (descriptor !== undefined && descriptor.configurable) {
+      Object.defineProperty(object, candidate, { enumerable: true });
+    }
+  }
+  const walked = [];
+  for (const key in object) {
+    if (Object.getOwnPropertyDescriptor(object, key) !== undefined) {
+      walked.push(key);
+    }
+  }
+  return Object.keys(object).join(",") + " / " + walked.join(",");
+}
+
+const affected = [
+  ["%GeneratorFunction%", generatorFunction],
+  ["%GeneratorFunction.prototype%", generatorFunctionPrototype],
+  ["%GeneratorPrototype%", generatorPrototype],
+  ["%AsyncFunction%", asyncFunction],
+  ["%AsyncFunction.prototype%", asyncFunctionPrototype],
+  ["%AsyncGeneratorFunction%", asyncGeneratorFunction],
+  ["%AsyncGeneratorFunction.prototype%", asyncGeneratorFunctionPrototype],
+  ["%AsyncGeneratorPrototype%", asyncGeneratorPrototype],
+];
+
+for (const entry of affected) {
+  console.log("created", entry[0], ownKeys(entry[1]));
+}
+for (const entry of affected) {
+  const object = entry[1];
+  const reported = [];
+  for (const candidate of candidates) {
+    reported.push(attributes(object, candidate));
+  }
+  console.log("attributes", entry[0], reported.join(" "));
+}
+for (const entry of affected) {
+  console.log("enumerable", entry[0], enumerableKeys(entry[1]));
+}
+for (const entry of affected) {
+  console.log("retained", entry[0], ownKeys(entry[1]));
+}
+
+/*
+ * The two orders a program reads without naming an intrinsic: the
+ * prototype object every generator function inherits from, and the
+ * prototype object every generator object inherits from.
+ */
+console.log(
+  "review",
+  Object.keys(Object.getPrototypeOf(function* () {})).join(","),
+  Object.keys(
+    Object.getPrototypeOf(Object.getPrototypeOf(generatorDeclaration(1))),
+  ).join(","),
+);
+`,
+  },
+];

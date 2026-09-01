@@ -4793,6 +4793,20 @@ cluster, the way the asynchronous generator cluster already was, because
 their links are circular and a program must never observe a
 `%GeneratorPrototype%` whose `constructor` is still missing.
 
+OrdinaryOwnPropertyKeys reports a non-index string key in the order the
+property was created, so the order the realm creates these links in is
+observable. A program reaches it through the own descriptor record, and,
+without `Object.getOwnPropertyNames`, by redefining a configurable link as
+enumerable and then reading `Object.keys` or walking `for`-`in`. Each object
+therefore creates its properties in the order the reference hosts expose:
+`%GeneratorFunction.prototype%` and `%AsyncGeneratorFunction.prototype%` take
+`prototype` before `constructor`, `%GeneratorPrototype%` and
+`%AsyncGeneratorPrototype%` take `constructor` before `next`, `return`, and
+`throw`, `%AsyncFunction.prototype%` carries `constructor` alone, and each
+constructor takes `length`, `name`, and `prototype` in that order. ECMA-262
+fixes no creation order for a built-in object, so the reference hosts own this
+one; the allocation order stays free, because only a definition creates a key.
+
 A generator function, an asynchronous function, an asynchronous arrow
 function, and an asynchronous generator function each inherit from the
 prototype object of its own kind, in every syntactic form: declaration,
@@ -4844,9 +4858,11 @@ Fixed native and generated differential evidence at property seed
 the complete descriptor set of each constructor and prototype object, the
 chain depth and identity a walk through `Object.getPrototypeOf` observes,
 the `Symbol.toStringTag` each object reports, the instance chain a generator
-object exposes, `instanceof` through each constructor, link replacement,
-both specialization policies, false hints, deliberate shape-guard misses,
-generic fallback, and collection forced at every safepoint. The three
+object exposes, `instanceof` through each constructor, link replacement, the
+complete own string-key order of every constructor and prototype object read
+both through the descriptor record and after each configurable link becomes
+enumerable, both specialization policies, false hints, deliberate shape-guard
+misses, generic fallback, and collection forced at every safepoint. The three
 dynamic-source diagnostics are proved as fixed native observations, because
 a rejected program produces a host diagnostic rather than a catchable throw.
 The fixed native lane also retains the AArch64 Linux cross-link.

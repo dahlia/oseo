@@ -83,7 +83,7 @@ const { genericStringCoercionFixtures } =
   await import("./native/fixtures/generic-string-coercion.ts");
 const { mathNamespaceFixtures } =
   await import("./native/fixtures/math-namespace.ts");
-const { functionIntrinsicChainFixtures } =
+const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
@@ -151,6 +151,7 @@ const fixtures: readonly Fixture[] = [
   ...regexpPrototypeAndExecFixtures,
   ...generatorFixtures,
   ...functionIntrinsicChainFixtures,
+  ...functionIntrinsicKeyOrderFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,

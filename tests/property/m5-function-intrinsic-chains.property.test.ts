@@ -185,6 +185,60 @@ console.log(
 );`;
 }
 
+/*
+ * OrdinaryOwnPropertyKeys reports non-index string keys in creation
+ * order, and every key here is one, so the order the realm creates its
+ * function-intrinsic properties in is observable through the own
+ * descriptor record, and through Object.keys once a program makes the
+ * configurable links enumerable. Every case observes it, because the
+ * order must survive each replaced link and each specialization policy
+ * alike.
+ */
+function orderSource(kind: Kind): string {
+  if (kind === "ordinary") {
+    return (
+      'console.log("order", "none", "none");\n' +
+      'console.log("instance order", "none", "none");'
+    );
+  }
+  const helpers = `const orderCandidates = [
+  "length",
+  "name",
+  "prototype",
+  "constructor",
+  "next",
+  "return",
+  "throw",
+];
+function createdOrder(object) {
+  return Object.keys(Object.getOwnPropertyDescriptors(object)).join(",");
+}
+function enumerableOrder(object) {
+  for (const candidate of orderCandidates) {
+    const descriptor = Object.getOwnPropertyDescriptor(object, candidate);
+    if (descriptor !== undefined && descriptor.configurable) {
+      Object.defineProperty(object, candidate, { enumerable: true });
+    }
+  }
+  return Object.keys(object).join(",");
+}
+console.log(
+  "order",
+  createdOrder(kindPrototype),
+  enumerableOrder(kindPrototype),
+);`;
+  if (kind === "async") {
+    return `${helpers}\nconsole.log("instance order", "none", "none");`;
+  }
+  return `${helpers}
+const kindInstancePrototype = kindPrototype.prototype;
+console.log(
+  "instance order",
+  createdOrder(kindInstancePrototype),
+  enumerableOrder(kindInstancePrototype),
+);`;
+}
+
 function printCase(testCase: ChainCase): string {
   return `
 function* referenceGenerator() { yield 0; }
@@ -214,6 +268,7 @@ console.log(
 );
 console.log("peer", Object.prototype.toString.call(reference));
 ${instanceSource(testCase.kind)}
+${orderSource(testCase.kind)}
 `;
 }
 
@@ -250,12 +305,20 @@ function expected(testCase: ChainCase): string {
       : `instance [object ${
           kind === "generator" ? "Generator" : "AsyncGenerator"
         }] function true\n`;
+  const order = ordinary
+    ? "order none none\ninstance order none none\n"
+    : kind === "async"
+      ? "order constructor constructor\ninstance order none none\n"
+      : "order prototype,constructor prototype,constructor\n" +
+        "instance order constructor,next,return,throw " +
+        "constructor,next,return,throw\n";
   return (
     chain +
     `tag [object ${subjectTag}]\n` +
     `constructor ${constructorName}\n` +
     `peer [object ${peerTag}]\n` +
-    instance
+    instance +
+    order
   );
 }
 
@@ -360,9 +423,9 @@ test(
           "object method, class method, or static class method, with its " +
           "[[Prototype]] detached, its instance prototype replaced, its " +
           "kind prototype retagged, or unchanged, compared with an " +
-          "independent chain-depth, identity, tag, and constructor model " +
-          "under Node.js, Deno, and both native specialization policies " +
-          "with forced collection",
+          "independent chain-depth, identity, tag, constructor, and " +
+          "intrinsic property creation order model under Node.js, Deno, " +
+          "and both native specialization policies with forced collection",
         numRuns: 12,
         profile: "M5 generator and asynchronous function intrinsic chains",
         seed: 0x6000_5a00,

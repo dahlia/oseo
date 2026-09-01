@@ -279,6 +279,16 @@ static OseoResult dynamic_source_constructor(
  * so a failed allocation leaves no partially wired intrinsic behind, and
  * its allocations are restored because an intrinsic created on first use
  * is not one the observed program performed.
+ *
+ * OrdinaryOwnPropertyKeys reports non-index string keys in the order
+ * they were created, and every key here is one, so creation order is
+ * observable as soon as a program makes a configurable link enumerable.
+ * Each object therefore defines its properties in the order the reference
+ * hosts expose them:
+ * %GeneratorFunction.prototype% takes `prototype` before `constructor`,
+ * and %GeneratorPrototype% takes `constructor` before `next`, `return`,
+ * and `throw`. The allocation order stays free, because only a
+ * definition creates a key.
  */
 OseoResult oseo_internal_generator_prototype(OseoContext *context) {
     OseoValue cached =
@@ -298,27 +308,6 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
             context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE]
         );
         frame.slots[0] = result.value;
-    }
-    static const char *const names[] = {"next", "return", "throw"};
-    static const size_t codes[] = {
-        OSEO_GENERATOR_NEXT_CODE_ID,
-        OSEO_GENERATOR_RETURN_CODE_ID,
-        OSEO_GENERATOR_THROW_CODE_ID,
-    };
-    const OseoPropertyAttributes method = {true, false, true, false};
-    for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 3u;
-         index += 1u) {
-        result = oseo_internal_iterator_method(context, codes[index]);
-        frame.slots[1] = result.value;
-        if (result.status != OSEO_STATUS_NORMAL) break;
-        result = define_ascii_property(
-            context,
-            frame.slots[0],
-            names[index],
-            frame.slots[1],
-            method
-        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_intrinsic(
@@ -349,8 +338,8 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
         result = define_ascii_property(
             context,
             frame.slots[2],
-            "constructor",
-            frame.slots[3],
+            "prototype",
+            frame.slots[0],
             hidden
         );
     }
@@ -358,8 +347,8 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
         result = define_ascii_property(
             context,
             frame.slots[2],
-            "prototype",
-            frame.slots[0],
+            "constructor",
+            frame.slots[3],
             hidden
         );
     }
@@ -378,6 +367,27 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
             "constructor",
             frame.slots[2],
             hidden
+        );
+    }
+    static const char *const names[] = {"next", "return", "throw"};
+    static const size_t codes[] = {
+        OSEO_GENERATOR_NEXT_CODE_ID,
+        OSEO_GENERATOR_RETURN_CODE_ID,
+        OSEO_GENERATOR_THROW_CODE_ID,
+    };
+    const OseoPropertyAttributes method = {true, false, true, false};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         index += 1u) {
+        result = oseo_internal_iterator_method(context, codes[index]);
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_ascii_property(
+            context,
+            frame.slots[0],
+            names[index],
+            frame.slots[1],
+            method
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -418,7 +428,9 @@ OseoResult oseo_internal_generator_function_intrinsic(OseoContext *context) {
  * ordinary object rather than a callable one, and, unlike the two
  * generator function prototypes, it carries no `prototype` property:
  * an asynchronous function is not a constructor and creates no
- * instances.
+ * instances. `constructor` is therefore its only string key, and the
+ * creation order the two generator clusters have to arrange is already
+ * the one this object exposes.
  */
 OseoResult oseo_internal_async_function_intrinsic(OseoContext *context) {
     OseoValue cached =
@@ -503,6 +515,11 @@ OseoResult oseo_internal_async_function_intrinsic(OseoContext *context) {
  *
  * Every rootward [[Prototype]] link uses the realm-owned object or
  * function prototype rather than a parallel null-terminated chain.
+ *
+ * Property creation order follows the synchronous cluster's, for the
+ * same observability reason: %AsyncGeneratorFunction.prototype% takes
+ * `prototype` before `constructor`, and %AsyncGeneratorPrototype% takes
+ * `constructor` before `next`, `return`, and `throw`.
  */
 static OseoResult async_generator_intrinsics(OseoContext *context) {
     OseoValue cached =
@@ -552,30 +569,6 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_method(
-            context,
-            frame.slots[1],
-            "next",
-            OSEO_ASYNC_GENERATOR_NEXT_CODE_ID
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_method(
-            context,
-            frame.slots[1],
-            "return",
-            OSEO_ASYNC_GENERATOR_RETURN_CODE_ID
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_method(
-            context,
-            frame.slots[1],
-            "throw",
-            OSEO_ASYNC_GENERATOR_THROW_CODE_ID
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, frame.slots[5]);
         frame.slots[2] = result.value;
     }
@@ -597,8 +590,8 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         result = define_ascii_property(
             context,
             frame.slots[2],
-            "constructor",
-            frame.slots[3],
+            "prototype",
+            frame.slots[1],
             hidden
         );
     }
@@ -606,8 +599,8 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         result = define_ascii_property(
             context,
             frame.slots[2],
-            "prototype",
-            frame.slots[1],
+            "constructor",
+            frame.slots[3],
             hidden
         );
     }
@@ -626,6 +619,30 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
             "constructor",
             frame.slots[2],
             hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_method(
+            context,
+            frame.slots[1],
+            "next",
+            OSEO_ASYNC_GENERATOR_NEXT_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_method(
+            context,
+            frame.slots[1],
+            "return",
+            OSEO_ASYNC_GENERATOR_RETURN_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_method(
+            context,
+            frame.slots[1],
+            "throw",
+            OSEO_ASYNC_GENERATOR_THROW_CODE_ID
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {

@@ -5051,7 +5051,12 @@ non-callable object below `%Function.prototype%` with no own `length` or
 ordinary own property defined where ECMA-262 places it, and
 `%GeneratorPrototype%` gains the `constructor` and `Symbol.toStringTag` it
 was missing. The synchronous generator intrinsics are created as one cluster
-for the same circularity reason the asynchronous cluster already was.
+for the same circularity reason the asynchronous cluster already was. Because
+OrdinaryOwnPropertyKeys reports a non-index string key in creation order, each
+object creates its properties in the order the reference hosts expose:
+`prototype` before `constructor` on the two generator function prototypes,
+`constructor` before `next`, `return`, and `throw` on the two generator
+prototypes.
 
 A generator, asynchronous, asynchronous arrow, and asynchronous generator
 function inherits from the prototype object of its own kind in every
@@ -5071,7 +5076,9 @@ than at the earlier point the prologue has to allocate its traced record.
 Fixed and generated native differential evidence at seed `0x60005a00` covers
 every kind in every admitted form, the complete descriptor set, chain depth
 and identity, string tags, generator instance chains, `instanceof`, link
-replacement, the three dynamic-source diagnostics, both specialization
+replacement, the complete own string-key order read through the descriptor
+record and after each configurable link becomes enumerable, the three
+dynamic-source diagnostics, both specialization
 policies, false hints, deliberate shape-guard misses, generic fallback,
 collection at every safepoint, and the AArch64 Linux cross-link.
 All 215 paths under the seven inventory roots are accounted for and 209 are
