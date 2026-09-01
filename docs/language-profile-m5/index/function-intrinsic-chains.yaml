@@ -1,0 +1,3 @@
+version: 1
+id: function-intrinsic-chains
+record: docs/language-profile-m5/families/function-intrinsic-chains.yaml

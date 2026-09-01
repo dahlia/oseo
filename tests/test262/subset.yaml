@@ -8343,9 +8343,63 @@ tests:
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
-  - path: test/built-ins/AsyncGeneratorFunction/extensibility.js
+  - path: test/built-ins/AsyncFunction/AsyncFunction-construct.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    dependencies: [async-functions, dynamic-source]
+  - path: test/built-ins/AsyncFunction/AsyncFunction-is-extensible.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunction-is-subclass.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunction-length.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunction-name.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunction-prototype.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunction.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunctionPrototype-is-extensible.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunctionPrototype-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunctionPrototype-prototype.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/AsyncFunctionPrototype-to-string.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/instance-construct-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, dynamic-source]
+  - path: test/built-ins/AsyncFunction/instance-has-name.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/instance-length.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/instance-prototype-property.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, dynamic-source]
+  - path: test/built-ins/AsyncFunction/is-not-a-global.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/built-ins/AsyncFunction/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, dynamic-source]
+  - path: test/built-ins/AsyncGeneratorFunction/extensibility.js
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/has-instance.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
@@ -8383,11 +8437,11 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
   - path: test/built-ins/AsyncGeneratorFunction/length.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/name.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
@@ -8395,40 +8449,40 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/Symbol.toStringTag.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/extensibility.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/not-callable.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/prop-desc.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorFunction/prototype/prototype.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-iteration, dynamic-source]
+    expectedClassification: pass
+    dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/Symbol.toStringTag.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/iterator-result-prototype.js
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
     expectedClassification: pass
@@ -8446,22 +8500,22 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/this-val-not-async-generator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/this-val-not-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/iterator-result-prototype.js
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/request-queue-order-state-executing.js
     expectedClassification: pass
@@ -8494,19 +8548,19 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/this-val-not-async-generator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/return/this-val-not-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/request-queue-order-state-executing.js
     expectedClassification: pass
@@ -8515,10 +8569,10 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/this-val-not-async-generator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/this-val-not-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/throw/throw-state-completed.js
     expectedClassification: pass
@@ -11483,8 +11537,8 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/GeneratorFunction/extensibility.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/has-instance.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, generators]
@@ -11522,11 +11576,11 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, generators]
   - path: test/built-ins/GeneratorFunction/length.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/name.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, generators]
@@ -11534,23 +11588,29 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, generators]
   - path: test/built-ins/GeneratorFunction/prototype/Symbol.toStringTag.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/prototype/extensibility.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/prototype/not-callable.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/prototype/prop-desc.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorFunction/prototype/prototype.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, generators]
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/constructor.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/next/consecutive-yields.js
     expectedClassification: pass
     dependencies: [generators]
@@ -11560,16 +11620,37 @@ tests:
   - path: test/built-ins/GeneratorPrototype/next/from-state-executing.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/length.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/next/lone-return.js
     expectedClassification: pass
     dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/next/lone-yield.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/name.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/next/no-control-flow.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/result-prototype.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/next/return-yield-expr.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/this-val-not-generator.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/this-val-not-object.js
     expectedClassification: pass
     dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/return/from-state-completed.js
@@ -11581,11 +11662,23 @@ tests:
   - path: test/built-ins/GeneratorPrototype/return/from-state-suspended-start.js
     expectedClassification: pass
     dependencies: [generators]
-  - path: test/built-ins/GeneratorPrototype/return/this-val-not-generator.js
+  - path: test/built-ins/GeneratorPrototype/return/length.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/not-a-constructor.js
     expectedClassification: unsupported-profile-feature
     dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/this-val-not-generator.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/return/this-val-not-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/return/try-catch-before-try.js
     expectedClassification: pass
@@ -11627,6 +11720,72 @@ tests:
     expectedClassification: pass
     dependencies: [generators]
   - path: test/built-ins/GeneratorPrototype/return/try-finally-within-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/from-state-completed.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/from-state-executing.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/from-state-suspended-start.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/length.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/this-val-not-generator.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/this-val-not-object.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-catch-before-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-catch-following-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-catch-within-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-catch-within-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-before-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-following-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-nested-try-catch-within-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-nested-try-catch-within-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-nested-try-catch-within-inner-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-nested-try-catch-within-outer-try-after-nested.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-nested-try-catch-within-outer-try-before-nested.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-within-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/throw/try-finally-within-try.js
     expectedClassification: pass
     dependencies: [generators]
   - path: test/built-ins/Infinity/15.1.1.2-0.js
@@ -23036,7 +23195,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-generators-builtin.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-map-builtin.js
     expectedClassification: unsupported-profile-feature
@@ -34097,7 +34256,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/default-proto.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-abrupt.js
     expectedClassification: pass
@@ -35336,7 +35495,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/generator-created-after-decl-inst.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/name.js
     expectedClassification: pass
@@ -42073,7 +42232,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
   - path: test/language/statements/async-generator/generator-created-after-decl-inst.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/object-destructuring-param-strict-body.js
     expectedClassification: expected-negative

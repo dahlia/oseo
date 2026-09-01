@@ -14,10 +14,9 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-iteration
-      - dynamic-source
     execution:
       harnessIncludes:
         - base.js
@@ -26,13 +25,13 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/AsyncGeneratorFunction/name.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorFunction/name.js:357:30:
-        error[OSEO2001]: Generator intrinsic reflection is not admitted
-        yet.\n"'
-      unsupportedCapability: generator-intrinsics
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

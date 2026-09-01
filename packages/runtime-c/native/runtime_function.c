@@ -1047,8 +1047,13 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
                 intrinsic <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER)) {
         materialized = oseo_internal_array_iterator_prototype(context);
-    } else if (intrinsic == OSEO_INTRINSIC_GENERATOR_PROTOTYPE) {
+    } else if (intrinsic == OSEO_INTRINSIC_GENERATOR_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_GENERATOR_FUNCTION_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_GENERATOR_FUNCTION) {
         materialized = oseo_internal_generator_prototype(context);
+    } else if (intrinsic == OSEO_INTRINSIC_ASYNC_FUNCTION_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_ASYNC_FUNCTION) {
+        materialized = oseo_internal_async_function_intrinsic(context);
     } else if (
         intrinsic >= OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE &&
         intrinsic <= OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION
@@ -1214,12 +1219,22 @@ OseoResult oseo_function_create(
             return result;
         }
     }
-    /* An asynchronous generator function itself inherits from
-     * %AsyncGeneratorFunction.prototype%, which is what makes its
-     * `constructor` reach %AsyncGeneratorFunction%. Every other function
-     * inherits from the realm's %Function.prototype%. */
-    if (function_kind == OSEO_FUNCTION_ASYNC_GENERATOR) {
-        result = oseo_internal_async_generator_intrinsic(context);
+    /* A generator, asynchronous generator, or asynchronous function
+     * inherits from the function-prototype object of its own kind, which
+     * is what makes its `constructor` reach %GeneratorFunction%,
+     * %AsyncGeneratorFunction%, or %AsyncFunction% and its
+     * `Symbol.toStringTag` report that kind. An asynchronous arrow
+     * function is an asynchronous function for this purpose. Every other
+     * function inherits from the realm's %Function.prototype%. */
+    if (function_kind == OSEO_FUNCTION_GENERATOR ||
+        function_kind == OSEO_FUNCTION_ASYNC_GENERATOR ||
+        function_kind == OSEO_FUNCTION_ASYNC ||
+        function_kind == OSEO_FUNCTION_ASYNC_ARROW) {
+        result = function_kind == OSEO_FUNCTION_GENERATOR
+            ? oseo_internal_generator_function_intrinsic(context)
+            : function_kind == OSEO_FUNCTION_ASYNC_GENERATOR
+                ? oseo_internal_async_generator_intrinsic(context)
+                : oseo_internal_async_function_intrinsic(context);
         frame.slots[9] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) {
             oseo_roots_release(context, &frame);
@@ -2590,6 +2605,17 @@ OseoResult oseo_call_function(
             OseoValue reason = result.value;
             oseo_context_clear_language_error(context);
             result = oseo_async_function_reject(context, reason);
+        } else if ((kind == OSEO_FUNCTION_GENERATOR ||
+                    kind == OSEO_FUNCTION_ASYNC_GENERATOR) &&
+                   result.status == OSEO_STATUS_NORMAL) {
+            /* EvaluateBody reads the function's `prototype` after
+             * FunctionDeclarationInstantiation, which the prologue has
+             * just finished. */
+            result = oseo_internal_generator_created(
+                context,
+                callee,
+                result.value
+            );
         }
     }
     oseo_call_leave(context);

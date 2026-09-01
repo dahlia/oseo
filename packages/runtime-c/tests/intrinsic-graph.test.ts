@@ -475,6 +475,82 @@ test("populates the realm-owned Function prototype", () => {
   assert.match(functionSource, /oseo_internal_throw_type_error_function/u);
 });
 
+test("populates the realm-owned function intrinsic chains", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const generatorSource = sources.get("runtime_generator.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const intrinsic of [
+    "GENERATOR_PROTOTYPE",
+    "GENERATOR_FUNCTION_PROTOTYPE",
+    "GENERATOR_FUNCTION",
+    "ASYNC_FUNCTION_PROTOTYPE",
+    "ASYNC_FUNCTION",
+    "ASYNC_GENERATOR_PROTOTYPE",
+    "ASYNC_GENERATOR_FUNCTION_PROTOTYPE",
+    "ASYNC_GENERATOR_FUNCTION",
+    "ASYNC_ITERATOR_PROTOTYPE",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const name of [
+    "GeneratorFunction",
+    "AsyncFunction",
+    "AsyncGeneratorFunction",
+    "Generator",
+    "AsyncGenerator",
+  ]) {
+    assert.match(generatorSource, new RegExp(`"${name}"`, "u"));
+  }
+  // Every link is an ordinary own property of the object the
+  // specification places it on, defined through the shared helpers
+  // rather than synthesized by a property read.
+  for (const property of ["constructor", "prototype", "next", "return"]) {
+    assert.match(generatorSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(generatorSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  // Each constructor is an ordinary built-in whose [[Prototype]] is
+  // %Function%, and only its dispatch reports the ADR 0016 boundary.
+  assert.match(
+    generatorSource,
+    /dynamic_source_constructor[\s\S]*?OSEO_INTRINSIC_FUNCTION\b/u,
+  );
+  for (const code of [
+    "OSEO_GENERATOR_FUNCTION_CODE_ID",
+    "OSEO_ASYNC_FUNCTION_CODE_ID",
+    "OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID",
+  ]) {
+    assert.match(internalHeader, new RegExp(code, "u"));
+    assert.match(generatorSource, new RegExp(`${code}`, "u"));
+  }
+  assert.match(generatorSource, /compiles source text at run time/u);
+  // A function of each kind inherits from its own realm prototype.
+  assert.match(
+    functionSource,
+    /oseo_internal_generator_function_intrinsic\(context\)/u,
+  );
+  assert.match(
+    functionSource,
+    /oseo_internal_async_function_intrinsic\(context\)/u,
+  );
+  // Reflection over a generator function or generator object is an
+  // ordinary prototype read rather than an owned boundary.
+  assert.doesNotMatch(objectBuiltins, /Generator intrinsic reflection/u);
+  // A generator object resolves its own [[Prototype]] where EvaluateBody
+  // reads it, after FunctionDeclarationInstantiation, so the call that
+  // produces it finishes the read the prologue could not.
+  assert.match(
+    generatorSource,
+    /oseo_internal_generator_created[\s\S]*?prototype_object/u,
+  );
+  assert.match(
+    functionSource,
+    /OSEO_FUNCTION_ASYNC_GENERATOR[\s\S]*?oseo_internal_generator_created/u,
+  );
+});
+
 test("populates the realm-owned Array constructor", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const arraySource = sources.get("runtime_array.c") ?? "";

@@ -83,6 +83,8 @@ const { genericStringCoercionFixtures } =
   await import("./native/fixtures/generic-string-coercion.ts");
 const { mathNamespaceFixtures } =
   await import("./native/fixtures/math-namespace.ts");
+const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
+  await import("./native/fixtures/function-intrinsic-chains.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -148,6 +150,8 @@ const fixtures: readonly Fixture[] = [
   ...regexpLiteralAotFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...generatorFixtures,
+  ...functionIntrinsicChainFixtures,
+  ...functionIntrinsicKeyOrderFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
@@ -252,6 +256,66 @@ for (const deferredRegExp of [
     new RegExp(
       `^${deferredRegExp.name.replace(".", "\\.")}:1:\\d+: ` +
         "error\\[OSEO2001\\]: (?:RegExp|Regular expression)",
+      "u",
+    ),
+  );
+}
+
+/*
+ * ADR 0016 keeps every form that compiles source text at run time outside
+ * the profile. Each function-family constructor is a materialized
+ * intrinsic value that a prototype chain reaches, so only its [[Call]]
+ * and [[Construct]] report the boundary, and each names itself.
+ */
+for (const dynamicSource of [
+  {
+    diagnostic: "GeneratorFunction",
+    name: "dynamic-source-generator-function.ts",
+    source: 'Object.getPrototypeOf(function* () {}).constructor("");',
+  },
+  {
+    diagnostic: "GeneratorFunction",
+    name: "dynamic-source-generator-function-construct.ts",
+    source: "new (Object.getPrototypeOf(function* () {}).constructor)();",
+  },
+  {
+    diagnostic: "AsyncFunction",
+    name: "dynamic-source-async-function.ts",
+    source: 'Object.getPrototypeOf(async function () {}).constructor("");',
+  },
+  {
+    diagnostic: "AsyncFunction",
+    name: "dynamic-source-async-function-construct.ts",
+    source: "new (Object.getPrototypeOf(async function () {}).constructor)();",
+  },
+  {
+    diagnostic: "AsyncGeneratorFunction",
+    name: "dynamic-source-async-generator-function.ts",
+    source: 'Object.getPrototypeOf(async function* () {}).constructor("");',
+  },
+  {
+    diagnostic: "AsyncGeneratorFunction",
+    name: "dynamic-source-async-generator-function-construct.ts",
+    source: "new (Object.getPrototypeOf(async function* () {}).constructor)();",
+  },
+]) {
+  const rejected = await runNativeCli(
+    {
+      args: [dynamicSource.name],
+      source: dynamicSource.source,
+      sourceId: dynamicSource.name,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(rejected.exitStatus, 1);
+  assert.equal(rejected.stdout, "");
+  assert.match(
+    rejected.stderr,
+    new RegExp(
+      `^${dynamicSource.name.replace(".", "\\.")}:1:\\d+: ` +
+        `error\\[OSEO1001\\]: ${dynamicSource.diagnostic} compiles ` +
+        "source text at run time, which is outside the admitted profile\\.",
       "u",
     ),
   );
@@ -654,6 +718,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
     fixture.name === "generic-string-coercion" ||
+    fixture.name === "function-intrinsic-chains" ||
     fixture.name === "number-prototype"
   ) {
     const enabledText = printMir(enabledMir);
@@ -802,6 +867,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-static-block-super" ||
     fixture.name === "generators" ||
     fixture.name === "generator-delegated-throw" ||
+    fixture.name === "function-intrinsic-chains" ||
     fixture.name === "async-generators" ||
     fixture.name === "async-from-sync-delegated-throw" ||
     fixture.name === "async-generator-prototypes" ||

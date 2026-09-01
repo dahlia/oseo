@@ -1334,6 +1334,60 @@ partitions:
   - group: built-ins/AsyncFromSyncIteratorPrototype
     key: fc
     path: results/built-ins/AsyncFromSyncIteratorPrototype/fc.yaml
+  - group: built-ins/AsyncFunction
+    key: "06"
+    path: results/built-ins/AsyncFunction/06.yaml
+  - group: built-ins/AsyncFunction
+    key: "08"
+    path: results/built-ins/AsyncFunction/08.yaml
+  - group: built-ins/AsyncFunction
+    key: 0f
+    path: results/built-ins/AsyncFunction/0f.yaml
+  - group: built-ins/AsyncFunction
+    key: "13"
+    path: results/built-ins/AsyncFunction/13.yaml
+  - group: built-ins/AsyncFunction
+    key: "14"
+    path: results/built-ins/AsyncFunction/14.yaml
+  - group: built-ins/AsyncFunction
+    key: "28"
+    path: results/built-ins/AsyncFunction/28.yaml
+  - group: built-ins/AsyncFunction
+    key: "60"
+    path: results/built-ins/AsyncFunction/60.yaml
+  - group: built-ins/AsyncFunction
+    key: 6c
+    path: results/built-ins/AsyncFunction/6c.yaml
+  - group: built-ins/AsyncFunction
+    key: a4
+    path: results/built-ins/AsyncFunction/a4.yaml
+  - group: built-ins/AsyncFunction
+    key: ac
+    path: results/built-ins/AsyncFunction/ac.yaml
+  - group: built-ins/AsyncFunction
+    key: b3
+    path: results/built-ins/AsyncFunction/b3.yaml
+  - group: built-ins/AsyncFunction
+    key: b4
+    path: results/built-ins/AsyncFunction/b4.yaml
+  - group: built-ins/AsyncFunction
+    key: c1
+    path: results/built-ins/AsyncFunction/c1.yaml
+  - group: built-ins/AsyncFunction
+    key: d0
+    path: results/built-ins/AsyncFunction/d0.yaml
+  - group: built-ins/AsyncFunction
+    key: df
+    path: results/built-ins/AsyncFunction/df.yaml
+  - group: built-ins/AsyncFunction
+    key: e2
+    path: results/built-ins/AsyncFunction/e2.yaml
+  - group: built-ins/AsyncFunction
+    key: ec
+    path: results/built-ins/AsyncFunction/ec.yaml
+  - group: built-ins/AsyncFunction
+    key: f8
+    path: results/built-ins/AsyncFunction/f8.yaml
   - group: built-ins/AsyncGeneratorFunction
     key: "06"
     path: results/built-ins/AsyncGeneratorFunction/06.yaml
@@ -3075,11 +3129,20 @@ partitions:
     key: 0e
     path: results/built-ins/GeneratorPrototype/0e.yaml
   - group: built-ins/GeneratorPrototype
+    key: 1b
+    path: results/built-ins/GeneratorPrototype/1b.yaml
+  - group: built-ins/GeneratorPrototype
+    key: "20"
+    path: results/built-ins/GeneratorPrototype/20.yaml
+  - group: built-ins/GeneratorPrototype
     key: 3a
     path: results/built-ins/GeneratorPrototype/3a.yaml
   - group: built-ins/GeneratorPrototype
     key: 3b
     path: results/built-ins/GeneratorPrototype/3b.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 3c
+    path: results/built-ins/GeneratorPrototype/3c.yaml
   - group: built-ins/GeneratorPrototype
     key: 3d
     path: results/built-ins/GeneratorPrototype/3d.yaml
@@ -3087,20 +3150,65 @@ partitions:
     key: "45"
     path: results/built-ins/GeneratorPrototype/45.yaml
   - group: built-ins/GeneratorPrototype
+    key: "46"
+    path: results/built-ins/GeneratorPrototype/46.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 4b
+    path: results/built-ins/GeneratorPrototype/4b.yaml
+  - group: built-ins/GeneratorPrototype
     key: "50"
     path: results/built-ins/GeneratorPrototype/50.yaml
   - group: built-ins/GeneratorPrototype
     key: "53"
     path: results/built-ins/GeneratorPrototype/53.yaml
   - group: built-ins/GeneratorPrototype
+    key: "55"
+    path: results/built-ins/GeneratorPrototype/55.yaml
+  - group: built-ins/GeneratorPrototype
     key: "59"
     path: results/built-ins/GeneratorPrototype/59.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 5d
+    path: results/built-ins/GeneratorPrototype/5d.yaml
   - group: built-ins/GeneratorPrototype
     key: "61"
     path: results/built-ins/GeneratorPrototype/61.yaml
   - group: built-ins/GeneratorPrototype
+    key: "62"
+    path: results/built-ins/GeneratorPrototype/62.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 6c
+    path: results/built-ins/GeneratorPrototype/6c.yaml
+  - group: built-ins/GeneratorPrototype
+    key: "72"
+    path: results/built-ins/GeneratorPrototype/72.yaml
+  - group: built-ins/GeneratorPrototype
+    key: "78"
+    path: results/built-ins/GeneratorPrototype/78.yaml
+  - group: built-ins/GeneratorPrototype
+    key: "82"
+    path: results/built-ins/GeneratorPrototype/82.yaml
+  - group: built-ins/GeneratorPrototype
+    key: "84"
+    path: results/built-ins/GeneratorPrototype/84.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 8a
+    path: results/built-ins/GeneratorPrototype/8a.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 8c
+    path: results/built-ins/GeneratorPrototype/8c.yaml
+  - group: built-ins/GeneratorPrototype
+    key: 9a
+    path: results/built-ins/GeneratorPrototype/9a.yaml
+  - group: built-ins/GeneratorPrototype
     key: 9e
     path: results/built-ins/GeneratorPrototype/9e.yaml
+  - group: built-ins/GeneratorPrototype
+    key: a2
+    path: results/built-ins/GeneratorPrototype/a2.yaml
+  - group: built-ins/GeneratorPrototype
+    key: a6
+    path: results/built-ins/GeneratorPrototype/a6.yaml
   - group: built-ins/GeneratorPrototype
     key: ab
     path: results/built-ins/GeneratorPrototype/ab.yaml
@@ -3114,11 +3222,26 @@ partitions:
     key: b7
     path: results/built-ins/GeneratorPrototype/b7.yaml
   - group: built-ins/GeneratorPrototype
+    key: b8
+    path: results/built-ins/GeneratorPrototype/b8.yaml
+  - group: built-ins/GeneratorPrototype
     key: b9
     path: results/built-ins/GeneratorPrototype/b9.yaml
   - group: built-ins/GeneratorPrototype
+    key: ba
+    path: results/built-ins/GeneratorPrototype/ba.yaml
+  - group: built-ins/GeneratorPrototype
     key: bd
     path: results/built-ins/GeneratorPrototype/bd.yaml
+  - group: built-ins/GeneratorPrototype
+    key: c0
+    path: results/built-ins/GeneratorPrototype/c0.yaml
+  - group: built-ins/GeneratorPrototype
+    key: c3
+    path: results/built-ins/GeneratorPrototype/c3.yaml
+  - group: built-ins/GeneratorPrototype
+    key: d2
+    path: results/built-ins/GeneratorPrototype/d2.yaml
   - group: built-ins/GeneratorPrototype
     key: d5
     path: results/built-ins/GeneratorPrototype/d5.yaml
@@ -3126,14 +3249,26 @@ partitions:
     key: d6
     path: results/built-ins/GeneratorPrototype/d6.yaml
   - group: built-ins/GeneratorPrototype
+    key: d7
+    path: results/built-ins/GeneratorPrototype/d7.yaml
+  - group: built-ins/GeneratorPrototype
+    key: e3
+    path: results/built-ins/GeneratorPrototype/e3.yaml
+  - group: built-ins/GeneratorPrototype
     key: e8
     path: results/built-ins/GeneratorPrototype/e8.yaml
   - group: built-ins/GeneratorPrototype
     key: ea
     path: results/built-ins/GeneratorPrototype/ea.yaml
   - group: built-ins/GeneratorPrototype
+    key: f0
+    path: results/built-ins/GeneratorPrototype/f0.yaml
+  - group: built-ins/GeneratorPrototype
     key: f2
     path: results/built-ins/GeneratorPrototype/f2.yaml
+  - group: built-ins/GeneratorPrototype
+    key: fb
+    path: results/built-ins/GeneratorPrototype/fb.yaml
   - group: built-ins/GeneratorPrototype
     key: fe
     path: results/built-ins/GeneratorPrototype/fe.yaml
@@ -10855,9 +10990,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 11604
+  passes: 11690
   semanticFailures: 0
-  unsupportedProfileFeatures: 2352
+  unsupportedProfileFeatures: 2319
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -10877,16 +11012,16 @@ summary:
       expectedNegatives: 161
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 456
+      passes: 469
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 12
     - dependency: async-iteration
       expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1149
+      passes: 1178
       semanticFailures: 0
-      unsupportedProfileFeatures: 139
+      unsupportedProfileFeatures: 110
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
@@ -10935,7 +11070,7 @@ summary:
       infrastructureFailures: 0
       passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 89
+      unsupportedProfileFeatures: 75
     - dependency: error-intrinsics
       expectedNegatives: 5
       harnessFailures: 0
@@ -10961,9 +11096,9 @@ summary:
       expectedNegatives: 83
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 285
+      passes: 328
       semanticFailures: 0
-      unsupportedProfileFeatures: 31
+      unsupportedProfileFeatures: 23
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
@@ -10996,9 +11131,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8142
+      passes: 8143
       semanticFailures: 0
-      unsupportedProfileFeatures: 1036
+      unsupportedProfileFeatures: 1035
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -11070,20 +11205,27 @@ summary:
       passes: 35
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/AsyncFunction
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 13
+      semanticFailures: 0
+      unsupportedProfileFeatures: 5
     - group: built-ins/AsyncGeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 9
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 14
     - group: built-ins/AsyncGeneratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 28
+      passes: 45
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 0
     - group: built-ins/AsyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -11123,16 +11265,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 9
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 14
     - group: built-ins/GeneratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 24
+      passes: 58
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 3
     - group: built-ins/Infinity
       expectedNegatives: 0
       harnessFailures: 0
@@ -11193,9 +11335,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2682
+      passes: 2683
       semanticFailures: 0
-      unsupportedProfileFeatures: 349
+      unsupportedProfileFeatures: 348
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -11277,9 +11419,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1444
+      passes: 1446
       semanticFailures: 0
-      unsupportedProfileFeatures: 147
+      unsupportedProfileFeatures: 145
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -11347,6 +11489,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1208
+      passes: 1209
       semanticFailures: 0
-      unsupportedProfileFeatures: 88
+      unsupportedProfileFeatures: 87

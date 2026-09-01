@@ -204,19 +204,6 @@ static OseoResult object_prototype_to_string(
     if (tag_of(receiver) == OSEO_TAG_NULL) {
         return object_tag_text(context, oseo_undefined(), "Null");
     }
-    if (
-        (is_function(receiver) &&
-         (function_object(receiver)->function_kind == OSEO_FUNCTION_GENERATOR ||
-          function_object(receiver)->function_kind ==
-              OSEO_FUNCTION_ASYNC_GENERATOR)) ||
-        is_generator(receiver)
-    ) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Generator intrinsic reflection is not admitted yet."
-        );
-    }
     const char *fallback = object_builtin_tag(receiver);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
@@ -519,20 +506,6 @@ static OseoResult object_get_prototype_of(
         builtin_argument(argument_count, arguments, 0u)
     );
     if (object.status != OSEO_STATUS_NORMAL) return object;
-    if (
-        (is_function(object.value) &&
-         (function_object(object.value)->function_kind ==
-              OSEO_FUNCTION_GENERATOR ||
-          function_object(object.value)->function_kind ==
-              OSEO_FUNCTION_ASYNC_GENERATOR)) ||
-        is_generator(object.value)
-    ) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Generator intrinsic reflection is not admitted yet."
-        );
-    }
     return normal(ordinary_object(object.value)->prototype);
 }
 

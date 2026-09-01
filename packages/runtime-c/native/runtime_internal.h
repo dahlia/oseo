@@ -169,6 +169,17 @@
  * can still reach. */
 #define OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID \
     (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 4u)
+/* %GeneratorFunction% and %AsyncFunction%. Both exist for the same
+ * reason %AsyncGeneratorFunction% does: the prototype chain a generator
+ * function, an asynchronous function, and a generator object expose
+ * through Object.getPrototypeOf ends at a real constructor whose
+ * `constructor` and `prototype` links close. Reaching either one's
+ * [[Call]] or [[Construct]] still means source text became known only at
+ * run time, which ADR 0016 keeps outside the profile. */
+#define OSEO_GENERATOR_FUNCTION_CODE_ID \
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_ASYNC_FUNCTION_CODE_ID \
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 6u)
 
 #define OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)5u)
 #define OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -2295,8 +2306,33 @@ OseoResult oseo_internal_well_known_symbol(
     OseoContext *context,
     size_t index
 );
-/* The lazily created, permanently rooted %GeneratorPrototype%. */
+/* The lazily created, permanently rooted %GeneratorPrototype%.
+ * Reaching it creates the whole synchronous generator intrinsic
+ * cluster, because %GeneratorPrototype%, %GeneratorFunction.prototype%,
+ * and %GeneratorFunction% name one another. */
 OseoResult oseo_internal_generator_prototype(OseoContext *context);
+/* %GeneratorFunction.prototype%, the object every generator function
+ * has as its [[Prototype]]. */
+OseoResult oseo_internal_generator_function_intrinsic(OseoContext *context);
+/* %AsyncFunction.prototype%, the object every asynchronous function and
+ * asynchronous arrow function has as its [[Prototype]]. Reaching it
+ * creates %AsyncFunction% with it, because the two name each other. */
+OseoResult oseo_internal_async_function_intrinsic(OseoContext *context);
+/*
+ * OrdinaryCreateFromConstructor for one generator object, applied where
+ * EvaluateBody reaches it: after FunctionDeclarationInstantiation. The
+ * prologue has to allocate the record before it instantiates parameters,
+ * because a parameter is initialized into the record's traced slots, so
+ * a parameter initializer that replaces its own function's `prototype`
+ * would otherwise be read one step too early. Relinking when the call
+ * returns is unobservable, because that result is the first time the
+ * object reaches the program.
+ */
+OseoResult oseo_internal_generator_created(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue generator
+);
 OseoResult oseo_internal_array_prototype(OseoContext *context);
 OseoResult oseo_internal_array_iterator_prototype(OseoContext *context);
 /* The same for %AsyncGeneratorPrototype%. Reaching it creates the whole

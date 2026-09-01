@@ -34,10 +34,10 @@ evidence:
       - tests/native.ts
       - tests/native/fixtures/async-generators.ts
   standards:
-    status: omitted
-    reason: "Standards cases require omitted Object.getPrototypeOf."
-    replacements:
-      - tests/native/fixtures/async-generators.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
   structural:
     status: covered
     references:
