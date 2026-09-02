@@ -136,6 +136,32 @@ results:
   - case:
       async: false
       features:
+        - Symbol.split
+        - Symbol.species
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-non-ctor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - regular-expressions
+    observation:
+      detail: "test/built-ins/RegExp/prototype/Symbol.split/species-ctor-spec\
+        ies-non-ctor.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/Symbol.split/species-c\
+        tor-species-non-ctor.js:129:34: error[OSEO1001]: Unknown binding
+        'Date'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-match-indices
       flags: []
       includes: []

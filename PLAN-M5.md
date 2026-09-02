@@ -5124,6 +5124,104 @@ checkpoint moves the runtime ABI to `oseo-runtime-m5-86` and allocates two
 code IDs inside the existing generator range without changing the graph's
 orchestration state.
 
+Implemented M5b node `regexp-symbol-methods` gives `%RegExp.prototype%` the
+real `[Symbol.match]`, `[Symbol.matchAll]`, `[Symbol.replace]`,
+`[Symbol.search]`, and `[Symbol.split]` methods, adds the `RegExp.escape`
+static, and routes `String.prototype.match`, `matchAll`, and `search`
+through them. Every method requires an Object receiver, reads `flags`,
+`lastIndex`, `constructor`, `Symbol.species`, `index`, `groups`, `length`,
+and the numbered capture properties through ordinary property access, and
+executes through `RegExpExec`, so an overridden `exec` is called and its
+non-object, non-null result is a `TypeError`.
+
+`@@match` answers one execution for a pattern that is not global and
+otherwise resets `lastIndex`, collects every matched substring, and advances
+by `AdvanceStringIndex` after an empty match. `@@search` restores its
+receiver's `lastIndex` through `SameValue`. `@@matchAll` and `@@split` take
+`SpeciesConstructor(rx, %RegExp%)` and construct a copy with the receiver's
+`flags`, which `@@split` extends with `y` when it is absent. `@@replace`
+collects every execution before it builds its result and hands a callable
+replacer the captures, the position, the subject, and the named-capture
+object. Its next source position keeps the unclamped sum of the position and
+the matched length, so a match object reporting a `0` longer than the
+remaining subject suppresses every later match. GetSubstitution therefore gains
+the capture and named-capture arguments the `string-prototype-replace` node
+reserved for exactly this node, so `$1` through `$99` and `$<name>` now resolve.
+
+`RegExp.escape` implements `EncodeForRegExpEscape`: a leading decimal digit
+or ASCII letter is hex-escaped, every SyntaxCharacter and the solidus is
+backslash-escaped, the five ControlEscape code points take their letters,
+and the other punctuators, WhiteSpace, LineTerminator, and either surrogate
+half take a hexadecimal or Unicode escape.
+`%RegExpStringIteratorPrototype%`, which `string-prototype-match-and-split`
+materialized, now holds the iterating RegExp with the frozen `global` and
+`unicode` decisions and keeps its cursor in that RegExp's own `lastIndex`.
+
+Routing the String methods retires the fixed-width fallback pattern language
+that node admitted, so a `String` operand is compiled as a real pattern and
+the `OSEO2001` boundary a branded RegExp operand used to reach is gone. One
+divergence follows from that and is inherited rather than introduced: a
+pattern only Annex B admits, such as `\x1`, now reaches the dynamic
+validator through RegExpCreate and is a `SyntaxError`, exactly as it already
+is for `new RegExp`, while both reference hosts accept it. The
+pattern-grammar node owns that gap.
+
+The new *runtime\_regexp\_symbol.c* component owns the five methods and
+`escape`. *runtime\_regexp.c* gains only `RegExpCreate` and the exported
+`RegExpExec`, and *runtime\_string\_match.c* keeps the iterator record,
+the String entry points, and GetSubstitution. The one growable UTF-16
+accumulator both replacement paths use now has a single owner in
+*runtime\_string.c*.
+
+Fixed native and generated differential evidence at seeds `0x60005b00`
+through `0x60005b02` covers descriptors, generic receivers, species
+construction, sticky and unicode traversal, every GetSubstitution reference
+form, functional replacers with their named-capture object, the complete
+iterator protocol, `EncodeForRegExpEscape` over every escaping class, the
+String routing through a callable, non-callable, nullish, deleted, RegExp,
+and plain String operand, both specialization policies, forced collection at
+every safepoint, false hints, and deliberate shape-guard misses. The
+generated method domain takes its expected observation from the
+compiler-side matcher rather than from the hosts. Two observations stay out
+of the fixed lane because the pinned hosts disagree: a `@@replace` receiver
+whose `exec` never advances `lastIndex`, where the pinned Node.js host stops
+after one execution while Deno and the edition continue, and the Annex B
+rejection above.
+
+All 253 paths under the node's seven inventory roots are applicable and 252
+are reviewed: 240 pass and 12 retain explicit prerequisite boundaries. Six
+`not-a-constructor.js` cases need `Reflect.construct`, two need a second
+realm, three reference the unadmitted `print`, `ERROR`, or `Date` globals,
+and one names a non-ASCII group in a literal the pattern grammar still
+refuses. The one path left out,
+*test/built-ins/RegExp/escape/escaped-otherpunctuators.js*, iterates a
+String with `for`-`of`, which the separate `string-iterator` node owns; its
+`RegExp.escape` observations are covered by the fixed and generated evidence
+above, so nothing about this node is unmeasured. The reviewed feature list
+gains `RegExp.escape` and `regexp-named-groups`, which this node implements
+and which no already-reviewed path declared.
+
+Ninety-two already-reviewed paths outside those roots move from
+`unsupported-profile-feature` to `pass` because the String methods now reach
+a real pattern: twenty-nine under *String/prototype/split/*, twenty-five
+under *String/prototype/replace/*, nineteen under *String/prototype/match/*,
+eight under *String/prototype/search/*, five under *RegExp/*, four under
+*String/prototype/matchAll/*, and two under *String/prototype/replaceAll/*.
+No previously reviewed path loses a pass. The manifest moves from 15,515 to
+15,767 cases and from 11,690 to 12,022 passes, keeps 1,506 expected
+negatives, and moves from 2,319 to 2,239 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The property inventory
+moves from 116 to 119 domains and seeds and from 5,246 to 5,268 ordinary
+cases. Adding `regular-expressions` to the reviewed rows of earlier RegExp
+nodes remains outside this change and belongs to the reviewed-subset-growth
+backlog. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, target-parity policy, and zero-override policy are unchanged.
+The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-87`. The five deferred RegExp code IDs become real ones and
+the range allocates one more for `escape`, so it holds twenty-one of its two
+hundred fifty-six without adding a generated-code entry point or changing
+the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

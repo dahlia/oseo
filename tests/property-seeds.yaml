@@ -364,3 +364,7 @@ families:
     owner: tests/property/m5-array-prototype-index-search.property.test.ts
     start: 0x60005900
     end: 0x600059ff
+  - family: m5-regexp-symbol-methods
+    owner: tests/property/m5-regexp-symbol-methods.property.test.ts
+    start: 0x60005b00
+    end: 0x60005bff

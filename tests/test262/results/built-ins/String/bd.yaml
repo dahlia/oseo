@@ -72,7 +72,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
       - object-properties
@@ -84,13 +84,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/String/prototype/split/argument-is-regexp-and-instance-is-number.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/String/prototype/split/argument-is-regexp-and-instance-is-number.js:94:15:
-        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
-      unsupportedCapability: regexp-string-dispatch
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

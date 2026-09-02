@@ -33,316 +33,6 @@ static OseoResult match_subject(
     return oseo_internal_value_string(context, receiver);
 }
 
-typedef enum {
-    OSEO_FALLBACK_REGEXP_LITERAL,
-    OSEO_FALLBACK_REGEXP_DOT,
-    OSEO_FALLBACK_REGEXP_DIGIT,
-    OSEO_FALLBACK_REGEXP_NOT_DIGIT,
-    OSEO_FALLBACK_REGEXP_WORD,
-    OSEO_FALLBACK_REGEXP_NOT_WORD,
-    OSEO_FALLBACK_REGEXP_SPACE,
-    OSEO_FALLBACK_REGEXP_NOT_SPACE,
-} OseoFallbackRegExpAtomKind;
-
-typedef struct {
-    OseoFallbackRegExpAtomKind kind;
-    uint16_t literal;
-} OseoFallbackRegExpAtom;
-
-typedef enum {
-    OSEO_FALLBACK_REGEXP_ATOM_OK,
-    OSEO_FALLBACK_REGEXP_ATOM_INVALID,
-    OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED,
-} OseoFallbackRegExpAtomStatus;
-
-static bool fallback_regexp_hex(uint16_t unit, uint16_t *value) {
-    if (unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39)) {
-        *value = unit - UINT16_C(0x30);
-        return true;
-    }
-    if (unit >= UINT16_C(0x41) && unit <= UINT16_C(0x46)) {
-        *value = unit - UINT16_C(0x41) + UINT16_C(10);
-        return true;
-    }
-    if (unit >= UINT16_C(0x61) && unit <= UINT16_C(0x66)) {
-        *value = unit - UINT16_C(0x61) + UINT16_C(10);
-        return true;
-    }
-    return false;
-}
-
-static bool fallback_regexp_escaped_literal(uint16_t unit) {
-    switch (unit) {
-        case UINT16_C(0x24):
-        case UINT16_C(0x28):
-        case UINT16_C(0x29):
-        case UINT16_C(0x2a):
-        case UINT16_C(0x2b):
-        case UINT16_C(0x2e):
-        case UINT16_C(0x2f):
-        case UINT16_C(0x3f):
-        case UINT16_C(0x5b):
-        case UINT16_C(0x5c):
-        case UINT16_C(0x5d):
-        case UINT16_C(0x5e):
-        case UINT16_C(0x7b):
-        case UINT16_C(0x7c):
-        case UINT16_C(0x7d):
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool fallback_regexp_unescaped_syntax(uint16_t unit) {
-    return fallback_regexp_escaped_literal(unit) &&
-        unit != UINT16_C(0x2f) && unit != UINT16_C(0x5c);
-}
-
-static OseoFallbackRegExpAtomStatus fallback_regexp_atom(
-    const OseoString *pattern,
-    size_t *index,
-    OseoFallbackRegExpAtom *atom
-) {
-    uint16_t unit = pattern->units[*index];
-    *index += 1u;
-    atom->kind = OSEO_FALLBACK_REGEXP_LITERAL;
-    atom->literal = unit;
-    if (unit == UINT16_C(0x2e)) {
-        atom->kind = OSEO_FALLBACK_REGEXP_DOT;
-        return OSEO_FALLBACK_REGEXP_ATOM_OK;
-    }
-    if (unit != UINT16_C(0x5c)) {
-        return fallback_regexp_unescaped_syntax(unit)
-            ? OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED
-            : OSEO_FALLBACK_REGEXP_ATOM_OK;
-    }
-    if (*index >= pattern->length) {
-        return OSEO_FALLBACK_REGEXP_ATOM_INVALID;
-    }
-    unit = pattern->units[*index];
-    *index += 1u;
-    switch (unit) {
-        case UINT16_C(0x64):
-            atom->kind = OSEO_FALLBACK_REGEXP_DIGIT;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x44):
-            atom->kind = OSEO_FALLBACK_REGEXP_NOT_DIGIT;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x77):
-            atom->kind = OSEO_FALLBACK_REGEXP_WORD;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x57):
-            atom->kind = OSEO_FALLBACK_REGEXP_NOT_WORD;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x73):
-            atom->kind = OSEO_FALLBACK_REGEXP_SPACE;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x53):
-            atom->kind = OSEO_FALLBACK_REGEXP_NOT_SPACE;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x66):
-            atom->literal = UINT16_C(0x0c);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x6e):
-            atom->literal = UINT16_C(0x0a);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x72):
-            atom->literal = UINT16_C(0x0d);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x74):
-            atom->literal = UINT16_C(0x09);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x76):
-            atom->literal = UINT16_C(0x0b);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x30):
-            if (*index < pattern->length &&
-                pattern->units[*index] >= UINT16_C(0x30) &&
-                pattern->units[*index] <= UINT16_C(0x39)) {
-                return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
-            }
-            atom->literal = UINT16_C(0);
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        case UINT16_C(0x78):
-        case UINT16_C(0x75): {
-            size_t digits = unit == UINT16_C(0x78) ? 2u : 4u;
-            if (digits > pattern->length - *index) {
-                return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
-            }
-            uint16_t value = 0u;
-            for (size_t offset = 0u; offset < digits; offset += 1u) {
-                uint16_t digit = 0u;
-                if (!fallback_regexp_hex(
-                        pattern->units[*index + offset],
-                        &digit
-                    )) {
-                    return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
-                }
-                value = (uint16_t)(value * UINT16_C(16) + digit);
-            }
-            *index += digits;
-            atom->literal = value;
-            return OSEO_FALLBACK_REGEXP_ATOM_OK;
-        }
-        default:
-            if (fallback_regexp_escaped_literal(unit)) {
-                atom->literal = unit;
-                return OSEO_FALLBACK_REGEXP_ATOM_OK;
-            }
-            return OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED;
-    }
-}
-
-static OseoResult fallback_regexp_validate(
-    OseoContext *context,
-    OseoValue pattern_value
-) {
-    const OseoString *pattern = string_object(pattern_value);
-    size_t index = 0u;
-    while (index < pattern->length) {
-        OseoFallbackRegExpAtom atom;
-        OseoFallbackRegExpAtomStatus status = fallback_regexp_atom(
-            pattern,
-            &index,
-            &atom
-        );
-        if (status == OSEO_FALLBACK_REGEXP_ATOM_INVALID) {
-            return oseo_internal_throw_error(
-                context,
-                OSEO_ERROR_SYNTAX,
-                "Invalid regular expression fallback pattern."
-            );
-        }
-        if (status == OSEO_FALLBACK_REGEXP_ATOM_UNSUPPORTED) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Regular expression fallback syntax is not admitted in "
-                "this M5b node."
-            );
-        }
-    }
-    return normal(pattern_value);
-}
-
-static bool fallback_regexp_word(uint16_t unit) {
-    return (unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39)) ||
-        (unit >= UINT16_C(0x41) && unit <= UINT16_C(0x5a)) ||
-        unit == UINT16_C(0x5f) ||
-        (unit >= UINT16_C(0x61) && unit <= UINT16_C(0x7a));
-}
-
-static bool fallback_regexp_space(uint16_t unit) {
-    switch (unit) {
-        case UINT16_C(0x0009):
-        case UINT16_C(0x000a):
-        case UINT16_C(0x000b):
-        case UINT16_C(0x000c):
-        case UINT16_C(0x000d):
-        case UINT16_C(0x0020):
-        case UINT16_C(0x00a0):
-        case UINT16_C(0x1680):
-        case UINT16_C(0x2000):
-        case UINT16_C(0x2001):
-        case UINT16_C(0x2002):
-        case UINT16_C(0x2003):
-        case UINT16_C(0x2004):
-        case UINT16_C(0x2005):
-        case UINT16_C(0x2006):
-        case UINT16_C(0x2007):
-        case UINT16_C(0x2008):
-        case UINT16_C(0x2009):
-        case UINT16_C(0x200a):
-        case UINT16_C(0x2028):
-        case UINT16_C(0x2029):
-        case UINT16_C(0x202f):
-        case UINT16_C(0x205f):
-        case UINT16_C(0x3000):
-        case UINT16_C(0xfeff):
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool fallback_regexp_atom_matches(
-    OseoFallbackRegExpAtom atom,
-    uint16_t unit
-) {
-    switch (atom.kind) {
-        case OSEO_FALLBACK_REGEXP_LITERAL:
-            return atom.literal == unit;
-        case OSEO_FALLBACK_REGEXP_DOT:
-            return unit != UINT16_C(0x000a) && unit != UINT16_C(0x000d) &&
-                unit != UINT16_C(0x2028) && unit != UINT16_C(0x2029);
-        case OSEO_FALLBACK_REGEXP_DIGIT:
-            return unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39);
-        case OSEO_FALLBACK_REGEXP_NOT_DIGIT:
-            return unit < UINT16_C(0x30) || unit > UINT16_C(0x39);
-        case OSEO_FALLBACK_REGEXP_WORD:
-            return fallback_regexp_word(unit);
-        case OSEO_FALLBACK_REGEXP_NOT_WORD:
-            return !fallback_regexp_word(unit);
-        case OSEO_FALLBACK_REGEXP_SPACE:
-            return fallback_regexp_space(unit);
-        case OSEO_FALLBACK_REGEXP_NOT_SPACE:
-            return !fallback_regexp_space(unit);
-    }
-    return false;
-}
-
-static bool fallback_regexp_matches_at(
-    const OseoString *subject,
-    const OseoString *pattern,
-    size_t position,
-    size_t *match_length
-) {
-    size_t pattern_index = 0u;
-    size_t subject_index = position;
-    while (pattern_index < pattern->length) {
-        if (subject_index >= subject->length) return false;
-        OseoFallbackRegExpAtom atom;
-        if (fallback_regexp_atom(pattern, &pattern_index, &atom) !=
-            OSEO_FALLBACK_REGEXP_ATOM_OK) {
-            return false;
-        }
-        if (!fallback_regexp_atom_matches(
-                atom,
-                subject->units[subject_index]
-            )) {
-            return false;
-        }
-        subject_index += 1u;
-    }
-    *match_length = subject_index - position;
-    return true;
-}
-
-static bool fallback_regexp_find(
-    OseoValue subject_value,
-    OseoValue pattern_value,
-    size_t start,
-    size_t *position,
-    size_t *match_length
-) {
-    const OseoString *subject = string_object(subject_value);
-    const OseoString *pattern = string_object(pattern_value);
-    if (start > subject->length) return false;
-    for (size_t index = start; index <= subject->length; index += 1u) {
-        if (fallback_regexp_matches_at(
-                subject,
-                pattern,
-                index,
-                match_length
-            )) {
-            *position = index;
-            return true;
-        }
-    }
-    return false;
-}
-
 static bool match_matches_at(
     const OseoString *subject,
     const OseoString *search,
@@ -364,83 +54,6 @@ static OseoResult match_is_regexp(
     bool *regexp
 ) {
     return oseo_internal_is_regexp(context, value, regexp);
-}
-
-static OseoResult string_named_property(
-    OseoContext *context,
-    OseoValue object,
-    const char *name,
-    OseoValue value
-) {
-    OseoValue slots[3] = {object, value, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 3u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_ascii_string(context, name);
-    slots[2] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
-            context,
-            slots[0],
-            slots[2],
-            slots[1],
-            (OseoPropertyAttributes){true, true, true, false}
-        );
-    }
-    oseo_roots_pop(context, &frame);
-    return result;
-}
-
-static OseoResult string_match_result(
-    OseoContext *context,
-    OseoValue subject,
-    size_t position,
-    size_t length
-) {
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = subject;
-    result = oseo_array_create(context, 0u);
-    frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        const OseoString *string = string_object(frame.slots[0]);
-        result = oseo_internal_allocate_string(
-            context,
-            string->units + position,
-            length
-        );
-        frame.slots[2] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_array_append(context, frame.slots[1], frame.slots[2]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_named_property(
-            context,
-            frame.slots[1],
-            "index",
-            oseo_number((double)position)
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_named_property(
-            context,
-            frame.slots[1],
-            "input",
-            frame.slots[0]
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_named_property(
-            context,
-            frame.slots[1],
-            "groups",
-            oseo_undefined()
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
-    oseo_roots_release(context, &frame);
-    return result;
 }
 
 static bool string_find(
@@ -475,18 +88,6 @@ static size_t string_symbol_index(size_t code_id) {
         return OSEO_WELL_KNOWN_REPLACE;
     }
     return OSEO_WELL_KNOWN_SPLIT;
-}
-
-static size_t deferred_regexp_protocol_code_id(size_t code_id) {
-    if (code_id == OSEO_STRING_MATCH_CODE_ID) {
-        return OSEO_REGEXP_MATCH_DEFERRED_CODE_ID;
-    }
-    if (code_id == OSEO_STRING_MATCH_ALL_CODE_ID) {
-        return OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID;
-    }
-    /* String split has no RegExpCreate fallback and never reaches this
-     * guard. */
-    return OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID;
 }
 
 /* The two methods whose operand must name a global RegExp when it is one. */
@@ -652,85 +253,79 @@ static OseoResult string_protocol_method(
     return result;
 }
 
-static OseoResult string_fallback_pattern(
-    OseoContext *context,
-    OseoValue value
-) {
-    return tag_of(value) == OSEO_TAG_UNDEFINED
-        ? oseo_internal_allocate_string(context, NULL, 0u)
-        : oseo_internal_value_string(context, value);
-}
-
 /*
- * The earlier String node keeps its string-only fallback until the RegExp
- * symbol-method node can perform RegExpCreate and Invoke. The fallback is
- * safe only while the first effective descriptor is the exact own placeholder
- * for the applicable protocol; otherwise it would skip observable behavior.
+ * The shared tail of String.prototype match, matchAll, and search once
+ * GetMethod found no symbol method on the operand: RegExpCreate over the
+ * raw operand, then Invoke of the same well-known symbol on the created
+ * RegExp. The created object is an ordinary %RegExp.prototype% instance,
+ * so the invoked method is the built-in one unless the program replaced
+ * it, which is exactly what the specification observes here.
  */
-static OseoResult deferred_regexp_string_dispatch(
+static OseoResult string_regexp_dispatch(
     OseoContext *context,
-    size_t code_id
+    size_t code_id,
+    OseoValue receiver,
+    OseoValue pattern,
+    const char *flags
 ) {
-    OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_intrinsic(
-        context,
-        OSEO_INTRINSIC_REGEXP_PROTOTYPE
-    );
-    slots[0] = result.value;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 0: subject, 1: pattern, 2: created RegExp, 3: symbol then method */
+    frame.slots[1] = pattern;
+    result = match_subject(context, receiver);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && flags != NULL) {
+        result = oseo_internal_ascii_string(context, flags);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_regexp_create(
+            context,
+            frame.slots[1],
+            flags == NULL ? oseo_undefined() : frame.slots[2]
+        );
+        frame.slots[2] = result.value;
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_well_known_symbol(
             context,
             string_symbol_index(code_id)
         );
-        slots[1] = result.value;
+        frame.slots[3] = result.value;
     }
-    bool descriptor_found = false;
-    while (result.status == OSEO_STATUS_NORMAL && is_object(slots[0])) {
-        OseoValue value = oseo_undefined();
-        OseoValue getter = oseo_undefined();
-        OseoValue setter = oseo_undefined();
-        OseoPropertyAttributes attributes = {false, false, false, false};
-        if (oseo_internal_own_descriptor(
-                slots[0],
-                slots[1],
-                &value,
-                &attributes,
-                &getter,
-                &setter
-            )) {
-            bool deferred_placeholder =
-                slots[0] == context->intrinsics[
-                    OSEO_INTRINSIC_REGEXP_PROTOTYPE
-                ] &&
-                !attributes.accessor &&
-                is_function(value) &&
-                function_object(value)->code_id ==
-                    deferred_regexp_protocol_code_id(code_id);
-            if (!deferred_placeholder) {
-                result = failure(
-                    context,
-                    "OSEO2001",
-                    "RegExp String dispatch is not admitted yet."
-                );
-            }
-            descriptor_found = true;
-            break;
-        }
-        slots[0] = ordinary_object(slots[0])->prototype;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[2], frame.slots[3]);
+        frame.slots[3] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !descriptor_found) {
-        result = failure(
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[3])) {
+        result = oseo_internal_throw_error(
             context,
-            "OSEO2001",
-            "RegExp String dispatch is not admitted yet."
+            OSEO_ERROR_TYPE,
+            "String symbol protocol method is not callable."
         );
     }
-    oseo_roots_pop(context, &frame);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[3],
+            frame.slots[2],
+            1u,
+            &frame.slots[0],
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
     return result;
 }
 
+/*
+ * String.prototype.match (22.1.3.13), matchAll (22.1.3.14), and search
+ * (22.1.3.16). Each observes an Object operand through IsRegExp where the
+ * specification says so and through GetMethod of its own well-known
+ * symbol; a nullish method reaches RegExpCreate, where matchAll alone
+ * supplies the `g` flag.
+ */
 static OseoResult string_match_or_search(
     OseoContext *context,
     size_t code_id,
@@ -748,57 +343,13 @@ static OseoResult string_match_or_search(
         &dispatched
     );
     if (result.status != OSEO_STATUS_NORMAL || dispatched) return result;
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 2u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = match_subject(context, receiver);
-    frame.slots[0] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        is_regexp(match_argument(argument_count, arguments, 0u))) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "Branded RegExp String protocol fallback "
-            "is not admitted yet."
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_fallback_pattern(
-            context,
-            match_argument(argument_count, arguments, 0u)
-        );
-        frame.slots[1] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = deferred_regexp_string_dispatch(context, code_id);
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = fallback_regexp_validate(context, frame.slots[1]);
-    }
-    size_t position = 0u;
-    size_t match_length = 0u;
-    bool found = result.status == OSEO_STATUS_NORMAL && fallback_regexp_find(
-        frame.slots[0],
-        frame.slots[1],
-        0u,
-        &position,
-        &match_length
+    return string_regexp_dispatch(
+        context,
+        code_id,
+        receiver,
+        match_argument(argument_count, arguments, 0u),
+        code_id == OSEO_STRING_MATCH_ALL_CODE_ID ? "g" : NULL
     );
-    if (result.status == OSEO_STATUS_NORMAL &&
-        code_id == OSEO_STRING_SEARCH_CODE_ID) {
-        result = normal(oseo_number(found ? (double)position : -1.0));
-    } else if (result.status == OSEO_STATUS_NORMAL && !found) {
-        result = normal(oseo_null());
-    } else if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_match_result(
-            context,
-            frame.slots[0],
-            position,
-            match_length
-        );
-    }
-    oseo_roots_release(context, &frame);
-    return result;
 }
 
 static OseoResult regexp_iterator_function(
@@ -944,34 +495,42 @@ OseoResult oseo_internal_regexp_string_iterator_prototype(
     return result;
 }
 
-static OseoResult regexp_string_iterator_create(
+OseoResult oseo_internal_regexp_string_iterator_create(
     OseoContext *context,
+    OseoValue regexp,
     OseoValue subject,
-    OseoValue pattern
+    bool global,
+    bool unicode
 ) {
-    OseoValue slots[3] = {subject, pattern, oseo_undefined()};
+    OseoValue slots[3] = {regexp, subject, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    OseoResult result = fallback_regexp_validate(context, slots[1]);
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_regexp_string_iterator_prototype(context);
-        slots[2] = result.value;
-    }
+    OseoResult result = oseo_internal_regexp_string_iterator_prototype(
+        context
+    );
+    slots[2] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, slots[2]);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoOrdinaryObject *iterator = ordinary_object(result.value);
         iterator->regexp_string_iterator = true;
-        iterator->regexp_iterator_subject = slots[0];
-        iterator->regexp_iterator_pattern = slots[1];
-        iterator->regexp_iterator_index = 0u;
+        iterator->regexp_iterator_regexp = slots[0];
+        iterator->regexp_iterator_subject = slots[1];
+        iterator->regexp_iterator_global = global;
+        iterator->regexp_iterator_unicode = unicode;
         iterator->regexp_iterator_complete = false;
     }
     oseo_roots_pop(context, &frame);
     return result;
 }
 
+/*
+ * %RegExpStringIteratorPrototype%.next (22.2.9.2.1). A non-global
+ * iterator finishes on its first match, and a global one that matched the
+ * empty string advances `lastIndex` on the iterating RegExp itself, which
+ * is where the cursor lives.
+ */
 static OseoResult regexp_string_iterator_next(
     OseoContext *context,
     OseoValue receiver
@@ -985,124 +544,53 @@ static OseoResult regexp_string_iterator_next(
     }
     OseoOrdinaryObject *state = ordinary_object(receiver);
     if (state->regexp_iterator_complete) {
-        state->regexp_iterator_subject = oseo_undefined();
-        state->regexp_iterator_pattern = oseo_undefined();
         return oseo_internal_iterator_result(
             context,
             oseo_undefined(),
             true
         );
     }
+    bool global = state->regexp_iterator_global;
+    bool unicode = state->regexp_iterator_unicode;
     OseoValue slots[4] = {
         receiver,
+        state->regexp_iterator_regexp,
         state->regexp_iterator_subject,
-        state->regexp_iterator_pattern,
         oseo_undefined(),
     };
-    size_t start = state->regexp_iterator_index;
     OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
-    size_t position = 0u;
-    size_t match_length = 0u;
-    bool found = fallback_regexp_find(
+    OseoResult result = oseo_internal_regexp_exec(
+        context,
         slots[1],
-        slots[2],
-        start,
-        &position,
-        &match_length
+        slots[2]
     );
-    OseoResult result = normal(oseo_undefined());
-    if (!found) {
+    slots[3] = result.value;
+    bool finished = result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[3]) == OSEO_TAG_NULL;
+    if (finished || (result.status == OSEO_STATUS_NORMAL && !global)) {
         state = ordinary_object(slots[0]);
         state->regexp_iterator_complete = true;
+        state->regexp_iterator_regexp = oseo_undefined();
         state->regexp_iterator_subject = oseo_undefined();
-        state->regexp_iterator_pattern = oseo_undefined();
-        result = oseo_internal_iterator_result(
-            context,
-            oseo_undefined(),
-            true
-        );
-    } else {
-        result = string_match_result(
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !finished && global) {
+        result = oseo_internal_regexp_iteration_step(
             context,
             slots[1],
-            position,
-            match_length
+            slots[2],
+            slots[3],
+            unicode
         );
-        slots[3] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            state = ordinary_object(slots[0]);
-            if (match_length == 0u) {
-                if (position == string_object(slots[1])->length) {
-                    state->regexp_iterator_complete = true;
-                } else {
-                    state->regexp_iterator_index = position + 1u;
-                }
-            } else {
-                state->regexp_iterator_index = position + match_length;
-            }
-            result = oseo_internal_iterator_result(
-                context,
-                slots[3],
-                false
-            );
-        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_result(
+            context,
+            finished ? oseo_undefined() : slots[3],
+            finished
+        );
     }
     oseo_roots_pop(context, &frame);
-    return result;
-}
-
-static OseoResult string_match_all(
-    OseoContext *context,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-) {
-    bool dispatched = false;
-    OseoResult result = string_protocol_method(
-        context,
-        OSEO_STRING_MATCH_ALL_CODE_ID,
-        receiver,
-        argument_count,
-        arguments,
-        &dispatched
-    );
-    if (result.status != OSEO_STATUS_NORMAL || dispatched) return result;
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 2u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = match_subject(context, receiver);
-    frame.slots[0] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        is_regexp(match_argument(argument_count, arguments, 0u))) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "Branded RegExp String protocol fallback "
-            "is not admitted yet."
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_fallback_pattern(
-            context,
-            match_argument(argument_count, arguments, 0u)
-        );
-        frame.slots[1] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = deferred_regexp_string_dispatch(
-            context,
-            OSEO_STRING_MATCH_ALL_CODE_ID
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = regexp_string_iterator_create(
-            context,
-            frame.slots[0],
-            frame.slots[1]
-        );
-    }
-    oseo_roots_release(context, &frame);
     return result;
 }
 
@@ -1173,15 +661,6 @@ static OseoResult string_split(
         if (result.status == OSEO_STATUS_NORMAL) {
             limit = string_to_uint32(number_value(result.value));
         }
-    }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        is_regexp(match_argument(argument_count, arguments, 0u))) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "Branded RegExp String protocol fallback "
-            "is not admitted yet."
-        );
     }
     if (result.status == OSEO_STATUS_NORMAL && !separator_undefined) {
         result = oseo_internal_value_string(context, frame.slots[0]);
@@ -1262,121 +741,169 @@ static OseoResult string_split(
 }
 
 
-/*
- * String.prototype.replace and replaceAll build their result in one
- * component-local UTF-16 buffer. The buffer is plain host memory rather
- * than a heap value, so a functional replacer may collect between matches
- * without invalidating the partial result; every OseoString pointer is
- * re-derived after each step that can allocate.
- */
-typedef struct {
-    uint16_t *units;
-    size_t length;
-    size_t capacity;
-} OseoReplaceBuilder;
+/* The decimal value of one ASCII digit, or `UINT16_MAX` for anything else. */
+static uint16_t substitution_digit(uint16_t unit) {
+    return unit >= UINT16_C(0x30) && unit <= UINT16_C(0x39)
+        ? (uint16_t)(unit - UINT16_C(0x30))
+        : UINT16_MAX;
+}
 
-static OseoResult replace_builder_append(
+/*
+ * The `$n`, `$nn`, and `$<name>` reference forms of GetSubstitution.
+ * `reference` receives how many code units the reference spans, and
+ * `capture` receives the substituted text or `oseo_uninitialized()` when
+ * the reference has no referent and copies its own text instead.
+ */
+static OseoResult substitution_reference(
     OseoContext *context,
-    OseoReplaceBuilder *builder,
-    const uint16_t *units,
-    size_t length
+    OseoValue replacement,
+    size_t index,
+    OseoValue captures,
+    OseoValue named_captures,
+    size_t *reference,
+    OseoValue *capture
 ) {
-    if (length == 0u) return normal(oseo_undefined());
-    if (length > SIZE_MAX - builder->length) {
-        return failure(context, "OSEO2001", "String allocation is too large.");
-    }
-    size_t required = builder->length + length;
-    OseoResult valid = oseo_internal_validate_string_length(
-        context,
-        required
-    );
-    if (valid.status != OSEO_STATUS_NORMAL) return valid;
-    if (required > builder->capacity) {
-        size_t capacity = builder->capacity == 0u ? 16u : builder->capacity;
-        while (capacity < required) {
-            if (capacity > OSEO_MAX_STRING_LENGTH / 2u) {
-                capacity = required;
-                break;
-            }
-            capacity *= 2u;
+    const OseoString *pattern = string_object(replacement);
+    uint16_t next = pattern->units[index + 1u];
+    *capture = oseo_uninitialized();
+    if (next == UINT16_C(0x3c)) {
+        *reference = 2u;
+        if (tag_of(named_captures) == OSEO_TAG_UNDEFINED) {
+            return normal(oseo_undefined());
         }
-        uint16_t *grown = realloc(
-            builder->units,
-            capacity * sizeof(uint16_t)
+        size_t close = index + 2u;
+        while (close < pattern->length &&
+               pattern->units[close] != UINT16_C(0x3e)) {
+            close += 1u;
+        }
+        if (close == pattern->length) return normal(oseo_undefined());
+        *reference = close + 1u - index;
+        OseoValue slots[3] = {replacement, named_captures, oseo_undefined()};
+        OseoRootFrame frame = {NULL, slots, 3u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_allocate_string(
+            context,
+            string_object(slots[0])->units + index + 2u,
+            close - index - 2u
         );
-        if (grown == NULL) {
-            return failure(
-                context,
-                "OSEO2001",
-                "String replacement allocation failed."
-            );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[1], slots[2]);
+            slots[2] = result.value;
         }
-        builder->units = grown;
-        builder->capacity = capacity;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            tag_of(slots[2]) == OSEO_TAG_UNDEFINED) {
+            result = oseo_internal_allocate_string(context, NULL, 0u);
+            slots[2] = result.value;
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_value_string(context, slots[2]);
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) *capture = slots[2];
+        oseo_roots_pop(context, &frame);
+        return result;
     }
-    memcpy(
-        builder->units + builder->length,
-        units,
-        length * sizeof(uint16_t)
+    uint16_t first = substitution_digit(next);
+    if (first == UINT16_MAX) {
+        *reference = 1u;
+        return normal(oseo_undefined());
+    }
+    uint16_t second = index + 2u < pattern->length
+        ? substitution_digit(pattern->units[index + 2u])
+        : UINT16_MAX;
+    size_t capture_count = tag_of(captures) == OSEO_TAG_UNDEFINED
+        ? 0u
+        : ordinary_object(captures)->array_length;
+    size_t digits = second == UINT16_MAX ? 1u : 2u;
+    size_t number = digits == 1u
+        ? (size_t)first
+        : (size_t)first * 10u + (size_t)second;
+    /*
+     * A two-digit reference past the capture count is one digit followed
+     * by a literal digit, so the second digit is left for the scan that
+     * resumes after this reference.
+     */
+    if (number > capture_count && digits == 2u) {
+        digits = 1u;
+        number = (size_t)first;
+    }
+    *reference = digits + 1u;
+    if (number < 1u || number > capture_count) {
+        return normal(oseo_undefined());
+    }
+    OseoValue slots[2] = {captures, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_value_string(
+        context,
+        oseo_number((double)(number - 1u))
     );
-    builder->length = required;
-    return normal(oseo_undefined());
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[1]) == OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_allocate_string(context, NULL, 0u);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) *capture = slots[1];
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
-static void replace_builder_release(OseoReplaceBuilder *builder) {
-    free(builder->units);
-    builder->units = NULL;
-    builder->length = 0u;
-    builder->capacity = 0u;
-}
-
-/*
- * GetSubstitution (22.1.3.19.1) for the two callers this component owns.
- * Both supply an empty capture list and an undefined named-capture object,
- * so `$$`, `` $` ``, `$&`, and `$'` substitute while `$1` through `$99` and
- * `$<name>` have no referent and copy their reference text unchanged.
- *
- * A digit reference copies only `$` and its first digit. The specification
- * copies `$` and both digits when a two-digit index is not greater than the
- * capture count, which an empty capture list reaches only for `$00`; either
- * length leaves the same remaining text unscanned for further references
- * and produces the same result, because the copied text is literal.
- *
- * The RegExp nodes that introduce real captures extend this operation with
- * the capture and named-capture arguments rather than replacing it.
- */
-static OseoResult replace_substitution(
+OseoResult oseo_internal_get_substitution(
     OseoContext *context,
-    OseoReplaceBuilder *builder,
-    OseoValue subject,
+    OseoStringBuilder *builder,
     OseoValue matched,
+    OseoValue subject,
     size_t position,
+    OseoValue captures,
+    OseoValue named_captures,
     OseoValue replacement
 ) {
-    OseoValue slots[3] = {subject, matched, replacement};
-    OseoRootFrame frame = {NULL, slots, 3u};
+    OseoValue slots[6] = {
+        matched,
+        subject,
+        captures,
+        named_captures,
+        replacement,
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 6u};
     oseo_roots_push(context, &frame);
     OseoResult result = normal(oseo_undefined());
     size_t index = 0u;
     while (result.status == OSEO_STATUS_NORMAL) {
-        const OseoString *pattern = string_object(slots[2]);
+        const OseoString *pattern = string_object(slots[4]);
         if (index >= pattern->length) break;
         uint16_t unit = pattern->units[index];
         if (unit != UINT16_C(0x24) || index + 1u >= pattern->length) {
-            result = replace_builder_append(context, builder, &unit, 1u);
+            result = oseo_internal_string_builder_append(
+                context,
+                builder,
+                &unit,
+                1u
+            );
             index += 1u;
             continue;
         }
         uint16_t next = pattern->units[index + 1u];
         if (next == UINT16_C(0x24)) {
             uint16_t dollar = UINT16_C(0x24);
-            result = replace_builder_append(context, builder, &dollar, 1u);
+            result = oseo_internal_string_builder_append(
+                context,
+                builder,
+                &dollar,
+                1u
+            );
             index += 2u;
             continue;
         }
         if (next == UINT16_C(0x26)) {
-            const OseoString *match = string_object(slots[1]);
-            result = replace_builder_append(
+            const OseoString *match = string_object(slots[0]);
+            result = oseo_internal_string_builder_append(
                 context,
                 builder,
                 match->units,
@@ -1386,8 +913,8 @@ static OseoResult replace_substitution(
             continue;
         }
         if (next == UINT16_C(0x60)) {
-            const OseoString *string = string_object(slots[0]);
-            result = replace_builder_append(
+            const OseoString *string = string_object(slots[1]);
+            result = oseo_internal_string_builder_append(
                 context,
                 builder,
                 string->units,
@@ -1397,10 +924,10 @@ static OseoResult replace_substitution(
             continue;
         }
         if (next == UINT16_C(0x27)) {
-            const OseoString *string = string_object(slots[0]);
-            size_t tail = position + string_object(slots[1])->length;
+            const OseoString *string = string_object(slots[1]);
+            size_t tail = position + string_object(slots[0])->length;
             if (tail > string->length) tail = string->length;
-            result = replace_builder_append(
+            result = oseo_internal_string_builder_append(
                 context,
                 builder,
                 string->units + tail,
@@ -1409,16 +936,36 @@ static OseoResult replace_substitution(
             index += 2u;
             continue;
         }
-        bool reference = (next >= UINT16_C(0x30) && next <= UINT16_C(0x39)) ||
-            next == UINT16_C(0x3c);
-        size_t copied = reference ? 2u : 1u;
-        result = replace_builder_append(
+        size_t reference = 1u;
+        result = substitution_reference(
             context,
-            builder,
-            pattern->units + index,
-            copied
+            slots[4],
+            index,
+            slots[2],
+            slots[3],
+            &reference,
+            &slots[5]
         );
-        index += copied;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (tag_of(slots[5]) == OSEO_TAG_UNINITIALIZED) {
+            /* The reference has no referent, so it copies its own text. */
+            result = oseo_internal_string_builder_append(
+                context,
+                builder,
+                string_object(slots[4])->units + index,
+                reference
+            );
+        } else {
+            const OseoString *text = string_object(slots[5]);
+            result = oseo_internal_string_builder_append(
+                context,
+                builder,
+                text->units,
+                text->length
+            );
+            slots[5] = oseo_undefined();
+        }
+        index += reference;
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -1481,7 +1028,7 @@ static OseoResult string_replace(
     size_t search_length = string_object(frame.slots[1])->length;
     size_t advance = search_length == 0u ? 1u : search_length;
     size_t consumed = 0u;
-    OseoReplaceBuilder builder = {NULL, 0u, 0u};
+    OseoStringBuilder builder = {NULL, 0u, 0u};
     while (result.status == OSEO_STATUS_NORMAL && found) {
         /*
          * The replacer runs before the preceding subject slice is staged.
@@ -1511,7 +1058,7 @@ static OseoResult string_replace(
         }
         if (result.status == OSEO_STATUS_NORMAL) {
             const OseoString *subject = string_object(frame.slots[0]);
-            result = replace_builder_append(
+            result = oseo_internal_string_builder_append(
                 context,
                 &builder,
                 subject->units + consumed,
@@ -1520,19 +1067,21 @@ static OseoResult string_replace(
         }
         if (result.status == OSEO_STATUS_NORMAL && functional) {
             const OseoString *text = string_object(frame.slots[3]);
-            result = replace_builder_append(
+            result = oseo_internal_string_builder_append(
                 context,
                 &builder,
                 text->units,
                 text->length
             );
         } else if (result.status == OSEO_STATUS_NORMAL) {
-            result = replace_substitution(
+            result = oseo_internal_get_substitution(
                 context,
                 &builder,
-                frame.slots[0],
                 frame.slots[1],
+                frame.slots[0],
                 position,
+                oseo_undefined(),
+                oseo_undefined(),
                 frame.slots[2]
             );
         }
@@ -1547,7 +1096,7 @@ static OseoResult string_replace(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         const OseoString *subject = string_object(frame.slots[0]);
-        result = replace_builder_append(
+        result = oseo_internal_string_builder_append(
             context,
             &builder,
             subject->units + consumed,
@@ -1561,7 +1110,7 @@ static OseoResult string_replace(
             builder.length
         );
     }
-    replace_builder_release(&builder);
+    oseo_internal_string_builder_release(&builder);
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -1577,18 +1126,11 @@ OseoResult oseo_internal_string_protocol_dispatch(
         return regexp_string_iterator_next(context, receiver);
     }
     if (code_id == OSEO_STRING_MATCH_CODE_ID ||
+        code_id == OSEO_STRING_MATCH_ALL_CODE_ID ||
         code_id == OSEO_STRING_SEARCH_CODE_ID) {
         return string_match_or_search(
             context,
             code_id,
-            receiver,
-            argument_count,
-            arguments
-        );
-    }
-    if (code_id == OSEO_STRING_MATCH_ALL_CODE_ID) {
-        return string_match_all(
-            context,
             receiver,
             argument_count,
             arguments

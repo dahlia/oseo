@@ -441,9 +441,10 @@ static OseoResult array_create_with_prototype(
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;
     array->regexp_string_iterator = false;
+    array->regexp_iterator_regexp = oseo_undefined();
     array->regexp_iterator_subject = oseo_undefined();
-    array->regexp_iterator_pattern = oseo_undefined();
-    array->regexp_iterator_index = 0u;
+    array->regexp_iterator_global = false;
+    array->regexp_iterator_unicode = false;
     array->regexp_iterator_complete = false;
     array->async_from_sync = false;
     array->async_sync_iterator = oseo_undefined();

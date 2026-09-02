@@ -226,17 +226,6 @@ OseoResult oseo_internal_string_wrapper_properties(
     return result;
 }
 
-/*
- * One growable UTF-16 accumulator. The statics build their result
- * outside the collected heap, so a conversion that runs user code
- * between two appends cannot observe or reclaim a partial string.
- */
-typedef struct {
-    uint16_t *units;
-    size_t length;
-    size_t capacity;
-} OseoStringBuilder;
-
 static OseoResult string_builder_reserve(
     OseoContext *context,
     OseoStringBuilder *builder,
@@ -281,7 +270,7 @@ static OseoResult string_builder_append_unit(
     return result;
 }
 
-static OseoResult string_builder_append(
+OseoResult oseo_internal_string_builder_append(
     OseoContext *context,
     OseoStringBuilder *builder,
     const uint16_t *units,
@@ -299,7 +288,7 @@ static OseoResult string_builder_append(
     return result;
 }
 
-static void string_builder_release(OseoStringBuilder *builder) {
+void oseo_internal_string_builder_release(OseoStringBuilder *builder) {
     free(builder->units);
     builder->units = NULL;
     builder->length = 0u;
@@ -453,7 +442,7 @@ static OseoResult string_from_code_points(
             units.length
         );
     }
-    string_builder_release(&units);
+    oseo_internal_string_builder_release(&units);
     return result;
 }
 
@@ -1205,7 +1194,7 @@ static OseoResult string_concat(
     result = string_method_subject(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = string_builder_append(
+        result = oseo_internal_string_builder_append(
             context,
             &builder,
             string_object(frame.slots[1])->units,
@@ -1218,7 +1207,7 @@ static OseoResult string_concat(
         result = oseo_internal_value_string(context, arguments[index]);
         frame.slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = string_builder_append(
+            result = oseo_internal_string_builder_append(
                 context,
                 &builder,
                 string_object(frame.slots[1])->units,
@@ -1233,7 +1222,7 @@ static OseoResult string_concat(
             builder.length
         );
     }
-    string_builder_release(&builder);
+    oseo_internal_string_builder_release(&builder);
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -1433,7 +1422,7 @@ static OseoResult string_from_char_code(
             builder.length
         );
     }
-    string_builder_release(&builder);
+    oseo_internal_string_builder_release(&builder);
     return result;
 }
 
@@ -1470,7 +1459,7 @@ static OseoResult string_from_code_point(
                 (uint16_t)(UINT32_C(0xd800) + (rest >> 10u)),
                 (uint16_t)(UINT32_C(0xdc00) + (rest & UINT32_C(0x3ff))),
             };
-            result = string_builder_append(
+            result = oseo_internal_string_builder_append(
                 context,
                 &builder,
                 pair,
@@ -1486,7 +1475,7 @@ static OseoResult string_from_code_point(
             builder.length
         );
     }
-    string_builder_release(&builder);
+    oseo_internal_string_builder_release(&builder);
     return result;
 }
 
@@ -1569,7 +1558,7 @@ static OseoResult string_raw(
         result = oseo_internal_value_string(context, frame.slots[2]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        result = string_builder_append(
+        result = oseo_internal_string_builder_append(
             context,
             &builder,
             string_object(frame.slots[2])->units,
@@ -1586,7 +1575,7 @@ static OseoResult string_raw(
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        result = string_builder_append(
+        result = oseo_internal_string_builder_append(
             context,
             &builder,
             string_object(frame.slots[2])->units,
@@ -1603,7 +1592,7 @@ static OseoResult string_raw(
             builder.length
         );
     }
-    string_builder_release(&builder);
+    oseo_internal_string_builder_release(&builder);
     oseo_roots_release(context, &frame);
     return result;
 }

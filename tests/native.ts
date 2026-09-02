@@ -85,6 +85,8 @@ const { mathNamespaceFixtures } =
   await import("./native/fixtures/math-namespace.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
+const { regexpSymbolMethodsFixtures } =
+  await import("./native/fixtures/regexp-symbol-methods.ts");
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -149,6 +151,7 @@ const fixtures: readonly Fixture[] = [
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
   ...regexpPrototypeAndExecFixtures,
+  ...regexpSymbolMethodsFixtures,
   ...generatorFixtures,
   ...functionIntrinsicChainFixtures,
   ...functionIntrinsicKeyOrderFixtures,
@@ -186,22 +189,6 @@ assert.equal(spreadDescriptorMap.exitStatus, 0, spreadDescriptorMap.stderr);
 assert.equal(spreadDescriptorMap.stdout, "3 null\n");
 assert.equal(spreadDescriptorMap.stderr, "");
 
-const deferredRegExpFallback = await runNativeCli(
-  {
-    args: ["deferred-regexp-fallback.ts"],
-    source: '"aaa".match("a*");',
-    sourceId: "deferred-regexp-fallback.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(deferredRegExpFallback.exitStatus, 1);
-assert.equal(deferredRegExpFallback.stdout, "");
-assert.match(
-  deferredRegExpFallback.stderr,
-  /^deferred-regexp-fallback\.ts:1:\d+: error\[OSEO2001\]: Regular/u,
-);
-
 for (const deferredRegExp of [
   {
     name: "deferred-regexp-property.ts",
@@ -234,10 +221,6 @@ for (const deferredRegExp of [
   {
     name: "deferred-regexp-nonascii-class-identity.ts",
     source: 'new RegExp("[\\\\é]");',
-  },
-  {
-    name: "deferred-regexp-symbol-search.ts",
-    source: 'RegExp.prototype[Symbol.search]("");',
   },
 ]) {
   const deferred = await runNativeCli(
@@ -321,148 +304,6 @@ for (const dynamicSource of [
   );
 }
 
-for (const deferredSymbol of [
-  {
-    name: "deferred-regexp-symbol-match.ts",
-    source: `
-const regexp = new RegExp("a+");
-regexp.toString = () => "z";
-"aaa".match(regexp);
-`,
-  },
-  {
-    name: "deferred-regexp-symbol-match-all.ts",
-    source: `
-const regexp = new RegExp("a+", "g");
-Object.defineProperty(regexp, "flags", { value: "g" });
-regexp.toString = () => "z";
-"aaa".matchAll(regexp);
-`,
-  },
-  {
-    name: "deferred-regexp-symbol-search-fallthrough.ts",
-    source: `
-const regexp = new RegExp("a+");
-regexp.toString = () => "z";
-"aaa".search(regexp);
-`,
-  },
-  {
-    name: "deferred-regexp-symbol-split.ts",
-    source: `
-const regexp = new RegExp("a+");
-regexp.toString = () => "z";
-"aaa".split(regexp);
-`,
-  },
-]) {
-  const deferred = await runNativeCli(
-    {
-      args: [deferredSymbol.name],
-      source: deferredSymbol.source,
-      sourceId: deferredSymbol.name,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(deferred.exitStatus, 1);
-  assert.equal(deferred.stdout, "");
-  assert.match(
-    deferred.stderr,
-    new RegExp(
-      `^${deferredSymbol.name.replace(".", "\\.")}:\\d+:\\d+: ` +
-        "error\\[OSEO2001\\]: RegExp",
-      "u",
-    ),
-  );
-}
-
-for (const misplacedRegExpPlaceholder of [
-  {
-    name: "misplaced-regexp-placeholder-match.ts",
-    source: `
-RegExp.prototype[Symbol.match] = RegExp.prototype.exec;
-"a".match("a");
-`,
-  },
-  {
-    name: "misplaced-regexp-placeholder-match-all.ts",
-    source: `
-RegExp.prototype[Symbol.matchAll] = RegExp.prototype[Symbol.match];
-"a".matchAll("a");
-`,
-  },
-  {
-    name: "misplaced-regexp-placeholder-search.ts",
-    source: `
-RegExp.prototype[Symbol.search] = RegExp.prototype[Symbol.split];
-"a".search("a");
-`,
-  },
-]) {
-  const deferred = await runNativeCli(
-    {
-      args: [misplacedRegExpPlaceholder.name],
-      source: misplacedRegExpPlaceholder.source,
-      sourceId: misplacedRegExpPlaceholder.name,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(deferred.exitStatus, 1);
-  assert.equal(deferred.stdout, "");
-  assert.match(
-    deferred.stderr,
-    new RegExp(
-      `^${misplacedRegExpPlaceholder.name.replace(".", "\\.")}:` +
-        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
-      "u",
-    ),
-  );
-}
-
-for (const missingRegExpPlaceholder of [
-  {
-    name: "missing-regexp-placeholder-match.ts",
-    symbol: "match",
-    expression: '"a".match("a")',
-  },
-  {
-    name: "missing-regexp-placeholder-match-all.ts",
-    symbol: "matchAll",
-    expression: '"a".matchAll("a")',
-  },
-  {
-    name: "missing-regexp-placeholder-search.ts",
-    symbol: "search",
-    expression: '"a".search("a")',
-  },
-]) {
-  const source = `
-delete RegExp.prototype[Symbol.${missingRegExpPlaceholder.symbol}];
-${missingRegExpPlaceholder.expression};
-`;
-  const deferred = await runNativeCli(
-    {
-      args: [missingRegExpPlaceholder.name],
-      source,
-      sourceId: missingRegExpPlaceholder.name,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(deferred.exitStatus, 1);
-  assert.equal(deferred.stdout, "");
-  assert.match(
-    deferred.stderr,
-    new RegExp(
-      `^${missingRegExpPlaceholder.name.replace(".", "\\.")}:` +
-        "\\d+:\\d+: error\\[OSEO2001\\]: RegExp String dispatch",
-      "u",
-    ),
-  );
-}
-
 for (const shadowedRegExpPlaceholder of [
   {
     expected: "\n",
@@ -520,35 +361,67 @@ assert.equal(coreClassBackreference.exitStatus, 0);
 assert.equal(coreClassBackreference.stdout, "true\n");
 assert.equal(coreClassBackreference.stderr, "");
 
-for (const deferredPattern of [
+// RegExp.prototype[Symbol.replace] keeps its next source position as the
+// unclamped position plus match length, so a match object built by user
+// code that reports a `0` longer than the remaining subject makes the
+// method ignore every later match, including one at the subject's end.
+// The pinned Node.js host stops its generic replace after one execution
+// while Deno and the edition continue, so the two reference hosts disagree
+// and this cannot be a differential fixture.
+const replaceSourcePosition = await runNativeCli(
   {
-    name: "deferred-regexp-short-hex.ts",
-    units: "92, 120, 49",
+    args: ["regexp-replace-source-position.ts"],
+    source: `
+let calls = 0;
+const rx = {
+  flags: "g",
+  lastIndex: 0,
+  exec() {
+    calls = calls + 1;
+    if (calls === 1) { const r = ["abcdef"]; r.index = 0; return r; }
+    if (calls === 2) { const r = ["x"]; r.index = 3; return r; }
+    return null;
   },
-  {
-    name: "deferred-regexp-bad-unicode.ts",
-    units: "92, 117, 49, 50, 122, 52",
+};
+console.log(String(RegExp.prototype[Symbol.replace].call(rx, "abc", "<R>")));
+console.log(String(calls));
+`,
+    sourceId: "regexp-replace-source-position.ts",
+    version: "0.1.0",
   },
+  host,
+);
+assert.equal(replaceSourcePosition.exitStatus, 0, replaceSourcePosition.stderr);
+assert.equal(replaceSourcePosition.stdout, "<R>\n3\n");
+assert.equal(replaceSourcePosition.stderr, "");
+
+// A String operand whose text uses an Annex B pattern construct now
+// reaches the dynamic validator through RegExpCreate, so it reports that
+// grammar's SyntaxError rather than the retired String-only fallback's
+// profile boundary. The reference hosts implement Annex B and accept both
+// patterns, so this observation cannot be a differential fixture.
+for (const annexBPattern of [
+  { name: "annex-b-short-hex.ts", units: "92, 120, 49" },
+  { name: "annex-b-bad-unicode.ts", units: "92, 117, 49, 50, 122, 52" },
 ]) {
-  const deferred = await runNativeCli(
+  const source =
+    "try {\n" +
+    `  "x".match(String.fromCharCode(${annexBPattern.units}));\n` +
+    "} catch (error) {\n" +
+    "  console.log(error instanceof SyntaxError);\n" +
+    "}\n";
+  const rejected = await runNativeCli(
     {
-      args: [deferredPattern.name],
-      source: '"x".match(String.fromCharCode(' + deferredPattern.units + "));",
-      sourceId: deferredPattern.name,
+      args: [annexBPattern.name],
+      source,
+      sourceId: annexBPattern.name,
       version: "0.1.0",
     },
     host,
   );
-  assert.equal(deferred.exitStatus, 1);
-  assert.equal(deferred.stdout, "");
-  assert.match(
-    deferred.stderr,
-    new RegExp(
-      `^${deferredPattern.name.replace(".", "\\.")}:1:\\d+: ` +
-        "error\\[OSEO2001\\]: Regular",
-      "u",
-    ),
-  );
+  assert.equal(rejected.exitStatus, 0, rejected.stderr);
+  assert.equal(rejected.stdout, "true\n");
+  assert.equal(rejected.stderr, "");
 }
 
 const deferredObjectAssign = await runNativeCli(
@@ -696,6 +569,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-prototype-and-exec" ||
+    fixture.name === "regexp-symbol-methods" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||

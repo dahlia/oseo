@@ -1290,9 +1290,10 @@ OseoResult oseo_function_create(
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;
     function->ordinary.regexp_string_iterator = false;
+    function->ordinary.regexp_iterator_regexp = oseo_undefined();
     function->ordinary.regexp_iterator_subject = oseo_undefined();
-    function->ordinary.regexp_iterator_pattern = oseo_undefined();
-    function->ordinary.regexp_iterator_index = 0u;
+    function->ordinary.regexp_iterator_global = false;
+    function->ordinary.regexp_iterator_unicode = false;
     function->ordinary.regexp_iterator_complete = false;
     function->ordinary.async_from_sync = false;
     function->ordinary.async_sync_iterator = oseo_undefined();

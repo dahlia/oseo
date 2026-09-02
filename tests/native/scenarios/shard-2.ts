@@ -834,15 +834,20 @@ await Promise.reject("bad");
     /error\[OSEO2001\].*BigInt allocation failed/u,
   );
 
-  for (const [method, shadow] of [
-    ["match", "null"],
-    ["match", "undefined"],
-    ["search", "null"],
-    ["search", "undefined"],
-    ["matchAll", "null"],
-    ["matchAll", "undefined"],
-    ["split", "null"],
-    ["split", "undefined"],
+  // A branded RegExp operand whose own protocol method is nullish reaches
+  // RegExpCreate, so its `toString` result becomes the pattern and the
+  // method the created RegExp inherits runs. `split` alone keeps the
+  // String search, because String.prototype.split has no RegExpCreate
+  // step of its own.
+  for (const [method, shadow, expected] of [
+    ["match", "null", "null"],
+    ["match", "undefined", "null"],
+    ["search", "null", "-1"],
+    ["search", "undefined", "-1"],
+    ["matchAll", "null", "0"],
+    ["matchAll", "undefined", "0"],
+    ["split", "null", "test"],
+    ["split", "undefined", "test"],
   ] as const) {
     const sym =
       method === "match"
@@ -853,13 +858,21 @@ await Promise.reject("bad");
             ? "Symbol.matchAll"
             : "Symbol.split";
     const matchGuard = method === "matchAll" ? "r[Symbol.match] = null;\n" : "";
+    const call =
+      method === "matchAll"
+        ? 'let count = 0;\nconst steps = "test".matchAll(r);\n' +
+          "let step = steps.next();\n" +
+          "while (step.done !== true) { count = count + 1; " +
+          "step = steps.next(); }\n" +
+          "console.log(String(count));\n"
+        : `console.log(String("test".${method}(r)));\n`;
     const source =
       'const r = new RegExp("abc");\n' +
       matchGuard +
       `r[${sym}] = ${shadow};\n` +
       "r.toString = function() " +
       '{ return "xyz"; };\n' +
-      `"test".${method}(r);\n`;
+      call;
     const id = `branded-regexp-${method}-${shadow}.ts`;
     const branded = await runNativeCli(
       {
@@ -872,10 +885,10 @@ await Promise.reject("bad");
     );
     assert.equal(
       branded.exitStatus,
-      1,
-      `branded RegExp ${method} ${shadow} ${sym}`,
+      0,
+      `branded RegExp ${method} ${shadow} ${sym}: ${branded.stderr}`,
     );
-    assert.match(branded.stderr, /error\[OSEO2001\].*Branded RegExp/u);
+    assert.equal(branded.stdout, `${expected}\n`);
   }
 
   for (const [id, source, expected] of [

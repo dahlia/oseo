@@ -3,18 +3,19 @@ id: string-prototype-match-and-split
 title: "String prototype match and split methods"
 scope:
   - "String.prototype.match, matchAll, search, and split, including receiver
-    coercion, well-known-symbol dispatch, fixed-width RegExp fallback atoms,
-    split limits, match metadata, and dedicated matchAll iteration."
-  - "Fallback patterns admit literal code units, dot, escaped syntax, control,
-    hex, Unicode, digit, word, and whitespace atoms. Quantifiers,
-    alternatives, assertions, character classes, captures, and backreferences
-    stop at a source-located OSEO2001 boundary owned by regexp-pattern-ast and
-    regexp-generic-matcher instead of receiving literal approximations."
-  - "Hexadecimal and Unicode escapes without their required digits reach the
-    same boundary. A trailing backslash throws SyntaxError as an invalid
-    pattern."
-  - "RegExp objects, flags, complete pattern compilation, and their symbol
-    methods remain owned by the regexp nodes."
+    coercion, well-known-symbol dispatch, split limits, match metadata, and
+    dedicated matchAll iteration."
+  - "An Object operand receives the applicable symbol lookup, and a callable
+    method is called with the original receiver and, for split, the original
+    limit. matchAll first applies IsRegExp and requires a global flags value
+    for a true result."
+  - "A nullish method, a primitive operand, and a missing operand take the
+    method's own tail. For match, matchAll, and search that tail is
+    RegExpCreate and Invoke, admitted by regexp-symbol-methods, which
+    replaced this node's fixed-width fallback pattern language. split keeps
+    the code-unit separator search the specification gives it."
+  - "RegExp objects, flags, pattern compilation, and the symbol methods
+    themselves remain owned by the regexp nodes."
 owners:
   - PLAN-M5.md
 evidence:
@@ -62,3 +63,4 @@ evidence:
       - packages/runtime-c/native/runtime_string.c
       - packages/runtime-c/native/runtime_string_match.c
       - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/runtime-c/tests/symbols.test.ts
