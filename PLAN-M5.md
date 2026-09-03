@@ -1237,6 +1237,16 @@ Reaching a green gate is not such a reason. That distinction is the whole
 point: weakening a measurement and improving an implementation are
 indistinguishable in a diff, and only the recorded reason separates them.
 
+`mise run test262:update --accept-promotions` accepts only a reviewed result
+whose prior expected classification was not `pass` and whose observation is
+now `pass`. It rewrites that path's expectation in *subset.yaml* and reports
+every rewritten path. A demotion, any other classification mismatch, and every
+semantic, harness, or infrastructure failure still abort the update. The
+compatibility ratchet remains the regression defense because it independently
+compares actual results and reviewed paths with the Git baseline. It rejects a
+lower pass count, a path leaving `pass`, or a removed subset path unless a
+separate, exact, reasoned override records the deliberate reversal.
+
 Coverage reports group results by syntax, abstract operation, intrinsic,
 built-in object, module behavior, and asynchronous behavior. Raw totals remain
 available so a large group cannot hide a regression in a smaller dependency.

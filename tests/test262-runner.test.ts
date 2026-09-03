@@ -12,10 +12,12 @@ import {
   assembleTest262Source,
   createReviewedManifest,
   executeTest262Case,
+  parseTest262Arguments,
   parseReviewedSubset,
   parseTest262Case,
   readSerializedManifestPartitions,
   ReviewedTest262RunError,
+  rewriteReviewedPromotions,
   selectManifestShard,
   validateReviewedResults,
 } from "../tools/test262.ts";
@@ -33,7 +35,10 @@ import type {
   Test262ExecutionRequest,
   Test262Executor,
 } from "../tools/test262.ts";
-import type { Test262Result } from "../packages/testkit/src/index.ts";
+import type {
+  Test262Classification,
+  Test262Result,
+} from "../packages/testkit/src/index.ts";
 import { isString } from "../tools/value-kinds.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
@@ -234,6 +239,109 @@ function passingTest262Result(path: string): Test262Result {
     unsupportedFeatures: [],
   };
 }
+
+function classifiedTest262Result(
+  path: string,
+  classification: Test262Classification,
+): Test262Result {
+  return {
+    ...passingTest262Result(path),
+    classification,
+    observation: {
+      passed:
+        classification === "pass" || classification === "expected-negative",
+    },
+  };
+}
+
+function classifiedSubset(
+  path: string,
+  expectedClassification: Test262Classification,
+): ReviewedTest262Subset {
+  return {
+    suiteRevision: revision,
+    supportedFeatures: [],
+    tests: [
+      {
+        dependencies: ["functions"],
+        expectedClassification,
+        path,
+      },
+    ],
+  };
+}
+
+test("accepts and rewrites a reviewed promotion without reformatting", () => {
+  const path = "test/a.js";
+  const source = `# retained header
+suiteRevision: ${revision}
+supportedFeatures: []
+tests:
+  - path: ${path}
+    expectedClassification: unsupported-profile-feature # retained comment
+    dependencies: [functions]
+`;
+  const promotedPaths = validateReviewedResults(
+    parseReviewedSubset(source),
+    [passingTest262Result(path)],
+    true,
+  );
+  assert.deepEqual(promotedPaths, [path]);
+  assert.equal(
+    rewriteReviewedPromotions(source, promotedPaths),
+    source.replace("unsupported-profile-feature", "pass"),
+  );
+});
+
+test("rejects a reviewed demotion when promotions are accepted", () => {
+  const path = "test/a.js";
+  assert.throws(
+    () =>
+      validateReviewedResults(
+        classifiedSubset(path, "pass"),
+        [classifiedTest262Result(path, "unsupported-profile-feature")],
+        true,
+      ),
+    /expected pass, received unsupported-profile-feature/u,
+  );
+});
+
+test("rejects a semantic failure even when it matches the expectation", () => {
+  const path = "test/a.js";
+  assert.throws(
+    () =>
+      validateReviewedResults(
+        classifiedSubset(path, "semantic-failure"),
+        [classifiedTest262Result(path, "semantic-failure")],
+        true,
+      ),
+    /Reviewed failures: semantic=1 harness=0 infrastructure=0/u,
+  );
+});
+
+test("rejects a reviewed promotion when promotion acceptance is absent", () => {
+  const path = "test/a.js";
+  assert.throws(
+    () =>
+      validateReviewedResults(
+        classifiedSubset(path, "unsupported-profile-feature"),
+        [passingTest262Result(path)],
+      ),
+    /expected unsupported-profile-feature, received pass/u,
+  );
+});
+
+test("parses promotion acceptance only beside update", () => {
+  assert.deepEqual(parseTest262Arguments(["--update", "--accept-promotions"]), {
+    acceptPromotions: true,
+    help: false,
+    update: true,
+  });
+  assert.throws(
+    () => parseTest262Arguments(["--accept-promotions"]),
+    /accept-promotions requires update/u,
+  );
+});
 
 test("validates each reviewed result path at the same index", () => {
   const subset = reviewedSubset(["test/a.js", "test/b.js"]);
