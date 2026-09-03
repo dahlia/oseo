@@ -1,7 +1,3 @@
-# Byte-pinned Unicode Character Database inputs, and the generated
-# table outputs compared against them, are reviewed as LF text. A
-# platform-specific checkout conversion must not change their bytes.
-packages/unicode/UNICODE-LICENSE.txt text eol=lf
-packages/unicode/data/** text eol=lf
-packages/unicode/src/tables.ts text eol=lf
-packages/runtime-c/native/runtime_unicode_tables.h text eol=lf
+# Keep every automatically detected text file LF-normalized in the repository
+# and in working trees on every platform.
+* text=auto eol=lf
