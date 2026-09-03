@@ -1237,6 +1237,33 @@ Reaching a green gate is not such a reason. That distinction is the whole
 point: weakening a measurement and improving an implementation are
 indistinguishable in a diff, and only the recorded reason separates them.
 
+`mise run test262:update --accept-promotions` accepts only a reviewed result
+whose prior expected classification was not `pass` and whose observation is
+now `pass`. It rewrites that path's expectation in *subset.yaml* and reports
+every rewritten path. A demotion, any other classification mismatch, and every
+semantic, harness, or infrastructure failure still abort the update. The
+compatibility ratchet remains the regression defense because it independently
+compares actual results and reviewed paths with the Git baseline. It rejects a
+lower pass count, a path leaving `pass`, or a removed subset path unless a
+separate, exact, reasoned override records the deliberate reversal.
+
+`mise run check:m5b-node-scope` adds the separate authorship axis. When
+`OSEO_M5B_NODE` names a node, additions, removals, and demotions outside that
+node's inventory roots fail, while promotions to `pass` remain allowed because
+inventory roots partition test paths, not the causes that make them pass. A
+node without an inventory block cannot change reviewed evidence. The check also
+rejects newly added ratchet overrides, since a worker reports a required
+reversal and the coordinator decides whether to record it. Removing a stale
+override remains allowed. The ratchet stays global and monotonic; node scope
+answers who may author a directional change, so neither axis replaces the
+other.
+
+A run that does not name a node enforces nothing. The coordinator merges
+nodes, regenerates the manifest, and records reversals, and CI runs the gate
+with no node identity; all of those cross node boundaries legitimately. The
+check is a worker guard, so a worker lane exports `OSEO_M5B_NODE` before
+running it and CI does not re-decide authorship.
+
 Coverage reports group results by syntax, abstract operation, intrinsic,
 built-in object, module behavior, and asynchronous behavior. Raw totals remain
 available so a large group cannot hide a regression in a smaller dependency.

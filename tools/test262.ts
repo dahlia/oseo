@@ -52,10 +52,10 @@ import type {
   Test262Strictness,
   Test262Variant,
 } from "../packages/testkit/src/index.ts";
-import { parse as parseYaml } from "yaml";
+import { isScalar, parse as parseYaml, parseDocument } from "yaml";
 
 import { parseTestShardArguments, selectTestShard } from "./shard.ts";
-import type { TestShard } from "./shard.ts";
+import type { TestShard, TestShardArguments } from "./shard.ts";
 import {
   canonicalTest262Target,
   normalizeReviewedManifestText,
@@ -196,16 +196,23 @@ export interface ReviewedTest262RunMetadata {
   readonly retries: number;
 }
 
-/** One reviewed run and its noncanonical operational metadata. */
+/** One reviewed run, its accepted promotions, and operational metadata. */
 export interface ReviewedTest262Run {
   readonly manifest: ReviewedTest262Manifest;
   readonly metadata: ReviewedTest262RunMetadata;
+  readonly promotedPaths: readonly string[];
 }
 
-/** Test-only overrides for the fixed production pool and retry limits. */
+/** Controls promotion acceptance and test-only pool and retry limits. */
 export interface ReviewedTest262RunOptions {
+  readonly acceptPromotions?: boolean;
   readonly poolLimit?: number;
   readonly retryLimit?: number;
+}
+
+/** Arguments owned by the reviewed test262 runner. */
+export interface Test262Arguments extends TestShardArguments {
+  readonly acceptPromotions: boolean;
 }
 
 /** A reviewed run failure carrying reproducible operational metadata. */
@@ -407,6 +414,59 @@ export function parseReviewedSubset(text: string): ReviewedTest262Subset {
     ),
     tests,
   };
+}
+
+/**
+ * Rewrite only accepted expected-classification scalars to `pass`.
+ *
+ * The source ranges come from the parsed YAML tree, so ordering, comments,
+ * whitespace, and every unrelated scalar remain byte-for-byte unchanged.
+ */
+export function rewriteReviewedPromotions(
+  text: string,
+  promotedPaths: readonly string[],
+): string {
+  const subset = parseReviewedSubset(text);
+  const promoted = new Set(promotedPaths);
+  if (promoted.size !== promotedPaths.length) {
+    throw new Error("Reviewed test262 promotions must be unique.");
+  }
+  const document = parseDocument(text);
+  if (document.errors.length > 0) {
+    throw new Error(document.errors.map((error) => error.message).join("\n"));
+  }
+  const replacements: { readonly end: number; readonly start: number }[] = [];
+  for (let index = 0; index < subset.tests.length; index += 1) {
+    const entry = subset.tests[index];
+    if (entry == null || !promoted.has(entry.path)) continue;
+    if (entry.expectedClassification === "pass") {
+      throw new Error(`${entry.path} is already expected to pass.`);
+    }
+    const scalar = document.getIn(
+      ["tests", index, "expectedClassification"],
+      true,
+    );
+    if (!isScalar(scalar) || scalar.range == null) {
+      throw new Error(`${entry.path} has no rewritable classification.`);
+    }
+    replacements.push({ end: scalar.range[1], start: scalar.range[0] });
+    promoted.delete(entry.path);
+  }
+  if (promoted.size > 0) {
+    throw new Error(
+      `Unknown reviewed test262 promotion: ${[...promoted].join(", ")}.`,
+    );
+  }
+  let rewritten = text;
+  for (const replacement of replacements.toSorted(
+    (left, right) => right.start - left.start,
+  )) {
+    rewritten =
+      rewritten.slice(0, replacement.start) +
+      "pass" +
+      rewritten.slice(replacement.end);
+  }
+  return rewritten;
 }
 
 /**
@@ -1305,11 +1365,18 @@ export async function executeTest262Case(
   );
 }
 
+/**
+ * Validate reviewed observations and return promotions explicitly accepted by
+ * the caller. Failure classifications always abort, independent of expected
+ * classifications and promotion acceptance.
+ */
 export function validateReviewedResults(
   subset: ReviewedTest262Subset,
   results: readonly Test262Result[],
-): void {
+  acceptPromotions = false,
+): readonly string[] {
   const failures: string[] = [];
+  const promotedPaths: string[] = [];
   if (results.length !== subset.tests.length) {
     failures.push(
       `Expected ${subset.tests.length} reviewed results, received ` +
@@ -1326,6 +1393,12 @@ export function validateReviewedResults(
         `Reviewed result at index ${index} expected path ${expected.path}, ` +
           `received ${actual.case.path}.`,
       );
+    } else if (
+      acceptPromotions &&
+      expected.expectedClassification !== "pass" &&
+      actual.classification === "pass"
+    ) {
+      promotedPaths.push(expected.path);
     } else if (actual.classification !== expected.expectedClassification) {
       failures.push(
         `${expected.path}: expected ${expected.expectedClassification}, ` +
@@ -1346,6 +1419,7 @@ export function validateReviewedResults(
     );
   }
   if (failures.length > 0) throw new Error(failures.join("\n"));
+  return promotedPaths;
 }
 
 async function suiteRoot(revision: string): Promise<string> {
@@ -1537,7 +1611,11 @@ export async function createReviewedManifest(
       }
       return result;
     });
-    validateReviewedResults(subset, results);
+    const promotedPaths = validateReviewedResults(
+      subset,
+      results,
+      options.acceptPromotions,
+    );
     return {
       manifest: {
         results,
@@ -1545,6 +1623,7 @@ export async function createReviewedManifest(
         summary: summarizeTest262(results),
       },
       metadata: runMetadata(startedAt, poolLimit, retries),
+      promotedPaths,
     };
   } catch (error) {
     throw new ReviewedTest262RunError(
@@ -1683,18 +1762,39 @@ async function writeSerializedManifest(
   await writeFile(resultPath, manifest.indexText);
 }
 
+/** Parse the reviewed runner's update-only promotion option. */
+export function parseTest262Arguments(
+  args: readonly string[],
+): Test262Arguments {
+  const promotionArguments = args.filter(
+    (argument) => argument === "--accept-promotions",
+  );
+  if (promotionArguments.length > 1) {
+    throw new Error("accept-promotions may be specified only once.");
+  }
+  const shared = parseTestShardArguments(
+    args.filter((argument) => argument !== "--accept-promotions"),
+    { allowUpdate: true },
+  );
+  const acceptPromotions = promotionArguments.length === 1;
+  if (acceptPromotions && !shared.update) {
+    throw new Error("accept-promotions requires update.");
+  }
+  return { ...shared, acceptPromotions };
+}
+
 async function main(): Promise<void> {
-  const cliArguments = parseTestShardArguments(process.argv.slice(2), {
-    allowUpdate: true,
-  });
+  const cliArguments = parseTest262Arguments(process.argv.slice(2));
   if (cliArguments.help) {
     console.log(
-      "usage: node tools/test262.ts [--shard INDEX/TOTAL | --update]",
+      "usage: node tools/test262.ts " +
+        "[--shard INDEX/TOTAL | --update [--accept-promotions]]",
     );
     return;
   }
   requireSupportedHost();
-  const subset = parseReviewedSubset(await readFile(subsetPath, "utf8"));
+  const subsetText = await readFile(subsetPath, "utf8");
+  const subset = parseReviewedSubset(subsetText);
   const selectedSubset = {
     ...subset,
     tests: selectTestShard(subset.tests, cliArguments.shard),
@@ -1705,7 +1805,13 @@ async function main(): Promise<void> {
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   let run: ReviewedTest262Run;
   try {
-    run = await createReviewedManifest(selectedSubset, root, harnesses);
+    run = await createReviewedManifest(
+      selectedSubset,
+      root,
+      harnesses,
+      nativeExecutor,
+      { acceptPromotions: cliArguments.acceptPromotions },
+    );
   } finally {
     if (previousGc == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
     else process.env.OSEO_GC_EVERY_SAFEPOINT = previousGc;
@@ -1714,11 +1820,19 @@ async function main(): Promise<void> {
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);
   if (cliArguments.update) {
+    const rewrittenSubset = rewriteReviewedPromotions(
+      subsetText,
+      run.promotedPaths,
+    );
     await writeSerializedManifest(serialized);
     await writeFile(
       parityPath,
       serializeTargetParity(serialized, manifest.suiteRevision),
     );
+    await writeFile(subsetPath, rewrittenSubset);
+    for (const path of run.promotedPaths) {
+      console.log(`promoted ${path}`);
+    }
   } else {
     const expected = await readSerializedManifest();
     const partitionTexts = new Map(

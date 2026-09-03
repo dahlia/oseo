@@ -10,6 +10,16 @@ on:
         required: true
         type: string
 
+concurrency:
+  # A main push gets its own group keyed by commit, because the ratchet reads
+  # the previous push as its baseline. Sharing a group would let GitHub drop a
+  # queued main run, and the next run would then measure against a commit no
+  # run ever checked.
+  group: >-
+    main-${{ github.workflow }}-${{ github.ref }}-${{
+      github.ref == 'refs/heads/main' && github.sha || 'shared' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   check:
     runs-on: ubuntu-latest

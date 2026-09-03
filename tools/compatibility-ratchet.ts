@@ -23,9 +23,12 @@ import {
 import { isNumber, isObject, isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
-const subsetPath = "tests/test262/subset.yaml";
+/** The reviewed test262 path set and its expected classifications. */
+export const reviewedSubsetPath = "tests/test262/subset.yaml";
 const resultsPath = "tests/test262/results.yaml";
-const overridesPath = "tests/compatibility-ratchet-overrides.yaml";
+/** The reviewed exceptions to monotonic compatibility measurement. */
+export const compatibilityRatchetOverridesPath =
+  "tests/compatibility-ratchet-overrides.yaml";
 const propertySeedRegistryPath = "tests/property-seeds.yaml";
 const absent = "absent";
 const present = "present";
@@ -33,7 +36,8 @@ const maximumFastCheckSeed = 0x7fff_ffff;
 const minimumFastCheckSeed = -0x8000_0000;
 const propertySeedBlockSize = 0x100;
 
-type Classification =
+/** One classification admitted by the reviewed test262 evidence. */
+export type CompatibilityClassification =
   | "expected-negative"
   | "harness-failure"
   | "infrastructure-failure"
@@ -75,12 +79,17 @@ export interface GeneratedDomain {
   readonly sources: ReadonlySet<string>;
 }
 
-export interface CompatibilitySnapshot {
+/** Reviewed subset paths and their expected classifications. */
+export interface ReviewedEvidenceSnapshot {
+  readonly expectedClassifications: ReadonlyMap<string, string>;
+  readonly subsetPaths: ReadonlySet<string>;
+}
+
+export interface CompatibilitySnapshot extends ReviewedEvidenceSnapshot {
   readonly admittedFamilies: ReadonlySet<string>;
-  readonly classifications: ReadonlyMap<string, Classification>;
+  readonly classifications: ReadonlyMap<string, CompatibilityClassification>;
   readonly domains: ReadonlyMap<string, GeneratedDomain>;
   readonly resultPaths: ReadonlySet<string>;
-  readonly subsetPaths: ReadonlySet<string>;
 }
 
 export interface RatchetCounts {
@@ -159,7 +168,7 @@ function requireKeys(
 function classification(
   value: StructuredDataInput,
   context: string,
-): Classification {
+): CompatibilityClassification {
   switch (value) {
     case "expected-negative":
     case "harness-failure":
@@ -173,7 +182,10 @@ function classification(
   }
 }
 
-function parseSubset(text: string): ReadonlySet<string> {
+/** Parse reviewed test262 paths and expectations from subset YAML. */
+export function createReviewedEvidenceSnapshot(
+  text: string,
+): ReviewedEvidenceSnapshot {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const root = record(
     parseYaml(text) as StructuredDataInput,
@@ -182,23 +194,30 @@ function parseSubset(text: string): ReadonlySet<string> {
   if (!Array.isArray(root.tests)) {
     throw new Error("reviewed subset tests must be an array.");
   }
-  const paths = root.tests.map((value, index) =>
-    stringValue(
-      record(value, `reviewed subset test ${index}`).path,
-      `reviewed subset test ${index} path`,
-    ),
-  );
+  const expectedClassifications = new Map<string, string>();
+  const paths = root.tests.map((value, index) => {
+    const entry = record(value, `reviewed subset test ${index}`);
+    const path = stringValue(entry.path, `reviewed subset test ${index} path`);
+    expectedClassifications.set(
+      path,
+      stringValue(
+        entry.expectedClassification,
+        `reviewed subset test ${index} expectedClassification`,
+      ),
+    );
+    return path;
+  });
   const unique = new Set(paths);
   if (unique.size !== paths.length) {
     throw new Error("reviewed subset paths must be unique.");
   }
-  return unique;
+  return { expectedClassifications, subsetPaths: unique };
 }
 
 function parseResults(
   source: ResultManifestSource,
   allowLegacyGitBaseline: boolean,
-): ReadonlyMap<string, Classification> {
+): ReadonlyMap<string, CompatibilityClassification> {
   // SAFETY: parsedMapping validates the complete YAML tree at this boundary.
   const legacy = record(
     parseYaml(source.indexText) as StructuredDataInput,
@@ -213,7 +232,7 @@ function parseResults(
     if (source.partitionPaths.length > 0) {
       throw new Error("a legacy Git baseline cannot contain partitions.");
     }
-    const results = new Map<string, Classification>();
+    const results = new Map<string, CompatibilityClassification>();
     for (const [index, value] of legacy.results.entries()) {
       const result = record(value, `result ${index}`);
       const testCase = record(result.case, `result ${index} case`);
@@ -233,7 +252,7 @@ function parseResults(
     source.indexText,
     source.readPartition,
   );
-  const results = new Map<string, Classification>();
+  const results = new Map<string, CompatibilityClassification>();
   for (const [index, result] of manifest.results.entries()) {
     const path = result.case.path;
     if (results.has(path)) {
@@ -746,13 +765,15 @@ function createCompatibilitySnapshotFromSource(
   allowLegacyGitBaseline: boolean,
   admittedFamilies: readonly string[],
 ): CompatibilitySnapshot {
+  const subset = createReviewedEvidenceSnapshot(subsetText);
   const classifications = parseResults(resultManifest, allowLegacyGitBaseline);
   return {
     admittedFamilies: new Set(admittedFamilies),
     classifications,
     domains: parseGeneratedDomains(propertySources),
+    expectedClassifications: subset.expectedClassifications,
     resultPaths: new Set(classifications.keys()),
-    subsetPaths: parseSubset(subsetText),
+    subsetPaths: subset.subsetPaths,
   };
 }
 
@@ -992,15 +1013,13 @@ function sameOverride(left: RatchetOverride, right: RatchetOverride): boolean {
   );
 }
 
-export function compareCompatibility(
-  baseline: CompatibilitySnapshot,
-  current: CompatibilitySnapshot,
-  currentOverridesText = "overrides: []\n",
-  baselineOverridesText = "overrides: []\n",
-): RatchetReport {
-  const violations = detectViolations(baseline, current);
-  const baselineOverrides = [...parseOverrides(baselineOverridesText)];
-  const overrides = parseOverrides(currentOverridesText).filter((override) => {
+/** Find override entries added since the selected Git baseline. */
+export function findAddedRatchetOverrides(
+  baselineText: string,
+  currentText: string,
+): readonly RatchetOverride[] {
+  const baselineOverrides = [...parseOverrides(baselineText)];
+  return parseOverrides(currentText).filter((override) => {
     const index = baselineOverrides.findIndex((baselineOverride) =>
       sameOverride(override, baselineOverride),
     );
@@ -1008,6 +1027,19 @@ export function compareCompatibility(
     baselineOverrides.splice(index, 1);
     return false;
   });
+}
+
+export function compareCompatibility(
+  baseline: CompatibilitySnapshot,
+  current: CompatibilitySnapshot,
+  currentOverridesText = "overrides: []\n",
+  baselineOverridesText = "overrides: []\n",
+): RatchetReport {
+  const violations = detectViolations(baseline, current);
+  const overrides = findAddedRatchetOverrides(
+    baselineOverridesText,
+    currentOverridesText,
+  );
   const remaining = [...violations];
   const staleOverrides: RatchetOverride[] = [];
   for (const override of overrides) {
@@ -1143,7 +1175,10 @@ function mainReference(): string {
   throw new Error("cannot find a local or remote main reference.");
 }
 
-function resolveBaseline(intent: BaselineIntent): string | undefined {
+/** Resolve a selected compatibility baseline to an available Git commit. */
+export function resolveCompatibilityBaseline(
+  intent: BaselineIntent,
+): string | undefined {
   if (intent.kind === "skip") return undefined;
   if (intent.kind === "commit") return resolveCommit(intent.revision);
   const reference = mainReference();
@@ -1182,17 +1217,14 @@ export function selectGitResultPartitionPaths(
     .map((path) => path.slice(prefix.length));
 }
 
-export function compatibilitySnapshotAtRevision(
-  revision: string,
-): CompatibilitySnapshot {
-  const commit = resolveCommit(revision);
+function compatibilitySnapshotAtCommit(commit: string): CompatibilitySnapshot {
   const listedPaths = git(["ls-tree", "-r", "--name-only", commit]).split("\n");
   const admittedFamilies = validatedEvidenceFamilyIdsFromTree(
     listedPaths,
     (path) => gitText(commit, path),
   );
   return createGitCompatibilitySnapshot(
-    gitText(commit, subsetPath),
+    gitText(commit, reviewedSubsetPath),
     {
       indexText: gitText(commit, resultsPath),
       partitionPaths: selectGitResultPartitionPaths(
@@ -1211,6 +1243,30 @@ export function compatibilitySnapshotAtRevision(
     },
     baselinePropertySources(commit),
     admittedFamilies,
+  );
+}
+
+/** Read one complete compatibility snapshot from a Git revision. */
+export function compatibilitySnapshotAtRevision(
+  revision: string,
+): CompatibilitySnapshot {
+  return compatibilitySnapshotAtCommit(resolveCommit(revision));
+}
+
+/** Read reviewed test262 evidence from a Git revision. */
+export function reviewedEvidenceAtRevision(
+  revision: string,
+): ReviewedEvidenceSnapshot {
+  const commit = resolveCommit(revision);
+  return createReviewedEvidenceSnapshot(gitText(commit, reviewedSubsetPath));
+}
+
+/** Read ratchet overrides from a Git revision. */
+export function ratchetOverridesAtRevision(revision: string): string {
+  const commit = resolveCommit(revision);
+  return (
+    optionalGitText(commit, compatibilityRatchetOverridesPath) ??
+    "overrides: []\n"
   );
 }
 
@@ -1250,6 +1306,45 @@ function currentResultPartitionPaths(): readonly string[] {
   }
 }
 
+function createCurrentCompatibilitySnapshot(
+  propertySources: readonly PropertySource[] = currentPropertySources(),
+): CompatibilitySnapshot {
+  return createCompatibilitySnapshot(
+    readFileSync(join(repositoryRoot, reviewedSubsetPath), "utf8"),
+    {
+      indexText: readFileSync(join(repositoryRoot, resultsPath), "utf8"),
+      partitionPaths: currentResultPartitionPaths(),
+      readPartition(path): string {
+        return readFileSync(
+          join(repositoryRoot, "tests/test262", path),
+          "utf8",
+        );
+      },
+    },
+    propertySources,
+    currentEvidenceFamilyIds(),
+  );
+}
+
+/** Select the baseline intent for the current checkout or CI event. */
+export function selectCurrentBaselineIntent(
+  environment: Readonly<Record<string, string | undefined>> = process.env,
+): BaselineIntent {
+  const branch = optionalGit(["symbolic-ref", "--quiet", "--short", "HEAD"]);
+  const eventPath = environment.GITHUB_EVENT_PATH;
+  // SAFETY: parsedMapping validates the complete GitHub event JSON tree.
+  const event =
+    environment.GITHUB_ACTIONS === "true"
+      ? record(
+          JSON.parse(
+            readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
+          ) as StructuredDataInput,
+          "GitHub event",
+        )
+      : {};
+  return selectBaselineIntent(environment, event, branch);
+}
+
 function formatCounts(label: string, value: RatchetCounts): string {
   return (
     `${label} families=${value.admittedFamilies} pass=${value.pass} ` +
@@ -1268,24 +1363,12 @@ function formatViolation(violation: RatchetViolation): string {
 }
 
 async function main(): Promise<void> {
-  const branch = optionalGit(["symbolic-ref", "--quiet", "--short", "HEAD"]);
-  const eventPath = process.env.GITHUB_EVENT_PATH;
-  // SAFETY: parsedMapping validates the complete GitHub event JSON tree.
-  const event =
-    process.env.GITHUB_ACTIONS === "true"
-      ? record(
-          JSON.parse(
-            readFileSync(stringValue(eventPath, "GITHUB_EVENT_PATH"), "utf8"),
-          ) as StructuredDataInput,
-          "GitHub event",
-        )
-      : {};
-  const intent = selectBaselineIntent(process.env, event, branch);
+  const intent = selectCurrentBaselineIntent();
   if (intent.kind === "skip") {
     console.log(`compatibility-ratchet skipped: ${intent.reason}`);
     return;
   }
-  const baselineRevision = resolveBaseline(intent);
+  const baselineRevision = resolveCompatibilityBaseline(intent);
   if (baselineRevision == null) {
     throw new Error("compatibility baseline selection produced no commit.");
   }
@@ -1295,26 +1378,16 @@ async function main(): Promise<void> {
     readFileSync(join(repositoryRoot, propertySeedRegistryPath), "utf8"),
     propertySources,
   );
-  const current = createCompatibilitySnapshot(
-    readFileSync(join(repositoryRoot, subsetPath), "utf8"),
-    {
-      indexText: readFileSync(join(repositoryRoot, resultsPath), "utf8"),
-      partitionPaths: currentResultPartitionPaths(),
-      readPartition(path): string {
-        return readFileSync(
-          join(repositoryRoot, "tests/test262", path),
-          "utf8",
-        );
-      },
-    },
-    propertySources,
-    currentEvidenceFamilyIds(),
-  );
+  const current = createCurrentCompatibilitySnapshot(propertySources);
   const report = compareCompatibility(
     baseline,
     current,
-    readFileSync(join(repositoryRoot, overridesPath), "utf8"),
-    optionalGitText(baselineRevision, overridesPath) ?? "overrides: []\n",
+    readFileSync(
+      join(repositoryRoot, compatibilityRatchetOverridesPath),
+      "utf8",
+    ),
+    optionalGitText(baselineRevision, compatibilityRatchetOverridesPath) ??
+      "overrides: []\n",
   );
   console.log(`compatibility-ratchet baseline=${baselineRevision}`);
   console.log(formatCounts("before", report.baseline));

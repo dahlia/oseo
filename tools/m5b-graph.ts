@@ -553,6 +553,17 @@ function readNodeSources(): readonly WorkGraphSource[] {
     .toSorted((left, right) => left.path.localeCompare(right.path));
 }
 
+/** Read and validate the current work graph's node records and inventories. */
+export function readCurrentWorkGraphNodes(): readonly WorkGraphNode[] {
+  const includedPaths = parseIncludedInventoryPaths(
+    readFileSync(join(repositoryRoot, workGraphInventoryPath), "utf8"),
+  );
+  const claimed = new Map<string, string>();
+  return readNodeSources().map((source) =>
+    parseNode(source, includedPaths, claimed),
+  );
+}
+
 /** Validate and summarize the current worktree's M5b work graph. */
 export function validateCurrentWorkGraph(): WorkGraphSummary {
   const graphSource: WorkGraphSource = {

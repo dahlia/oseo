@@ -45,6 +45,8 @@ depends = [
   "check:lines",
   "check:lint",
   "check:m5b-graph",
+  "check:m5b-node-scope",
+  "check:native-host-guards",
   "check:packages",
   "check:types",
   "check:unicode-tables",
@@ -97,6 +99,17 @@ run = "aube exec -- oxlint ."
 description = "Validate the checked-in M5b work graph"
 run = "node tools/m5b-graph.ts"
 
+[tasks."check:m5b-node-scope"]
+description = "Keep reviewed evidence within the named M5b node scope"
+run = "node tools/m5b-node-scope.ts"
+
+[tasks."check:native-host-guards"]
+description = "Require unsupported-host skips for native property tests"
+run = '''
+node --test tests/native-host-guards.test.ts
+node tools/check-native-host-guards.ts
+'''
+
 [tasks."check:packages"]
 depends = ["build"]
 run = '''
@@ -144,6 +157,7 @@ run = "oxfmt ."
 
 [tasks.install-hooks]
 description = "Install the local pre-commit and commit-msg hooks"
+run_windows = "echo Git hook installation is skipped on Windows."
 run = """
 # git rev-parse --git-path resolves core.hooksPath and a linked worktree's
 # shared hook directory. Neither hook may go to $GIT_DIR/hooks, which git
@@ -155,9 +169,10 @@ mkdir -p "$hooks"
 mise generate git-pre-commit --task=check > "$hooks/pre-commit"
 chmod +x "$hooks/pre-commit"
 
-# mise generate cannot produce the commit-msg hook: its body never forwards
-# the hook's arguments, and git passes the message file as $1, which is
-# .git/MERGE_MSG for a merge rather than .git/COMMIT_EDITMSG.
+# The commit-msg hook is written by hand for the guard below, not because
+# mise cannot generate it. mise 2026.9.1 forwards "$@" from a generated
+# hook, which it did not when this task was written, so the argument git
+# passes as $1 would now reach the task either way.
 #
 # A hook outlives the checkout it was installed from. It stays in .git while
 # the working tree moves to a branch cut before this task existed, or to an
