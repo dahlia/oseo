@@ -4764,6 +4764,117 @@ runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-84` without
 adding a generated-code entry point or changing the graph's orchestration
 state.
 
+M5b node `regexp-symbol-methods` admits the five `RegExp.prototype`
+well-known symbol methods, the `RegExp.escape` static, and the
+`String.prototype` dispatch that reaches them. Each method requires an
+Object receiver, reads `flags`, `lastIndex`, `constructor`,
+`Symbol.species`, `index`, `groups`, `length`, and the numbered capture
+properties through ordinary property access, and executes through
+`RegExpExec`, so an overridden `exec` is called and its non-object,
+non-null result is a `TypeError`.
+
+`@@match` returns one execution for a pattern that is not global, and
+otherwise resets `lastIndex`, collects every matched substring, advances by
+`AdvanceStringIndex` after an empty match, and answers null when nothing
+matched. `@@search` saves `lastIndex`, executes from zero, restores the
+saved value through `SameValue`, and reports `index` or -1. `@@matchAll`
+and `@@split` take `SpeciesConstructor(rx, %RegExp%)` and construct a copy
+with the receiver's `flags`, which `@@split` extends with `y` when it is
+absent; `@@matchAll` also copies `lastIndex` and freezes the `global` and
+`unicode` decisions into the iterator it returns. `@@replace` collects
+every execution before it builds, clamps each `index`, converts every
+capture that participated, passes the captures, the position, the subject,
+and the named-capture object to a callable replacer, and otherwise runs
+GetSubstitution, which now resolves `$1` through `$99` and `$<name>`. Its
+next source position is the unclamped sum of that position and the matched
+length, so a match object built by user code that reports a `0` longer than
+the remaining subject makes every later match, including one at the
+subject's end, contribute nothing. A
+two-digit reference past the capture count is one digit followed by a
+literal digit, and an unterminated `$<` copies its own text.
+
+`RegExp.escape` requires a String argument, hex-escapes a leading decimal
+digit or ASCII letter, escapes every SyntaxCharacter and the solidus,
+spells the five ControlEscape code points, hex-escapes the other
+punctuators, WhiteSpace, LineTerminator, and either surrogate half, and
+leaves every other code point unchanged, so the result is inert wherever it
+is spliced. `%RegExpStringIteratorPrototype%` keeps its `next` and
+`Symbol.toStringTag` and now iterates real executions: a non-global
+iterator finishes after one match, and a global one that matched the empty
+String advances `lastIndex` on the RegExp itself, which is where the cursor
+lives.
+
+`String.prototype.match`, `matchAll`, and `search` now perform RegExpCreate
+and Invoke once GetMethod finds no method on their operand, with `matchAll`
+alone supplying `g`. That retires the fixed-width fallback pattern language
+`string-prototype-match-and-split` admitted, so a `String` operand is a real
+pattern and the `OSEO2001` boundary a branded RegExp operand used to reach
+is gone. `split`, `replace`, and `replaceAll` keep the code-unit fallback
+the specification gives them.
+
+One consequence is a divergence this node inherits rather than introduces.
+A `String` operand whose text uses a construct only Annex B admits, such as
+`\x1` or `\u12z4`, now reaches the dynamic pattern validator and is
+rejected as a `SyntaxError`, exactly as `new RegExp` already rejects it,
+while both reference hosts implement Annex B and accept it. The
+pattern-grammar node owns that gap; the alternative was keeping a
+String-only approximation that no longer has a specified meaning.
+
+The new *runtime\_regexp\_symbol.c* component owns the five methods and
+`escape`; *runtime\_regexp.c* gains only `RegExpCreate` and the exported
+`RegExpExec` they and the String component call, and
+*runtime\_string\_match.c* keeps the iterator record, the String entry
+points, and the GetSubstitution operation that now takes captures. The five
+deferred code IDs become real ones and the RegExp range gains a
+twenty-first for `escape`, so the range holds twenty-one of its two hundred
+fifty-six and no other component renumbers. The runtime ABI moves to
+`oseo-runtime-m5-87` without adding a generated-code entry point.
+
+Fixed native and generated differential evidence at seeds `0x60005b00`
+through `0x60005b02` covers descriptors, generic receivers, species
+construction, sticky and unicode traversal, every GetSubstitution reference
+form, functional replacers with their named-capture object, the complete
+iterator protocol, `EncodeForRegExpEscape` over every escaping class, the
+String routing through a callable, non-callable, nullish, deleted, RegExp,
+and plain String operand, both specialization policies, forced collection at
+every safepoint, false hints, and deliberate shape-guard misses. The
+generated method domain takes its expected observation from the
+compiler-side matcher rather than from the hosts, so a disagreement is
+visible from three sides at once. Two observations stay out of the fixed
+lane because the pinned hosts disagree about them: a `@@replace` receiver
+whose `exec` never advances `lastIndex`, where the pinned Node.js host stops
+after one execution while Deno and the edition continue, and the Annex B
+rejection above.
+
+All 253 paths under the node's seven inventory roots are applicable and 252
+are reviewed: 240 pass and 12 retain explicit prerequisite boundaries. Six
+`not-a-constructor.js` cases need `Reflect.construct`, two need a second
+realm, three reference the unadmitted `print`, `ERROR`, or `Date` globals,
+and one names a non-ASCII group in a literal the pattern grammar still
+refuses. The one path left out,
+*test/built-ins/RegExp/escape/escaped-otherpunctuators.js*, iterates a
+String with `for`-`of`, which the separate `string-iterator` node owns; its
+`RegExp.escape` observations are covered by the fixed and generated evidence
+above, so nothing about this node is unmeasured. The reviewed feature list
+gains `RegExp.escape` and `regexp-named-groups`, which this node implements
+and which no already-reviewed path declared.
+
+Ninety-two already-reviewed paths outside those roots move from
+`unsupported-profile-feature` to `pass` because the String methods now reach
+a real pattern: twenty-nine under *String/prototype/split/*, twenty-five
+under *String/prototype/replace/*, nineteen under *String/prototype/match/*,
+eight under *String/prototype/search/*, five under *RegExp/*, four under
+*String/prototype/matchAll/*, and two under *String/prototype/replaceAll/*.
+No previously reviewed path loses a pass. The manifest moves from 15,515 to
+15,767 cases and from 11,690 to 12,022 passes, keeps 1,506 expected
+negatives, and moves from 2,319 to 2,239 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The property inventory
+moves from 116 to 119 domains and seeds and from 5,246 to 5,268 ordinary
+cases. Adding `regular-expressions` to the reviewed rows of earlier RegExp
+nodes remains outside this change and belongs to the reviewed-subset-growth
+backlog. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, target-parity policy, and zero-override policy are unchanged.
+
 
 Generator and asynchronous function intrinsic chains
 ----------------------------------------------------
@@ -4928,13 +5039,15 @@ complete. The remaining gaps retain their existing owners.
     `regexp-prototype-and-exec`, and ahead-of-time literal compilation by
     `regexp-literal-aot`, all as recorded above. What remains
     outside the admitted profile is the pattern grammar this edition still
-    defers, the real well-known symbol methods, `RegExp.escape`, and
-    matcher backend selection, all owned by
-    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). `%RegExp.prototype%` carries
-    `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split` as
-    deferred placeholders, so a String protocol method reaches one owned
-    boundary through GetMethod rather than approximating a pattern; the
-    `regexp-symbol-methods` node replaces them. Literal syntax is admitted:
+    defers and matcher backend selection, both owned by
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). `%RegExp.prototype%` carries the
+    real `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split`
+    methods, `%RegExp%` carries `escape`, and `String.prototype.match`,
+    `matchAll`, and `search` reach them through RegExpCreate and Invoke,
+    all admitted by the `regexp-symbol-methods` node. That routing makes
+    the deferred grammar reachable from a `String` operand: a pattern only
+    Annex B admits is now a `SyntaxError` there, as it already was for
+    `new RegExp`. Literal syntax is admitted:
     the frontend records a literal's pattern text, flag text, and range as
     an owned value, validates it with the owned pattern parser so an
     invalid pattern or flag set is an early error at the offending text,

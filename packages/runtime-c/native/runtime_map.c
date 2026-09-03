@@ -137,9 +137,10 @@ static OseoResult map_allocate(
     map->ordinary.iterator_array = oseo_undefined();
     map->ordinary.iterator_index = 0u;
     map->ordinary.regexp_string_iterator = false;
+    map->ordinary.regexp_iterator_regexp = oseo_undefined();
     map->ordinary.regexp_iterator_subject = oseo_undefined();
-    map->ordinary.regexp_iterator_pattern = oseo_undefined();
-    map->ordinary.regexp_iterator_index = 0u;
+    map->ordinary.regexp_iterator_global = false;
+    map->ordinary.regexp_iterator_unicode = false;
     map->ordinary.regexp_iterator_complete = false;
     map->ordinary.async_from_sync = false;
     map->ordinary.async_sync_iterator = oseo_undefined();
@@ -721,9 +722,10 @@ static OseoResult map_create_iterator(
     iterator->ordinary.iterator_array = oseo_undefined();
     iterator->ordinary.iterator_index = 0u;
     iterator->ordinary.regexp_string_iterator = false;
+    iterator->ordinary.regexp_iterator_regexp = oseo_undefined();
     iterator->ordinary.regexp_iterator_subject = oseo_undefined();
-    iterator->ordinary.regexp_iterator_pattern = oseo_undefined();
-    iterator->ordinary.regexp_iterator_index = 0u;
+    iterator->ordinary.regexp_iterator_global = false;
+    iterator->ordinary.regexp_iterator_unicode = false;
     iterator->ordinary.regexp_iterator_complete = false;
     iterator->ordinary.async_from_sync = false;
     iterator->ordinary.async_sync_iterator = oseo_undefined();

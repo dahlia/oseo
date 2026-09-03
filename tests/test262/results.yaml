@@ -7187,6 +7187,54 @@ partitions:
   - group: built-ins/RegExp
     key: ff
     path: results/built-ins/RegExp/ff.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: "08"
+    path: results/built-ins/RegExpStringIteratorPrototype/08.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: "16"
+    path: results/built-ins/RegExpStringIteratorPrototype/16.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: 1f
+    path: results/built-ins/RegExpStringIteratorPrototype/1f.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: "36"
+    path: results/built-ins/RegExpStringIteratorPrototype/36.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: "58"
+    path: results/built-ins/RegExpStringIteratorPrototype/58.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: 7c
+    path: results/built-ins/RegExpStringIteratorPrototype/7c.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: "88"
+    path: results/built-ins/RegExpStringIteratorPrototype/88.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: 9c
+    path: results/built-ins/RegExpStringIteratorPrototype/9c.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: ac
+    path: results/built-ins/RegExpStringIteratorPrototype/ac.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: b8
+    path: results/built-ins/RegExpStringIteratorPrototype/b8.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: bd
+    path: results/built-ins/RegExpStringIteratorPrototype/bd.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: d3
+    path: results/built-ins/RegExpStringIteratorPrototype/d3.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: de
+    path: results/built-ins/RegExpStringIteratorPrototype/de.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: e1
+    path: results/built-ins/RegExpStringIteratorPrototype/e1.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: e4
+    path: results/built-ins/RegExpStringIteratorPrototype/e4.yaml
+  - group: built-ins/RegExpStringIteratorPrototype
+    key: f9
+    path: results/built-ins/RegExpStringIteratorPrototype/f9.yaml
   - group: built-ins/String
     key: "00"
     path: results/built-ins/String/00.yaml
@@ -10990,9 +11038,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 11690
+  passes: 12022
   semanticFailures: 0
-  unsupportedProfileFeatures: 2319
+  unsupportedProfileFeatures: 2239
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -11089,9 +11137,9 @@ summary:
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3218
+      passes: 3421
       semanticFailures: 0
-      unsupportedProfileFeatures: 1153
+      unsupportedProfileFeatures: 1074
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -11103,9 +11151,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1013
+      passes: 1034
       semanticFailures: 0
-      unsupportedProfileFeatures: 81
+      unsupportedProfileFeatures: 77
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -11131,9 +11179,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8143
+      passes: 8289
       semanticFailures: 0
-      unsupportedProfileFeatures: 1035
+      unsupportedProfileFeatures: 945
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -11148,6 +11196,13 @@ summary:
       passes: 38
       semanticFailures: 0
       unsupportedProfileFeatures: 25
+    - dependency: regular-expressions
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 240
+      semanticFailures: 0
+      unsupportedProfileFeatures: 12
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -11159,9 +11214,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 413
+      passes: 500
       semanticFailures: 0
-      unsupportedProfileFeatures: 163
+      unsupportedProfileFeatures: 76
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -11349,16 +11404,23 @@ summary:
       expectedNegatives: 142
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 614
+      passes: 842
       semanticFailures: 0
-      unsupportedProfileFeatures: 632
+      unsupportedProfileFeatures: 639
+    - group: built-ins/RegExpStringIteratorPrototype
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 17
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 965
+      passes: 1052
       semanticFailures: 0
-      unsupportedProfileFeatures: 189
+      unsupportedProfileFeatures: 102
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0

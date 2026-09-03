@@ -382,9 +382,10 @@ static OseoResult promise_allocate(
     promise->ordinary.iterator_array = oseo_undefined();
     promise->ordinary.iterator_index = 0u;
     promise->ordinary.regexp_string_iterator = false;
+    promise->ordinary.regexp_iterator_regexp = oseo_undefined();
     promise->ordinary.regexp_iterator_subject = oseo_undefined();
-    promise->ordinary.regexp_iterator_pattern = oseo_undefined();
-    promise->ordinary.regexp_iterator_index = 0u;
+    promise->ordinary.regexp_iterator_global = false;
+    promise->ordinary.regexp_iterator_unicode = false;
     promise->ordinary.regexp_iterator_complete = false;
     promise->ordinary.async_from_sync = false;
     promise->ordinary.async_sync_iterator = oseo_undefined();

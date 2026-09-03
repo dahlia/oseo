@@ -1,0 +1,3 @@
+version: 1
+id: regexp-symbol-methods
+record: docs/language-profile-m5/families/regexp-symbol-methods.yaml

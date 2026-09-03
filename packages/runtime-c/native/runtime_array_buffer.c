@@ -150,9 +150,10 @@ static OseoResult array_buffer_allocate(
     buffer->ordinary.iterator_array = oseo_undefined();
     buffer->ordinary.iterator_index = 0u;
     buffer->ordinary.regexp_string_iterator = false;
+    buffer->ordinary.regexp_iterator_regexp = oseo_undefined();
     buffer->ordinary.regexp_iterator_subject = oseo_undefined();
-    buffer->ordinary.regexp_iterator_pattern = oseo_undefined();
-    buffer->ordinary.regexp_iterator_index = 0u;
+    buffer->ordinary.regexp_iterator_global = false;
+    buffer->ordinary.regexp_iterator_unicode = false;
     buffer->ordinary.regexp_iterator_complete = false;
     buffer->ordinary.async_from_sync = false;
     buffer->ordinary.async_sync_iterator = oseo_undefined();

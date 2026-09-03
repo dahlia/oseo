@@ -29,6 +29,128 @@ results:
   - case:
       async: false
       features:
+        - Symbol.match
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-y-set-lastindex.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.matchAll
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-tostring-flags-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+      - regular-expressions
+    observation:
+      detail: "test/built-ins/RegExp/prototype/Symbol.matchAll/this-tostring-\
+        flags-throws.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/Symbol.matchAll/this-t\
+        ostring-flags-throws.js:98:7: error[OSEO1001]: Unknown binding
+        'ERROR'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.search
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.search/cstm-exec-return-index.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.search
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.search/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-properties
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - Symbol
         - regexp-dotall
       flags: []

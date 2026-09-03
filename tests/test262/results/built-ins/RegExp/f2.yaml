@@ -135,6 +135,31 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Symbol.replace
+        - regexp-named-groups
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/prototype/Symbol.replace/named-groups.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    observation:
+      detail: 'test/built-ins/RegExp/prototype/Symbol.replace/named-groups.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/prototype/Symbol.replace/named-groups.js:118:22:
+        error[OSEO1001]: A group name outside ASCII needs Unicode
+        identifier data that is not linked.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

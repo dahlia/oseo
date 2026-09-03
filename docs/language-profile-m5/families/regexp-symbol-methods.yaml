@@ -1,0 +1,106 @@
+version: 1
+id: regexp-symbol-methods
+title: "RegExp symbol methods, RegExp.escape, and String dispatch"
+scope:
+  - "`RegExp.prototype[Symbol.match]`, `[Symbol.matchAll]`,
+    `[Symbol.replace]`, `[Symbol.search]`, and `[Symbol.split]` require an
+    Object receiver, read `flags`, `lastIndex`, `constructor`,
+    `Symbol.species`, `index`, `groups`, `length`, and the numbered capture
+    properties through ordinary property access, and execute through
+    `RegExpExec`, so an overridden `exec` is called and its non-object,
+    non-null result is a `TypeError`."
+  - "`@@match` returns one `RegExpExec` result for a pattern that is not
+    global, and otherwise resets `lastIndex`, collects every matched
+    substring, advances by `AdvanceStringIndex` after an empty match, and
+    returns null when nothing matched. `@@search` saves `lastIndex`,
+    executes from zero, restores the saved value with `SameValue`, and
+    reports `index` or -1. `@@matchAll` and `@@split` take
+    `SpeciesConstructor(rx, %RegExp%)` and construct a copy with the
+    receiver's `flags`, which `@@split` extends with `y` when it is
+    absent."
+  - "`@@replace` collects every execution before it builds its result,
+    clamps each `index` with `ToIntegerOrInfinity`, converts every capture
+    that participated, passes the captures, position, subject, and the
+    named-capture object to a callable replacer, and otherwise runs
+    GetSubstitution with those captures. Its next source position is the
+    unclamped sum of that position and the matched length, so a match whose
+    position precedes the text already consumed contributes nothing even
+    when a match object built by user code reported a `0` longer than the
+    remaining subject."
+  - "GetSubstitution now resolves `$1` through `$99` and `$<name>`. A
+    two-digit reference past the capture count is one digit followed by a
+    literal digit, an unterminated `$<` copies its own text, and
+    `$<name>` reads the named-capture object through `Get` and converts a
+    present value with `ToString`."
+  - "`RegExp.escape` requires a String argument, hex-escapes a leading
+    decimal digit or ASCII letter, escapes every SyntaxCharacter and the
+    solidus, spells the five ControlEscape code points, hex-escapes the
+    other punctuators, WhiteSpace, LineTerminator, and either surrogate
+    half, and leaves every other code point unchanged."
+  - "`%RegExpStringIteratorPrototype%` keeps its `next` and
+    `Symbol.toStringTag`, and its records now hold the iterating RegExp,
+    the iterated String, and the frozen `global` and `unicode` decisions.
+    A non-global iterator finishes after one match, and a global one that
+    matched the empty String advances `lastIndex` on the RegExp itself."
+  - "`String.prototype.match`, `matchAll`, and `search` reach these
+    methods through RegExpCreate and Invoke once GetMethod finds no method
+    on the operand, with `matchAll` alone supplying `g`. `split`,
+    `replace`, and `replaceAll` keep their code-unit fallback, which the
+    specification gives them."
+  - "A String operand whose text uses a construct only Annex B admits
+    reaches the dynamic pattern validator, which rejects it as a
+    `SyntaxError`. Both reference hosts accept those patterns, so this is
+    the same divergence `new RegExp` already has and the pattern-grammar
+    node owns it."
+owners:
+  - PLAN-M5.md
+  - PLAN-REGEXP.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/regexp-symbol-methods.ts
+      - tests/property/m5-regexp-symbol-methods.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-symbol-methods.ts
+      - tests/native/scenarios/shard-2.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-symbol-methods.ts
+      - tests/property/m5-regexp-symbol-methods.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-regexp-symbol-methods.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-symbol-methods.ts
+      - tests/property/m5-regexp-symbol-methods.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/regexp-symbol-methods.ts
+      - tests/property/m5-regexp-symbol-methods.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_regexp.c
+      - packages/runtime-c/native/runtime_regexp_symbol.c
+      - packages/runtime-c/native/runtime_string_match.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - packages/runtime-c/tests/symbols.test.ts

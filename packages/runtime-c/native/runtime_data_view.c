@@ -347,9 +347,10 @@ static OseoResult data_view_allocate(
     view->ordinary.iterator_array = oseo_undefined();
     view->ordinary.iterator_index = 0u;
     view->ordinary.regexp_string_iterator = false;
+    view->ordinary.regexp_iterator_regexp = oseo_undefined();
     view->ordinary.regexp_iterator_subject = oseo_undefined();
-    view->ordinary.regexp_iterator_pattern = oseo_undefined();
-    view->ordinary.regexp_iterator_index = 0u;
+    view->ordinary.regexp_iterator_global = false;
+    view->ordinary.regexp_iterator_unicode = false;
     view->ordinary.regexp_iterator_complete = false;
     view->ordinary.async_from_sync = false;
     view->ordinary.async_sync_iterator = oseo_undefined();

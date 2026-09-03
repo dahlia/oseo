@@ -704,16 +704,25 @@ Delivery order
     into ASCII except U+017F and U+212A, so the runtime resolves an ASCII
     closure exactly and keeps an `OSEO2001` boundary for a set that meets a
     non-ASCII class and for an ignore-case backreference in a pattern whose
-    sets can reach one. That node also gave `%RegExp.prototype%` deferred
-    `@@match`, `@@matchAll`, `@@search`, and `@@split` placeholders, and
-    `string-prototype-replace` added the `@@replace` placeholder beside
-    them, so a RegExp operand reaches the owned boundary through GetMethod
-    rather than a String approximation. The regular expression string
-    iterator is already materialized: `string-prototype-match-and-split`
-    owns `%RegExpStringIteratorPrototype%`, its `next`, and its
-    `Symbol.toStringTag`, and `regexp-symbol-methods` extends that object
-    with the results a real `@@matchAll` yields. `RegExp.escape`, the real
-    symbol methods, and String dispatch remain.
+    sets can reach one. The M5b `regexp-symbol-methods` node then
+    replaced the five deferred `%RegExp.prototype%` placeholders with the
+    real `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split`
+    methods, added `RegExp.escape`, and routed
+    `String.prototype.match`, `matchAll`, and `search` through
+    RegExpCreate and Invoke. Every method executes through `RegExpExec`
+    and reads `flags`, `lastIndex`, `constructor`, `Symbol.species`, and
+    the result's own properties through ordinary property access;
+    `@@matchAll` and `@@split` construct their copy through
+    `SpeciesConstructor`; `@@replace` collects every execution before it
+    builds and extends GetSubstitution with captures and named captures.
+    `%RegExpStringIteratorPrototype%`, materialized by
+    `string-prototype-match-and-split`, now holds the iterating RegExp and
+    keeps its cursor in that object's `lastIndex`. Landed with seeds
+    `0x60005b00` through `0x60005b02`, runtime ABI `oseo-runtime-m5-87`,
+    and the *runtime\_regexp\_symbol.c* component. Routing the String
+    methods makes the deferred pattern grammar reachable from a `String`
+    operand, so a construct only Annex B admits is now a `SyntaxError`
+    there as it already was for `new RegExp`; item 3 owns that gap.
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.

@@ -944,14 +944,14 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT/u);
   assert.match(internalHeader, /bool regexp_string_iterator;/u);
   assert.match(internalHeader, /OseoValue regexp_iterator_subject;/u);
-  assert.match(internalHeader, /OseoValue regexp_iterator_pattern;/u);
+  assert.match(internalHeader, /OseoValue regexp_iterator_regexp;/u);
   assert.match(
     memorySource,
     /mark_value\(ordinary->regexp_iterator_subject, worklist\)/u,
   );
   assert.match(
     memorySource,
-    /mark_value\(ordinary->regexp_iterator_pattern, worklist\)/u,
+    /mark_value\(ordinary->regexp_iterator_regexp, worklist\)/u,
   );
   assert.match(stringSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(internalHeader, /oseo_internal_install_string_global/u);
@@ -979,20 +979,95 @@ test("populates the realm-owned String intrinsic cluster", () => {
   );
   assert.match(
     matchSource,
-    /string_replace\([\s\S]*oseo_call_function[\s\S]*replace_substitution/u,
+    new RegExp(
+      String.raw`string_replace\([\s\S]*oseo_call_function` +
+        String.raw`[\s\S]*oseo_internal_get_substitution`,
+      "u",
+    ),
   );
   assert.doesNotMatch(header, /oseo_string_replace/u);
   // The unadmitted-method placeholder no longer covers either name.
   assert.doesNotMatch(stringSource, /unadmitted_names\[\] = \{[^}]*"replace"/u);
-  // %RegExp.prototype% carries the deferred [Symbol.replace] placeholder, so
-  // a RegExp operand reaches the owned boundary through GetMethod instead of
-  // falling through to the String search this node admits.
+  // %RegExp.prototype% carries the real [Symbol.replace] method, so a
+  // RegExp operand reaches it through GetMethod instead of falling through
+  // to the String search this node admits.
   assert.match(
     regexpSource,
-    /deferred_symbol_methods\[\] = \{[^}]*"\[Symbol\.replace\]"/u,
+    /symbol_methods\[\] = \{[^}]*"\[Symbol\.replace\]"/u,
   );
-  assert.match(regexpSource, /OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID/u);
-  assert.match(internalHeader, /OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID/u);
+  assert.match(regexpSource, /OSEO_REGEXP_REPLACE_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_REGEXP_REPLACE_CODE_ID/u);
+});
+
+test("routes the RegExp symbol methods and String dispatch", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const matchSource = sources.get("runtime_string_match.c") ?? "";
+  const regexpSource = sources.get("runtime_regexp.c") ?? "";
+  const symbolSource = sources.get("runtime_regexp_symbol.c") ?? "";
+  const stringSource = sources.get("runtime_string.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+
+  // The five symbol methods and the escape static share one contiguous
+  // block of the RegExp range, which one range test hands to the
+  // symbol-method component.
+  for (const code of [
+    "OSEO_REGEXP_MATCH_CODE_ID",
+    "OSEO_REGEXP_MATCH_ALL_CODE_ID",
+    "OSEO_REGEXP_REPLACE_CODE_ID",
+    "OSEO_REGEXP_SEARCH_CODE_ID",
+    "OSEO_REGEXP_SPLIT_CODE_ID",
+    "OSEO_REGEXP_ESCAPE_CODE_ID",
+  ]) {
+    assert.match(internalHeader, new RegExp(`#define ${code} `, "u"));
+    assert.match(symbolSource, new RegExp(code, "u"));
+  }
+  assert.doesNotMatch(internalHeader, /_DEFERRED_CODE_ID/u);
+  assert.match(
+    regexpSource,
+    new RegExp(
+      String.raw`OSEO_REGEXP_ESCAPE_CODE_ID &&[\s\S]*?` +
+        "oseo_internal_regexp_symbol_dispatch",
+      "u",
+    ),
+  );
+  // Every method executes through RegExpExec rather than through the
+  // built-in matcher directly, so an overridden `exec` is observed.
+  assert.match(symbolSource, /oseo_internal_regexp_exec/u);
+  assert.match(symbolSource, /symbol_species_constructor/u);
+  assert.match(symbolSource, /oseo_constructor_result/u);
+  // String.prototype match, matchAll, and search reach the symbol methods
+  // through RegExpCreate and Invoke instead of a String-only fallback.
+  assert.match(
+    matchSource,
+    new RegExp(
+      String.raw`string_regexp_dispatch\([\s\S]*` +
+        String.raw`oseo_internal_regexp_create[\s\S]*oseo_call_function`,
+      "u",
+    ),
+  );
+  assert.doesNotMatch(matchSource, /fallback_regexp_/u);
+  assert.doesNotMatch(matchSource, /is not admitted yet/u);
+  // The RegExp String iterator holds the iterating RegExp and its frozen
+  // global and unicode decisions, and the collector traces both values.
+  assert.match(internalHeader, /bool regexp_iterator_global;/u);
+  assert.match(internalHeader, /bool regexp_iterator_unicode;/u);
+  assert.match(
+    matchSource,
+    new RegExp(
+      "oseo_internal_regexp_string_iterator_create" +
+        String.raw`[\s\S]*regexp_iterator_regexp = `,
+      "u",
+    ),
+  );
+  assert.match(
+    memorySource,
+    /mark_value\(ordinary->regexp_iterator_regexp, worklist\)/u,
+  );
+  // One UTF-16 accumulator serves every component that assembles a
+  // result in pieces.
+  assert.match(stringSource, /OseoResult oseo_internal_string_builder_append/u);
+  assert.match(internalHeader, /\} OseoStringBuilder;/u);
+  assert.equal((symbolSource.match(/typedef struct \{/gu) ?? []).length, 0);
 });
 
 test("populates the realm-owned Map intrinsic cluster", () => {

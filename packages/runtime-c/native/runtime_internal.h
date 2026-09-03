@@ -555,16 +555,19 @@
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 7u)
 #define OSEO_REGEXP_FLAG_ACCESSOR_CODE_ID_FIRST \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 14u)
-#define OSEO_REGEXP_MATCH_DEFERRED_CODE_ID \
-    (OSEO_REGEXP_CODE_ID_RANGE_LAST - 15u)
-#define OSEO_REGEXP_MATCH_ALL_DEFERRED_CODE_ID \
+/*
+ * The five well-known symbol methods occupy one contiguous block that
+ * ends at the `escape` static, so the dispatcher routes the whole block
+ * to the symbol-method component with one range test.
+ */
+#define OSEO_REGEXP_MATCH_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_REGEXP_MATCH_ALL_CODE_ID \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 16u)
-#define OSEO_REGEXP_SEARCH_DEFERRED_CODE_ID \
-    (OSEO_REGEXP_CODE_ID_RANGE_LAST - 17u)
-#define OSEO_REGEXP_SPLIT_DEFERRED_CODE_ID \
-    (OSEO_REGEXP_CODE_ID_RANGE_LAST - 18u)
-#define OSEO_REGEXP_REPLACE_DEFERRED_CODE_ID \
+#define OSEO_REGEXP_SEARCH_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_REGEXP_SPLIT_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 18u)
+#define OSEO_REGEXP_REPLACE_CODE_ID \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 19u)
+#define OSEO_REGEXP_ESCAPE_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 20u)
 
 #define OSEO_MATH_CODE_ID_RANGE_INDEX ((size_t)17u)
 #define OSEO_MATH_CODE_ID_RANGE_FIRST \
@@ -922,15 +925,17 @@ typedef struct {
     OseoValue iterator_array;
     size_t iterator_index;
     /*
-     * The private RegExp String iterator used by String.prototype.matchAll's
-     * admitted fallback. Its subject and pattern are collector-traced, and
-     * its cursor is a UTF-16 code-unit index because the fallback has no
-     * Unicode flag.
+     * RegExp String Iterator state (22.2.9.1). The iterating RegExp object
+     * and the iterated String are collector-traced. The cursor itself lives
+     * in the RegExp object's own `lastIndex`, so the record holds only the
+     * [[Global]] and [[Unicode]] decisions CreateRegExpStringIterator froze
+     * and the [[Done]] flag.
      */
     bool regexp_string_iterator;
+    OseoValue regexp_iterator_regexp;
     OseoValue regexp_iterator_subject;
-    OseoValue regexp_iterator_pattern;
-    size_t regexp_iterator_index;
+    bool regexp_iterator_global;
+    bool regexp_iterator_unicode;
     bool regexp_iterator_complete;
     /*
      * AsyncFromSyncIterator state. A `for await` head whose iterable has
@@ -1842,6 +1847,56 @@ OseoResult oseo_internal_string_protocol_dispatch(
 OseoResult oseo_internal_regexp_string_iterator_prototype(
     OseoContext *context
 );
+/*
+ * CreateRegExpStringIterator (22.2.9.1). The iterator freezes the
+ * `global` and `unicode` decisions its creator already read from
+ * `flags`, and every step afterwards reads and writes `lastIndex` on
+ * `regexp` itself.
+ */
+OseoResult oseo_internal_regexp_string_iterator_create(
+    OseoContext *context,
+    OseoValue regexp,
+    OseoValue subject,
+    bool global,
+    bool unicode
+);
+/*
+ * A growable UTF-16 buffer for a result the runtime assembles in pieces.
+ * The units are plain host memory rather than a heap value, so user code
+ * running between two appends may collect without invalidating the
+ * partial result. The owner zero-initializes it, releases it on every
+ * exit path, and an append validates the runtime's string ceiling before
+ * it grows.
+ */
+typedef struct {
+    uint16_t *units;
+    size_t length;
+    size_t capacity;
+} OseoStringBuilder;
+OseoResult oseo_internal_string_builder_append(
+    OseoContext *context,
+    OseoStringBuilder *builder,
+    const uint16_t *units,
+    size_t length
+);
+void oseo_internal_string_builder_release(OseoStringBuilder *builder);
+/*
+ * GetSubstitution (22.1.3.19.1), appended into `builder`. `captures` is
+ * either undefined or a private Array whose elements are the capture
+ * strings and undefined for a capture that did not participate, and
+ * `named_captures` is either undefined or the object `$<name>` reads.
+ * Substituted text is never rescanned.
+ */
+OseoResult oseo_internal_get_substitution(
+    OseoContext *context,
+    OseoStringBuilder *builder,
+    OseoValue matched,
+    OseoValue subject,
+    size_t position,
+    OseoValue captures,
+    OseoValue named_captures,
+    OseoValue replacement
+);
 /* Materializes %String% together with %String.prototype% and its
  * fromCharCode, fromCodePoint, and raw statics, and returns the
  * constructor. */
@@ -2172,6 +2227,52 @@ OseoResult oseo_internal_is_regexp(
     OseoContext *context,
     OseoValue value,
     bool *regexp
+);
+/*
+ * Implements the RegExp.prototype well-known symbol methods and the
+ * `RegExp.escape` static after the RegExp built-in dispatcher selects
+ * one of their code IDs.
+ */
+OseoResult oseo_internal_regexp_symbol_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+/*
+ * RegExpExec (22.2.7.1): an own or inherited callable `exec` is called
+ * with the receiver and its non-object, non-null result is a TypeError;
+ * otherwise built-in execution runs and a receiver without the internal
+ * slot is a TypeError.
+ */
+OseoResult oseo_internal_regexp_exec(
+    OseoContext *context,
+    OseoValue regexp,
+    OseoValue subject
+);
+/*
+ * RegExpCreate (22.2.4.1) over %RegExp.prototype%, which is what
+ * RegExpAlloc(%RegExp%) reaches because the constructor's `prototype`
+ * property is neither writable nor configurable.
+ */
+OseoResult oseo_internal_regexp_create(
+    OseoContext *context,
+    OseoValue pattern,
+    OseoValue flags
+);
+/*
+ * The iteration step @@match, @@replace, and the RegExp String iterator
+ * share once a global execution produced a match: an empty match advances
+ * `lastIndex` on the RegExp itself by one code unit, or by one code point
+ * when `unicode` is true, so the next execution cannot repeat it.
+ */
+OseoResult oseo_internal_regexp_iteration_step(
+    OseoContext *context,
+    OseoValue regexp,
+    OseoValue subject,
+    OseoValue match,
+    bool unicode
 );
 /*
  * Compile one already validated pattern into an owned matcher program,

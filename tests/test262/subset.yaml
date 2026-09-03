@@ -19,6 +19,7 @@ supportedFeatures:
   - Float16Array
   - Map
   - Object.is
+  - RegExp.escape
   - String.fromCodePoint
   - String.prototype.at
   - String.prototype.endsWith
@@ -66,6 +67,7 @@ supportedFeatures:
   - promise-with-resolvers
   - regexp-dotall
   - regexp-match-indices
+  - regexp-named-groups
   - regexp-unicode-property-escapes
   - resizable-arraybuffer
   - rest-parameters
@@ -25754,7 +25756,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/S15.10.2.8_A3_T18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/S15.10.2.8_A3_T19.js
     expectedClassification: pass
@@ -26078,10 +26080,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/character-class-escape-non-whitespace-u180e.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/character-class-escape-non-whitespace.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/duplicate-flags.js
     expectedClassification: pass
@@ -26155,6 +26157,63 @@ tests:
   - path: test/built-ins/RegExp/early-err-modifiers-should-not-unicode-case-fold-s.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
+  - path: test/built-ins/RegExp/escape/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-control-characters.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-lineterminator.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-solidus-character-mixed.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-solidus-character-simple.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-surrogates.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-syntax-characters-mixed.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-syntax-characters-simple.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-utf16encodecodepoint.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-whitespace.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/initial-char-escape.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/is-function.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/escape/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/escape/non-string-inputs.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/escape/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/escape/not-escaped-underscore.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/not-escaped.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/escape/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
   - path: test/built-ins/RegExp/from-regexp-like-flag-override.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -26180,7 +26239,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/lookahead-quantifier-match-groups.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/nullable-quantifier.js
     expectedClassification: pass
@@ -28057,6 +28116,654 @@ tests:
   - path: test/built-ins/RegExp/prototype/S15.10.6_A1_T2.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-coerce-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-g-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-g-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-y-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-y-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-failure-y-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-infer-unicode.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-g-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-g-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-return-val-groups.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-u-return-val-groups.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-y-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-success-y-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/builtin-y-coerce-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/coerce-arg-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/coerce-arg.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/coerce-global.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/exec-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/exec-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/exec-return-type-invalid.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/exec-return-type-valid.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/flags-tostring-error.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-coerce-result-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-get-exec-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-get-result-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-init-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-init-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-match-empty-advance-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-match-empty-coerce-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-match-empty-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-match-no-coerce-lastindex.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-match-no-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-success-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/g-zero-matches.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/get-exec-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/get-flags-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/get-global-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/get-unicode-error.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/this-val-non-regexp.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/u-advance-after-empty.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-fail-global-return.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-fail-lastindex-no-write.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-fail-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-fail-return.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-init-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.match/y-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/isregexp-called-once.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/isregexp-this-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/regexpcreate-this-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-get-constructor-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-get-species-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-is-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-is-undefined.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-species-is-not-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-species-is-null-or-undefined.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor-species-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-regexp-get-global-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/species-regexp-get-unicode-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/string-tostring-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/string-tostring.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-get-flags-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-get-flags.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-lastindex-cached.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-tolength-lastindex-throws.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-tostring-flags-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.matchAll/this-tostring-flags.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/arg-1-coerce-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/arg-1-coerce.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/arg-2-coerce-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/arg-2-coerce.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-lastindex.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-unicode.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/exec-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/exec-invocation.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/flags-tostring-error.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-coerce-replacement-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-coerce-replacement.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-invoke-args-empty-result.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-invoke-args.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-invoke-this-no-strict.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/fn-invoke-this-strict.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/g-init-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/g-init-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/g-pos-decrement.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/g-pos-increment.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/get-exec-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/get-flags-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/get-global-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/get-unicode-error.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/match-failure.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/named-groups-fn.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/named-groups.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/poisoned-stdlib.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/replace-with-trailing.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/replace-without-trailing.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-capture-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-capture.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-groups-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-groups-prop-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-groups-prop.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-groups.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-index-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-index-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-index.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-length-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-length.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-matched-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-matched-global.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-coerce-matched.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-capture-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-groups-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-groups-prop-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-index-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-length-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/result-get-matched-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-after.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-before.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-capture-idx-1.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-capture-idx-2.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-dollar.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/subst-matched.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/u-advance-after-empty.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-fail-global-return.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-fail-lastindex-no-write.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-fail-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-fail-return.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-init-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.replace/y-set-lastindex.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/coerce-string-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/coerce-string.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/cstm-exec-return-index.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/cstm-exec-return-invalid.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/failure-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/get-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/lastindex-no-restore.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/match-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-init-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-init-samevalue.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-init.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-restore-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-restore-samevalue.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/set-lastindex-restore.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/success-get-index-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/success-return-val.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/u-lastindex-advance.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.search/y-fail-return.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-flags-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-flags.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-limit-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-limit.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-string-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/coerce-string.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/get-flags-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/last-index-exceeds-str-size.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/limit-0-bail.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-ctor-get-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-ctor-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-ctor-undef.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-get-err.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-non-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-undef.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-y.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/splitter-proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-adv-thru-empty-match.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-coerce-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-coerce-lastindex.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-empty-match-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-empty-match.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-empty-no-match.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-get-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-limit-capturing.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-limit.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-match-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-result-coerce-length-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-result-coerce-length.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-result-get-capture-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-result-get-length-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-set-lastindex-err.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-set-lastindex-match.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-set-lastindex-no-match.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/str-trailing-chars.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [functions, regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/u-lastindex-adv-thru-failure.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/prototype/Symbol.split/u-lastindex-adv-thru-match.js
+    expectedClassification: pass
+    dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/prototype/dotAll/cross-realm.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
@@ -29015,7 +29722,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/u180e.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/unicode_character_class_backspace_escape.js
     expectedClassification: pass
@@ -29062,6 +29769,57 @@ tests:
   - path: test/built-ins/RegExp/valid-flags-y.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/RegExpStringIteratorPrototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/ancestry.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-call-throws.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-get-throws.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-match-get-0-throws.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-match-get-0-tostring-throws.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-match-get-0-tostring.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec-not-callable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/custom-regexpexec.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/next-iteration-global.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/next-iteration.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/next-missing-internal-slots.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/prop-desc.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/regexp-tolength-lastindex-throws.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/RegExpStringIteratorPrototype/next/this-is-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, regular-expressions]
   - path: test/built-ins/String/15.5.5.5.2-1-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -30170,7 +30928,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T3.js
     expectedClassification: unsupported-profile-feature
@@ -30197,55 +30955,55 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T13.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T17.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T4.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T6.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A2_T9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/S15.5.4.10_A6.js
     expectedClassification: pass
@@ -30287,7 +31045,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/invoke-builtin-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/length.js
     expectedClassification: pass
@@ -30347,7 +31105,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-is-undefined-or-null-invokes-matchAll.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-is-undefined.js
     expectedClassification: pass
@@ -30356,7 +31114,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-is-undefined-or-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-matchAll-not-callable.js
     expectedClassification: pass
@@ -30368,7 +31126,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-invocation.js
     expectedClassification: pass
@@ -30383,7 +31141,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/matchAll/toString-this-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/String/prototype/normalize/form-is-not-valid-throws.js
     expectedClassification: pass
@@ -30428,10 +31186,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/replace/15.5.4.11-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T1.js
     expectedClassification: unsupported-profile-feature
@@ -30449,16 +31207,16 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T15.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T17.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T2.js
     expectedClassification: unsupported-profile-feature
@@ -30476,64 +31234,64 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T9.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T4.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T6.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T7.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A2_T9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A3_T3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A4_T4.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A5_T1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/S15.5.4.11_A6.js
     expectedClassification: pass
@@ -30572,7 +31330,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/regexp-capture-by-index.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/regexp-prototype-replace-v-u-flag.js
     expectedClassification: unsupported-profile-feature
@@ -30689,10 +31447,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-RegExp-call.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replaceAll/searchValue-replacer-before-tostring.js
     expectedClassification: pass
@@ -30752,7 +31510,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A1_T2.js
     expectedClassification: unsupported-profile-feature
@@ -30782,13 +31540,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T4.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A2_T6.js
     expectedClassification: pass
@@ -30797,10 +31555,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A3_T1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A3_T2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/S15.5.4.12_A6.js
     expectedClassification: pass
@@ -30836,10 +31594,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/invoke-builtin-search-searcher-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/invoke-builtin-search.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/name.js
     expectedClassification: pass
@@ -30971,34 +31729,34 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/split/argument-is-new-reg-exp-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-null-and-instance-is-function-call-that-returned-string.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-reg-exp-a-z-and-instance-is-string-abc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-a-z-and-instance-is-string-abc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-and-instance-is-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-d-and-instance-is-string-dfe23iu-34-65.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-l-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-reg-exp-d-and-instance-is-string-dfe23iu-34-65.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-s-and-instance-is-string-a-b-c-de-f.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-regexp-x-and-instance-is-string-a-b-c-de-f.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/argument-is-undefined-and-instance-is-string.js
     expectedClassification: pass
@@ -31013,55 +31771,55 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-0-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-1-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-2-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-3-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-4-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-hi-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-undefined-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-new-reg-exp-and-void-0-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-0-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-1-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-2-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-3-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-4-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-hi-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-undefined-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-l-and-void-0-and-instance-is-string-hello.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/arguments-are-regexp-s-and-3-and-instance-is-string-a-b-c-de-f.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-1-0-instance-is-number.js
     expectedClassification: pass
@@ -31091,7 +31849,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-2-instance-is-string-one-two-three-four-five.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-4-instance-is-string-one-1-two-2-four-4.js
     expectedClassification: pass
@@ -31145,7 +31903,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-new-reg-exp.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/call-split-null-instance-is-thisnullisnullanullstringnullobject.js
     expectedClassification: pass
@@ -31292,7 +32050,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-regexp-comma-instance-is-string-one-1-two-2-four-4.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-regexp-limit-string-via-eval.js
     expectedClassification: unsupported-profile-feature

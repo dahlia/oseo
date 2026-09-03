@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-three reviewed assets in this order:
+The runtime input now lists thirty-four reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -30,14 +30,16 @@ The runtime input now lists thirty-three reviewed assets in this order:
 *runtime\_primitive.c*, *runtime\_promise.c*,
 *runtime\_event\_loop.c*, *runtime\_map.c*,
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
-*runtime\_regexp.c*, *runtime\_regexp\_matcher.c*, and
+*runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
+*runtime\_regexp\_symbol.c*, and
 *runtime\_math.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
-RegExp-prototype-and-exec, and Math-namespace units each
+RegExp-prototype-and-exec, Math-namespace, and
+RegExp-symbol-methods units each
 added one
 component the same
 way. The M5b
@@ -78,10 +80,12 @@ Ownership follows the plan's target layout:
     view of the pinned Unicode data;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`,
     `matchAll`, `search`, `split`, `replace`, and `replaceAll`
-    well-known-symbol dispatch and their String fallback algorithms,
-    including the admitted fixed-width regular expression atoms, the
-    dedicated RegExp String iterator, and the GetSubstitution replacement
-    template both replacement methods share;
+    well-known-symbol dispatch, the RegExpCreate and Invoke tail that
+    `match`, `matchAll`, and `search` take when the operand carries no
+    method, the code-unit fallbacks the specification gives `split`,
+    `replace`, and `replaceAll`, the RegExp String iterator record and its
+    prototype, and the GetSubstitution replacement template every
+    replacement path shares;
  -  *runtime\_object.c*: ordinary object creation and layout, the
     property vector and its growth, own-property lookup and removal,
     cell-backed property recognition, shape identifiers and the
@@ -120,9 +124,8 @@ Ownership follows the plan's target layout:
     and flag validation, immutable matcher artifact, `Symbol.species`,
     built-in execution and its match result object, `exec`, `test`,
     `toString`, the `source` and `flags` accessors, the eight individual
-    flag accessors, the ahead-of-time literal entry point with the
-    realm-local artifact cache its descriptors key, and the explicit
-    symbol-method boundary;
+    flag accessors, and the ahead-of-time literal entry point with the
+    realm-local artifact cache its descriptors key;
  -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the
     pattern compiler that lowers one validated pattern into an owned
     instruction program over a register file and the executor that runs
@@ -132,6 +135,15 @@ Ownership follows the plan's target layout:
     empty-progress failure, UTF-16 and code-point traversal, ignore-case
     closure, and the reviewed instruction, register, step, backtrack, and
     trail boundaries;
+ -  *runtime\_regexp\_symbol.c*: the five `RegExp.prototype`
+    well-known symbol methods of 22.2.6 and the `RegExp.escape` static of
+    22.2.5, meaning their receiver requirement, their `flags`,
+    `lastIndex`, `constructor`, and `Symbol.species` reads, the
+    `SpeciesConstructor` and `Construct` steps `@@matchAll` and `@@split`
+    take, `AdvanceStringIndex`, the replacement list `@@replace` collects
+    before it builds, and `EncodeForRegExpEscape`. It executes only
+    through `RegExpExec`, so an overridden `exec` is observed, and it owns
+    no pattern grammar, matcher, or String entry point of its own;
  -  *runtime\_math.c*: the `Math` namespace object, its eight value
     properties, its `Symbol.toStringTag`, the thirty-six function
     properties of 21.3.2, and the realm's `Math.random` draw, whose
@@ -406,6 +418,14 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_validate_string_length`              | *runtime\_string.c*           |
 | `oseo_internal_string_protocol_dispatch`            | *runtime\_string\_match.c*    |
 | `oseo_internal_regexp_string_iterator_prototype`    | *runtime\_string\_match.c*    |
+| `oseo_internal_regexp_string_iterator_create`       | *runtime\_string\_match.c*    |
+| `oseo_internal_get_substitution`                    | *runtime\_string\_match.c*    |
+| `oseo_internal_string_builder_append`               | *runtime\_string.c*           |
+| `oseo_internal_string_builder_release`              | *runtime\_string.c*           |
+| `oseo_internal_regexp_symbol_dispatch`              | *runtime\_regexp\_symbol.c*   |
+| `oseo_internal_regexp_iteration_step`               | *runtime\_regexp\_symbol.c*   |
+| `oseo_internal_regexp_exec`                         | *runtime\_regexp.c*           |
+| `oseo_internal_regexp_create`                       | *runtime\_regexp.c*           |
 | `oseo_internal_array_join_element_string`           | *runtime\_primitive.c*        |
 | `oseo_internal_map_builtin_dispatch`                | *runtime\_map.c*              |
 | `oseo_internal_map_prototype`                       | *runtime\_map.c*              |
@@ -887,6 +907,37 @@ specialization policies, false hints, deliberate guard hits and misses,
 generic fallback, and collection at every safepoint. The node adds no
 generated-code entry point, allocates four code IDs inside the existing Array
 range, and moves `abiVersion` to `m5-85`.
+
+### RegExp symbol method evidence
+
+M5b node `regexp-symbol-methods` adds *runtime\_regexp\_symbol.c*, which
+owns the five `RegExp.prototype` well-known symbol methods and the
+`RegExp.escape` static. The component executes only through
+`oseo_internal_regexp_exec`, so every method observes an overridden `exec`,
+and it reads `flags`, `lastIndex`, `constructor`, `Symbol.species`, `index`,
+`groups`, `length`, and the numbered capture properties through ordinary
+property access.
+
+*runtime\_regexp.c* keeps the pattern grammar, the artifact, and built-in
+execution, and gains only `RegExpCreate` and the exported `RegExpExec` the new
+component and the String component call. *runtime\_string\_match.c* retires
+its String-only pattern approximation: `match`, `matchAll`, and `search` now
+perform RegExpCreate and Invoke when GetMethod finds no method on their
+operand, and its RegExp String iterator record holds the iterating RegExp with
+the frozen `global` and `unicode` decisions rather than a fallback cursor. Its
+GetSubstitution operation gains the capture and named-capture arguments the
+earlier String node reserved for this one, and the growable UTF-16 accumulator
+both replacement paths use is now the one *runtime\_string.c* already owned.
+
+The five deferred code IDs become real ones and the range gains a
+twenty-first for `escape`, so no other component renumbers. Fixed and
+generated native differential evidence covers descriptors, generic receivers,
+species construction, sticky and unicode traversal, every GetSubstitution
+reference form, functional replacers with their named-capture object, the
+complete iterator protocol, `EncodeForRegExpEscape` over every escaping class,
+both specialization policies, false hints, deliberate shape-guard misses, and
+collection at every safepoint. The node adds no generated-code entry point and
+moves `abiVersion` to `m5-87`.
 
 ### Function prototype evidence
 
