@@ -324,17 +324,25 @@ mise run check
 mise run test
 ~~~~
 
+The `mise run test` gate already runs `test:node`, `test:deno`, `test:native`,
+and `test:test262`, so it covers the native fixtures, the cross-target links,
+and the complete reviewed test262 corpus. `test:node` runs `node --test` at
+the repository root, which also discovers every *.property.test.ts* file, so
+the ordinary property suites run inside it as well. Naming `test:native`,
+`test:test262`, or `test:property:native` again after it repeats work that
+takes over an hour and proves nothing new.
+
 Also run any focused test task shown by `mise tasks` for the packages you
 changed. Do not commit generated binaries, temporary C output, or debug dumps
 unless they are reviewed fixtures with a documented purpose.
 
 Changes to targets, host adapters, C lowering, the runtime, collector,
-specialization, or native generators run `mise run test:native`,
-`mise run test:property:native`, and `mise run test:test262` in addition to the
-ordinary gates. They also run `mise run test:property:extended` before
-submission. The native and standards tasks execute the matching host target
-and retain the AArch64 Linux cross-link; do not replace a required execution
-with a blanket skip.
+specialization, or native generators also run `mise run test:property:extended`
+before submission. That is the one task the ordinary gate does not contain: it
+runs the same property files at ten times the case budget. The native and
+standards tasks inside the ordinary gate execute the matching host target and
+retain the AArch64 Linux cross-link; do not replace a required execution with a
+blanket skip.
 
 CI partitions the native and test262 suites with `--shard INDEX/TOTAL`, for
 example `mise run test:native --shard 1/3` or
