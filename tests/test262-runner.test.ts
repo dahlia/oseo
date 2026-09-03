@@ -475,10 +475,10 @@ for (const deterministicFailure of [
         join(directory, path),
         "/*---\nflags: [noStrict]\n---*/\n",
       );
-      let calls = 0;
+      const attempts: string[] = [];
       const executor: Test262Executor = {
-        execute(): Promise<CliResult> {
-          calls += 1;
+        execute(request: Test262ExecutionRequest): Promise<CliResult> {
+          attempts.push(request.specialization);
           return Promise.resolve({
             exitStatus: 1,
             stderr: `${path}:1:1: error[OSEO3001]: ${deterministicFailure}\n`,
@@ -501,12 +501,251 @@ for (const deterministicFailure of [
           return true;
         },
       );
-      assert.equal(calls, 1);
+      // Variant-level scheduling runs each planned variant once. A
+      // deterministic failure adds no attempt beyond that, so the
+      // specializations appear exactly once each and in launch order.
+      assert.deepEqual(attempts, ["disabled", "enabled"]);
     } finally {
       await rm(directory, { force: true, recursive: true });
     }
   });
 }
+
+test("schedules one path's variants as concurrent work items", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-variant-"));
+  const paths = ["a.js", "b.js", "c.js"];
+  let active = 0;
+  let maximumActive = 0;
+  const executing = new Set<string>();
+  let concurrentSources: string[] = [];
+  let releaseAll: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => {
+    releaseAll = resolve;
+  });
+  let markSaturated: (() => void) | undefined;
+  const saturated = new Promise<void>((resolve) => {
+    markSaturated = resolve;
+  });
+  try {
+    await Promise.all(
+      paths.map(async (path) => {
+        await writeFile(join(directory, path), "/*---\n---*/\n");
+      }),
+    );
+    const executor: Test262Executor = {
+      async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+        active += 1;
+        executing.add(request.sourceId);
+        maximumActive = Math.max(maximumActive, active);
+        if (active === 4) {
+          concurrentSources = [...executing];
+          markSaturated?.();
+        }
+        try {
+          // Each admitted variant blocks until the gate is saturated,
+          // which only happens when one path's variants are separate
+          // work items rather than steps of one path-sized item.
+          await held;
+          return successfulResult();
+        } finally {
+          executing.delete(request.sourceId);
+          active -= 1;
+        }
+      },
+    };
+    const runPromise = createReviewedManifest(
+      reviewedSubset(paths),
+      directory,
+      harnesses,
+      executor,
+      { poolLimit: 4 },
+    );
+    await saturated;
+    releaseAll?.();
+    const run = await runPromise;
+    assert.equal(maximumActive, 4);
+    assert.equal(active, 0);
+    // The gate admits one path's four variants together, so the four
+    // concurrent executions all belong to the same reviewed path.
+    assert.equal(concurrentSources.length, 1);
+    assert.ok(paths.includes(concurrentSources[0] ?? ""));
+    assert.equal(run.metadata.poolLimit, 4);
+    assert.deepEqual(
+      run.manifest.results.map((result) => result.case.path),
+      paths,
+    );
+    assert.deepEqual(run.manifest.results[0]?.execution?.variants, [
+      { specialization: "disabled", strictness: "non-strict" },
+      { specialization: "enabled", strictness: "non-strict" },
+      { specialization: "disabled", strictness: "strict" },
+      { specialization: "enabled", strictness: "strict" },
+    ]);
+  } finally {
+    releaseAll?.();
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("clamps the reviewed pool against variant work items", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-clamp-"));
+  const path = "clamp.js";
+  let active = 0;
+  let maximumActive = 0;
+  try {
+    await writeFile(join(directory, path), "/*---\n---*/\n");
+    const executor: Test262Executor = {
+      async execute(): Promise<CliResult> {
+        active += 1;
+        maximumActive = Math.max(maximumActive, active);
+        try {
+          await Promise.resolve();
+          await Promise.resolve();
+          return successfulResult();
+        } finally {
+          active -= 1;
+        }
+      },
+    };
+    // One reviewed path contributes four variant work items, so a limit
+    // of three stays three rather than collapsing to the path count.
+    const run = await createReviewedManifest(
+      reviewedSubset([path]),
+      directory,
+      harnesses,
+      executor,
+      { poolLimit: 3 },
+    );
+    assert.equal(run.metadata.poolLimit, 3);
+    assert.equal(maximumActive, 3);
+    assert.equal(active, 0);
+    assert.equal(run.manifest.results[0]?.classification, "pass");
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("aggregates variants in specification order, not completion", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const completed: string[] = [];
+  const ticks = new Map<string, number>([
+    ["non-strict disabled", 3],
+    ["non-strict enabled", 1],
+    ["strict disabled", 2],
+    ["strict enabled", 0],
+  ]);
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const strictness = request.source.startsWith('"use strict";')
+        ? "strict"
+        : "non-strict";
+      const label = `${strictness} ${request.specialization}`;
+      for (let step = 0; step < (ticks.get(label) ?? 0); step += 1) {
+        // eslint-disable-next-line no-await-in-loop -- Ordered ticks.
+        await Promise.resolve();
+      }
+      completed.push(label);
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  // The four observations settle in a deliberately reversed order and
+  // the recorded variant list stays in specification order.
+  assert.deepEqual(completed, [
+    "strict enabled",
+    "non-strict enabled",
+    "strict disabled",
+    "non-strict disabled",
+  ]);
+  assert.equal(result.classification, "pass");
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+    { specialization: "enabled", strictness: "non-strict" },
+    { specialization: "disabled", strictness: "strict" },
+    { specialization: "enabled", strictness: "strict" },
+  ]);
+});
+
+test("records only the variant prefix an early decision reached", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  let launched = 0;
+  let settled = 0;
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      launched += 1;
+      await Promise.resolve();
+      settled += 1;
+      if (request.specialization === "disabled") {
+        return {
+          exitStatus: 1,
+          stderr:
+            "test/example.js:1:1: error[OSEO2001]: " +
+            "RegExp prototype execution is not admitted yet.\n",
+          stdout: "",
+        };
+      }
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(
+    result.observation.unsupportedCapability,
+    "regexp-prototype-execution",
+  );
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
+  // Every launched variant settles before the case returns, so no
+  // execution outlives the case that started it.
+  assert.equal(launched, 4);
+  assert.equal(settled, 4);
+});
+
+test("classifies an executor rejection as infrastructure", async () => {
+  const source = "/*---\nflags: [noStrict]\n---*/\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  let settled = 0;
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      await Promise.resolve();
+      settled += 1;
+      if (request.specialization === "disabled") {
+        throw new Error("the executor could not start");
+      }
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  assert.equal(result.classification, "infrastructure-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /the executor could not start/u,
+  );
+  assert.equal(settled, 2);
+});
 
 test("separates infrastructure failures from harness defects", async () => {
   const infrastructureSource = "/*---\nflags: [noStrict]\n---*/\n";

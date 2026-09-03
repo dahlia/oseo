@@ -232,8 +232,13 @@ test task ran at the same time.
 | Deno                      | 2.9.2                                  |
 
 The worker bound is eight, one for each physical core. A host with less
-available parallelism uses and reports that lower effective bound. The measured
-reused footprint makes the resource comparison explicit:
+available parallelism uses and reports that lower effective bound. The bound
+counts concurrent native executions rather than reviewed paths: the pool
+schedules one work item for each strictness and specialization variant, so one
+path's variants can hold several slots at once and a single long path no longer
+serializes four executions behind one worker. A subset with fewer paths than
+the configured bound clamps against that work-item count instead of the path
+count. The measured reused footprint makes the resource comparison explicit:
 
 | Resource          | Per execution | Eight-worker aggregate | Constrained successful capacity |
 | ----------------- | ------------- | ---------------------- | ------------------------------- |
