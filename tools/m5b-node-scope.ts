@@ -223,6 +223,11 @@ export function checkM5bNodeScope(inputs: M5bNodeScopeInputs): void {
 }
 
 function main(): void {
+  // Read the node name before anything else. Without one the check enforces
+  // nothing, so resolving a baseline first would let a checkout that cannot
+  // produce one fail a gate that had no work to do.
+  const nodeId = process.env.OSEO_M5B_NODE;
+  if (nodeId == null || nodeId.length === 0) return;
   const intent = selectCurrentBaselineIntent();
   if (intent.kind === "skip") return;
   const revision = resolveCompatibilityBaseline(intent);
@@ -243,7 +248,7 @@ function main(): void {
       "utf8",
     ),
     includedPaths,
-    nodeId: process.env.OSEO_M5B_NODE,
+    nodeId,
     nodes: readCurrentWorkGraphNodes(),
   });
 }
