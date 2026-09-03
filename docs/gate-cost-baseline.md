@@ -12,6 +12,14 @@ Every number below was observed on one host. A later comparison run records
 its own host facts instead of reusing these. Observed values and derived
 values are separated; a derived value names the observation it divides.
 
+Every wall-clock number here is bounded by the reviewed corpus at the baseline
+commit, which held 681 paths. That corpus now holds 15,515, more than twenty-two
+times as many, so these timings no longer describe what a gate costs today and
+must not be read as an expectation. They remain valid as a record of the
+baseline the throughput work measured against, and the ratios between tasks in
+one table are still comparable with each other. Anyone who needs a current cost
+measures it again and records the corpus size alongside it.
+
 
 Measurement host
 ----------------
