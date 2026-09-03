@@ -45,6 +45,7 @@ depends = [
   "check:lines",
   "check:lint",
   "check:m5b-graph",
+  "check:m5b-node-scope",
   "check:native-host-guards",
   "check:packages",
   "check:types",
@@ -97,6 +98,10 @@ run = "aube exec -- oxlint ."
 [tasks."check:m5b-graph"]
 description = "Validate the checked-in M5b work graph"
 run = "node tools/m5b-graph.ts"
+
+[tasks."check:m5b-node-scope"]
+description = "Keep reviewed evidence within the named M5b node scope"
+run = "node tools/m5b-node-scope.ts"
 
 [tasks."check:native-host-guards"]
 description = "Require unsupported-host skips for native property tests"

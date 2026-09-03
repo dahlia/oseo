@@ -13,6 +13,7 @@ import {
   compareCompatibility,
   createCompatibilitySnapshot,
   createGitCompatibilitySnapshot,
+  createReviewedEvidenceSnapshot,
   selectBaselineIntent,
   selectCurrentPropertyPaths,
   selectGitResultPartitionPaths,
@@ -27,9 +28,15 @@ import { serializeTest262Manifest } from "../tools/test262-manifest.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
-function subset(paths: readonly string[]): string {
+function subset(
+  paths: readonly string[],
+  classifications: ReadonlyMap<string, string> = new Map(),
+): string {
   return JSON.stringify({
-    tests: paths.map((path) => ({ path })),
+    tests: paths.map((path) => ({
+      expectedClassification: classifications.get(path) ?? "pass",
+      path,
+    })),
   });
 }
 
@@ -148,7 +155,7 @@ function snapshot(
   families: readonly string[] = [],
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshot(
-    subset(subsetPaths),
+    subset(subsetPaths, new Map(resultEntries)),
     results(resultEntries),
     properties,
     families,
@@ -263,6 +270,23 @@ test("accepts a legacy result manifest only for a Git snapshot", () => {
   assert.equal(
     gitSnapshot.classifications.get("test/language/statements/a.js"),
     "pass",
+  );
+});
+
+test("retains a legacy reviewed expectation for a Git baseline", () => {
+  const evidence = createReviewedEvidenceSnapshot(
+    JSON.stringify({
+      tests: [
+        {
+          expectedClassification: "expected-parse-failure",
+          path: "test/language/statements/a.js",
+        },
+      ],
+    }),
+  );
+  assert.equal(
+    evidence.expectedClassifications.get("test/language/statements/a.js"),
+    "expected-parse-failure",
   );
 });
 

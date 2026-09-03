@@ -253,6 +253,8 @@ crosses a boundary. Depending on the work, this may include:
  -  structural checks of generated IR or C when code shape is part of the
     contract;
  -  applicable ECMA-262, test262, or WinterTC conformance tests.
+ -  `mise run check:m5b-node-scope` for directional reviewed-evidence changes
+    made by an explicitly named M5b node.
 
 Every admitted M5 semantic family has one normative record indexed by
 *docs/language-profile-m5/index/*. The record assesses the fixed vocabulary in
