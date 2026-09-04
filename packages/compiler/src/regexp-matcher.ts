@@ -1016,21 +1016,83 @@ function emitClassAlternatives(
   placeLabel(builder, end);
 }
 
+/**
+ * One pending step of the iterative class-string trie emission.
+ *
+ * A trie is as deep as its longest string, so emitting it through host
+ * recursion would spend one frame per code point and exhaust the stack on a
+ * `\q{...}` alternative that the reviewed source and instruction limits both
+ * admit. These steps carry that work on the heap instead, and the emitter
+ * pops them in the order the equivalent recursion ran, so one pattern still
+ * compiles to exactly the same instructions and labels.
+ */
+type ClassStringStep =
+  | {
+      readonly end: number;
+      readonly entries: readonly (readonly [number, ClassStringTrie])[];
+      readonly index: number;
+      readonly kind: "branch";
+      readonly terminal: boolean;
+    }
+  | { readonly character: number; readonly kind: "consume" }
+  | {
+      readonly jump: number | undefined;
+      readonly kind: "finish";
+      readonly label: number;
+    }
+  | { readonly kind: "node"; readonly node: ClassStringTrie };
+
 function emitClassStringTrie(
   builder: Builder,
-  node: ClassStringTrie,
+  root: ClassStringTrie,
   backward: boolean,
   span: RegExpSpan,
 ): void {
-  const branches: (() => void)[] = [...node.children].map(
-    ([character, child]) =>
-      () => {
-        emitClassValueBranch(builder, [character], false, backward, span);
-        emitClassStringTrie(builder, child, backward, span);
-      },
-  );
-  if (node.terminal) branches.push(() => undefined);
-  emitClassAlternatives(builder, branches, span);
+  const steps: ClassStringStep[] = [{ kind: "node", node: root }];
+  for (;;) {
+    const step = steps.pop();
+    if (step == null) return;
+    if (step.kind === "consume") {
+      emitClassValueBranch(builder, [step.character], false, backward, span);
+      continue;
+    }
+    if (step.kind === "finish") {
+      if (step.jump != null) {
+        emit(builder, { kind: "jump", target: step.jump }, span);
+      }
+      placeLabel(builder, step.label);
+      continue;
+    }
+    if (step.kind === "node") {
+      const entries = [...step.node.children];
+      const terminal = step.node.terminal;
+      if (entries.length === 0 && !terminal) continue;
+      steps.push({
+        end: newLabel(builder),
+        entries,
+        index: 0,
+        kind: "branch",
+        terminal,
+      });
+      continue;
+    }
+    const { end, entries, index, terminal } = step;
+    if (index + 1 === entries.length + (terminal ? 1 : 0)) {
+      steps.push({ jump: undefined, kind: "finish", label: end });
+    } else {
+      const preferred = newLabel(builder);
+      const next = newLabel(builder);
+      emit(builder, { alternative: next, kind: "fork", preferred }, span);
+      placeLabel(builder, preferred);
+      steps.push({ ...step, index: index + 1 });
+      steps.push({ jump: end, kind: "finish", label: next });
+    }
+    const entry = entries[index];
+    if (entry != null) {
+      steps.push({ kind: "node", node: entry[1] });
+      steps.push({ character: entry[0], kind: "consume" });
+    }
+  }
 }
 
 function buildClassValue(

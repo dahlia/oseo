@@ -716,3 +716,46 @@ test("agrees with the host engine over a reviewed ASCII corpus", () => {
   }
   assert.ok(compared > 500, `only ${compared} comparisons ran`);
 });
+
+/*
+ * A class string lowers to a shared-prefix trie, and the trie is as deep as
+ * the longest alternative, so emitting it through host recursion spent one
+ * frame per code point. The reviewed source and instruction limits both
+ * admit a twenty-thousand-character alternative, so that pattern reached the
+ * host stack rather than any owned boundary. Emission carries its own work
+ * list now, which this pins at a depth the recursion could not survive.
+ */
+test("emits a deep class string without host recursion", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  const length = 20_000;
+  const alternative = "a".repeat(length);
+  const parsed = parseRegExpPattern({
+    extensions,
+    flags: "v",
+    source: `^[\\q{${alternative}}]$`,
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const result = buildRegExpMatcher(pattern, {
+    unicodeData: asciiUnicodeData,
+  });
+  assert.deepEqual(result.errors, []);
+  const program = result.program;
+  if (program == null) throw new Error("a built artifact is present");
+  assert.equal(program.instructions.length, length + 6);
+  const matched = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: alternative,
+  });
+  assert.equal(matched.outcome, "matched");
+  const missed = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: `${alternative}a`,
+  });
+  assert.equal(missed.outcome, "unmatched");
+});

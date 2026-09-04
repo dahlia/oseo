@@ -928,8 +928,24 @@ function classSetOperandMayContainStrings(
   return first != null && classSetOperandMayContainStrings(first);
 }
 
+/**
+ * Parse one `v`-mode class set, charging the reviewed nesting budget.
+ *
+ * A nested class is an operand of its enclosing class, so this production
+ * recurses through `parseClassSetOperand` exactly as a group recurses
+ * through `parseDisjunction`. It shares the one `nestingDepth` budget so a
+ * pattern that nests either way, or both at once, reports the owned located
+ * `limit` error rather than exhausting the host stack.
+ */
 function parseUnicodeClassSet(state: ParseState): RegExpUnicodeClassSet {
   const start = state.index;
+  state.depth += 1;
+  if (state.depth > state.limits.nestingDepth) {
+    fail("limit", "A pattern nests above the reviewed depth limit.", {
+      end: state.index,
+      start,
+    });
+  }
   state.index += 1;
   const negated = eat(state, "^");
   const operands: RegExpClassSetOperand[] = [];
@@ -1003,6 +1019,7 @@ function parseUnicodeClassSet(state: ParseState): RegExpUnicodeClassSet {
       classSet.span,
     );
   }
+  state.depth -= 1;
   return classSet;
 }
 

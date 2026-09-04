@@ -866,6 +866,28 @@ test("reports an owned limit rather than exhausting a host", () => {
     assert.equal(error.kind, "limit", source);
     assert.equal(error.message, message, source);
   }
+  /*
+   * A nested class set recurses through the same operand production a group
+   * recurses through, so it charges the one nesting budget too, whether it
+   * nests alone or inside a group.
+   */
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  for (const source of ["[[[a]]]", "(?:[[a]])"]) {
+    const error = rejected(source, "v", { extensions, limits });
+    assert.equal(error.kind, "limit", source);
+    assert.equal(
+      error.message,
+      "A pattern nests above the reviewed depth limit.",
+      source,
+    );
+  }
+  assert.equal(
+    parseRegExpPattern({ extensions, flags: "v", limits, source: "[[a]]" })
+      .parsed,
+    true,
+  );
   assert.equal(
     parseRegExpPattern({ flags: "u", limits, source: "(a)(b)" }).parsed,
     true,
@@ -887,6 +909,30 @@ test("keeps the reviewed default limits within one pattern", () => {
     parseRegExpPattern({
       flags: "u",
       source: `${"(?:".repeat(200)}a${")".repeat(200)}`,
+    }).parsed,
+    true,
+  );
+  /*
+   * A nested `v` class set is the other production that recurses, and it
+   * charges the same budget. Both depths here are far below the source
+   * length limit, so without that accounting the deeper one reached the
+   * host stack instead of this located answer.
+   */
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  const deepClass = `${"[".repeat(20_000)}a${"]".repeat(20_000)}`;
+  const classError = rejected(deepClass, "v", { extensions });
+  assert.equal(classError.kind, "limit");
+  assert.equal(
+    classError.message,
+    "A pattern nests above the reviewed depth limit.",
+  );
+  assert.equal(
+    parseRegExpPattern({
+      extensions,
+      flags: "v",
+      source: `${"[".repeat(200)}a${"]".repeat(200)}`,
     }).parsed,
     true,
   );
