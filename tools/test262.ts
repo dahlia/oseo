@@ -935,6 +935,145 @@ async function moduleNegativeResult(
   );
 }
 
+/** One launched variant execution, settled without rejecting. */
+type SettledTest262Execution =
+  | { readonly observation: CliResult }
+  | { readonly error: unknown };
+
+/** One launched variant execution and the outcome it settled to. */
+interface AwaitedTest262Variant {
+  readonly settled: SettledTest262Execution;
+  readonly variant: Test262Variant;
+}
+
+/**
+ * One strictness mode's assembled source, or the assembly failure that
+ * mode hit. A failure keeps its position so the scan reports it exactly
+ * where a sequential scan reached it, and truncates the plan so no later
+ * mode contributes a variant the scan would not reach.
+ */
+type PlannedTest262Strictness =
+  | {
+      readonly input: string;
+      readonly kind: "assembled";
+      readonly strictness: Test262Strictness;
+    }
+  | {
+      readonly error: unknown;
+      readonly kind: "unassembled";
+      readonly strictness: Test262Strictness;
+    };
+
+/**
+ * Start one variant execution and settle both a rejected promise and a
+ * synchronous throw into a value, so the scan can await every outcome
+ * without an unhandled rejection.
+ */
+async function startTest262Execution(
+  executor: Test262Executor,
+  request: Test262ExecutionRequest,
+): Promise<SettledTest262Execution> {
+  try {
+    return { observation: await executor.execute(request) };
+  } catch (error) {
+    return { error };
+  }
+}
+
+/**
+ * Assemble each strictness mode's source without executing anything.
+ * The plan stops after a mode that cannot assemble, because that mode
+ * decides the result and no later mode is reached.
+ */
+function planTest262Variants(
+  source: string,
+  parsed: ParsedTest262Case,
+  testCase: Test262Case,
+  harnesses: Test262Harnesses,
+): readonly PlannedTest262Strictness[] {
+  const planned: PlannedTest262Strictness[] = [];
+  for (const strictnessMode of testCase.strictness) {
+    try {
+      planned.push({
+        input: assembleTest262Source(
+          source,
+          strictnessMode,
+          testCase,
+          harnesses,
+          parsed.flags.includes("raw"),
+        ),
+        kind: "assembled",
+        strictness: strictnessMode,
+      });
+    } catch (error) {
+      planned.push({
+        error,
+        kind: "unassembled",
+        strictness: strictnessMode,
+      });
+      break;
+    }
+  }
+  return planned;
+}
+
+/**
+ * Every variant the plan admits, in specification order. The first entry
+ * is the probe the scan runs alone; ADR 0013 requires every executed
+ * combination to be listed and compared, so the rest start only once the
+ * probe has shown that the case does not stop at its first variant.
+ */
+function plannedTest262Variants(
+  planned: readonly PlannedTest262Strictness[],
+): readonly { readonly input: string; readonly variant: Test262Variant }[] {
+  return planned.flatMap((plan) =>
+    plan.kind === "assembled"
+      ? (["disabled", "enabled"] as const).map((specialization) => ({
+          input: plan.input,
+          variant: { specialization, strictness: plan.strictness },
+        }))
+      : [],
+  );
+}
+
+/**
+ * Whether one variant's outcome decides the reviewed result by itself.
+ * The probe gate and the recorded scan share this predicate, so a
+ * variant never starts unless the scan will reach, record, and compare
+ * it, and the scan never records a variant the gate would have skipped.
+ */
+function test262VariantDecides(
+  settled: SettledTest262Execution,
+  expectRuntimeNegative: boolean,
+): boolean {
+  if ("error" in settled) return true;
+  const observation = settled.observation;
+  if (observation.exitStatus === 0) return expectRuntimeNegative;
+  // An unhandled throw is the expected observation for a runtime
+  // negative, so it leaves the result to the remaining variants.
+  const isJavaScriptThrow =
+    unhandledErrorType(observation.stderr) != null ||
+    observation.stderr.includes(untypedThrowMessage);
+  return !(
+    expectRuntimeNegative &&
+    !test262CompileStage(observation) &&
+    isJavaScriptThrow
+  );
+}
+
+/**
+ * Whether one observation is an owned compile-stage rejection. Such a
+ * variant ran no native program, so it contributes no execution
+ * evidence. Its outcome is still compared against the other variants,
+ * because one specialization compiling while another did not is itself
+ * a divergence.
+ */
+function test262CompileStage(observation: CliResult): boolean {
+  if (observation.exitStatus === 0) return false;
+  const code = diagnosticCode(observation.stderr);
+  return code === "OSEO1001" || code === "OSEO0001";
+}
+
 async function executedResult(
   source: string,
   parsed: ParsedTest262Case,
@@ -1045,133 +1184,160 @@ async function executedResult(
     readonly variant: Test262Variant;
   }
   const observations: VariantObservation[] = [];
-  for (const strictnessMode of testCase.strictness) {
-    let input: string;
-    try {
-      input = assembleTest262Source(
-        source,
-        strictnessMode,
-        testCase,
-        harnesses,
-        parsed.flags.includes("raw"),
-      );
-    } catch (error) {
+  const planned = planTest262Variants(source, parsed, testCase, harnesses);
+  const admitted = plannedTest262Variants(planned);
+  const unassembled = planned.find((plan) => plan.kind === "unassembled");
+  const request = (input: string, variant: Test262Variant) => ({
+    mode: testCase.mode,
+    source: input,
+    sourceId: testCase.path,
+    ...includePropertiesWhen(() => {
+      if (sourcePath == null) return undefined;
+      return {
+        sourcePath,
+      };
+    }),
+    specialization: variant.specialization,
+  });
+  /*
+   * ADR 0013 requires every executed combination to be listed and
+   * compared, so nothing starts that the scan would not record. The
+   * first variant runs alone because a case that stops at it records
+   * only that variant. Once it has shown that the case does not stop
+   * there, every remaining variant starts together and shares the
+   * reviewed execution gate, which is what keeps one long path from
+   * serializing its variants behind a single worker. Every one of those
+   * outcomes is then awaited, recorded, and compared, so a late
+   * rejection, a late divergence, and a late failure all still decide
+   * the result instead of being discarded.
+   */
+  const awaited: AwaitedTest262Variant[] = [];
+  const probe = admitted[0];
+  if (probe != null) {
+    const probed = await startTest262Execution(
+      executor,
+      request(probe.input, probe.variant),
+    );
+    awaited.push({ settled: probed, variant: probe.variant });
+    if (!test262VariantDecides(probed, expectRuntimeNegative)) {
+      const started = admitted.slice(1).map((entry) => ({
+        settled: startTest262Execution(
+          executor,
+          request(entry.input, entry.variant),
+        ),
+        variant: entry.variant,
+      }));
+      for (const entry of started) {
+        awaited.push({
+          settled: await entry.settled,
+          variant: entry.variant,
+        });
+      }
+    }
+  }
+  /*
+   * Every executed combination is collected before any outcome decides
+   * the result, so the evidence names the complete set the run
+   * compared. Evidence eligibility and comparison eligibility differ: a
+   * compile-stage rejection ran no native program, so it is absent from
+   * the execution evidence, but its outcome still takes part in the
+   * comparison below, because one specialization compiling while
+   * another did not is exactly the divergence this comparison exists to
+   * catch.
+   */
+  for (const entry of awaited) {
+    if ("error" in entry.settled) continue;
+    const observation = entry.settled.observation;
+    if (!test262CompileStage(observation)) variants.push(entry.variant);
+    observations.push({ observation, variant: entry.variant });
+  }
+  // A rejected execution can never be masked by another variant's
+  // outcome, so it settles the result before any classification that a
+  // later or earlier variant would otherwise produce.
+  const rejected = awaited.find((entry) => "error" in entry.settled);
+  if (rejected != null && "error" in rejected.settled) {
+    return classifyTest262(
+      testCase,
+      {
+        detail: errorMessage(rejected.settled.error),
+        failureKind: "infrastructure",
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
+  }
+  /*
+   * Classify the case from one variant's outcome. Both the
+   * infrastructure scan and the deciding scan below route through this,
+   * so an outcome that is reported early carries exactly the fields it
+   * would have carried when the scan reached it in order.
+   */
+  const classifyFrom = (
+    variant: Test262Variant,
+    observation: CliResult,
+  ): Test262Result => {
+    const strictnessMode = variant.strictness;
+    const specialization = variant.specialization;
+    if (observation.exitStatus === 0) {
+      // Only a runtime negative reaches this branch, because a clean
+      // exit decides nothing for any other case.
       return classifyTest262(
         testCase,
         {
-          detail: errorMessage(error),
-          failureKind: "harness",
+          detail:
+            `${testCase.path} ${strictnessMode} ${specialization} ` +
+            "completed without the expected runtime error.",
           passed: false,
         },
         supportedFeatures,
-        { dependencies },
+        evidence(),
       );
     }
-    for (const specialization of ["disabled", "enabled"] as const) {
-      const variant: Test262Variant = {
-        specialization,
-        strictness: strictnessMode,
-      };
-      let observation: CliResult;
-      try {
-        observation = await executor.execute({
-          mode: testCase.mode,
-          source: input,
-          sourceId: testCase.path,
-          ...includePropertiesWhen(() => {
-            if (sourcePath == null) return undefined;
-            return {
-              sourcePath,
-            };
-          }),
-          specialization,
-        });
-      } catch (error) {
-        return classifyTest262(
-          testCase,
-          {
-            detail: errorMessage(error),
-            failureKind: "infrastructure",
-            passed: false,
-          },
-          supportedFeatures,
-          evidence(),
-        );
-      }
-      variants.push(variant);
-      observations.push({ observation, variant });
-      if (observation.exitStatus !== 0) {
-        // The owned diagnostic code is read from the outer source-located
-        // line, not any substring of a thrown message.
-        const code = diagnosticCode(observation.stderr);
-        const unsupportedSyntax = code === "OSEO1001";
-        // A compile-stage OSEO0001 parse or early-error rejection means
-        // no native program executed.
-        const parseRejected = code === "OSEO0001";
-        const compileStage = unsupportedSyntax || parseRejected;
-        const runtimeCapability = unsupportedRuntimeCapability(
-          observation.stderr,
-        );
-        // A genuine unhandled JavaScript throw is either a typed error
-        // instance, identified by the stable thrown marker, or the exact
-        // untyped-throw diagnostic. A non-catchable resource diagnostic
-        // such as a call depth or frame-budget limit is also OSEO2001 but
-        // is not a thrown value, so it must not be mistaken for the
-        // expected negative observation.
-        const isJavaScriptThrow =
-          unhandledErrorType(observation.stderr) != null ||
-          observation.stderr.includes(untypedThrowMessage);
-        if (expectRuntimeNegative && !compileStage && isJavaScriptThrow) {
-          // The unhandled throw is the expected observation for a
-          // runtime negative; every variant must still agree before the
-          // thrown error type is compared. A compile-stage, resource, or
-          // infrastructure diagnostic instead falls through to the
-          // phase-mismatch and infrastructure handling below.
-          continue;
-        }
-        // A compile-stage rejection ran no native variant, so the result
-        // carries no execution evidence and keeps its owned diagnostic
-        // phase.
-        return classifyTest262(
-          testCase,
-          {
-            detail: detail(
-              testCase,
-              strictnessMode,
-              specialization,
-              observation,
-            ),
-            ...(unsupportedSyntax
-              ? { unsupportedCapability: "profile-syntax" }
-              : parseRejected
-                ? { failedPhase: "parse" as const }
-                : runtimeCapability == null
-                  ? { failedPhase: "runtime" as const }
-                  : { unsupportedCapability: runtimeCapability }),
-            ...includePropertiesWhen(() => {
-              if (!(!compileStage && infrastructureFailure(observation)))
-                return undefined;
-              return { failureKind: "infrastructure" as const };
-            }),
-            passed: false,
-          },
-          supportedFeatures,
-          compileStage ? { dependencies } : evidence(),
-        );
-      } else if (expectRuntimeNegative) {
-        return classifyTest262(
-          testCase,
-          {
-            detail:
-              `${testCase.path} ${strictnessMode} ${specialization} ` +
-              "completed without the expected runtime error.",
-            passed: false,
-          },
-          supportedFeatures,
-          evidence(),
-        );
-      }
-    }
+    // The owned diagnostic code is read from the outer source-located
+    // line, not any substring of a thrown message.
+    const code = diagnosticCode(observation.stderr);
+    const unsupportedSyntax = code === "OSEO1001";
+    // A compile-stage OSEO0001 parse or early-error rejection means no
+    // native program executed.
+    const parseRejected = code === "OSEO0001";
+    const compileStage = test262CompileStage(observation);
+    const runtimeCapability = unsupportedRuntimeCapability(observation.stderr);
+    // A compile-stage rejection keeps its owned diagnostic phase and
+    // reports execution evidence only when some other variant did run a
+    // native program.
+    return classifyTest262(
+      testCase,
+      {
+        detail: detail(testCase, strictnessMode, specialization, observation),
+        ...(unsupportedSyntax
+          ? { unsupportedCapability: "profile-syntax" }
+          : parseRejected
+            ? { failedPhase: "parse" as const }
+            : runtimeCapability == null
+              ? { failedPhase: "runtime" as const }
+              : { unsupportedCapability: runtimeCapability }),
+        ...includePropertiesWhen(() => {
+          if (!(!compileStage && infrastructureFailure(observation)))
+            return undefined;
+          return { failureKind: "infrastructure" as const };
+        }),
+        passed: false,
+      },
+      supportedFeatures,
+      compileStage && variants.length === 0 ? { dependencies } : evidence(),
+    );
+  };
+  // A host infrastructure diagnostic is not a semantic observation, so
+  // it settles the result before the comparison below could report the
+  // exit-status difference it causes as a divergence.
+  const infrastructural = observations.find(
+    (entry) =>
+      !test262CompileStage(entry.observation) &&
+      infrastructureFailure(entry.observation),
+  );
+  if (infrastructural != null) {
+    return classifyFrom(infrastructural.variant, infrastructural.observation);
   }
   const baseline = observations[0];
   // A strict variant shifts source lines by its added directive, so a
@@ -1191,6 +1357,9 @@ async function executedResult(
             comparableStderr(entry.observation.stderr) !==
               comparableStderr(baseline.observation.stderr),
         );
+  // Executed variants that disagree are a specialization or strictness
+  // divergence, which outranks the classification any one of them would
+  // carry on its own.
   if (baseline != null && diverging != null) {
     return classifyTest262(
       testCase,
@@ -1205,6 +1374,24 @@ async function executedResult(
       },
       supportedFeatures,
       evidence(),
+    );
+  }
+  for (const entry of awaited) {
+    const settled = entry.settled;
+    if ("error" in settled) continue;
+    if (!test262VariantDecides(settled, expectRuntimeNegative)) continue;
+    return classifyFrom(entry.variant, settled.observation);
+  }
+  if (unassembled != null) {
+    return classifyTest262(
+      testCase,
+      {
+        detail: errorMessage(unassembled.error),
+        failureKind: "harness",
+        passed: false,
+      },
+      supportedFeatures,
+      { dependencies },
     );
   }
   if (
@@ -1523,6 +1710,57 @@ function runMetadata(
   };
 }
 
+/**
+ * A first-in, first-out gate that bounds how many reviewed executions
+ * run at once. Variant-level scheduling lets one path have several
+ * executions in flight, so the concurrent execution count is bounded
+ * here rather than by the number of path workers. A released slot is
+ * handed to the longest-waiting caller instead of being returned to the
+ * counter, which keeps the bound exact when a waiter resumes.
+ */
+interface ReviewedExecutionGate {
+  run<Value>(work: () => Promise<Value>): Promise<Value>;
+}
+
+function createReviewedExecutionGate(limit: number): ReviewedExecutionGate {
+  let active = 0;
+  const waiting: (() => void)[] = [];
+  const acquire = async (): Promise<void> => {
+    if (active < limit) {
+      active += 1;
+      return;
+    }
+    await new Promise<void>((admit) => {
+      waiting.push(admit);
+    });
+  };
+  const release = (): void => {
+    const next = waiting.shift();
+    if (next != null) {
+      next();
+      return;
+    }
+    active -= 1;
+  };
+  return {
+    async run<Value>(work: () => Promise<Value>): Promise<Value> {
+      await acquire();
+      try {
+        return await work();
+      } finally {
+        release();
+      }
+    },
+  };
+}
+
+/**
+ * The most variant executions one reviewed path can contribute: one per
+ * strictness mode the case admits, times the two specialization
+ * policies every reviewed observation compares.
+ */
+const reviewedVariantsPerPath = 4;
+
 /** Run every explicitly reviewed source path at the pinned revision. */
 export async function createReviewedManifest(
   subset: ReviewedTest262Subset,
@@ -1540,7 +1778,18 @@ export async function createReviewedManifest(
     options.retryLimit ?? reviewedExecutionRetryLimit,
     "Reviewed test262 retry limit",
   );
-  const poolLimit = Math.min(configuredPoolLimit, subset.tests.length);
+  /*
+   * The pool schedules one work item per variant, and one reviewed path
+   * contributes at most one item per strictness mode and specialization
+   * policy. The limit therefore clamps against that work-item bound
+   * rather than the path count, so a subset with fewer paths than cores
+   * still runs one path's variants together. A shard large enough to
+   * saturate the host keeps the configured limit unchanged.
+   */
+  const poolLimit = Math.min(
+    configuredPoolLimit,
+    subset.tests.length * reviewedVariantsPerPath,
+  );
   const supportedFeatures = new Set(subset.supportedFeatures);
   const pendingResults: (Test262Result | undefined)[] = Array(
     subset.tests.length,
@@ -1569,6 +1818,20 @@ export async function createReviewedManifest(
       return result;
     },
   };
+  const gate = createReviewedExecutionGate(Math.max(poolLimit, 1));
+  const gatedExecutor: Test262Executor = {
+    ...includePropertiesWhen(() => {
+      if (retryingExecutor.target == null) return undefined;
+      return {
+        target: retryingExecutor.target,
+      };
+    }),
+    async execute(request): Promise<CliResult> {
+      return await gate.run(
+        async () => await retryingExecutor.execute(request),
+      );
+    },
+  };
   const worker = async (): Promise<void> => {
     while (true) {
       if (aborted) return;
@@ -1589,7 +1852,7 @@ export async function createReviewedManifest(
           parsed,
           supportedFeatures,
           harnesses,
-          retryingExecutor,
+          gatedExecutor,
           entry.dependencies,
           { rootPath: root, sourcePath },
         );
