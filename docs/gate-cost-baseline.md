@@ -236,9 +236,17 @@ available parallelism uses and reports that lower effective bound. The bound
 counts concurrent native executions rather than reviewed paths: the pool
 schedules one work item for each strictness and specialization variant, so one
 path's variants can hold several slots at once and a single long path no longer
-serializes four executions behind one worker. A subset with fewer paths than
+serializes every execution behind one worker. A subset with fewer paths than
 the configured bound clamps against that work-item count instead of the path
-count. The measured reused footprint makes the resource comparison explicit:
+count.
+
+A path's first variant runs alone as a probe, because a case that stops at
+that variant records only that variant, and ADR 0013 requires every executed
+combination to be listed and compared. Once the probe shows that the case does
+not stop there, the remaining variants start together, and every one of their
+outcomes is awaited, recorded, and compared before the result is decided. No
+combination executes that the result would not list. The measured reused
+footprint makes the resource comparison explicit:
 
 | Resource          | Per execution | Eight-worker aggregate | Constrained successful capacity |
 | ----------------- | ------------- | ---------------------- | ------------------------------- |

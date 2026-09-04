@@ -501,23 +501,20 @@ for (const deterministicFailure of [
           return true;
         },
       );
-      // Variant-level scheduling runs each planned variant once. A
-      // deterministic failure adds no attempt beyond that, so the
-      // specializations appear exactly once each and in launch order.
-      assert.deepEqual(attempts, ["disabled", "enabled"]);
+      // The probe decides the result, so it is the only combination that
+      // executes, and a deterministic failure adds no retry to it.
+      assert.deepEqual(attempts, ["disabled"]);
     } finally {
       await rm(directory, { force: true, recursive: true });
     }
   });
 }
 
-test("schedules one path's variants as concurrent work items", async () => {
+test("runs a path's remaining variants as concurrent work items", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oseo-test262-variant-"));
   const paths = ["a.js", "b.js", "c.js"];
-  let active = 0;
-  let maximumActive = 0;
-  const executing = new Set<string>();
-  let concurrentSources: string[] = [];
+  const active = new Map<string, number>();
+  let concurrentSource: string | undefined;
   let releaseAll: (() => void) | undefined;
   const held = new Promise<void>((resolve) => {
     releaseAll = resolve;
@@ -532,24 +529,26 @@ test("schedules one path's variants as concurrent work items", async () => {
         await writeFile(join(directory, path), "/*---\n---*/\n");
       }),
     );
+    const probed = new Set<string>();
     const executor: Test262Executor = {
       async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-        active += 1;
-        executing.add(request.sourceId);
-        maximumActive = Math.max(maximumActive, active);
-        if (active === 4) {
-          concurrentSources = [...executing];
+        // The probe runs alone, so it must not block or the remaining
+        // variants would never start.
+        if (!probed.has(request.sourceId)) {
+          probed.add(request.sourceId);
+          return successfulResult();
+        }
+        const running = (active.get(request.sourceId) ?? 0) + 1;
+        active.set(request.sourceId, running);
+        if (running === 3) {
+          concurrentSource = request.sourceId;
           markSaturated?.();
         }
         try {
-          // Each admitted variant blocks until the gate is saturated,
-          // which only happens when one path's variants are separate
-          // work items rather than steps of one path-sized item.
           await held;
           return successfulResult();
         } finally {
-          executing.delete(request.sourceId);
-          active -= 1;
+          active.set(request.sourceId, (active.get(request.sourceId) ?? 1) - 1);
         }
       },
     };
@@ -563,12 +562,13 @@ test("schedules one path's variants as concurrent work items", async () => {
     await saturated;
     releaseAll?.();
     const run = await runPromise;
-    assert.equal(maximumActive, 4);
-    assert.equal(active, 0);
-    // The gate admits one path's four variants together, so the four
-    // concurrent executions all belong to the same reviewed path.
-    assert.equal(concurrentSources.length, 1);
-    assert.ok(paths.includes(concurrentSources[0] ?? ""));
+    // One path held all three of its remaining variants at once, which
+    // only happens when they are separate pool work items.
+    assert.ok(paths.includes(concurrentSource ?? ""));
+    assert.deepEqual(
+      [...active.values()].filter((count) => count !== 0),
+      [],
+    );
     assert.equal(run.metadata.poolLimit, 4);
     assert.deepEqual(
       run.manifest.results.map((result) => result.case.path),
@@ -629,9 +629,8 @@ test("aggregates variants in specification order, not completion", async () => {
   const parsed = parseTest262Case(source, "test/example.js", revision);
   const completed: string[] = [];
   const ticks = new Map<string, number>([
-    ["non-strict disabled", 3],
-    ["non-strict enabled", 1],
-    ["strict disabled", 2],
+    ["non-strict enabled", 2],
+    ["strict disabled", 3],
     ["strict enabled", 0],
   ]);
   const executor: Test262Executor = {
@@ -656,13 +655,14 @@ test("aggregates variants in specification order, not completion", async () => {
     executor,
     ["functions"],
   );
-  // The four observations settle in a deliberately reversed order and
-  // the recorded variant list stays in specification order.
+  // The probe settles first, then the three remaining observations
+  // settle in a deliberately reversed order, and the recorded variant
+  // list stays in specification order.
   assert.deepEqual(completed, [
+    "non-strict disabled",
     "strict enabled",
     "non-strict enabled",
     "strict disabled",
-    "non-strict disabled",
   ]);
   assert.equal(result.classification, "pass");
   assert.deepEqual(result.execution?.variants, [
@@ -673,17 +673,134 @@ test("aggregates variants in specification order, not completion", async () => {
   ]);
 });
 
-test("records only the variant prefix an early decision reached", async () => {
+test("starts no variant beyond a probe that decides the result", async () => {
   const source = "/*---\n---*/\nconst value = 1;\n";
   const parsed = parseTest262Case(source, "test/example.js", revision);
-  let launched = 0;
+  const started: string[] = [];
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      started.push(request.specialization);
+      await Promise.resolve();
+      return {
+        exitStatus: 1,
+        stderr:
+          "test/example.js:1:1: error[OSEO2001]: " +
+          "RegExp prototype execution is not admitted yet.\n",
+        stdout: "",
+      };
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(
+    result.observation.unsupportedCapability,
+    "regexp-prototype-execution",
+  );
+  // The probe decided the result, so no further combination executed and
+  // the evidence lists exactly the one that did.
+  assert.deepEqual(started, ["disabled"]);
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
+});
+
+test("fails on a rejection from a variant after the probe", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
   let settled = 0;
   const executor: Test262Executor = {
     async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-      launched += 1;
       await Promise.resolve();
       settled += 1;
-      if (request.specialization === "disabled") {
+      if (request.specialization === "enabled") {
+        throw new Error("the executor could not start");
+      }
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  // A rejection after the deciding-looking probe must still decide the
+  // result rather than be awaited and discarded.
+  assert.equal(result.classification, "infrastructure-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /the executor could not start/u,
+  );
+  assert.equal(settled, 4);
+  // The rejecting combinations produced no observation, so the evidence
+  // lists the two that did.
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+    { specialization: "disabled", strictness: "strict" },
+  ]);
+});
+
+test("fails on a divergence from a variant after the probe", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const executor: Test262Executor = {
+    execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      if (
+        request.specialization === "enabled" &&
+        request.source.startsWith('"use strict";')
+      ) {
+        return Promise.resolve({
+          exitStatus: 0,
+          stderr: "",
+          stdout: "specialized\n",
+        });
+      }
+      return Promise.resolve(successfulResult());
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  // A late specialization divergence must not be masked by the probe.
+  assert.equal(result.classification, "semantic-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /observations diverge between non-strict disabled and strict enabled/u,
+  );
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+    { specialization: "enabled", strictness: "non-strict" },
+    { specialization: "disabled", strictness: "strict" },
+    { specialization: "enabled", strictness: "strict" },
+  ]);
+});
+
+test("reports a late variant failure as a divergence", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const started: string[] = [];
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const strictness = request.source.startsWith('"use strict";')
+        ? "strict"
+        : "non-strict";
+      started.push(`${strictness} ${request.specialization}`);
+      await Promise.resolve();
+      if (strictness === "strict" && request.specialization === "disabled") {
         return {
           exitStatus: 1,
           stderr:
@@ -703,29 +820,42 @@ test("records only the variant prefix an early decision reached", async () => {
     executor,
     ["functions"],
   );
-  assert.equal(result.classification, "unsupported-profile-feature");
-  assert.equal(
-    result.observation.unsupportedCapability,
-    "regexp-prototype-execution",
+  // One executed combination failing while the others succeeded is a
+  // divergence, not an honest unsupported result, and every executed
+  // combination is listed.
+  assert.equal(result.classification, "semantic-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /observations diverge between non-strict disabled and strict disabled/u,
   );
+  assert.equal(started.length, 4);
   assert.deepEqual(result.execution?.variants, [
     { specialization: "disabled", strictness: "non-strict" },
+    { specialization: "enabled", strictness: "non-strict" },
+    { specialization: "disabled", strictness: "strict" },
+    { specialization: "enabled", strictness: "strict" },
   ]);
-  // Every launched variant settles before the case returns, so no
-  // execution outlives the case that started it.
-  assert.equal(launched, 4);
-  assert.equal(settled, 4);
 });
 
-test("classifies an executor rejection as infrastructure", async () => {
-  const source = "/*---\nflags: [noStrict]\n---*/\n";
+test("a rejection outranks another variant's failure", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
   const parsed = parseTest262Case(source, "test/example.js", revision);
-  let settled = 0;
   const executor: Test262Executor = {
     async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const strictness = request.source.startsWith('"use strict";')
+        ? "strict"
+        : "non-strict";
       await Promise.resolve();
-      settled += 1;
-      if (request.specialization === "disabled") {
+      if (strictness === "non-strict" && request.specialization === "enabled") {
+        return {
+          exitStatus: 1,
+          stderr:
+            "test/example.js:1:1: error[OSEO2001]: " +
+            "RegExp prototype execution is not admitted yet.\n",
+          stdout: "",
+        };
+      }
+      if (strictness === "strict" && request.specialization === "enabled") {
         throw new Error("the executor could not start");
       }
       return successfulResult();
@@ -739,12 +869,130 @@ test("classifies an executor rejection as infrastructure", async () => {
     executor,
     ["functions"],
   );
+  // The rejecting combination runs after one that would classify the
+  // case on its own, and the rejection must still not be masked.
   assert.equal(result.classification, "infrastructure-failure");
   assert.match(
     result.observation.detail ?? "",
     /the executor could not start/u,
   );
-  assert.equal(settled, 2);
+});
+
+test("reports a late compile-stage rejection as a divergence", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const strictness = request.source.startsWith('"use strict";')
+        ? "strict"
+        : "non-strict";
+      await Promise.resolve();
+      if (strictness === "strict" && request.specialization === "disabled") {
+        return {
+          exitStatus: 1,
+          stderr:
+            "test/example.js:1:1: error[OSEO1001]: " +
+            "Unsupported syntax in the reviewed profile.\n",
+          stdout: "",
+        };
+      }
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  // One specialization compiled and ran while another did not, which is
+  // a divergence rather than an honest unsupported result.
+  assert.equal(result.classification, "semantic-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /observations diverge between non-strict disabled and strict disabled/u,
+  );
+  // The compile-stage variant ran no native program, so it is absent
+  // from the evidence, but the three that did run are still listed
+  // rather than dropped with it.
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+    { specialization: "enabled", strictness: "non-strict" },
+    { specialization: "enabled", strictness: "strict" },
+  ]);
+});
+
+test("a late host diagnostic outranks the divergence it causes", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const executor: Test262Executor = {
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const strictness = request.source.startsWith('"use strict";')
+        ? "strict"
+        : "non-strict";
+      await Promise.resolve();
+      if (strictness === "strict" && request.specialization === "enabled") {
+        return {
+          exitStatus: 1,
+          stderr:
+            "test/example.js:1:1: error[OSEO3001]: " +
+            "The native executable could not be started.\n",
+          stdout: "",
+        };
+      }
+      return successfulResult();
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  // A host diagnostic is not a semantic observation, so it must be
+  // reported as an infrastructure failure rather than as the exit-status
+  // divergence it also produces.
+  assert.equal(result.classification, "infrastructure-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /The native executable could not be started/u,
+  );
+});
+
+test("keeps a compile-stage probe free of execution evidence", async () => {
+  const source = "/*---\n---*/\nconst value = 1;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const started: string[] = [];
+  const executor: Test262Executor = {
+    execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      started.push(request.specialization);
+      return Promise.resolve({
+        exitStatus: 1,
+        stderr:
+          "test/example.js:1:1: error[OSEO1001]: " +
+          "Unsupported syntax in the reviewed profile.\n",
+        stdout: "",
+      });
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["functions"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(result.observation.unsupportedCapability, "profile-syntax");
+  // No native program ran, so the result carries no execution evidence
+  // and the probe decided without starting another combination.
+  assert.equal(result.execution, undefined);
+  assert.deepEqual(started, ["disabled"]);
 });
 
 test("separates infrastructure failures from harness defects", async () => {
