@@ -9,10 +9,14 @@ import {
   regExpUnicodeMode,
 } from "../src/index.ts";
 import type {
+  RegExpClassSetOperand,
+  RegExpClassSetOperation,
+  RegExpClassStringDisjunction,
   RegExpPattern,
   RegExpPatternError,
   RegExpPatternExtensions,
   RegExpPatternLimits,
+  RegExpUnicodeClassSet,
 } from "../src/index.ts";
 
 function accepted(source: string, flags = ""): RegExpPattern {
@@ -254,6 +258,97 @@ test("prints assertions, dots, groups, and negated class escapes", () => {
       "",
     ].join("\n"),
   );
+});
+
+/*
+ * A class-set operand may be another class set or a `\q{...}` disjunction,
+ * so the dump has to recurse to describe one. Printing only the header gave
+ * every set of the same operation and polarity the same lines, which is the
+ * one thing a structural dump must not do.
+ */
+test("prints every class-set operand and class string", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  const source = "[[a-c]--[\\q{xy|}\\d]]";
+  const result = parseRegExpPattern({ extensions, flags: "v", source });
+  assert.deepEqual(result.errors, []);
+  const pattern = result.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  /*
+   * The class-set model is part of the package's public API, so these read
+   * the parsed shape through the root entry point's own types. Dropping one
+   * of those re-exports fails the type check rather than only this test.
+   */
+  const term = pattern.body.alternatives[0]?.terms[0];
+  assert.equal(term?.kind, "class-set");
+  if (term?.kind !== "class-set") throw new Error("a class set is present");
+  const outer: RegExpUnicodeClassSet = term;
+  const operation: RegExpClassSetOperation = outer.operation;
+  assert.equal(operation, "subtraction");
+  const right: RegExpClassSetOperand | undefined = outer.operands[1];
+  assert.equal(right?.kind, "class-set");
+  if (right?.kind !== "class-set") throw new Error("a nested set is present");
+  const disjunction: RegExpClassSetOperand | undefined = right.operands[0];
+  assert.equal(disjunction?.kind, "class-strings");
+  if (disjunction?.kind !== "class-strings") {
+    throw new Error("a class string disjunction is present");
+  }
+  const strings: RegExpClassStringDisjunction = disjunction;
+  assert.deepEqual(
+    strings.strings.map((characters) =>
+      characters.map((character) => character.value),
+    ),
+    [[0x78, 0x79], []],
+  );
+  assert.equal(
+    printRegExpPattern(pattern),
+    [
+      `pattern /${source}/v`,
+      "  captures ",
+      "  disjunction",
+      "    alternative",
+      "      class-set subtraction",
+      "        class-set union",
+      "          range u+0061 a .. u+0063 c",
+      "        class-set union",
+      "          class-strings",
+      "            string",
+      "              char u+0078 x",
+      "              char u+0079 y",
+      "            string empty",
+      "          class-escape digit",
+      "",
+    ].join("\n"),
+  );
+});
+
+/*
+ * The dump's first line quotes the source text, so two patterns always
+ * differ there. These compare the model lines alone, which is where the
+ * incomplete dump collapsed structures that share an operation.
+ */
+test("gives structurally different class sets different dumps", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  const model = (source: string): string => {
+    const result = parseRegExpPattern({ extensions, flags: "v", source });
+    assert.deepEqual(result.errors, [], source);
+    const pattern = result.pattern;
+    if (pattern == null) throw new Error("a parsed pattern is present");
+    return printRegExpPattern(pattern).split("\n").slice(1).join("\n");
+  };
+  const groups: readonly (readonly string[])[] = [
+    ["[[a]--[b]]", "[[a]--[c]]", "[a--b]"],
+    ["[\\q{ab}]", "[\\q{ba}]", "[\\q{a|b}]"],
+    ["[\\q{a|}]", "[\\q{a}]", "[\\q{}]"],
+    ["[[a][b]]", "[[[a]]]", "[[a]]"],
+  ];
+  for (const group of groups) {
+    const dumps = new Set(group.map((source) => model(source)));
+    assert.equal(dumps.size, group.length, group.join(" vs "));
+  }
 });
 
 test("reports an invalid quantifier at its own text", () => {
