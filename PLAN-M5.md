@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-15,515 reviewed cases: 11,690 passes, 1,506 expected negatives, and 2,319
+16,014 reviewed cases: 12,248 passes, 1,506 expected negatives, and 2,260
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -31,8 +31,8 @@ M5a is complete. The 102 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-11,690 passes across 15,515 paths, and the property inventory records 116
-domains, 116 seeds, and an ordinary case budget of 5,246.
+12,248 passes across 16,014 paths, and the property inventory records 120
+domains, 120 seeds, and an ordinary case budget of 5,280.
 
 
 M5a implementation history
@@ -5221,6 +5221,61 @@ The admitted runtime checkpoint moves the runtime ABI to
 the range allocates one more for `escape`, so it holds twenty-one of its two
 hundred fifty-six without adding a generated-code entry point or changing
 the graph's orchestration state.
+
+Implemented M5b node `array-prototype-mutation` gives the realm-owned
+`%Array.prototype%` ordinary `push`, `pop`, `shift`, `unshift`, `splice`,
+`fill`, `copyWithin`, and `reverse` functions. Every method converts its
+receiver and snapshots LengthOfArrayLike before its operation-specific
+arguments or indexed access. `push`, `unshift`, and `splice` reject a result
+length above `2**53 - 1`, and every successful method performs the specified
+final `length` write.
+
+The indexed moves use HasProperty before Get, then Set a present source or
+delete an absent one, so holes remain holes while inherited values become own
+values at their destination. `pop` and `shift` read their returned element
+before deletion. `fill` writes every selected index. `copyWithin` chooses its
+direction before an overlapping move, and `reverse` observes both sides of
+each pair before writing either. `splice` creates its result through
+ArraySpeciesCreate before it reads removed elements, preserves holes in that
+result, shifts the receiver in the direction its size change requires, and
+inserts arguments only after the moves complete. The implementation stays in
+*runtime\_array.c* because these paths share property primitives, array-like
+length conversion, species allocation, and collector roots with the other
+Array methods.
+
+Fixed native and generated differential evidence at seed `0x60005c00` covers
+a 12-case ordinary budget over all eight methods, sparse Arrays and ordinary
+array-like objects, zero through seven entries, zero through three inserted
+values, every splice argument-count mode, and integer, fractional, infinite,
+`NaN`, signed-zero, and explicit-`undefined` relative indices. Its independent
+indexed-property model predicts the return value, result length, receiver
+length, and every observed hole. Fixed evidence also covers metadata, generic
+and inherited receivers, species construction, overlap direction, observable
+conversion and access order, abrupt completion, both specialization policies,
+collection forced at every safepoint, false hints, deliberate shape-guard
+misses, and generic fallback.
+
+Of the node's 249 inventory paths, 247 are reviewed: 223 pass and 24 retain
+explicit prerequisite boundaries. The root split is 34/5 for `copyWithin`,
+18/4 for `fill`, 22/1 for `pop`, 23/1 for `push`, 14/3 for `reverse`, 19/1
+for `shift`, 72/8 for `splice`, and 21/1 for `unshift`, as
+pass/unsupported. Ten paths need constructor detection through `Reflect`,
+three need the unadmitted Boolean intrinsic, four need resizable-buffer or
+TypedArray support, five need `Proxy`, and two need realm creation. The two
+remaining paths require the unavailable *proxyTrapsHelper.js* harness include;
+the fixed and generated suites replace their large-length and species-length
+observations. Two Array sort paths that pop during an accessor and one Map set
+path that collects observations through Array `push` and `pop` also move from
+`unsupported-profile-feature` to `pass`. The manifest moves from 15,767 to
+16,014 paths and from 12,022 to 12,248 passes, keeps 1,506 expected negatives,
+and moves from 2,239 to 2,260 unsupported profile features, with no failures.
+The property ratchet
+moves from 119 to 120 domains and seeds and from 5,268 to 5,280 ordinary
+cases. The admitted runtime checkpoint moves the ABI to
+`oseo-runtime-m5-88`, allocates seven code IDs inside the existing Array
+range, and adds no generated-code entry point or graph-state change. The
+reviewed test262 revision, 41,091-path applicable inventory, ADR 0013
+vocabulary, inventory policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

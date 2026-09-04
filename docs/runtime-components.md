@@ -939,6 +939,29 @@ both specialization policies, false hints, deliberate shape-guard misses, and
 collection at every safepoint. The node adds no generated-code entry point and
 moves `abiVersion` to `m5-87`.
 
+M5b node `array-prototype-mutation` also remains in *runtime\_array.c*. It
+adds `push`, `pop`, `shift`, `unshift`, `splice`, `fill`, `copyWithin`, and
+`reverse` to the materialized `%Array.prototype%`. These methods reuse the
+ordinary property operations, array-like length conversion, species creation,
+and collector roots that the other Array methods already own.
+
+Every indexed move uses HasProperty before Get, then Set for a present source
+or DeletePropertyOrThrow for a hole. This preserves sparse receivers and
+turns an inherited source into an own destination. `copyWithin` selects its
+direction before overlap, `reverse` observes both sides before writing, and
+`splice` creates and roots its species result before collecting removed
+elements. Receiver, arguments, moved values, and results stay rooted across
+every observable conversion and property operation.
+
+Fixed and generated native differential evidence covers all eight methods,
+sparse and generic receivers, hole preservation, inherited values, overlap,
+species construction, length limits and writes, coercion order, abrupt
+completion, both specialization policies, false hints, deliberate guard hits
+and misses, generic fallback, and collection at every safepoint. The node adds
+no generated-code entry point, allocates seven code IDs inside the existing
+Array range because `push` already owns its ID, and moves `abiVersion` to
+`m5-88`.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

@@ -287,6 +287,73 @@ test("populates Array index search methods with both comparisons", () => {
   assert.doesNotMatch(at, /oseo_has_property/u);
 });
 
+test("populates Array mutation methods with hole-preserving moves", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of [
+    "copyWithin",
+    "fill",
+    "pop",
+    "push",
+    "reverse",
+    "shift",
+    "splice",
+    "unshift",
+  ]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of [
+    "COPY_WITHIN",
+    "FILL",
+    "POP",
+    "PUSH",
+    "REVERSE",
+    "SHIFT",
+    "SPLICE",
+    "UNSHIFT",
+  ]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  const move = definition("array_move_property");
+  assert.match(move, /oseo_has_property[\s\S]*oseo_object_get/u);
+  assert.match(move, /oseo_object_set/u);
+  assert.match(move, /oseo_object_delete/u);
+
+  const splice = definition("array_splice");
+  assert.match(splice, /array_species_create/u);
+  assert.match(splice, /create_index_property/u);
+  assert.match(splice, /array_move_property/u);
+  assert.match(splice, /array_set_length/u);
+
+  const reverse = definition("array_reverse_pair");
+  assert.match(reverse, /oseo_has_property[\s\S]*oseo_object_get/u);
+  assert.match(reverse, /oseo_object_set/u);
+  assert.match(reverse, /oseo_object_delete/u);
+
+  for (const name of [
+    "array_copy_within",
+    "array_fill",
+    "array_pop",
+    "array_shift",
+    "array_unshift",
+  ]) {
+    assert.match(definition(name), /oseo_internal_to_object/u);
+  }
+  assert.doesNotMatch(
+    arraySource,
+    /unadmitted_names\[\][\s\S]*"(?:pop|reverse|shift|splice|unshift)"/u,
+  );
+});
+
 test("orders Object.defineProperty conversion before descriptors", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 

@@ -63,6 +63,8 @@ const { arrayPrototypeReductionFixtures } =
   await import("./native/fixtures/array-prototype-reduction.ts");
 const { arrayPrototypeIndexSearchFixtures } =
   await import("./native/fixtures/array-prototype-index-search.ts");
+const { arrayPrototypeMutationFixtures } =
+  await import("./native/fixtures/array-prototype-mutation.ts");
 const { arrayPrototypeSortFixtures } =
   await import("./native/fixtures/array-prototype-sort.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
@@ -137,6 +139,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeCopyingFixtures,
   ...arrayPrototypeIterativeFixtures,
   ...arrayPrototypeIndexSearchFixtures,
+  ...arrayPrototypeMutationFixtures,
   ...arrayPrototypeReductionFixtures,
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
@@ -561,6 +564,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-index-search" ||
+    fixture.name === "array-prototype-mutation" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "array-prototype-species-mapping" ||
@@ -775,6 +779,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-index-search" ||
+    fixture.name === "array-prototype-mutation" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
     fixture.name === "string-prototype-search-and-slice" ||
@@ -867,6 +872,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-iterative" ||
             fixture.name === "array-prototype-index-search" ||
+            fixture.name === "array-prototype-mutation" ||
             fixture.name === "array-prototype-reduction" ||
             fixture.name === "array-prototype-sort" ||
             fixture.name === "array-prototype-species-mapping" ||
@@ -904,6 +910,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
                 fixture.name === "array-prototype-index-search" ||
+                fixture.name === "array-prototype-mutation" ||
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||

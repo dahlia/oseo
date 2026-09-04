@@ -368,3 +368,7 @@ families:
     owner: tests/property/m5-regexp-symbol-methods.property.test.ts
     start: 0x60005b00
     end: 0x60005bff
+  - family: m5-array-prototype-mutation
+    owner: tests/property/m5-array-prototype-mutation.property.test.ts
+    start: 0x60005c00
+    end: 0x60005cff

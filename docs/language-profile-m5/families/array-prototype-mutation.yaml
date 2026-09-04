@@ -1,0 +1,67 @@
+version: 1
+id: array-prototype-mutation
+title: "Array prototype mutation"
+scope:
+  - "Array.prototype push, pop, shift, unshift, splice, fill, copyWithin,
+    and reverse, including receiver and length conversion, relative-index
+    conversion, maximum-safe-integer checks, length updates, sparse and
+    inherited indexed properties, overlap direction, species construction,
+    and abrupt completion order."
+  - "Reviewed standards coverage is 247 of the 249 upstream paths under
+    test/built-ins/Array/prototype/copyWithin/,
+    test/built-ins/Array/prototype/fill/,
+    test/built-ins/Array/prototype/pop/,
+    test/built-ins/Array/prototype/push/,
+    test/built-ins/Array/prototype/reverse/,
+    test/built-ins/Array/prototype/shift/,
+    test/built-ins/Array/prototype/splice/, and
+    test/built-ins/Array/prototype/unshift/. The reviewed paths contain
+    223 passes and 24 explicit prerequisite boundaries. Two paths require
+    the unavailable proxyTrapsHelper.js include and have fixed and generated
+    replacement evidence for their large-length contracts."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-mutation.ts
+      - tests/property/m5-array-prototype-mutation.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-mutation.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-mutation.ts
+      - tests/property/m5-array-prototype-mutation.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-mutation.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-mutation.ts
+      - tests/property/m5-array-prototype-mutation.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-mutation.ts
+      - tests/property/m5-array-prototype-mutation.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

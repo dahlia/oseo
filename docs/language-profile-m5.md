@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 101
+M5a is complete. The normative family records described below inventory 102
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 15,462 reviewed cases: 11,604 passes, 1,506
-expected negatives, and 2,352 unsupported profile features. It records no
+The current manifest contains 16,014 reviewed cases: 12,248 passes, 1,506
+expected negatives, and 2,260 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4683,6 +4683,52 @@ from 2,326 to 2,352 unsupported profile features, with no failures. The
 admitted runtime checkpoint moves
 the runtime ABI to `oseo-runtime-m5-85`, allocates four code IDs inside the
 existing Array range, and adds no generated-code entry point or graph-state
+change.
+
+M5b node `array-prototype-mutation` implements ordinary `push`, `pop`,
+`shift`, `unshift`, `splice`, `fill`, `copyWithin`, and `reverse` functions
+on the realm-owned `%Array.prototype%`. Every method converts its receiver
+and snapshots LengthOfArrayLike before its later arguments or indexed access.
+`push`, `unshift`, and `splice` reject a result length above `2**53 - 1`, and
+every successful operation performs its specified final `length` write.
+
+Indexed moves check HasProperty before Get, then Set a present value or delete
+an absent destination, so sparse receivers preserve holes while inherited
+values become own values where the algorithm moves them. `pop` and `shift`
+read their result before deleting it. `copyWithin` chooses the safe overlap
+direction, and `reverse` observes both ends before changing either. `splice`
+uses ArraySpeciesCreate, preserves holes in its removed-elements result, and
+moves the receiver in the direction selected by its size change. Receiver,
+arguments, moved values, and the splice result stay rooted across every
+conversion, accessor, species constructor, and property mutation.
+
+Fixed native and generated differential evidence at seed `0x60005c00` covers
+a 12-case ordinary budget over all eight methods, sparse Arrays and ordinary
+array-like objects, zero through seven entries, zero through three inserted
+values, every splice argument-count mode, and integer, fractional, infinite,
+`NaN`, signed-zero, and explicit-`undefined` relative indices. Its independent
+indexed-property model predicts results, lengths, and holes. The evidence also
+covers metadata, generic and inherited receivers, species construction,
+overlap, observable conversion and access order, abrupt completion, both
+specialization policies, collection forced at every safepoint, false hints,
+deliberate shape-guard misses, and generic fallback.
+
+Of the 249 paths in the node inventory, 247 are reviewed: 223 pass and 24
+retain explicit prerequisite boundaries. The root split is 34/5 for
+`copyWithin`, 18/4 for `fill`, 22/1 for `pop`, 23/1 for `push`, 14/3 for
+`reverse`, 19/1 for `shift`, 72/8 for `splice`, and 21/1 for `unshift`, as
+pass/unsupported. Ten paths need constructor detection through `Reflect`,
+three need `Boolean`, four need resizable-buffer or TypedArray support, five
+need `Proxy`, and two need realm creation. Two additional paths require the
+unavailable *proxyTrapsHelper.js* include and are replaced by fixed and
+generated evidence. Two Array sort paths that pop during an accessor and one
+Map set path that collects observations through Array `push` and `pop` also
+move from `unsupported-profile-feature` to `pass`. The manifest moves from
+15,767 to 16,014 cases and from 12,022 to 12,248 passes, keeps 1,506 expected
+negatives, and moves from 2,239 to 2,260 unsupported profile features, with no
+failures. The admitted runtime
+checkpoint moves the ABI to `oseo-runtime-m5-88`, allocates seven code IDs in
+the existing Array range, and adds no generated-code entry point or graph-state
 change.
 
 

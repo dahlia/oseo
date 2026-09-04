@@ -148,6 +148,38 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/push/length-near-integer-limit.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -245,6 +277,37 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Array/prototype/shift/set-length-array-is-frozen.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Array/prototype/slice/S15.4.4.10_A2_T4.js
       strictness:
         - non-strict
@@ -278,6 +341,38 @@ results:
       includes: []
       mode: script
       path: test/built-ins/Array/prototype/slice/create-species-poisoned.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Array/prototype/unshift/throws-if-integer-limit-exceeded.js
       strictness:
         - non-strict
         - strict
