@@ -129,6 +129,13 @@ function commonFlags(
   ];
 }
 
+function runtimeCompileFlags(
+  target: TargetDescription,
+  runtimeDirectory: string,
+): readonly string[] {
+  return ["-O2", ...commonFlags(target, runtimeDirectory)];
+}
+
 function runtimePathFlags(): readonly string[] {
   return ["-fdebug-compilation-dir=/oseo/runtime"];
 }
@@ -146,7 +153,7 @@ function relativePath(
 
 function archiveKeyRecord(input: RuntimeArchiveKeyInput) {
   requireZigEnvironment(input.toolchainEnvironment);
-  const runtimeCommon = commonFlags(input.target, ".");
+  const runtimeCommon = runtimeCompileFlags(input.target, ".");
   const linkCommon = commonFlags(input.target, "<runtime-directory>");
   return {
     archiveInvocation: [
@@ -283,7 +290,7 @@ export const zigToolchain: NativeToolchain = {
       input.workingDirectory,
       `fixture-${suffix}`,
     );
-    const runtimeCommon = commonFlags(input.target, ".");
+    const runtimeCommon = runtimeCompileFlags(input.target, ".");
     const linkCommon = commonFlags(input.target, input.runtimeDirectory);
     const runtimePaths = runtimePathFlags();
     return {

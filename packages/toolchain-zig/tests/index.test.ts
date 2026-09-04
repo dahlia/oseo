@@ -148,6 +148,23 @@ for (const [target, zigTarget] of [
     const compilerRequests = plan.requests.filter(
       (request) => request.args[0] === "cc",
     );
+    const requiredFlags = ["-Wall", "-Wextra", "-Werror", "-pedantic"];
+    assert.ok(
+      compilerRequests.every((request) =>
+        requiredFlags.every((flag) => request.args.includes(flag)),
+      ),
+    );
+    const runtimeCompileRequests = compilerRequests.filter((request) =>
+      request.args.includes("-c"),
+    );
+    assert.ok(
+      runtimeCompileRequests.every((request) => request.args.includes("-O2")),
+    );
+    assert.ok(
+      compilerRequests
+        .filter((request) => !request.args.includes("-c"))
+        .every((request) => !request.args.includes("-O2")),
+    );
     if (sanitizer === "") {
       assert.ok(
         compilerRequests.every((request) =>
