@@ -1,0 +1,3 @@
+version: 1
+id: promise-allsettled-and-any
+record: docs/language-profile-m5/families/promise-allsettled-and-any.yaml

@@ -1,0 +1,58 @@
+version: 1
+id: promise-allsettled-and-any
+title: "Promise.allSettled and Promise.any"
+scope:
+  - "Promise.allSettled result records in input order, with status followed by
+    value or reason as ordinary own data properties and one shared first-call
+    guard for each element's two settlement closures."
+  - "Promise.any fulfillment by the first fulfilled input and AggregateError
+    rejection with an input-ordered errors array when every input rejects,
+    including the empty input."
+  - "NewPromiseCapability from the receiver, one observable resolve read,
+    per-element resolve calls, iterator closing, subclass behavior, and abrupt
+    completion shared with the other iterable promise combinators."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-promise-combine.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-combine.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_promise.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

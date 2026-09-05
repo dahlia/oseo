@@ -88,11 +88,10 @@
     (OSEO_PROMISE_CODE_ID_RANGE_LAST - 17u)
 #define OSEO_PROMISE_RACE_CODE_ID \
     (OSEO_PROMISE_CODE_ID_RANGE_LAST - 18u)
-/* The combinators whose graph node has not landed. They exist as
- * function objects so %Promise% carries every own property ECMA-262
- * requires, and calling one reports the owned unadmitted diagnostic. */
-#define OSEO_PROMISE_DEFERRED_STATIC_CODE_ID \
+#define OSEO_PROMISE_ALL_SETTLED_CODE_ID \
     (OSEO_PROMISE_CODE_ID_RANGE_LAST - 19u)
+#define OSEO_PROMISE_ANY_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 20u)
 
 #define OSEO_ERROR_CODE_ID_RANGE_INDEX ((size_t)1u)
 #define OSEO_ERROR_CODE_ID_RANGE_FIRST \
@@ -1228,6 +1227,8 @@ typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
     OSEO_REACTION_RACE = 2,
+    OSEO_REACTION_ALL_SETTLED = 3,
+    OSEO_REACTION_ANY = 4,
 } OseoReactionKind;
 
 typedef struct {
@@ -1246,6 +1247,7 @@ typedef struct {
     OseoValue capability;
     OseoValue values;
     size_t remaining;
+    bool settled;
 } OseoPromiseAggregate;
 
 typedef enum {

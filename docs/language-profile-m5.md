@@ -5198,6 +5198,71 @@ property domain emits lone atoms rather than operations, and
 that must keep complementing over the folded code points.
 
 
+Promise settled combinators
+---------------------------
+
+M5b node `promise-allsettled-and-any` completes the four iterable Promise
+combinators by replacing the deferred `Promise.allSettled` and `Promise.any`
+entry points with their ECMA-262 algorithms. `allSettled` creates one
+ordinary result record per input in input order. A fulfilled record creates
+`status` with value `"fulfilled"` before `value`; a rejected record creates
+`status` with value `"rejected"` before `reason`. Every property is writable,
+enumerable, and configurable. Each element's fulfill and reject closure
+shares one first-call guard, so only the first call contributes its record
+and decrements the remaining count.
+
+`any` fulfills with the first fulfilled input. When every input rejects, it
+creates an `AggregateError` with the realm's standard prototype, the
+reference-host message, and an own non-enumerable `errors` data property whose
+Array preserves rejection reasons in input order. The empty input takes the
+same path with an empty errors Array. The runtime constructs the error from
+that already-collected Array instead of calling the public `AggregateError`
+constructor, so an overridden Array iterator is not observed a second time.
+
+Both methods share the capability, iterator, and abrupt-completion machinery
+with `Promise.all` and `Promise.race`. They apply NewPromiseCapability to the
+receiver, read `resolve` once, call it with the receiver for every element,
+close an active iterator after the applicable abrupt completions, and
+preserve subclass-created promise capabilities. A native capability records
+aggregate settlement so a later closure cannot settle it again, while a
+foreign constructor continues to receive the exact resolve and reject
+functions it created.
+
+Fixed native and generated differential evidence at property seed
+`0x60004502` covers zero through four directly generated thenables, each of
+which fulfills, rejects, fulfills then rejects, or rejects then fulfills with
+one bounded integer. The independent schedule oracle checks first-call
+behavior, input-ordered result records and rejection reasons, empty input,
+subclass capabilities, metadata, abrupt iterator completion, both
+specialization policies, false hints, deliberate shape-guard misses, generic
+fallback, and collection forced at every safepoint. The property has a
+12-case ordinary budget, direct Array and record shrinking, and reports its
+seed, replay path, profile, domain, size limit, and host target. The fixed
+native lane retains the AArch64 Linux cross-link.
+
+The reviewed *promiseHelper.js* implementation supplies
+`checkSettledPromises` for the `allSettled` result-record assertions. All 198
+paths under the node's two inventory roots are accounted for and 192 are
+reviewed: 180 pass and 12 retain explicit prerequisite boundaries. Five keep
+the unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two
+need `Reflect.construct`, and two call dynamic `eval`. Three String-iteration
+cases stay outside this node for the separate `string-iterator` owner. Three
+cases whose result promise rejects with a typed error but installs no reaction
+stay outside the reviewed subset because the current unhandled-rejection
+policy cannot distinguish that rejection from an unhandled throw. No
+previously reviewed path loses a pass.
+The manifest moves from 16,269 to 16,461 paths and from 12,599 to 12,779
+passes, keeps 1,556 expected negatives, and moves from 2,114 to 2,126
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property inventory moves from 121 to 122 domains and seeds and
+from 5,344 to 5,356 ordinary cases. The suite revision, 41,091-path applicable
+inventory, manifest schema and vocabulary, target-parity policy, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
+existing Promise range without adding a generated-code entry point or
+changing the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -5377,11 +5442,6 @@ complete. The remaining gaps retain their existing owners.
     a representation choice, not a behavior difference, and it would become
     real only if a later edition exposed the wrapper. Owner: the intrinsics
     and built-in objects stream.
- -  `Promise.allSettled` and `Promise.any` are own properties of `%Promise%`
-    with their specified names and lengths, but calling either reports the
-    owned `promise-static-method` diagnostic instead of combining.
-    The reviewed *Promise/allSettled/* and *Promise/any/* roots stay outside
-    this node. Owner: the `promise-allsettled-and-any` graph node.
  -  A rejected promise that no reaction ever handles ends the program at the
     next rejection checkpoint. A case whose reason is not a typed error
     names the owned `unhandled-rejection-policy` boundary, but a case whose
@@ -5391,10 +5451,6 @@ complete. The remaining gaps retain their existing owners.
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* stay
     outside the reviewed subset. Owner: the modules and asynchronous
     execution stream.
- -  The reviewed *promiseHelper.js* implements `checkSequence` for the
-    `Promise.all` and `Promise.race` scheduling inventory. Its
-    `checkSettledPromises` half stays deferred with the combinators that use
-    it. Owner: the `promise-allsettled-and-any` graph node.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
