@@ -16,5 +16,5 @@ inventory:
     - test/built-ins/Array/prototype/unshift/
 dependencies:
   - array-constructor
-landed: false
+landed: true
 status: ready
