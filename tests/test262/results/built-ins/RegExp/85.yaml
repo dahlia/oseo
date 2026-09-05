@@ -73,7 +73,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Buhid.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Buhid.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Buhid.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -98,7 +98,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Malayalam.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Malayalam.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Malayalam.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

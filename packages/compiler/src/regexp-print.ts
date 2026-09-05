@@ -5,11 +5,14 @@ import type {
 } from "./regexp-matcher.ts";
 import type {
   RegExpAlternative,
+  RegExpCharacter,
   RegExpClassItem,
+  RegExpClassSetOperand,
   RegExpDisjunction,
   RegExpPattern,
   RegExpQuantifier,
   RegExpTerm,
+  RegExpUnicodeClassSet,
 } from "./regexp.ts";
 
 function quantifierText(quantifier: RegExpQuantifier): string {
@@ -44,6 +47,59 @@ function printClassItem(item: RegExpClassItem, indent: string): string {
   return (
     `${indent}property ${item.negated ? "not " : ""}` +
     `${item.property}${value}\n`
+  );
+}
+
+/**
+ * Render one `\q{...}` alternative.
+ *
+ * An alternative that spells no character is a member of the class in its
+ * own right, so it is named rather than left as a header with no lines
+ * under it.
+ */
+function printClassString(
+  characters: readonly RegExpCharacter[],
+  indent: string,
+): string {
+  if (characters.length === 0) return `${indent}string empty\n`;
+  const nested = `${indent}  `;
+  return (
+    `${indent}string\n` +
+    characters.map((character) => printClassItem(character, nested)).join("")
+  );
+}
+
+function printClassSetOperand(
+  operand: RegExpClassSetOperand,
+  indent: string,
+): string {
+  if (operand.kind === "class-set") return printClassSet(operand, indent);
+  if (operand.kind === "class-strings") {
+    const nested = `${indent}  `;
+    return (
+      `${indent}class-strings\n` +
+      operand.strings
+        .map((characters) => printClassString(characters, nested))
+        .join("")
+    );
+  }
+  return printClassItem(operand, indent);
+}
+
+/**
+ * Render one `v`-mode class set and everything under it.
+ *
+ * An operand may be another class set or a `\q{...}` disjunction, so this
+ * recurses. Printing only the header would give two structurally different
+ * sets the same dump, which is what a structural test compares.
+ */
+function printClassSet(set: RegExpUnicodeClassSet, indent: string): string {
+  const nested = `${indent}  `;
+  return (
+    `${indent}class-set ${set.operation}${set.negated ? " negated" : ""}\n` +
+    set.operands
+      .map((operand) => printClassSetOperand(operand, nested))
+      .join("")
   );
 }
 
@@ -104,6 +160,7 @@ function printTerm(term: RegExpTerm, indent: string): string {
   if (term.kind === "backreference") {
     return `${indent}backreference ${term.index}\n`;
   }
+  if (term.kind === "class-set") return printClassSet(term, indent);
   return `${indent}backreference ${term.name} -> ${term.indices.join(",")}\n`;
 }
 

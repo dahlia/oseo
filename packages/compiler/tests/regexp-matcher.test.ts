@@ -359,6 +359,29 @@ test("evaluates a lookbehind body from right to left", () => {
   assert.deepEqual(search("(?<=(a+))b", "", "aaab"), ["b", "aaa"]);
 });
 
+test("scopes inline modifiers to their group", () => {
+  const parsed = parseRegExpPattern({
+    extensions: { admitted: ["modifiers"] },
+    flags: "",
+    source: "(?i:a)(?-i:B)(?s:.)(?-s:.)\\n(?m:^x$)",
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const result = buildRegExpMatcher(pattern, {
+    unicodeData: asciiUnicodeData,
+  });
+  assert.deepEqual(result.errors, []);
+  const program = result.program;
+  if (program == null) throw new Error("a built artifact is present");
+  const matched = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: "aB\nq\nx\n",
+  });
+  assert.equal(matched.outcome, "matched");
+});
+
 test("matches a backreference, including one that never participated", () => {
   assert.deepEqual(search("(a)\\1", "", "aa"), ["aa", "a"]);
   assert.deepEqual(search("(a)?\\1b", "", "b"), ["b", null]);
@@ -435,22 +458,6 @@ test("advances a search by one character unless the pattern is sticky", () => {
   assert.equal(found("", "", "ab", 2), "2:");
   assert.equal(found("a", "", "aa", 3), "unmatched");
   assert.equal(found("b", "u", "a\u{1F600}b"), "3:b");
-});
-
-test("refuses a construct whose matcher semantics this unit lacks", () => {
-  const modifiers = refused(
-    "(?i:a)",
-    "u",
-    { unicodeData: asciiUnicodeData },
-    { admitted: ["modifiers"] },
-  );
-  assert.equal(modifiers.kind, "unsupported");
-  assert.equal(modifiers.section, "pattern");
-  assert.deepEqual(modifiers.span, { end: 6, start: 0 });
-  assert.equal(
-    modifiers.message,
-    "An inline modifier group has no matcher lowering yet.",
-  );
 });
 
 test("refuses a pattern whose Unicode facts the caller did not supply", () => {
@@ -708,4 +715,222 @@ test("agrees with the host engine over a reviewed ASCII corpus", () => {
     }
   }
   assert.ok(compared > 500, `only ${compared} comparisons ran`);
+});
+
+/*
+ * A class string lowers to a shared-prefix trie, and the trie is as deep as
+ * the longest alternative, so emitting it through host recursion spent one
+ * frame per code point. The reviewed source and instruction limits both
+ * admit a twenty-thousand-character alternative, so that pattern reached the
+ * host stack rather than any owned boundary. Emission carries its own work
+ * list now, which this pins at a depth the recursion could not survive.
+ */
+test("emits a deep class string without host recursion", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation"],
+  };
+  const length = 20_000;
+  const alternative = "a".repeat(length);
+  const parsed = parseRegExpPattern({
+    extensions,
+    flags: "v",
+    source: `^[\\q{${alternative}}]$`,
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const result = buildRegExpMatcher(pattern, {
+    unicodeData: asciiUnicodeData,
+  });
+  assert.deepEqual(result.errors, []);
+  const program = result.program;
+  if (program == null) throw new Error("a built artifact is present");
+  assert.equal(program.instructions.length, length + 6);
+  const matched = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: alternative,
+  });
+  assert.equal(matched.outcome, "matched");
+  const missed = searchRegExpMatcher({
+    program,
+    startIndex: 0,
+    text: `${alternative}a`,
+  });
+  assert.equal(missed.outcome, "unmatched");
+});
+
+/*
+ * A lone `\p{...}` escape keeps its exact code points through `v`-mode set
+ * algebra only when it names a General_Category value, so the builder has to
+ * know which spelling it holds. It asks the caller, because a category table
+ * in the compiler core would cross the package boundary.
+ *
+ * The caller answers that question directly. Inferring it from whether some
+ * other spelling resolves would let a provider that answers the escape but
+ * not the classification fold an operand the edition keeps exact, and match
+ * nothing at all, without saying so. Every other unlinked Unicode fact
+ * reports an owned refusal, and so does this one.
+ */
+test("refuses a lone property escape without category classification", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation", "unicode-property-escapes"],
+    unicodeProperty: () => true,
+  };
+  const parsed = parseRegExpPattern({
+    extensions,
+    flags: "iv",
+    source: "[\\p{Ll}--\\p{Lu}]",
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const partial = buildRegExpMatcher(pattern, {
+    unicodeData: {
+      caseEquivalenceClasses: () => [[0x61, 0x41]],
+      propertySet: () => [0x61, 0x62],
+    },
+  });
+  assert.equal(partial.built, false);
+  assert.equal(
+    partial.errors[0]?.message,
+    "A lone Unicode property escape needs the General_Category value " +
+      "classification that is not linked.",
+  );
+  /*
+   * The same provider builds once it can answer, and the answer decides
+   * whether the operands stay exact rather than fold.
+   */
+  const classified = buildRegExpMatcher(pattern, {
+    unicodeData: {
+      caseEquivalenceClasses: () => [[0x61, 0x41]],
+      generalCategoryValue: () => true,
+      propertySet: () => [0x61, 0x62],
+    },
+  });
+  assert.deepEqual(classified.errors, []);
+  assert.notEqual(classified.program, undefined);
+});
+
+/** How often the builder has derived a counted class string's key. */
+let classStringKeys = 0;
+
+/**
+ * One class string that counts every key the builder derives from it.
+ *
+ * The builder joins a class string's code points to decide whether it
+ * already holds that alternative, so counting the joins counts how often a
+ * construction visited the alternative. The count does not depend on the
+ * machine, which is what makes a cost bound written against it stable.
+ */
+class CountedClassString extends Array<number> {
+  override join(separator?: string): string {
+    classStringKeys += 1;
+    return super.join(separator);
+  }
+}
+
+/** The property names one wide class-set union writes, in order. */
+function unionPropertyNames(total: number): readonly string[] {
+  return Array.from({ length: total }, (_, index) => `P${index}`);
+}
+
+/**
+ * The part of one artifact a class set decides, encoded for comparison.
+ *
+ * Two patterns that name the same class set differently record different
+ * sources and agree on everything else, and an element-by-element report
+ * of every instruction is not a readable failure, so the comparison is
+ * made over one encoded value.
+ */
+function loweredArtifact(program: RegExpMatcherProgram): string {
+  return JSON.stringify({
+    instructions: program.instructions,
+    sets: program.sets,
+  });
+}
+
+/*
+ * A `v`-mode union built two operands at a time renormalized every
+ * alternative the accumulator already held, once per operand, so building
+ * one class set cost the square of its operand count rather than its size.
+ * The reviewed source limit admits a one-mebibyte pattern, which writes
+ * well over a hundred thousand operands into a single union, and sixteen
+ * thousand of them already spent about eighteen seconds.
+ *
+ * The bound is counted rather than timed, and it bounds growth rather than
+ * the count itself: an operand is visited a small fixed number of times,
+ * two as the builder stands, which is not itself the contract. The keys
+ * the builder derives are counted for one operand count and for twice that
+ * operand count, so a construction that revisits its whole accumulator for
+ * every operand roughly quadruples, while one that visits each operand a
+ * bounded number of times roughly doubles. A slow machine derives exactly
+ * as many keys as a fast one, so the comparison holds wherever the suite
+ * runs.
+ *
+ * Writing every operand a second time, in the opposite order, pins what
+ * the accumulation must preserve: one copy of each alternative, in the
+ * position its first appearance had, lowering to the same artifact.
+ */
+test("visits each class-set operand a bounded number of times", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation", "unicode-property-escapes"],
+    unicodeProperty: () => true,
+  };
+  const unicodeData: RegExpMatcherUnicodeData = {
+    stringPropertySet: (escape) => {
+      const index = Number(escape.property.slice(1));
+      return [CountedClassString.from([0x10_00 + index, 0x20_00 + index])];
+    },
+  };
+  const build = (names: readonly string[]): RegExpMatcherProgram => {
+    const operands = names.map((name) => `\\p{${name}}`).join("");
+    const parsed = parseRegExpPattern({
+      extensions,
+      flags: "v",
+      source: `^[${operands}]$`,
+    });
+    assert.deepEqual(parsed.errors, []);
+    const pattern = parsed.pattern;
+    if (pattern == null) throw new Error("a parsed pattern is present");
+    const result = buildRegExpMatcher(pattern, { unicodeData });
+    assert.deepEqual(result.errors, []);
+    const program = result.program;
+    if (program == null) throw new Error("a built artifact is present");
+    return program;
+  };
+  const count = 2_000;
+  classStringKeys = 0;
+  const ordered = build(unionPropertyNames(count));
+  const once = classStringKeys;
+  classStringKeys = 0;
+  build(unionPropertyNames(2 * count));
+  const twice = classStringKeys;
+  assert.ok(once > 0, "the caller's class strings reached the builder");
+  assert.ok(
+    twice < 3 * once,
+    `twice the operands derived ${twice} class-string keys, against ` +
+      `${once} for half as many, which is more than linear growth`,
+  );
+  const repeated = build([
+    ...unionPropertyNames(count),
+    ...unionPropertyNames(count).toReversed(),
+  ]);
+  assert.equal(repeated.instructions.length, ordered.instructions.length);
+  assert.ok(
+    loweredArtifact(repeated) === loweredArtifact(ordered),
+    "the repeated operands lower to the artifact the union already built",
+  );
+  const matched = searchRegExpMatcher({
+    program: ordered,
+    startIndex: 0,
+    text: String.fromCodePoint(0x10_00 + count - 1, 0x20_00 + count - 1),
+  });
+  assert.equal(matched.outcome, "matched");
+  const missed = searchRegExpMatcher({
+    program: ordered,
+    startIndex: 0,
+    text: String.fromCodePoint(0x10_00 + count, 0x20_00 + count),
+  });
+  assert.equal(missed.outcome, "unmatched");
 });

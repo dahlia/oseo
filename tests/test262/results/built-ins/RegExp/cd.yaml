@@ -115,7 +115,7 @@ results:
         ory_-_Initial_Punctuation.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Initial_Punctuation.js:104:22: error[OSEO1001]:
+        al_Category_-_Initial_Punctuation.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

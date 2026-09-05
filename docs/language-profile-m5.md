@@ -5051,6 +5051,152 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 generator range without adding a generated-code entry point or changing the
 graph's orchestration state.
 
+M5b node `regexp-pattern-extensions` admits the candidate-edition pattern
+surface that had remained behind the RegExp syntax boundary. Unicode `v`
+classes now support nested union, intersection, and subtraction, finite
+`\q{...}` string alternatives, and all seven properties of strings assembled
+from the pinned Unicode 17.0 emoji sequence inputs. Inline modifier groups
+scope `i`, `m`, and `s` over their body and restore the enclosing state when
+they finish. Named groups and backreferences accept pinned Unicode identifier
+names, and literals admit positive and negative lookbehind, match indices with
+`d`, and dotAll matching with `s`.
+
+The generic matcher remains the semantic authority. Finite strings lower to
+shared-prefix tries made from its existing ordered branch and consume
+instructions, while class-set characters stay normalized inversion lists;
+neither adds a matcher ABI or a host regular-expression dependency. Sharing
+prefixes keeps the complete `RGI_Emoji` artifact bounded, and the active native
+frame ceiling moves from 32,768 to 65,536 slots so the reviewed 3,953-element
+Test262 corpus can enter its generated top-level frame. A literal receives the
+Unicode data at the command-line composition boundary and compiles ahead of
+time. The dynamic C compiler admits modifier groups, but retains the
+source-located `OSEO2001` boundary for Unicode properties and class sets
+because it deliberately does not link the generated Unicode tables.
+
+Fixed native and generated differential evidence at property seed
+`0x60005d00` covers class-set intersection and subtraction, finite strings,
+properties of strings, nested modifier scope, Unicode named captures and
+backreferences, lookbehind, match indices, and dotAll. The fixed fixture runs
+with both specialization policies, exercises the generated matcher artifact,
+deliberately misses the `exec` property-call shape guard so the generic path
+answers, and forces collection at every safepoint. The generated oracle is the
+host candidate-edition RegExp implementation, while Unicode sequence answers
+come only from the pinned files and the independently decoded
+`@oseo/unicode` tables.
+
+The node owns eight inventory roots. Two of them, the generated
+property-of-strings escapes and the `unicodeSets` prototype accessor, moved
+here from `regexp-unicode-property-escapes` and `regexp-prototype-and-exec`,
+whose broad roots were narrowed to keep every inventory path owned exactly
+once. That transfer moves sixty-six paths and no classification: the graph's
+included total is unchanged, and the two neighbors read 597 and 233. It
+records where the evidence actually belongs, because a `\p{RGI_Emoji}` escape
+and the `unicodeSets` accessor are only decidable once this node admits
+properties of strings and the `v` grammar.
+
+All 321 paths in those roots are reviewed: 262 pass, fifty are reviewed
+expected negatives, and nine retain explicit prerequisite boundaries. All four
+dotAll paths, all seventeen lookbehind paths, all seventy modifier paths, and
+all 114 UnicodeSets paths pass, the last through the reviewed
+property-of-strings and extended-character-class harness helpers, including the
+Unicode 17.0 `RGI_Emoji` corpus. Match indices contributes thirteen passes and
+one boundary, and named groups twenty-nine passes and seven boundaries. The
+generated property-of-strings root contributes seven passes and twenty-one
+expected negatives, and the `unicodeSets` accessor root eight passes,
+twenty-nine expected negatives, and one boundary. The symbol-method dispatch
+this node once waited on landed first, so rows the node's own evidence had
+recorded as prerequisite boundaries are observed passing here rather than
+retained.
+
+Outside those roots, eighty-nine previously reviewed paths move from
+`unsupported-profile-feature` to `pass` and nothing moves down. Seventy-eight
+are `RegExp` construction cases: one duplicate-named-group syntax case,
+twenty-two modifier early-error cases, and fifty-five modifier arithmetic
+syntax cases. The other eleven are `exec`, `flags`, `Symbol.replace`, and
+`String.prototype` `match`, `replace`, and `search` cases that observe a `v`
+pattern executing. No reviewed path is removed, and no reviewed classification
+moves down anywhere. The manifest moves from 16,014 to 16,269 cases and from
+12,248 to 12,599 passes, moves from 1,506 to 1,556 expected negatives, and
+moves from 2,260 to 2,114 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The runtime
+checkpoint moves to
+`oseo-runtime-m5-89`; the node adds no generated-code entry point, built-in
+code ID, intrinsic number, fixed allocation, or matcher instruction, and it
+does not change the graph's orchestration state.
+
+A `\q{...}` alternative that spells no character is admitted and kept. The
+grammar has an empty `ClassString`, `CompileClassSetString` returns an empty
+sequence of characters for it, and `CompileAtom` appends an `EmptyMatcher`
+for a class whose set holds that sequence, after the longer strings and
+after the single characters. So `[\q{a|}]` matches the empty string wherever
+nothing longer matches, and both reference hosts agree. A trailing empty
+alternative is the one a parser drops most easily, because the closing brace
+follows the separator immediately, and dropping it would also clear
+`MayContainStrings` and turn the `[^\q{a|}]` early error into a pattern that
+silently compiled as `[^a]`.
+
+The one deliberate divergence this node records is how V8 reads a `\q{...}`
+alternative of exactly one code point under `i` and `v`. The edition settles
+that in its CharSet notation: with `UnicodeSets` a CharSetElement is a
+sequence of characters, and “an individual character is treated
+interchangeably with a sequence of one character.” A one-code-point `\q{X}`
+is therefore the same set member as the `ClassSetCharacter` `X`, and
+`ClassSetOperand` applies `MaybeSimpleCaseFolding` to a
+`ClassStringDisjunction` and to a `ClassSetCharacter` alike, so both
+spellings reach every later step as one folded element. A one-character
+`ClassString` also leaves `MayContainStrings` false, which is what admits the
+negated spelling at all.
+
+That one rule decides every place set membership is observed. In isolation,
+`CompileAtom` hands a class whose every element “consists of a single
+character” to `CharacterSetMatcher`, which canonicalizes the input against
+the folded element, so `/^[\q{a}]$/iv` matches `"A"`, and
+`ClassSetOperand :: NestedClass` returns its operand unchanged, so `[[\q{a}]]`
+reads the same. Under the two operations that compare members,
+`ClassIntersection` intersects CharSets and `ClassSubtraction` returns “the
+CharSetElements of charSet which are not also CharSetElements of otherSet”, and
+`a` and `\q{a}` are that one element, so `[a&&\q{a}]` retains it while
+`[a--\q{a}]` is empty. Under negation, `CompileCharacterClass` replaces a
+`v`-mode inversion with `CharacterComplement` over `AllCharacters`, which under
+`i` and `v` holds only the code points that case-fold to themselves, so
+`[^\q{a}]` drops `a`, retains no member that canonicalizes to it, and
+`/^[^\q{a}]$/iv` rejects `"A"` as well.
+
+V8 answers the opposite way in each of those spellings on the input that
+separates the two readings, and agrees on an input that is already the folded
+case. It folds such an element but never canonicalizes an input against it,
+and its own results show that cannot be a reading of the edition: it reports
+`/^[\q{A}]$/iv` matching `"a"` but not `"A"`, and a folded set compared
+against a folded input can never separate the two. The compiler-side matcher
+produces the edition's answer, and JavaScriptCore produces that answer in
+each case independently. Test262 pins none of this: its thirty-three
+`\q{...}` files are all generated without `i`, so the generated execution
+domain excludes the combination and *tests/regexp-matcher.test.ts* records
+the exact cases instead.
+
+A second divergence, and the only one this claim records against both
+reference hosts, is how a lone General\_Category value behaves inside `v`-mode
+set algebra under `i`. `CompileToCharSet` returns that spelling unfolded: the
+production reads “Return the CharSet containing all Unicode code points whose
+character database definition includes the property `General_Category` with
+value s”, with no `MaybeSimpleCaseFolding` around it, while the `\p{gc=Ll}`
+spelling and every binary property in the same production end in that call.
+`ClassSetOperand :: NestedClass` returns its operand unchanged, so the exact
+set survives a nesting level as well. The difference is invisible on a lone
+atom, because the matcher canonicalizes the input either way, and shows only
+under an operation: `[\p{Ll}--\p{Lu}]` under `iv` subtracts two disjoint
+categories and retains Ll, matching both `"a"` and `"A"`, where folding first
+maps every uppercase letter onto its lowercase counterpart and cancels the
+ASCII case class. `[\p{Ll}&&\p{Lu}]` is empty under the same reading.
+
+Both reference hosts fold that operand and answer the opposite way on all
+three cases. Test262 pins none of it: no file in the pinned revision combines
+the `unicodeSets` grammar with `i`, so no reviewed path moves, the generated
+property domain emits lone atoms rather than operations, and
+*tests/regexp-matcher.test.ts* records the exact cases together with the
+`\p{gc=Ll}` and binary spellings that must keep cancelling and the negation
+that must keep complementing over the folded code points.
+
 
 Known gaps inside the claim
 ---------------------------

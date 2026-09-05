@@ -22,7 +22,7 @@ results:
         riptional_Parthian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Inscriptional_Parthian.js:104:22: error[OSEO1001]: Unknown
+        t_-_Inscriptional_Parthian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

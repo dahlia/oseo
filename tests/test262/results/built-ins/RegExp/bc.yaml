@@ -81,7 +81,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Cher\
         okee.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Cherokee.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Cherokee.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -106,7 +106,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Arabic.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Arabic.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Arabic.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -131,7 +131,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Garay.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Garay.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Garay.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -156,7 +156,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Ugaritic.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Ugaritic.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Ugaritic.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

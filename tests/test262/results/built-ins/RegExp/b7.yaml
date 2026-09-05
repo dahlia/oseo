@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Cauc\
         asian_Albanian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Caucasian_Albanian.js:104:22: error[OSEO1001]: Unknown
+        t_-_Caucasian_Albanian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -46,7 +46,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Sogd\
         ian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Sogdian.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Sogdian.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -71,7 +71,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Unified_Ideog\
         raph.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Unifi\
-        ed_Ideograph.js:104:22: error[OSEO1001]: Unknown binding
+        ed_Ideograph.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -182,14 +182,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

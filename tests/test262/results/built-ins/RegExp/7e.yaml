@@ -22,7 +22,7 @@ results:
         ions_-_Caucasian_Albanian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Caucasian_Albanian.js:104:22: error[OSEO1001]:
+        t_Extensions_-_Caucasian_Albanian.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -47,7 +47,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Takri.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Takri.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Takri.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

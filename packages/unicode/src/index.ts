@@ -7,11 +7,11 @@
  * or a C library regular-expression facility, so two hosts running the same
  * checkout agree exactly.
  *
- * The contract is deliberately narrow. It reports code-point properties, case
- * folding, case mapping, the ECMAScript word-character sets, and the exact
- * aliases an ECMAScript Unicode property escape admits. Matching,
- * canonicalization order, and locale policy belong to the regular-expression
- * and String units that read these tables.
+ * The contract is deliberately narrow. It reports code-point and string
+ * properties, case folding, case mapping, the ECMAScript word-character
+ * sets, and the exact aliases an ECMAScript Unicode property escape admits.
+ * Matching, canonicalization order, and locale policy belong to the
+ * regular-expression and String units that read these tables.
  *
  * A code-point set is an inversion list, so a consumer may lower one straight
  * into a generated table without reshaping it. Sets are built on first use
@@ -63,6 +63,7 @@ import {
   simpleLowercase as encodedSimpleLowercase,
   simpleTitlecase as encodedSimpleTitlecase,
   simpleUppercase as encodedSimpleUppercase,
+  stringPropertySequences as encodedStringPropertySequences,
   unicodeDataInputs,
   unicodeDataLicense,
   unicodeVersion,
@@ -167,6 +168,29 @@ export const nonBinaryPropertyNameAliases: readonly string[] = Object.entries(
   .filter(([, canonical]) => nonBinaryPropertyNames.includes(canonical))
   .map(([name]) => name)
   .toSorted();
+
+/** Every ECMAScript property of strings, in ascending order. */
+export const stringPropertyNames: readonly string[] = Object.keys(
+  encodedStringPropertySequences,
+).toSorted();
+
+const stringPropertySequencesFor = lazyKeyed(
+  (name: string): readonly (readonly number[])[] =>
+    (encodedStringPropertySequences[name] ?? []).map((encoded) =>
+      encoded
+        .split(" ")
+        .filter((token) => token !== "")
+        .map((token) => Number.parseInt(token, 36)),
+    ),
+);
+
+/** The code-point sequences of one ECMAScript string property. */
+export function ecma262UnicodeStringPropertySet(
+  name: string,
+): readonly (readonly number[])[] | undefined {
+  if (!Object.hasOwn(encodedStringPropertySequences, name)) return undefined;
+  return stringPropertySequencesFor(name);
+}
 
 /** Every canonical General_Category value, supercategories included. */
 export const generalCategoryValues: readonly string[] = [

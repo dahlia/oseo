@@ -81,7 +81,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Hangul.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Hangul.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Hangul.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -167,6 +167,39 @@ results:
     execution:
       harnessIncludes:
         - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-v-flag
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/unicodeSets/generated/character-union-character.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - regExpUtils.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled

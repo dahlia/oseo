@@ -4,6 +4,37 @@ results:
   - case:
       async: false
       features:
+        - regexp-named-groups
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js:97:12:
+        error[OSEO2001]: Regular expression pattern extension is not
+        admitted yet.\n"'
+      unsupportedCapability: regexp-pattern-extension
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - regexp-unicode-property-escapes
       flags: []
       includes:
@@ -21,7 +52,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Old_\
         North_Arabian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Old_North_Arabian.js:104:22: error[OSEO1001]: Unknown
+        t_-_Old_North_Arabian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -38,12 +69,23 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - regexp-modifiers
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

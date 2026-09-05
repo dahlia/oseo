@@ -112,7 +112,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Emoji_Modifie\
         r_Base.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Emoji\
-        _Modifier_Base.js:104:22: error[OSEO1001]: Unknown binding
+        _Modifier_Base.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -137,7 +137,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Pattern_Synta\
         x.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Patte\
-        rn_Syntax.js:104:22: error[OSEO1001]: Unknown binding
+        rn_Syntax.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -162,7 +162,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Gran\
         tha.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Grantha.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Grantha.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -187,7 +187,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Mani\
         chaean.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Manichaean.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Manichaean.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -212,7 +212,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Adlam.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Adlam.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Adlam.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -238,7 +238,7 @@ results:
         ions_-_Inscriptional_Parthian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Inscriptional_Parthian.js:104:22:
+        t_Extensions_-_Inscriptional_Parthian.js:140:22:
         error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -264,7 +264,7 @@ results:
         ions_-_Mende_Kikakui.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Mende_Kikakui.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Mende_Kikakui.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -284,12 +284,12 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

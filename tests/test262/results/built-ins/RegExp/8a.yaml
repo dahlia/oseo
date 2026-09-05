@@ -22,7 +22,7 @@ results:
         ions_-_Nyiakeng_Puachue_Hmong.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Nyiakeng_Puachue_Hmong.js:104:22:
+        t_Extensions_-_Nyiakeng_Puachue_Hmong.js:140:22:
         error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -73,14 +73,14 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -101,6 +101,5 @@ results:
       detail: "Not executed: the frontmatter needs an unsupported feature."
       passed: false
     unsupportedFeatures:
-      - regexp-v-flag
       - cross-realm
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

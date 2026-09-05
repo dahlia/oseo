@@ -111,7 +111,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Mongolian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Mongolian.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Mongolian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -137,7 +137,7 @@ results:
         ions_-_Old_South_Arabian.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Old_South_Arabian.js:104:22: error[OSEO1001]:
+        t_Extensions_-_Old_South_Arabian.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

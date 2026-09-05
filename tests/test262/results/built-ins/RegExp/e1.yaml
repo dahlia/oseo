@@ -73,7 +73,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Any.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Any.j\
-        s:104:22: error[OSEO1001]: Unknown binding 'buildString'.\\n\""
+        s:140:22: error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -97,7 +97,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/General_Categ\
         ory_-_Mark.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Mark.js:104:22: error[OSEO1001]: Unknown binding
+        al_Category_-_Mark.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -122,7 +122,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Glag\
         olitic.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Glagolitic.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Glagolitic.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

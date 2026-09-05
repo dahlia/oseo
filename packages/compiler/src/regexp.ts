@@ -149,6 +149,34 @@ export interface RegExpCharacterClass {
   readonly span: RegExpSpan;
 }
 
+/** One finite string alternative inside a `v`-mode `\q{...}` operand. */
+export interface RegExpClassStringDisjunction {
+  readonly kind: "class-strings";
+  readonly span: RegExpSpan;
+  readonly strings: readonly (readonly RegExpCharacter[])[];
+}
+
+/** One operand of a `v`-mode class-set expression. */
+export type RegExpClassSetOperand =
+  | RegExpCharacter
+  | RegExpCharacterRange
+  | RegExpClassEscape
+  | RegExpClassStringDisjunction
+  | RegExpUnicodeClassSet
+  | RegExpUnicodePropertyEscape;
+
+/** The operation joining operands in one `v`-mode character class. */
+export type RegExpClassSetOperation = "intersection" | "subtraction" | "union";
+
+/** One nested or top-level `v`-mode class-set expression. */
+export interface RegExpUnicodeClassSet {
+  readonly kind: "class-set";
+  readonly negated: boolean;
+  readonly operands: readonly RegExpClassSetOperand[];
+  readonly operation: RegExpClassSetOperation;
+  readonly span: RegExpSpan;
+}
+
 /** One capturing group with its one-based index and optional name. */
 export interface RegExpCapturingGroup {
   readonly body: RegExpDisjunction;
@@ -210,6 +238,7 @@ export type RegExpAtom =
   | RegExpCapturingGroup
   | RegExpCharacter
   | RegExpCharacterClass
+  | RegExpUnicodeClassSet
   | RegExpClassEscape
   | RegExpDot
   | RegExpGroup
@@ -287,12 +316,12 @@ export interface RegExpPatternError {
  *
  * The parser recognizes each construct and refuses it with a located
  * `unsupported` error unless the caller admits the point. Admitting a
- * point never changes how any other construct parses. Class set notation
- * is deliberately absent: this unit has no class-set representation, so a
- * `v` flag character class is always refused, and the unit that adds that
- * representation adds the point with it.
+ * point never changes how any other construct parses.
  */
-export type RegExpExtensionPoint = "modifiers" | "unicode-property-escapes";
+export type RegExpExtensionPoint =
+  | "class-set-notation"
+  | "modifiers"
+  | "unicode-property-escapes";
 
 /**
  * Capabilities a caller supplies to the pattern parser.

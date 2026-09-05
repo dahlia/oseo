@@ -22,11 +22,23 @@ results:
       - iterator-protocol
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js:96:29:
+        error[OSEO2001]: Regular expression pattern extension is not
+        admitted yet.\n"'
+      unsupportedCapability: regexp-pattern-extension
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

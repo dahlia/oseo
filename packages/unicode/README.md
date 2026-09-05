@@ -1,12 +1,13 @@
 @oseo/unicode
 =============
 
-This package owns Oseo's Unicode data. It reports code-point properties, case
-folding, case mapping, and the ECMAScript word-character sets from generated
-tables built out of one reviewed copy of the Unicode Character Database. No
-answer depends on a host locale, a `wchar_t` classification routine, or a C
-library regular-expression facility, so two hosts running the same checkout
-agree exactly and a cross-compiled target agrees with the host that built it.
+This package owns Oseo's Unicode data. It reports code-point and string
+properties, case folding, case mapping, and the ECMAScript word-character sets
+from generated tables built out of one reviewed copy of the Unicode Character
+Database and emoji sequence data. No answer depends on a host locale, a
+`wchar_t` classification routine, or a C library regular-expression facility,
+so two hosts running the same checkout agree exactly and a cross-compiled
+target agrees with the host that built it.
 
 The contract is deliberately narrow. The package supplies tables and resolves
 the exact property and value aliases ECMA-262 admits in a Unicode property
@@ -27,8 +28,8 @@ offline and produce the same tables on every machine.
 Generation rejects an input whose byte length or digest has moved. It then
 requires the structural version marker the manifest names for that file: a
 `# <Name>-<version>.txt` first line for an ordinary database file, the emoji
-header and its `# Version:` line for *emoji-data.txt*, and no header at all
-for *UnicodeData.txt*, which upstream ships without one. A missing or
+header and its `# Version:` line for the three emoji data files, and no header
+at all for *UnicodeData.txt*, which upstream ships without one. A missing or
 reshaped header fails rather than being skipped, because a skipped header is
 what a substituted file looks like once its digest has been updated without
 its contents being reviewed. Generation also rejects a property or case
@@ -67,6 +68,8 @@ What the tables cover
  -  Every binary property in table 70 of ECMA-262, including the three
     (`ASCII`, `Any`, and `Assigned`) that ECMAScript defines rather than the
     Unicode Character Database.
+ -  Every ECMAScript property of strings derived from *emoji-sequences.txt*
+    and *emoji-zwj-sequences.txt*, including the composed `RGI_Emoji` set.
  -  Simple and full case folding, and the simple and unconditional full
     lowercase, uppercase, and titlecase mappings.
  -  The conditional case mappings of *SpecialCasing.txt*, recorded with their
@@ -87,18 +90,17 @@ itself; an unassigned code point has `General_Category=Cn`. Passing anything
 that is not a code point raises a `RangeError` rather than returning a
 plausible answer.
 
-Properties of strings, such as `RGI_Emoji` and `Basic_Emoji`, are out of
-scope. They are sequence properties rather than code-point properties, they
-need the emoji sequence files that this package does not pin, and they only
-matter to the `v` flag. The unit that admits `v`-mode class set notation owns
-them.
-
 `ecma262UnicodePropertySet` resolves the exact aliases admitted for a `p` or
 `P` escape. A lone canonical name selects a binary property or a
 `General_Category` value. A two-part expression selects `General_Category`,
 `Script`, or `Script_Extensions`. The function performs no loose matching and
 returns `undefined` for an invalid property expression, including a lone
 Script value.
+
+`ecma262UnicodeStringPropertySet` resolves an exact property-of-strings name
+to its code-point sequences. It performs no alias or loose matching because
+ECMA-262 admits only the canonical names in this grammar, and it returns
+`undefined` for a code-point property or an unknown name.
 
 
 Representation
@@ -115,3 +117,7 @@ literal: base-36 integers separated by whitespace, where all but the first are
 increases from the value before them. That keeps the module small, keeps every
 line inside the repository limit, and confines a diff to the entries that
 actually moved.
+
+A property of strings is a shared immutable list of shared immutable
+code-point sequences. Each generated sequence is base-36 text decoded on the
+first lookup, and the complete property is cached just like a code-point set.

@@ -23,7 +23,7 @@ results:
         n-word-class-escape-negative-cases.js non-strict disabled failed
         (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
-        class-non-word-class-escape-negative-cases.js:137:13:
+        class-non-word-class-escape-negative-cases.js:173:13:
         error[OSEO1001]: Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -108,7 +108,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Emoji_Compone\
         nt.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Emoji\
-        _Component.js:104:22: error[OSEO1001]: Unknown binding
+        _Component.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -133,7 +133,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Quotation_Mar\
         k.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Quota\
-        tion_Mark.js:104:22: error[OSEO1001]: Unknown binding
+        tion_Mark.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -158,7 +158,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Georgian.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Georgian.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Georgian.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

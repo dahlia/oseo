@@ -82,7 +82,7 @@ results:
         ory_-_Modifier_Symbol.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Modifier_Symbol.js:104:22: error[OSEO1001]:
+        al_Category_-_Modifier_Symbol.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -107,7 +107,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Ol_O\
         nal.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Ol_Onal.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Ol_Onal.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

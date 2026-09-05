@@ -52,7 +52,7 @@ results:
         ory_-_Open_Punctuation.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Open_Punctuation.js:104:22: error[OSEO1001]:
+        al_Category_-_Open_Punctuation.js:140:22: error[OSEO1001]:
         Unknown binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -77,7 +77,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tagb\
         anwa.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Tagbanwa.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Tagbanwa.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -102,7 +102,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Vai.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Vai.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Vai.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

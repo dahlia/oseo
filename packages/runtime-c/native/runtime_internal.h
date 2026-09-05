@@ -15,7 +15,7 @@
 #define OSEO_CANONICAL_NAN UINT64_C(0x7ff8000000000000)
 /* 2^53 - 1, the largest integer ToIndex admits. */
 #define OSEO_INDEX_LIMIT 9007199254740991.0
-#define OSEO_MAX_ACTIVE_FRAME_SLOTS ((size_t)32768u)
+#define OSEO_MAX_ACTIVE_FRAME_SLOTS ((size_t)65536u)
 #define OSEO_MAX_CALL_DEPTH ((size_t)256u)
 /* Node.js and Deno expose this V8 UTF-16 string ceiling. */
 #define OSEO_MAX_STRING_LENGTH ((size_t)536870888u)

@@ -372,3 +372,7 @@ families:
     owner: tests/property/m5-array-prototype-mutation.property.test.ts
     start: 0x60005c00
     end: 0x60005cff
+  - family: m5-regexp-pattern-extensions
+    owner: tests/property/m5-regexp-pattern-extensions.property.test.ts
+    start: 0x60005d00
+    end: 0x60005dff

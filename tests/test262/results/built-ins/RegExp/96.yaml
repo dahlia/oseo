@@ -141,7 +141,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Lisu.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Lisu.js:104:22: error[OSEO1001]: Unknown binding
+        t_Extensions_-_Lisu.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -282,12 +282,12 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

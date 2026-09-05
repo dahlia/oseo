@@ -4,6 +4,7 @@ import {
   type RegExpAtom,
   type RegExpCapture,
   type RegExpCharacterClass,
+  type RegExpClassSetOperand,
   type RegExpClassEscapeSet,
   type RegExpClassItem,
   type RegExpDisjunction,
@@ -16,6 +17,7 @@ import {
   type RegExpSpan,
   type RegExpTerm,
   type RegExpUnicodePropertyEscape,
+  type RegExpUnicodeClassSet,
 } from "./regexp.ts";
 
 function includePropertiesWhen<const Properties extends object>(
@@ -93,6 +95,46 @@ function setUnion(
   return boundaries;
 }
 
+/**
+ * A running union of inversion lists, held as one partial union per rank.
+ *
+ * Slot `rank` holds the union of a run of exactly `2 ** rank` lists, so
+ * adding one list carries upward the way a binary counter does. Every
+ * boundary then takes part in a logarithmic number of merges rather than
+ * in one merge for each list that follows it, and the accumulator holds
+ * one partial union per rank rather than one per list.
+ *
+ * Folding `setUnion` from the left instead rewalks the whole accumulated
+ * list once per operand, which is the square of the operand count for a
+ * union whose operands name distinct code points. Collecting the lists
+ * and merging them at the end holds every operand at once, which a union
+ * of many large operands cannot afford.
+ */
+type SetUnionSlots = (RegExpMatcherSet | undefined)[];
+
+/** Add one inversion list to a running union. */
+function addSetUnion(slots: SetUnionSlots, set: RegExpMatcherSet): void {
+  let carry = set;
+  for (let rank = 0; ; rank += 1) {
+    const held = slots[rank];
+    if (held == null) {
+      slots[rank] = carry;
+      return;
+    }
+    slots[rank] = undefined;
+    carry = setUnion(held, carry);
+  }
+}
+
+/** The union every slot of a running union holds together. */
+function finishSetUnion(slots: SetUnionSlots): RegExpMatcherSet {
+  let union: RegExpMatcherSet = [];
+  for (const held of slots) {
+    if (held != null) union = setUnion(union, held);
+  }
+  return union;
+}
+
 /** The complement of one inversion list over the whole code-point range. */
 function setComplement(set: RegExpMatcherSet): RegExpMatcherSet {
   const boundaries: number[] = [];
@@ -104,6 +146,42 @@ function setComplement(set: RegExpMatcherSet): RegExpMatcherSet {
   }
   if (position < codePointLimit) boundaries.push(position, codePointLimit);
   return boundaries;
+}
+
+function combineSets(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+  include: (inLeft: boolean, inRight: boolean) => boolean,
+): RegExpMatcherSet {
+  const points = [...new Set([0, ...left, ...right, codePointLimit])].toSorted(
+    (first, second) => first - second,
+  );
+  const result: number[] = [];
+  let included = false;
+  for (let index = 0; index + 1 < points.length; index += 1) {
+    const point = points[index] ?? 0;
+    const next = include(setHas(left, point), setHas(right, point));
+    if (next !== included) result.push(point);
+    included = next;
+  }
+  if (included) result.push(codePointLimit);
+  return result;
+}
+
+/** The intersection of two inversion lists. */
+function setIntersection(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+): RegExpMatcherSet {
+  return combineSets(left, right, (inLeft, inRight) => inLeft && inRight);
+}
+
+/** The members of the first inversion list absent from the second. */
+function setDifference(
+  left: RegExpMatcherSet,
+  right: RegExpMatcherSet,
+): RegExpMatcherSet {
+  return combineSets(left, right, (inLeft, inRight) => inLeft && !inRight);
 }
 
 /** Build a normalized inversion list from unsorted inclusive ranges. */
@@ -391,6 +469,10 @@ export interface RegExpMatcherUnicodeData {
   readonly propertySet?: (
     escape: RegExpUnicodePropertyEscape,
   ) => RegExpMatcherSet | undefined;
+  readonly stringPropertySet?: (
+    escape: RegExpUnicodePropertyEscape,
+  ) => readonly (readonly number[])[] | undefined;
+  readonly generalCategoryValue?: (name: string) => boolean;
   readonly spaceSeparators?: RegExpMatcherSet;
 }
 
@@ -480,18 +562,18 @@ const unplacedLabel = -1;
  */
 interface Builder {
   readonly addresses: number[];
-  readonly dotAll: boolean;
   readonly failLabel: number;
-  readonly ignoreCase: boolean;
   readonly instructions: RegExpMatcherInstruction[];
   readonly limits: RegExpMatcherLimits;
-  readonly multiline: boolean;
   readonly setIndices: Map<string, number>;
   readonly sets: RegExpMatcherSet[];
   readonly unicodeData: RegExpMatcherUnicodeData;
   readonly unicodeMode: boolean;
   readonly unicodeSets: boolean;
+  caseRepresentatives: ReadonlyMap<number, number> | undefined;
   classes: readonly (readonly number[])[] | undefined;
+  dotAll: boolean;
+  ignoreCase: boolean;
   /**
    * How many instructions a native encoding of this artifact needs.
    *
@@ -503,8 +585,9 @@ interface Builder {
    * than on this array's length alone.
    */
   lowered: number;
+  multiline: boolean;
   registers: number;
-  wordSet: number | undefined;
+  readonly wordSets: Map<boolean, number>;
 }
 
 function newLabel(builder: Builder): number {
@@ -614,6 +697,25 @@ function closeSet(
   return added.length === 0 ? set : setUnion(set, setOfRanges(added));
 }
 
+/** Map each cased character to one stable representative of its class. */
+function caseRepresentatives(
+  builder: Builder,
+  span: RegExpSpan,
+): ReadonlyMap<number, number> {
+  const cached = builder.caseRepresentatives;
+  if (cached != null) return cached;
+  const representatives = new Map<number, number>();
+  for (const members of caseClasses(builder, span)) {
+    const representative = members.reduce(
+      (lowest, member) => Math.min(lowest, member),
+      members[0] ?? 0,
+    );
+    for (const member of members) representatives.set(member, representative);
+  }
+  builder.caseRepresentatives = representatives;
+  return representatives;
+}
+
 /**
  * The `WordCharacters` of this pattern.
  *
@@ -686,6 +788,316 @@ function propertyEscapeSet(
   return setComplement(resolved);
 }
 
+interface ClassValue {
+  readonly characters: RegExpMatcherSet;
+  readonly strings: readonly (readonly number[])[];
+}
+
+/** The key two class strings share exactly when they hold the same run. */
+function classStringKey(sequence: readonly number[]): string {
+  return sequence.join(",");
+}
+
+/**
+ * Fold one class-set value into a running union of values.
+ *
+ * The edition holds a one-character `\q{...}` alternative as a code point
+ * rather than as a string, and holds each remaining alternative once. An
+ * alternative already in `unique` is left as it was written, so a repeated
+ * alternative keeps the spelling and the position of its first appearance,
+ * which is the order the class string trie is then built in.
+ *
+ * `slots` and `unique` are the accumulator: folding is written this way so
+ * that a union of many operands folds each operand a bounded number of
+ * times and releases it, rather than refolding everything it already
+ * holds once more for every operand that follows.
+ */
+function addClassValue(
+  slots: SetUnionSlots,
+  unique: Map<string, readonly number[]>,
+  value: ClassValue,
+): void {
+  const single: (readonly [number, number])[] = [];
+  for (const sequence of value.strings) {
+    const character = sequence.length === 1 ? sequence[0] : undefined;
+    if (character == null) {
+      const key = classStringKey(sequence);
+      if (!unique.has(key)) unique.set(key, sequence);
+      continue;
+    }
+    single.push([character, character]);
+  }
+  addSetUnion(slots, value.characters);
+  if (single.length > 0) addSetUnion(slots, setOfRanges(single));
+}
+
+/** One class-set value with its one-character alternatives folded in. */
+function normalizeClassValue(value: ClassValue): ClassValue {
+  const slots: SetUnionSlots = [];
+  const unique = new Map<string, readonly number[]>();
+  addClassValue(slots, unique, value);
+  return {
+    characters: finishSetUnion(slots),
+    strings: [...unique.values()],
+  };
+}
+
+function propertyEscapeClassValue(
+  builder: Builder,
+  escape: RegExpUnicodePropertyEscape,
+): ClassValue {
+  const characters = builder.unicodeData.propertySet?.(escape);
+  if (characters != null) {
+    return { characters: propertyEscapeSet(builder, escape), strings: [] };
+  }
+  const strings = builder.unicodeData.stringPropertySet?.(escape);
+  if (strings == null || escape.negated) {
+    refuse(
+      "unsupported",
+      "A Unicode property of strings needs data that is not linked.",
+      escape.span,
+    );
+  }
+  return normalizeClassValue({ characters: [], strings });
+}
+
+/**
+ * Whether one escape is a lone General_Category value such as `\p{Ll}`.
+ *
+ * `CompileToCharSet` returns that spelling without folding it, while the
+ * `\p{gc=Ll}` spelling and every binary property end in
+ * `MaybeSimpleCaseFolding`. The asymmetry is deliberate and is only
+ * observable inside `v`-mode set algebra, where folding an operand before
+ * the operation removes members the edition keeps.
+ *
+ * The builder asks the question the edition asks, whether the name is a
+ * General_Category value, through the caller's own data. Holding a table of
+ * category names here would put Unicode knowledge in the compiler core,
+ * which the package boundary does not allow.
+ *
+ * The caller answers it directly rather than the builder inferring it from
+ * whether some other spelling resolves. A provider that resolves a lone
+ * escape but not the classification would otherwise fold an operand the
+ * edition keeps exact and match nothing, silently, where every other
+ * missing Unicode fact reports an owned refusal.
+ */
+function loneGeneralCategory(
+  builder: Builder,
+  escape: RegExpUnicodePropertyEscape,
+): boolean {
+  if (escape.value != null) return false;
+  const classify = builder.unicodeData.generalCategoryValue;
+  if (classify == null) {
+    refuse(
+      "unsupported",
+      "A lone Unicode property escape needs the General_Category value " +
+        "classification that is not linked.",
+      escape.span,
+    );
+  }
+  return classify(escape.property);
+}
+
+/**
+ * Whether one operand keeps its exact code points through set algebra.
+ *
+ * The edition folds a `ClassSetCharacter` and a `ClassStringDisjunction`
+ * operand but returns a `NestedClass` operand unchanged, so a nested class
+ * carries whatever its own operands decided rather than being folded again.
+ * Closing a nested value that is already closed changes nothing, so this
+ * only matters for the one leaf the edition leaves raw.
+ */
+function preservesExactOperand(
+  builder: Builder,
+  operand: RegExpClassSetOperand,
+): boolean {
+  if (operand.kind === "class-set") return true;
+  return (
+    operand.kind === "unicode-property" &&
+    !operand.negated &&
+    loneGeneralCategory(builder, operand)
+  );
+}
+
+function classSetOperandValue(
+  builder: Builder,
+  operand: RegExpClassSetOperand,
+): ClassValue {
+  let value: ClassValue;
+  if (operand.kind === "class-set") {
+    value = classSetValue(builder, operand);
+  } else if (operand.kind === "class-strings") {
+    value = normalizeClassValue({
+      characters: [],
+      strings: operand.strings.map((characters) =>
+        characters.map((character) => character.value),
+      ),
+    });
+  } else if (operand.kind === "unicode-property") {
+    value = propertyEscapeClassValue(builder, operand);
+  } else {
+    value = { characters: classItemSet(builder, operand), strings: [] };
+  }
+  if (!builder.unicodeSets || !builder.ignoreCase) return value;
+  const representatives = caseRepresentatives(builder, operand.span);
+  const exact = preservesExactOperand(builder, operand);
+  return normalizeClassValue({
+    characters: exact
+      ? value.characters
+      : closeSet(builder, value.characters, operand.span),
+    strings: value.strings.map((sequence) =>
+      sequence.map((character) => representatives.get(character) ?? character),
+    ),
+  });
+}
+
+/** The first operand's value, or the empty value for no operand at all. */
+function leadingClassValue(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const first = operands[0];
+  if (first == null) return { characters: [], strings: [] };
+  return normalizeClassValue(classSetOperandValue(builder, first));
+}
+
+/**
+ * The union of every operand, accumulated as the operands resolve.
+ *
+ * Unioning two values at a time renormalized every alternative the
+ * accumulator already held, once per operand, which is the square of the
+ * operand count: an admitted one-mebibyte source can write more than a
+ * hundred thousand `\q{...}` operands into one union. Each operand is
+ * folded on its own instead, and the alternatives accumulate in a map
+ * keyed the way `normalizeClassValue` keys them, so a repeated alternative
+ * still keeps the position and spelling of its first appearance and the
+ * result is the value the pairwise fold produced.
+ *
+ * One operand is resolved at a time and released once it has been folded
+ * in, because a union of many operands that each name thousands of
+ * alternatives cannot hold every operand's value at once.
+ */
+function unionClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const slots: SetUnionSlots = [];
+  const unique = new Map<string, readonly number[]>();
+  for (const operand of operands) {
+    addClassValue(slots, unique, classSetOperandValue(builder, operand));
+  }
+  return {
+    characters: finishSetUnion(slots),
+    strings: [...unique.values()],
+  };
+}
+
+/**
+ * The intersection of the first operand with every operand after it.
+ *
+ * An alternative of the first operand survives exactly when every later
+ * operand also holds it, which one counting pass decides. Re-filtering the
+ * survivors against each operand in turn would instead cost the first
+ * operand's size once per operand. Only an alternative the first operand
+ * wrote is counted, so the counts stay within its size however many
+ * operands follow.
+ */
+function intersectClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const left = leadingClassValue(builder, operands);
+  const candidates = new Set(left.strings.map(classStringKey));
+  const holders = new Map<string, number>();
+  let characters = left.characters;
+  let rights = 0;
+  for (const [index, operand] of operands.entries()) {
+    if (index === 0) continue;
+    const value = classSetOperandValue(builder, operand);
+    characters = setIntersection(characters, value.characters);
+    for (const key of new Set(value.strings.map(classStringKey))) {
+      if (!candidates.has(key)) continue;
+      holders.set(key, (holders.get(key) ?? 0) + 1);
+    }
+    rights += 1;
+  }
+  return {
+    characters,
+    strings: left.strings.filter(
+      (value) => (holders.get(classStringKey(value)) ?? 0) === rights,
+    ),
+  };
+}
+
+/**
+ * The first operand less every operand after it.
+ *
+ * Difference is left-associative, and removing the operands in turn
+ * removes exactly what removing their union removes, so an alternative
+ * leaves the survivors the first time a later operand writes it rather
+ * than being looked for again in every operand, which would cost the first
+ * operand's size once per operand. Only what the first operand wrote is
+ * tracked, so the survivors stay within its size however many alternatives
+ * the later operands name, and each of their values is released once it
+ * has been folded in.
+ */
+function subtractClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const left = leadingClassValue(builder, operands);
+  const slots: SetUnionSlots = [];
+  const surviving = new Set(left.strings.map(classStringKey));
+  for (const [index, operand] of operands.entries()) {
+    if (index === 0) continue;
+    const value = classSetOperandValue(builder, operand);
+    addSetUnion(slots, value.characters);
+    for (const sequence of value.strings) {
+      surviving.delete(classStringKey(sequence));
+    }
+  }
+  return {
+    characters: setDifference(left.characters, finishSetUnion(slots)),
+    strings: left.strings.filter((value) =>
+      surviving.has(classStringKey(value)),
+    ),
+  };
+}
+
+function classSetValue(
+  builder: Builder,
+  node: RegExpUnicodeClassSet,
+): ClassValue {
+  let value: ClassValue;
+  if (node.operation === "union") {
+    value = unionClassSet(builder, node.operands);
+  } else if (node.operation === "intersection") {
+    value = intersectClassSet(builder, node.operands);
+  } else {
+    value = subtractClassSet(builder, node.operands);
+  }
+  if (!node.negated) return value;
+  if (value.strings.length > 0) {
+    refuse(
+      "unsupported",
+      "A negated class set cannot contain strings.",
+      node.span,
+    );
+  }
+  /*
+   * `CharacterComplement` complements over the folded code points under
+   * `iv`, so a set that reached here holding the exact members of a lone
+   * category is closed first. Complementing it raw would keep every case
+   * sibling of its members, which is the opposite of what negation means
+   * here. A set that is already closed is unchanged by this.
+   */
+  const complemented =
+    builder.unicodeSets && builder.ignoreCase
+      ? closeSet(builder, value.characters, node.span)
+      : value.characters;
+  return { characters: setComplement(complemented), strings: [] };
+}
+
 /** The raw set one class member names, before the class is closed. */
 function classItemSet(
   builder: Builder,
@@ -742,11 +1154,204 @@ function characterAtomSet(
     );
   }
   if (atom.kind === "unicode-property") {
+    if (
+      builder.unicodeData.propertySet?.(atom) == null &&
+      builder.unicodeData.stringPropertySet?.(atom) != null
+    ) {
+      return undefined;
+    }
     return closeSet(builder, propertyEscapeSet(builder, atom), atom.span);
   }
+  if (atom.kind === "class-set") return undefined;
   if (atom.kind !== "character-class") return undefined;
   const closed = closeSet(builder, characterClassSet(builder, atom), atom.span);
   return atom.negated ? setComplement(closed) : closed;
+}
+
+function emitClassValueBranch(
+  builder: Builder,
+  sequence: readonly number[] | RegExpMatcherSet,
+  characters: boolean,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  if (characters) {
+    const closed = closeSet(builder, sequence, span);
+    emit(
+      builder,
+      { backward, kind: "consume", set: internSet(builder, closed) },
+      span,
+    );
+    return;
+  }
+  const ordered = backward ? sequence.toReversed() : sequence;
+  for (const character of ordered) {
+    const closed = closeSet(builder, setOfRange(character, character), span);
+    emit(
+      builder,
+      { backward, kind: "consume", set: internSet(builder, closed) },
+      span,
+    );
+  }
+}
+
+interface ClassStringTrie {
+  readonly children: Map<number, ClassStringTrie>;
+  terminal: boolean;
+}
+
+function classStringTrie(
+  sequences: readonly (readonly number[])[],
+  backward: boolean,
+): ClassStringTrie {
+  const root: ClassStringTrie = { children: new Map(), terminal: false };
+  for (const source of sequences.toSorted(
+    (first, second) => second.length - first.length,
+  )) {
+    const sequence = backward ? source.toReversed() : source;
+    let node = root;
+    for (const character of sequence) {
+      const child: ClassStringTrie = node.children.get(character) ?? {
+        children: new Map(),
+        terminal: false,
+      };
+      node.children.set(character, child);
+      node = child;
+    }
+    node.terminal = true;
+  }
+  return root;
+}
+
+function emitClassAlternatives(
+  builder: Builder,
+  branches: readonly (() => void)[],
+  span: RegExpSpan,
+): void {
+  if (branches.length === 0) return;
+  const end = newLabel(builder);
+  for (const [index, branch] of branches.entries()) {
+    if (index + 1 === branches.length) {
+      branch();
+      break;
+    }
+    const preferred = newLabel(builder);
+    const next = newLabel(builder);
+    emit(builder, { alternative: next, kind: "fork", preferred }, span);
+    placeLabel(builder, preferred);
+    branch();
+    emit(builder, { kind: "jump", target: end }, span);
+    placeLabel(builder, next);
+  }
+  placeLabel(builder, end);
+}
+
+/**
+ * One pending step of the iterative class-string trie emission.
+ *
+ * A trie is as deep as its longest string, so emitting it through host
+ * recursion would spend one frame per code point and exhaust the stack on a
+ * `\q{...}` alternative that the reviewed source and instruction limits both
+ * admit. These steps carry that work on the heap instead, and the emitter
+ * pops them in the order the equivalent recursion ran, so one pattern still
+ * compiles to exactly the same instructions and labels.
+ */
+type ClassStringStep =
+  | {
+      readonly end: number;
+      readonly entries: readonly (readonly [number, ClassStringTrie])[];
+      readonly index: number;
+      readonly kind: "branch";
+      readonly terminal: boolean;
+    }
+  | { readonly character: number; readonly kind: "consume" }
+  | {
+      readonly jump: number | undefined;
+      readonly kind: "finish";
+      readonly label: number;
+    }
+  | { readonly kind: "node"; readonly node: ClassStringTrie };
+
+function emitClassStringTrie(
+  builder: Builder,
+  root: ClassStringTrie,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  const steps: ClassStringStep[] = [{ kind: "node", node: root }];
+  for (;;) {
+    const step = steps.pop();
+    if (step == null) return;
+    if (step.kind === "consume") {
+      emitClassValueBranch(builder, [step.character], false, backward, span);
+      continue;
+    }
+    if (step.kind === "finish") {
+      if (step.jump != null) {
+        emit(builder, { kind: "jump", target: step.jump }, span);
+      }
+      placeLabel(builder, step.label);
+      continue;
+    }
+    if (step.kind === "node") {
+      const entries = [...step.node.children];
+      const terminal = step.node.terminal;
+      if (entries.length === 0 && !terminal) continue;
+      steps.push({
+        end: newLabel(builder),
+        entries,
+        index: 0,
+        kind: "branch",
+        terminal,
+      });
+      continue;
+    }
+    const { end, entries, index, terminal } = step;
+    if (index + 1 === entries.length + (terminal ? 1 : 0)) {
+      steps.push({ jump: undefined, kind: "finish", label: end });
+    } else {
+      const preferred = newLabel(builder);
+      const next = newLabel(builder);
+      emit(builder, { alternative: next, kind: "fork", preferred }, span);
+      placeLabel(builder, preferred);
+      steps.push({ ...step, index: index + 1 });
+      steps.push({ jump: end, kind: "finish", label: next });
+    }
+    const entry = entries[index];
+    if (entry != null) {
+      steps.push({ kind: "node", node: entry[1] });
+      steps.push({ character: entry[0], kind: "consume" });
+    }
+  }
+}
+
+function buildClassValue(
+  builder: Builder,
+  value: ClassValue,
+  backward: boolean,
+  span: RegExpSpan,
+): void {
+  if (value.strings.length === 0 && value.characters.length === 0) {
+    emitClassValueBranch(builder, [], true, backward, span);
+    return;
+  }
+  const branches: (() => void)[] = [];
+  const nonEmptyStrings = value.strings.filter(
+    (sequence) => sequence.length > 0,
+  );
+  if (nonEmptyStrings.length > 0) {
+    const trie = classStringTrie(nonEmptyStrings, backward);
+    branches.push(() => emitClassStringTrie(builder, trie, backward, span));
+  }
+  if (value.characters.length > 0) {
+    branches.push(() =>
+      emitClassValueBranch(builder, value.characters, true, backward, span),
+    );
+  }
+  if (value.strings.some((sequence) => sequence.length === 0)) {
+    branches.push(() => undefined);
+  }
+  emitClassAlternatives(builder, branches, span);
 }
 
 /** The lowest and highest capture index one atom encloses. */
@@ -801,6 +1406,19 @@ function buildAtom(
     );
     return;
   }
+  if (atom.kind === "class-set") {
+    buildClassValue(builder, classSetValue(builder, atom), backward, atom.span);
+    return;
+  }
+  if (atom.kind === "unicode-property") {
+    buildClassValue(
+      builder,
+      propertyEscapeClassValue(builder, atom),
+      backward,
+      atom.span,
+    );
+    return;
+  }
   if (atom.kind === "capturing-group") {
     const start = 2 * atom.index;
     const end = start + 1;
@@ -814,11 +1432,21 @@ function buildAtom(
     return;
   }
   if (atom.kind === "modifier-group") {
-    refuse(
-      "unsupported",
-      "An inline modifier group has no matcher lowering yet.",
-      atom.span,
-    );
+    const dotAll = builder.dotAll;
+    const ignoreCase = builder.ignoreCase;
+    const multiline = builder.multiline;
+    builder.dotAll =
+      atom.enabled.includes("s") || (dotAll && !atom.disabled.includes("s"));
+    builder.ignoreCase =
+      atom.enabled.includes("i") ||
+      (ignoreCase && !atom.disabled.includes("i"));
+    builder.multiline =
+      atom.enabled.includes("m") || (multiline && !atom.disabled.includes("m"));
+    buildDisjunction(builder, atom.body, backward);
+    builder.dotAll = dotAll;
+    builder.ignoreCase = ignoreCase;
+    builder.multiline = multiline;
+    return;
   }
   if (atom.kind === "backreference" || atom.kind === "named-backreference") {
     const slots =
@@ -910,8 +1538,9 @@ function buildAssertion(builder: Builder, term: RegExpEdgeAssertion): void {
     return;
   }
   const set =
-    builder.wordSet ?? internSet(builder, wordCharacters(builder, term.span));
-  builder.wordSet = set;
+    builder.wordSets.get(builder.ignoreCase) ??
+    internSet(builder, wordCharacters(builder, term.span));
+  builder.wordSets.set(builder.ignoreCase, set);
   emit(
     builder,
     {
@@ -1167,6 +1796,7 @@ export function buildRegExpMatcher(
   const flags = pattern.flags;
   const builder: Builder = {
     addresses: [unplacedLabel],
+    caseRepresentatives: undefined,
     classes: undefined,
     dotAll: flags.dotAll,
     failLabel: 0,
@@ -1181,7 +1811,7 @@ export function buildRegExpMatcher(
     unicodeData: options.unicodeData ?? {},
     unicodeMode: regExpUnicodeMode(flags),
     unicodeSets: flags.unicodeSets,
-    wordSet: undefined,
+    wordSets: new Map(),
   };
   const whole: RegExpSpan = { end: pattern.source.length, start: 0 };
   try {

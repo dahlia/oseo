@@ -63,6 +63,39 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - regexp-lookbehind
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/RegExp/lookBehind/mutual-recursive.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes:
@@ -113,7 +146,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Pattern_White\
         _Space.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Patte\
-        rn_White_Space.js:104:22: error[OSEO1001]: Unknown binding
+        rn_White_Space.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -138,7 +171,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Gree\
         k.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Greek.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Greek.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -163,7 +196,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tibe\
         tan.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Tibetan.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Tibetan.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -188,7 +221,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
         ions_-_Gurmukhi.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Gurmukhi.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Gurmukhi.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -402,6 +435,39 @@ results:
     execution:
       harnessIncludes:
         - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-v-flag
+      flags: []
+      includes:
+        - regExpUtils.js
+      mode: script
+      path: test/built-ins/RegExp/unicodeSets/generated/character-intersection-character.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - regExpUtils.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled

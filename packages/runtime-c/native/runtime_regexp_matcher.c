@@ -414,8 +414,8 @@ typedef struct {
     uint32_t *set_hashes;
     size_t set_count;
     size_t set_capacity;
-    size_t word_set;
-    bool word_set_ready;
+    size_t word_sets[2];
+    bool word_sets_ready[2];
 
     OseoRegExpRepeat *repeats;
     size_t repeat_count;
@@ -741,6 +741,29 @@ static bool buffer_copy(
     if (count > 0u) memcpy(output->values, values, count * sizeof(uint32_t));
     output->count = count;
     return true;
+}
+
+/*
+ * A valid modifier group can enable ignore-case matching even when the
+ * enclosing RegExp has no `i` flag. This deliberately conservative scan may
+ * recognize escaped or class-contained text, but cannot miss an admitted
+ * modifier group and keeps the ordinary case-sensitive path allocation-free.
+ */
+static bool pattern_may_enable_ignore_case(const OseoString *source) {
+    for (size_t index = 0u; index + 2u < source->length; index += 1u) {
+        if (source->units[index] != '(' ||
+            source->units[index + 1u] != '?') {
+            continue;
+        }
+        for (size_t cursor = index + 2u;
+             cursor < source->length;
+             cursor += 1u) {
+            uint16_t unit = source->units[cursor];
+            if (unit == ':' || unit == '-' || unit == ')') break;
+            if (unit == 'i') return true;
+        }
+    }
+    return false;
 }
 
 /*
@@ -1575,7 +1598,10 @@ static uint32_t class_escape_atom_set(
 }
 
 static uint32_t word_boundary_set(OseoRegExpCompiler *compiler) {
-    if (compiler->word_set_ready) return (uint32_t)compiler->word_set;
+    size_t mode = compiler->ignore_case ? 1u : 0u;
+    if (compiler->word_sets_ready[mode]) {
+        return (uint32_t)compiler->word_sets[mode];
+    }
     if (!class_escape_set(
             compiler,
             OSEO_REGEXP_CLASS_WORD,
@@ -1583,13 +1609,13 @@ static uint32_t word_boundary_set(OseoRegExpCompiler *compiler) {
         )) {
         return 0u;
     }
-    compiler->word_set = intern_set(
+    compiler->word_sets[mode] = intern_set(
         compiler,
         compiler->work[0].values,
         compiler->work[0].count
     );
-    compiler->word_set_ready = compiler_ok(compiler);
-    return (uint32_t)compiler->word_set;
+    compiler->word_sets_ready[mode] = compiler_ok(compiler);
+    return (uint32_t)compiler->word_sets[mode];
 }
 
 static void parse_disjunction(OseoRegExpCompiler *compiler, bool backward);
@@ -1597,6 +1623,10 @@ static void parse_disjunction(OseoRegExpCompiler *compiler, bool backward);
 static void parse_group(OseoRegExpCompiler *compiler, bool backward) {
     compiler->index += 1u;
     bool capturing = true;
+    bool modifier_group = false;
+    bool previous_ignore_case = compiler->ignore_case;
+    bool previous_multiline = compiler->multiline;
+    bool previous_dot_all = compiler->dot_all;
     if (unit_at(compiler, compiler->index) == '?') {
         uint16_t kind = unit_at(compiler, compiler->index + 1u);
         if (kind == ':') {
@@ -1609,6 +1639,40 @@ static void parse_group(OseoRegExpCompiler *compiler, bool backward) {
                 compiler->index += 1u;
             }
             compiler->index += 1u;
+        } else if (kind == 'i' || kind == 'm' || kind == 's' || kind == '-') {
+            uint16_t add = 0u;
+            uint16_t remove = 0u;
+            bool removing = false;
+            compiler->index += 1u;
+            while (!at_end(compiler) &&
+                   unit_at(compiler, compiler->index) != ':') {
+                uint16_t flag = unit_at(compiler, compiler->index);
+                if (flag == '-') {
+                    removing = true;
+                    compiler->index += 1u;
+                    continue;
+                }
+                uint16_t bit = flag == 'i'
+                    ? OSEO_REGEXP_FLAG_I
+                    : flag == 'm'
+                        ? OSEO_REGEXP_FLAG_M
+                        : OSEO_REGEXP_FLAG_S;
+                if (removing) remove = (uint16_t)(remove | bit);
+                else add = (uint16_t)(add | bit);
+                compiler->index += 1u;
+            }
+            compiler->index += 1u;
+            compiler->ignore_case = (add & OSEO_REGEXP_FLAG_I) != 0u ||
+                (compiler->ignore_case &&
+                 (remove & OSEO_REGEXP_FLAG_I) == 0u);
+            compiler->multiline = (add & OSEO_REGEXP_FLAG_M) != 0u ||
+                (compiler->multiline &&
+                 (remove & OSEO_REGEXP_FLAG_M) == 0u);
+            compiler->dot_all = (add & OSEO_REGEXP_FLAG_S) != 0u ||
+                (compiler->dot_all &&
+                 (remove & OSEO_REGEXP_FLAG_S) == 0u);
+            capturing = false;
+            modifier_group = true;
         } else {
             compiler_fail(compiler, OSEO_REGEXP_UNSUPPORTED);
             return;
@@ -1633,6 +1697,11 @@ static void parse_group(OseoRegExpCompiler *compiler, bool backward) {
         );
     }
     parse_disjunction(compiler, backward);
+    if (modifier_group) {
+        compiler->ignore_case = previous_ignore_case;
+        compiler->multiline = previous_multiline;
+        compiler->dot_all = previous_dot_all;
+    }
     if (!compiler_ok(compiler)) return;
     if (unit_at(compiler, compiler->index) != ')') {
         compiler_fail(compiler, OSEO_REGEXP_INVALID);
@@ -2256,7 +2325,8 @@ OseoRegExpProgram *oseo_internal_regexp_program_build(
         *status = OSEO_REGEXP_ALLOCATION_FAILURE;
         return NULL;
     }
-    if (compiler.ignore_case && !build_unknown_region(&compiler)) {
+    if ((compiler.ignore_case || pattern_may_enable_ignore_case(source)) &&
+        !build_unknown_region(&compiler)) {
         compiler_release(&compiler);
         *status = OSEO_REGEXP_ALLOCATION_FAILURE;
         return NULL;

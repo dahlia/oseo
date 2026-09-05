@@ -461,12 +461,14 @@ length, and SHA-256 in *packages/unicode/data/manifest.yaml*, and the tables
 generated from it. It covers `General_Category`, `Script`, and
 `Script_Extensions`, every binary property in table 70 of ECMA-262, simple and
 full case folding, the simple and unconditional full case mappings, the
-conditional mappings of *SpecialCasing.txt* recorded but not applied, and both
-ECMAScript word-character sets. Sets are inversion lists, so a matcher may
-lower one into generated C without reshaping it. `mise run unicode:update`
-regenerates the tables and `mise run check:unicode-tables` fails when the
-checked-in module is not what the pinned inputs produce, offline in both
-directions.
+conditional mappings of *SpecialCasing.txt* recorded but not applied, both
+ECMAScript word-character sets, and the seven properties of strings derived
+from the pinned Unicode 17.0 emoji sequence files. Code-point sets are
+inversion lists, so a matcher may lower one into generated C without reshaping
+it, and string properties are immutable code-point sequence lists.
+`mise run unicode:update` regenerates the tables and
+`mise run check:unicode-tables` fails when the checked-in module is not what
+the pinned inputs produce, offline in both directions.
 
 The generic matcher reads the tables through its caller rather than
 directly, so the builder resolves `\d`, `\s`, `\w`, `\p`, and every
@@ -474,13 +476,11 @@ ignore-case closure into inversion lists while the artifact is built and
 the executor needs no table at all. That keeps the package boundary and
 already gives an artifact one native lowering could consume unchanged.
 
-Two pieces remain. Properties of strings, which only the `v` flag needs,
-are out of scope for that package: they are sequence rather than code-point
-properties and need emoji sequence files it does not pin, so the unit that
-admits class set notation owns them. The runtime-side representation is also
-still open, because the tables are build-time data today and no matcher reads
-them yet; the probe still owns the comparison of candidate table layouts and
-of what a dynamic pattern must carry into the runtime.
+The runtime-side representation remains open. The tables are build-time data,
+so an ahead-of-time matcher reads them while it lowers a literal and the
+dynamic pattern compiler retains its located boundary for a property or class
+set that needs them. The probe still owns what a dynamic pattern must carry
+into the runtime before that boundary can move.
 
 ### Resource behavior
 

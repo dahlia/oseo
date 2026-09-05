@@ -41,12 +41,15 @@ import {
 import {
   caseEquivalenceClasses,
   propertyEscapeSet,
+  stringPropertyEscapeSet,
   unicodeMatcherData,
 } from "./regexp-matcher-data.ts";
 
 const propertyExtensions: RegExpPatternExtensions = {
-  admitted: ["unicode-property-escapes"],
-  unicodeProperty: (escape) => propertyEscapeSet(escape) != null,
+  admitted: ["class-set-notation", "modifiers", "unicode-property-escapes"],
+  unicodeProperty: (escape) =>
+    propertyEscapeSet(escape) != null ||
+    stringPropertyEscapeSet(escape) != null,
 };
 
 function artifact(source: string, flags: string): RegExpMatcherProgram {
@@ -258,6 +261,146 @@ test("records a strictly increasing canonicalization table", () => {
   }
 });
 
+test("matches class-set operations and pinned properties of strings", () => {
+  for (const [source, input] of [
+    ["^[[a-c]&&[b-d]]$", "b"],
+    ["^[[a-c]--[b]]$", "c"],
+    ["^[\\q{ab|cd}x]$", "ab"],
+    ["^\\p{Emoji_Keycap_Sequence}$", "9\ufe0f\u20e3"],
+    ["^\\p{RGI_Emoji}$", "👨‍👩‍👧"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, "v", input),
+      hostObserve(source, "v", input),
+    );
+  }
+  assert.equal(observe("^[[a-c]&&[b-d]]$", "v", "a"), undefined);
+  assert.equal(observe("^[[a-c]--[b]]$", "v", "b"), undefined);
+  assert.equal(artifact("^\\p{RGI_Emoji}+$", "v").instructions.length, 10_173);
+});
+
+test("folds class-set operands before v-mode set operations", () => {
+  for (const [source, flags, input] of [
+    ["[^a]", "iv", "a"],
+    ["[a&&A]", "iv", "a"],
+    ["[[a-z]--A]", "iv", "a"],
+    ["[\\q{AB}--\\q{ab}]", "iv", "AB"],
+    ["[\\q{|a}]", "v", "a"],
+    ["[\\q{a|}]", "v", "b"],
+    ["[\\q{a|}]", "v", "a"],
+    ["[\\q{ab|a|}]", "v", "ac"],
+    ["[\\q{}]", "v", "a"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, flags, input),
+      hostObserve(source, flags, input),
+      `/${source}/${flags} on ${input}`,
+    );
+  }
+});
+
+/*
+ * An empty `ClassString` is a production of the grammar, so a `\q{}`
+ * alternative that spells no character contributes the empty sequence to
+ * the class rather than nothing at all. `CompileClassSetString` returns
+ * "an empty sequence of characters" for it, `CompileToCharSet` unions in
+ * "the CharSet containing the one string s", and `CompileAtom` appends an
+ * `EmptyMatcher` when "cs contains the empty sequence of characters",
+ * after the longer strings and after the single characters. So the empty
+ * alternative is the class's last branch: it matches at any position, and
+ * only where no other branch does.
+ *
+ * A trailing one is the case a parser drops most easily, because the
+ * closing brace follows the separator immediately. Dropping it is not a
+ * normalization: it also clears `MayContainStrings`, which turns the
+ * `[^\q{a|}]` early error into a pattern that silently compiles as
+ * `[^a]`. The host agrees with the edition throughout, so these stay
+ * ordinary differential cases above and the early errors are pinned here.
+ */
+test("keeps an empty q alternative in a v-mode class", () => {
+  const empty = { captures: [""], index: 0 };
+  assert.deepEqual(observe("[\\q{a|}]", "v", "b"), empty);
+  assert.deepEqual(observe("^[\\q{a|}]$", "v", ""), empty);
+  assert.deepEqual(observe("^[\\q{a|}]+$", "v", ""), empty);
+  assert.deepEqual(observe("[\\q{a|}]", "v", "a"), {
+    captures: ["a"],
+    index: 0,
+  });
+  for (const source of ["[^\\q{a|}]", "[^\\q{}]", "[^[\\q{a|}]]"]) {
+    assert.equal(
+      parseRegExpPattern({ extensions: propertyExtensions, flags: "v", source })
+        .parsed,
+      false,
+      `/${source}/v names a string in a negated class`,
+    );
+  }
+});
+
+/*
+ * A `\q{}` alternative of exactly one code point is that code point. The
+ * edition says so outright: with `UnicodeSets` a CharSetElement is a
+ * sequence of characters, and "an individual character is treated
+ * interchangeably with a sequence of one character". `ClassSetOperand`
+ * applies `MaybeSimpleCaseFolding` to a `ClassStringDisjunction` and to a
+ * `ClassSetCharacter` alike, and `CompileAtom` hands every element that
+ * "consists of a single character" to `CharacterSetMatcher`, which
+ * canonicalizes the input against it. So under `iv` a one-code-point
+ * `\q{X}` is the class `[X]`, in isolation and under every set operation.
+ *
+ * The spellings that hide that rule derive the same way. `ClassSetOperand
+ * :: NestedClass` returns its operand unchanged, so `[[\q{a}]]` reads like
+ * the bare class. `ClassIntersection` intersects CharSets and
+ * `ClassSubtraction` keeps "the CharSetElements of charSet which are not
+ * also CharSetElements of otherSet", and `a` and `\q{a}` are that one
+ * element, so `[a&&\q{a}]` retains it while `[a--\q{a}]` is empty.
+ * `CompileCharacterClass` replaces a `v`-mode inversion with
+ * `CharacterComplement` over `AllCharacters`, which under `iv` holds only
+ * the code points that case-fold to themselves, so `[^\q{a}]` drops `a`,
+ * retains no member that canonicalizes to it, and rejects "A" as well. A
+ * one-character `ClassString` leaves `MayContainStrings` false, which is
+ * what admits that negated spelling at all.
+ *
+ * V8 answers the opposite way in each of those spellings on the input that
+ * separates the two readings, and agrees on an input that is already the
+ * folded case. It folds such an element but never canonicalizes an input
+ * against it, which is a deliberate divergence recorded rather than
+ * followed: it reports `/^[\q{A}]$/iv` matching "a" but not "A", an answer
+ * the edition cannot produce, since a folded set compared against a folded
+ * input can never separate the two. JavaScriptCore produces the edition's
+ * answer in each case.
+ * test262 pins none of this; its 33 `\q{}` files all run without `i`.
+ */
+test("reads a one-code-point q class string as that character", () => {
+  for (const [source, flags, input, matches] of [
+    ["^[\\q{a}]$", "iv", "A", true],
+    ["^[\\q{A}]$", "iv", "A", true],
+    ["^[\\q{A}]$", "iv", "a", true],
+    ["^[\\q{k}]$", "iv", "\u212a", true],
+    ["^[\\q{s}]$", "iv", "\u017f", true],
+    ["^[[\\q{a}]]$", "iv", "A", true],
+    ["^[a&&\\q{a}]$", "iv", "A", true],
+    ["^[a&&\\q{a}]$", "iv", "a", true],
+    ["^[a--\\q{a}]$", "iv", "A", false],
+    ["^[a--\\q{a}]$", "iv", "a", false],
+    ["^[a--\\q{A}]$", "iv", "a", false],
+    ["^[A--\\q{a}]$", "iv", "A", false],
+    ["^[^\\q{a}]$", "iv", "A", false],
+    ["^[^\\q{a}]$", "iv", "b", true],
+    ["^[\\q{a}]$", "v", "A", false],
+  ] as const) {
+    assert.equal(
+      observe(source, flags, input) != null,
+      matches,
+      `/${source}/${flags} on ${JSON.stringify(input)}`,
+    );
+    assert.deepEqual(
+      observe(source, flags, input),
+      observe(source.replace(/\\q\{(.)\}/u, "$1"), flags, input),
+      `/${source}/${flags} differs from its one-character class`,
+    );
+  }
+});
+
 /*
  * The two unicode-mode flags complement a property differently. `v` folds
  * a property before complementing it over the folded code points, so a
@@ -288,6 +431,88 @@ test("complements a negated property the way each flag set does", () => {
     ["\\P{Lu}", "iv", "a"],
     ["\\p{Ll}", "iv", "A"],
     ["\\P{Ll}", "v", "A"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, flags, text),
+      hostObserve(source, flags, text),
+      `/${source}/${flags} on ${text}`,
+    );
+  }
+});
+
+/*
+ * `CompileToCharSet` returns a lone General_Category value unfolded: the
+ * production reads "Return the CharSet containing all Unicode code points
+ * whose character database definition includes the property
+ * General_Category with value s", with no `MaybeSimpleCaseFolding` around
+ * it. Its two siblings in the same production, the `\p{gc=Ll}` spelling and
+ * every binary property, both end in that call, and `ClassSetOperand ::
+ * NestedClass` returns its operand unchanged, so the raw set survives one
+ * nesting level too.
+ *
+ * That only shows in `v`-mode set algebra. Folding `\p{Ll}` and `\p{Lu}`
+ * before subtracting maps the uppercase letters onto the lowercase ones and
+ * cancels the whole ASCII case class; keeping them exact subtracts two
+ * disjoint categories and leaves Ll, which then matches either case through
+ * `Canonicalize`. Both reference hosts fold here and answer the opposite
+ * way, so these are recorded rather than compared against them, the way the
+ * `u`-mode advance already is.
+ */
+test("keeps a lone category exact through v-mode set algebra", () => {
+  const matches = (source: string, flags: string, text: string): boolean =>
+    observe(source, flags, text) != null;
+  for (const [source, text] of [
+    ["^[\\p{Ll}--\\p{Lu}]$", "a"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "A"],
+    ["^[[\\p{Ll}--\\p{Lu}]]$", "A"],
+    /*
+     * A nested class has to reach the outer operation still exact. These
+     * two put it on the right of one, which the sole-operand spelling above
+     * cannot do: there the outer union has nothing to cancel against, so it
+     * answers the same either way.
+     */
+    ["^[\\p{Ll}--[\\p{Lu}]]$", "A"],
+    ["^[\\p{Ll}--[\\p{Lu}]]$", "a"],
+  ] as const) {
+    assert.equal(matches(source, "iv", text), true, `/${source}/iv on ${text}`);
+  }
+  assert.equal(matches("^[\\p{Ll}&&\\p{Lu}]$", "iv", "a"), false);
+  assert.equal(matches("^[\\p{Ll}&&[\\p{Lu}]]$", "iv", "a"), false);
+  /*
+   * The spellings that do fold must keep cancelling, or the exemption has
+   * been applied to the wrong operand.
+   */
+  for (const source of [
+    "^[\\p{gc=Ll}--\\p{gc=Lu}]$",
+    "^[\\p{General_Category=Ll}--\\p{General_Category=Lu}]$",
+    "^[\\p{Lowercase}--\\p{Uppercase}]$",
+  ]) {
+    for (const text of ["a", "A"]) {
+      assert.equal(matches(source, "iv", text), false, `/${source}/iv ${text}`);
+    }
+  }
+  /*
+   * Negation complements over the folded code points, so a raw operand must
+   * be closed before it is complemented rather than keeping its siblings.
+   */
+  for (const text of ["a", "A"]) {
+    assert.equal(matches("^[^\\p{Ll}]$", "iv", text), false, text);
+    assert.equal(matches("^\\P{Ll}$", "iv", text), false, text);
+  }
+  assert.equal(matches("^[^\\p{Ll}]$", "iv", "1"), true);
+  /*
+   * Everything the exemption does not reach still answers with the host: a
+   * lone atom, a folding leaf beside a category, and plain `v`.
+   */
+  for (const [source, flags, text] of [
+    ["^[\\p{Ll}]$", "iv", "A"],
+    ["^[\\p{Lu}]$", "iv", "a"],
+    ["^[\\p{Ll}--a]$", "iv", "a"],
+    ["^[\\p{Ll}--a]$", "iv", "A"],
+    ["^[\\p{Ll}--a]$", "iv", "b"],
+    ["^[a&&\\p{Ll}]$", "iv", "A"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "v", "a"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "v", "A"],
   ] as const) {
     assert.deepEqual(
       observe(source, flags, text),

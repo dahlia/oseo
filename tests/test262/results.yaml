@@ -11035,12 +11035,12 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1506
+  expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 12248
+  passes: 12599
   semanticFailures: 0
-  unsupportedProfileFeatures: 2260
+  unsupportedProfileFeatures: 2114
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -11134,12 +11134,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - dependency: functions
-      expectedNegatives: 266
+      expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3646
+      passes: 3668
       semanticFailures: 0
-      unsupportedProfileFeatures: 1096
+      unsupportedProfileFeatures: 1053
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -11176,12 +11176,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 33
     - dependency: object-properties
-      expectedNegatives: 542
+      expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8514
+      passes: 8601
       semanticFailures: 0
-      unsupportedProfileFeatures: 967
+      unsupportedProfileFeatures: 851
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -11200,9 +11200,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 240
+      passes: 488
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 19
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -11214,9 +11214,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 500
+      passes: 506
       semanticFailures: 0
-      unsupportedProfileFeatures: 76
+      unsupportedProfileFeatures: 70
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -11401,12 +11401,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 68
     - group: built-ins/RegExp
-      expectedNegatives: 142
+      expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 842
+      passes: 1187
       semanticFailures: 0
-      unsupportedProfileFeatures: 639
+      unsupportedProfileFeatures: 499
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -11418,9 +11418,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1052
+      passes: 1058
       semanticFailures: 0
-      unsupportedProfileFeatures: 102
+      unsupportedProfileFeatures: 96
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0

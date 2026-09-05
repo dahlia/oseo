@@ -51,7 +51,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Dive\
         s_Akuru.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Dives_Akuru.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Dives_Akuru.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -76,7 +76,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Egyp\
         tian_Hieroglyphs.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Egyptian_Hieroglyphs.js:104:22: error[OSEO1001]: Unknown
+        t_-_Egyptian_Hieroglyphs.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -96,14 +96,14 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
   - case:
       async: false
       features: []
@@ -180,12 +180,12 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - regexp-v-flag
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

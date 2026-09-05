@@ -51,7 +51,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Gurm\
         ukhi.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Gurmukhi.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Gurmukhi.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -76,7 +76,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Mand\
         aic.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Mandaic.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_Mandaic.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

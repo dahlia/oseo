@@ -93,6 +93,73 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - regexp-named-groups
+        - regexp-match-indices
+      flags: []
+      includes:
+        - propertyHelper.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/RegExp/match-indices/indices-groups-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-duplicate-named-groups
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/named-groups/duplicate-names-replaceall.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes:
@@ -137,6 +204,37 @@ results:
     classification: pass
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - regexp-modifiers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/RegExp/regexp-modifiers/add-ignoreCase-affects-backreferences.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - regular-expressions
     execution:
       harnessIncludes:
         - base.js

@@ -14,6 +14,7 @@ import {
   codePointSetSize,
   conditionalCaseMappings,
   emojiVersion,
+  ecma262UnicodeStringPropertySet,
   ecma262UnicodePropertySet,
   fullCaseFolding,
   fullLowercase,
@@ -38,6 +39,7 @@ import {
   simpleLowercase,
   simpleTitlecase,
   simpleUppercase,
+  stringPropertyNames,
   unicodeDataInputs,
   unicodeDataLicense,
   unicodeVersion,
@@ -84,6 +86,31 @@ test("the vocabulary matches the ECMAScript property tables", () => {
   assert.equal(generalCategoryValues.length, 38);
   assert.ok(scriptValues.includes("Latin"));
   assert.ok(scriptValues.includes("Unknown"));
+  assert.deepEqual(stringPropertyNames, [
+    "Basic_Emoji",
+    "Emoji_Keycap_Sequence",
+    "RGI_Emoji",
+    "RGI_Emoji_Flag_Sequence",
+    "RGI_Emoji_Modifier_Sequence",
+    "RGI_Emoji_Tag_Sequence",
+    "RGI_Emoji_ZWJ_Sequence",
+  ]);
+});
+
+test("properties of strings come from the pinned emoji sequence files", () => {
+  const keycaps = ecma262UnicodeStringPropertySet("Emoji_Keycap_Sequence");
+  assert.ok(
+    keycaps?.some((sequence) => sequence.join(" ") === "57 65039 8419"),
+  );
+  const rgi = ecma262UnicodeStringPropertySet("RGI_Emoji");
+  assert.equal(rgi?.length, 3_953);
+  assert.ok(rgi.some((sequence) => sequence.join(" ") === "57 65039 8419"));
+  assert.equal(ecma262UnicodeStringPropertySet("Emoji"), undefined);
+  assert.equal(ecma262UnicodeStringPropertySet("rgi_emoji"), undefined);
+  assert.equal(
+    ecma262UnicodeStringPropertySet("RGI_Emoji"),
+    ecma262UnicodeStringPropertySet("RGI_Emoji"),
+  );
 });
 
 test("property and value spellings resolve without loose matching", () => {

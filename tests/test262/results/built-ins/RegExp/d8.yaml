@@ -81,7 +81,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Mero\
         itic_Hieroglyphs.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Meroitic_Hieroglyphs.js:104:22: error[OSEO1001]: Unknown
+        t_-_Meroitic_Hieroglyphs.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -106,7 +106,7 @@ results:
       detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Sign\
         Writing.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_SignWriting.js:104:22: error[OSEO1001]: Unknown binding
+        t_-_SignWriting.js:140:22: error[OSEO1001]: Unknown binding
         'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -132,7 +132,7 @@ results:
         ions_-_Medefaidrin.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Medefaidrin.js:104:22: error[OSEO1001]: Unknown
+        t_Extensions_-_Medefaidrin.js:140:22: error[OSEO1001]: Unknown
         binding 'buildString'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -4,7 +4,7 @@ title: "RegExp.prototype and built-in execution"
 delivers: "Adds RegExp.prototype.exec, test, toString, and the source, flags,
   and individual flag accessors with the match result object."
 inventory:
-  included: 271
+  included: 233
   roots:
     - test/built-ins/RegExp/prototype/*.js
     - test/built-ins/RegExp/prototype/dotAll/
@@ -19,7 +19,6 @@ inventory:
     - test/built-ins/RegExp/prototype/test/
     - test/built-ins/RegExp/prototype/toString/
     - test/built-ins/RegExp/prototype/unicode/
-    - test/built-ins/RegExp/prototype/unicodeSets/
 dependencies:
   - array-constructor
   - object-define-property

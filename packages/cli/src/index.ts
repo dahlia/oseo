@@ -40,7 +40,12 @@ import {
 } from "@oseo/parser-babel";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 import { zigToolchain } from "@oseo/toolchain-zig";
-import { ecma262UnicodePropertySet } from "@oseo/unicode";
+import {
+  binaryPropertySet,
+  codePointSetHas,
+  ecma262UnicodeStringPropertySet,
+  ecma262UnicodePropertySet,
+} from "@oseo/unicode";
 import { object, or } from "@optique/core/constructs";
 import { runParser } from "@optique/core/facade";
 import { message } from "@optique/core/message";
@@ -55,6 +60,7 @@ import { unicodeMatcherData } from "./regexp-unicode.ts";
 export {
   caseEquivalenceClasses,
   propertyEscapeSet,
+  stringPropertyEscapeSet,
   unicodeMatcherData,
 } from "./regexp-unicode.ts";
 
@@ -179,9 +185,16 @@ export interface CliResult {
 
 /** RegExp extensions supplied at the outer Unicode composition boundary. */
 const regexpExtensions: RegExpPatternExtensions = {
-  admitted: ["unicode-property-escapes"],
+  admitted: ["class-set-notation", "modifiers", "unicode-property-escapes"],
+  identifierPart: (codePoint) =>
+    codePointSetHas(binaryPropertySet("ID_Continue") ?? [], codePoint),
+  identifierStart: (codePoint) =>
+    codePointSetHas(binaryPropertySet("ID_Start") ?? [], codePoint),
   unicodeProperty: (escape) =>
-    ecma262UnicodePropertySet(escape.property, escape.value) != null,
+    ecma262UnicodePropertySet(escape.property, escape.value) != null ||
+    (escape.value == null &&
+      !escape.negated &&
+      ecma262UnicodeStringPropertySet(escape.property) != null),
 };
 
 const babelFrontend = createBabelFrontend({
