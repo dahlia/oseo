@@ -5246,8 +5246,10 @@ from the expected classifications. `mise run test262:update` regenerates the
 *results.yaml* index and its record partitions after a reviewed change.
 Applicable Script cases execute in
 every requested strictness mode, and every executed case compares
-specialization-disabled and specialization-enabled native observations with
-collection forced at every safepoint.
+specialization-disabled and specialization-enabled native observations.
+Forced-collection coverage runs in the per-family native and property lanes
+recorded by [ADR 0018](./adr/0018-recorded-evidence-coverage.md), not as a
+collector-policy override across the standards corpus.
 
 CI can execute the reviewed subset in deterministic round-robin partitions by
 passing `--shard INDEX/TOTAL` to `mise run test:test262`. Every one-based index

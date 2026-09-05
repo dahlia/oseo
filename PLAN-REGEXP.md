@@ -768,8 +768,10 @@ This plan is complete when:
     owned locations and catchable error identity where required;
  -  the matcher has explicit collector, work-area, resource, artifact-version,
     and runtime-composition contracts;
- -  ahead-of-time and generic matching agree with Node.js, Deno, test262, both
-    specialization policies, and forced collection across the reviewed corpus;
+ -  ahead-of-time and generic matching agree with Node.js and Deno across the
+    generated corpus and with applicable reviewed test262 standards evidence;
+ -  both specialization policies and forced collection cover the generated
+    property and native lanes;
  -  every generated strategy and fast path stays within published compile-time,
     code-size, allocation, native-stack, and latency budgets;
  -  Linux AMD64 and macOS AArch64 execute the complete semantic corpus, while

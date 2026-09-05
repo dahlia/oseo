@@ -2064,21 +2064,13 @@ async function main(): Promise<void> {
   };
   const root = await suiteRoot(subset.suiteRevision);
   const harnesses = await readHarnesses();
-  const previousGc = process.env.OSEO_GC_EVERY_SAFEPOINT;
-  process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-  let run: ReviewedTest262Run;
-  try {
-    run = await createReviewedManifest(
-      selectedSubset,
-      root,
-      harnesses,
-      nativeExecutor,
-      { acceptPromotions: cliArguments.acceptPromotions },
-    );
-  } finally {
-    if (previousGc == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-    else process.env.OSEO_GC_EVERY_SAFEPOINT = previousGc;
-  }
+  const run = await createReviewedManifest(
+    selectedSubset,
+    root,
+    harnesses,
+    nativeExecutor,
+    { acceptPromotions: cliArguments.acceptPromotions },
+  );
   const { manifest, metadata } = run;
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);

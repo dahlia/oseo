@@ -104,6 +104,16 @@ behavior, since a hint that changed behavior would violate the optimization
 rule in *CONTRIBUTING.md*, and the existing rule already permits the omission.
 Nothing in the profile records it.
 
+The reviewed test262 runner began forcing collection across its complete
+subset when the subset contained 37 paths. The subset now contains 15,767
+paths. On `linux-x86_64-gnu`, the reviewed
+*test/built-ins/RegExp/character-class-escape-non-whitespace.js* path took
+537,193.72 ms with collection forced at every safepoint and 4,728.40 ms
+without that policy. Both runs classified the path as passing. These times
+were measured after the native runtime archive was optimized, so they isolate
+the remaining cost of forcing collection rather than unoptimized collector
+code.
+
 
 Decision
 --------
@@ -134,6 +144,19 @@ omission, is read as covered by every class. A family admitted before the
 template exists is `unassessed` until it is annotated. `unassessed` is not a
 claim of coverage and not a claim of absence; it means the judgment has not
 been written down yet.
+
+Forced-collection evidence belongs to the per-family native and property
+lanes, not to the reviewed test262 standards lane. The current record set has
+93 covered forced-collection entries and 10 deliberate omissions. Eighty-four
+covered entries cite a property suite that sets
+`OSEO_GC_EVERY_SAFEPOINT`; the other nine cite native fixtures. No
+forced-collection entry cites the test262 subset or result manifest.
+
+The test262 runner therefore leaves the collector policy unset unless its
+caller explicitly selects one. It still runs every applicable strictness and
+specialization variant and requires exact agreement with the reviewed
+manifest. Removing its corpus-wide override does not weaken any family-owned
+forced-collection reference.
 
 
 Consequences
@@ -184,3 +207,5 @@ Links
     records.
  -  [ADR 0013](./0013-m5-edition-and-manifest.md) defines the claim this
     evidence substantiates.
+ -  [ADR 0006](./0006-root-stack-and-safepoints.md) defines the root-stack and
+    safepoint contract covered by native and property evidence.

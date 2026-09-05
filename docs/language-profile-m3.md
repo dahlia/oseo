@@ -139,9 +139,12 @@ The reviewed subset pins test262 revision
 parse failures, 1 unsupported profile feature, 0 semantic failures, and 0
 harness failures. The positive cases produce 98 native executions across their
 requested strictness modes and specialization-disabled and
-specialization-enabled compilation. The runner forces collection at every
-safepoint and requires exact agreement with *tests/test262/results.yaml*.
-Run it with `mise run test:test262`; refresh reviewed evidence explicitly with
+specialization-enabled compilation. The M3 completion run forced collection
+at every safepoint and required exact agreement with
+*tests/test262/results.yaml*. The current runner leaves forced-collection
+coverage to the native and property lanes recorded by
+[ADR 0018](./adr/0018-recorded-evidence-coverage.md). Run the standards lane
+with `mise run test:test262`; refresh reviewed evidence explicitly with
 `mise run test262:update` on x86-64 Linux.
 
 
