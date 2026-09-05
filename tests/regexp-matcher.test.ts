@@ -419,6 +419,88 @@ test("complements a negated property the way each flag set does", () => {
   }
 });
 
+/*
+ * `CompileToCharSet` returns a lone General_Category value unfolded: the
+ * production reads "Return the CharSet containing all Unicode code points
+ * whose character database definition includes the property
+ * General_Category with value s", with no `MaybeSimpleCaseFolding` around
+ * it. Its two siblings in the same production, the `\p{gc=Ll}` spelling and
+ * every binary property, both end in that call, and `ClassSetOperand ::
+ * NestedClass` returns its operand unchanged, so the raw set survives one
+ * nesting level too.
+ *
+ * That only shows in `v`-mode set algebra. Folding `\p{Ll}` and `\p{Lu}`
+ * before subtracting maps the uppercase letters onto the lowercase ones and
+ * cancels the whole ASCII case class; keeping them exact subtracts two
+ * disjoint categories and leaves Ll, which then matches either case through
+ * `Canonicalize`. Both reference hosts fold here and answer the opposite
+ * way, so these are recorded rather than compared against them, the way the
+ * `u`-mode advance already is.
+ */
+test("keeps a lone category exact through v-mode set algebra", () => {
+  const matches = (source: string, flags: string, text: string): boolean =>
+    observe(source, flags, text) != null;
+  for (const [source, text] of [
+    ["^[\\p{Ll}--\\p{Lu}]$", "a"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "A"],
+    ["^[[\\p{Ll}--\\p{Lu}]]$", "A"],
+    /*
+     * A nested class has to reach the outer operation still exact. These
+     * two put it on the right of one, which the sole-operand spelling above
+     * cannot do: there the outer union has nothing to cancel against, so it
+     * answers the same either way.
+     */
+    ["^[\\p{Ll}--[\\p{Lu}]]$", "A"],
+    ["^[\\p{Ll}--[\\p{Lu}]]$", "a"],
+  ] as const) {
+    assert.equal(matches(source, "iv", text), true, `/${source}/iv on ${text}`);
+  }
+  assert.equal(matches("^[\\p{Ll}&&\\p{Lu}]$", "iv", "a"), false);
+  assert.equal(matches("^[\\p{Ll}&&[\\p{Lu}]]$", "iv", "a"), false);
+  /*
+   * The spellings that do fold must keep cancelling, or the exemption has
+   * been applied to the wrong operand.
+   */
+  for (const source of [
+    "^[\\p{gc=Ll}--\\p{gc=Lu}]$",
+    "^[\\p{General_Category=Ll}--\\p{General_Category=Lu}]$",
+    "^[\\p{Lowercase}--\\p{Uppercase}]$",
+  ]) {
+    for (const text of ["a", "A"]) {
+      assert.equal(matches(source, "iv", text), false, `/${source}/iv ${text}`);
+    }
+  }
+  /*
+   * Negation complements over the folded code points, so a raw operand must
+   * be closed before it is complemented rather than keeping its siblings.
+   */
+  for (const text of ["a", "A"]) {
+    assert.equal(matches("^[^\\p{Ll}]$", "iv", text), false, text);
+    assert.equal(matches("^\\P{Ll}$", "iv", text), false, text);
+  }
+  assert.equal(matches("^[^\\p{Ll}]$", "iv", "1"), true);
+  /*
+   * Everything the exemption does not reach still answers with the host: a
+   * lone atom, a folding leaf beside a category, and plain `v`.
+   */
+  for (const [source, flags, text] of [
+    ["^[\\p{Ll}]$", "iv", "A"],
+    ["^[\\p{Lu}]$", "iv", "a"],
+    ["^[\\p{Ll}--a]$", "iv", "a"],
+    ["^[\\p{Ll}--a]$", "iv", "A"],
+    ["^[\\p{Ll}--a]$", "iv", "b"],
+    ["^[a&&\\p{Ll}]$", "iv", "A"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "v", "a"],
+    ["^[\\p{Ll}--\\p{Lu}]$", "v", "A"],
+  ] as const) {
+    assert.deepEqual(
+      observe(source, flags, text),
+      hostObserve(source, flags, text),
+      `/${source}/${flags} on ${text}`,
+    );
+  }
+});
+
 test("agrees with the host over the reviewed matcher corpus", () => {
   const patterns: readonly (readonly [string, string])[] = [
     ["a|ab", ""],

@@ -5154,6 +5154,29 @@ all generated without `i`, so the generated execution domain excludes the
 combination and *tests/regexp-matcher.test.ts* records the exact cases
 instead.
 
+A second divergence, and the only one this claim records against both
+reference hosts, is how a lone General\_Category value behaves inside `v`-mode
+set algebra under `i`. `CompileToCharSet` returns that spelling unfolded: the
+production reads “Return the CharSet containing all Unicode code points whose
+character database definition includes the property `General_Category` with
+value s”, with no `MaybeSimpleCaseFolding` around it, while the `\p{gc=Ll}`
+spelling and every binary property in the same production end in that call.
+`ClassSetOperand :: NestedClass` returns its operand unchanged, so the exact
+set survives a nesting level as well. The difference is invisible on a lone
+atom, because the matcher canonicalizes the input either way, and shows only
+under an operation: `[\p{Ll}--\p{Lu}]` under `iv` subtracts two disjoint
+categories and retains Ll, matching both `"a"` and `"A"`, where folding first
+maps every uppercase letter onto its lowercase counterpart and cancels the
+ASCII case class. `[\p{Ll}&&\p{Lu}]` is empty under the same reading.
+
+Both reference hosts fold that operand and answer the opposite way on all
+three cases. Test262 pins none of it: no file in the pinned revision combines
+the `unicodeSets` grammar with `i`, so no reviewed path moves, the generated
+property domain emits lone atoms rather than operations, and
+*tests/regexp-matcher.test.ts* records the exact cases together with the
+`\p{gc=Ll}` and binary spellings that must keep cancelling and the negation
+that must keep complementing over the folded code points.
+
 
 Known gaps inside the claim
 ---------------------------

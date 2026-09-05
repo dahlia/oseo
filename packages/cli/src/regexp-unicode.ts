@@ -18,6 +18,7 @@
  */
 
 import {
+  canonicalPropertyValue,
   ecma262UnicodeStringPropertySet,
   ecma262UnicodePropertySet,
   fullUppercase,
@@ -99,6 +100,17 @@ export function propertyEscapeSet(
   return ecma262UnicodePropertySet(escape.property, escape.value);
 }
 
+/**
+ * Whether one lone property name is a General_Category value.
+ *
+ * `CompileToCharSet` asks exactly this before it decides whether to fold a
+ * lone `\p{...}` escape, so the answer comes from the pinned property value
+ * aliases rather than from whether some set happens to resolve.
+ */
+export function generalCategoryValue(name: string): boolean {
+  return canonicalPropertyValue("General_Category", name) != null;
+}
+
 /** The code-point sequences one string property escape names, or undefined. */
 export function stringPropertyEscapeSet(
   escape: RegExpUnicodePropertyEscape,
@@ -110,6 +122,7 @@ export function stringPropertyEscapeSet(
 /** The reviewed matcher data provider over the pinned Unicode tables. */
 export const unicodeMatcherData: RegExpMatcherUnicodeData = {
   caseEquivalenceClasses,
+  generalCategoryValue,
   propertySet: propertyEscapeSet,
   spaceSeparators: generalCategorySet("Space_Separator") ?? [],
   stringPropertySet: stringPropertyEscapeSet,

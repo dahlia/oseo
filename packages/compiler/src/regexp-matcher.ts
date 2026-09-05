@@ -432,6 +432,7 @@ export interface RegExpMatcherUnicodeData {
   readonly stringPropertySet?: (
     escape: RegExpUnicodePropertyEscape,
   ) => readonly (readonly number[])[] | undefined;
+  readonly generalCategoryValue?: (name: string) => boolean;
   readonly spaceSeparators?: RegExpMatcherSet;
 }
 
@@ -787,6 +788,64 @@ function propertyEscapeClassValue(
   return normalizeClassValue({ characters: [], strings });
 }
 
+/**
+ * Whether one escape is a lone General_Category value such as `\p{Ll}`.
+ *
+ * `CompileToCharSet` returns that spelling without folding it, while the
+ * `\p{gc=Ll}` spelling and every binary property end in
+ * `MaybeSimpleCaseFolding`. The asymmetry is deliberate and is only
+ * observable inside `v`-mode set algebra, where folding an operand before
+ * the operation removes members the edition keeps.
+ *
+ * The builder asks the question the edition asks, whether the name is a
+ * General_Category value, through the caller's own data. Holding a table of
+ * category names here would put Unicode knowledge in the compiler core,
+ * which the package boundary does not allow.
+ *
+ * The caller answers it directly rather than the builder inferring it from
+ * whether some other spelling resolves. A provider that resolves a lone
+ * escape but not the classification would otherwise fold an operand the
+ * edition keeps exact and match nothing, silently, where every other
+ * missing Unicode fact reports an owned refusal.
+ */
+function loneGeneralCategory(
+  builder: Builder,
+  escape: RegExpUnicodePropertyEscape,
+): boolean {
+  if (escape.value != null) return false;
+  const classify = builder.unicodeData.generalCategoryValue;
+  if (classify == null) {
+    refuse(
+      "unsupported",
+      "A lone Unicode property escape needs the General_Category value " +
+        "classification that is not linked.",
+      escape.span,
+    );
+  }
+  return classify(escape.property);
+}
+
+/**
+ * Whether one operand keeps its exact code points through set algebra.
+ *
+ * The edition folds a `ClassSetCharacter` and a `ClassStringDisjunction`
+ * operand but returns a `NestedClass` operand unchanged, so a nested class
+ * carries whatever its own operands decided rather than being folded again.
+ * Closing a nested value that is already closed changes nothing, so this
+ * only matters for the one leaf the edition leaves raw.
+ */
+function preservesExactOperand(
+  builder: Builder,
+  operand: RegExpClassSetOperand,
+): boolean {
+  if (operand.kind === "class-set") return true;
+  return (
+    operand.kind === "unicode-property" &&
+    !operand.negated &&
+    loneGeneralCategory(builder, operand)
+  );
+}
+
 function classSetOperandValue(
   builder: Builder,
   operand: RegExpClassSetOperand,
@@ -808,8 +867,11 @@ function classSetOperandValue(
   }
   if (!builder.unicodeSets || !builder.ignoreCase) return value;
   const representatives = caseRepresentatives(builder, operand.span);
+  const exact = preservesExactOperand(builder, operand);
   return normalizeClassValue({
-    characters: closeSet(builder, value.characters, operand.span),
+    characters: exact
+      ? value.characters
+      : closeSet(builder, value.characters, operand.span),
     strings: value.strings.map((sequence) =>
       sequence.map((character) => representatives.get(character) ?? character),
     ),
@@ -865,7 +927,18 @@ function classSetValue(
       node.span,
     );
   }
-  return { characters: setComplement(value.characters), strings: [] };
+  /*
+   * `CharacterComplement` complements over the folded code points under
+   * `iv`, so a set that reached here holding the exact members of a lone
+   * category is closed first. Complementing it raw would keep every case
+   * sibling of its members, which is the opposite of what negation means
+   * here. A set that is already closed is unchanged by this.
+   */
+  const complemented =
+    builder.unicodeSets && builder.ignoreCase
+      ? closeSet(builder, value.characters, node.span)
+      : value.characters;
+  return { characters: setComplement(complemented), strings: [] };
 }
 
 /** The raw set one class member names, before the class is closed. */

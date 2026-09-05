@@ -759,3 +759,55 @@ test("emits a deep class string without host recursion", () => {
   });
   assert.equal(missed.outcome, "unmatched");
 });
+
+/*
+ * A lone `\p{...}` escape keeps its exact code points through `v`-mode set
+ * algebra only when it names a General_Category value, so the builder has to
+ * know which spelling it holds. It asks the caller, because a category table
+ * in the compiler core would cross the package boundary.
+ *
+ * The caller answers that question directly. Inferring it from whether some
+ * other spelling resolves would let a provider that answers the escape but
+ * not the classification fold an operand the edition keeps exact, and match
+ * nothing at all, without saying so. Every other unlinked Unicode fact
+ * reports an owned refusal, and so does this one.
+ */
+test("refuses a lone property escape without category classification", () => {
+  const extensions: RegExpPatternExtensions = {
+    admitted: ["class-set-notation", "unicode-property-escapes"],
+    unicodeProperty: () => true,
+  };
+  const parsed = parseRegExpPattern({
+    extensions,
+    flags: "iv",
+    source: "[\\p{Ll}--\\p{Lu}]",
+  });
+  assert.deepEqual(parsed.errors, []);
+  const pattern = parsed.pattern;
+  if (pattern == null) throw new Error("a parsed pattern is present");
+  const partial = buildRegExpMatcher(pattern, {
+    unicodeData: {
+      caseEquivalenceClasses: () => [[0x61, 0x41]],
+      propertySet: () => [0x61, 0x62],
+    },
+  });
+  assert.equal(partial.built, false);
+  assert.equal(
+    partial.errors[0]?.message,
+    "A lone Unicode property escape needs the General_Category value " +
+      "classification that is not linked.",
+  );
+  /*
+   * The same provider builds once it can answer, and the answer decides
+   * whether the operands stay exact rather than fold.
+   */
+  const classified = buildRegExpMatcher(pattern, {
+    unicodeData: {
+      caseEquivalenceClasses: () => [[0x61, 0x41]],
+      generalCategoryValue: () => true,
+      propertySet: () => [0x61, 0x62],
+    },
+  });
+  assert.deepEqual(classified.errors, []);
+  assert.notEqual(classified.program, undefined);
+});
