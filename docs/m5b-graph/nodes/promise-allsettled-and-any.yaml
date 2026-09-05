@@ -12,5 +12,5 @@ dependencies:
   - error-aggregate-and-options
   - object-constructor
   - promise-all-and-race
-landed: false
+landed: true
 status: ready
