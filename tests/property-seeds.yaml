@@ -376,3 +376,7 @@ families:
     owner: tests/property/m5-regexp-pattern-extensions.property.test.ts
     start: 0x60005d00
     end: 0x60005dff
+  - family: m5-iterator-helpers-lazy
+    owner: tests/property/m5-iterator-helpers-lazy.property.test.ts
+    start: 0x60005e00
+    end: 0x60005eff

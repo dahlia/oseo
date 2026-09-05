@@ -1,0 +1,24 @@
+group: built-ins/Iterator
+key: 7a
+results:
+  - case:
+      async: false
+      features:
+        - iterator-helpers
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Iterator/prototype/take/limit-tonumber-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - iterator-protocol
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - iterator-helpers
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -40,6 +40,7 @@ import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
+import * as lazyHelpers from "./native/fixtures/iterator-helpers-lazy.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
@@ -162,6 +163,7 @@ const fixtures: readonly Fixture[] = [
   ...functionIntrinsicChainFixtures,
   ...functionIntrinsicKeyOrderFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
+  ...lazyHelpers.iteratorHelpersLazyFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
@@ -194,6 +196,55 @@ const spreadDescriptorMap = await runNativeCli(
 assert.equal(spreadDescriptorMap.exitStatus, 0, spreadDescriptorMap.stderr);
 assert.equal(spreadDescriptorMap.stdout, "3 null\n");
 assert.equal(spreadDescriptorMap.stderr, "");
+
+/*
+ * %IteratorHelperPrototype%.return resumes a suspended helper through
+ * GeneratorResumeAbrupt, so [[GeneratorState]] is `executing` for the whole
+ * cleanup and a `return` method that re-enters the helper reaches the
+ * running-generator TypeError. A helper that has never run instead completes
+ * before its close, so the same re-entry there observes a `done` result.
+ *
+ * This is a native-only observation rather than a differential fixture: the
+ * two reference hosts disagree, because Node.js still reports the earlier
+ * behavior for the suspended case while Deno reports the specified one.
+ */
+const helperReentry = await runNativeCli(
+  {
+    args: ["iterator-helper-reentry.ts"],
+    source: `
+function probe(pull) {
+  let observed = "none";
+  const underlying = {
+    __proto__: Iterator.prototype,
+    next() { return { done: false, value: 1 }; },
+    return() {
+      try {
+        observed = "resumed done=" + helper.next().done;
+      } catch (error) {
+        observed = error.constructor.name;
+      }
+      return {};
+    },
+  };
+  const helper = underlying.map((v) => v);
+  if (pull) helper.next();
+  const closed = helper.return();
+  console.log(observed, closed.value, closed.done);
+}
+probe(true);
+probe(false);
+`,
+    sourceId: "iterator-helper-reentry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(helperReentry.exitStatus, 0, helperReentry.stderr);
+assert.equal(
+  helperReentry.stdout,
+  "TypeError undefined true\nresumed done=true undefined true\n",
+);
+assert.equal(helperReentry.stderr, "");
 
 for (const deferredRegExp of [
   {
@@ -583,6 +634,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
+    fixture.name === "iterator-helpers-lazy" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
@@ -669,6 +721,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
+    fixture.name === "iterator-helpers-lazy" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
@@ -892,6 +945,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "global-object-record" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
+            fixture.name === "iterator-helpers-lazy" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "map-intrinsic" ||
             fixture.name === "number-intrinsic" ||
@@ -916,6 +970,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||
+                fixture.name === "iterator-helpers-lazy" ||
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||
                 fixture.name === "number-prototype"

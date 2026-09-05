@@ -3291,14 +3291,65 @@ partitions:
     key: d7
     path: results/built-ins/Infinity/d7.yaml
   - group: built-ins/Iterator
+    key: "02"
+    path: results/built-ins/Iterator/02.yaml
+  - group: built-ins/Iterator
+    key: "04"
+    path: results/built-ins/Iterator/04.yaml
+  - group: built-ins/Iterator
     key: "05"
     path: results/built-ins/Iterator/05.yaml
   - group: built-ins/Iterator
     key: "09"
     path: results/built-ins/Iterator/09.yaml
   - group: built-ins/Iterator
+    key: 0a
+    path: results/built-ins/Iterator/0a.yaml
+  - group: built-ins/Iterator
+    key: 0c
+    path: results/built-ins/Iterator/0c.yaml
+  - group: built-ins/Iterator
+    key: 0d
+    path: results/built-ins/Iterator/0d.yaml
+  - group: built-ins/Iterator
     key: "16"
     path: results/built-ins/Iterator/16.yaml
+  - group: built-ins/Iterator
+    key: "17"
+    path: results/built-ins/Iterator/17.yaml
+  - group: built-ins/Iterator
+    key: "19"
+    path: results/built-ins/Iterator/19.yaml
+  - group: built-ins/Iterator
+    key: 1b
+    path: results/built-ins/Iterator/1b.yaml
+  - group: built-ins/Iterator
+    key: 1c
+    path: results/built-ins/Iterator/1c.yaml
+  - group: built-ins/Iterator
+    key: 1d
+    path: results/built-ins/Iterator/1d.yaml
+  - group: built-ins/Iterator
+    key: "20"
+    path: results/built-ins/Iterator/20.yaml
+  - group: built-ins/Iterator
+    key: "21"
+    path: results/built-ins/Iterator/21.yaml
+  - group: built-ins/Iterator
+    key: "22"
+    path: results/built-ins/Iterator/22.yaml
+  - group: built-ins/Iterator
+    key: "23"
+    path: results/built-ins/Iterator/23.yaml
+  - group: built-ins/Iterator
+    key: "24"
+    path: results/built-ins/Iterator/24.yaml
+  - group: built-ins/Iterator
+    key: "27"
+    path: results/built-ins/Iterator/27.yaml
+  - group: built-ins/Iterator
+    key: "29"
+    path: results/built-ins/Iterator/29.yaml
   - group: built-ins/Iterator
     key: 2b
     path: results/built-ins/Iterator/2b.yaml
@@ -3309,8 +3360,47 @@ partitions:
     key: "30"
     path: results/built-ins/Iterator/30.yaml
   - group: built-ins/Iterator
+    key: "32"
+    path: results/built-ins/Iterator/32.yaml
+  - group: built-ins/Iterator
+    key: "33"
+    path: results/built-ins/Iterator/33.yaml
+  - group: built-ins/Iterator
     key: "34"
     path: results/built-ins/Iterator/34.yaml
+  - group: built-ins/Iterator
+    key: "36"
+    path: results/built-ins/Iterator/36.yaml
+  - group: built-ins/Iterator
+    key: "38"
+    path: results/built-ins/Iterator/38.yaml
+  - group: built-ins/Iterator
+    key: 3b
+    path: results/built-ins/Iterator/3b.yaml
+  - group: built-ins/Iterator
+    key: 3c
+    path: results/built-ins/Iterator/3c.yaml
+  - group: built-ins/Iterator
+    key: 3d
+    path: results/built-ins/Iterator/3d.yaml
+  - group: built-ins/Iterator
+    key: 3f
+    path: results/built-ins/Iterator/3f.yaml
+  - group: built-ins/Iterator
+    key: "41"
+    path: results/built-ins/Iterator/41.yaml
+  - group: built-ins/Iterator
+    key: "43"
+    path: results/built-ins/Iterator/43.yaml
+  - group: built-ins/Iterator
+    key: "44"
+    path: results/built-ins/Iterator/44.yaml
+  - group: built-ins/Iterator
+    key: "45"
+    path: results/built-ins/Iterator/45.yaml
+  - group: built-ins/Iterator
+    key: "46"
+    path: results/built-ins/Iterator/46.yaml
   - group: built-ins/Iterator
     key: "48"
     path: results/built-ins/Iterator/48.yaml
@@ -3318,8 +3408,23 @@ partitions:
     key: "49"
     path: results/built-ins/Iterator/49.yaml
   - group: built-ins/Iterator
+    key: 4a
+    path: results/built-ins/Iterator/4a.yaml
+  - group: built-ins/Iterator
     key: 4b
     path: results/built-ins/Iterator/4b.yaml
+  - group: built-ins/Iterator
+    key: 4d
+    path: results/built-ins/Iterator/4d.yaml
+  - group: built-ins/Iterator
+    key: 4e
+    path: results/built-ins/Iterator/4e.yaml
+  - group: built-ins/Iterator
+    key: 4f
+    path: results/built-ins/Iterator/4f.yaml
+  - group: built-ins/Iterator
+    key: "52"
+    path: results/built-ins/Iterator/52.yaml
   - group: built-ins/Iterator
     key: "57"
     path: results/built-ins/Iterator/57.yaml
@@ -3327,17 +3432,101 @@ partitions:
     key: "59"
     path: results/built-ins/Iterator/59.yaml
   - group: built-ins/Iterator
+    key: 5a
+    path: results/built-ins/Iterator/5a.yaml
+  - group: built-ins/Iterator
+    key: 5c
+    path: results/built-ins/Iterator/5c.yaml
+  - group: built-ins/Iterator
+    key: 5e
+    path: results/built-ins/Iterator/5e.yaml
+  - group: built-ins/Iterator
+    key: "60"
+    path: results/built-ins/Iterator/60.yaml
+  - group: built-ins/Iterator
+    key: "61"
+    path: results/built-ins/Iterator/61.yaml
+  - group: built-ins/Iterator
     key: "64"
     path: results/built-ins/Iterator/64.yaml
   - group: built-ins/Iterator
     key: "65"
     path: results/built-ins/Iterator/65.yaml
   - group: built-ins/Iterator
+    key: "66"
+    path: results/built-ins/Iterator/66.yaml
+  - group: built-ins/Iterator
+    key: "68"
+    path: results/built-ins/Iterator/68.yaml
+  - group: built-ins/Iterator
+    key: 6d
+    path: results/built-ins/Iterator/6d.yaml
+  - group: built-ins/Iterator
+    key: 6e
+    path: results/built-ins/Iterator/6e.yaml
+  - group: built-ins/Iterator
+    key: 6f
+    path: results/built-ins/Iterator/6f.yaml
+  - group: built-ins/Iterator
+    key: "72"
+    path: results/built-ins/Iterator/72.yaml
+  - group: built-ins/Iterator
+    key: "75"
+    path: results/built-ins/Iterator/75.yaml
+  - group: built-ins/Iterator
     key: "76"
     path: results/built-ins/Iterator/76.yaml
   - group: built-ins/Iterator
+    key: "78"
+    path: results/built-ins/Iterator/78.yaml
+  - group: built-ins/Iterator
+    key: "79"
+    path: results/built-ins/Iterator/79.yaml
+  - group: built-ins/Iterator
+    key: 7a
+    path: results/built-ins/Iterator/7a.yaml
+  - group: built-ins/Iterator
+    key: 7b
+    path: results/built-ins/Iterator/7b.yaml
+  - group: built-ins/Iterator
+    key: 7d
+    path: results/built-ins/Iterator/7d.yaml
+  - group: built-ins/Iterator
+    key: 7e
+    path: results/built-ins/Iterator/7e.yaml
+  - group: built-ins/Iterator
+    key: 7f
+    path: results/built-ins/Iterator/7f.yaml
+  - group: built-ins/Iterator
+    key: "80"
+    path: results/built-ins/Iterator/80.yaml
+  - group: built-ins/Iterator
+    key: "82"
+    path: results/built-ins/Iterator/82.yaml
+  - group: built-ins/Iterator
+    key: "83"
+    path: results/built-ins/Iterator/83.yaml
+  - group: built-ins/Iterator
+    key: "86"
+    path: results/built-ins/Iterator/86.yaml
+  - group: built-ins/Iterator
+    key: "87"
+    path: results/built-ins/Iterator/87.yaml
+  - group: built-ins/Iterator
+    key: "88"
+    path: results/built-ins/Iterator/88.yaml
+  - group: built-ins/Iterator
+    key: "89"
+    path: results/built-ins/Iterator/89.yaml
+  - group: built-ins/Iterator
+    key: 8b
+    path: results/built-ins/Iterator/8b.yaml
+  - group: built-ins/Iterator
     key: 8d
     path: results/built-ins/Iterator/8d.yaml
+  - group: built-ins/Iterator
+    key: "91"
+    path: results/built-ins/Iterator/91.yaml
   - group: built-ins/Iterator
     key: "92"
     path: results/built-ins/Iterator/92.yaml
@@ -3348,14 +3537,62 @@ partitions:
     key: "94"
     path: results/built-ins/Iterator/94.yaml
   - group: built-ins/Iterator
+    key: "95"
+    path: results/built-ins/Iterator/95.yaml
+  - group: built-ins/Iterator
+    key: "96"
+    path: results/built-ins/Iterator/96.yaml
+  - group: built-ins/Iterator
+    key: "97"
+    path: results/built-ins/Iterator/97.yaml
+  - group: built-ins/Iterator
+    key: 9b
+    path: results/built-ins/Iterator/9b.yaml
+  - group: built-ins/Iterator
+    key: 9d
+    path: results/built-ins/Iterator/9d.yaml
+  - group: built-ins/Iterator
+    key: 9e
+    path: results/built-ins/Iterator/9e.yaml
+  - group: built-ins/Iterator
+    key: 9f
+    path: results/built-ins/Iterator/9f.yaml
+  - group: built-ins/Iterator
     key: a0
     path: results/built-ins/Iterator/a0.yaml
   - group: built-ins/Iterator
     key: a2
     path: results/built-ins/Iterator/a2.yaml
   - group: built-ins/Iterator
+    key: a4
+    path: results/built-ins/Iterator/a4.yaml
+  - group: built-ins/Iterator
     key: a8
     path: results/built-ins/Iterator/a8.yaml
+  - group: built-ins/Iterator
+    key: ab
+    path: results/built-ins/Iterator/ab.yaml
+  - group: built-ins/Iterator
+    key: ac
+    path: results/built-ins/Iterator/ac.yaml
+  - group: built-ins/Iterator
+    key: ad
+    path: results/built-ins/Iterator/ad.yaml
+  - group: built-ins/Iterator
+    key: ae
+    path: results/built-ins/Iterator/ae.yaml
+  - group: built-ins/Iterator
+    key: b1
+    path: results/built-ins/Iterator/b1.yaml
+  - group: built-ins/Iterator
+    key: b3
+    path: results/built-ins/Iterator/b3.yaml
+  - group: built-ins/Iterator
+    key: b4
+    path: results/built-ins/Iterator/b4.yaml
+  - group: built-ins/Iterator
+    key: b5
+    path: results/built-ins/Iterator/b5.yaml
   - group: built-ins/Iterator
     key: b7
     path: results/built-ins/Iterator/b7.yaml
@@ -3366,11 +3603,53 @@ partitions:
     key: bf
     path: results/built-ins/Iterator/bf.yaml
   - group: built-ins/Iterator
+    key: c0
+    path: results/built-ins/Iterator/c0.yaml
+  - group: built-ins/Iterator
+    key: c2
+    path: results/built-ins/Iterator/c2.yaml
+  - group: built-ins/Iterator
+    key: c4
+    path: results/built-ins/Iterator/c4.yaml
+  - group: built-ins/Iterator
+    key: c5
+    path: results/built-ins/Iterator/c5.yaml
+  - group: built-ins/Iterator
     key: c6
     path: results/built-ins/Iterator/c6.yaml
   - group: built-ins/Iterator
+    key: cb
+    path: results/built-ins/Iterator/cb.yaml
+  - group: built-ins/Iterator
+    key: cc
+    path: results/built-ins/Iterator/cc.yaml
+  - group: built-ins/Iterator
     key: cd
     path: results/built-ins/Iterator/cd.yaml
+  - group: built-ins/Iterator
+    key: d2
+    path: results/built-ins/Iterator/d2.yaml
+  - group: built-ins/Iterator
+    key: d3
+    path: results/built-ins/Iterator/d3.yaml
+  - group: built-ins/Iterator
+    key: d4
+    path: results/built-ins/Iterator/d4.yaml
+  - group: built-ins/Iterator
+    key: d6
+    path: results/built-ins/Iterator/d6.yaml
+  - group: built-ins/Iterator
+    key: d7
+    path: results/built-ins/Iterator/d7.yaml
+  - group: built-ins/Iterator
+    key: d8
+    path: results/built-ins/Iterator/d8.yaml
+  - group: built-ins/Iterator
+    key: dc
+    path: results/built-ins/Iterator/dc.yaml
+  - group: built-ins/Iterator
+    key: dd
+    path: results/built-ins/Iterator/dd.yaml
   - group: built-ins/Iterator
     key: de
     path: results/built-ins/Iterator/de.yaml
@@ -3378,17 +3657,53 @@ partitions:
     key: df
     path: results/built-ins/Iterator/df.yaml
   - group: built-ins/Iterator
+    key: e1
+    path: results/built-ins/Iterator/e1.yaml
+  - group: built-ins/Iterator
+    key: e2
+    path: results/built-ins/Iterator/e2.yaml
+  - group: built-ins/Iterator
+    key: e3
+    path: results/built-ins/Iterator/e3.yaml
+  - group: built-ins/Iterator
     key: e4
     path: results/built-ins/Iterator/e4.yaml
   - group: built-ins/Iterator
     key: e7
     path: results/built-ins/Iterator/e7.yaml
   - group: built-ins/Iterator
+    key: e9
+    path: results/built-ins/Iterator/e9.yaml
+  - group: built-ins/Iterator
+    key: ea
+    path: results/built-ins/Iterator/ea.yaml
+  - group: built-ins/Iterator
+    key: eb
+    path: results/built-ins/Iterator/eb.yaml
+  - group: built-ins/Iterator
     key: ec
     path: results/built-ins/Iterator/ec.yaml
   - group: built-ins/Iterator
+    key: f3
+    path: results/built-ins/Iterator/f3.yaml
+  - group: built-ins/Iterator
     key: f6
     path: results/built-ins/Iterator/f6.yaml
+  - group: built-ins/Iterator
+    key: f7
+    path: results/built-ins/Iterator/f7.yaml
+  - group: built-ins/Iterator
+    key: fc
+    path: results/built-ins/Iterator/fc.yaml
+  - group: built-ins/Iterator
+    key: fd
+    path: results/built-ins/Iterator/fd.yaml
+  - group: built-ins/Iterator
+    key: fe
+    path: results/built-ins/Iterator/fe.yaml
+  - group: built-ins/Iterator
+    key: ff
+    path: results/built-ins/Iterator/ff.yaml
   - group: built-ins/Map
     key: "00"
     path: results/built-ins/Map/00.yaml
@@ -11109,7 +11424,7 @@ summary:
   infrastructureFailures: 0
   passes: 12779
   semanticFailures: 0
-  unsupportedProfileFeatures: 2126
+  unsupportedProfileFeatures: 2310
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -11222,7 +11537,7 @@ summary:
       infrastructureFailures: 0
       passes: 1035
       semanticFailures: 0
-      unsupportedProfileFeatures: 76
+      unsupportedProfileFeatures: 260
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -11412,7 +11727,7 @@ summary:
       infrastructureFailures: 0
       passes: 5
       semanticFailures: 0
-      unsupportedProfileFeatures: 32
+      unsupportedProfileFeatures: 216
     - group: built-ins/Map
       expectedNegatives: 0
       harnessFailures: 0

@@ -1045,8 +1045,13 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
-                intrinsic <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER)) {
+                intrinsic <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER) ||
+               (intrinsic >= OSEO_INTRINSIC_ITERATOR_MAP &&
+                intrinsic <= OSEO_INTRINSIC_ITERATOR_FLAT_MAP)) {
         materialized = oseo_internal_array_iterator_prototype(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_ITERATOR_HELPER_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_ITERATOR_HELPER_RETURN) {
+        materialized = oseo_internal_iterator_helper_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_GENERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_GENERATOR_FUNCTION_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_GENERATOR_FUNCTION) {

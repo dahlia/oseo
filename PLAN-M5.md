@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-16,014 reviewed cases: 12,248 passes, 1,506 expected negatives, and 2,260
+16,645 reviewed cases: 12,779 passes, 1,556 expected negatives, and 2,310
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 102 indexed records in the normative
+M5a is complete. The 107 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-12,248 passes across 16,014 paths, and the property inventory records 120
-domains, 120 seeds, and an ordinary case budget of 5,280.
+12,779 passes across 16,645 paths, and the property inventory records 123
+domains, 123 seeds, and an ordinary case budget of 5,366.
 
 
 M5a implementation history
@@ -5328,6 +5328,67 @@ policy, and zero-override policy are unchanged. The checkpoint moves the
 runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
 existing Promise range without adding a generated-code entry point or
 changing the graph's orchestration state.
+
+Implemented M5b node `iterator-helpers-lazy` gives the realm-owned
+`%IteratorPrototype%` ordinary `map`, `filter`, `take`, `drop`, and `flatMap`
+functions and the single `%IteratorHelperPrototype%` their results share.
+Each method validates its receiver, then validates its argument against the
+iterator record it would capture and closes that record when the validation
+fails, and only then reads `next` once. A non-callable mapper or predicate is
+a `TypeError`; a `NaN` or negative `take` or `drop` limit is a `RangeError`;
+and an abrupt `ToNumber` propagates. Each returns an Iterator Helper object
+that inherits from `%IteratorPrototype%` through
+`%IteratorHelperPrototype%` and reports the `Iterator Helper` string tag.
+
+ECMA-262 writes each helper as a generator over an abstract closure with one
+`yield`. This implementation stores that closure's captured state on the
+helper instead, so a resumption re-enters the loop where the yield left it.
+The state is the underlying record, the callback, the callback counter, the
+count `take` and `drop` decrement, and the inner record `flatMap` is
+flattening, and the `[[GeneratorState]]` that makes re-entrant resumption a
+`TypeError`, closes the underlying iterator on a `return` before the first
+step and while suspended, and closes nothing after completion. A `flatMap`
+`return` closes the live inner iterator before the underlying one. A step
+that throws completes the helper without closing it, and a callback that
+throws closes the underlying iterator and keeps the original completion.
+A `return` on a suspended helper resumes its closure, so the cleanup runs in
+the `executing` state and a `return` method that re-enters that helper reaches
+the running-generator `TypeError`. The two reference hosts disagree there,
+Node.js reporting a `done` result and Deno the specified `TypeError`, so
+*tests/native.ts* asserts the specified behavior as a fixed native observation
+instead of a differential fixture.
+A helper is one collector-traced heap kind, so the ordinary object layout is
+unchanged and every captured value is reachable through the helper alone.
+The implementation stays in *runtime\_iterator.c*, which already owns the
+synchronous iterator protocol these paths are built from.
+
+Fixed native and generated differential evidence at seed `0x60005e00` covers
+a 10-case ordinary budget over one to three `map`, `filter`, `drop`, and
+`flatMap` stages, an optional trailing `take` limit, at most five source
+values, and a bounded early close, measured against an independent pull model
+that predicts the emitted values, the counter sequence, and whether a close
+reaches the source. Fixed evidence also covers metadata and descriptors,
+non-construction, limit conversion, the single captured `next`, close
+forwarding in all three generator states, the re-entrancy `TypeError`,
+`flatMap` primitive rejection and inner-then-outer close order, parallel and
+already-closed underlying iterators, both specialization policies, collection
+forced at every safepoint, false hints, deliberate shape-guard hits and
+misses, and generic fallback.
+
+All 184 of the node's inventory paths are reviewed and every one declares the
+upstream `iterator-helpers` feature, which stays unsupported until the
+separately owned `iterator-helpers-eager` node completes that feature, so
+each enters as an explicit prerequisite boundary rather than a pass. No
+previously reviewed path moves. The manifest moves from 16,461 to 16,645
+paths, keeps 12,779 passes and 1,556 expected negatives, and moves from 2,126
+to 2,310 unsupported profile features, with no failures. The property ratchet
+moves from 122 to 123 domains and seeds and from 5,356 to 5,366 ordinary
+cases. The admitted runtime checkpoint moves the ABI to
+`oseo-runtime-m5-91`, allocates seven code IDs inside the existing iterator
+range, adds one heap kind and eight realm intrinsics, and adds no
+generated-code entry point or graph-state change. The reviewed test262
+revision, 41,091-path applicable inventory, ADR 0013 vocabulary, inventory
+policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

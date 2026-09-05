@@ -1,0 +1,77 @@
+version: 1
+id: iterator-helpers-lazy
+title: "Lazy iterator helpers"
+scope:
+  - "Iterator.prototype map, filter, take, drop, and flatMap, including
+    receiver and argument validation with the underlying-iterator close it
+    performs, the single captured next method, callback counters, take and
+    drop limit conversion and range checks, flatMap flattening with
+    rejected primitives, the %IteratorHelperPrototype% next and return
+    methods, generator-state re-entrancy, and close forwarding before the
+    first step, while suspended, and after completion."
+  - "Reviewed standards coverage is all 184 upstream paths under
+    test/built-ins/Iterator/prototype/drop/,
+    test/built-ins/Iterator/prototype/filter/,
+    test/built-ins/Iterator/prototype/flatMap/,
+    test/built-ins/Iterator/prototype/map/, and
+    test/built-ins/Iterator/prototype/take/. Every one of them carries the
+    upstream iterator-helpers feature tag, which stays unsupported until
+    the separately owned eager helper methods complete that feature, so
+    each reviewed path records an explicit prerequisite boundary rather
+    than a pass. Fixed and generated native differential evidence proves
+    the admitted behavior for the same contracts in the meantime."
+  - "One observation is native-only rather than differential. Re-entering a
+    suspended helper from the underlying iterator return method reaches the
+    running-generator TypeError ECMA-262 specifies, and the two reference
+    hosts disagree about it: Node.js reports a done result while Deno
+    reports that TypeError. tests/native.ts asserts the specified behavior
+    directly, because a differential fixture requires both reference hosts
+    to agree."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/iterator-helpers-lazy.ts
+      - tests/property/m5-iterator-helpers-lazy.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/iterator-helpers-lazy.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/iterator-helpers-lazy.ts
+      - tests/property/m5-iterator-helpers-lazy.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-iterator-helpers-lazy.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/iterator-helpers-lazy.ts
+      - tests/property/m5-iterator-helpers-lazy.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/iterator-helpers-lazy.ts
+      - tests/property/m5-iterator-helpers-lazy.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_iterator.c
+      - packages/runtime-c/native/runtime_memory.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
