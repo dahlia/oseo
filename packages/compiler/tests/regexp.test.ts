@@ -656,6 +656,27 @@ test("admits Unicode class sets only through the extension point", () => {
     }).parsed,
     true,
   );
+  const trailingEmpty = parseRegExpPattern({
+    extensions,
+    flags: "v",
+    source: "[\\q{a|}]",
+  });
+  assert.deepEqual(trailingEmpty.errors, []);
+  const trailingEmptyTerm =
+    trailingEmpty.pattern?.body.alternatives[0]?.terms[0];
+  assert.equal(trailingEmptyTerm?.kind, "class-set");
+  if (trailingEmptyTerm?.kind === "class-set") {
+    const strings = trailingEmptyTerm.operands[0];
+    assert.equal(strings?.kind, "class-strings");
+    if (strings?.kind === "class-strings") {
+      assert.deepEqual(
+        strings.strings.map((characters) =>
+          characters.map((character) => character.value),
+        ),
+        [[0x61], []],
+      );
+    }
+  }
   for (const source of ["[\\&]", "[\\!]", "[\\q{\\-|\\&}]", "[\\q{\\b}]"]) {
     assert.equal(
       parseRegExpPattern({ extensions, flags: "v", source }).parsed,

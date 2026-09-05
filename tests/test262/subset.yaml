@@ -26996,55 +26996,55 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/lookBehind/alternations.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/back-references-to-captures.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/back-references.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/captures-negative.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/captures.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/do-not-backtrack.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/greedy-loop.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/misc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/mutual-recursive.js
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/negative.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/nested-lookaround.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/simple-fixed-length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/sliced-strings.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/start-of-line.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/sticky.js
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/variable-length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookBehind/word-boundary.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/lookahead-quantifier-match-groups.js
     expectedClassification: pass
@@ -27056,13 +27056,13 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-array-non-unicode-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-array-properties.js
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-array-unicode-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-array-unicode-property-names.js
     expectedClassification: pass
@@ -27098,25 +27098,25 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-match-indices.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-matchall.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-replace.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-replaceall.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-search.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-split.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/duplicate-names-test.js
     expectedClassification: pass
@@ -27125,19 +27125,19 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/functional-replace-non-global.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-object-subclass-sans.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-object-subclass.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-object-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-object-unmatched.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-object.js
     expectedClassification: pass
@@ -27149,55 +27149,55 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-property-names-valid.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-property-names.js
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-references.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-escaped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-get.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-missing.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-nocaptures.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-numbered.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-unclosed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/string-replace-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/unicode-match.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/unicode-property-names-invalid.js
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/unicode-property-names-valid.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/unicode-property-names.js
     expectedClassification: unsupported-profile-feature
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/unicode-references.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/nullable-quantifier.js
     expectedClassification: pass
@@ -29402,7 +29402,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.replace/named-groups.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.replace/not-a-constructor.js
     expectedClassification: unsupported-profile-feature
@@ -32549,10 +32549,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/duplicate-named-groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/duplicate-named-indices-groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/invoke-builtin-match.js
     expectedClassification: pass
@@ -32567,7 +32567,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/regexp-prototype-match-v-u-flag.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/match/this-val-bool.js
     expectedClassification: unsupported-profile-feature
@@ -32843,7 +32843,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/regexp-prototype-replace-v-u-flag.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/replace/replaceValue-evaluation-order-regexp-object.js
     expectedClassification: pass
@@ -33116,10 +33116,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/regexp-prototype-search-v-flag.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/regexp-prototype-search-v-u-flag.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/search/this-value-not-obj-coercible.js
     expectedClassification: pass

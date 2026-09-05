@@ -5084,26 +5084,75 @@ host candidate-edition RegExp implementation, while Unicode sequence answers
 come only from the pinned files and the independently decoded
 `@oseo/unicode` tables.
 
-All 255 paths in the node's six inventory roots are reviewed: 205 pass and 50
-retain explicit prerequisite boundaries. All four dotAll paths and all seventy
-modifier paths pass. Lookbehind contributes two passes and fifteen
-boundaries, match indices eleven passes and three boundaries, and named groups
-four passes and thirty-two boundaries. All 114 UnicodeSets cases pass through
-the reviewed property-of-strings and extended-character-class harness helpers,
-including the Unicode 17.0 `RGI_Emoji` corpus. Seventy-eight previously
-reviewed paths move from
-`unsupported-profile-feature` to `pass`: one duplicate-named-group syntax
-case, twenty-two modifier early-error cases, and fifty-five modifier
-arithmetic syntax cases. Nineteen more previously reviewed property-string,
-duplicate-group, execution, flags, and UnicodeSets prototype cases pass, and
-fifty property-string and UnicodeSets early errors become reviewed expected
-negatives. The manifest moves from 15,020 to 15,275 cases and from 11,188 to
-11,490 passes, moves from 1,506 to 1,556 expected negatives, and moves from
-2,326 to 2,229 unsupported profile features, with no semantic, harness, or
-infrastructure failures. The runtime checkpoint moves to
+The node owns eight inventory roots. Two of them, the generated
+property-of-strings escapes and the `unicodeSets` prototype accessor, moved
+here from `regexp-unicode-property-escapes` and `regexp-prototype-and-exec`,
+whose broad roots were narrowed to keep every inventory path owned exactly
+once. That transfer moves sixty-six paths and no classification: the graph's
+included total is unchanged, and the two neighbors read 597 and 233. It
+records where the evidence actually belongs, because a `\p{RGI_Emoji}` escape
+and the `unicodeSets` accessor are only decidable once this node admits
+properties of strings and the `v` grammar.
+
+All 321 paths in those roots are reviewed: 262 pass, fifty are reviewed
+expected negatives, and nine retain explicit prerequisite boundaries. All four
+dotAll paths, all seventeen lookbehind paths, all seventy modifier paths, and
+all 114 UnicodeSets paths pass, the last through the reviewed
+property-of-strings and extended-character-class harness helpers, including the
+Unicode 17.0 `RGI_Emoji` corpus. Match indices contributes thirteen passes and
+one boundary, and named groups twenty-nine passes and seven boundaries. The
+generated property-of-strings root contributes seven passes and twenty-one
+expected negatives, and the `unicodeSets` accessor root eight passes,
+twenty-nine expected negatives, and one boundary. The symbol-method dispatch
+this node once waited on landed first, so rows the node's own evidence had
+recorded as prerequisite boundaries are observed passing here rather than
+retained.
+
+Outside those roots, eighty-nine previously reviewed paths move from
+`unsupported-profile-feature` to `pass` and nothing moves down. Seventy-eight
+are `RegExp` construction cases: one duplicate-named-group syntax case,
+twenty-two modifier early-error cases, and fifty-five modifier arithmetic
+syntax cases. The other eleven are `exec`, `flags`, `Symbol.replace`, and
+`String.prototype` `match`, `replace`, and `search` cases that observe a `v`
+pattern executing. No reviewed path is removed, and no reviewed classification
+moves down anywhere. The manifest moves from 16,014 to 16,269 cases and from
+12,248 to 12,599 passes, moves from 1,506 to 1,556 expected negatives, and
+moves from 2,260 to 2,114 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The runtime
+checkpoint moves to
 `oseo-runtime-m5-89`; the node adds no generated-code entry point, built-in
 code ID, intrinsic number, fixed allocation, or matcher instruction, and it
 does not change the graph's orchestration state.
+
+A `\q{...}` alternative that spells no character is admitted and kept. The
+grammar has an empty `ClassString`, `CompileClassSetString` returns an empty
+sequence of characters for it, and `CompileAtom` appends an `EmptyMatcher`
+for a class whose set holds that sequence, after the longer strings and
+after the single characters. So `[\q{a|}]` matches the empty string wherever
+nothing longer matches, and both reference hosts agree. A trailing empty
+alternative is the one a parser drops most easily, because the closing brace
+follows the separator immediately, and dropping it would also clear
+`MayContainStrings` and turn the `[^\q{a|}]` early error into a pattern that
+silently compiled as `[^a]`.
+
+The one deliberate divergence this node records is how V8 reads a `\q{...}`
+alternative of exactly one code point under `i` and `v`. With `UnicodeSets` a
+CharSetElement is a sequence of characters, and the edition treats an
+individual character interchangeably with a sequence of one character.
+`ClassSetOperand` applies `MaybeSimpleCaseFolding` to a
+`ClassStringDisjunction` and to a `ClassSetCharacter` alike, and `CompileAtom`
+hands every element that consists of a single character to
+`CharacterSetMatcher`, which canonicalizes the input against it. A
+one-code-point `\q{X}` is therefore the class `[X]`, in isolation and under
+every set operation. V8 folds such an element but never canonicalizes an input
+against it, so it reports `/^[\q{A}]$/iv` matching `"a"` but not `"A"`, an
+answer the edition cannot produce, because a folded set compared against a
+folded input can never separate the two. The compiler-side matcher produces
+the edition's answer, and JavaScriptCore produces the same answer
+independently. Test262 pins none of this: its thirty-three `\q{...}` files are
+all generated without `i`, so the generated execution domain excludes the
+combination and *tests/regexp-matcher.test.ts* records the exact cases
+instead.
 
 
 Known gaps inside the claim

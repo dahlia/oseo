@@ -110,6 +110,11 @@ const caseArbitrary: fc.Arbitrary<PatternCase> = fc.oneof(
   textArbitrary.map((input) => ({
     flags: "v",
     input,
+    source: "[\\q{a|}]",
+  })),
+  textArbitrary.map((input) => ({
+    flags: "v",
+    input,
     source: "\\p{Emoji_Keycap_Sequence}",
   })),
   textArbitrary.map((input) => ({

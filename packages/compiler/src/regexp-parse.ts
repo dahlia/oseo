@@ -794,11 +794,14 @@ function parseClassStringDisjunction(
         start,
       });
     }
-    if (eat(state, "|") || at(state, 0) === "}") {
+    if (eat(state, "|")) {
       strings.push(characters);
       characters = [];
-      if (eat(state, "}")) break;
       continue;
+    }
+    if (eat(state, "}")) {
+      strings.push(characters);
+      break;
     }
     const characterStart = state.index;
     let value: number;

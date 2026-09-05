@@ -286,11 +286,96 @@ test("folds class-set operands before v-mode set operations", () => {
     ["[[a-z]--A]", "iv", "a"],
     ["[\\q{AB}--\\q{ab}]", "iv", "AB"],
     ["[\\q{|a}]", "v", "a"],
+    ["[\\q{a|}]", "v", "b"],
+    ["[\\q{a|}]", "v", "a"],
+    ["[\\q{ab|a|}]", "v", "ac"],
+    ["[\\q{}]", "v", "a"],
   ] as const) {
     assert.deepEqual(
       observe(source, flags, input),
       hostObserve(source, flags, input),
       `/${source}/${flags} on ${input}`,
+    );
+  }
+});
+
+/*
+ * An empty `ClassString` is a production of the grammar, so a `\q{}`
+ * alternative that spells no character contributes the empty sequence to
+ * the class rather than nothing at all. `CompileClassSetString` returns
+ * "an empty sequence of characters" for it, `CompileToCharSet` unions in
+ * "the CharSet containing the one string s", and `CompileAtom` appends an
+ * `EmptyMatcher` when "cs contains the empty sequence of characters",
+ * after the longer strings and after the single characters. So the empty
+ * alternative is the class's last branch: it matches at any position, and
+ * only where no other branch does.
+ *
+ * A trailing one is the case a parser drops most easily, because the
+ * closing brace follows the separator immediately. Dropping it is not a
+ * normalization: it also clears `MayContainStrings`, which turns the
+ * `[^\q{a|}]` early error into a pattern that silently compiles as
+ * `[^a]`. The host agrees with the edition throughout, so these stay
+ * ordinary differential cases above and the early errors are pinned here.
+ */
+test("keeps an empty q alternative in a v-mode class", () => {
+  const empty = { captures: [""], index: 0 };
+  assert.deepEqual(observe("[\\q{a|}]", "v", "b"), empty);
+  assert.deepEqual(observe("^[\\q{a|}]$", "v", ""), empty);
+  assert.deepEqual(observe("^[\\q{a|}]+$", "v", ""), empty);
+  assert.deepEqual(observe("[\\q{a|}]", "v", "a"), {
+    captures: ["a"],
+    index: 0,
+  });
+  for (const source of ["[^\\q{a|}]", "[^\\q{}]", "[^[\\q{a|}]]"]) {
+    assert.equal(
+      parseRegExpPattern({ extensions: propertyExtensions, flags: "v", source })
+        .parsed,
+      false,
+      `/${source}/v names a string in a negated class`,
+    );
+  }
+});
+
+/*
+ * A `\q{}` alternative of exactly one code point is that code point. The
+ * edition says so outright: with `UnicodeSets` a CharSetElement is a
+ * sequence of characters, and "an individual character is treated
+ * interchangeably with a sequence of one character". `ClassSetOperand`
+ * applies `MaybeSimpleCaseFolding` to a `ClassStringDisjunction` and to a
+ * `ClassSetCharacter` alike, and `CompileAtom` hands every element that
+ * "consists of a single character" to `CharacterSetMatcher`, which
+ * canonicalizes the input against it. So under `iv` a one-code-point
+ * `\q{X}` is the class `[X]`, in isolation and under every set operation.
+ *
+ * V8 folds such an element but never canonicalizes an input against it,
+ * which is a deliberate divergence recorded rather than followed: it
+ * reports `/^[\q{A}]$/iv` matching "a" but not "A", an answer the edition
+ * cannot produce, since a folded set compared against a folded input can
+ * never separate the two. JavaScriptCore produces the edition's answer.
+ * test262 pins none of this; its 33 `\q{}` files all run without `i`.
+ */
+test("reads a one-code-point q class string as that character", () => {
+  for (const [source, flags, input, matches] of [
+    ["^[\\q{a}]$", "iv", "A", true],
+    ["^[\\q{A}]$", "iv", "A", true],
+    ["^[\\q{A}]$", "iv", "a", true],
+    ["^[\\q{k}]$", "iv", "\u212a", true],
+    ["^[\\q{s}]$", "iv", "\u017f", true],
+    ["^[a--\\q{a}]$", "iv", "A", false],
+    ["^[a--\\q{A}]$", "iv", "a", false],
+    ["^[A--\\q{a}]$", "iv", "A", false],
+    ["^[^\\q{a}]$", "iv", "A", false],
+    ["^[\\q{a}]$", "v", "A", false],
+  ] as const) {
+    assert.equal(
+      observe(source, flags, input) != null,
+      matches,
+      `/${source}/${flags} on ${JSON.stringify(input)}`,
+    );
+    assert.deepEqual(
+      observe(source, flags, input),
+      observe(source.replace(/\\q\{(.)\}/u, "$1"), flags, input),
+      `/${source}/${flags} differs from its one-character class`,
     );
   }
 });

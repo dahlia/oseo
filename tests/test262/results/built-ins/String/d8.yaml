@@ -34,8 +34,9 @@ results:
       detail: 'test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js:96:29:
-        error[OSEO2001]: RegExp String dispatch is not admitted yet.\n"'
-      unsupportedCapability: regexp-string-dispatch
+        error[OSEO2001]: Regular expression pattern extension is not
+        admitted yet.\n"'
+      unsupportedCapability: regexp-pattern-extension
       passed: false
     unsupportedFeatures: []
   - case:

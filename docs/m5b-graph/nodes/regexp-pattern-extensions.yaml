@@ -4,12 +4,14 @@ title: "Unicode sets, modifiers, and assertions"
 delivers: "Adds class set notation, inline modifiers, named groups,
   lookbehind, match indices, and dotAll matching."
 inventory:
-  included: 255
+  included: 321
   roots:
     - test/built-ins/RegExp/dotall/
     - test/built-ins/RegExp/lookBehind/
     - test/built-ins/RegExp/match-indices/
     - test/built-ins/RegExp/named-groups/
+    - test/built-ins/RegExp/property-escapes/generated/strings/
+    - test/built-ins/RegExp/prototype/unicodeSets/
     - test/built-ins/RegExp/regexp-modifiers/
     - test/built-ins/RegExp/unicodeSets/
 dependencies:

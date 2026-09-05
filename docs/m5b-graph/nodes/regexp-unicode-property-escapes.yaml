@@ -4,10 +4,11 @@ title: "Unicode property escapes"
 delivers: "Adds the Unicode property escapes and the character class escapes
   over the pinned Unicode property tables."
 inventory:
-  included: 625
+  included: 597
   roots:
     - test/built-ins/RegExp/CharacterClassEscapes/
-    - test/built-ins/RegExp/property-escapes/
+    - test/built-ins/RegExp/property-escapes/*.js
+    - test/built-ins/RegExp/property-escapes/generated/*.js
 dependencies:
   - regexp-generic-matcher
   - unicode-tables
