@@ -17,8 +17,10 @@ scope:
     test/built-ins/Array/prototype/splice/, and
     test/built-ins/Array/prototype/unshift/. The reviewed paths contain
     223 passes and 24 explicit prerequisite boundaries. Two paths require
-    the unavailable proxyTrapsHelper.js include and have fixed and generated
-    replacement evidence for their large-length contracts."
+    the unavailable proxyTrapsHelper.js include. Fixed replacement evidence
+    covers maximum-safe reverse pairing with sparse moves and access order,
+    plus a deleteCount above the maximum safe integer clamped to the largest
+    ordinary Array length before species construction."
 owners:
   - PLAN-M5.md
 evidence:

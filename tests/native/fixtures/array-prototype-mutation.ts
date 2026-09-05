@@ -134,6 +134,74 @@ const count = { valueOf() { order.push("count"); return 1; } };
 Array.prototype.splice.call(ordered, start, count, "x");
 console.log("order", order.join(","));
 
+const largeReverseOrder = [];
+const stopReverse = {};
+let lowerValue = "zero";
+let upperValue = "2**53-2";
+const largeReversed = { length: 2 ** 53 + 2 };
+Object.defineProperty(largeReversed, "0", {
+  configurable: true,
+  get() { largeReverseOrder.push("get-0"); return lowerValue; },
+  set(value) {
+    largeReverseOrder.push("set-0-" + value);
+    lowerValue = value;
+  },
+});
+Object.defineProperty(largeReversed, "9007199254740990", {
+  configurable: true,
+  get() { largeReverseOrder.push("get-upper-0"); return upperValue; },
+  set(value) {
+    largeReverseOrder.push("set-upper-0-" + value);
+    upperValue = value;
+  },
+});
+Object.defineProperty(largeReversed, "2", {
+  configurable: true,
+  get() { largeReverseOrder.push("get-2"); return "two"; },
+});
+Object.defineProperty(largeReversed, "9007199254740987", {
+  configurable: true,
+  get() { largeReverseOrder.push("get-upper-3"); return "2**53-5"; },
+});
+Object.defineProperty(largeReversed, "4", {
+  configurable: true,
+  get() { largeReverseOrder.push("get-4"); throw stopReverse; },
+});
+try { Array.prototype.reverse.call(largeReversed); } catch (error) {
+  console.log("large reverse stop", error === stopReverse);
+}
+console.log("large reverse order", largeReverseOrder.join(","));
+console.log(
+  "large reverse ends",
+  largeReversed[0],
+  largeReversed[9007199254740990],
+);
+console.log(
+  "large reverse sparse",
+  Object.prototype.hasOwnProperty.call(largeReversed, 1),
+  Object.prototype.hasOwnProperty.call(largeReversed, 2),
+  largeReversed[3],
+  Object.prototype.hasOwnProperty.call(largeReversed, 9007199254740987),
+  largeReversed[9007199254740988],
+  Object.prototype.hasOwnProperty.call(largeReversed, 9007199254740989),
+);
+
+const largeSpeciesArray = [];
+largeSpeciesArray.length = 2 ** 32 - 1;
+let largeSpeciesLength = -1;
+const stopSplice = {};
+function LargeSpecies(length) {
+  largeSpeciesLength = length;
+  throw stopSplice;
+}
+largeSpeciesArray.constructor = { [Symbol.species]: LargeSpecies };
+try {
+  largeSpeciesArray.splice(0, 2 ** 53 + 4);
+} catch (error) {
+  console.log("large splice stop", error === stopSplice);
+}
+console.log("large splice species length", largeSpeciesLength);
+
 const inherited = { length: 3 };
 Object.setPrototypeOf(inherited, { 0: "a", 2: "c" });
 Array.prototype.reverse.call(inherited);
