@@ -28,6 +28,12 @@ const { assertAsyncProperty } = await import(
 
 type CombineFailure = "none" | "resolve" | "then-call" | "then-get";
 type CombineOperation = "all" | "race";
+type SettledOperation = "allSettled" | "any";
+type SettledOutcome =
+  | "fulfill"
+  | "fulfill-then-reject"
+  | "reject"
+  | "reject-then-fulfill";
 type IterableKind = "array" | "custom" | "sparse";
 
 interface HoleEntry {
@@ -56,6 +62,17 @@ interface PromiseCombineRepairCase {
   readonly iteratorRaceValue: number;
   readonly setterIndex: number;
   readonly thenGetRaceValue: number;
+}
+
+interface SettledEntry {
+  readonly outcome: SettledOutcome;
+  readonly value: number;
+}
+
+/** One directly generated allSettled or any settlement schedule. */
+interface PromiseSettledCombineCase {
+  readonly entries: readonly SettledEntry[];
+  readonly operation: SettledOperation;
 }
 
 const entryArbitrary: fc.Arbitrary<CombineEntry> = fc.oneof(
@@ -88,6 +105,24 @@ const repairCaseArbitrary: fc.Arbitrary<PromiseCombineRepairCase> = fc.record({
   setterIndex: fc.integer({ max: 2, min: 0 }),
   thenGetRaceValue: fc.integer({ max: 50, min: -50 }),
 });
+
+const settledCaseArbitrary: fc.Arbitrary<PromiseSettledCombineCase> = fc.record(
+  {
+    entries: fc.array(
+      fc.record({
+        outcome: fc.constantFrom(
+          "fulfill",
+          "fulfill-then-reject",
+          "reject",
+          "reject-then-fulfill",
+        ),
+        value: fc.integer({ max: 50, min: -50 }),
+      }),
+      { maxLength: 4 },
+    ),
+    operation: fc.constantFrom("allSettled", "any"),
+  },
+);
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -368,6 +403,111 @@ function repairExpected(testCase: PromiseCombineRepairCase): string {
   ].join("\n");
 }
 
+function settledEntrySource(entry: SettledEntry, index: number): string {
+  const first = entry.outcome.startsWith("fulfill") ? "resolve" : "reject";
+  const second = first === "resolve" ? "reject" : "resolve";
+  const secondCall = entry.outcome.includes("then")
+    ? `${second}(${entry.value + 100});`
+    : "";
+  return `{
+  then(resolve, reject) {
+    console.log("entry", ${index}, ${JSON.stringify(entry.outcome)});
+    ${first}(${entry.value});
+    ${secondCall}
+  },
+}`;
+}
+
+function settledSource(testCase: PromiseSettledCombineCase): string {
+  const entries = testCase.entries
+    .map((entry, index) => settledEntrySource(entry, index))
+    .join(",\n");
+  return `
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 2), hinted("x", 2));
+class GeneratedPromise extends Promise {
+  static resolve(value) { return value; }
+}
+const combined = GeneratedPromise.${testCase.operation}([${entries}]);
+console.log("instance", combined instanceof GeneratedPromise);
+combined.then(
+  function(value) {
+    if (${JSON.stringify(testCase.operation)} === "any") {
+      console.log("fulfilled", value);
+      return;
+    }
+    let text = "settled";
+    for (let index = 0; index < value.length; index = index + 1) {
+      const record = value[index];
+      const keys = Object.keys(record);
+      text = text + " " + keys[0] + ":" + record.status +
+        "," + keys[1] + ":" +
+        (record.status === "fulfilled" ? record.value : record.reason);
+    }
+    console.log(text);
+  },
+  function(error) {
+    let text = "rejected " + (error instanceof AggregateError) +
+      " " + error.errors.length;
+    for (let index = 0; index < error.errors.length; index = index + 1) {
+      text = text + " " + error.errors[index];
+    }
+    console.log(text);
+  },
+);
+console.log("sync");
+`;
+}
+
+function settlesFulfilled(entry: SettledEntry): boolean {
+  return entry.outcome.startsWith("fulfill");
+}
+
+function anyFulfillment(entry: SettledEntry): number | undefined {
+  if (settlesFulfilled(entry)) return entry.value;
+  return entry.outcome === "reject-then-fulfill"
+    ? entry.value + 100
+    : undefined;
+}
+
+/** Independent first-call model for the generated settlement schedule. */
+function settledExpected(testCase: PromiseSettledCombineCase): string {
+  const lines = ["hint 3 x2"];
+  for (let index = 0; index < testCase.entries.length; index += 1) {
+    const entry = testCase.entries[index];
+    assert(entry != null);
+    lines.push(`entry ${index} ${entry.outcome}`);
+  }
+  lines.push("instance true", "sync");
+  if (testCase.operation === "allSettled") {
+    lines.push(
+      "settled" +
+        testCase.entries
+          .map((entry) =>
+            settlesFulfilled(entry)
+              ? ` status:fulfilled,value:${entry.value}`
+              : ` status:rejected,reason:${entry.value}`,
+          )
+          .join(""),
+    );
+  } else {
+    const first = testCase.entries
+      .map(anyFulfillment)
+      .find((value) => value !== undefined);
+    if (first === undefined) {
+      lines.push(
+        `rejected true ${testCase.entries.length}` +
+          testCase.entries.map((entry) => ` ${entry.value}`).join(""),
+      );
+    } else {
+      lines.push(`fulfilled ${first}`);
+    }
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
 async function references(source: string): Promise<
   readonly [
     {
@@ -584,6 +724,49 @@ test(
         sizeLimit:
           "two two-step race schedules, two thenable assimilation jobs, " +
           "three all values, and one inherited indexed setter",
+        timeLimitMilliseconds: 240_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated Promise allSettled and any schedules match the M5 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "Promise allSettled and any first-call schedules agree",
+      fc.asyncProperty(settledCaseArbitrary, async (testCase) => {
+        await assertGeneratedSchedule(settledSource(testCase), {
+          exitStatus: 0,
+          stderr: "",
+          stdout: settledExpected(testCase),
+        });
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+                "shrink=direct array and record shrinkers",
+                "replay=OSEO_PROPERTY_SEED and OSEO_PROPERTY_PATH",
+              ],
+        domain:
+          "zero to four directly generated thenables for allSettled or any; " +
+          "each calls fulfill, reject, fulfill then reject, or reject then " +
+          "fulfill with one bounded integer; first-call result-record or " +
+          "AggregateError ordering; one false number hint; and direct " +
+          "array and record shrinking",
+        numRuns: 12,
+        profile: "M5 Promise allSettled and any",
+        seed: 0x6000_4502,
+        sizeLimit:
+          "four thenables, eight settlement calls, four result records, " +
+          "four AggregateError reasons, and one aggregate reaction",
         timeLimitMilliseconds: 240_000,
       },
     );

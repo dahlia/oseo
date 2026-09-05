@@ -5277,6 +5277,58 @@ range, and adds no generated-code entry point or graph-state change. The
 reviewed test262 revision, 41,091-path applicable inventory, ADR 0013
 vocabulary, inventory policy, and zero-override policy are unchanged.
 
+Implemented M5b node `promise-allsettled-and-any` completes the four iterable
+Promise combinators by replacing the deferred `Promise.allSettled` and
+`Promise.any` entry points with their ECMA-262 algorithms. `allSettled`
+creates one ordinary result record per input in input order. Each record
+creates its `status` property before its `value` or `reason` property, and
+each element's fulfill and reject closure shares one first-call guard. `any`
+fulfills with the first fulfilled input, or rejects with an `AggregateError`
+whose `errors` array preserves input order after every input rejects,
+including an empty input. The runtime constructs that error directly from
+the already-collected array, so an overridden Array iterator is not observed
+a second time.
+
+Both methods share the capability, iterator, and abrupt-completion machinery
+with `Promise.all` and `Promise.race`. They apply NewPromiseCapability to the
+receiver, read `resolve` once, call it with the receiver for every element,
+close an active iterator after the applicable abrupt completions, and
+preserve subclass-created promise capabilities. A native capability records
+aggregate settlement so a later closure cannot settle it again, while a
+foreign constructor continues to receive the exact resolve and reject
+functions it created.
+
+Fixed native and generated differential evidence at seed `0x60004502` covers
+a 12-case ordinary budget over zero through four directly generated
+thenables. Each thenable fulfills, rejects, fulfills then rejects, or rejects
+then fulfills with one bounded integer. An independent schedule oracle checks
+first-call behavior, input-ordered result records and rejection reasons,
+empty input, subclass capabilities, metadata, abrupt iterator completion,
+both specialization policies, collection forced at every safepoint, false
+hints, deliberate shape-guard misses, and compiled generic fallback. The
+generator uses direct Array and record shrinkers and reports the seed, replay
+path, profile, domain, size limit, and host target.
+
+The reviewed *promiseHelper.js* implementation supplies
+`checkSettledPromises` for the `allSettled` result-record assertions. All 198
+paths under the two inventory roots are accounted for and 192 are reviewed:
+180 pass and 12 retain explicit prerequisite boundaries. Five keep the
+unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two need
+`Reflect.construct`, and two call dynamic `eval`. Three String-iteration cases
+stay outside this node for the separate `string-iterator` owner, and three
+typed-unhandled-rejection cases stay outside the reviewed subset because the
+current host policy cannot distinguish their rejection from an unhandled
+throw. No previously reviewed path loses a pass. The manifest moves from
+16,269 to 16,461 paths and from 12,599 to 12,779 passes, keeps 1,556 expected
+negatives, and moves from 2,114 to 2,126 unsupported profile features, with
+no failures. The property ratchet moves from 121 to 122 domains and seeds and
+from 5,344 to 5,356 ordinary cases. The reviewed test262 revision,
+41,091-path applicable inventory, ADR 0013 schema and vocabulary, inventory
+policy, and zero-override policy are unchanged. The checkpoint moves the
+runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
+existing Promise range without adding a generated-code entry point or
+changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

@@ -679,6 +679,71 @@ if (originalArrayThen === undefined) {
   Array.prototype.then = originalArrayThen;
 }
 
+let anyAssimilationIndex = 0;
+Array.prototype.then = function (resolve) { resolve("any-array"); };
+Promise.resolve = function () {
+  const index = anyAssimilationIndex;
+  anyAssimilationIndex = anyAssimilationIndex + 1;
+  return {
+    then(resolve, reject) {
+      if (index === 0) {
+        resolve([1]);
+        reject("late-any");
+      } else {
+        reject("other-any");
+      }
+    },
+  };
+};
+Promise.any([1, 2]).then(
+  function (value) {
+    console.log("any assimilation first wins", value === "any-array");
+  },
+  function () { console.log("unexpected any assimilation rejection"); },
+);
+Promise.resolve = originalPromiseResolve;
+if (originalArrayThen === undefined) {
+  delete Array.prototype.then;
+} else {
+  Array.prototype.then = originalArrayThen;
+}
+
+let anyIteratorStep = 0;
+Array.prototype.then = function (resolve) { resolve("any-iterator-array"); };
+Promise.resolve = function () {
+  return { then(resolve) { resolve([2]); } };
+};
+const settledAnyThenAbruptIterator = {
+  [Symbol.iterator]() {
+    return {
+      next() {
+        if (anyIteratorStep === 0) {
+          anyIteratorStep = 1;
+          return { value: 1, done: false };
+        }
+        console.log("any iterator step abrupt");
+        throw new Error("any-iterator-after-settlement");
+      },
+      return() {
+        console.log("unexpected settled any iterator close");
+        return {};
+      },
+    };
+  },
+};
+Promise.any(settledAnyThenAbruptIterator).then(
+  function (value) {
+    console.log("any iterator first wins", value === "any-iterator-array");
+  },
+  function () { console.log("unexpected any iterator rejection"); },
+);
+Promise.resolve = originalPromiseResolve;
+if (originalArrayThen === undefined) {
+  delete Array.prototype.then;
+} else {
+  Array.prototype.then = originalArrayThen;
+}
+
 const finalResolveError = new Error("final-resolve");
 function FinalResolveCapability(executor) {
   executor(
@@ -722,6 +787,126 @@ setTimeout(function () {
     },
   );
 }, 0);
+
+console.log(
+  "settled metadata",
+  Promise.allSettled.name,
+  Promise.allSettled.length,
+  Promise.any.name,
+  Promise.any.length,
+);
+
+function printSettled(label, records) {
+  let text = label;
+  for (let index = 0; index < records.length; index = index + 1) {
+    const record = records[index];
+    const keys = Object.keys(record);
+    text = text + " " + keys[0] + ":" + record.status +
+      "," + keys[1] + ":" +
+      (record.status === "fulfilled" ? record.value : record.reason);
+  }
+  console.log(text);
+}
+
+Promise.allSettled([]).then(function (records) {
+  printSettled("allSettled empty", records);
+});
+Promise.allSettled([
+  Promise.resolve(21),
+  Promise.reject(22),
+  23,
+]).then(function (records) {
+  printSettled("allSettled mixed", records);
+});
+Promise.any([Promise.reject(31), Promise.resolve(32), 33]).then(
+  function (value) { console.log("any first fulfilled", value); },
+);
+Promise.any([Promise.reject(41), Promise.reject(42)]).catch(
+  function (error) {
+    console.log(
+      "any rejected",
+      error instanceof AggregateError,
+      error.errors.length,
+      error.errors[0],
+      error.errors[1],
+      Object.prototype.hasOwnProperty.call(error, "message"),
+      error.message,
+    );
+  },
+);
+Promise.any([]).catch(function (error) {
+  console.log(
+    "any empty",
+    error instanceof AggregateError,
+    error.errors.length,
+  );
+});
+
+class SettledPromise extends Promise {
+  static get resolve() {
+    console.log("settled resolve get");
+    return Promise.resolve;
+  }
+}
+const subclassSettled = SettledPromise.allSettled([51]);
+const subclassAny = SettledPromise.any([52]);
+console.log(
+  "settled subclass",
+  subclassSettled instanceof SettledPromise,
+  subclassAny instanceof SettledPromise,
+);
+
+class DirectSettledPromise extends Promise {
+  static resolve(value) {
+    return {
+      then(resolve, reject) {
+        if (value < 0) {
+          reject(value);
+          resolve(value - 100);
+        } else {
+          resolve(value);
+          reject(value + 100);
+        }
+      },
+    };
+  }
+}
+DirectSettledPromise.allSettled([61, -62]).then(function (records) {
+  printSettled("allSettled first call", records);
+});
+DirectSettledPromise.any([-71, 72, -73]).then(
+  function (value) { console.log("any first call", value); },
+  function () { console.log("unexpected any rejection"); },
+);
+
+const originalArrayIterator = Array.prototype[Symbol.iterator];
+let errorsIteratorReads = 0;
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true,
+  get() {
+    errorsIteratorReads = errorsIteratorReads + 1;
+    return originalArrayIterator;
+  },
+});
+const rejectedIterable = {
+  [Symbol.iterator]() {
+    let index = 0;
+    return {
+      next() {
+        index = index + 1;
+        if (index === 1) {
+          return { value: Promise.reject(81), done: false };
+        }
+        return { value: undefined, done: true };
+      },
+    };
+  },
+};
+Promise.any(rejectedIterable).catch(function () {
+  delete Array.prototype[Symbol.iterator];
+  Array.prototype[Symbol.iterator] = originalArrayIterator;
+  console.log("any errors list iterator", errorsIteratorReads);
+});
 `,
   },
 ];

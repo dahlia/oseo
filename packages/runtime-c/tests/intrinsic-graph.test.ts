@@ -903,6 +903,9 @@ test("populates the realm-owned Promise intrinsic cluster", () => {
   // the realm's own global property, and the species accessor is a
   // getter-only symbol-keyed property on it.
   assert.match(promiseSource, /OSEO_PROMISE_CONSTRUCTOR_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_PROMISE_ALL_SETTLED_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_PROMISE_ANY_CODE_ID/u);
+  assert.doesNotMatch(internalHeader, /OSEO_PROMISE_DEFERRED_STATIC_CODE_ID/u);
   assert.match(promiseSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(promiseSource, /OSEO_WELL_KNOWN_SPECIES/u);
   assert.match(promiseSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
