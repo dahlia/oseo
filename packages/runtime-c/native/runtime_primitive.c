@@ -860,8 +860,7 @@ static OseoResult default_array_text(
         if (result.status == OSEO_STATUS_NORMAL &&
             is_function(frame.slots[2])) {
             OseoFunction *join = function_object(frame.slots[2]);
-            if ((join->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
-                 join->code_id == OSEO_ARRAY_JOIN_CODE_ID) &&
+            if (join->code_id == OSEO_ARRAY_JOIN_CODE_ID &&
                 oseo_internal_string_is_ascii(
                     join->initial_name,
                     "join"
@@ -1017,8 +1016,7 @@ static OseoResult to_primitive_value(
         OseoFunction *method = function_object(frame.slots[2]);
         if (trying_to_string &&
             conversion_reaches_array_prototype(context, frame.slots[0]) &&
-            (method->code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID ||
-             method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID) &&
+            method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID &&
             oseo_internal_string_is_ascii(
                 method->initial_name,
                 "toString"

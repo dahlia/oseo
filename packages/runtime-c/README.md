@@ -700,6 +700,18 @@ undefined out of range. The receiver and searched value stay rooted across
 conversion and property access. All four code IDs come from the existing Array
 range, and the generated-code ABI gains no entry point.
 
+The `m5-88` ABI adds ordinary `pop`, `shift`, `unshift`, `splice`, `fill`,
+`copyWithin`, and `reverse` functions and completes the existing `push`
+function on `%Array.prototype%`. Every method converts its receiver, snapshots
+its array-like length, and performs its specified final length update. Indexed
+moves distinguish present sources from holes, preserving holes and inherited
+values through the required Set and DeletePropertyOrThrow operations.
+`copyWithin` selects a safe overlap direction, `reverse` observes both ends
+before writing, and `splice` creates its result through ArraySpeciesCreate.
+Receiver, argument, result, and moved values stay rooted across every
+observable operation. Seven new code IDs come from the existing Array range,
+and the generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

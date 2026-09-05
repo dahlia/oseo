@@ -11038,9 +11038,9 @@ summary:
   expectedNegatives: 1506
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 12022
+  passes: 12248
   semanticFailures: 0
-  unsupportedProfileFeatures: 2239
+  unsupportedProfileFeatures: 2260
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -11137,9 +11137,9 @@ summary:
       expectedNegatives: 266
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3421
+      passes: 3646
       semanticFailures: 0
-      unsupportedProfileFeatures: 1074
+      unsupportedProfileFeatures: 1096
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -11151,9 +11151,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1034
+      passes: 1035
       semanticFailures: 0
-      unsupportedProfileFeatures: 77
+      unsupportedProfileFeatures: 76
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -11179,9 +11179,9 @@ summary:
       expectedNegatives: 542
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8289
+      passes: 8514
       semanticFailures: 0
-      unsupportedProfileFeatures: 945
+      unsupportedProfileFeatures: 967
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -11243,9 +11243,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2265
+      passes: 2490
       semanticFailures: 0
-      unsupportedProfileFeatures: 246
+      unsupportedProfileFeatures: 268
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -11348,9 +11348,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 136
+      passes: 137
       semanticFailures: 0
-      unsupportedProfileFeatures: 34
+      unsupportedProfileFeatures: 33
     - group: built-ins/MapIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

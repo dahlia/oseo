@@ -115,6 +115,42 @@ static OseoResult array_index_search(
     const OseoValue *arguments,
     size_t code_id
 );
+static OseoResult array_pop(
+    OseoContext *context,
+    OseoValue receiver
+);
+static OseoResult array_shift(
+    OseoContext *context,
+    OseoValue receiver
+);
+static OseoResult array_unshift(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_splice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_fill(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_copy_within(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_reverse(
+    OseoContext *context,
+    OseoValue receiver
+);
 
 OseoResult oseo_internal_array_builtin_dispatch(
     OseoContext *context,
@@ -246,12 +282,31 @@ OseoResult oseo_internal_array_builtin_dispatch(
             code_id
         );
     }
-    if (code_id == OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID) {
-        return failure(
+    if (code_id == OSEO_ARRAY_POP_CODE_ID) {
+        return array_pop(context, receiver);
+    }
+    if (code_id == OSEO_ARRAY_SHIFT_CODE_ID) {
+        return array_shift(context, receiver);
+    }
+    if (code_id == OSEO_ARRAY_UNSHIFT_CODE_ID) {
+        return array_unshift(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_SPLICE_CODE_ID) {
+        return array_splice(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_FILL_CODE_ID) {
+        return array_fill(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_COPY_WITHIN_CODE_ID) {
+        return array_copy_within(
             context,
-            "OSEO2001",
-            "Array prototype method is not admitted in this M5b node."
+            receiver,
+            argument_count,
+            arguments
         );
+    }
+    if (code_id == OSEO_ARRAY_REVERSE_CODE_ID) {
+        return array_reverse(context, receiver);
     }
     (void)callee;
     return oseo_unknown_function(context, code_id);
@@ -2596,56 +2651,6 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             );
         }
     }
-    static const char *const unadmitted_names[] = {
-        "pop",
-        "reverse",
-        "shift",
-        "splice",
-        "unshift",
-    };
-    static const size_t unadmitted_lengths[] = {
-        0u,
-        0u,
-        0u,
-        2u,
-        1u,
-    };
-    _Static_assert(
-        sizeof(unadmitted_names) / sizeof(unadmitted_names[0]) ==
-            sizeof(unadmitted_lengths) / sizeof(unadmitted_lengths[0]),
-        "Array boundary method tables must stay aligned."
-    );
-    const size_t unadmitted_count =
-        sizeof(unadmitted_names) / sizeof(unadmitted_names[0]);
-    for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < unadmitted_count;
-         index += 1u) {
-        result = array_builtin_function(
-            context,
-            OSEO_ARRAY_UNADMITTED_METHOD_CODE_ID,
-            unadmitted_names[index],
-            unadmitted_lengths[index],
-            OSEO_FUNCTION_INTERNAL,
-            OSEO_FUNCTION_NAME_PREFIX_NONE
-        );
-        frame.slots[2] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_ascii_string(
-                context,
-                unadmitted_names[index]
-            );
-            frame.slots[3] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_define(
-                context,
-                frame.slots[0],
-                frame.slots[3],
-                frame.slots[2],
-                method
-            );
-        }
-    }
     static const size_t copying_codes[] = {
         OSEO_ARRAY_CONCAT_CODE_ID,
         OSEO_ARRAY_FLAT_CODE_ID,
@@ -2836,6 +2841,66 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             );
         }
     }
+    static const size_t mutation_codes[] = {
+        OSEO_ARRAY_COPY_WITHIN_CODE_ID,
+        OSEO_ARRAY_FILL_CODE_ID,
+        OSEO_ARRAY_POP_CODE_ID,
+        OSEO_ARRAY_REVERSE_CODE_ID,
+        OSEO_ARRAY_SHIFT_CODE_ID,
+        OSEO_ARRAY_SPLICE_CODE_ID,
+        OSEO_ARRAY_UNSHIFT_CODE_ID,
+    };
+    static const char *const mutation_names[] = {
+        "copyWithin",
+        "fill",
+        "pop",
+        "reverse",
+        "shift",
+        "splice",
+        "unshift",
+    };
+    static const size_t mutation_lengths[] = {2u, 1u, 0u, 0u, 0u, 2u, 1u};
+    _Static_assert(
+        sizeof(mutation_codes) / sizeof(mutation_codes[0]) ==
+            sizeof(mutation_names) / sizeof(mutation_names[0]),
+        "Array mutation method tables must stay aligned."
+    );
+    _Static_assert(
+        sizeof(mutation_codes) / sizeof(mutation_codes[0]) ==
+            sizeof(mutation_lengths) / sizeof(mutation_lengths[0]),
+        "Array mutation length tables must stay aligned."
+    );
+    const size_t mutation_count =
+        sizeof(mutation_names) / sizeof(mutation_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < mutation_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            mutation_codes[index],
+            mutation_names[index],
+            mutation_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                mutation_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_array_push_function(context);
         frame.slots[2] = result.value;
@@ -2985,12 +3050,6 @@ OseoResult oseo_internal_array_push(
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    if (!is_object(receiver)) {
-        return type_error(
-            context,
-            "Array.prototype.push requires an object receiver."
-        );
-    }
     if (argument_count > 0u && arguments == NULL) {
         return failure(context, "OSEO2001", "Push arguments are missing.");
     }
@@ -3005,27 +3064,14 @@ OseoResult oseo_internal_array_push(
     for (size_t index = 0u; index < argument_count; index += 1u) {
         frame.slots[index + 4u] = arguments[index];
     }
-    result = oseo_internal_ascii_string(context, "length");
-    frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
-        frame.slots[2] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_to_number(context, frame.slots[2]);
-        frame.slots[2] = result.value;
-    }
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
     double length = 0.0;
     if (result.status == OSEO_STATUS_NORMAL) {
-        const double number = number_value(frame.slots[2]);
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         const double maximum_safe_integer = 9007199254740991.0;
-        if (isnan(number) || number <= 0.0) {
-            length = 0.0;
-        } else if (!isfinite(number) || number > maximum_safe_integer) {
-            length = maximum_safe_integer;
-        } else {
-            length = floor(number);
-        }
         if ((double)argument_count > maximum_safe_integer - length) {
             result = type_error(
                 context,
@@ -3053,18 +3099,641 @@ OseoResult oseo_internal_array_push(
     }
     const double new_length = length + (double)argument_count;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_set(
-            context,
-            frame.slots[0],
-            frame.slots[1],
-            oseo_number(new_length),
-            true
-        );
+        result = array_set_length(context, frame.slots[0], new_length);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_number(new_length));
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult array_delete_index(
+    OseoContext *context,
+    OseoValue object,
+    double index
+) {
+    OseoValue slots[2] = {object, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_property_key(context, oseo_number(index));
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_delete(context, slots[0], slots[1], true);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* Move one indexed property through HasProperty/Get/Set or delete a hole. */
+static OseoResult array_move_property(
+    OseoContext *context,
+    OseoValue object,
+    double from,
+    double to
+) {
+    OseoValue slots[4] = {
+        object,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_property_key(context, oseo_number(from));
+    slots[1] = result.value;
+    bool present = false;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_has_property(context, slots[1], slots[0]);
+        present = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && present) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_property_key(context, oseo_number(to));
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = present
+            ? oseo_object_set(context, slots[0], slots[2], slots[3], true)
+            : oseo_object_delete(context, slots[0], slots[2], true);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_pop(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoValue slots[3] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && length == 0.0) {
+        result = array_set_length(context, slots[0], 0.0);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(oseo_undefined());
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        const double index = length - 1.0;
+        result = oseo_property_key(context, oseo_number(index));
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[1]);
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_delete(context, slots[0], slots[1], true);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = array_set_length(context, slots[0], index);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(slots[2]);
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_shift(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoValue slots[3] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && length == 0.0) {
+        result = array_set_length(context, slots[0], 0.0);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(oseo_undefined());
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_property_key(context, oseo_number(0.0));
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[1]);
+            slots[2] = result.value;
+        }
+        for (double index = 1.0;
+             result.status == OSEO_STATUS_NORMAL && index < length;
+             index += 1.0) {
+            result = array_move_property(
+                context,
+                slots[0],
+                index,
+                index - 1.0
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = array_delete_index(context, slots[0], length - 1.0);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = array_set_length(context, slots[0], length - 1.0);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(slots[2]);
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_unshift(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Unshift arguments are missing.");
+    }
+    if (argument_count > SIZE_MAX - 3u) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Unshift argument list is too large."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(
+        context,
+        &frame,
+        argument_count + 3u
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    for (size_t index = 0u; index < argument_count; index += 1u) {
+        frame.slots[index + 3u] = arguments[index];
+    }
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    const double maximum = 9007199254740991.0;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (double)argument_count > maximum - length) {
+        result = type_error(
+            context,
+            "Array.prototype.unshift exceeds the maximum safe integer."
+        );
+    }
+    if (argument_count > 0u) {
+        for (double index = length;
+             result.status == OSEO_STATUS_NORMAL && index > 0.0;
+             index -= 1.0) {
+            result = array_move_property(
+                context,
+                frame.slots[0],
+                index - 1.0,
+                index + (double)argument_count - 1.0
+            );
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = oseo_property_key(context, oseo_number((double)index));
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                frame.slots[index + 3u],
+                true
+            );
+        }
+    }
+    const double new_length = length + (double)argument_count;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(context, frame.slots[0], new_length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_number(new_length));
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult array_splice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Splice arguments are missing.");
+    }
+    if (argument_count > SIZE_MAX - 8u) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Splice argument list is too large."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(
+        context,
+        &frame,
+        argument_count + 8u
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    for (size_t index = 0u; index < argument_count; index += 1u) {
+        frame.slots[index + 8u] = arguments[index];
+    }
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    double actual_start = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL && argument_count > 0u) {
+        result = array_integer_or_infinity(context, frame.slots[8]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            actual_start = array_clamped_index(
+                number_value(result.value),
+                length
+            );
+        }
+    }
+    double delete_count = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL && argument_count == 1u) {
+        delete_count = length - actual_start;
+    } else if (result.status == OSEO_STATUS_NORMAL && argument_count >= 2u) {
+        result = array_integer_or_infinity(context, frame.slots[9]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            delete_count = fmin(
+                fmax(number_value(result.value), 0.0),
+                length - actual_start
+            );
+        }
+    }
+    const size_t item_count = argument_count > 2u
+        ? argument_count - 2u
+        : 0u;
+    const double maximum = 9007199254740991.0;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (double)item_count > maximum - length + delete_count) {
+        result = type_error(
+            context,
+            "Array.prototype.splice exceeds the maximum safe integer."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_species_create(context, frame.slots[0], delete_count);
+        frame.slots[3] = result.value;
+    }
+    for (double index = 0.0;
+         result.status == OSEO_STATUS_NORMAL && index < delete_count;
+         index += 1.0) {
+        result = oseo_property_key(
+            context,
+            oseo_number(actual_start + index)
+        );
+        frame.slots[4] = result.value;
+        bool present = false;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_has_property(
+                context,
+                frame.slots[4],
+                frame.slots[0]
+            );
+            present = result.status == OSEO_STATUS_NORMAL &&
+                oseo_to_boolean(result.value);
+        }
+        if (result.status == OSEO_STATUS_NORMAL && present) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[4]
+            );
+            frame.slots[5] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && present) {
+            result = create_index_property(
+                context,
+                frame.slots[3],
+                index,
+                frame.slots[5]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(context, frame.slots[3], delete_count);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (double)item_count < delete_count) {
+        for (double index = actual_start;
+             result.status == OSEO_STATUS_NORMAL &&
+                 index < length - delete_count;
+             index += 1.0) {
+            result = array_move_property(
+                context,
+                frame.slots[0],
+                index + delete_count,
+                index + (double)item_count
+            );
+        }
+        for (double index = length;
+             result.status == OSEO_STATUS_NORMAL &&
+                 index > length - delete_count + (double)item_count;
+             index -= 1.0) {
+            result = array_delete_index(
+                context,
+                frame.slots[0],
+                index - 1.0
+            );
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL &&
+               (double)item_count > delete_count) {
+        for (double index = length - delete_count;
+             result.status == OSEO_STATUS_NORMAL && index > actual_start;
+             index -= 1.0) {
+            result = array_move_property(
+                context,
+                frame.slots[0],
+                index + delete_count - 1.0,
+                index + (double)item_count - 1.0
+            );
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < item_count;
+         index += 1u) {
+        result = oseo_property_key(
+            context,
+            oseo_number(actual_start + (double)index)
+        );
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                frame.slots[0],
+                frame.slots[4],
+                frame.slots[index + 10u],
+                true
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_set_length(
+            context,
+            frame.slots[0],
+            length - delete_count + (double)item_count
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(frame.slots[3]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult array_fill(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[5] = {
+        receiver,
+        builtin_argument(argument_count, arguments, 0u),
+        builtin_argument(argument_count, arguments, 1u),
+        builtin_argument(argument_count, arguments, 2u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    double start = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_integer_or_infinity(context, slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            start = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double end = length;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[3]) != OSEO_TAG_UNDEFINED) {
+        result = array_integer_or_infinity(context, slots[3]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            end = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    for (double index = start;
+         result.status == OSEO_STATUS_NORMAL && index < end;
+         index += 1.0) {
+        result = oseo_property_key(context, oseo_number(index));
+        slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                slots[0],
+                slots[4],
+                slots[1],
+                true
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[0]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_copy_within(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[4] = {
+        receiver,
+        builtin_argument(argument_count, arguments, 0u),
+        builtin_argument(argument_count, arguments, 1u),
+        builtin_argument(argument_count, arguments, 2u),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, slots[0], &length);
+    }
+    double target = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_integer_or_infinity(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            target = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double source = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_integer_or_infinity(context, slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            source = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double final = length;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[3]) != OSEO_TAG_UNDEFINED) {
+        result = array_integer_or_infinity(context, slots[3]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            final = array_clamped_index(number_value(result.value), length);
+        }
+    }
+    double count = fmin(final - source, length - target);
+    double direction = 1.0;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        source < target && target < source + count) {
+        direction = -1.0;
+        source += count - 1.0;
+        target += count - 1.0;
+    }
+    while (result.status == OSEO_STATUS_NORMAL && count > 0.0) {
+        result = array_move_property(context, slots[0], source, target);
+        source += direction;
+        target += direction;
+        count -= 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[0]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_reverse_pair(
+    OseoContext *context,
+    OseoValue object,
+    double lower,
+    double upper
+) {
+    OseoValue slots[5] = {
+        object,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_property_key(context, oseo_number(lower));
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_property_key(context, oseo_number(upper));
+        slots[2] = result.value;
+    }
+    bool lower_present = false;
+    bool upper_present = false;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_has_property(context, slots[1], slots[0]);
+        lower_present = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && lower_present) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_has_property(context, slots[2], slots[0]);
+        upper_present = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && upper_present) {
+        result = oseo_object_get(context, slots[0], slots[2]);
+        slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && lower_present && upper_present) {
+        result = oseo_object_set(context, slots[0], slots[1], slots[4], true);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                slots[0],
+                slots[2],
+                slots[3],
+                true
+            );
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL && !lower_present &&
+               upper_present) {
+        result = oseo_object_set(context, slots[0], slots[1], slots[4], true);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_delete(context, slots[0], slots[2], true);
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL && lower_present) {
+        result = oseo_object_delete(context, slots[0], slots[1], true);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                slots[0],
+                slots[2],
+                slots[3],
+                true
+            );
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult array_reverse(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoValue object = receiver;
+    OseoRootFrame frame = {NULL, &object, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, object);
+    object = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, object, &length);
+    }
+    const double middle = floor(length / 2.0);
+    for (double lower = 0.0;
+         result.status == OSEO_STATUS_NORMAL && lower < middle;
+         lower += 1.0) {
+        result = array_reverse_pair(
+            context,
+            object,
+            lower,
+            length - lower - 1.0
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(object);
+    oseo_roots_pop(context, &frame);
     return result;
 }
 

@@ -594,11 +594,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
     return "promise-static-method";
   }
   if (
-    diagnostic === "Array prototype method is not admitted in this M5b node."
-  ) {
-    return "array-prototype-method";
-  }
-  if (
     diagnostic === "String prototype method is not admitted in this M5b node."
   ) {
     return "string-prototype-method";
