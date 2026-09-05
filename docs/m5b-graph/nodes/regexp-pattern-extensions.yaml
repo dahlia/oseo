@@ -15,4 +15,11 @@ inventory:
 dependencies:
   - regexp-unicode-property-escapes
 landed: false
-status: ready
+status: parked
+reason: "Mandatory root review round five raised a q-string singleton
+  semantic finding. A Claude Opus correction dispatch derived the branch's
+  behavior from ECMA-262, added discriminating evidence in commit cabe2063,
+  and passed Codex cross-review and all three gates, but that new delta still
+  requires another root codex review and the coordinator review limit is five.
+  Resume the preserved m5b-regexp-extensions branch only with authority to
+  restart or extend that root-review budget."
