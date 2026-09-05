@@ -5136,23 +5136,43 @@ follows the separator immediately, and dropping it would also clear
 silently compiled as `[^a]`.
 
 The one deliberate divergence this node records is how V8 reads a `\q{...}`
-alternative of exactly one code point under `i` and `v`. With `UnicodeSets` a
-CharSetElement is a sequence of characters, and the edition treats an
-individual character interchangeably with a sequence of one character.
+alternative of exactly one code point under `i` and `v`. The edition settles
+that in its CharSet notation: with `UnicodeSets` a CharSetElement is a
+sequence of characters, and “an individual character is treated
+interchangeably with a sequence of one character.” A one-code-point `\q{X}`
+is therefore the same set member as the `ClassSetCharacter` `X`, and
 `ClassSetOperand` applies `MaybeSimpleCaseFolding` to a
-`ClassStringDisjunction` and to a `ClassSetCharacter` alike, and `CompileAtom`
-hands every element that consists of a single character to
-`CharacterSetMatcher`, which canonicalizes the input against it. A
-one-code-point `\q{X}` is therefore the class `[X]`, in isolation and under
-every set operation. V8 folds such an element but never canonicalizes an input
-against it, so it reports `/^[\q{A}]$/iv` matching `"a"` but not `"A"`, an
-answer the edition cannot produce, because a folded set compared against a
-folded input can never separate the two. The compiler-side matcher produces
-the edition's answer, and JavaScriptCore produces the same answer
-independently. Test262 pins none of this: its thirty-three `\q{...}` files are
-all generated without `i`, so the generated execution domain excludes the
-combination and *tests/regexp-matcher.test.ts* records the exact cases
-instead.
+`ClassStringDisjunction` and to a `ClassSetCharacter` alike, so both
+spellings reach every later step as one folded element. A one-character
+`ClassString` also leaves `MayContainStrings` false, which is what admits the
+negated spelling at all.
+
+That one rule decides every place set membership is observed. In isolation,
+`CompileAtom` hands a class whose every element “consists of a single
+character” to `CharacterSetMatcher`, which canonicalizes the input against
+the folded element, so `/^[\q{a}]$/iv` matches `"A"`, and
+`ClassSetOperand :: NestedClass` returns its operand unchanged, so `[[\q{a}]]`
+reads the same. Under the two operations that compare members,
+`ClassIntersection` intersects CharSets and `ClassSubtraction` returns “the
+CharSetElements of charSet which are not also CharSetElements of otherSet”, and
+`a` and `\q{a}` are that one element, so `[a&&\q{a}]` retains it while
+`[a--\q{a}]` is empty. Under negation, `CompileCharacterClass` replaces a
+`v`-mode inversion with `CharacterComplement` over `AllCharacters`, which under
+`i` and `v` holds only the code points that case-fold to themselves, so
+`[^\q{a}]` drops `a`, retains no member that canonicalizes to it, and
+`/^[^\q{a}]$/iv` rejects `"A"` as well.
+
+V8 answers the opposite way in each of those spellings on the input that
+separates the two readings, and agrees on an input that is already the folded
+case. It folds such an element but never canonicalizes an input against it,
+and its own results show that cannot be a reading of the edition: it reports
+`/^[\q{A}]$/iv` matching `"a"` but not `"A"`, and a folded set compared
+against a folded input can never separate the two. The compiler-side matcher
+produces the edition's answer, and JavaScriptCore produces that answer in
+each case independently. Test262 pins none of this: its thirty-three
+`\q{...}` files are all generated without `i`, so the generated execution
+domain excludes the combination and *tests/regexp-matcher.test.ts* records
+the exact cases instead.
 
 A second divergence, and the only one this claim records against both
 reference hosts, is how a lone General\_Category value behaves inside `v`-mode

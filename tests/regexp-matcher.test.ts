@@ -347,11 +347,27 @@ test("keeps an empty q alternative in a v-mode class", () => {
  * canonicalizes the input against it. So under `iv` a one-code-point
  * `\q{X}` is the class `[X]`, in isolation and under every set operation.
  *
- * V8 folds such an element but never canonicalizes an input against it,
- * which is a deliberate divergence recorded rather than followed: it
- * reports `/^[\q{A}]$/iv` matching "a" but not "A", an answer the edition
- * cannot produce, since a folded set compared against a folded input can
- * never separate the two. JavaScriptCore produces the edition's answer.
+ * The spellings that hide that rule derive the same way. `ClassSetOperand
+ * :: NestedClass` returns its operand unchanged, so `[[\q{a}]]` reads like
+ * the bare class. `ClassIntersection` intersects CharSets and
+ * `ClassSubtraction` keeps "the CharSetElements of charSet which are not
+ * also CharSetElements of otherSet", and `a` and `\q{a}` are that one
+ * element, so `[a&&\q{a}]` retains it while `[a--\q{a}]` is empty.
+ * `CompileCharacterClass` replaces a `v`-mode inversion with
+ * `CharacterComplement` over `AllCharacters`, which under `iv` holds only
+ * the code points that case-fold to themselves, so `[^\q{a}]` drops `a`,
+ * retains no member that canonicalizes to it, and rejects "A" as well. A
+ * one-character `ClassString` leaves `MayContainStrings` false, which is
+ * what admits that negated spelling at all.
+ *
+ * V8 answers the opposite way in each of those spellings on the input that
+ * separates the two readings, and agrees on an input that is already the
+ * folded case. It folds such an element but never canonicalizes an input
+ * against it, which is a deliberate divergence recorded rather than
+ * followed: it reports `/^[\q{A}]$/iv` matching "a" but not "A", an answer
+ * the edition cannot produce, since a folded set compared against a folded
+ * input can never separate the two. JavaScriptCore produces the edition's
+ * answer in each case.
  * test262 pins none of this; its 33 `\q{}` files all run without `i`.
  */
 test("reads a one-code-point q class string as that character", () => {
@@ -361,10 +377,15 @@ test("reads a one-code-point q class string as that character", () => {
     ["^[\\q{A}]$", "iv", "a", true],
     ["^[\\q{k}]$", "iv", "\u212a", true],
     ["^[\\q{s}]$", "iv", "\u017f", true],
+    ["^[[\\q{a}]]$", "iv", "A", true],
+    ["^[a&&\\q{a}]$", "iv", "A", true],
+    ["^[a&&\\q{a}]$", "iv", "a", true],
     ["^[a--\\q{a}]$", "iv", "A", false],
+    ["^[a--\\q{a}]$", "iv", "a", false],
     ["^[a--\\q{A}]$", "iv", "a", false],
     ["^[A--\\q{a}]$", "iv", "A", false],
     ["^[^\\q{a}]$", "iv", "A", false],
+    ["^[^\\q{a}]$", "iv", "b", true],
     ["^[\\q{a}]$", "v", "A", false],
   ] as const) {
     assert.equal(
