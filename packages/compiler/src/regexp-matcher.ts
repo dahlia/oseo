@@ -95,6 +95,46 @@ function setUnion(
   return boundaries;
 }
 
+/**
+ * A running union of inversion lists, held as one partial union per rank.
+ *
+ * Slot `rank` holds the union of a run of exactly `2 ** rank` lists, so
+ * adding one list carries upward the way a binary counter does. Every
+ * boundary then takes part in a logarithmic number of merges rather than
+ * in one merge for each list that follows it, and the accumulator holds
+ * one partial union per rank rather than one per list.
+ *
+ * Folding `setUnion` from the left instead rewalks the whole accumulated
+ * list once per operand, which is the square of the operand count for a
+ * union whose operands name distinct code points. Collecting the lists
+ * and merging them at the end holds every operand at once, which a union
+ * of many large operands cannot afford.
+ */
+type SetUnionSlots = (RegExpMatcherSet | undefined)[];
+
+/** Add one inversion list to a running union. */
+function addSetUnion(slots: SetUnionSlots, set: RegExpMatcherSet): void {
+  let carry = set;
+  for (let rank = 0; ; rank += 1) {
+    const held = slots[rank];
+    if (held == null) {
+      slots[rank] = carry;
+      return;
+    }
+    slots[rank] = undefined;
+    carry = setUnion(held, carry);
+  }
+}
+
+/** The union every slot of a running union holds together. */
+function finishSetUnion(slots: SetUnionSlots): RegExpMatcherSet {
+  let union: RegExpMatcherSet = [];
+  for (const held of slots) {
+    if (held != null) union = setUnion(union, held);
+  }
+  return union;
+}
+
 /** The complement of one inversion list over the whole code-point range. */
 function setComplement(set: RegExpMatcherSet): RegExpMatcherSet {
   const boundaries: number[] = [];
@@ -753,20 +793,53 @@ interface ClassValue {
   readonly strings: readonly (readonly number[])[];
 }
 
+/** The key two class strings share exactly when they hold the same run. */
+function classStringKey(sequence: readonly number[]): string {
+  return sequence.join(",");
+}
+
+/**
+ * Fold one class-set value into a running union of values.
+ *
+ * The edition holds a one-character `\q{...}` alternative as a code point
+ * rather than as a string, and holds each remaining alternative once. An
+ * alternative already in `unique` is left as it was written, so a repeated
+ * alternative keeps the spelling and the position of its first appearance,
+ * which is the order the class string trie is then built in.
+ *
+ * `slots` and `unique` are the accumulator: folding is written this way so
+ * that a union of many operands folds each operand a bounded number of
+ * times and releases it, rather than refolding everything it already
+ * holds once more for every operand that follows.
+ */
+function addClassValue(
+  slots: SetUnionSlots,
+  unique: Map<string, readonly number[]>,
+  value: ClassValue,
+): void {
+  const single: (readonly [number, number])[] = [];
+  for (const sequence of value.strings) {
+    const character = sequence.length === 1 ? sequence[0] : undefined;
+    if (character == null) {
+      const key = classStringKey(sequence);
+      if (!unique.has(key)) unique.set(key, sequence);
+      continue;
+    }
+    single.push([character, character]);
+  }
+  addSetUnion(slots, value.characters);
+  if (single.length > 0) addSetUnion(slots, setOfRanges(single));
+}
+
+/** One class-set value with its one-character alternatives folded in. */
 function normalizeClassValue(value: ClassValue): ClassValue {
-  let characters = value.characters;
-  const strings: readonly (readonly number[])[] = value.strings.filter(
-    (sequence) => {
-      const character = sequence.length === 1 ? sequence[0] : undefined;
-      if (character == null) return true;
-      characters = setUnion(characters, setOfRange(character, character));
-      return false;
-    },
-  );
-  const unique = new Map(
-    strings.map((sequence) => [sequence.join(","), sequence]),
-  );
-  return { characters, strings: [...unique.values()] };
+  const slots: SetUnionSlots = [];
+  const unique = new Map<string, readonly number[]>();
+  addClassValue(slots, unique, value);
+  return {
+    characters: finishSetUnion(slots),
+    strings: [...unique.values()],
+  };
 }
 
 function propertyEscapeClassValue(
@@ -878,29 +951,116 @@ function classSetOperandValue(
   });
 }
 
-function classValueUnion(left: ClassValue, right: ClassValue): ClassValue {
-  return normalizeClassValue({
-    characters: setUnion(left.characters, right.characters),
-    strings: [...left.strings, ...right.strings],
-  });
+/** The first operand's value, or the empty value for no operand at all. */
+function leadingClassValue(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const first = operands[0];
+  if (first == null) return { characters: [], strings: [] };
+  return normalizeClassValue(classSetOperandValue(builder, first));
 }
 
-function classValueIntersection(
-  left: ClassValue,
-  right: ClassValue,
+/**
+ * The union of every operand, accumulated as the operands resolve.
+ *
+ * Unioning two values at a time renormalized every alternative the
+ * accumulator already held, once per operand, which is the square of the
+ * operand count: an admitted one-mebibyte source can write more than a
+ * hundred thousand `\q{...}` operands into one union. Each operand is
+ * folded on its own instead, and the alternatives accumulate in a map
+ * keyed the way `normalizeClassValue` keys them, so a repeated alternative
+ * still keeps the position and spelling of its first appearance and the
+ * result is the value the pairwise fold produced.
+ *
+ * One operand is resolved at a time and released once it has been folded
+ * in, because a union of many operands that each name thousands of
+ * alternatives cannot hold every operand's value at once.
+ */
+function unionClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
 ): ClassValue {
-  const rightStrings = new Set(right.strings.map((value) => value.join(",")));
+  const slots: SetUnionSlots = [];
+  const unique = new Map<string, readonly number[]>();
+  for (const operand of operands) {
+    addClassValue(slots, unique, classSetOperandValue(builder, operand));
+  }
   return {
-    characters: setIntersection(left.characters, right.characters),
-    strings: left.strings.filter((value) => rightStrings.has(value.join(","))),
+    characters: finishSetUnion(slots),
+    strings: [...unique.values()],
   };
 }
 
-function classValueDifference(left: ClassValue, right: ClassValue): ClassValue {
-  const rightStrings = new Set(right.strings.map((value) => value.join(",")));
+/**
+ * The intersection of the first operand with every operand after it.
+ *
+ * An alternative of the first operand survives exactly when every later
+ * operand also holds it, which one counting pass decides. Re-filtering the
+ * survivors against each operand in turn would instead cost the first
+ * operand's size once per operand. Only an alternative the first operand
+ * wrote is counted, so the counts stay within its size however many
+ * operands follow.
+ */
+function intersectClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const left = leadingClassValue(builder, operands);
+  const candidates = new Set(left.strings.map(classStringKey));
+  const holders = new Map<string, number>();
+  let characters = left.characters;
+  let rights = 0;
+  for (const [index, operand] of operands.entries()) {
+    if (index === 0) continue;
+    const value = classSetOperandValue(builder, operand);
+    characters = setIntersection(characters, value.characters);
+    for (const key of new Set(value.strings.map(classStringKey))) {
+      if (!candidates.has(key)) continue;
+      holders.set(key, (holders.get(key) ?? 0) + 1);
+    }
+    rights += 1;
+  }
   return {
-    characters: setDifference(left.characters, right.characters),
-    strings: left.strings.filter((value) => !rightStrings.has(value.join(","))),
+    characters,
+    strings: left.strings.filter(
+      (value) => (holders.get(classStringKey(value)) ?? 0) === rights,
+    ),
+  };
+}
+
+/**
+ * The first operand less every operand after it.
+ *
+ * Difference is left-associative, and removing the operands in turn
+ * removes exactly what removing their union removes, so an alternative
+ * leaves the survivors the first time a later operand writes it rather
+ * than being looked for again in every operand, which would cost the first
+ * operand's size once per operand. Only what the first operand wrote is
+ * tracked, so the survivors stay within its size however many alternatives
+ * the later operands name, and each of their values is released once it
+ * has been folded in.
+ */
+function subtractClassSet(
+  builder: Builder,
+  operands: readonly RegExpClassSetOperand[],
+): ClassValue {
+  const left = leadingClassValue(builder, operands);
+  const slots: SetUnionSlots = [];
+  const surviving = new Set(left.strings.map(classStringKey));
+  for (const [index, operand] of operands.entries()) {
+    if (index === 0) continue;
+    const value = classSetOperandValue(builder, operand);
+    addSetUnion(slots, value.characters);
+    for (const sequence of value.strings) {
+      surviving.delete(classStringKey(sequence));
+    }
+  }
+  return {
+    characters: setDifference(left.characters, finishSetUnion(slots)),
+    strings: left.strings.filter((value) =>
+      surviving.has(classStringKey(value)),
+    ),
   };
 }
 
@@ -908,16 +1068,13 @@ function classSetValue(
   builder: Builder,
   node: RegExpUnicodeClassSet,
 ): ClassValue {
-  let value: ClassValue = { characters: [], strings: [] };
-  for (const [index, operand] of node.operands.entries()) {
-    const next = classSetOperandValue(builder, operand);
-    if (index === 0 || node.operation === "union") {
-      value = classValueUnion(value, next);
-    } else if (node.operation === "intersection") {
-      value = classValueIntersection(value, next);
-    } else {
-      value = classValueDifference(value, next);
-    }
+  let value: ClassValue;
+  if (node.operation === "union") {
+    value = unionClassSet(builder, node.operands);
+  } else if (node.operation === "intersection") {
+    value = intersectClassSet(builder, node.operands);
+  } else {
+    value = subtractClassSet(builder, node.operands);
   }
   if (!node.negated) return value;
   if (value.strings.length > 0) {
