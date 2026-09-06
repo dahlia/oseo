@@ -613,6 +613,22 @@
 #define OSEO_MATH_FUNCTION_CODE_ID_FIRST \
     (OSEO_MATH_CODE_ID_RANGE_LAST - (OSEO_MATH_FUNCTION_COUNT - 1u))
 
+#define OSEO_URI_CODE_ID_RANGE_INDEX ((size_t)18u)
+#define OSEO_URI_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_URI_CODE_ID_RANGE_INDEX)
+#define OSEO_URI_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_URI_CODE_ID_RANGE_INDEX)
+/*
+ * The four URI handling functions keep one dense order, so a code ID is
+ * the range last minus that function's index in `uri_functions` and the
+ * dispatch needs no separate table. The first and last IDs bound the
+ * range the builder and the dispatcher both walk.
+ */
+#define OSEO_URI_FUNCTION_COUNT ((size_t)4u)
+#define OSEO_URI_FUNCTION_CODE_ID_LAST OSEO_URI_CODE_ID_RANGE_LAST
+#define OSEO_URI_FUNCTION_CODE_ID_FIRST \
+    (OSEO_URI_CODE_ID_RANGE_LAST - (OSEO_URI_FUNCTION_COUNT - 1u))
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1794,6 +1810,15 @@ OseoResult oseo_internal_math_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_uri_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_internal_array_buffer_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -2458,6 +2483,22 @@ OseoResult oseo_internal_install_number_global(
 /* The realm's lazily created Math namespace object. */
 OseoResult oseo_internal_math_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_math_global(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * One of the realm's four lazily created URI handling functions and the
+ * global installation that binds all four as writable, non-enumerable,
+ * configurable properties. `intrinsic` must be one of the four numbers
+ * from OSEO_INTRINSIC_DECODE_URI through
+ * OSEO_INTRINSIC_ENCODE_URI_COMPONENT, whose order is also the order the
+ * component's own function table and code-ID range use.
+ */
+OseoResult oseo_internal_uri_intrinsic(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+);
+OseoResult oseo_internal_install_uri_global(
     OseoContext *context,
     OseoValue global
 );

@@ -218,6 +218,10 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "SyntaxError" ||
     name === "TypeError" ||
     name === "URIError" ||
+    name === "decodeURI" ||
+    name === "decodeURIComponent" ||
+    name === "encodeURI" ||
+    name === "encodeURIComponent" ||
     name === "undefined"
   );
 }

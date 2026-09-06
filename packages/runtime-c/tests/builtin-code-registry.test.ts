@@ -34,6 +34,7 @@ const components = [
   "DATA_VIEW",
   "REGEXP",
   "MATH",
+  "URI",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

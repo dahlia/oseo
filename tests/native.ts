@@ -88,6 +88,8 @@ const { genericStringCoercionFixtures } =
   await import("./native/fixtures/generic-string-coercion.ts");
 const { mathNamespaceFixtures } =
   await import("./native/fixtures/math-namespace.ts");
+const { uriHandlingFunctionFixtures } =
+  await import("./native/fixtures/uri-handling-functions.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
 const { regexpSymbolMethodsFixtures } =
@@ -175,6 +177,7 @@ const fixtures: readonly Fixture[] = [
   ...stringPrototypeReplaceFixtures,
   ...numberPrototypeFixtures,
   ...mathNamespaceFixtures,
+  ...uriHandlingFunctionFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -638,6 +641,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
+    fixture.name === "uri-handling-functions" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -725,6 +729,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
+    fixture.name === "uri-handling-functions" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -1127,6 +1132,16 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
+          if (fixture.name === "uri-handling-functions") {
+            // Every escape sequence is staged in host memory while the
+            // collector runs at every safepoint, and reading a global
+            // URI function through the realm's global object misses its
+            // shape guard once the fixture adds a global property.
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
           if (fixture.name === "object-literal-prototype-setter") {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1136,10 +1151,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus eighteen admitted standard
-            // global property names shared by every Script, the Math
-            // namespace being the one this node adds.
-            assert.equal(native.counters.allocations, 34);
+            // value-property allocations plus twenty-two admitted standard
+            // global property names shared by every Script, the four URI
+            // handling functions being the ones this node adds.
+            assert.equal(native.counters.allocations, 38);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

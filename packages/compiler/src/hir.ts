@@ -377,6 +377,10 @@ export function intrinsicGlobalKind(
     name === "RegExp" ||
     name === "String" ||
     name === "Symbol" ||
+    name === "decodeURI" ||
+    name === "decodeURIComponent" ||
+    name === "encodeURI" ||
+    name === "encodeURIComponent" ||
     errorIntrinsicName(name) != null
   ) {
     return "replaceable";

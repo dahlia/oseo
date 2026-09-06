@@ -380,3 +380,7 @@ families:
     owner: tests/property/m5-iterator-helpers-lazy.property.test.ts
     start: 0x60005e00
     end: 0x60005eff
+  - family: m5-uri-handling-functions
+    owner: tests/property/m5-uri-handling-functions.property.test.ts
+    start: 0x60005f00
+    end: 0x60005fff

@@ -111,6 +111,10 @@ const compareIteratorHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareIterator.js",
 );
+const decimalToHexStringHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/decimalToHexString.js",
+);
 const deepEqualHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/deepEqual.js",
@@ -1645,6 +1649,10 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       [
         "compareIterator.js",
         await readFile(compareIteratorHarnessPath, "utf8"),
+      ],
+      [
+        "decimalToHexString.js",
+        await readFile(decimalToHexStringHarnessPath, "utf8"),
       ],
       ["deepEqual.js", await readFile(deepEqualHarnessPath, "utf8")],
       [

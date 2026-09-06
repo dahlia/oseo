@@ -814,6 +814,49 @@ test("populates the realm-owned Math namespace object", () => {
   assert.doesNotMatch(mathSource, /OSEO_FUNCTION_ORDINARY/u);
 });
 
+test("populates the realm-owned URI handling functions", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const uriSource = sources.get("runtime_uri.c") ?? "";
+
+  for (const intrinsic of [
+    "DECODE_URI",
+    "DECODE_URI_COMPONENT",
+    "ENCODE_URI",
+    "ENCODE_URI_COMPONENT",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "decodeURI",
+    "decodeURIComponent",
+    "encodeURI",
+    "encodeURIComponent",
+  ]) {
+    assert.match(uriSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(internalHeader, /oseo_internal_install_uri_global/u);
+  assert.match(bindingSource, /oseo_internal_install_uri_global/u);
+  // The enum members are public, so a direct `oseo_intrinsic` request
+  // reaches the same materialization the global installation uses.
+  assert.match(
+    functionSource,
+    new RegExp(
+      "OSEO_INTRINSIC_ENCODE_URI_COMPONENT\\)[\\s\\S]{0,60}" +
+        "oseo_internal_uri_intrinsic",
+      "u",
+    ),
+  );
+  // Each function is an ordinary built-in that is not a constructor, and
+  // the four share one dense code-ID range the dispatcher indexes.
+  assert.match(uriSource, /OSEO_FUNCTION_INTERNAL/u);
+  assert.doesNotMatch(uriSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(uriSource, /OSEO_URI_FUNCTION_CODE_ID_LAST - operation/u);
+  assert.match(uriSource, /OSEO_ERROR_URI/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

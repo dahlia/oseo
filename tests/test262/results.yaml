@@ -8528,6 +8528,486 @@ partitions:
   - group: built-ins/ThrowTypeError
     key: f9
     path: results/built-ins/ThrowTypeError/f9.yaml
+  - group: built-ins/decodeURI
+    key: "03"
+    path: results/built-ins/decodeURI/03.yaml
+  - group: built-ins/decodeURI
+    key: "09"
+    path: results/built-ins/decodeURI/09.yaml
+  - group: built-ins/decodeURI
+    key: 0e
+    path: results/built-ins/decodeURI/0e.yaml
+  - group: built-ins/decodeURI
+    key: "16"
+    path: results/built-ins/decodeURI/16.yaml
+  - group: built-ins/decodeURI
+    key: 1a
+    path: results/built-ins/decodeURI/1a.yaml
+  - group: built-ins/decodeURI
+    key: "23"
+    path: results/built-ins/decodeURI/23.yaml
+  - group: built-ins/decodeURI
+    key: 3a
+    path: results/built-ins/decodeURI/3a.yaml
+  - group: built-ins/decodeURI
+    key: "42"
+    path: results/built-ins/decodeURI/42.yaml
+  - group: built-ins/decodeURI
+    key: "48"
+    path: results/built-ins/decodeURI/48.yaml
+  - group: built-ins/decodeURI
+    key: 4f
+    path: results/built-ins/decodeURI/4f.yaml
+  - group: built-ins/decodeURI
+    key: "57"
+    path: results/built-ins/decodeURI/57.yaml
+  - group: built-ins/decodeURI
+    key: 5e
+    path: results/built-ins/decodeURI/5e.yaml
+  - group: built-ins/decodeURI
+    key: "64"
+    path: results/built-ins/decodeURI/64.yaml
+  - group: built-ins/decodeURI
+    key: 6a
+    path: results/built-ins/decodeURI/6a.yaml
+  - group: built-ins/decodeURI
+    key: "71"
+    path: results/built-ins/decodeURI/71.yaml
+  - group: built-ins/decodeURI
+    key: "76"
+    path: results/built-ins/decodeURI/76.yaml
+  - group: built-ins/decodeURI
+    key: "79"
+    path: results/built-ins/decodeURI/79.yaml
+  - group: built-ins/decodeURI
+    key: 7b
+    path: results/built-ins/decodeURI/7b.yaml
+  - group: built-ins/decodeURI
+    key: 7d
+    path: results/built-ins/decodeURI/7d.yaml
+  - group: built-ins/decodeURI
+    key: "83"
+    path: results/built-ins/decodeURI/83.yaml
+  - group: built-ins/decodeURI
+    key: "88"
+    path: results/built-ins/decodeURI/88.yaml
+  - group: built-ins/decodeURI
+    key: "89"
+    path: results/built-ins/decodeURI/89.yaml
+  - group: built-ins/decodeURI
+    key: 8b
+    path: results/built-ins/decodeURI/8b.yaml
+  - group: built-ins/decodeURI
+    key: "91"
+    path: results/built-ins/decodeURI/91.yaml
+  - group: built-ins/decodeURI
+    key: "94"
+    path: results/built-ins/decodeURI/94.yaml
+  - group: built-ins/decodeURI
+    key: "95"
+    path: results/built-ins/decodeURI/95.yaml
+  - group: built-ins/decodeURI
+    key: "96"
+    path: results/built-ins/decodeURI/96.yaml
+  - group: built-ins/decodeURI
+    key: 9b
+    path: results/built-ins/decodeURI/9b.yaml
+  - group: built-ins/decodeURI
+    key: a0
+    path: results/built-ins/decodeURI/a0.yaml
+  - group: built-ins/decodeURI
+    key: a6
+    path: results/built-ins/decodeURI/a6.yaml
+  - group: built-ins/decodeURI
+    key: aa
+    path: results/built-ins/decodeURI/aa.yaml
+  - group: built-ins/decodeURI
+    key: bf
+    path: results/built-ins/decodeURI/bf.yaml
+  - group: built-ins/decodeURI
+    key: c2
+    path: results/built-ins/decodeURI/c2.yaml
+  - group: built-ins/decodeURI
+    key: c6
+    path: results/built-ins/decodeURI/c6.yaml
+  - group: built-ins/decodeURI
+    key: c8
+    path: results/built-ins/decodeURI/c8.yaml
+  - group: built-ins/decodeURI
+    key: ca
+    path: results/built-ins/decodeURI/ca.yaml
+  - group: built-ins/decodeURI
+    key: cb
+    path: results/built-ins/decodeURI/cb.yaml
+  - group: built-ins/decodeURI
+    key: cc
+    path: results/built-ins/decodeURI/cc.yaml
+  - group: built-ins/decodeURI
+    key: dd
+    path: results/built-ins/decodeURI/dd.yaml
+  - group: built-ins/decodeURI
+    key: df
+    path: results/built-ins/decodeURI/df.yaml
+  - group: built-ins/decodeURI
+    key: e4
+    path: results/built-ins/decodeURI/e4.yaml
+  - group: built-ins/decodeURI
+    key: ea
+    path: results/built-ins/decodeURI/ea.yaml
+  - group: built-ins/decodeURI
+    key: eb
+    path: results/built-ins/decodeURI/eb.yaml
+  - group: built-ins/decodeURI
+    key: ec
+    path: results/built-ins/decodeURI/ec.yaml
+  - group: built-ins/decodeURI
+    key: f0
+    path: results/built-ins/decodeURI/f0.yaml
+  - group: built-ins/decodeURI
+    key: f2
+    path: results/built-ins/decodeURI/f2.yaml
+  - group: built-ins/decodeURI
+    key: f3
+    path: results/built-ins/decodeURI/f3.yaml
+  - group: built-ins/decodeURI
+    key: f8
+    path: results/built-ins/decodeURI/f8.yaml
+  - group: built-ins/decodeURI
+    key: fc
+    path: results/built-ins/decodeURI/fc.yaml
+  - group: built-ins/decodeURI
+    key: fe
+    path: results/built-ins/decodeURI/fe.yaml
+  - group: built-ins/decodeURIComponent
+    key: 0f
+    path: results/built-ins/decodeURIComponent/0f.yaml
+  - group: built-ins/decodeURIComponent
+    key: "10"
+    path: results/built-ins/decodeURIComponent/10.yaml
+  - group: built-ins/decodeURIComponent
+    key: "13"
+    path: results/built-ins/decodeURIComponent/13.yaml
+  - group: built-ins/decodeURIComponent
+    key: "17"
+    path: results/built-ins/decodeURIComponent/17.yaml
+  - group: built-ins/decodeURIComponent
+    key: 1d
+    path: results/built-ins/decodeURIComponent/1d.yaml
+  - group: built-ins/decodeURIComponent
+    key: "24"
+    path: results/built-ins/decodeURIComponent/24.yaml
+  - group: built-ins/decodeURIComponent
+    key: 2d
+    path: results/built-ins/decodeURIComponent/2d.yaml
+  - group: built-ins/decodeURIComponent
+    key: "30"
+    path: results/built-ins/decodeURIComponent/30.yaml
+  - group: built-ins/decodeURIComponent
+    key: "36"
+    path: results/built-ins/decodeURIComponent/36.yaml
+  - group: built-ins/decodeURIComponent
+    key: "37"
+    path: results/built-ins/decodeURIComponent/37.yaml
+  - group: built-ins/decodeURIComponent
+    key: 3b
+    path: results/built-ins/decodeURIComponent/3b.yaml
+  - group: built-ins/decodeURIComponent
+    key: 3c
+    path: results/built-ins/decodeURIComponent/3c.yaml
+  - group: built-ins/decodeURIComponent
+    key: "41"
+    path: results/built-ins/decodeURIComponent/41.yaml
+  - group: built-ins/decodeURIComponent
+    key: 4d
+    path: results/built-ins/decodeURIComponent/4d.yaml
+  - group: built-ins/decodeURIComponent
+    key: "52"
+    path: results/built-ins/decodeURIComponent/52.yaml
+  - group: built-ins/decodeURIComponent
+    key: "57"
+    path: results/built-ins/decodeURIComponent/57.yaml
+  - group: built-ins/decodeURIComponent
+    key: "59"
+    path: results/built-ins/decodeURIComponent/59.yaml
+  - group: built-ins/decodeURIComponent
+    key: 5c
+    path: results/built-ins/decodeURIComponent/5c.yaml
+  - group: built-ins/decodeURIComponent
+    key: 5f
+    path: results/built-ins/decodeURIComponent/5f.yaml
+  - group: built-ins/decodeURIComponent
+    key: "62"
+    path: results/built-ins/decodeURIComponent/62.yaml
+  - group: built-ins/decodeURIComponent
+    key: "65"
+    path: results/built-ins/decodeURIComponent/65.yaml
+  - group: built-ins/decodeURIComponent
+    key: "66"
+    path: results/built-ins/decodeURIComponent/66.yaml
+  - group: built-ins/decodeURIComponent
+    key: "67"
+    path: results/built-ins/decodeURIComponent/67.yaml
+  - group: built-ins/decodeURIComponent
+    key: 6a
+    path: results/built-ins/decodeURIComponent/6a.yaml
+  - group: built-ins/decodeURIComponent
+    key: 6b
+    path: results/built-ins/decodeURIComponent/6b.yaml
+  - group: built-ins/decodeURIComponent
+    key: "72"
+    path: results/built-ins/decodeURIComponent/72.yaml
+  - group: built-ins/decodeURIComponent
+    key: "74"
+    path: results/built-ins/decodeURIComponent/74.yaml
+  - group: built-ins/decodeURIComponent
+    key: 7d
+    path: results/built-ins/decodeURIComponent/7d.yaml
+  - group: built-ins/decodeURIComponent
+    key: 8a
+    path: results/built-ins/decodeURIComponent/8a.yaml
+  - group: built-ins/decodeURIComponent
+    key: 8b
+    path: results/built-ins/decodeURIComponent/8b.yaml
+  - group: built-ins/decodeURIComponent
+    key: 8f
+    path: results/built-ins/decodeURIComponent/8f.yaml
+  - group: built-ins/decodeURIComponent
+    key: "90"
+    path: results/built-ins/decodeURIComponent/90.yaml
+  - group: built-ins/decodeURIComponent
+    key: a8
+    path: results/built-ins/decodeURIComponent/a8.yaml
+  - group: built-ins/decodeURIComponent
+    key: ac
+    path: results/built-ins/decodeURIComponent/ac.yaml
+  - group: built-ins/decodeURIComponent
+    key: b1
+    path: results/built-ins/decodeURIComponent/b1.yaml
+  - group: built-ins/decodeURIComponent
+    key: b3
+    path: results/built-ins/decodeURIComponent/b3.yaml
+  - group: built-ins/decodeURIComponent
+    key: b4
+    path: results/built-ins/decodeURIComponent/b4.yaml
+  - group: built-ins/decodeURIComponent
+    key: bc
+    path: results/built-ins/decodeURIComponent/bc.yaml
+  - group: built-ins/decodeURIComponent
+    key: bf
+    path: results/built-ins/decodeURIComponent/bf.yaml
+  - group: built-ins/decodeURIComponent
+    key: c4
+    path: results/built-ins/decodeURIComponent/c4.yaml
+  - group: built-ins/decodeURIComponent
+    key: c7
+    path: results/built-ins/decodeURIComponent/c7.yaml
+  - group: built-ins/decodeURIComponent
+    key: ce
+    path: results/built-ins/decodeURIComponent/ce.yaml
+  - group: built-ins/decodeURIComponent
+    key: d7
+    path: results/built-ins/decodeURIComponent/d7.yaml
+  - group: built-ins/decodeURIComponent
+    key: da
+    path: results/built-ins/decodeURIComponent/da.yaml
+  - group: built-ins/decodeURIComponent
+    key: df
+    path: results/built-ins/decodeURIComponent/df.yaml
+  - group: built-ins/decodeURIComponent
+    key: e0
+    path: results/built-ins/decodeURIComponent/e0.yaml
+  - group: built-ins/decodeURIComponent
+    key: e1
+    path: results/built-ins/decodeURIComponent/e1.yaml
+  - group: built-ins/decodeURIComponent
+    key: e2
+    path: results/built-ins/decodeURIComponent/e2.yaml
+  - group: built-ins/decodeURIComponent
+    key: e5
+    path: results/built-ins/decodeURIComponent/e5.yaml
+  - group: built-ins/decodeURIComponent
+    key: e6
+    path: results/built-ins/decodeURIComponent/e6.yaml
+  - group: built-ins/decodeURIComponent
+    key: f9
+    path: results/built-ins/decodeURIComponent/f9.yaml
+  - group: built-ins/decodeURIComponent
+    key: fb
+    path: results/built-ins/decodeURIComponent/fb.yaml
+  - group: built-ins/encodeURI
+    key: 0a
+    path: results/built-ins/encodeURI/0a.yaml
+  - group: built-ins/encodeURI
+    key: 0b
+    path: results/built-ins/encodeURI/0b.yaml
+  - group: built-ins/encodeURI
+    key: 0e
+    path: results/built-ins/encodeURI/0e.yaml
+  - group: built-ins/encodeURI
+    key: "10"
+    path: results/built-ins/encodeURI/10.yaml
+  - group: built-ins/encodeURI
+    key: "26"
+    path: results/built-ins/encodeURI/26.yaml
+  - group: built-ins/encodeURI
+    key: "31"
+    path: results/built-ins/encodeURI/31.yaml
+  - group: built-ins/encodeURI
+    key: "38"
+    path: results/built-ins/encodeURI/38.yaml
+  - group: built-ins/encodeURI
+    key: 3b
+    path: results/built-ins/encodeURI/3b.yaml
+  - group: built-ins/encodeURI
+    key: 3c
+    path: results/built-ins/encodeURI/3c.yaml
+  - group: built-ins/encodeURI
+    key: 3f
+    path: results/built-ins/encodeURI/3f.yaml
+  - group: built-ins/encodeURI
+    key: 4b
+    path: results/built-ins/encodeURI/4b.yaml
+  - group: built-ins/encodeURI
+    key: "54"
+    path: results/built-ins/encodeURI/54.yaml
+  - group: built-ins/encodeURI
+    key: 6b
+    path: results/built-ins/encodeURI/6b.yaml
+  - group: built-ins/encodeURI
+    key: "75"
+    path: results/built-ins/encodeURI/75.yaml
+  - group: built-ins/encodeURI
+    key: "77"
+    path: results/built-ins/encodeURI/77.yaml
+  - group: built-ins/encodeURI
+    key: 7d
+    path: results/built-ins/encodeURI/7d.yaml
+  - group: built-ins/encodeURI
+    key: "88"
+    path: results/built-ins/encodeURI/88.yaml
+  - group: built-ins/encodeURI
+    key: 8c
+    path: results/built-ins/encodeURI/8c.yaml
+  - group: built-ins/encodeURI
+    key: 8e
+    path: results/built-ins/encodeURI/8e.yaml
+  - group: built-ins/encodeURI
+    key: 8f
+    path: results/built-ins/encodeURI/8f.yaml
+  - group: built-ins/encodeURI
+    key: 9b
+    path: results/built-ins/encodeURI/9b.yaml
+  - group: built-ins/encodeURI
+    key: a5
+    path: results/built-ins/encodeURI/a5.yaml
+  - group: built-ins/encodeURI
+    key: ba
+    path: results/built-ins/encodeURI/ba.yaml
+  - group: built-ins/encodeURI
+    key: c9
+    path: results/built-ins/encodeURI/c9.yaml
+  - group: built-ins/encodeURI
+    key: d6
+    path: results/built-ins/encodeURI/d6.yaml
+  - group: built-ins/encodeURI
+    key: db
+    path: results/built-ins/encodeURI/db.yaml
+  - group: built-ins/encodeURI
+    key: e1
+    path: results/built-ins/encodeURI/e1.yaml
+  - group: built-ins/encodeURI
+    key: e5
+    path: results/built-ins/encodeURI/e5.yaml
+  - group: built-ins/encodeURI
+    key: ed
+    path: results/built-ins/encodeURI/ed.yaml
+  - group: built-ins/encodeURI
+    key: f1
+    path: results/built-ins/encodeURI/f1.yaml
+  - group: built-ins/encodeURIComponent
+    key: 0f
+    path: results/built-ins/encodeURIComponent/0f.yaml
+  - group: built-ins/encodeURIComponent
+    key: "23"
+    path: results/built-ins/encodeURIComponent/23.yaml
+  - group: built-ins/encodeURIComponent
+    key: "44"
+    path: results/built-ins/encodeURIComponent/44.yaml
+  - group: built-ins/encodeURIComponent
+    key: "56"
+    path: results/built-ins/encodeURIComponent/56.yaml
+  - group: built-ins/encodeURIComponent
+    key: "66"
+    path: results/built-ins/encodeURIComponent/66.yaml
+  - group: built-ins/encodeURIComponent
+    key: "72"
+    path: results/built-ins/encodeURIComponent/72.yaml
+  - group: built-ins/encodeURIComponent
+    key: "75"
+    path: results/built-ins/encodeURIComponent/75.yaml
+  - group: built-ins/encodeURIComponent
+    key: "80"
+    path: results/built-ins/encodeURIComponent/80.yaml
+  - group: built-ins/encodeURIComponent
+    key: "85"
+    path: results/built-ins/encodeURIComponent/85.yaml
+  - group: built-ins/encodeURIComponent
+    key: "86"
+    path: results/built-ins/encodeURIComponent/86.yaml
+  - group: built-ins/encodeURIComponent
+    key: "89"
+    path: results/built-ins/encodeURIComponent/89.yaml
+  - group: built-ins/encodeURIComponent
+    key: "91"
+    path: results/built-ins/encodeURIComponent/91.yaml
+  - group: built-ins/encodeURIComponent
+    key: "95"
+    path: results/built-ins/encodeURIComponent/95.yaml
+  - group: built-ins/encodeURIComponent
+    key: "96"
+    path: results/built-ins/encodeURIComponent/96.yaml
+  - group: built-ins/encodeURIComponent
+    key: "98"
+    path: results/built-ins/encodeURIComponent/98.yaml
+  - group: built-ins/encodeURIComponent
+    key: 9b
+    path: results/built-ins/encodeURIComponent/9b.yaml
+  - group: built-ins/encodeURIComponent
+    key: 9c
+    path: results/built-ins/encodeURIComponent/9c.yaml
+  - group: built-ins/encodeURIComponent
+    key: aa
+    path: results/built-ins/encodeURIComponent/aa.yaml
+  - group: built-ins/encodeURIComponent
+    key: b4
+    path: results/built-ins/encodeURIComponent/b4.yaml
+  - group: built-ins/encodeURIComponent
+    key: c2
+    path: results/built-ins/encodeURIComponent/c2.yaml
+  - group: built-ins/encodeURIComponent
+    key: c7
+    path: results/built-ins/encodeURIComponent/c7.yaml
+  - group: built-ins/encodeURIComponent
+    key: cc
+    path: results/built-ins/encodeURIComponent/cc.yaml
+  - group: built-ins/encodeURIComponent
+    key: cf
+    path: results/built-ins/encodeURIComponent/cf.yaml
+  - group: built-ins/encodeURIComponent
+    key: d8
+    path: results/built-ins/encodeURIComponent/d8.yaml
+  - group: built-ins/encodeURIComponent
+    key: db
+    path: results/built-ins/encodeURIComponent/db.yaml
+  - group: built-ins/encodeURIComponent
+    key: df
+    path: results/built-ins/encodeURIComponent/df.yaml
+  - group: built-ins/encodeURIComponent
+    key: e4
+    path: results/built-ins/encodeURIComponent/e4.yaml
+  - group: built-ins/encodeURIComponent
+    key: f6
+    path: results/built-ins/encodeURIComponent/f6.yaml
   - group: built-ins/undefined
     key: 2e
     path: results/built-ins/undefined/2e.yaml
@@ -11422,15 +11902,15 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 12779
+  passes: 12948
   semanticFailures: 0
-  unsupportedProfileFeatures: 2310
+  unsupportedProfileFeatures: 2314
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 46
+      passes: 121
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - dependency: array-buffer
@@ -11523,7 +12003,7 @@ summary:
       infrastructureFailures: 0
       passes: 3668
       semanticFailures: 0
-      unsupportedProfileFeatures: 1053
+      unsupportedProfileFeatures: 1057
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -11563,9 +12043,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8601
+      passes: 8770
       semanticFailures: 0
-      unsupportedProfileFeatures: 851
+      unsupportedProfileFeatures: 855
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -11819,6 +12299,34 @@ summary:
       passes: 12
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - group: built-ins/decodeURI
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 54
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/decodeURIComponent
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 55
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/encodeURI
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 30
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/encodeURIComponent
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 30
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/undefined
       expectedNegatives: 0
       harnessFailures: 0
