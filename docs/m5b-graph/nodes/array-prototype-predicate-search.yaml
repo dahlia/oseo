@@ -12,5 +12,5 @@ inventory:
     - test/built-ins/Array/prototype/findLastIndex/
 dependencies:
   - array-prototype-iterative
-landed: false
+landed: true
 status: ready
