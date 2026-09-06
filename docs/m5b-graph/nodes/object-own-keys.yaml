@@ -20,9 +20,4 @@ dependencies:
   - array-constructor
   - object-constructor
 landed: false
-status: parked
-reason: "Mandatory codex review still found an inconsistent virtual String
-  iterator reflection path after five rounds: Object.hasOwn recognizes the
-  virtual descriptor while inherited hasOwnProperty and propertyIsEnumerable
-  do not. Preserve branch m5b-object-keys for the required shared own-property
-  primitive fix and a new clean review cycle."
+status: ready
