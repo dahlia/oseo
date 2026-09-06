@@ -661,6 +661,46 @@ test("populates the realm-owned Iterator intrinsic cluster", () => {
   assert.match(iteratorSource, /wrap_for_valid_iterator/u);
 });
 
+test("populates the lazy iterator helper cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+
+  for (const intrinsic of [
+    "ITERATOR_MAP",
+    "ITERATOR_FILTER",
+    "ITERATOR_TAKE",
+    "ITERATOR_DROP",
+    "ITERATOR_FLAT_MAP",
+    "ITERATOR_HELPER_PROTOTYPE",
+    "ITERATOR_HELPER_NEXT",
+    "ITERATOR_HELPER_RETURN",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of ["map", "filter", "take", "drop", "flatMap"]) {
+    assert.match(iteratorSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(iteratorSource, /"Iterator Helper"/u);
+  // Every helper is one heap kind with its own traced closure state, so
+  // the collector reaches the underlying record, the callback, and the
+  // in-flight flatMap inner record through the helper alone.
+  assert.match(internalHeader, /OSEO_HEAP_ITERATOR_HELPER/u);
+  assert.match(internalHeader, /OseoIteratorHelperState/u);
+  assert.match(memorySource, /helper->underlying_iterator/u);
+  assert.match(memorySource, /helper->inner_iterator/u);
+  // Argument validation closes the underlying iterator before the
+  // captured `next` is ever read.
+  const validation = iteratorSource.indexOf(
+    "result = helper_close_after_abrupt(context, slots[0], result);",
+  );
+  const capture = iteratorSource.indexOf(
+    "result = helper_get_iterator_direct(context, slots[0], &slots[2]);",
+  );
+  assert.ok(validation > 0 && capture > validation);
+});
+
 test("populates the realm-owned Number intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const numberSource = sources.get("runtime_number.c") ?? "";

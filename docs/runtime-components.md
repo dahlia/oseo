@@ -167,7 +167,8 @@ Ownership follows the plan's target layout:
     intrinsic, the well-known symbols, and descriptive symbol text;
  -  *runtime\_iterator.c*: the synchronous iterator protocol
     (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
-    first-class array iterator, and its realm-owned prototype methods;
+    first-class array iterator, its realm-owned prototype methods, and
+    the lazy iterator helpers with `%IteratorHelperPrototype%`;
  -  *runtime\_generator.c*: the suspended body frame both generator kinds
     share, its collector-traced root slots and saved completion records,
     and the `%GeneratorPrototype%` resumptions that drive a synchronous
@@ -280,7 +281,7 @@ one.
 
 ### Internal helpers
 
-One hundred and forty-four helpers cross a translation-unit
+One hundred and fifty-six helpers cross a translation-unit
 boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -394,6 +395,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*         |
 | `oseo_internal_iterator_key_matches`                | *runtime\_iterator.c*         |
 | `oseo_internal_iterator_method`                     | *runtime\_iterator.c*         |
+| `oseo_internal_iterator_helper_prototype`           | *runtime\_iterator.c*         |
 | `oseo_internal_async_from_sync_fulfilled`           | *runtime\_iterator.c*         |
 | `oseo_internal_async_from_sync_rejected`            | *runtime\_iterator.c*         |
 | `oseo_internal_throw_type_error_function`           | *runtime\_arguments.c*        |
@@ -961,6 +963,34 @@ and misses, generic fallback, and collection at every safepoint. The node adds
 no generated-code entry point, allocates seven code IDs inside the existing
 Array range because `push` already owns its ID, and moves `abiVersion` to
 `m5-88`.
+
+### Lazy iterator helper evidence
+
+M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
+`flatMap` to *runtime\_iterator.c*, which already owns the synchronous
+iterator protocol and `%IteratorPrototype%`. The helpers stay in that
+component because every one of them is the protocol applied to an
+already-captured iterator record; they add no translation unit and no
+generated-code entry point.
+
+An Iterator Helper object is a new heap kind whose record carries the
+captured `[[UnderlyingIterator]]`, the mapper or predicate, the callback
+counter, the remaining count `take` and `drop` decrement, and the inner
+record `flatMap` is flattening. Storing that state on the helper rather
+than on every ordinary object keeps the ordinary layout unchanged, and the
+collector reaches all of it through the helper alone.
+
+The node allocates seven code IDs inside the existing iterator range, adds
+one internal helper, adds eight realm intrinsics, and moves `abiVersion` to
+`m5-91`. Fixed and generated native differential evidence covers all five
+helpers, chained pipelines, argument validation that closes the underlying
+iterator before reading `next`, close forwarding and its suppression after
+exhaustion, the re-entrancy `TypeError`, `flatMap` inner-then-outer close
+order, both specialization policies, deliberate guard hits and misses,
+generic fallback, and collection at every safepoint. One re-entrancy
+observation is a fixed native assertion in *tests/native.ts* rather than a
+differential fixture, because the two reference hosts disagree about it and
+this runtime follows the specified behavior.
 
 ### Function prototype evidence
 

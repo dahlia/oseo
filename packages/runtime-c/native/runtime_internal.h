@@ -146,6 +146,23 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 11u)
 #define OSEO_ITERATOR_TAG_SETTER_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 12u)
+/* The five lazy iterator helper methods and the two
+ * %IteratorHelperPrototype% methods every helper object they return
+ * shares. */
+#define OSEO_ITERATOR_MAP_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_ITERATOR_FILTER_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_ITERATOR_TAKE_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_ITERATOR_DROP_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_ITERATOR_FLAT_MAP_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_ITERATOR_HELPER_NEXT_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 18u)
+#define OSEO_ITERATOR_HELPER_RETURN_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 19u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -647,6 +664,7 @@ typedef enum {
     OSEO_HEAP_DATA_VIEW = 21,
     OSEO_HEAP_REGEXP_MATCHER = 22,
     OSEO_HEAP_REGEXP = 23,
+    OSEO_HEAP_ITERATOR_HELPER = 24,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -1307,6 +1325,73 @@ typedef enum {
     OSEO_MAP_ITERATION_KEY_VALUE = 2,
 } OseoMapIterationKind;
 
+/*
+ * The lazy helper an %Iterator.prototype% method returns (27.1.4). Each
+ * kind is the ECMA-262 abstract closure that helper creates, so the kind
+ * alone decides what one resumption does.
+ */
+typedef enum {
+    OSEO_ITERATOR_HELPER_MAP = 0,
+    OSEO_ITERATOR_HELPER_FILTER = 1,
+    OSEO_ITERATOR_HELPER_TAKE = 2,
+    OSEO_ITERATOR_HELPER_DROP = 3,
+    OSEO_ITERATOR_HELPER_FLAT_MAP = 4,
+} OseoIteratorHelperKind;
+
+/*
+ * [[GeneratorState]] of one helper. The helper closures suspend only at
+ * their single yield, so the four specified states are what a
+ * resumption, a `return`, and the re-entrancy check need: a helper that
+ * has never run closes its underlying iterator directly, a suspended one
+ * resumes its loop, an executing one rejects re-entry, and a completed
+ * one answers `done` without touching the underlying iterator again.
+ */
+typedef enum {
+    OSEO_ITERATOR_HELPER_SUSPENDED_START = 0,
+    OSEO_ITERATOR_HELPER_SUSPENDED_YIELD = 1,
+    OSEO_ITERATOR_HELPER_EXECUTING = 2,
+    OSEO_ITERATOR_HELPER_COMPLETED = 3,
+} OseoIteratorHelperState;
+
+/*
+ * One Iterator Helper object. It is an ordinary object with the extra
+ * state its closure would have captured: the [[UnderlyingIterator]]
+ * record, the mapper or predicate, the counter that record passes to
+ * that callback, the remaining count `take` and `drop` decrement, and
+ * the inner iterator record `flatMap` is currently flattening.
+ *
+ * Every value here is traced through this object alone, so a helper the
+ * program still holds keeps its underlying iterator, its callback, and
+ * its in-flight inner iterator alive across a collection at any
+ * safepoint inside a resumption.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue underlying_iterator;
+    OseoValue underlying_next;
+    /* The mapper or predicate; undefined for `take` and `drop`. */
+    OseoValue callback;
+    /* The flatMap inner iterator record, live while `inner_alive`. */
+    OseoValue inner_iterator;
+    OseoValue inner_next;
+    /*
+     * `take`'s and `drop`'s remaining count, possibly infinite. The
+     * specified countdown is over mathematical values, and subtracting
+     * one from a double above 2**53 does not change it, so a limit that
+     * large would never reach zero here. That is unobservable: reaching
+     * it needs more than 2**53 steps of the underlying iterator, which
+     * no program can perform.
+     */
+    double remaining;
+    /* The counter one callback receives as its second argument. */
+    double counter;
+    bool inner_alive;
+    /* True once `drop` has skipped its prefix. */
+    bool prefix_dropped;
+    OseoIteratorHelperKind kind;
+    OseoIteratorHelperState state;
+} OseoIteratorHelper;
+
 typedef struct {
     OseoOrdinaryObject ordinary;
     /*
@@ -1540,6 +1625,13 @@ static inline bool is_map_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_MAP_ITERATOR;
 }
+static inline bool is_iterator_helper(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_ITERATOR_HELPER;
+}
+static inline OseoIteratorHelper *iterator_helper_object(OseoValue value) {
+    return (OseoIteratorHelper *)heap_object(value);
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
@@ -1547,7 +1639,7 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
         kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
-        kind == OSEO_HEAP_REGEXP;
+        kind == OSEO_HEAP_REGEXP || kind == OSEO_HEAP_ITERATOR_HELPER;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2491,6 +2583,12 @@ OseoResult oseo_internal_iterator_method(
     OseoContext *context,
     size_t code_id
 );
+/*
+ * %IteratorHelperPrototype% and its two methods. The object is built on
+ * first use rather than with %IteratorPrototype%, because a realm that
+ * never calls a helper method never creates a helper object.
+ */
+OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context);
 OseoResult oseo_internal_async_from_sync_fulfilled(
     OseoContext *context,
     OseoValue callee,

@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 102
+M5a is complete. The normative family records described below inventory 107
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 16,014 reviewed cases: 12,248 passes, 1,506
-expected negatives, and 2,260 unsupported profile features. It records no
+The current manifest contains 16,645 reviewed cases: 12,779 passes, 1,556
+expected negatives, and 2,310 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -5261,6 +5261,105 @@ zero-override policy are unchanged. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
 existing Promise range without adding a generated-code entry point or
 changing the graph's orchestration state.
+
+
+Lazy iterator helpers
+---------------------
+
+M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
+`flatMap` to the realm-owned `%IteratorPrototype%`. Each is a writable,
+non-enumerable, configurable data property whose function has `length` 1, its
+own name, `%Function.prototype%` as its `[[Prototype]]`, and no
+`[[Construct]]`. Each returns an Iterator Helper object whose
+`[[Prototype]]` is the realm's single `%IteratorHelperPrototype%`, which
+inherits from `%IteratorPrototype%`, carries `next` and `return`, and reports
+a non-writable, non-enumerable, configurable `Symbol.toStringTag` of
+`"Iterator Helper"`. A helper is therefore `instanceof Iterator` and its
+`Symbol.iterator` returns itself.
+
+Every method validates its receiver first, so a primitive receiver throws a
+`TypeError` before any argument is read. It then validates its argument
+against the iterator record it would capture, and an argument failure closes
+that record: a non-callable mapper or predicate throws a `TypeError`, and a
+`take` or `drop` limit that is `NaN` after `ToNumber`, or negative after
+`ToIntegerOrInfinity`, throws a `RangeError`, each after calling the
+underlying iterator's `return`. An abrupt `ToNumber` closes it the same way.
+The `next` method is read exactly once, after that validation, so a failing
+argument never reaches the receiver's `next` getter, and every later step
+reuses the captured method.
+
+The helpers are lazy. ECMA-262 writes each as a generator over an abstract
+closure with a single `yield`, and this profile stores that closure's captured
+state on the helper instead: the underlying record, the callback, the counter
+the callback receives as its second argument, the count `take` and `drop`
+decrement, and the inner record `flatMap` is flattening. One resumption
+re-enters the loop where the yield left it, so the underlying iterator
+advances only as far as the consumer pulls, and a program that steps the
+underlying iterator in parallel observes the interleaving that produces.
+
+The `[[GeneratorState]]` each helper carries is observable. Resuming or
+closing a helper from inside its own callback throws a `TypeError`. A helper
+that has not run yet completes before it closes its underlying iterator
+directly, which is what `%IteratorHelperPrototype%.return` performs without
+resuming. A suspended helper instead resumes with a return completion through
+GeneratorResumeAbrupt, so its state is `executing` for the whole cleanup and a
+`return` method that re-enters that helper reaches the running-generator
+`TypeError` rather than a `done` result. The cleanup closes the underlying
+iterator, and `flatMap` closes its live inner iterator first and the
+underlying iterator second, propagating the inner close failure through the
+outer close. A completed helper closes nothing and answers `done`.
+
+A step that throws, including a `next` result that is not an object,
+completes the helper without closing it, matching the `[[Done]]` the specified
+operation sets before propagating. A callback that throws closes the underlying
+iterator and keeps the original completion, so a `return` method that also
+throws does not replace it. `take` closes its underlying iterator when its
+limit is reached, and `drop` skips its prefix with `IteratorStep`, so a skipped
+result's `value` getter never runs. `flatMap` flattens through
+GetIteratorFlattenable with primitives rejected, so a String and a Number are
+`TypeError`s while their wrapper objects flatten, and a nullish
+`Symbol.iterator` leaves the mapped object itself as the inner iterator.
+
+The two reference hosts disagree on that one re-entry: Node.js reports a
+`done` result for a suspended helper, while Deno reports the specified
+`TypeError`. This profile follows ECMA-262 and Deno. The observation is
+therefore recorded as a fixed native evidence assertion in *tests/native.ts*
+rather than as a differential fixture, because a differential fixture requires
+both reference hosts to agree.
+
+A helper is one collector-traced heap kind rather than extra state on every
+ordinary object. Its underlying record, callback, and in-flight inner record
+are reachable only through the helper, so a collection at any safepoint inside
+a resumption keeps all of them alive.
+
+Fixed native and generated differential evidence at property seed
+`0x60005e00` covers all five helpers, chained pipelines, metadata and
+descriptors, non-construction, argument validation with its close, limit
+conversion through `valueOf` and `toString`, the single captured `next`,
+counter sequences, close forwarding before the first step, while suspended,
+and after completion, the re-entrancy `TypeError`, `flatMap` inner-then-outer
+close order and its primitive rejection, parallel and already-closed
+underlying iterators, both specialization policies, deliberate shape-guard
+hits and misses, generic fallback, and collection forced at every safepoint.
+The generated suite measures a demand-driven pipeline against an independent
+pull model that predicts the emitted values, the callback counter sequence,
+and whether a close reaches the source.
+
+All 184 paths under the node's five inventory roots are reviewed. Every one of
+them declares the upstream `iterator-helpers` feature, which stays unsupported
+until the separately owned `iterator-helpers-eager` node completes that
+feature, so each reviewed path records an explicit prerequisite boundary
+rather than a pass and the fixed and generated evidence above owns the
+admitted behavior in the meantime. No previously reviewed path moves. The
+manifest reaches 16,645 cases: 12,779 passes, 1,556 expected negatives, and
+2,310 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property inventory moves from 122 to 123 domains
+and seeds and from 5,356 to 5,366 ordinary cases. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, target-parity policy,
+and zero-override policy are unchanged. The new heap kind and the expanded
+intrinsic table move the runtime ABI to `oseo-runtime-m5-91` and allocate
+seven code IDs inside the existing iterator range without adding a
+generated-code entry point or changing the graph's orchestration state.
 
 
 Known gaps inside the claim

@@ -23,6 +23,21 @@ static OseoResult iterator_prototype_accessor(
     size_t argument_count,
     const OseoValue *arguments
 );
+static OseoResult iterator_helper_method(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult iterator_helper_resume(
+    OseoContext *context,
+    OseoValue receiver
+);
+static OseoResult iterator_helper_return(
+    OseoContext *context,
+    OseoValue receiver
+);
 
 OseoResult oseo_internal_iterator_builtin_dispatch(
     OseoContext *context,
@@ -54,6 +69,22 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     }
     if (code_id == OSEO_WRAP_FOR_VALID_ITERATOR_RETURN_CODE_ID) {
         return wrap_for_valid_iterator_return(context, receiver);
+    }
+    if (code_id <= OSEO_ITERATOR_MAP_CODE_ID &&
+        code_id >= OSEO_ITERATOR_FLAT_MAP_CODE_ID) {
+        return iterator_helper_method(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_ITERATOR_HELPER_NEXT_CODE_ID) {
+        return iterator_helper_resume(context, receiver);
+    }
+    if (code_id == OSEO_ITERATOR_HELPER_RETURN_CODE_ID) {
+        return iterator_helper_return(context, receiver);
     }
     if (code_id >= OSEO_ITERATOR_TAG_SETTER_CODE_ID &&
         code_id <= OSEO_ITERATOR_CONSTRUCTOR_GETTER_CODE_ID) {
@@ -103,7 +134,10 @@ static OseoResult ascii_iterator_string(
     const char *text
 ) {
     size_t length = strlen(text);
-    uint16_t units[16];
+    uint16_t units[32];
+    if (length > sizeof(units) / sizeof(*units)) {
+        return failure(context, "OSEO2001", "Iterator key is too long.");
+    }
     for (size_t index = 0u; index < length; index += 1u) {
         units[index] = (uint16_t)(unsigned char)text[index];
     }
@@ -336,6 +370,11 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_SETTER,
         OSEO_INTRINSIC_ITERATOR_TAG_GETTER,
         OSEO_INTRINSIC_ITERATOR_TAG_SETTER,
+        OSEO_INTRINSIC_ITERATOR_MAP,
+        OSEO_INTRINSIC_ITERATOR_FILTER,
+        OSEO_INTRINSIC_ITERATOR_TAKE,
+        OSEO_INTRINSIC_ITERATOR_DROP,
+        OSEO_INTRINSIC_ITERATOR_FLAT_MAP,
     };
     static const size_t codes[] = {
         OSEO_ITERATOR_FROM_CODE_ID,
@@ -345,6 +384,11 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_ITERATOR_CONSTRUCTOR_SETTER_CODE_ID,
         OSEO_ITERATOR_TAG_GETTER_CODE_ID,
         OSEO_ITERATOR_TAG_SETTER_CODE_ID,
+        OSEO_ITERATOR_MAP_CODE_ID,
+        OSEO_ITERATOR_FILTER_CODE_ID,
+        OSEO_ITERATOR_TAKE_CODE_ID,
+        OSEO_ITERATOR_DROP_CODE_ID,
+        OSEO_ITERATOR_FLAT_MAP_CODE_ID,
     };
     static const char *const names[] = {
         "from",
@@ -354,8 +398,15 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         "constructor",
         "[Symbol.toStringTag]",
         "[Symbol.toStringTag]",
+        "map",
+        "filter",
+        "take",
+        "drop",
+        "flatMap",
     };
-    static const size_t lengths[] = {1u, 0u, 0u, 0u, 1u, 0u, 1u};
+    static const size_t lengths[] = {
+        1u, 0u, 0u, 0u, 1u, 0u, 1u, 1u, 1u, 1u, 1u, 1u,
+    };
     static const OseoFunctionNamePrefix prefixes[] = {
         OSEO_FUNCTION_NAME_PREFIX_NONE,
         OSEO_FUNCTION_NAME_PREFIX_NONE,
@@ -364,9 +415,14 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_FUNCTION_NAME_PREFIX_SET,
         OSEO_FUNCTION_NAME_PREFIX_GET,
         OSEO_FUNCTION_NAME_PREFIX_SET,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 7u;
+         result.status == OSEO_STATUS_NORMAL && index < 12u;
          index += 1u) {
         result = create_iterator_builtin(
             context,
@@ -443,6 +499,24 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER]
         );
     }
+    /* The five lazy helper methods are ordinary writable,
+     * non-enumerable, configurable data properties of
+     * %IteratorPrototype%, so replacing one on the prototype changes
+     * what every iterator that inherits it resolves. */
+    for (size_t index = 7u;
+         result.status == OSEO_STATUS_NORMAL && index < 12u;
+         index += 1u) {
+        result = ascii_iterator_string(context, names[index]);
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_iterator_data(
+                context,
+                frame.slots[1],
+                frame.slots[3],
+                context->intrinsics[intrinsics[index]]
+            );
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, frame.slots[1]);
         frame.slots[6] = result.value;
@@ -506,6 +580,11 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         *array_cache = oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_ITERATOR;
              index <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER;
+             index += 1u) {
+            context->intrinsics[index] = oseo_undefined();
+        }
+        for (size_t index = OSEO_INTRINSIC_ITERATOR_MAP;
+             index <= OSEO_INTRINSIC_ITERATOR_FLAT_MAP;
              index += 1u) {
             context->intrinsics[index] = oseo_undefined();
         }
@@ -783,6 +862,803 @@ static OseoResult iterator_prototype_accessor(
         ? arguments[0]
         : oseo_undefined();
     return iterator_setter(context, code_id, receiver, value);
+}
+
+/*
+ * The lazy iterator helpers (27.1.4): map, filter, take, drop, and
+ * flatMap, the %IteratorHelperPrototype% their results share, and the
+ * underlying-iterator close each specified abstract closure performs.
+ *
+ * ECMA-262 writes every one of these as a generator over an abstract
+ * closure with a single `yield`. A helper object here stores that
+ * closure's captured state instead, so one resumption re-enters the
+ * loop at the point the yield left it: the iterator record and callback
+ * never change, and only the counter, the remaining count, and the
+ * flatMap inner record advance. The [[GeneratorState]] the object
+ * carries is what makes a re-entrant resumption, a `return` before the
+ * first step, and a `return` after completion behave exactly as the
+ * generator would.
+ */
+
+/* IfAbruptCloseIterator: close the record and keep the original abrupt
+ * completion, unless closing itself throws or the completion is a
+ * non-catchable internal diagnostic rather than a thrown value. */
+static OseoResult helper_close_after_abrupt(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoResult abrupt
+) {
+    if (abrupt.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+        return abrupt;
+    }
+    OseoValue slots[2] = {iterator, abrupt.value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    oseo_context_clear_language_error(context);
+    OseoResult closed = oseo_iterator_close(context, slots[0], true);
+    OseoResult result = closed.status == OSEO_STATUS_NORMAL
+        ? (OseoResult){OSEO_STATUS_THROW, slots[1]}
+        : closed;
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * IteratorStep and IteratorStepValue over one already-captured record.
+ * `value` stays undefined when `read_value` is false, which is the
+ * plain IteratorStep `drop` performs while skipping its prefix: a
+ * skipped result's `value` getter never runs.
+ *
+ * A throw anywhere in the step leaves the record exhausted without
+ * closing it, which is what the specified operations do by setting
+ * [[Done]] before propagating. The caller marks the helper completed
+ * for the same reason, so a later `return` performs no close.
+ */
+static OseoResult helper_iterator_step(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    bool read_value,
+    OseoValue *value,
+    bool *done
+) {
+    *value = oseo_undefined();
+    *done = false;
+    OseoValue slots[4] = {
+        iterator,
+        next_method,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        0u,
+        NULL,
+        oseo_undefined()
+    );
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = iterator_type_error(
+            context,
+            "The iterator next result is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "done");
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[2], slots[3]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        oseo_to_boolean(result.value)) {
+        *done = true;
+        oseo_roots_pop(context, &frame);
+        return normal(oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL && read_value) {
+        result = ascii_iterator_string(context, "value");
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[2], slots[3]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) *value = result.value;
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_undefined());
+}
+
+/*
+ * GetIteratorDirect(obj): the record every helper method captures. The
+ * `next` method is read exactly once, when the helper object is
+ * created, and reused for every later step.
+ */
+static OseoResult helper_get_iterator_direct(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue *next_method
+) {
+    *next_method = oseo_undefined();
+    OseoValue slots[2] = {object, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "next");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) *next_method = result.value;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * GetIteratorFlattenable(value, REJECT-PRIMITIVES), which is what
+ * flatMap applies to each mapped value. A primitive, a String included,
+ * is rejected rather than iterated; a nullish `Symbol.iterator` leaves
+ * the object itself as the iterator; and any other non-callable value
+ * there is a TypeError.
+ */
+static OseoResult helper_get_iterator_flattenable(
+    OseoContext *context,
+    OseoValue value,
+    OseoValue *iterator,
+    OseoValue *next_method
+) {
+    *iterator = oseo_undefined();
+    *next_method = oseo_undefined();
+    if (!is_object(value)) {
+        return iterator_type_error(
+            context,
+            "flatMap requires each mapped value to be an object."
+        );
+    }
+    OseoValue slots[2] = {value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ITERATOR
+    );
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        slots[1] = slots[0];
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        if (!is_function(slots[1])) {
+            result = iterator_type_error(
+                context,
+                "The Symbol.iterator property is not callable."
+            );
+        } else {
+            result = oseo_call_function(
+                context,
+                slots[1],
+                slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            slots[1] = result.value;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = iterator_type_error(
+            context,
+            "The iterator method did not return an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue captured = oseo_undefined();
+        result = helper_get_iterator_direct(context, slots[1], &captured);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            *iterator = slots[1];
+            *next_method = captured;
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context) {
+    OseoValue *cache =
+        &context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_PROTOTYPE];
+    if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
+    size_t entry_allocations = context->allocations;
+    /* 0 %IteratorPrototype%, 1 the helper prototype, 2 one key,
+     * 3 the tag string. */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_ITERATOR_PROTOTYPE
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[1] = result.value;
+    }
+    static const OseoIntrinsic methods[] = {
+        OSEO_INTRINSIC_ITERATOR_HELPER_NEXT,
+        OSEO_INTRINSIC_ITERATOR_HELPER_RETURN,
+    };
+    static const size_t codes[] = {
+        OSEO_ITERATOR_HELPER_NEXT_CODE_ID,
+        OSEO_ITERATOR_HELPER_RETURN_CODE_ID,
+    };
+    static const char *const names[] = {"next", "return"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_iterator_builtin(
+            context,
+            codes[index],
+            names[index],
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->intrinsics[methods[index]] = result.value;
+            result = ascii_iterator_string(context, names[index]);
+            frame.slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_iterator_data(
+                context,
+                frame.slots[1],
+                frame.slots[2],
+                context->intrinsics[methods[index]]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "Iterator Helper");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *cache = frame.slots[1];
+        result = normal(*cache);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    } else {
+        *cache = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_NEXT] =
+            oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_RETURN] =
+            oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/* CreateIteratorFromClosure for one helper kind, with the closure's
+ * captured state stored in the object the collector traces. */
+static OseoResult iterator_helper_create(
+    OseoContext *context,
+    OseoIteratorHelperKind kind,
+    OseoValue underlying_iterator,
+    OseoValue underlying_next,
+    OseoValue callback,
+    double remaining
+) {
+    OseoValue slots[4] = {
+        underlying_iterator,
+        underlying_next,
+        callback,
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_iterator_helper_prototype(context);
+    slots[3] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    OseoIteratorHelper *helper =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*helper));
+    if (helper == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Iterator helper allocation failed."
+        );
+    }
+    helper->ordinary.prototype = slots[3];
+    helper->ordinary.properties = NULL;
+    helper->ordinary.property_capacity = 0u;
+    helper->ordinary.property_count = 0u;
+    helper->ordinary.private_elements = NULL;
+    helper->ordinary.private_element_capacity = 0u;
+    helper->ordinary.private_element_count = 0u;
+    helper->ordinary.shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    helper->ordinary.array_length = 0u;
+    helper->ordinary.dictionary = false;
+    helper->ordinary.length_writable = false;
+    helper->ordinary.extensible = true;
+    helper->ordinary.module_namespace = false;
+    helper->ordinary.global_object = false;
+    helper->ordinary.error_data = false;
+    helper->ordinary.number_data = false;
+    helper->ordinary.number_value = oseo_undefined();
+    helper->ordinary.primitive_data = false;
+    helper->ordinary.primitive_value = oseo_undefined();
+    helper->ordinary.primitive_wrapper_methods_initialized = false;
+    helper->ordinary.virtual_string_iterator = false;
+    helper->ordinary.virtual_string_iterator_configurable = false;
+    helper->ordinary.virtual_string_iterator_enumerable = false;
+    helper->ordinary.virtual_string_iterator_writable = false;
+    helper->ordinary.array_iterator = false;
+    helper->ordinary.iterator_array = oseo_undefined();
+    helper->ordinary.iterator_index = 0u;
+    helper->ordinary.regexp_string_iterator = false;
+    helper->ordinary.regexp_iterator_regexp = oseo_undefined();
+    helper->ordinary.regexp_iterator_subject = oseo_undefined();
+    helper->ordinary.regexp_iterator_global = false;
+    helper->ordinary.regexp_iterator_unicode = false;
+    helper->ordinary.regexp_iterator_complete = false;
+    helper->ordinary.async_from_sync = false;
+    helper->ordinary.async_sync_iterator = oseo_undefined();
+    helper->ordinary.wrap_for_valid_iterator = false;
+    helper->ordinary.wrapped_iterator = oseo_undefined();
+    helper->ordinary.wrapped_next = oseo_undefined();
+    helper->ordinary.generator = NULL;
+    helper->ordinary.arguments_object = false;
+    helper->ordinary.mapped_arguments = false;
+    helper->underlying_iterator = slots[0];
+    helper->underlying_next = slots[1];
+    helper->callback = slots[2];
+    helper->inner_iterator = oseo_undefined();
+    helper->inner_next = oseo_undefined();
+    helper->remaining = remaining;
+    helper->counter = 0.0;
+    helper->inner_alive = false;
+    helper->prefix_dropped = false;
+    helper->kind = kind;
+    helper->state = OSEO_ITERATOR_HELPER_SUSPENDED_START;
+    OseoResult published = oseo_internal_publish_heap(
+        context,
+        &helper->ordinary.header,
+        OSEO_HEAP_ITERATOR_HELPER
+    );
+    oseo_roots_pop(context, &frame);
+    return published;
+}
+
+/*
+ * One resumption of a helper's closure. It either yields a value or
+ * reports that the closure returned; every abrupt completion here has
+ * already performed the close its specified step requires.
+ */
+static OseoResult iterator_helper_advance(
+    OseoContext *context,
+    OseoValue helper_value,
+    OseoValue *yielded,
+    bool *closure_done
+) {
+    *closure_done = false;
+    /* 0 helper, 1 underlying iterator, 2 stepped value, 3 callback
+     * result or inner iterator, 4 callback arguments. */
+    OseoValue slots[5] = {
+        helper_value,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    while (result.status == OSEO_STATUS_NORMAL) {
+        OseoIteratorHelper *helper = iterator_helper_object(slots[0]);
+        OseoIteratorHelperKind kind = helper->kind;
+        slots[1] = helper->underlying_iterator;
+        if (kind == OSEO_ITERATOR_HELPER_TAKE && helper->remaining == 0.0) {
+            /* Return ? IteratorClose(iterated, ReturnCompletion). */
+            result = oseo_iterator_close(context, slots[1], false);
+            if (result.status == OSEO_STATUS_NORMAL) *closure_done = true;
+            break;
+        }
+        if (kind == OSEO_ITERATOR_HELPER_FLAT_MAP && helper->inner_alive) {
+            bool inner_done = false;
+            OseoValue inner_iterator = helper->inner_iterator;
+            OseoValue inner_next = helper->inner_next;
+            result = helper_iterator_step(
+                context,
+                inner_iterator,
+                inner_next,
+                true,
+                &slots[2],
+                &inner_done
+            );
+            if (result.status != OSEO_STATUS_NORMAL) {
+                result = helper_close_after_abrupt(context, slots[1], result);
+                break;
+            }
+            helper = iterator_helper_object(slots[0]);
+            if (!inner_done) {
+                *yielded = slots[2];
+                break;
+            }
+            helper->inner_alive = false;
+            helper->inner_iterator = oseo_undefined();
+            helper->inner_next = oseo_undefined();
+            continue;
+        }
+        if (kind == OSEO_ITERATOR_HELPER_DROP && !helper->prefix_dropped) {
+            bool exhausted = false;
+            while (result.status == OSEO_STATUS_NORMAL) {
+                helper = iterator_helper_object(slots[0]);
+                if (!(helper->remaining > 0.0)) break;
+                if (helper->remaining != INFINITY) {
+                    helper->remaining -= 1.0;
+                }
+                bool skipped_done = false;
+                OseoValue ignored = oseo_undefined();
+                result = helper_iterator_step(
+                    context,
+                    helper->underlying_iterator,
+                    helper->underlying_next,
+                    false,
+                    &ignored,
+                    &skipped_done
+                );
+                if (result.status == OSEO_STATUS_NORMAL && skipped_done) {
+                    exhausted = true;
+                    break;
+                }
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            helper = iterator_helper_object(slots[0]);
+            helper->prefix_dropped = true;
+            if (exhausted) {
+                *closure_done = true;
+                break;
+            }
+        }
+        helper = iterator_helper_object(slots[0]);
+        if (kind == OSEO_ITERATOR_HELPER_TAKE &&
+            helper->remaining != INFINITY) {
+            helper->remaining -= 1.0;
+        }
+        bool step_done = false;
+        result = helper_iterator_step(
+            context,
+            helper->underlying_iterator,
+            helper->underlying_next,
+            true,
+            &slots[2],
+            &step_done
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (step_done) {
+            *closure_done = true;
+            break;
+        }
+        if (kind == OSEO_ITERATOR_HELPER_TAKE ||
+            kind == OSEO_ITERATOR_HELPER_DROP) {
+            *yielded = slots[2];
+            break;
+        }
+        helper = iterator_helper_object(slots[0]);
+        slots[3] = helper->callback;
+        slots[4] = oseo_number(helper->counter);
+        OseoValue callback_arguments[2] = {slots[2], slots[4]};
+        result = oseo_call_function(
+            context,
+            slots[3],
+            oseo_undefined(),
+            2u,
+            callback_arguments,
+            oseo_undefined()
+        );
+        slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) {
+            result = helper_close_after_abrupt(context, slots[1], result);
+            break;
+        }
+        /* The specified closures increment the counter after the yield
+         * the callback result feeds. Nothing between the call and that
+         * increment can observe the counter, and a resumption that
+         * never returns leaves the closure completed, so incrementing
+         * here produces the same 0, 1, 2, ... sequence. */
+        helper = iterator_helper_object(slots[0]);
+        helper->counter += 1.0;
+        if (kind == OSEO_ITERATOR_HELPER_MAP) {
+            *yielded = slots[3];
+            break;
+        }
+        if (kind == OSEO_ITERATOR_HELPER_FILTER) {
+            if (oseo_to_boolean(slots[3])) {
+                *yielded = slots[2];
+                break;
+            }
+            continue;
+        }
+        OseoValue inner_iterator = oseo_undefined();
+        OseoValue inner_next = oseo_undefined();
+        result = helper_get_iterator_flattenable(
+            context,
+            slots[3],
+            &inner_iterator,
+            &inner_next
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
+            result = helper_close_after_abrupt(context, slots[1], result);
+            break;
+        }
+        helper = iterator_helper_object(slots[0]);
+        helper->inner_iterator = inner_iterator;
+        helper->inner_next = inner_next;
+        helper->inner_alive = true;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* GeneratorResume for a helper: %IteratorHelperPrototype%.next. */
+static OseoResult iterator_helper_resume(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_iterator_helper(receiver)) {
+        return iterator_type_error(
+            context,
+            "Method %IteratorHelperPrototype%.next called on incompatible "
+            "receiver."
+        );
+    }
+    OseoIteratorHelper *helper = iterator_helper_object(receiver);
+    if (helper->state == OSEO_ITERATOR_HELPER_EXECUTING) {
+        return iterator_type_error(
+            context,
+            "Cannot resume an iterator helper that is already running."
+        );
+    }
+    if (helper->state == OSEO_ITERATOR_HELPER_COMPLETED) {
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+    }
+    helper->state = OSEO_ITERATOR_HELPER_EXECUTING;
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    bool closure_done = false;
+    OseoResult result = iterator_helper_advance(
+        context,
+        slots[0],
+        &slots[1],
+        &closure_done
+    );
+    helper = iterator_helper_object(slots[0]);
+    if (result.status != OSEO_STATUS_NORMAL || closure_done) {
+        helper->state = OSEO_ITERATOR_HELPER_COMPLETED;
+        helper->callback = oseo_undefined();
+        helper->inner_alive = false;
+        helper->inner_iterator = oseo_undefined();
+        helper->inner_next = oseo_undefined();
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_iterator_result(
+                context,
+                oseo_undefined(),
+                true
+            );
+        }
+    } else {
+        helper->state = OSEO_ITERATOR_HELPER_SUSPENDED_YIELD;
+        result = oseo_internal_iterator_result(context, slots[1], false);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * %IteratorHelperPrototype%.return. A helper that has never run closes
+ * its underlying iterator directly; a suspended one resumes with a
+ * return completion, which is what makes the specified closure close
+ * the flatMap inner iterator first and the underlying iterator second;
+ * and a completed one closes nothing.
+ */
+static OseoResult iterator_helper_return(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_iterator_helper(receiver)) {
+        return iterator_type_error(
+            context,
+            "Method %IteratorHelperPrototype%.return called on "
+            "incompatible receiver."
+        );
+    }
+    OseoIteratorHelper *helper = iterator_helper_object(receiver);
+    if (helper->state == OSEO_ITERATOR_HELPER_EXECUTING) {
+        return iterator_type_error(
+            context,
+            "Cannot close an iterator helper that is already running."
+        );
+    }
+    if (helper->state == OSEO_ITERATOR_HELPER_COMPLETED) {
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+    }
+    bool suspended_yield =
+        helper->state == OSEO_ITERATOR_HELPER_SUSPENDED_YIELD;
+    bool close_inner = suspended_yield &&
+        helper->kind == OSEO_ITERATOR_HELPER_FLAT_MAP &&
+        helper->inner_alive;
+    /*
+     * A helper that has never run completes before its close runs, which
+     * is what %IteratorHelperPrototype%.return does directly. A suspended
+     * one instead resumes its closure with a return completion through
+     * GeneratorResumeAbrupt, so its state is `executing` for the whole
+     * cleanup and a `return` method that re-enters this helper reaches
+     * the running-generator TypeError rather than a `done` result.
+     */
+    helper->state = suspended_yield
+        ? OSEO_ITERATOR_HELPER_EXECUTING
+        : OSEO_ITERATOR_HELPER_COMPLETED;
+    helper->callback = oseo_undefined();
+    /* 0 helper, 1 underlying iterator, 2 inner iterator. */
+    OseoValue slots[3] = {
+        receiver,
+        helper->underlying_iterator,
+        helper->inner_iterator,
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    helper->inner_alive = false;
+    helper->inner_iterator = oseo_undefined();
+    helper->inner_next = oseo_undefined();
+    OseoResult result = normal(oseo_undefined());
+    if (close_inner) {
+        result = oseo_iterator_close(context, slots[2], false);
+        if (result.status != OSEO_STATUS_NORMAL) {
+            result = helper_close_after_abrupt(context, slots[1], result);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_iterator_close(context, slots[1], false);
+    }
+    /* The resumed closure has finished, normally or abruptly, so the
+     * generator is completed either way. */
+    iterator_helper_object(slots[0])->state =
+        OSEO_ITERATOR_HELPER_COMPLETED;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_result(
+            context,
+            oseo_undefined(),
+            true
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* ToIntegerOrInfinity's truncation, applied to an already-checked
+ * non-NaN Number. */
+static double helper_integer_or_infinity(double value) {
+    if (value == 0.0) return 0.0;
+    if (value == INFINITY || value == -INFINITY) return value;
+    return trunc(value);
+}
+
+/*
+ * The five %Iterator.prototype% helper methods. Each one validates its
+ * receiver, then validates its argument against the record it would
+ * have captured, closing that record when the validation fails, and
+ * only then reads `next`. Reading `next` last is what keeps a failing
+ * argument from ever reaching the underlying iterator's `next` getter.
+ */
+static OseoResult iterator_helper_method(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoIteratorHelperKind kind = OSEO_ITERATOR_HELPER_MAP;
+    if (code_id == OSEO_ITERATOR_FILTER_CODE_ID) {
+        kind = OSEO_ITERATOR_HELPER_FILTER;
+    } else if (code_id == OSEO_ITERATOR_TAKE_CODE_ID) {
+        kind = OSEO_ITERATOR_HELPER_TAKE;
+    } else if (code_id == OSEO_ITERATOR_DROP_CODE_ID) {
+        kind = OSEO_ITERATOR_HELPER_DROP;
+    } else if (code_id == OSEO_ITERATOR_FLAT_MAP_CODE_ID) {
+        kind = OSEO_ITERATOR_HELPER_FLAT_MAP;
+    }
+    bool counted = kind == OSEO_ITERATOR_HELPER_TAKE ||
+        kind == OSEO_ITERATOR_HELPER_DROP;
+    if (!is_object(receiver)) {
+        return iterator_type_error(
+            context,
+            counted
+                ? "Iterator take and drop require an object receiver."
+                : "Iterator map, filter, and flatMap require an object "
+                  "receiver."
+        );
+    }
+    OseoValue argument = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    /* 0 receiver, 1 argument, 2 captured next method. */
+    OseoValue slots[3] = {receiver, argument, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    double remaining = INFINITY;
+    if (counted) {
+        result = oseo_internal_to_number(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            double limit = number_value(result.value);
+            if (limit != limit) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_RANGE,
+                    "Iterator take and drop reject a NaN limit."
+                );
+            } else {
+                remaining = helper_integer_or_infinity(limit);
+                if (remaining < 0.0) {
+                    result = oseo_internal_throw_error(
+                        context,
+                        OSEO_ERROR_RANGE,
+                        "Iterator take and drop reject a negative limit."
+                    );
+                }
+            }
+        }
+    } else if (!is_function(slots[1])) {
+        result = iterator_type_error(
+            context,
+            "Iterator map, filter, and flatMap require a callable "
+            "argument."
+        );
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        result = helper_close_after_abrupt(context, slots[0], result);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    result = helper_get_iterator_direct(context, slots[0], &slots[2]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = iterator_helper_create(
+            context,
+            kind,
+            slots[0],
+            slots[2],
+            counted ? oseo_undefined() : slots[1],
+            remaining
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 /* ToLength's clamp: 2^53 - 1. */
