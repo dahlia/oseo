@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 108
+M5a is complete. The normative family records described below inventory 109
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 16,818 reviewed cases: 12,948 passes, 1,556
-expected negatives, and 2,314 unsupported profile features. It records no
+The current manifest contains 16,912 reviewed cases: 13,022 passes, 1,556
+expected negatives, and 2,334 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -4731,6 +4731,57 @@ failures. The admitted runtime
 checkpoint moves the ABI to `oseo-runtime-m5-88`, allocates seven code IDs in
 the existing Array range, and adds no generated-code entry point or graph-state
 change.
+
+M5b node `array-prototype-predicate-search` implements ordinary `find`,
+`findIndex`, `findLast`, and `findLastIndex` functions on the realm-owned
+`%Array.prototype%`. Each method converts its receiver and reads
+LengthOfArrayLike before validating the predicate, so the length read is
+observable even when the predicate is not callable, and a non-callable
+predicate then throws a `TypeError`. `find` and `findIndex` visit ascending
+indices from zero; `findLast` and `findLastIndex` visit descending indices
+from the snapshot length minus one. Every index below the snapshot is read
+with Get rather than filtered through HasProperty, so a hole reaches the
+predicate as `undefined`, inherited entries participate, and an element
+deleted, assigned, or added below the snapshot length during traversal is
+observed live while indices at or above the snapshot stay unvisited.
+
+The predicate receives the element, index, and converted receiver with the
+caller's `this` argument. Its first truthy result ends the search: `find` and
+`findLast` return that element and `findIndex` and `findLastIndex` return its
+index, while an exhausted search returns `undefined` or `-1`. An abrupt
+predicate completion or an abrupt `length`, element, or coercion read stops
+the loop at that step. No method allocates a result array, so no
+`constructor` or `Symbol.species` read is reachable. The receiver, predicate,
+`this` argument, and current element stay rooted across user code, so the
+returned element keeps its identity through a collection inside any
+predicate or accessor.
+
+Fixed native and generated differential evidence at seed `0x60006000` covers
+a 12-case ordinary budget over all four methods, sparse Arrays and ordinary
+array-like objects with zero through six entries that are a small integer,
+an explicit `undefined`, or a hole, a numeric acceptance threshold that
+nothing may reach, and an omitted or object `this` argument. Its independent
+traversal model predicts every predicate call, the `this` value, the
+receiver identity, and the element or index result. Fixed evidence also
+covers metadata and unscopables, generic, inherited, primitive, and frozen
+receivers, result truthiness, length coercion and clamping including the
+`2**53 - 2` maximum index, mutation during the snapshot-length loop, accessor
+order, abrupt completion at each observable step, result identity across
+collection, both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard misses, and generic fallback.
+All 94 paths under the four inventory roots are reviewed: 74 pass and 20
+retain explicit prerequisite boundaries. Each root splits 18 pass and five
+unsupported for `find` and `findIndex` and 19 pass and five unsupported for
+`findLast` and `findLastIndex`. Sixteen unsupported paths need the resizable
+ArrayBuffer or TypedArray harness and four need constructor detection
+through `Reflect.construct`. The reviewed subset adds `array-find-from-last`
+to its supported features so the two descending roots execute. The
+manifest moves from 16,818 to 16,912 cases
+and from 12,948 to 13,022 passes, keeps 1,556 expected negatives, and moves
+from 2,314 to 2,334 unsupported profile features, with no failures. The
+admitted runtime checkpoint moves the ABI to `oseo-runtime-m5-93`, allocates
+four code IDs inside the existing Array range, and adds no generated-code
+entry point or graph-state change.
 
 
 String prototype case conversion and normalization

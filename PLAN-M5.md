@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-16,818 reviewed cases: 12,948 passes, 1,556 expected negatives, and 2,314
+16,912 reviewed cases: 13,022 passes, 1,556 expected negatives, and 2,334
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 108 indexed records in the normative
+M5a is complete. The 109 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-12,948 passes across 16,818 paths, and the property inventory records 124
-domains, 124 seeds, and an ordinary case budget of 5,378.
+13,022 passes across 16,912 paths, and the property inventory records 125
+domains, 125 seeds, and an ordinary case budget of 5,390.
 
 
 M5a implementation history
@@ -5454,6 +5454,60 @@ property ratchet moves from 123 to 124 domains and seeds and from 5,366 to
 changing the graph's orchestration state. The reviewed test262 revision,
 41,091-path applicable inventory, ADR 0013 vocabulary, inventory policy,
 and zero-override policy are unchanged.
+
+Implemented M5b node `array-prototype-predicate-search` gives the
+realm-owned `%Array.prototype%` ordinary `find`, `findIndex`, `findLast`, and
+`findLastIndex` functions. Each method converts its receiver with ToObject
+and reads LengthOfArrayLike before validating the predicate, so a length read
+is observable even when the predicate is not callable, and a non-callable
+predicate then throws a `TypeError`. One predicate loop serves all four
+methods: `find` and `findIndex` visit ascending indices from zero and
+`findLast` and `findLastIndex` descending indices from the snapshot length
+minus one. Every index below the snapshot is read with Get rather than
+filtered through HasProperty, so a hole reaches the predicate as `undefined`
+and inherited entries participate, while the live reads observe an element
+deleted, assigned, or added below the snapshot length during traversal. The
+predicate receives the element, index, and converted receiver with the
+caller's `this` argument, its first truthy result ends the search with that
+element or its index, and an exhausted search returns `undefined` or `-1`.
+An abrupt predicate completion or an abrupt `length`, element, or coercion
+read stops the loop at that step. No method allocates a result array, so no
+`constructor` or `Symbol.species` read is reachable. The implementation stays
+in *runtime\_array.c* because it shares the Array intrinsic's property
+primitives, array-like length conversion, and collector roots, and the
+receiver, predicate, `this` argument, and current element remain rooted
+across every user-code boundary.
+
+Fixed native and generated differential evidence at seed `0x60006000` covers
+a 12-case ordinary budget over all four methods, sparse Arrays and ordinary
+array-like objects with zero through six entries that are a small integer,
+an explicit `undefined`, or a hole, a numeric acceptance threshold that
+nothing may reach, and an omitted or object `this` argument. Its independent
+traversal model predicts every predicate call, the `this` value, the
+receiver identity, and the element or index result. Fixed evidence also
+covers metadata and unscopables, generic, inherited, primitive, and frozen
+receivers, result truthiness, length coercion and clamping including the
+`2**53 - 2` maximum index, mutation during the snapshot-length loop, accessor
+order, abrupt completion at each observable step, result identity across
+collection, both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard misses, and generic fallback.
+
+All 94 paths under the node's four inventory roots are reviewed: 74 pass and
+20 retain explicit prerequisite boundaries. Each root splits 18 pass and
+five unsupported for `find` and `findIndex` and 19 pass and five unsupported
+for `findLast` and `findLastIndex`. Sixteen unsupported paths need the
+resizable ArrayBuffer or TypedArray harness and four need constructor
+detection through `Reflect.construct`. The reviewed subset adds
+`array-find-from-last` to its supported features so the two descending
+roots execute. The manifest moves from 16,818 to
+16,912 paths and from 12,948 to 13,022 passes, keeps 1,556 expected
+negatives, and moves from 2,314 to 2,334 unsupported profile features, with
+no failures. The property ratchet moves from 124 to 125 domains and seeds and
+from 5,378 to 5,390 ordinary cases. The admitted runtime checkpoint moves the
+ABI to `oseo-runtime-m5-93`, allocates four code IDs inside the existing
+Array range, and adds no generated-code entry point or graph-state change.
+The reviewed test262 revision, 41,091-path applicable inventory, ADR 0013
+vocabulary, inventory policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

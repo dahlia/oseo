@@ -31,6 +31,7 @@ supportedFeatures:
   - String.prototype.trimEnd
   - String.prototype.trimStart
   - align-detached-buffer-semantics-with-web-reality
+  - array-find-from-last
   - array-grouping
   - arraybuffer-transfer
   - arrow-function
@@ -2454,6 +2455,288 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/target-array-with-non-writable-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/array-altered-during-loop.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/callbackfn-resize-arraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-called-for-each-array-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-abrupt-from-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-abrupt-from-this-length-as-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-abrupt-from-this-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/find/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/array-altered-during-loop.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/callbackfn-resize-arraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-called-for-each-array-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this-length-as-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findIndex/return-negative-one-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/array-altered-during-loop.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/callbackfn-resize-arraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/maximum-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-called-for-each-array-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-this-length-as-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-this-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLast/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/array-altered-during-loop.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/call-with-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/callbackfn-resize-arraybuffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/maximum-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-called-for-each-array-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-this-length-as-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-this-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/findLastIndex/return-negative-one-if-predicate-returns-false-value.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flat/array-like-objects.js

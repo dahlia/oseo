@@ -974,6 +974,32 @@ no generated-code entry point, allocates seven code IDs inside the existing
 Array range because `push` already owns its ID, and moves `abiVersion` to
 `m5-88`.
 
+M5b node `array-prototype-predicate-search` also remains in
+*runtime\_array.c*. It adds `find`, `findIndex`, `findLast`, and
+`findLastIndex` to the materialized `%Array.prototype%` over the ordinary
+property access, array-like length conversion, and collector roots the
+other Array methods already own.
+
+One predicate loop serves all four methods: the receiver is converted and
+its length read before the callable check, `find` and `findIndex` visit
+ascending indices and `findLast` and `findLastIndex` descending ones, and
+every index is read with Get rather than filtered through HasProperty, so a
+hole reaches the predicate as `undefined`. The predicate receives the
+element, index, and converted receiver with the caller's `this` argument,
+its first truthy result returns the element or its index, and an exhausted
+search returns `undefined` or `-1`. The receiver, predicate, `this`
+argument, and current element stay rooted across user code, so the returned
+element survives a collection inside any predicate or accessor.
+
+Fixed and generated native differential evidence covers all four methods,
+sparse, generic, inherited, primitive, and frozen receivers, both traversal
+directions, hole visits, result truthiness, length coercion and clamping,
+mutation during the snapshot-length loop, abrupt completion at each
+observable step, both specialization policies, false hints, deliberate guard
+hits and misses, generic fallback, and collection at every safepoint. The
+node adds no generated-code entry point, allocates four code IDs inside the
+existing Array range, and moves `abiVersion` to `m5-93`.
+
 ### Lazy iterator helper evidence
 
 M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
