@@ -13,5 +13,5 @@ inventory:
     - test/built-ins/Iterator/prototype/take/
 dependencies:
   - iterator-intrinsic
-landed: false
+landed: true
 status: ready
