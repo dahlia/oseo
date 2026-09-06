@@ -287,6 +287,46 @@ test("populates Array index search methods with both comparisons", () => {
   assert.doesNotMatch(at, /oseo_has_property/u);
 });
 
+test("populates Array predicate search methods over one loop", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["find", "findIndex", "findLast", "findLastIndex"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["FIND", "FIND_INDEX", "FIND_LAST", "FIND_LAST_INDEX"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  // Receiver conversion and the length read precede the callable check.
+  const search = definition("array_predicate_search");
+  assert.match(
+    search,
+    /oseo_internal_to_object[\s\S]*array_like_length[\s\S]*not callable/u,
+  );
+  // Every index is read with Get rather than filtered through
+  // HasProperty, so a hole reaches the predicate as undefined, and the
+  // predicate receives three arguments with the caller's this value.
+  assert.doesNotMatch(search, /oseo_has_property/u);
+  assert.match(search, /oseo_object_get[\s\S]*oseo_call_function/u);
+  assert.match(search, /3u,/u);
+  // The four methods return the rooted element or its index without
+  // allocating a result array, so no species or constructor read is
+  // reachable.
+  assert.doesNotMatch(search, /array_species_create/u);
+  assert.match(search, /wants_index \? oseo_number\(index\) : frame\.slots/u);
+  assert.match(search, /wants_index \? oseo_number\(-1\.0\) : oseo_undefined/u);
+  // One shared loop flips traversal direction for the findLast pair.
+  assert.match(search, /from_last \? length - 1\.0 : 0\.0/u);
+});
+
 test("populates Array mutation methods with hole-preserving moves", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

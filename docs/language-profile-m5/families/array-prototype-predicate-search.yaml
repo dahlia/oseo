@@ -1,0 +1,67 @@
+version: 1
+id: array-prototype-predicate-search
+title: "Array prototype predicate search"
+scope:
+  - "Array.prototype find, findIndex, findLast, and findLastIndex, including
+    receiver conversion and length reading before callable validation,
+    ascending and descending index traversal, a Get at every index below
+    the snapshot length so holes reach the predicate as undefined,
+    predicate argument order and this value, the first truthy result
+    ending the search with the element or its index, the undefined or -1
+    result of an exhausted search, abrupt completion order, and mutation
+    observed during the snapshot-length loop."
+  - "Reviewed standards coverage is all 94 upstream paths under
+    test/built-ins/Array/prototype/find/,
+    test/built-ins/Array/prototype/findIndex/,
+    test/built-ins/Array/prototype/findLast/, and
+    test/built-ins/Array/prototype/findLastIndex/: 74 pass and 20 retain
+    explicit prerequisite boundaries for the resizable ArrayBuffer and
+    TypedArray harness and for constructor detection through
+    Reflect.construct. The subset lists array-find-from-last as a supported
+    feature so the findLast and findLastIndex roots execute."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-predicate-search.ts
+      - tests/property/m5-array-prototype-predicate-search.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-predicate-search.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-predicate-search.ts
+      - tests/property/m5-array-prototype-predicate-search.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-predicate-search.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-predicate-search.ts
+      - tests/property/m5-array-prototype-predicate-search.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-predicate-search.ts
+      - tests/property/m5-array-prototype-predicate-search.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

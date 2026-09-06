@@ -712,6 +712,20 @@ Receiver, argument, result, and moved values stay rooted across every
 observable operation. Seven new code IDs come from the existing Array range,
 and the generated-code ABI gains no entry point.
 
+The `m5-93` ABI adds ordinary `find`, `findIndex`, `findLast`, and
+`findLastIndex` functions to `%Array.prototype%`. One predicate loop serves
+all four: the receiver is converted and its length read before the callable
+check, `find` and `findIndex` visit ascending indices and `findLast` and
+`findLastIndex` descending ones, and every index below the snapshot length
+is read with Get, so a hole reaches the predicate as `undefined`. The
+predicate receives the element, index, and converted receiver with the
+caller's `this` argument; its first truthy result returns the element or its
+index, and an exhausted search returns `undefined` or `-1`. No method
+allocates a result array, so no `constructor` or `Symbol.species` read is
+reachable, and the current element stays rooted across the predicate call.
+All four code IDs come from the existing Array range, and the generated-code
+ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

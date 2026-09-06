@@ -102,6 +102,13 @@ static OseoResult array_reduction(
     const OseoValue *arguments,
     bool from_right
 );
+static OseoResult array_predicate_search(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+);
 static OseoResult array_at(
     OseoContext *context,
     OseoValue receiver,
@@ -266,6 +273,18 @@ OseoResult oseo_internal_array_builtin_dispatch(
             argument_count,
             arguments,
             code_id == OSEO_ARRAY_REDUCE_RIGHT_CODE_ID
+        );
+    }
+    if (code_id == OSEO_ARRAY_FIND_CODE_ID ||
+        code_id == OSEO_ARRAY_FIND_INDEX_CODE_ID ||
+        code_id == OSEO_ARRAY_FIND_LAST_CODE_ID ||
+        code_id == OSEO_ARRAY_FIND_LAST_INDEX_CODE_ID) {
+        return array_predicate_search(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
         );
     }
     if (code_id == OSEO_ARRAY_AT_CODE_ID) {
@@ -2901,6 +2920,54 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             );
         }
     }
+    static const size_t predicate_codes[] = {
+        OSEO_ARRAY_FIND_CODE_ID,
+        OSEO_ARRAY_FIND_INDEX_CODE_ID,
+        OSEO_ARRAY_FIND_LAST_CODE_ID,
+        OSEO_ARRAY_FIND_LAST_INDEX_CODE_ID,
+    };
+    static const char *const predicate_names[] = {
+        "find",
+        "findIndex",
+        "findLast",
+        "findLastIndex",
+    };
+    _Static_assert(
+        sizeof(predicate_codes) / sizeof(predicate_codes[0]) ==
+            sizeof(predicate_names) / sizeof(predicate_names[0]),
+        "Array predicate search method tables must stay aligned."
+    );
+    const size_t predicate_count =
+        sizeof(predicate_names) / sizeof(predicate_names[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < predicate_count;
+         index += 1u) {
+        result = array_builtin_function(
+            context,
+            predicate_codes[index],
+            predicate_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                predicate_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_array_push_function(context);
         frame.slots[2] = result.value;
@@ -4058,6 +4125,87 @@ static OseoResult array_at(
                 );
             }
         }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Array.prototype find, findIndex, findLast, and findLastIndex share one
+ * predicate loop. find and findIndex visit ascending indices and findLast
+ * and findLastIndex descending ones. Every index below the snapshot length
+ * is read with Get rather than HasProperty, so a hole is observed as
+ * undefined and the predicate runs for it. The first truthy predicate
+ * result stops the loop and yields the element or its index; an exhausted
+ * loop yields undefined or -1. The receiver, predicate, this value, and
+ * current element stay rooted across user code and forced collection.
+ */
+static OseoResult array_predicate_search(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    const bool from_last = code_id == OSEO_ARRAY_FIND_LAST_CODE_ID ||
+        code_id == OSEO_ARRAY_FIND_LAST_INDEX_CODE_ID;
+    const bool wants_index = code_id == OSEO_ARRAY_FIND_INDEX_CODE_ID ||
+        code_id == OSEO_ARRAY_FIND_LAST_INDEX_CODE_ID;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
+    frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_like_length(context, frame.slots[0], &length);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_function(frame.slots[1])) {
+        result = type_error(context, "Array predicate is not callable.");
+    }
+    bool found = false;
+    double index = from_last ? length - 1.0 : 0.0;
+    while (result.status == OSEO_STATUS_NORMAL &&
+           (from_last ? index >= 0.0 : index < length)) {
+        result = oseo_property_key(context, oseo_number(index));
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[3]
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        frame.slots[5] = oseo_number(index);
+        frame.slots[6] = frame.slots[0];
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            3u,
+            &frame.slots[4],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (oseo_to_boolean(result.value)) {
+            result = normal(
+                wants_index ? oseo_number(index) : frame.slots[4]
+            );
+            found = true;
+            break;
+        }
+        index += from_last ? -1.0 : 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !found) {
+        result = normal(
+            wants_index ? oseo_number(-1.0) : oseo_undefined()
+        );
     }
     oseo_roots_release(context, &frame);
     return result;
