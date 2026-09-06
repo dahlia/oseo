@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-16,645 reviewed cases: 12,779 passes, 1,556 expected negatives, and 2,310
+16,818 reviewed cases: 12,948 passes, 1,556 expected negatives, and 2,314
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 107 indexed records in the normative
+M5a is complete. The 108 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-12,779 passes across 16,645 paths, and the property inventory records 123
-domains, 123 seeds, and an ordinary case budget of 5,366.
+12,948 passes across 16,818 paths, and the property inventory records 124
+domains, 124 seeds, and an ordinary case budget of 5,378.
 
 
 M5a implementation history
@@ -5389,6 +5389,71 @@ range, adds one heap kind and eight realm intrinsics, and adds no
 generated-code entry point or graph-state change. The reviewed test262
 revision, 41,091-path applicable inventory, ADR 0013 vocabulary, inventory
 policy, and zero-override policy are unchanged.
+
+Implemented M5b node `uri-handling-functions` materializes `decodeURI`,
+`decodeURIComponent`, `encodeURI`, and `encodeURIComponent` as four
+ordinary built-in functions the realm's global object binds as writable,
+non-enumerable, configurable properties. Each has its specified name, a
+`length` of 1, `%Function.prototype%` as its `[[Prototype]]`, and no
+`prototype` property, and none of them is a constructor, so `new` on one
+throws a `TypeError` before its argument is converted. The compiler
+resolves all four as property-owned replaceable intrinsics, so a program
+may replace, delete, or shadow them exactly as it may `Number` or `Math`.
+
+Each function converts its single argument with `ToString` first, so an
+abrupt conversion is observed before any escape sequence is inspected and a
+missing argument encodes the string `"undefined"`. Encode leaves the ASCII
+word characters and the eight marks 19.2.6.5 names unescaped, `encodeURI`
+also leaves the eleven reserved units unescaped, and every other code point
+becomes one uppercase two-digit `%XX` escape per UTF-8 octet. An unpaired
+surrogate throws a `URIError`. Decode reads each escape through
+`ParseHexOctet`, preserves a reserved unit's escape exactly as written for
+`decodeURI`, and admits only the UTF-8 sequences the Unicode standard
+defines, so a truncated escape, a non-hexadecimal digit pair, a lone or
+missing continuation octet, an overlong encoding, a surrogate code point,
+and a value past U+10FFFF each throw a `URIError`.
+
+The runtime gains one component, *runtime\_uri.c*, and one built-in code
+range whose four IDs count down from the range last in the order the global
+installation creates the properties, so the dispatch reads an index rather
+than a table. Each function is its own lazily created intrinsic, and the
+UTF-16 result is staged in the existing host-memory string builder rather
+than on the collected heap, so a collection between two escapes cannot
+invalidate a partial answer. The node adds no generated-code entry point
+and owns no numeric or string conversion of its own.
+
+The reviewed *decimalToHexString.js* harness include becomes available with
+this node, because 78 of its reviewed cases name it and its two functions
+need only unsigned shifts, string index reads, and concatenation. No
+reviewed path used the include before, so it unblocks nothing outside this
+node's roots.
+
+Fixed native and generated differential evidence at property seed
+`0x60005f00` covers the four identities, descriptors, names, and lengths,
+both unescaped sets, every UTF-8 octet count in both directions, the
+preserved reserved escapes, the round trips through each matching pair,
+seven malformed decoding classes, unpaired surrogates in both encoders,
+`ToString` coercion and abrupt conversion, `Symbol` operands, the `new`
+rejection, both specialization policies, collection forced at every
+safepoint, a false number hint, a deliberate global-object shape guard miss
+with generic fallback, and the global write, delete, restore,
+assignment-target, and strict missing-property sequences the replaceable
+bindings admit. The generated oracle computes each expected escape from the
+code point's own bits rather than through any host encoder.
+
+All 173 paths under the node's four inventory roots are reviewed: 169 pass
+and four retain the explicit `Reflect.construct` prerequisite their
+*isConstructor.js* include needs. No reviewed path outside those roots
+changes, because none of them names a URI handling function. The manifest
+moves from 16,645 to 16,818 paths and from 12,779 to 12,948 passes, keeps
+1,556 expected negatives, and moves from 2,310 to 2,314 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The
+property ratchet moves from 123 to 124 domains and seeds and from 5,366 to
+5,378 ordinary cases. The admitted runtime checkpoint moves the ABI to
+`oseo-runtime-m5-92` without adding a generated-code entry point or
+changing the graph's orchestration state. The reviewed test262 revision,
+41,091-path applicable inventory, ADR 0013 vocabulary, inventory policy,
+and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

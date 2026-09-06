@@ -1,0 +1,66 @@
+version: 1
+id: uri-handling-functions
+title: "URI handling functions"
+scope:
+  - "The four realm-owned URI handling functions of 19.2.6, meaning
+    decodeURI, decodeURIComponent, encodeURI, and encodeURIComponent, their
+    names, lengths, [[Prototype]], absent prototype property, and the
+    writable, non-enumerable, configurable global-object properties that
+    bind them."
+  - "Encode, 19.2.6.5: the always-unescaped ASCII word characters and marks,
+    the reserved units only encodeURI leaves unescaped, the UTF-8
+    transformation of every scalar value, the uppercase two-digit escapes,
+    and the URIError an unpaired surrogate raises."
+  - "Decode, 19.2.6.6: ParseHexOctet, the preserved reserved escapes only
+    decodeURI keeps, the UTF-8 sequences the Unicode standard admits, the
+    UTF-16 encoding of the decoded code point, and the URIError every
+    truncated, non-hexadecimal, overlong, surrogate, out-of-range, or
+    otherwise malformed sequence raises."
+  - "The single-argument ToString conversion each function performs before
+    it inspects its operand, including the abrupt completion a throwing
+    conversion propagates."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/uri-handling-functions.ts
+      - tests/property/m5-uri-handling-functions.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/uri-handling-functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/uri-handling-functions.ts
+      - tests/property/m5-uri-handling-functions.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-uri-handling-functions.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/uri-handling-functions.ts
+      - tests/property/m5-uri-handling-functions.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/uri-handling-functions.ts
+      - tests/property/m5-uri-handling-functions.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

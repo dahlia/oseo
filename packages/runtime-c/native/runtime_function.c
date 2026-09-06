@@ -163,6 +163,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_MATH_CODE_ID_RANGE_FIRST,
      OSEO_MATH_CODE_ID_RANGE_LAST,
      oseo_internal_math_builtin_dispatch},
+    {OSEO_URI_CODE_ID_RANGE_FIRST,
+     OSEO_URI_CODE_ID_RANGE_LAST,
+     oseo_internal_uri_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -1042,6 +1045,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         materialized = oseo_internal_regexp_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_MATH) {
         materialized = oseo_internal_math_intrinsic(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_DECODE_URI &&
+               intrinsic <= OSEO_INTRINSIC_ENCODE_URI_COMPONENT) {
+        materialized = oseo_internal_uri_intrinsic(context, intrinsic);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&

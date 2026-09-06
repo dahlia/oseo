@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 107
+M5a is complete. The normative family records described below inventory 108
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 16,645 reviewed cases: 12,779 passes, 1,556
-expected negatives, and 2,310 unsupported profile features. It records no
+The current manifest contains 16,818 reviewed cases: 12,948 passes, 1,556
+expected negatives, and 2,314 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -163,7 +163,8 @@ current evidence assessment. Those live only in the indexed records above.
     value, so `"undefined"` would misreport it, the same boundary
     the Unit 8.1b identifier delete records. A name the profile has
     since materialized, such as `Object`, `Number`, `Promise`, `String`,
-    or `Math`, reads the realm global object's property instead. The same
+    `Math`, or `encodeURI`, reads the realm global object's property
+    instead. The same
     rule covers every
     other global name ECMA-262 clause 19 requires of the pinned
     ECMAScript 2025 realm, such as `JSON`, `Array`, `eval`, and
@@ -5362,6 +5363,98 @@ seven code IDs inside the existing iterator range without adding a
 generated-code entry point or changing the graph's orchestration state.
 
 
+URI handling functions
+----------------------
+
+M5b node `uri-handling-functions` materializes the four URI handling
+functions of 19.2.6. `decodeURI`, `decodeURIComponent`, `encodeURI`, and
+`encodeURIComponent` are ordinary built-in functions whose `[[Prototype]]`
+is the realm's `%Function.prototype%`, each with its specified name, a
+`length` of 1, and no `prototype` property. None of them is a constructor,
+so `new encodeURI("a")` throws a `TypeError` before its argument is
+converted. The global object binds each as a writable, non-enumerable,
+configurable property, so the compiler treats all four as property-owned
+replaceable intrinsics exactly as it treats `Number` and `Math`, and a
+program may replace or delete any of them.
+
+Each function converts its single argument with `ToString` before it
+inspects one code unit, so a missing argument encodes the string
+`"undefined"` and a throwing `toString` propagates its abrupt completion
+unchanged. A `Symbol` operand throws the `TypeError` `ToString` raises.
+
+Encode, 19.2.6.5, leaves the ASCII word characters, meaning the letters,
+the digits, and `_`, together with the eight marks `-`, `.`, `!`, `~`,
+`*`, `'`, `(`, and `)`, unescaped in both directions. `encodeURI` additionally
+leaves the reserved units `;`, `/`, `?`, `:`, `@`, `&`, `=`, `+`, `$`, `,`, and
+`#` unescaped, while `encodeURIComponent` escapes them. Every other code point
+is read through `CodePointAt`, transformed to UTF-8, and written as one
+uppercase two-digit `%XX` escape per octet, so a one-, two-, three-, or
+four-octet sequence appears exactly as the Unicode standard defines it. An
+unpaired surrogate, leading or trailing, throws a `URIError` rather than
+producing a replacement character.
+
+Decode, 19.2.6.6, reads each `%XX` escape through `ParseHexOctet`, which
+accepts the `HexDigits` grammar in either letter case. A first octet whose
+high bit is clear decodes to that ASCII code unit, except that `decodeURI`
+preserves the escape of a reserved unit exactly as written, so
+`decodeURI("%3b")` is `"%3b"` and `decodeURIComponent("%3b")` is `";"`.
+A first octet with two, three, or four leading one bits consumes that many
+escapes and decodes only a sequence the Unicode standard admits, so a
+continuation octet outside `0x80` to `0xBF`, an overlong encoding, a
+surrogate code point, and a value past U+10FFFF each throw a `URIError`.
+So does a truncated escape, a non-hexadecimal digit pair, a continuation
+that is not itself an escape, a lone continuation octet, and a first octet
+with one or more than four leading one bits. A decoded code point above
+U+FFFF becomes the surrogate pair `UTF16EncodeCodePoint` produces.
+
+Annex B's `escape` and `unescape` stay outside the claim under
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md) and remain ordinary
+unresolvable names.
+
+The runtime gains one component, *runtime\_uri.c*, and one built-in code
+range whose four IDs count down from the range last in the order the
+global installation creates the properties, so the dispatch reads an index
+rather than a table. Each function is its own lazily created intrinsic,
+and the growable UTF-16 builder that stages a result lives in host memory
+rather than on the collected heap, so a collection between two escapes
+cannot invalidate the partial answer. The node adds no generated-code
+entry point and no numeric or string conversion of its own.
+
+The reviewed *decimalToHexString.js* harness include becomes available
+with this node. Its two functions need only unsigned shifts, string index
+reads, and concatenation, all already admitted; the include had no
+reviewed implementation before, so every case that named it was a harness
+failure and none could enter the reviewed subset.
+
+Fixed native and generated differential evidence at property seed
+`0x60005f00` covers the four function identities, descriptors, names, and
+lengths, both unescaped sets, every UTF-8 octet count in both directions,
+the preserved reserved escapes, the uppercase escape digits, the
+round trips through each matching pair, seven malformed decoding classes,
+unpaired surrogates in both encoders, `ToString` coercion and abrupt
+conversion, `Symbol` operands, the `new` rejection, both specialization
+policies, collection forced at every safepoint, a false number hint, a
+deliberate global-object shape guard miss with generic fallback, and the
+global write, delete, restore, assignment-target, and strict
+missing-property sequences the replaceable bindings admit. The generated
+oracle computes each expected escape from the code point's own bits rather
+than through any host encoder.
+
+All 173 paths under the node's four inventory roots are reviewed: 169 pass
+and four retain the explicit `Reflect.construct` prerequisite their
+*isConstructor.js* include needs, the same boundary the `math-namespace`
+node records. No reviewed path outside those roots changes, because no
+reviewed case outside them names a URI handling function and the new
+harness include unblocks no reviewed path. The manifest moves from 16,645
+to 16,818 cases and from 12,779 to 12,948 passes, keeps 1,556 expected
+negatives, and moves from 2,310 to 2,314 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
+to `oseo-runtime-m5-92` without adding a generated-code entry point or
+changing the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -5458,7 +5551,10 @@ complete. The remaining gaps retain their existing owners.
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
     admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
-    `Promise`, and `String` identities. Because this realm
+    `Promise`, and `String` identities. The
+    `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
+    `encodeURI`, and `encodeURIComponent` as four more replaceable
+    properties of the same object. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh
@@ -5560,10 +5656,13 @@ complete. The remaining gaps retain their existing owners.
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
-    *asyncHelpers.js*, *compareArray.js*, *nans.js*, *propertyHelper.js*,
+    *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
+    *nans.js*, *propertyHelper.js*,
     and the `checkSequence` portion of *promiseHelper.js*. *nans.js*
     joined that list with the `math-namespace` node, whose `Math.pow`
-    intrinsic was its only unadmitted dependency. Cases in the reviewed
+    intrinsic was its only unadmitted dependency, and
+    *decimalToHexString.js* with the `uri-handling-functions` node that
+    its 78 reviewed cases observe. Cases in the reviewed
     function inventory that need *nativeFunctionMatcher.js* or
     *wellKnownIntrinsicObjects.js* classify as unsupported until those
     includes have reviewed implementations. The reviewed

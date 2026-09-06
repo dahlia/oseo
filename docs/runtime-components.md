@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-four reviewed assets in this order:
+The runtime input now lists thirty-five reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -32,14 +32,14 @@ The runtime input now lists thirty-four reviewed assets in this order:
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
-*runtime\_math.c*. The M5
+*runtime\_math.c*, and *runtime\_uri.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
-RegExp-prototype-and-exec, Math-namespace, and
-RegExp-symbol-methods units each
+RegExp-prototype-and-exec, Math-namespace,
+RegExp-symbol-methods, and URI-handling-functions units each
 added one
 component the same
 way. The M5b
@@ -151,6 +151,13 @@ Ownership follows the plan's target layout:
     initialization ordinal. It owns no numeric conversion of its own:
     `ToNumber`, `ToUint32`, and Number::exponentiate stay with
     *runtime\_primitive.c*;
+ -  *runtime\_uri.c*: the four URI handling functions of 19.2.6, the
+    Encode and Decode operations they share, the unescaped and preserved
+    ASCII sets that separate the two pairs, the UTF-8 transformation both
+    directions run, and the `URIError` every malformed operand raises. It
+    owns no string representation of its own: `ToString`, the growable
+    UTF-16 builder, and string allocation stay with
+    *runtime\_primitive.c* and *runtime\_string.c*;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -304,6 +311,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_math_builtin_dispatch`               | *runtime\_math.c*             |
 | `oseo_internal_math_intrinsic`                      | *runtime\_math.c*             |
 | `oseo_internal_install_math_global`                 | *runtime\_math.c*             |
+| `oseo_internal_uri_builtin_dispatch`                | *runtime\_uri.c*              |
+| `oseo_internal_uri_intrinsic`                       | *runtime\_uri.c*              |
+| `oseo_internal_install_uri_global`                  | *runtime\_uri.c*              |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
