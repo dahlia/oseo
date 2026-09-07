@@ -161,6 +161,84 @@ function verifyPrimordialProperty(object, name, descriptor) {
   return verifyProperty(object, name, descriptor);
 }
 
+/*
+ * The upstream helper's callable variant. It checks that `object[name]`
+ * is a function, that the property carries the writable, non-enumerable,
+ * configurable data attributes clause 19 gives a built-in function
+ * property unless the case names others, and that the function's own
+ * `name` and `length` properties hold the given values with the
+ * non-writable, non-enumerable, configurable attributes SetFunctionName
+ * and SetFunctionLength define. A symbol key needs an explicit
+ * `functionName`, because symbol description reflection is outside the
+ * admitted profile. `options` is accepted for upstream call
+ * compatibility; this reviewed `verifyProperty` always restores, so the
+ * upstream restore option is implied.
+ */
+function verifyCallableProperty(
+  object,
+  name,
+  functionName,
+  functionLength,
+  descriptor,
+  options,
+) {
+  const label = __oseoKeyLabel(name);
+  const value = object && object[name];
+  assert.sameValue(typeof value, "function", label + " should be a function");
+  let expected = descriptor;
+  if (expected === undefined) {
+    expected = {
+      writable: true,
+      enumerable: false,
+      configurable: true,
+      value: value,
+    };
+  } else if (!("value" in expected) && !("get" in expected)) {
+    expected.value = value;
+  }
+  verifyProperty(object, name, expected);
+  let expectedName = functionName;
+  if (expectedName === undefined) {
+    if (typeof name === "symbol") {
+      throw new Test262Error(
+        "The reviewed helper needs an explicit function name for a symbol key.",
+      );
+    }
+    expectedName = name;
+  }
+  verifyProperty(value, "name", {
+    value: expectedName,
+    writable: false,
+    enumerable: false,
+    configurable: expected.configurable,
+  });
+  verifyProperty(value, "length", {
+    value: functionLength,
+    writable: false,
+    enumerable: false,
+    configurable: expected.configurable,
+  });
+  return true;
+}
+
+function verifyPrimordialCallableProperty(
+  object,
+  name,
+  functionName,
+  functionLength,
+  descriptor,
+  options,
+) {
+  return verifyCallableProperty(
+    object,
+    name,
+    functionName,
+    functionLength,
+    descriptor,
+    options,
+  );
+}
+
 function verifyEqualTo(object, name, value) {
   if (!__oseoSameValue(object[name], value)) {
     throw new Test262Error(

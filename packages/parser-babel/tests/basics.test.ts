@@ -240,6 +240,45 @@ test("reads the four URI handling functions as global properties", () => {
   );
 });
 
+test("reads the four global numeric functions as global properties", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof parseInt, parseInt('0x1F'), parseFloat('1.5e1'), " +
+      "isNaN('x'), isFinite('12'));",
+    sourceId: "global-numeric-functions.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  for (const name of ["parseInt", "parseFloat", "isNaN", "isFinite"]) {
+    assert.match(hir, new RegExp(`"${name}" in %b\\d+`, "u"));
+    assert.match(hir, new RegExp(`get %b\\d+\\(.*\\)\\["${name}"\\]`, "u"));
+  }
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /read \*missing intrinsic:parseInt\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete isNaN;",
+    sourceId: "delete-is-nan.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["isNaN"\]/u);
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { parseFloat = 1; }",
+    sourceId: "with-parse-float-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'parseFloat' through a with fallback/u,
+  );
+});
+
 test("reads the replaceable Array value through its global property", () => {
   const result = compileSource(babelFrontend, {
     source: "console.log(typeof Array, Array(2), Array.of(4));",
@@ -2030,6 +2069,33 @@ console.log(new Derived(1).x, new Implicit() instanceof Base);
   // synthetic rest parameter, so it is a spread super call.
   assert.match(text, /call super -> %b\d+ this\(\.\.\.%b\d+\(/u);
   assert.ok(result.mir != null);
+});
+
+test("reads the super constructor before its call arguments", () => {
+  // SuperCall, 13.3.7.1: GetSuperConstructor runs at step 3,
+  // ArgumentListEvaluation at step 4, and the IsConstructor check at
+  // step 5, so the lookup precedes the arguments while the check the
+  // construct operation performs follows them.
+  const result = compileSource(babelFrontend, {
+    source: `function sideEffect() { return 1; }
+class Derived extends Object {
+  constructor() {
+    super(sideEffect());
+  }
+}
+new Derived();
+`,
+    sourceId: "super-call-order.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const text = printMir(result.mir);
+  const lookup = text.indexOf("super-constructor super constructor");
+  const argumentCall = text.indexOf("call dynamic function value");
+  const construct = text.indexOf("construct super constructor");
+  assert.ok(lookup >= 0);
+  assert.ok(argumentCall > lookup);
+  assert.ok(construct > argumentCall);
 });
 
 test("lowers a super property reference to its base and receiver", () => {

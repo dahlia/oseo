@@ -931,6 +931,67 @@ test("populates the realm-owned URI handling functions", () => {
   assert.match(uriSource, /OSEO_ERROR_URI/u);
 });
 
+test("populates the realm-owned global numeric functions", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const numberSource = sources.get("runtime_number.c") ?? "";
+
+  for (const intrinsic of ["IS_FINITE", "IS_NAN"]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const code of ["GLOBAL_IS_FINITE", "GLOBAL_IS_NAN"]) {
+    assert.match(
+      internalHeader,
+      new RegExp(
+        `#define OSEO_${code}_CODE_ID \\\\\\n` +
+          String.raw`\s+\(OSEO_NUMBER_CODE_ID_RANGE_LAST - \d+u\)`,
+        "u",
+      ),
+    );
+  }
+  assert.match(
+    internalHeader,
+    /oseo_internal_install_global_numeric_functions/u,
+  );
+  assert.match(
+    bindingSource,
+    /oseo_internal_install_global_numeric_functions/u,
+  );
+  // The enum members are public, so a direct `oseo_intrinsic` request
+  // reaches the same materialization the global installation uses.
+  assert.match(
+    functionSource,
+    new RegExp(
+      "OSEO_INTRINSIC_IS_NAN\\)[\\s\\S]{0,80}" +
+        "oseo_internal_global_numeric_intrinsic",
+      "u",
+    ),
+  );
+  // The global parseFloat and parseInt properties are the %parseFloat%
+  // and %parseInt% objects the Number statics already bind, and the two
+  // predicates convert their operand with ToNumber before they inspect
+  // it, unlike the Number statics of the same names.
+  const installation = numberSource.slice(
+    numberSource.indexOf("oseo_internal_install_global_numeric_functions("),
+  );
+  assert.match(installation, /OSEO_INTRINSIC_NUMBER_PARSE_FLOAT/u);
+  assert.match(installation, /OSEO_INTRINSIC_NUMBER_PARSE_INT/u);
+  assert.match(
+    installation,
+    /"isFinite",\s*"isNaN",\s*"parseFloat",\s*"parseInt",/u,
+  );
+  assert.match(
+    numberSource,
+    /static OseoResult global_is_nan\([\s\S]{0,200}oseo_internal_to_number/u,
+  );
+  assert.match(
+    numberSource,
+    /static OseoResult global_is_finite\([\s\S]{0,200}oseo_internal_to_number/u,
+  );
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

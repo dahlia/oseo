@@ -423,6 +423,18 @@
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 11u)
 #define OSEO_NUMBER_TO_LOCALE_STRING_CODE_ID \
     (OSEO_NUMBER_CODE_ID_RANGE_LAST - 12u)
+/*
+ * The two global numeric predicates of 19.2.2 and 19.2.3 live in the
+ * Number range because they are the ToNumber-converting counterparts of
+ * the Number statics and share that component. The global parseFloat
+ * and parseInt properties are the %parseFloat% and %parseInt% function
+ * objects the Number statics already bind, so they need no ID of their
+ * own.
+ */
+#define OSEO_GLOBAL_IS_FINITE_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_GLOBAL_IS_NAN_CODE_ID \
+    (OSEO_NUMBER_CODE_ID_RANGE_LAST - 14u)
 
 #define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_INDEX ((size_t)11u)
 #define OSEO_ARRAY_BUFFER_CODE_ID_RANGE_FIRST \
@@ -2530,6 +2542,22 @@ OseoResult oseo_internal_install_object_global(
 );
 OseoResult oseo_internal_number_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_number_global(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * One of the realm's two lazily created global numeric predicates,
+ * `isFinite` or `isNaN`, and the global installation that binds those
+ * two together with the %parseFloat% and %parseInt% function objects the
+ * Number statics share as writable, non-enumerable, configurable
+ * properties. `intrinsic` must be OSEO_INTRINSIC_IS_FINITE or
+ * OSEO_INTRINSIC_IS_NAN.
+ */
+OseoResult oseo_internal_global_numeric_intrinsic(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+);
+OseoResult oseo_internal_install_global_numeric_functions(
     OseoContext *context,
     OseoValue global
 );

@@ -1008,6 +1008,12 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
         materialized = oseo_internal_number_intrinsic(context);
+    } else if (intrinsic == OSEO_INTRINSIC_IS_FINITE ||
+               intrinsic == OSEO_INTRINSIC_IS_NAN) {
+        materialized = oseo_internal_global_numeric_intrinsic(
+            context,
+            intrinsic
+        );
     } else if (intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_STRING &&
                 intrinsic <= OSEO_INTRINSIC_STRING_RAW)) {
@@ -2405,6 +2411,7 @@ OseoResult oseo_super_property_delete(OseoContext *context) {
 }
 
 OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
+    (void)context;
     OseoValue context_function = callee;
     if (function_has_lexical_this(callee)) {
         context_function = function_object(callee)->lexical_super;
@@ -2412,6 +2419,13 @@ OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
     OseoValue parent = is_function(context_function)
         ? function_object(context_function)->ordinary.prototype
         : oseo_undefined();
+    return normal(parent);
+}
+
+OseoResult oseo_super_constructor_check(
+    OseoContext *context,
+    OseoValue parent
+) {
     if (!function_is_constructible(parent)) {
         return oseo_internal_throw_error(
             context,

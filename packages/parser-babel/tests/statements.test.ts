@@ -835,7 +835,7 @@ test("rejects typeof of an unimplemented standard global name", () => {
     "console.log(typeof JSON);",
     "console.log(typeof eval);",
     "console.log(typeof globalThis);",
-    "console.log(typeof parseInt);",
+    "console.log(typeof Date);",
     "with ({}) { console.log(typeof JSON); }",
   ]) {
     const result = compileSource(babelFrontend, {

@@ -392,3 +392,7 @@ families:
     owner: tests/property/m5-object-own-keys.property.test.ts
     start: 0x60006100
     end: 0x600061ff
+  - family: m5-global-numeric-functions
+    owner: tests/property/m5-global-numeric-functions.property.test.ts
+    start: 0x60006200
+    end: 0x600062ff

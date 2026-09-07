@@ -9008,6 +9008,399 @@ partitions:
   - group: built-ins/encodeURIComponent
     key: f6
     path: results/built-ins/encodeURIComponent/f6.yaml
+  - group: built-ins/isFinite
+    key: 0d
+    path: results/built-ins/isFinite/0d.yaml
+  - group: built-ins/isFinite
+    key: 0e
+    path: results/built-ins/isFinite/0e.yaml
+  - group: built-ins/isFinite
+    key: "26"
+    path: results/built-ins/isFinite/26.yaml
+  - group: built-ins/isFinite
+    key: "28"
+    path: results/built-ins/isFinite/28.yaml
+  - group: built-ins/isFinite
+    key: "31"
+    path: results/built-ins/isFinite/31.yaml
+  - group: built-ins/isFinite
+    key: "53"
+    path: results/built-ins/isFinite/53.yaml
+  - group: built-ins/isFinite
+    key: "69"
+    path: results/built-ins/isFinite/69.yaml
+  - group: built-ins/isFinite
+    key: 6e
+    path: results/built-ins/isFinite/6e.yaml
+  - group: built-ins/isFinite
+    key: 9c
+    path: results/built-ins/isFinite/9c.yaml
+  - group: built-ins/isFinite
+    key: ca
+    path: results/built-ins/isFinite/ca.yaml
+  - group: built-ins/isFinite
+    key: d8
+    path: results/built-ins/isFinite/d8.yaml
+  - group: built-ins/isFinite
+    key: e2
+    path: results/built-ins/isFinite/e2.yaml
+  - group: built-ins/isFinite
+    key: ea
+    path: results/built-ins/isFinite/ea.yaml
+  - group: built-ins/isFinite
+    key: ee
+    path: results/built-ins/isFinite/ee.yaml
+  - group: built-ins/isNaN
+    key: "26"
+    path: results/built-ins/isNaN/26.yaml
+  - group: built-ins/isNaN
+    key: "29"
+    path: results/built-ins/isNaN/29.yaml
+  - group: built-ins/isNaN
+    key: "33"
+    path: results/built-ins/isNaN/33.yaml
+  - group: built-ins/isNaN
+    key: "55"
+    path: results/built-ins/isNaN/55.yaml
+  - group: built-ins/isNaN
+    key: "62"
+    path: results/built-ins/isNaN/62.yaml
+  - group: built-ins/isNaN
+    key: 6c
+    path: results/built-ins/isNaN/6c.yaml
+  - group: built-ins/isNaN
+    key: 6e
+    path: results/built-ins/isNaN/6e.yaml
+  - group: built-ins/isNaN
+    key: 6f
+    path: results/built-ins/isNaN/6f.yaml
+  - group: built-ins/isNaN
+    key: "96"
+    path: results/built-ins/isNaN/96.yaml
+  - group: built-ins/isNaN
+    key: a6
+    path: results/built-ins/isNaN/a6.yaml
+  - group: built-ins/isNaN
+    key: b1
+    path: results/built-ins/isNaN/b1.yaml
+  - group: built-ins/isNaN
+    key: b6
+    path: results/built-ins/isNaN/b6.yaml
+  - group: built-ins/isNaN
+    key: c8
+    path: results/built-ins/isNaN/c8.yaml
+  - group: built-ins/isNaN
+    key: ce
+    path: results/built-ins/isNaN/ce.yaml
+  - group: built-ins/isNaN
+    key: df
+    path: results/built-ins/isNaN/df.yaml
+  - group: built-ins/parseFloat
+    key: "03"
+    path: results/built-ins/parseFloat/03.yaml
+  - group: built-ins/parseFloat
+    key: "07"
+    path: results/built-ins/parseFloat/07.yaml
+  - group: built-ins/parseFloat
+    key: 0a
+    path: results/built-ins/parseFloat/0a.yaml
+  - group: built-ins/parseFloat
+    key: 0b
+    path: results/built-ins/parseFloat/0b.yaml
+  - group: built-ins/parseFloat
+    key: 0e
+    path: results/built-ins/parseFloat/0e.yaml
+  - group: built-ins/parseFloat
+    key: "16"
+    path: results/built-ins/parseFloat/16.yaml
+  - group: built-ins/parseFloat
+    key: "17"
+    path: results/built-ins/parseFloat/17.yaml
+  - group: built-ins/parseFloat
+    key: "24"
+    path: results/built-ins/parseFloat/24.yaml
+  - group: built-ins/parseFloat
+    key: 2b
+    path: results/built-ins/parseFloat/2b.yaml
+  - group: built-ins/parseFloat
+    key: 3b
+    path: results/built-ins/parseFloat/3b.yaml
+  - group: built-ins/parseFloat
+    key: 4a
+    path: results/built-ins/parseFloat/4a.yaml
+  - group: built-ins/parseFloat
+    key: 4d
+    path: results/built-ins/parseFloat/4d.yaml
+  - group: built-ins/parseFloat
+    key: "50"
+    path: results/built-ins/parseFloat/50.yaml
+  - group: built-ins/parseFloat
+    key: 5d
+    path: results/built-ins/parseFloat/5d.yaml
+  - group: built-ins/parseFloat
+    key: "69"
+    path: results/built-ins/parseFloat/69.yaml
+  - group: built-ins/parseFloat
+    key: 6b
+    path: results/built-ins/parseFloat/6b.yaml
+  - group: built-ins/parseFloat
+    key: 6f
+    path: results/built-ins/parseFloat/6f.yaml
+  - group: built-ins/parseFloat
+    key: "70"
+    path: results/built-ins/parseFloat/70.yaml
+  - group: built-ins/parseFloat
+    key: "75"
+    path: results/built-ins/parseFloat/75.yaml
+  - group: built-ins/parseFloat
+    key: "79"
+    path: results/built-ins/parseFloat/79.yaml
+  - group: built-ins/parseFloat
+    key: 7d
+    path: results/built-ins/parseFloat/7d.yaml
+  - group: built-ins/parseFloat
+    key: 7f
+    path: results/built-ins/parseFloat/7f.yaml
+  - group: built-ins/parseFloat
+    key: "81"
+    path: results/built-ins/parseFloat/81.yaml
+  - group: built-ins/parseFloat
+    key: "84"
+    path: results/built-ins/parseFloat/84.yaml
+  - group: built-ins/parseFloat
+    key: 8b
+    path: results/built-ins/parseFloat/8b.yaml
+  - group: built-ins/parseFloat
+    key: "91"
+    path: results/built-ins/parseFloat/91.yaml
+  - group: built-ins/parseFloat
+    key: "92"
+    path: results/built-ins/parseFloat/92.yaml
+  - group: built-ins/parseFloat
+    key: "94"
+    path: results/built-ins/parseFloat/94.yaml
+  - group: built-ins/parseFloat
+    key: "98"
+    path: results/built-ins/parseFloat/98.yaml
+  - group: built-ins/parseFloat
+    key: "99"
+    path: results/built-ins/parseFloat/99.yaml
+  - group: built-ins/parseFloat
+    key: a2
+    path: results/built-ins/parseFloat/a2.yaml
+  - group: built-ins/parseFloat
+    key: a9
+    path: results/built-ins/parseFloat/a9.yaml
+  - group: built-ins/parseFloat
+    key: ae
+    path: results/built-ins/parseFloat/ae.yaml
+  - group: built-ins/parseFloat
+    key: b8
+    path: results/built-ins/parseFloat/b8.yaml
+  - group: built-ins/parseFloat
+    key: b9
+    path: results/built-ins/parseFloat/b9.yaml
+  - group: built-ins/parseFloat
+    key: be
+    path: results/built-ins/parseFloat/be.yaml
+  - group: built-ins/parseFloat
+    key: c0
+    path: results/built-ins/parseFloat/c0.yaml
+  - group: built-ins/parseFloat
+    key: c1
+    path: results/built-ins/parseFloat/c1.yaml
+  - group: built-ins/parseFloat
+    key: c4
+    path: results/built-ins/parseFloat/c4.yaml
+  - group: built-ins/parseFloat
+    key: c5
+    path: results/built-ins/parseFloat/c5.yaml
+  - group: built-ins/parseFloat
+    key: cc
+    path: results/built-ins/parseFloat/cc.yaml
+  - group: built-ins/parseFloat
+    key: cd
+    path: results/built-ins/parseFloat/cd.yaml
+  - group: built-ins/parseFloat
+    key: cf
+    path: results/built-ins/parseFloat/cf.yaml
+  - group: built-ins/parseFloat
+    key: d2
+    path: results/built-ins/parseFloat/d2.yaml
+  - group: built-ins/parseFloat
+    key: da
+    path: results/built-ins/parseFloat/da.yaml
+  - group: built-ins/parseFloat
+    key: dc
+    path: results/built-ins/parseFloat/dc.yaml
+  - group: built-ins/parseFloat
+    key: e5
+    path: results/built-ins/parseFloat/e5.yaml
+  - group: built-ins/parseFloat
+    key: e7
+    path: results/built-ins/parseFloat/e7.yaml
+  - group: built-ins/parseFloat
+    key: ee
+    path: results/built-ins/parseFloat/ee.yaml
+  - group: built-ins/parseFloat
+    key: f8
+    path: results/built-ins/parseFloat/f8.yaml
+  - group: built-ins/parseFloat
+    key: f9
+    path: results/built-ins/parseFloat/f9.yaml
+  - group: built-ins/parseInt
+    key: 0b
+    path: results/built-ins/parseInt/0b.yaml
+  - group: built-ins/parseInt
+    key: "12"
+    path: results/built-ins/parseInt/12.yaml
+  - group: built-ins/parseInt
+    key: 1a
+    path: results/built-ins/parseInt/1a.yaml
+  - group: built-ins/parseInt
+    key: "28"
+    path: results/built-ins/parseInt/28.yaml
+  - group: built-ins/parseInt
+    key: "29"
+    path: results/built-ins/parseInt/29.yaml
+  - group: built-ins/parseInt
+    key: 2d
+    path: results/built-ins/parseInt/2d.yaml
+  - group: built-ins/parseInt
+    key: 2e
+    path: results/built-ins/parseInt/2e.yaml
+  - group: built-ins/parseInt
+    key: 2f
+    path: results/built-ins/parseInt/2f.yaml
+  - group: built-ins/parseInt
+    key: "35"
+    path: results/built-ins/parseInt/35.yaml
+  - group: built-ins/parseInt
+    key: "38"
+    path: results/built-ins/parseInt/38.yaml
+  - group: built-ins/parseInt
+    key: "39"
+    path: results/built-ins/parseInt/39.yaml
+  - group: built-ins/parseInt
+    key: 3f
+    path: results/built-ins/parseInt/3f.yaml
+  - group: built-ins/parseInt
+    key: "47"
+    path: results/built-ins/parseInt/47.yaml
+  - group: built-ins/parseInt
+    key: "49"
+    path: results/built-ins/parseInt/49.yaml
+  - group: built-ins/parseInt
+    key: 4a
+    path: results/built-ins/parseInt/4a.yaml
+  - group: built-ins/parseInt
+    key: 4d
+    path: results/built-ins/parseInt/4d.yaml
+  - group: built-ins/parseInt
+    key: 4e
+    path: results/built-ins/parseInt/4e.yaml
+  - group: built-ins/parseInt
+    key: "51"
+    path: results/built-ins/parseInt/51.yaml
+  - group: built-ins/parseInt
+    key: "52"
+    path: results/built-ins/parseInt/52.yaml
+  - group: built-ins/parseInt
+    key: 6d
+    path: results/built-ins/parseInt/6d.yaml
+  - group: built-ins/parseInt
+    key: 6f
+    path: results/built-ins/parseInt/6f.yaml
+  - group: built-ins/parseInt
+    key: "76"
+    path: results/built-ins/parseInt/76.yaml
+  - group: built-ins/parseInt
+    key: "82"
+    path: results/built-ins/parseInt/82.yaml
+  - group: built-ins/parseInt
+    key: "90"
+    path: results/built-ins/parseInt/90.yaml
+  - group: built-ins/parseInt
+    key: a0
+    path: results/built-ins/parseInt/a0.yaml
+  - group: built-ins/parseInt
+    key: a1
+    path: results/built-ins/parseInt/a1.yaml
+  - group: built-ins/parseInt
+    key: a4
+    path: results/built-ins/parseInt/a4.yaml
+  - group: built-ins/parseInt
+    key: a6
+    path: results/built-ins/parseInt/a6.yaml
+  - group: built-ins/parseInt
+    key: af
+    path: results/built-ins/parseInt/af.yaml
+  - group: built-ins/parseInt
+    key: b9
+    path: results/built-ins/parseInt/b9.yaml
+  - group: built-ins/parseInt
+    key: bb
+    path: results/built-ins/parseInt/bb.yaml
+  - group: built-ins/parseInt
+    key: be
+    path: results/built-ins/parseInt/be.yaml
+  - group: built-ins/parseInt
+    key: c0
+    path: results/built-ins/parseInt/c0.yaml
+  - group: built-ins/parseInt
+    key: c1
+    path: results/built-ins/parseInt/c1.yaml
+  - group: built-ins/parseInt
+    key: c6
+    path: results/built-ins/parseInt/c6.yaml
+  - group: built-ins/parseInt
+    key: c7
+    path: results/built-ins/parseInt/c7.yaml
+  - group: built-ins/parseInt
+    key: cb
+    path: results/built-ins/parseInt/cb.yaml
+  - group: built-ins/parseInt
+    key: cc
+    path: results/built-ins/parseInt/cc.yaml
+  - group: built-ins/parseInt
+    key: cd
+    path: results/built-ins/parseInt/cd.yaml
+  - group: built-ins/parseInt
+    key: ce
+    path: results/built-ins/parseInt/ce.yaml
+  - group: built-ins/parseInt
+    key: d1
+    path: results/built-ins/parseInt/d1.yaml
+  - group: built-ins/parseInt
+    key: d4
+    path: results/built-ins/parseInt/d4.yaml
+  - group: built-ins/parseInt
+    key: df
+    path: results/built-ins/parseInt/df.yaml
+  - group: built-ins/parseInt
+    key: e0
+    path: results/built-ins/parseInt/e0.yaml
+  - group: built-ins/parseInt
+    key: e2
+    path: results/built-ins/parseInt/e2.yaml
+  - group: built-ins/parseInt
+    key: e4
+    path: results/built-ins/parseInt/e4.yaml
+  - group: built-ins/parseInt
+    key: e6
+    path: results/built-ins/parseInt/e6.yaml
+  - group: built-ins/parseInt
+    key: ea
+    path: results/built-ins/parseInt/ea.yaml
+  - group: built-ins/parseInt
+    key: ee
+    path: results/built-ins/parseInt/ee.yaml
+  - group: built-ins/parseInt
+    key: f1
+    path: results/built-ins/parseInt/f1.yaml
+  - group: built-ins/parseInt
+    key: f9
+    path: results/built-ins/parseInt/f9.yaml
   - group: built-ins/undefined
     key: 2e
     path: results/built-ins/undefined/2e.yaml
@@ -11902,17 +12295,17 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 13301
+  passes: 13449
   semanticFailures: 0
-  unsupportedProfileFeatures: 2347
+  unsupportedProfileFeatures: 2338
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 121
+      passes: 141
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 17
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -11945,9 +12338,9 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 857
+      passes: 858
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 71
     - dependency: control-flow
       expectedNegatives: 225
       harnessFailures: 0
@@ -12001,9 +12394,9 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3746
+      passes: 3754
       semanticFailures: 0
-      unsupportedProfileFeatures: 1073
+      unsupportedProfileFeatures: 1065
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -12050,9 +12443,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8847
+      passes: 8994
       semanticFailures: 0
-      unsupportedProfileFeatures: 869
+      unsupportedProfileFeatures: 861
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -12064,7 +12457,7 @@ summary:
       expectedNegatives: 67
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 38
+      passes: 40
       semanticFailures: 0
       unsupportedProfileFeatures: 25
     - dependency: regular-expressions
@@ -12085,7 +12478,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 506
+      passes: 520
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: top-level-await
@@ -12114,9 +12507,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2564
+      passes: 2572
       semanticFailures: 0
-      unsupportedProfileFeatures: 288
+      unsupportedProfileFeatures: 280
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -12205,9 +12598,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5
+      passes: 6
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/Iterator
       expectedNegatives: 0
       harnessFailures: 0
@@ -12254,9 +12647,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 312
+      passes: 318
       semanticFailures: 0
-      unsupportedProfileFeatures: 28
+      unsupportedProfileFeatures: 22
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
@@ -12334,6 +12727,34 @@ summary:
       passes: 30
       semanticFailures: 0
       unsupportedProfileFeatures: 1
+    - group: built-ins/isFinite
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 14
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/isNaN
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 14
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/parseFloat
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 52
+      semanticFailures: 0
+      unsupportedProfileFeatures: 2
+    - group: built-ins/parseInt
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 52
+      semanticFailures: 0
+      unsupportedProfileFeatures: 3
     - group: built-ins/undefined
       expectedNegatives: 0
       harnessFailures: 0
@@ -12380,9 +12801,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1446
+      passes: 1447
       semanticFailures: 0
-      unsupportedProfileFeatures: 145
+      unsupportedProfileFeatures: 144
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0

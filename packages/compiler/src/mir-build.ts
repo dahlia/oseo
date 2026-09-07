@@ -4958,6 +4958,12 @@ function lowerSuperCall(
   thisBinding: { readonly bindingId: number },
   builder: MirBuilder,
 ): number {
+  // SuperCall, 13.3.7.1: GetSuperConstructor reads the running
+  // constructor's [[Prototype]] at step 3 and cannot fail, Arguments are
+  // evaluated at step 4, and only step 5 checks IsConstructor. The lookup
+  // therefore stays ahead of the arguments, and the construct operation
+  // performs the check after they are evaluated, so an argument side
+  // effect is observed even when the check then throws.
   appendMirMetadata(
     builder,
     "safepoint",
