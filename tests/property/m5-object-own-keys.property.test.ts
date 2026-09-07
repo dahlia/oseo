@@ -29,6 +29,14 @@ const { assertAsyncProperty } = await import(
 interface PropertyCase {
   readonly booleanEntryValue: number;
   readonly entries: readonly EntryCase[];
+  readonly entryStringParts: readonly (
+    | "a"
+    | "b"
+    | "🥰"
+    | "💩"
+    | "\ud800"
+    | "\udfff"
+  )[];
   readonly grouped: readonly number[];
   readonly laterSymbolEnumerable: boolean;
   readonly numberIteratorValues: readonly number[];
@@ -62,6 +70,15 @@ const caseArbitrary: fc.Arbitrary<PropertyCase> = fc.record({
     minLength: 1,
     selector: (entry) => entry.key,
   }),
+  // The empty String is a valid empty iterable, so this domain
+  // deliberately admits it alongside non-empty code-point sequences.
+  // Unpaired surrogate halves belong here too: nothing this domain
+  // observes prints the String itself, so a lone half exercises the
+  // shared code-point step without depending on how a host encodes it.
+  entryStringParts: fc.array(
+    fc.constantFrom("a", "b", "🥰", "💩", "\ud800", "\udfff"),
+    { maxLength: 3, minLength: 0 },
+  ),
   grouped: fc.array(fc.integer({ max: 6, min: -6 }), { maxLength: 5 }),
   laterSymbolEnumerable: fc.boolean(),
   numberIteratorValues: fc.array(fc.integer({ max: 6, min: -6 }), {
@@ -256,6 +273,43 @@ console.log(
   render(wrapperCallbacks),
   render(groupedWrapperString.wrapper),
 );
+const entryString = ${JSON.stringify(testCase.entryStringParts.join(""))};
+for (const entrySource of [entryString, new String(entryString)]) {
+  try {
+    const built = Object.fromEntries(entrySource);
+    console.log(
+      "from entries default string",
+      "built",
+      Object.getOwnPropertyNames(built).length,
+      Object.getOwnPropertySymbols(built).length,
+    );
+  } catch (error) {
+    console.log(
+      "from entries default string",
+      "threw",
+      error instanceof TypeError &&
+        error.message.indexOf("entry object") >= 0,
+    );
+  }
+}
+const ownEntryWrapper = new String(entryString);
+ownEntryWrapper[Symbol.iterator] = function () {
+  let done = false;
+  return {
+    next: function () {
+      if (done) return { done: true };
+      done = true;
+      return { done: false, value: ["own", ${testCase.booleanEntryValue}] };
+    },
+  };
+};
+const ownEntryResult = Object.fromEntries(ownEntryWrapper);
+console.log(
+  "from entries own string iterator",
+  Object.hasOwn(ownEntryWrapper, Symbol.iterator),
+  render(Object.getOwnPropertyNames(ownEntryResult)),
+  ownEntryResult.own,
+);
 const assignedStringIterator = function () {
   let done = false;
   return {
@@ -378,6 +432,18 @@ try {
     error instanceof TypeError,
     deletedStringIteratorCalls,
   );
+}
+for (const deletedSource of [entryString, new String(entryString)]) {
+  try {
+    Object.fromEntries(deletedSource);
+    console.log("from entries deleted string iterator", "no error");
+  } catch (error) {
+    console.log(
+      "from entries deleted string iterator",
+      error instanceof TypeError,
+      error.message.indexOf("entry object") >= 0,
+    );
+  }
 }
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   configurable: true,
@@ -507,6 +573,13 @@ function expected(testCase: PropertyCase): string {
   const assignedSymbols = new Set(
     symbols.filter((entry) => entry.enumerable).map((entry) => entry.key),
   );
+  // The default String path reports the same line for the primitive and
+  // its wrapper: an empty String is a valid empty iterable, and every
+  // element a non-empty String yields fails the entry-object check.
+  const defaultStringEntryLine =
+    testCase.entryStringParts.length === 0
+      ? "from entries default string built 0 0"
+      : "from entries default string threw true";
   const lines = [
     `keys ${enumerableStrings.map((entry) => entry.key).join(",")}`,
     `values ${enumerableStrings.map((entry) => entry.value).join(",")}`,
@@ -567,6 +640,10 @@ function expected(testCase: PropertyCase): string {
     `group wrapper string ${testCase.wrapperParts
       .map((part, index) => `${index}:${part}`)
       .join(",")} ${testCase.wrapperParts.join(",")}`,
+    defaultStringEntryLine,
+    defaultStringEntryLine,
+    "from entries own string iterator true own " +
+      String(testCase.booleanEntryValue),
     "assigned string iterator true true true true " +
       `${String(testCase.virtualIteratorEnumerable)} true 2 true true ` +
       "1 assigned",
@@ -582,6 +659,8 @@ function expected(testCase: PropertyCase): string {
     "string iterator reflection deleted false false false false false " +
       "absent absent absent",
     "group deleted string iterator true 0",
+    "from entries deleted string iterator true false",
+    "from entries deleted string iterator true false",
     "redefined string iterator order 2 true true",
     "string iterator reflection redefined true true true true true " +
       "data true true",
@@ -725,7 +804,10 @@ test(
           "propertyIsEnumerable, the in operator, and the own descriptor; " +
           "inherited Number and Boolean iterators through built-in and " +
           "generated consumers; nullish and absent-iterator failures; a " +
-          "false hint and one shape-guard miss",
+          "false hint and one shape-guard miss; zero to three code points, " +
+          "including unpaired surrogate halves, built into an object " +
+          "through Object.fromEntries with the default, own, and deleted " +
+          "String iterator",
         numRuns: 16,
         profile: "M5 Object own-key statics",
         seed: 0x6000_6100,
@@ -736,9 +818,10 @@ test(
           "iterator reflection observations, eleven assignment " +
           "observations, two Boolean " +
           "iterator observations, four nullish " +
-          "observations, three invalid for-of observations, and four " +
-          "specialization observations",
-        timeLimitMilliseconds: 180_000,
+          "observations, three invalid for-of observations, four " +
+          "specialization observations, and three fromEntries String " +
+          "code points",
+        timeLimitMilliseconds: 240_000,
       },
     );
   },

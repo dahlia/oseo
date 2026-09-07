@@ -5520,8 +5520,13 @@ pair through CreateDataProperty and closes the iterator on abrupt entry
 processing. `hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy`
 converts callback results through ToPropertyKey, appends values to arrays on a
 null-prototype result, and closes an acquired iterator after callback or key
-failure. Its default primitive String path consumes Unicode code points while
-the separate String iterator node remains unmaterialized. One own-property
+failure. `fromEntries` and `groupBy` share one default primitive String path
+that consumes Unicode code points while the separate String iterator node
+remains unmaterialized, so an empty String or empty String wrapper builds an
+empty object and a non-empty one fails on its first primitive element. Either
+static takes that path only while the realm's virtual
+%String.prototype%[`Symbol.iterator`] is the nearest iterator the value
+reaches. One own-property
 descriptor primitive answers every reflective query, so `Object.hasOwn`,
 inherited `hasOwnProperty`, `propertyIsEnumerable`, the `in` operator,
 descriptor reads, redefinition rechecks, own-key spread, and assignment agree
@@ -5537,8 +5542,10 @@ virtual.
 Fixed native and generated differential evidence at seed `0x60006100` covers
 both specialization policies, forced collection at every safepoint, integer,
 string, and symbol key ordering, mutation during enumeration, assignment
-accessors, iterator closing, null-prototype groups, ordinary assignment to
-the virtual property and through a String wrapper, read-only refusal, frozen
+accessors, iterator closing, null-prototype groups, empty and non-empty
+Strings and String wrappers built through `fromEntries` with the default,
+own, inherited, replaced, and deleted iterator, ordinary assignment to the
+virtual property and through a String wrapper, read-only refusal, frozen
 redefinition, false hints, deliberate shape-guard misses, and generic
 fallback. Of the 296 paths under the node's
 inventory roots, 295 are reviewed: 259 pass and 36 retain explicit prerequisite

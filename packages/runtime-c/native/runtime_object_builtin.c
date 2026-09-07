@@ -2264,12 +2264,134 @@ static OseoResult object_has_own(
     return result;
 }
 
+/* Recover the String value a primitive or [[StringData]] wrapper stores. */
+static bool object_string_value(OseoValue source, OseoValue *string_value) {
+    if (is_string(source)) {
+        *string_value = source;
+        return true;
+    }
+    if (!oseo_internal_string_data(source)) return false;
+    *string_value = ordinary_object(source)->primitive_value;
+    return true;
+}
+
+/*
+ * Decide whether a value iterates as a String through the realm's
+ * untouched virtual %String.prototype%[Symbol.iterator]. A primitive
+ * String or a [[StringData]] wrapper that still reaches that default has
+ * no iterator object to acquire, so the caller walks code points itself.
+ * Anything else, including an own, inherited, replaced, or deleted
+ * iterator, reports false and goes through observable iterator
+ * acquisition. Both intrinsic lookups can allocate, so the frame roots
+ * the source and its [[StringData]] rather than relying on the caller to
+ * keep them reachable, and `string_value` is written after the last
+ * allocation so the caller's rooted slot receives a live value.
+ */
+static OseoResult object_virtual_string_iteration(
+    OseoContext *context,
+    OseoValue source,
+    OseoValue *string_value,
+    bool *direct
+) {
+    *direct = false;
+    OseoValue candidate = oseo_undefined();
+    if (!object_string_value(source, &candidate)) {
+        return normal(oseo_undefined());
+    }
+    OseoValue slots[3] = {source, candidate, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ITERATOR
+    );
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_primitive_wrapper_prototype(
+            context,
+            OSEO_INTRINSIC_STRING_PROTOTYPE
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /* The prototype is used before the next allocation, so it needs
+         * no slot of its own. */
+        *direct = oseo_internal_uses_virtual_string_iterator(
+            slots[0],
+            result.value,
+            slots[2]
+        );
+        *string_value = slots[1];
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Code-unit length of the code point the default String iterator yields
+ * at `offset`, pairing a leading surrogate with a following trailing one
+ * and reporting a lone surrogate as a single unit. Each caller reacquires
+ * its OseoString from a rooted slot on every step, so the interior
+ * `units` pointer it then hands to oseo_string_from_units stays valid:
+ * the collector sweeps unreachable objects in place and never relocates a
+ * reachable one.
+ */
+static size_t object_string_element_length(
+    const OseoString *source,
+    size_t offset
+) {
+    uint16_t first = source->units[offset];
+    if (first < UINT16_C(0xd800) || first > UINT16_C(0xdbff)) return 1u;
+    if (offset + 1u >= source->length) return 1u;
+    uint16_t second = source->units[offset + 1u];
+    if (second < UINT16_C(0xdc00) || second > UINT16_C(0xdfff)) return 1u;
+    return 2u;
+}
+
+/*
+ * CreateDataPropertyOnObject (20.1.2.7 step 5.c onward) for the entry now
+ * in slots[4], defining its "0" key and "1" value on the target object in
+ * slots[3]. slots[5] through slots[7] are the caller's rooted scratch.
+ */
+static OseoResult object_define_entry(OseoContext *context, OseoValue *slots) {
+    if (!is_object(slots[4])) {
+        return type_error(context, "Iterator value is not an entry object.");
+    }
+    OseoResult result = oseo_internal_ascii_string(context, "0");
+    slots[5] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[4], slots[5]);
+        slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "1");
+        slots[6] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[4], slots[6]);
+        slots[6] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_property_key(context, slots[5]);
+        slots[7] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            slots[3],
+            slots[7],
+            slots[6],
+            (OseoPropertyAttributes){true, true, true, false}
+        );
+    }
+    return result;
+}
+
 static OseoResult object_from_entries(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    OseoValue slots[8] = {
+    OseoValue slots[9] = {
         builtin_argument(argument_count, arguments, 0u),
         oseo_undefined(),
         oseo_undefined(),
@@ -2278,55 +2400,59 @@ static OseoResult object_from_entries(
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
+        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 8u};
+    OseoRootFrame frame = {NULL, slots, 9u};
     oseo_roots_push(context, &frame);
-    OseoResult result = oseo_object_literal_create(context);
-    slots[3] = result.value;
+    bool direct_string = false;
+    OseoResult result = object_virtual_string_iteration(
+        context,
+        slots[0],
+        &slots[8],
+        &direct_string
+    );
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_literal_create(context);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !direct_string) {
         result = oseo_iterator_get(context, slots[0], &slots[2]);
         slots[1] = result.value;
     }
+    if (result.status == OSEO_STATUS_NORMAL && direct_string) {
+        /*
+         * The separate String iterator node has not materialized an
+         * iterator object yet, so walk the default code-point sequence
+         * here as Object.groupBy and Array.from do. An empty String
+         * yields nothing and produces an empty object; every element a
+         * non-empty String yields is a primitive, so the first one
+         * reaches the entry-object TypeError below. There is no iterator
+         * object to close on that abrupt completion.
+         */
+        size_t offset = 0u;
+        while (result.status == OSEO_STATUS_NORMAL) {
+            OseoString *source = string_object(slots[8]);
+            if (offset >= source->length) break;
+            size_t element_length =
+                object_string_element_length(source, offset);
+            result = oseo_string_from_units(
+                context,
+                &source->units[offset],
+                element_length
+            );
+            slots[4] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = object_define_entry(context, slots);
+            }
+            offset += element_length;
+        }
+    }
     bool done = false;
-    while (result.status == OSEO_STATUS_NORMAL && !done) {
+    while (result.status == OSEO_STATUS_NORMAL && !direct_string && !done) {
         result = oseo_iterator_next(
             context, slots[1], slots[2], &slots[4], &done);
         if (result.status != OSEO_STATUS_NORMAL || done) break;
-        if (!is_object(slots[4])) {
-            result = type_error(
-                context,
-                "Iterator value is not an entry object."
-            );
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_ascii_string(context, "0");
-            slots[5] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_get(context, slots[4], slots[5]);
-            slots[5] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_ascii_string(context, "1");
-            slots[6] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_get(context, slots[4], slots[6]);
-            slots[6] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_property_key(context, slots[5]);
-            slots[7] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_define(
-                context,
-                slots[3],
-                slots[7],
-                slots[6],
-                (OseoPropertyAttributes){true, true, true, false}
-            );
-        }
+        result = object_define_entry(context, slots);
         if (result.status != OSEO_STATUS_NORMAL) {
             result = object_close_after_abrupt(context, slots[1], result);
         }
@@ -2385,26 +2511,12 @@ static OseoResult object_add_grouped_value(
     return result;
 }
 
-/* Recover the String value a primitive or [[StringData]] wrapper stores. */
-static bool object_group_by_string_value(
-    OseoValue source,
-    OseoValue *string_value
-) {
-    if (is_string(source)) {
-        *string_value = source;
-        return true;
-    }
-    if (!oseo_internal_string_data(source)) return false;
-    *string_value = ordinary_object(source)->primitive_value;
-    return true;
-}
-
 static OseoResult object_group_by(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    OseoValue slots[11] = {
+    OseoValue slots[9] = {
         builtin_argument(argument_count, arguments, 0u),
         builtin_argument(argument_count, arguments, 1u),
         oseo_undefined(),
@@ -2414,10 +2526,8 @@ static OseoResult object_group_by(
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
-        oseo_undefined(),
-        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 11u};
+    OseoRootFrame frame = {NULL, slots, 9u};
     oseo_roots_push(context, &frame);
     OseoResult result = normal(oseo_undefined());
     if (is_nullish(slots[0])) {
@@ -2429,25 +2539,13 @@ static OseoResult object_group_by(
         );
     }
     bool direct_string = false;
-    bool has_string_value = result.status == OSEO_STATUS_NORMAL &&
-        object_group_by_string_value(slots[0], &slots[10]);
-    if (result.status == OSEO_STATUS_NORMAL && has_string_value) {
-        result = oseo_internal_well_known_symbol(
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = object_virtual_string_iteration(
             context,
-            OSEO_WELL_KNOWN_ITERATOR
+            slots[0],
+            &slots[8],
+            &direct_string
         );
-        slots[8] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL && has_string_value) {
-        result = oseo_internal_primitive_wrapper_prototype(
-            context,
-            OSEO_INTRINSIC_STRING_PROTOTYPE
-        );
-        slots[9] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            direct_string = oseo_internal_uses_virtual_string_iterator(
-                slots[0], slots[9], slots[8]);
-        }
     }
     if (result.status == OSEO_STATUS_NORMAL && !direct_string) {
         result = oseo_iterator_get(context, slots[0], &slots[3]);
@@ -2467,19 +2565,10 @@ static OseoResult object_group_by(
          */
         size_t offset = 0u;
         while (result.status == OSEO_STATUS_NORMAL) {
-            OseoString *source = string_object(slots[10]);
+            OseoString *source = string_object(slots[8]);
             if (offset >= source->length) break;
-            size_t element_length = 1u;
-            uint16_t first = source->units[offset];
-            if (first >= UINT16_C(0xd800) &&
-                first <= UINT16_C(0xdbff) &&
-                offset + 1u < source->length) {
-                uint16_t second = source->units[offset + 1u];
-                if (second >= UINT16_C(0xdc00) &&
-                    second <= UINT16_C(0xdfff)) {
-                    element_length = 2u;
-                }
-            }
+            size_t element_length =
+                object_string_element_length(source, offset);
             result = oseo_string_from_units(
                 context,
                 &source->units[offset],

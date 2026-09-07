@@ -279,6 +279,98 @@ console.log(
   render(wrapperCallbacks),
   render(groupedWrapperString.all),
 );
+/* The shared code-point step pairs a leading surrogate only with a
+ * following trailing one, so a lone half stays its own element. Recording
+ * code units instead of the elements themselves keeps the observation
+ * independent of how each host encodes an unpaired surrogate. */
+const surrogateElements = [];
+Object.groupBy("\\ud800\\ud83d\\ude00\\udfff\\ud800", (value) => {
+  surrogateElements.push(value.length + ":" + value.charCodeAt(0));
+  return "all";
+});
+console.log("grouped surrogate elements", render(surrogateElements));
+/* Object.fromEntries walks the same default String code points. An empty
+ * String and an empty wrapper are valid empty iterables, so each must
+ * build an empty object rather than report the unmaterialized default as
+ * a missing iterator. A non-empty String is consumed and then fails on
+ * its first primitive element, which the entry-object message separates
+ * from a not-iterable failure. */
+function entryObjectFailure(error) {
+  return error instanceof TypeError &&
+    error.message.indexOf("entry object") >= 0;
+}
+const emptyStringEntries = Object.fromEntries("");
+const emptyWrapperEntries = Object.fromEntries(new String(""));
+console.log(
+  "from entries default empty string",
+  Object.getOwnPropertyNames(emptyStringEntries).length,
+  Object.getOwnPropertySymbols(emptyStringEntries).length,
+  Object.getPrototypeOf(emptyStringEntries) === Object.prototype,
+  Object.getOwnPropertyNames(emptyWrapperEntries).length,
+  Object.getPrototypeOf(emptyWrapperEntries) === Object.prototype,
+);
+for (
+  const nonEmpty of [
+    "a",
+    "🥰b",
+    "\\ud800",
+    "\\udfff\\ud800",
+    new String("ab"),
+    new String("🥰"),
+    new String("\\ud800"),
+  ]
+) {
+  try {
+    Object.fromEntries(nonEmpty);
+    console.log("from entries default string element", "no error");
+  } catch (error) {
+    console.log(
+      "from entries default string element",
+      entryObjectFailure(error),
+    );
+  }
+}
+const entryWrapper = new String("ignored");
+let entryWrapperReceiverIsWrapper = false;
+entryWrapper[Symbol.iterator] = function () {
+  entryWrapperReceiverIsWrapper = this === entryWrapper;
+  let done = false;
+  return {
+    next: function () {
+      if (done) return { done: true };
+      done = true;
+      return { done: false, value: ["own", 7] };
+    },
+  };
+};
+const ownIteratorEntries = Object.fromEntries(entryWrapper);
+console.log(
+  "from entries own string iterator",
+  Object.hasOwn(entryWrapper, Symbol.iterator),
+  entryWrapperReceiverIsWrapper,
+  render(Object.getOwnPropertyNames(ownIteratorEntries)),
+  ownIteratorEntries.own,
+);
+class EntryString extends String {}
+EntryString.prototype[Symbol.iterator] = function () {
+  let done = false;
+  return {
+    next: function () {
+      if (done) return { done: true };
+      done = true;
+      return { done: false, value: ["inherited", 9] };
+    },
+  };
+};
+const inheritedIteratorEntries = Object.fromEntries(new EntryString("ab"));
+const inheritedEmptyEntries = Object.fromEntries(new EntryString(""));
+console.log(
+  "from entries inherited string iterator",
+  render(Object.getOwnPropertyNames(inheritedIteratorEntries)),
+  inheritedIteratorEntries.inherited,
+  inheritedEmptyEntries.inherited,
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+);
 let stringIteratorReads = 0;
 let replacementReceiverIsWrapper = false;
 stringSymbolAccessLog = [];
@@ -330,6 +422,19 @@ console.log(
   replacementReceiverIsWrapper,
   render(replacedStringGroups.replacement),
 );
+const replacedEntryReads = stringIteratorReads;
+try {
+  Object.fromEntries(new String("ignored"));
+  console.log("from entries replaced string iterator", "no error");
+} catch (error) {
+  /* The replacement yields a primitive, so acquisition is observable
+   * through the accessor read and the failure is the entry-object one. */
+  console.log(
+    "from entries replaced string iterator",
+    entryObjectFailure(error),
+    stringIteratorReads - replacedEntryReads,
+  );
+}
 console.log(
   "delete string iterator",
   delete stringPrototype[Symbol.iterator],
@@ -365,6 +470,20 @@ try {
     error instanceof TypeError,
     deletedStringIteratorCalls,
   );
+}
+for (const deleted of ["", "ab", new String(""), new String("ab")]) {
+  try {
+    Object.fromEntries(deleted);
+    console.log("from entries deleted string iterator", "no error");
+  } catch (error) {
+    /* Without the default there is no String iteration to fall back on,
+     * so even the empty String reports a missing iterator. */
+    console.log(
+      "from entries deleted string iterator",
+      error instanceof TypeError,
+      entryObjectFailure(error),
+    );
+  }
 }
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   configurable: true,

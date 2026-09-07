@@ -5517,8 +5517,16 @@ configurable attributes and closes the iterator after abrupt entry processing.
 `hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy` converts
 callback results through ToPropertyKey, appends values to arrays on a
 null-prototype result, and closes an acquired iterator after callback or key
-failure. Its default primitive String path consumes Unicode code points while
-the separate String iterator node remains unmaterialized.
+failure. `fromEntries` and `groupBy` share one default primitive String path
+that consumes Unicode code points while the separate String iterator node
+remains unmaterialized. An empty String or empty String wrapper is a valid
+empty iterable, so `Object.fromEntries` builds an empty object from it rather
+than reporting the unmaterialized default as a missing iterator, and a
+non-empty String is consumed until its first primitive element fails the
+entry-object check. Both statics take that path only while the realm's
+virtual %String.prototype%[`Symbol.iterator`] is still the nearest one a
+value reaches, so an own, inherited, replaced, or deleted iterator goes
+through observable iterator acquisition instead.
 
 One own-property primitive answers every reflective query, so the virtual
 %String.prototype%[`Symbol.iterator`] the String iterator node has not
@@ -5548,7 +5556,9 @@ iteration keeps working afterward.
 Fixed native and generated differential evidence at seed `0x60006100` covers
 integer, string, and symbol key ordering, mutation during enumeration,
 assignment accessors, iterator closing, null-prototype groups, primitive
-Strings, ordinary assignment to the virtual property and through a String
+Strings, empty and non-empty Strings and String wrappers built through
+`fromEntries` with the default, own, inherited, replaced, and deleted
+iterator, ordinary assignment to the virtual property and through a String
 wrapper, read-only refusal, frozen redefinition, both specialization
 policies, forced collection at every safepoint, false hints, deliberate
 shape-guard misses, and generic fallback. Of the 296
