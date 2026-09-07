@@ -11,7 +11,4 @@ dependencies:
   - object-integrity-levels
   - reflect-namespace
 landed: false
-status: parked
-reason: "Transitively depends on parked object-own-keys through
-  reflect-namespace. Resume after that prerequisite passes a fresh mandatory
-  review cycle."
+status: blocked

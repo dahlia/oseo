@@ -19,5 +19,5 @@ inventory:
 dependencies:
   - array-constructor
   - object-constructor
-landed: false
+landed: true
 status: ready
