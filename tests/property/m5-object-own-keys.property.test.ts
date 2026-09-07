@@ -821,7 +821,14 @@ test(
           "observations, three invalid for-of observations, four " +
           "specialization observations, and three fromEntries String " +
           "code points",
-        timeLimitMilliseconds: 240_000,
+        // Each case compiles and executes two specializations under
+        // forced collection, so this suite is among the slowest in the
+        // ordinary gate. A GitHub-hosted ubuntu-latest runner reached
+        // only thirteen of the sixteen cases within 240,000 ms, which
+        // extrapolates to roughly 295,000 ms for the whole suite. This
+        // budget covers that runner with room for ordinary variance;
+        // an interrupted suite still fails rather than passing.
+        timeLimitMilliseconds: 360_000,
       },
     );
   },
