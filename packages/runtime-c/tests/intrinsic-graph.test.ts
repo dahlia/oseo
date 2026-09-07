@@ -432,7 +432,7 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
     new RegExp(
       String.raw`oseo_internal_to_object\(context, value\)[\s\S]*` +
         String.raw`snapshot_own_keys\(context, &frame, key_count\)[\s\S]*` +
-        String.raw`oseo_internal_own_descriptor\([\s\S]*` +
+        String.raw`oseo_internal_own_property_descriptor\([\s\S]*` +
         String.raw`from_property_descriptor\(context, &descriptor`,
       "u",
     ),
@@ -445,11 +445,7 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
       "u",
     ),
   );
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(deferred[1] ?? "", /getOwnPropertyDescriptors/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("collects every defineProperties descriptor before mutation", () => {
@@ -484,11 +480,7 @@ test("collects every defineProperties descriptor before mutation", () => {
     objectBuiltins,
     /OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID[\s\S]*"defineProperties"/u,
   );
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(deferred[1] ?? "", /defineProperties/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("creates over the shared defineProperties collection", () => {
@@ -510,11 +502,7 @@ test("creates over the shared defineProperties collection", () => {
   );
   assert.doesNotMatch(objectBuiltins, /unsupported in M3/u);
   assert.match(objectBuiltins, /OSEO_OBJECT_CREATE_CODE_ID[\s\S]*"create"/u);
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
-  );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(deferred[1] ?? "", /"create"/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
 });
 
 test("owns Object integrity transitions and queries", () => {
@@ -533,14 +521,60 @@ test("owns Object integrity transitions and queries", () => {
   assert.match(objectBuiltins, /object_set_integrity_level/u);
   assert.match(objectBuiltins, /object_test_integrity_level/u);
   assert.match(objectBuiltins, /object->extensible = false/u);
-  const deferred = objectBuiltins.match(
-    /deferred_static_names\[\] = \{([^}]*)\}/u,
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
+});
+
+test("owns Object key, entry, assignment, and grouping statics", () => {
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const name of [
+    "assign",
+    "entries",
+    "fromEntries",
+    "getOwnPropertyNames",
+    "getOwnPropertySymbols",
+    "groupBy",
+    "hasOwn",
+    "keys",
+    "values",
+  ]) {
+    assert.match(objectBuiltins, new RegExp(`"${name}"`, "u"));
+  }
+  assert.match(objectBuiltins, /snapshot_own_keys/u);
+  assert.match(objectBuiltins, /object_enumerable_own_properties/u);
+  assert.match(objectBuiltins, /object_close_after_abrupt/u);
+  assert.match(objectBuiltins, /object_add_grouped_value/u);
+  assert.doesNotMatch(objectBuiltins, /deferred_static_names/u);
+});
+
+test("answers own-property queries through one descriptor primitive", () => {
+  const descriptorSource = sources.get("runtime_descriptor.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+  const primitiveSource = sources.get("runtime_primitive.c") ?? "";
+  const propertySource = sources.get("runtime_property.c") ?? "";
+
+  assert.match(
+    descriptorSource,
+    new RegExp(
+      String.raw`bool oseo_internal_own_property_descriptor\([\s\S]*?` +
+        String.raw`oseo_internal_own_descriptor\([\s\S]*?` +
+        String.raw`oseo_internal_virtual_string_iterator_descriptor\(`,
+      "u",
+    ),
   );
-  assert.ok(deferred != null, "deferred Object statics");
-  assert.doesNotMatch(
-    deferred[1] ?? "",
-    /freeze|isExtensible|isFrozen|isSealed|preventExtensions|seal/u,
+  // Every reflective own-property answer comes from the shared primitive,
+  // so the virtual String iterator cannot be visible to one query and
+  // absent from another. The remaining direct caller is the string-keyed
+  // default-conversion lookup, which no symbol key can reach.
+  for (const source of [objectBuiltins, propertySource]) {
+    assert.doesNotMatch(source, /[^_]oseo_internal_own_descriptor\(/u);
+  }
+  assert.match(
+    primitiveSource,
+    /oseo_has_property\([\s\S]*?oseo_internal_own_property_descriptor\(/u,
   );
+  assert.match(objectBuiltins, /oseo_internal_own_property_descriptor\(/u);
+  assert.match(propertySource, /oseo_internal_own_property_descriptor\(/u);
 });
 
 test("installs the module namespace toStringTag descriptor", () => {

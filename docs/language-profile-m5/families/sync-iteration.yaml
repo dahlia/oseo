@@ -10,18 +10,23 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/native/fixtures/object-own-keys.ts
+      - tests/property/m5-object-own-keys.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/native/fixtures/object-own-keys.ts
   forced-collection:
     status: covered
     references:
       - tests/property/m5-for-of.property.test.ts
+      - tests/property/m5-object-own-keys.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-for-of.property.test.ts
+      - tests/property/m5-object-own-keys.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."

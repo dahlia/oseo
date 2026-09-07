@@ -605,6 +605,9 @@ OseoResult oseo_internal_array_join_element_string(
     return value_text(context, value, &current);
 }
 
+/* The keys this walk asks about are the ASCII method names of the default
+ * conversion protocol, so the plain descriptor primitive is enough: no
+ * synthetic symbol-keyed own property can answer here. */
 static bool conversion_property_exists(
     OseoValue object_value,
     OseoValue key
@@ -1749,8 +1752,8 @@ OseoResult oseo_has_property(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue ignored_getter = oseo_undefined();
         OseoValue ignored_setter = oseo_undefined();
-        if (oseo_internal_own_descriptor(
-            current, property, &value, &attributes,
+        if (oseo_internal_own_property_descriptor(
+            context, current, property, &value, &attributes,
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }

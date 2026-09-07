@@ -464,6 +464,33 @@ async function main() {
   // identity stays observable without an await in a rejected position. A
   // runtime-authored TypeError reports only its name, because Oseo owns
   // its own message text.
+  const numberPrototype = Object.getPrototypeOf(Object(0));
+  let numberIteratorReads = 0;
+  Object.defineProperty(numberPrototype, Symbol.iterator, {
+    configurable: true,
+    get: function () {
+      numberIteratorReads = numberIteratorReads + 1;
+      return function () {
+        let index = 0;
+        return {
+          next: function () {
+            index = index + 1;
+            if (index === 1) return { done: false, value: 2 };
+            if (index === 2) return { done: false, value: 3 };
+            return { done: true };
+          },
+        };
+      };
+    },
+  });
+  let numberValues = "";
+  for await (const value of 7) numberValues = numberValues + value;
+  console.log(
+    "number sync fallback",
+    numberIteratorReads,
+    numberValues,
+  );
+  delete numberPrototype[Symbol.iterator];
   try {
     for await (const value of 5) console.log(value);
   } catch (error) {

@@ -388,3 +388,7 @@ families:
     owner: tests/property/m5-array-prototype-predicate-search.property.test.ts
     start: 0x60006000
     end: 0x600060ff
+  - family: m5-object-own-keys
+    owner: tests/property/m5-object-own-keys.property.test.ts
+    start: 0x60006100
+    end: 0x600061ff

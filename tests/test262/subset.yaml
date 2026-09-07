@@ -18,6 +18,8 @@ supportedFeatures:
   - DataView.prototype.setUint8
   - Float16Array
   - Map
+  - Object.fromEntries
+  - Object.hasOwn
   - Object.is
   - Promise.allSettled
   - Promise.any
@@ -12326,7 +12328,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/toString/AsyncFunction.js
     expectedClassification: unsupported-profile-feature
@@ -16267,6 +16269,120 @@ tests:
   - path: test/built-ins/Object/S9.9_A6.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/assign/ObjectOverride-sameproperty.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/OnlyOneArgument.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Override-notstringtarget.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Override.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Source-Null-Undefined.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Source-Number-Boolen-Symbol.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Source-String.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Null.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Number.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Object.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-String.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/Target-Undefined.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/assign-descriptor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/assign-length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/assignment-to-readonly-property-of-target-must-throw-a-typeerror-exception.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/invoked-as-ctor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/source-get-attr-error.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/source-non-enum.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/source-own-prop-desc-missing.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/source-own-prop-error.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/source-own-prop-keys-error.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/strings-and-symbol-order-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/strings-and-symbol-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-frozen-accessor-property-set-succeeds.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-frozen-data-property-set-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-non-extensible-existing-accessor-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-non-extensible-existing-data-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-non-extensible-property-creation-throws.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-sealed-existing-accessor-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-sealed-existing-data-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-is-sealed-property-creation-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-set-not-writable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/assign/target-set-user-error.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/bigint.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -16433,7 +16549,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-140.js
     expectedClassification: unsupported-profile-feature
@@ -17012,7 +17128,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-37.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-38.js
     expectedClassification: pass
@@ -17219,7 +17335,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object-bigint.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object-non-empty-string.js
     expectedClassification: pass
@@ -17228,7 +17344,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-0-1.js
     expectedClassification: pass
@@ -22519,6 +22635,69 @@ tests:
   - path: test/built-ins/Object/defineProperty/typedarray-backed-by-resizable-buffer.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
+  - path: test/built-ins/Object/entries/exception-during-enumeration.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/exception-not-object-coercible.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/function-length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/function-name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/function-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/getter-adding-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/getter-making-future-key-nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/getter-removing-future-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/inherited-properties-omitted.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/observable-operations.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/order-after-define-property-with-function.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/order-after-define-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/primitive-booleans.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/primitive-numbers.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/primitive-strings.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/primitive-symbols.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/return-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/symbols-omitted.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/tamper-with-global-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/entries/tamper-with-object-keys.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/freeze/15.2.3.9-0-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -22678,6 +22857,81 @@ tests:
   - path: test/built-ins/Object/freeze/typedarray-backed-by-resizable-buffer.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
+  - path: test/built-ins/Object/fromEntries/empty-iterable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/evaluation-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-closed-for-null-entry.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-closed-for-string-entry.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-closed-for-throwing-entry-key-accessor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-closed-for-throwing-entry-key-tostring.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-closed-for-throwing-entry-value-accessor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-not-closed-for-next-returning-non-object.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-not-closed-for-throwing-done-accessor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-not-closed-for-throwing-next.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/iterator-not-closed-for-uncallable-next.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/key-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/prototype.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/requires-argument.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/simple-properties.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/string-entry-object-succeeds.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/string-entry-primitive-throws.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/string-entry-string-object-succeeds.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/supports-symbols.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/to-property-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/uses-define-semantics.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/fromEntries/uses-keys-not-iterator.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-0-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -23609,7 +23863,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/symbols-included.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/tamper-with-global-object.js
     expectedClassification: pass
@@ -23617,6 +23871,174 @@ tests:
   - path: test/built-ins/Object/getOwnPropertyDescriptors/tamper-with-object-keys.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-0-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-0-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-1-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-1-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-1-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-1-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-2-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-2-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-2-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-2-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-3-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-36.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-37.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-38.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-39.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-40.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-41.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-42.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-43.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-44.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-45.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-46.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-47.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-48.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-49.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-50.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-b-6.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/S15.2.3.4_A1_T1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/non-object-argument-invalid.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/non-object-argument-valid.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/order-after-define-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-absent-not-configurable-symbol-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-duplicate-symbol-entry.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-not-extensible-absent-symbol-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-not-extensible-extra-symbol-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/non-object-argument-invalid.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/non-object-argument-valid.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/object-contains-symbol-property-with-description.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/object-contains-symbol-property-without-description.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/order-after-define-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-absent-not-configurable-string-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-duplicate-string-entry.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-not-extensible-absent-string-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-not-extensible-extra-string-key.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-0-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -23734,6 +24156,234 @@ tests:
   - path: test/built-ins/Object/getPrototypeOf/not-a-constructor.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
+  - path: test/built-ins/Object/groupBy/callback-arg.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/callback-throws.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/emptyList.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/evenOdd.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/groupLength.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/invalid-callback.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/invalid-iterable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/invalid-property-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/iterator-next-throws.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/null-prototype.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/string.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/groupBy/toPropertyKey.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_exists.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_and_setter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_and_setter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_and_setter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_and_setter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_and_setter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_getter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_nonwritable_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_nonwritable_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_nonwritable_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_nonwritable_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_setter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_setter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_setter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_setter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_setter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_writable_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_writable_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_writable_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_inherited_writable_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_nonexistent.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_and_setter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_and_setter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_and_setter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_and_setter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_and_setter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_getter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_nonwritable_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_nonwritable_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_nonwriteable_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_nonwriteable_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_property_exists.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_setter.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_setter_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_setter_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_setter_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_setter_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_writable_configurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_writable_configurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_writable_nonconfigurable_enumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/hasown_own_writable_nonconfigurable_nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/prototype.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/symbol_own_property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/symbol_property_toPrimitive.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/symbol_property_toString.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/symbol_property_valueOf.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/toobject_before_topropertykey.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/toobject_null.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/hasOwn/toobject_undefined.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/internals/DefineOwnProperty/consistent-value-function-arguments.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
@@ -24208,15 +24858,183 @@ tests:
   - path: test/built-ins/Object/isSealed/proxy-no-ownkeys-returned-keys-order.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
+  - path: test/built-ins/Object/keys/15.2.3.14-0-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-0-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-1-1.js
     expectedClassification: pass
-    dependencies: [object-properties]
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-1-2.js
     expectedClassification: pass
-    dependencies: [object-properties]
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-1-3.js
     expectedClassification: pass
-    dependencies: [object-properties]
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-1-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-1-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-6.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-7.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-2-8.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-6.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-3-7.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-4-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-10.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-11.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-12.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-13.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-14.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-15.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-16.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-5.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-6.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-7.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-8.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-9.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-a-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-a-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-a-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-a-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-5-b-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-6-1.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-6-2.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-6-3.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-6-4.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/15.2.3.14-6-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/order-after-define-property-with-function.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/order-after-define-property.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/property-traps-order-with-proxied-array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/proxy-keys.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/keys/return-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-0-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -24341,7 +25159,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/proto-from-ctor-realm.js
     expectedClassification: unsupported-profile-feature
@@ -25198,6 +26016,66 @@ tests:
   - path: test/built-ins/Object/symbol_object-returns-fresh-symbol.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/values/exception-during-enumeration.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/exception-not-object-coercible.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/function-length.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/function-name.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/function-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/getter-adding-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/getter-making-future-key-nonenumerable.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/getter-removing-future-key.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/inherited-properties-omitted.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/observable-operations.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/order-after-define-property.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/primitive-booleans.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/primitive-numbers.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/primitive-strings.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/primitive-symbols.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/return-order.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/symbols-omitted.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/tamper-with-global-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-own-keys]
+  - path: test/built-ins/Object/values/tamper-with-object-keys.js
+    expectedClassification: pass
+    dependencies: [object-own-keys]
   - path: test/built-ins/Promise/Symbol.species/length.js
     expectedClassification: pass
     dependencies: [promise-settlement]
@@ -25463,7 +26341,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/resolve-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/resolve-element-function-prototype.js
     expectedClassification: pass
@@ -25703,7 +26581,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/reject-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/reject-element-function-prototype.js
     expectedClassification: pass
@@ -25736,7 +26614,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/resolve-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/resolve-element-function-prototype.js
     expectedClassification: pass
@@ -26012,7 +26890,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/reject-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/reject-element-function-prototype.js
     expectedClassification: pass
@@ -26117,7 +26995,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/executor-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/executor-function-prototype.js
     expectedClassification: pass
@@ -26144,7 +27022,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/proto-from-ctor-realm.js
     expectedClassification: unsupported-profile-feature
@@ -26786,7 +27664,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject-function-prototype.js
     expectedClassification: pass
@@ -26876,7 +27754,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/resolve-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/resolve-function-prototype.js
     expectedClassification: pass
@@ -28496,7 +29374,7 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-property.js
     expectedClassification: pass
@@ -28556,10 +29434,10 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/lookbehind.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-match.js
     expectedClassification: pass
@@ -36335,7 +37213,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/ThrowTypeError/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/ThrowTypeError/prototype.js
     expectedClassification: pass
@@ -46894,7 +47772,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, functions]
   - path: test/language/statements/class/definition/fn-length-static-precedence-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-length-static-precedence.js
     expectedClassification: pass
@@ -46906,7 +47784,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties, symbols]
   - path: test/language/statements/class/definition/fn-name-static-precedence-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-name-static-precedence.js
     expectedClassification: pass
@@ -50166,7 +51044,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,
@@ -53616,7 +54494,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-gen-decl-dstr-obj-rest-same-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,

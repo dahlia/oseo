@@ -5509,6 +5509,57 @@ Array range, and adds no generated-code entry point or graph-state change.
 The reviewed test262 revision, 41,091-path applicable inventory, ADR 0013
 vocabulary, inventory policy, and zero-override policy are unchanged.
 
+Implemented M5b node `object-own-keys` completes the realm-owned `Object`
+constructor's key, entry, assignment, and grouping statics. `keys`, `values`,
+and `entries` snapshot ordinary own keys, omit symbols, and recheck each
+descriptor before reading an enumerable value. `getOwnPropertyNames` and
+`getOwnPropertySymbols` filter that same ordering without reading values.
+`assign` converts the target first, skips nullish sources, and performs each
+source Get followed by the target Set. `fromEntries` defines each iterated
+pair through CreateDataProperty and closes the iterator on abrupt entry
+processing. `hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy`
+converts callback results through ToPropertyKey, appends values to arrays on a
+null-prototype result, and closes an acquired iterator after callback or key
+failure. `fromEntries` and `groupBy` share one default primitive String path
+that consumes Unicode code points while the separate String iterator node
+remains unmaterialized, so an empty String or empty String wrapper builds an
+empty object and a non-empty one fails on its first primitive element. Either
+static takes that path only while the realm's virtual
+%String.prototype%[`Symbol.iterator`] is the nearest iterator the value
+reaches. One own-property
+descriptor primitive answers every reflective query, so `Object.hasOwn`,
+inherited `hasOwnProperty`, `propertyIsEnumerable`, the `in` operator,
+descriptor reads, redefinition rechecks, own-key spread, and assignment agree
+about the virtual %String.prototype%[`Symbol.iterator`], and an ordinary read
+of the untouched default stops at %String.prototype%. An ordinary assignment
+replaces the virtual property in place and keeps its symbol position, an
+assignment through a String wrapper creates a nearer own property, a
+read-only virtual property refuses assignment, and a non-configurable
+non-writable one accepts only a redefinition whose value is SameValue to the
+`undefined` it models, which changes nothing and so leaves the property
+virtual.
+
+Fixed native and generated differential evidence at seed `0x60006100` covers
+both specialization policies, forced collection at every safepoint, integer,
+string, and symbol key ordering, mutation during enumeration, assignment
+accessors, iterator closing, null-prototype groups, empty and non-empty
+Strings and String wrappers built through `fromEntries` with the default,
+own, inherited, replaced, and deleted iterator, ordinary assignment to the
+virtual property and through a String wrapper, read-only refusal, frozen
+redefinition, false hints, deliberate shape-guard misses, and generic
+fallback. Of the 296 paths under the node's
+inventory roots, 295 are reviewed: 259 pass and 36 retain explicit prerequisite
+boundaries. The legacy global-own-name case remains outside the subset because
+it has no feature metadata but requires unadmitted global constructors and
+functions. Twenty-three reviewed cases outside those roots also move from
+unsupported profile feature to pass, because own-key order, own-key
+reflection, and object rest destructuring are what they were waiting on. The
+manifest moves from 16,912 to 17,204 paths, from 13,022 to 13,301 passes, from
+2,334 to 2,347 unsupported profile features, and keeps 1,556 expected
+negatives. No reviewed row moves away from pass. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-94` without adding a
+generated-code entry point or changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

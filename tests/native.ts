@@ -74,6 +74,8 @@ const { arrayPrototypeSortFixtures } =
   await import("./native/fixtures/array-prototype-sort.ts");
 const { arrayPrototypeSpeciesMappingFixtures } =
   await import("./native/fixtures/array-prototype-species-mapping.ts");
+const { objectOwnKeysFixtures } =
+  await import("./native/fixtures/object-own-keys.ts");
 const { stringPrototypeAccessFixtures } =
   await import("./native/fixtures/string-prototype-access.ts");
 const { stringPrototypeSearchAndSliceFixtures } =
@@ -141,6 +143,7 @@ const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   ...objectFixtures,
+  ...objectOwnKeysFixtures,
   ...arrayBufferFixtures,
   ...arrayConstructorFixtures,
   ...arrayPrototypeCopyingFixtures,
@@ -483,22 +486,6 @@ for (const annexBPattern of [
   assert.equal(rejected.stderr, "");
 }
 
-const deferredObjectAssign = await runNativeCli(
-  {
-    args: ["deferred-object-assign.ts"],
-    source: "Object.assign({}, {});",
-    sourceId: "deferred-object-assign.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(deferredObjectAssign.exitStatus, 1);
-assert.equal(deferredObjectAssign.stdout, "");
-assert.match(
-  deferredObjectAssign.stderr,
-  /^deferred-object-assign\.ts:1:\d+: error\[OSEO2001\]: Object static/u,
-);
-
 // ADR 0023's portable baseline admits magnitudes through 65,536 bits, and
 // BigInt.asUintN is the one fixed-width request whose result grows to the
 // full requested width. The reviewed ceiling is Oseo's own resource
@@ -638,6 +625,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-create" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
@@ -744,6 +732,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-create" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "object-own-keys" ||
+    fixture.name === "object-own-keys-virtual-assignment" ||
+    fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||

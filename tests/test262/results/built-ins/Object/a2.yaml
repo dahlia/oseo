@@ -262,6 +262,38 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Symbol.iterator
+        - Object.fromEntries
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/fromEntries/iterator-closed-for-throwing-entry-value-accessor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-own-keys
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -337,6 +369,39 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - arrow-function
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/Object/getOwnPropertyNames/order-after-define-property.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-own-keys
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -356,6 +421,37 @@ results:
         86:15: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Object.hasOwn
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/hasOwn/hasown_inherited_writable_configurable_enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - object-own-keys
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

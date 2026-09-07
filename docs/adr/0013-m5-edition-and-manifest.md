@@ -274,6 +274,31 @@ for another. The tagging rule above names every operation a case exercises, so
 a case that builds a pattern and calls a function exercises both, and dropping
 either tag would understate what the row covers.
 
+The M5b `object-own-keys` node entered `object-own-keys` into the enforced
+vocabulary in *packages/testkit/src/index.ts* alongside the reviewed rows that
+carry it, and that change did not amend this record. This amendment adopts the
+tag as reviewed vocabulary without moving any classification. The tag
+identifies the realm-owned `Object` statics that read or produce an object's
+own properties by key: `keys`, `values`, `entries`, `getOwnPropertyNames`,
+`getOwnPropertySymbols`, `assign`, `fromEntries`, `hasOwn`, and `groupBy`.
+`keys`, `values`, and `entries` snapshot the own keys, omit symbols, and
+recheck each descriptor before reading an enumerable value.
+`getOwnPropertyNames` and `getOwnPropertySymbols` filter that same key
+ordering without reading values, and `assign` walks each source's own keys and
+performs a Get followed by a Set on the target for every enumerable one.
+`hasOwn` tests a single own property instead of a list, while `fromEntries`
+and `groupBy` run in the other direction and define own properties from
+iterated pairs or from callback results converted through `ToPropertyKey`. One
+tag covers all nine because the node builds them on the same own-key ordering
+and the same own-property representation. The node needs a tag of its own
+because `object-properties` names property definition and descriptor semantics
+without naming the constructor statics that reach them, and
+`property-enumeration` names the `for-in` statement, whose enumeration walks
+the prototype chain rather than one object's own keys. The 295 reviewed rows
+under the node's inventory roots carry it. Whether reviewed rows outside those
+roots that also observe own-key order gain this tag is a separate reviewed
+change; when they do, they gain it alongside the tags they already carry.
+
 
 Alternatives considered
 -----------------------

@@ -2066,7 +2066,7 @@ static bool array_from_string_value(
  * A nearer actual property wins, while the untouched default on
  * %String.prototype% shadows any property inherited from Object.prototype.
  */
-static bool array_from_uses_virtual_string_iterator(
+bool oseo_internal_uses_virtual_string_iterator(
     OseoValue source,
     OseoValue string_prototype,
     OseoValue iterator_key
@@ -2139,7 +2139,7 @@ static OseoResult array_from(
         frame.slots[10] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             uses_virtual_string_iterator =
-                array_from_uses_virtual_string_iterator(
+                oseo_internal_uses_virtual_string_iterator(
                     frame.slots[1],
                     frame.slots[10],
                     frame.slots[4]

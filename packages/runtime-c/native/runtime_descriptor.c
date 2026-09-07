@@ -12,6 +12,35 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+/* A concrete descriptor replacing the virtual String iterator keeps the
+ * virtual property's original position before every user-created symbol.
+ * The property vector already owns creation order, so inserting the
+ * replacement at its first symbol slot lets ordinary deletion and later
+ * redefinition recover the usual append-at-creation behavior. */
+static OseoProperty *append_property_slot(
+    OseoOrdinaryObject *object,
+    bool replaces_virtual
+) {
+    size_t insertion = object->property_count;
+    if (replaces_virtual) {
+        for (size_t index = 0u;
+             index < object->property_count;
+             index += 1u) {
+            if (is_symbol(object->properties[index].key)) {
+                insertion = index;
+                break;
+            }
+        }
+        for (size_t index = object->property_count;
+             index > insertion;
+             index -= 1u) {
+            object->properties[index] = object->properties[index - 1u];
+        }
+    }
+    object->property_count += 1u;
+    return &object->properties[insertion];
+}
+
 bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -118,6 +147,36 @@ bool oseo_internal_own_descriptor(
     return true;
 }
 
+bool oseo_internal_own_property_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+) {
+    if (oseo_internal_own_descriptor(
+            object_value,
+            key,
+            value,
+            attributes,
+            getter,
+            setter
+        )) {
+        return true;
+    }
+    *value = oseo_undefined();
+    *getter = oseo_undefined();
+    *setter = oseo_undefined();
+    return oseo_internal_virtual_string_iterator_descriptor(
+        context,
+        object_value,
+        key,
+        attributes
+    );
+}
+
 static OseoResult define_data_property(
     OseoContext *context,
     OseoValue object_value,
@@ -165,17 +224,31 @@ static OseoResult define_data_property(
             &virtual_attributes
         );
     if (replaces_virtual) {
+        /* The virtual property models an undefined value until the String
+         * iterator node materializes one, so a non-writable redefinition
+         * rejects only a value that is not SameValue to it. Reapplying the
+         * descriptor a frozen %String.prototype% reports must succeed, the
+         * way it does on Node.js and Deno. */
         if (!virtual_attributes.configurable &&
             (attributes.configurable ||
              attributes.enumerable != virtual_attributes.enumerable ||
              (!virtual_attributes.writable && attributes.writable) ||
-             (!virtual_attributes.writable && has_value))) {
+             (!virtual_attributes.writable && has_value &&
+              !oseo_internal_same_value(value, oseo_undefined())))) {
             return type_error(
                 context,
                 "Cannot redefine a non-configurable property."
             );
         }
-        if (!has_value) {
+        /* A non-configurable, non-writable property cannot change: the
+         * validation above rejected every descriptor that would alter its
+         * attributes, and a value SameValue to the modeled `undefined`
+         * leaves the value alone. Keep the virtual representation instead
+         * of materializing an `undefined` the String iterator node has not
+         * produced, so default String iteration still works afterward. */
+        bool read_only_no_op = !virtual_attributes.configurable &&
+            !virtual_attributes.writable;
+        if (!has_value || read_only_no_op) {
             object->virtual_string_iterator_configurable =
                 attributes.configurable;
             object->virtual_string_iterator_enumerable =
@@ -344,13 +417,12 @@ static OseoResult define_data_property(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = &object->properties[object->property_count];
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
     property->key = key;
     property->value = value;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
-    object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;
@@ -526,13 +598,12 @@ OseoResult oseo_object_define_accessor(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = &object->properties[object->property_count];
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
     property->key = key;
     property->value = oseo_undefined();
     property->getter = new_getter;
     property->setter = new_setter;
-    object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;

@@ -360,8 +360,6 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 13u)
 #define OSEO_OBJECT_KEYS_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 14u)
-#define OSEO_OBJECT_DEFERRED_STATIC_CODE_ID \
-    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 15u)
 #define OSEO_OBJECT_GET_OWN_PROPERTY_DESCRIPTORS_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 16u)
 #define OSEO_OBJECT_FREEZE_CODE_ID \
@@ -378,6 +376,22 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 22u)
 #define OSEO_OBJECT_DEFINE_PROPERTIES_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 23u)
+#define OSEO_OBJECT_ASSIGN_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 24u)
+#define OSEO_OBJECT_ENTRIES_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 25u)
+#define OSEO_OBJECT_FROM_ENTRIES_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 26u)
+#define OSEO_OBJECT_GET_OWN_PROPERTY_NAMES_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 27u)
+#define OSEO_OBJECT_GET_OWN_PROPERTY_SYMBOLS_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 28u)
+#define OSEO_OBJECT_GROUP_BY_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 29u)
+#define OSEO_OBJECT_HAS_OWN_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 30u)
+#define OSEO_OBJECT_VALUES_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 31u)
 
 #define OSEO_NUMBER_CODE_ID_RANGE_INDEX ((size_t)10u)
 #define OSEO_NUMBER_CODE_ID_RANGE_FIRST \
@@ -2160,14 +2174,45 @@ bool oseo_internal_own_descriptor(
 );
 /*
  * Reads the descriptor state of %String.prototype%'s virtual iterator.
- * Its value remains an Array.from implementation detail until the separate
- * string-iterator node lands, so ordinary reflective lookup stays unchanged.
+ * Its value stays unmaterialized until the separate string-iterator node
+ * lands, so the descriptor carries attributes only. Components that
+ * classify or rebuild the property use this directly; every reflective
+ * own-property query goes through
+ * oseo_internal_own_property_descriptor instead so that the virtual
+ * property cannot be visible to one query and absent from another.
  */
 bool oseo_internal_virtual_string_iterator_descriptor(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
     OseoPropertyAttributes *attributes
+);
+/*
+ * OrdinaryGetOwnProperty (10.1.5.1) over every own property a program can
+ * observe, including the virtual %String.prototype%[@@iterator]. The
+ * virtual property reports attributes with an undefined value, which is
+ * also what Get returns while the String iterator node has not
+ * materialized the function, so HasOwnProperty, propertyIsEnumerable,
+ * descriptor reads, redefinition rechecks, and assignment all agree on
+ * one answer.
+ */
+bool oseo_internal_own_property_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+);
+/*
+ * True when a String primitive or wrapper reaches %String.prototype%'s
+ * untouched virtual default iterator without a nearer own replacement.
+ */
+bool oseo_internal_uses_virtual_string_iterator(
+    OseoValue source,
+    OseoValue string_prototype,
+    OseoValue iterator_key
 );
 /*
  * Ordinary object layout helpers owned by runtime_object.c. The

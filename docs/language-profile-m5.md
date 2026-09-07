@@ -5505,6 +5505,79 @@ policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
 to `oseo-runtime-m5-92` without adding a generated-code entry point or
 changing the graph's orchestration state.
 
+M5b node `object-own-keys` completes the realm-owned `Object` constructor's
+key, entry, assignment, and grouping statics. `keys`, `values`, and `entries`
+snapshot ordinary own keys, omit symbols, and recheck each descriptor before
+reading an enumerable value. `getOwnPropertyNames` and
+`getOwnPropertySymbols` filter the same integer-index, String, then Symbol
+ordering without reading values. `assign` converts its target first, skips
+nullish sources, and performs each source Get followed by the target Set.
+`fromEntries` defines each iterated pair with writable, enumerable, and
+configurable attributes and closes the iterator after abrupt entry processing.
+`hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy` converts
+callback results through ToPropertyKey, appends values to arrays on a
+null-prototype result, and closes an acquired iterator after callback or key
+failure. `fromEntries` and `groupBy` share one default primitive String path
+that consumes Unicode code points while the separate String iterator node
+remains unmaterialized. An empty String or empty String wrapper is a valid
+empty iterable, so `Object.fromEntries` builds an empty object from it rather
+than reporting the unmaterialized default as a missing iterator, and a
+non-empty String is consumed until its first primitive element fails the
+entry-object check. Both statics take that path only while the realm's
+virtual %String.prototype%[`Symbol.iterator`] is still the nearest one a
+value reaches, so an own, inherited, replaced, or deleted iterator goes
+through observable iterator acquisition instead.
+
+One own-property primitive answers every reflective query, so the virtual
+%String.prototype%[`Symbol.iterator`] the String iterator node has not
+materialized cannot be visible to one query and absent from another.
+`Object.hasOwn`, inherited `hasOwnProperty`, `propertyIsEnumerable`, the `in`
+operator, `getOwnPropertyDescriptor`, `getOwnPropertyDescriptors`,
+redefinition rechecks, own-key spread, `Object.assign`, and ordinary
+assignment now report the same existence, attributes, and configurability,
+and an ordinary read of the untouched default stops at %String.prototype%
+instead of reaching a property inherited from %Object.prototype%. The
+descriptor reports the same unmaterialized `undefined` value that a read
+returns, so a program comparing the two agrees with Node.js and Deno.
+
+An ordinary assignment to the virtual property replaces it in place, keeping
+its attributes and its position among the object's symbol keys, while an
+assignment through a String wrapper creates a nearer own property and leaves
+the prototype's virtual property alone. A read-only virtual property refuses
+an assignment the way an ordinary read-only data property does, silently in
+sloppy code and with a `TypeError` in strict code. A non-configurable,
+non-writable virtual property accepts a redefinition whose value is SameValue
+to the `undefined` it models and rejects any other value, so reapplying the
+descriptor a frozen %String.prototype% reports succeeds as it does on Node.js
+and Deno. That redefinition changes nothing, so it leaves the property
+virtual rather than materializing an `undefined`, and default String
+iteration keeps working afterward.
+
+Fixed native and generated differential evidence at seed `0x60006100` covers
+integer, string, and symbol key ordering, mutation during enumeration,
+assignment accessors, iterator closing, null-prototype groups, primitive
+Strings, empty and non-empty Strings and String wrappers built through
+`fromEntries` with the default, own, inherited, replaced, and deleted
+iterator, ordinary assignment to the virtual property and through a String
+wrapper, read-only refusal, frozen redefinition, both specialization
+policies, forced collection at every safepoint, false hints, deliberate
+shape-guard misses, and generic fallback. Of the 296
+paths under the node's inventory roots, 295 are reviewed: 259 pass and 36
+retain explicit prerequisite boundaries. The legacy global-own-name case
+remains outside the subset because its frontmatter has no feature metadata but
+requires unadmitted global constructors and functions. Twenty-three reviewed
+cases outside those roots also move from unsupported profile feature to pass,
+because own-key order, own-key reflection, and object rest destructuring are
+what they were waiting on; no reviewed row moves away from pass. The manifest
+reaches 17,204 cases: 13,301 passes, 1,556 expected negatives, and 2,347
+unsupported profile features with no semantic, harness, or infrastructure
+failures, up from 16,912 cases with 13,022 passes and 2,334 unsupported
+profile features. The suite revision, 41,091-path inventory, manifest schema,
+and zero-override policy are unchanged; the dependency vocabulary adds the
+`object-own-keys` evidence tag. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-94` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -5578,6 +5651,18 @@ complete. The remaining gaps retain their existing owners.
     key is a string, and the realm does not yet expose the string iterator the
     array pattern must consume. Owner: the intrinsics and built-in objects
     stream.
+ -  The untouched %String.prototype%[`Symbol.iterator`] exists as an own
+    property with the specified attributes and own-key position, but its
+    value is not materialized: an ordinary read returns `undefined`, and the
+    descriptor reports the same value. Every operation that only compares
+    the read against the descriptor, including `Object.assign` and own-key
+    spread, therefore agrees with the reference hosts. An operation that
+    requires the value itself to be an object does not: after a program makes
+    the property enumerable, `Object.defineProperties` over
+    %String.prototype% throws a catchable `TypeError` where the reference
+    hosts convert the function into an empty descriptor. The
+    `string-iterator` graph node materializes the value and closes the gap.
+    Owner: the intrinsics and built-in objects stream.
  -  A `super` property reference in a class body without `extends` and in an
     object literal method stays rejected until the `super-without-extends`
     graph node lands. The object prototype root is now populated, but that

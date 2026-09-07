@@ -74,8 +74,8 @@ static OseoResult object_get(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (oseo_internal_own_descriptor(
-            current, key, &value, &attributes, &getter, &setter)) {
+        if (oseo_internal_own_property_descriptor(
+            context, current, key, &value, &attributes, &getter, &setter)) {
             if (attributes.accessor) {
                 if (!is_function(getter)) return normal(oseo_undefined());
                 OseoRootFrame frame = {NULL, NULL, 0u};
@@ -140,17 +140,22 @@ OseoResult oseo_object_has_own(
             NULL
         )));
     }
-    if (function_has_prototype_property(object_value) &&
-        oseo_internal_string_is_ascii(key, "prototype")) {
-        return normal(oseo_boolean(true));
-    }
-    if (is_array(object_value) &&
-        oseo_internal_string_is_ascii(key, "length")) {
-        return normal(oseo_boolean(true));
-    }
-    OseoOrdinaryObject *object = ordinary_object(object_value);
-    return normal(oseo_boolean(
-        oseo_internal_own_property_index(object, key) != SIZE_MAX));
+    /* The shared descriptor primitive already reports a function's
+     * `prototype`, an array's `length`, and the virtual String iterator,
+     * so the ownership answer never needs a separate synthetic case. */
+    OseoValue value = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false, false};
+    OseoValue getter = oseo_undefined();
+    OseoValue setter = oseo_undefined();
+    return normal(oseo_boolean(oseo_internal_own_property_descriptor(
+        context,
+        object_value,
+        key,
+        &value,
+        &attributes,
+        &getter,
+        &setter
+    )));
 }
 
 OseoResult oseo_object_set(
@@ -218,15 +223,9 @@ OseoResult oseo_object_set(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        bool virtual_string_iterator =
-            oseo_internal_virtual_string_iterator_descriptor(
-                context,
-                current,
-                key,
-                &attributes
-            );
-        if (virtual_string_iterator || oseo_internal_own_descriptor(
-            current, key, &own_value, &attributes, &getter, &setter)) {
+        if (oseo_internal_own_property_descriptor(
+            context, current, key, &own_value, &attributes, &getter,
+            &setter)) {
             if (attributes.accessor) {
                 if (!is_function(setter)) {
                     if (strict) {
@@ -265,13 +264,24 @@ OseoResult oseo_object_set(
             }
             size_t index = oseo_internal_own_property_index(owner, key);
             if (index == SIZE_MAX) {
-                if (current == object_value && virtual_string_iterator) {
+                /* An own property outside the property vector is either a
+                 * synthetic descriptor a dedicated branch above already
+                 * answered or the virtual String iterator, which an
+                 * assignment to its own object replaces in place. */
+                OseoPropertyAttributes virtual_attributes = attributes;
+                if (current == object_value &&
+                    oseo_internal_virtual_string_iterator_descriptor(
+                        context,
+                        current,
+                        key,
+                        &virtual_attributes
+                    )) {
                     OseoResult assigned = oseo_object_define(
                         context,
                         object_value,
                         key,
                         value,
-                        attributes
+                        virtual_attributes
                     );
                     if (assigned.status != OSEO_STATUS_NORMAL) {
                         return assigned;
@@ -356,8 +366,9 @@ OseoResult oseo_super_set(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (oseo_internal_own_descriptor(
-            current, key, &own_value, &attributes, &getter, &setter)) {
+        if (oseo_internal_own_property_descriptor(
+            context, current, key, &own_value, &attributes, &getter,
+            &setter)) {
             if (attributes.accessor) {
                 if (!is_function(setter)) {
                     if (strict) {
@@ -411,7 +422,8 @@ OseoResult oseo_super_set(
     OseoPropertyAttributes receiver_attributes = {false, false, false, false};
     OseoValue receiver_getter = oseo_undefined();
     OseoValue receiver_setter = oseo_undefined();
-    if (oseo_internal_own_descriptor(
+    if (oseo_internal_own_property_descriptor(
+        context,
         receiver,
         key,
         &receiver_value,
