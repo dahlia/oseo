@@ -808,6 +808,59 @@ test("populates the lazy iterator helper cluster", () => {
   assert.ok(validation > 0 && capture > validation);
 });
 
+test("populates the eager iterator helper cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+
+  for (const intrinsic of [
+    "ITERATOR_REDUCE",
+    "ITERATOR_TO_ARRAY",
+    "ITERATOR_FOR_EACH",
+    "ITERATOR_SOME",
+    "ITERATOR_EVERY",
+    "ITERATOR_FIND",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const code of [
+    "OSEO_ITERATOR_REDUCE_CODE_ID",
+    "OSEO_ITERATOR_TO_ARRAY_CODE_ID",
+    "OSEO_ITERATOR_FOR_EACH_CODE_ID",
+    "OSEO_ITERATOR_SOME_CODE_ID",
+    "OSEO_ITERATOR_EVERY_CODE_ID",
+    "OSEO_ITERATOR_FIND_CODE_ID",
+  ]) {
+    assert.match(internalHeader, new RegExp(code, "u"));
+    assert.match(iteratorSource, new RegExp(code, "u"));
+  }
+  for (const property of [
+    "reduce",
+    "toArray",
+    "forEach",
+    "some",
+    "every",
+    "find",
+  ]) {
+    assert.match(iteratorSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The eager methods drain the record they capture, so they add no heap
+  // kind: the accumulator, the collected array, and the callback argument
+  // list live in one root frame for the length of the loop.
+  assert.match(iteratorSource, /oseo_roots_allocate\(context, &frame, 8u\)/u);
+  // Argument validation closes the record before the captured `next` is
+  // ever read, which is what keeps a failing callback away from the
+  // receiver's `next` getter.
+  const validation = iteratorSource.indexOf(
+    "result = iterator_type_error(context, eager_callback_errors[kind]);",
+  );
+  const capture = iteratorSource.indexOf(
+    "result = helper_get_iterator_direct(\n        context,\n" +
+      "        frame.slots[0],\n        &frame.slots[2]\n    );",
+  );
+  assert.ok(validation > 0 && capture > validation);
+});
+
 test("populates the realm-owned Number intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const numberSource = sources.get("runtime_number.c") ?? "";

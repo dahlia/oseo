@@ -167,6 +167,21 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 20u)
 #define OSEO_ARRAY_ENTRIES_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 21u)
+/* The six eager iterator helper methods. They drain the record they
+ * capture instead of returning a helper object, so they need no state
+ * beyond the loop that reads it. */
+#define OSEO_ITERATOR_REDUCE_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 22u)
+#define OSEO_ITERATOR_TO_ARRAY_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 23u)
+#define OSEO_ITERATOR_FOR_EACH_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 24u)
+#define OSEO_ITERATOR_SOME_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 25u)
+#define OSEO_ITERATOR_EVERY_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 26u)
+#define OSEO_ITERATOR_FIND_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 27u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \

@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 113
+M5a is complete. The normative family records described below inventory 116
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 17,570 reviewed cases: 13,929 passes, 1,556
-expected negatives, and 2,085 unsupported profile features. It records no
+The current manifest contains 17,743 reviewed cases: 14,019 passes, 1,556
+expected negatives, and 2,168 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3093,10 +3093,12 @@ differential evidence at seed `0x60003400` covers both specialization
 policies, forced collection, direct and iterable inputs, late `return` lookup,
 and deliberate shape-guard misses. All 37 paths under the node's six inventory
 roots are reviewed. Their common upstream `iterator-helpers` feature tag
-remains unsupported until the later helper method nodes complete that feature,
-so the manifest reaches 5,459 cases: 3,141 passes, 1,355 expected negatives,
-and 963 unsupported profile features with no semantic, harness, or
-infrastructure failures. The suite revision, 41,091-path inventory, manifest
+remains unsupported, so the manifest reaches 5,459 cases: 3,141 passes, 1,355
+expected negatives, and 963 unsupported profile features with no semantic,
+harness, or infrastructure failures. This section originally expected the
+later helper method nodes to complete that feature; the eager helper section
+below records the String iteration and *temporalHelpers.js* prerequisites that
+disproved it. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, and zero-override policy are unchanged. The expanded
 intrinsic table and traced wrapper state move the runtime ABI to
 `oseo-runtime-m5-49` without changing the graph's orchestration state.
@@ -5443,11 +5445,16 @@ pull model that predicts the emitted values, the callback counter sequence,
 and whether a close reaches the source.
 
 All 184 paths under the node's five inventory roots are reviewed. Every one of
-them declares the upstream `iterator-helpers` feature, which stays unsupported
-until the separately owned `iterator-helpers-eager` node completes that
-feature, so each reviewed path records an explicit prerequisite boundary
+them declares the upstream `iterator-helpers` feature, which stays
+unsupported, so each reviewed path records an explicit prerequisite boundary
 rather than a pass and the fixed and generated evidence above owns the
-admitted behavior in the meantime. No previously reviewed path moves. The
+admitted behavior in the meantime. This paragraph originally named the
+separately owned `iterator-helpers-eager` node as the one that completes that
+feature. The eager helper landing measured the remaining blockers and
+disproved that: the tag also needs String iteration, which the unlanded
+`string-iterator` node owns, and the `temporalHelpers.js` harness include the
+reviewed harness set does not supply. The eager section below names the six
+paths that measurement identified. No previously reviewed path moves. The
 manifest reaches 16,645 cases: 12,779 passes, 1,556 expected negatives, and
 2,310 unsupported profile features with no semantic, harness, or
 infrastructure failures. The property inventory moves from 122 to 123 domains
@@ -6055,6 +6062,105 @@ semantic, harness, or infrastructure failures. The property ratchet moves
 from 131 to 132 domains and seeds and from 5,478 to 5,490 ordinary cases. The
 suite revision, manifest schema, classification vocabulary, and zero-override
 policy remain unchanged.
+
+
+Eager iterator helpers
+----------------------
+
+M5b node `iterator-helpers-eager` adds `reduce`, `toArray`, `forEach`, `some`,
+`every`, and `find` to the realm-owned `%IteratorPrototype%`, completing the
+helper methods the lazy node began. Each is a writable, non-enumerable,
+configurable data property whose function has its own name,
+`%Function.prototype%` as its `[[Prototype]]`, and no `[[Construct]]`.
+`toArray` has `length` 0 and the other five have `length` 1.
+
+These six are eager: each drains the iterator it captures rather than
+returning a helper object, so none of them adds an observable object kind.
+`reduce` answers the accumulator, `toArray` a fresh ordinary array whose
+`[[Prototype]]` is `%Array.prototype%`, `forEach` `undefined`, `some` and
+`every` booleans, and `find` the first value its predicate accepts or
+`undefined`.
+
+Every method validates its receiver first, so a primitive receiver throws a
+`TypeError` before any argument is read. The five that take a callback then
+validate it against the iterator record they would capture, and a
+non-callable callback throws a `TypeError` after calling the receiver's
+`return`, which is `IteratorClose` over a record whose `next` method is still
+`undefined`. `next` is read exactly once, after that validation, so a failing
+callback never reaches the receiver's `next` getter, and every later step
+reuses the captured method. `toArray` takes no callback and reads `next`
+immediately.
+
+The counter each callback receives as its last argument counts callback
+invocations, not steps. `reduce` passes the accumulator, the value, and that
+counter. Without an initial value it takes the first value as the accumulator
+and starts its counter at one, and an iterator that is already exhausted
+there throws a `TypeError` with no close, because the step that reported done
+already ended the record. With an initial value, including an explicit
+`undefined`, the counter starts at zero.
+
+A step that throws, including a `next` result that is not an object, and a
+`done` or `value` getter that throws, propagates without a close, matching the
+`[[Done]]` the specified operation sets before propagating. A callback that
+throws closes the record and keeps its own completion, so a `return` method
+that also throws there does not replace it. `some`, `every`, and `find` stop
+early and close the record with a normal completion instead, so a `return`
+that throws at that point replaces the answer the method would have produced
+with its own thrown value, whatever that value is, and a `return` that answers
+a non-object replaces it with a `TypeError`. `forEach` and `toArray` never
+stop early, so a source they exhaust is never closed.
+
+The eager helpers need no heap kind, because none of them suspends. One root
+frame holds the receiver, the callback, the captured `next` method, the
+`toArray` result, and the contiguous callback argument list for the length of
+the drain, so a collection at any safepoint inside a callback, a `next`, or a
+`return` keeps the accumulator and every in-flight value alive.
+
+Fixed native and generated differential evidence at property seed
+`0x60006700` covers all six methods, metadata and descriptors,
+non-construction, receiver and callback validation with its close, the
+counter sequences, the reduce accumulator with and without an initial value,
+the empty-iterator `TypeError`, early stop and exhaustion for all three
+predicates, close failures in both the abrupt and the normal-completion
+position, a close that answers a non-object, throwing `next`, `done`, and
+`value`, chained lazy-to-eager pipelines, both specialization policies,
+deliberate shape-guard hits and misses, generic fallback, and collection
+forced at every safepoint. The generated suite measures one drain against an
+independent model that predicts the outcome, the callback trace, and the
+number of closes.
+
+All 173 paths under the node's six inventory roots are reviewed. Every one of
+them declares the upstream `iterator-helpers` feature, which stays
+unsupported, so each reviewed path records an explicit prerequisite boundary
+rather than a pass and the fixed and generated evidence above owns the
+admitted behavior. The lazy helper section above originally expected this node
+to complete that feature tag. A scoped classification run over all 394
+reviewed and inventoried `test/built-ins/Iterator/` paths with the tag enabled
+measured otherwise. Six paths outside this node's roots do not pass, and a
+reviewed manifest admits no semantic or harness failure, so the tag stays
+unsupported. *test/built-ins/Iterator/from/primitives.js*,
+*test/built-ins/Iterator/from/supports-iterable.js*, and
+*test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js* fail
+semantically because each iterates a String or a String wrapper, which the
+unlanded `string-iterator` node owns.
+*test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
+*test/built-ins/Iterator/from/return-method-calls-base-return-method.js*, and
+*test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail
+in the harness because each includes *temporalHelpers.js*, which the reviewed
+harness set does not supply. Thirteen further paths keep an honest boundary
+for the separate `globalThis` feature, and one for `cross-realm`.
+
+No previously reviewed path moves. The manifest reaches 17,743 cases: 14,019
+passes, 1,556 expected negatives, and 2,168 unsupported profile features with
+no semantic, harness, or infrastructure failures, up from 17,570 cases with
+1,995 unsupported profile features. The property inventory moves from 134 to
+135 domains and seeds and from 5,508 to 5,518 ordinary cases. The normative
+family index moves from 115 to 116 records. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, target-parity policy, and
+zero-override policy are unchanged. The expanded intrinsic table moves the
+runtime ABI to `oseo-runtime-m5-100` and allocates six code IDs inside the
+existing iterator range without adding a heap kind, a generated-code entry
+point, or a change to the graph's orchestration state.
 
 
 Known gaps inside the claim

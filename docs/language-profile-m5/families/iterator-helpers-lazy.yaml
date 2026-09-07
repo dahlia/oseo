@@ -15,11 +15,17 @@ scope:
     test/built-ins/Iterator/prototype/flatMap/,
     test/built-ins/Iterator/prototype/map/, and
     test/built-ins/Iterator/prototype/take/. Every one of them carries the
-    upstream iterator-helpers feature tag, which stays unsupported until
-    the separately owned eager helper methods complete that feature, so
+    upstream iterator-helpers feature tag, which stays unsupported, so
     each reviewed path records an explicit prerequisite boundary rather
     than a pass. Fixed and generated native differential evidence proves
-    the admitted behavior for the same contracts in the meantime."
+    the admitted behavior for the same contracts in the meantime. This
+    record originally said the separately owned eager helper methods
+    would complete that feature. The iterator-helpers-eager landing
+    measured the remaining blockers and disproved it: the tag also needs
+    the String iteration the unlanded string-iterator node owns and the
+    temporalHelpers.js harness include the reviewed harness set does not
+    supply. The iterator-helpers-eager record names the six paths that
+    measurement identified."
   - "One observation is native-only rather than differential. Re-entering a
     suspended helper from the underlying iterator return method reaches the
     running-generator TypeError ECMA-262 specifies, and the two reference
