@@ -5521,21 +5521,37 @@ processing. `hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy`
 converts callback results through ToPropertyKey, appends values to arrays on a
 null-prototype result, and closes an acquired iterator after callback or key
 failure. Its default primitive String path consumes Unicode code points while
-the separate String iterator node remains unmaterialized.
+the separate String iterator node remains unmaterialized. One own-property
+descriptor primitive answers every reflective query, so `Object.hasOwn`,
+inherited `hasOwnProperty`, `propertyIsEnumerable`, the `in` operator,
+descriptor reads, redefinition rechecks, own-key spread, and assignment agree
+about the virtual %String.prototype%[`Symbol.iterator`], and an ordinary read
+of the untouched default stops at %String.prototype%. An ordinary assignment
+replaces the virtual property in place and keeps its symbol position, an
+assignment through a String wrapper creates a nearer own property, a
+read-only virtual property refuses assignment, and a non-configurable
+non-writable one accepts only a redefinition whose value is SameValue to the
+`undefined` it models, which changes nothing and so leaves the property
+virtual.
 
-Fixed native and generated differential evidence at seed `0x60004500` covers
+Fixed native and generated differential evidence at seed `0x60006100` covers
 both specialization policies, forced collection at every safepoint, integer,
 string, and symbol key ordering, mutation during enumeration, assignment
-accessors, iterator closing, null-prototype groups, false hints, deliberate
-shape-guard misses, and generic fallback. Of the 296 paths under the node's
-inventory roots, 295 are reviewed: 252 pass and 43 retain explicit prerequisite
+accessors, iterator closing, null-prototype groups, ordinary assignment to
+the virtual property and through a String wrapper, read-only refusal, frozen
+redefinition, false hints, deliberate shape-guard misses, and generic
+fallback. Of the 296 paths under the node's
+inventory roots, 295 are reviewed: 259 pass and 36 retain explicit prerequisite
 boundaries. The legacy global-own-name case remains outside the subset because
 it has no feature metadata but requires unadmitted global constructors and
-functions. Five previously reviewed dependency cases also become passes. The
-manifest moves to 10,659 paths with 7,850 passes, 1,364 expected negatives,
-and 1,445 unsupported profile features. The admitted runtime checkpoint moves
-the runtime ABI to `oseo-runtime-m5-94` without adding a generated-code entry
-point or changing the graph's orchestration state.
+functions. Twenty-three reviewed cases outside those roots also move from
+unsupported profile feature to pass, because own-key order, own-key
+reflection, and object rest destructuring are what they were waiting on. The
+manifest moves from 16,912 to 17,204 paths, from 13,022 to 13,301 passes, from
+2,334 to 2,347 unsupported profile features, and keeps 1,556 expected
+negatives. No reviewed row moves away from pass. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-94` without adding a
+generated-code entry point or changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

@@ -147,6 +147,36 @@ bool oseo_internal_own_descriptor(
     return true;
 }
 
+bool oseo_internal_own_property_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+) {
+    if (oseo_internal_own_descriptor(
+            object_value,
+            key,
+            value,
+            attributes,
+            getter,
+            setter
+        )) {
+        return true;
+    }
+    *value = oseo_undefined();
+    *getter = oseo_undefined();
+    *setter = oseo_undefined();
+    return oseo_internal_virtual_string_iterator_descriptor(
+        context,
+        object_value,
+        key,
+        attributes
+    );
+}
+
 static OseoResult define_data_property(
     OseoContext *context,
     OseoValue object_value,
@@ -194,17 +224,31 @@ static OseoResult define_data_property(
             &virtual_attributes
         );
     if (replaces_virtual) {
+        /* The virtual property models an undefined value until the String
+         * iterator node materializes one, so a non-writable redefinition
+         * rejects only a value that is not SameValue to it. Reapplying the
+         * descriptor a frozen %String.prototype% reports must succeed, the
+         * way it does on Node.js and Deno. */
         if (!virtual_attributes.configurable &&
             (attributes.configurable ||
              attributes.enumerable != virtual_attributes.enumerable ||
              (!virtual_attributes.writable && attributes.writable) ||
-             (!virtual_attributes.writable && has_value))) {
+             (!virtual_attributes.writable && has_value &&
+              !oseo_internal_same_value(value, oseo_undefined())))) {
             return type_error(
                 context,
                 "Cannot redefine a non-configurable property."
             );
         }
-        if (!has_value) {
+        /* A non-configurable, non-writable property cannot change: the
+         * validation above rejected every descriptor that would alter its
+         * attributes, and a value SameValue to the modeled `undefined`
+         * leaves the value alone. Keep the virtual representation instead
+         * of materializing an `undefined` the String iterator node has not
+         * produced, so default String iteration still works afterward. */
+        bool read_only_no_op = !virtual_attributes.configurable &&
+            !virtual_attributes.writable;
+        if (!has_value || read_only_no_op) {
             object->virtual_string_iterator_configurable =
                 attributes.configurable;
             object->virtual_string_iterator_enumerable =

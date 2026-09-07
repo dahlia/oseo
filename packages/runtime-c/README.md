@@ -733,8 +733,18 @@ functions. They share the existing ordinary own-key ordering and preserve
 descriptor rechecks, Get and Set order, iterator closing, symbol identity, and
 null-prototype grouping. The temporary default primitive String path in
 `groupBy` iterates Unicode code points without exposing the separate String
-iterator node. The generated-code ABI gains no entry point; the added
-intrinsic code IDs remain runtime-internal.
+iterator node. `oseo_internal_own_property_descriptor` becomes the one
+own-property query every reflective path uses, so the virtual
+%String.prototype%[`Symbol.iterator`] reports the same existence and
+attributes to HasOwnProperty, `propertyIsEnumerable`, the `in` operator,
+descriptor reads, redefinition rechecks, own-key spread, and assignment, and
+an ordinary read of the untouched default stops at %String.prototype%. An
+assignment to that virtual property replaces it in place, a read-only one
+refuses the assignment, and a non-configurable non-writable one accepts only
+a redefinition whose value is SameValue to the `undefined` it models and
+stays virtual through it. The
+generated-code ABI gains no entry point; the added intrinsic code IDs remain
+runtime-internal.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

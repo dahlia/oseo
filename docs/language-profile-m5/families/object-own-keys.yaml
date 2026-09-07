@@ -5,8 +5,11 @@ scope:
   - "Object.keys, values, entries, getOwnPropertyNames,
     getOwnPropertySymbols, assign, fromEntries, hasOwn, and groupBy,
     including ordinary own-key order, descriptor rechecks, symbol keys,
-    iterator closing, null-prototype groups, default String iteration, and
-    inherited primitive iterators."
+    iterator closing, null-prototype groups, default String iteration,
+    inherited primitive iterators, and one own-property descriptor primitive
+    that keeps the virtual %String.prototype% iterator's existence,
+    attributes, descriptor value, ordinary assignment, read-only refusal,
+    and same-value redefinition consistent across every reflective query."
 owners:
   - PLAN-M5.md
 evidence:

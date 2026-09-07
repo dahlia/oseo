@@ -12328,7 +12328,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/toString/AsyncFunction.js
     expectedClassification: unsupported-profile-feature
@@ -16297,7 +16297,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/Target-Number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/Target-Object.js
     expectedClassification: pass
@@ -16549,7 +16549,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-14.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-140.js
     expectedClassification: unsupported-profile-feature
@@ -17128,7 +17128,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-37.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-38.js
     expectedClassification: pass
@@ -17335,7 +17335,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object-bigint.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object-non-empty-string.js
     expectedClassification: pass
@@ -17344,7 +17344,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/properties-arg-to-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-0-1.js
     expectedClassification: pass
@@ -22678,7 +22678,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/entries/primitive-numbers.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/entries/primitive-strings.js
     expectedClassification: pass
@@ -23863,7 +23863,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/symbols-included.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/tamper-with-global-object.js
     expectedClassification: pass
@@ -23908,7 +23908,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/15.2.3.4-4-36.js
     expectedClassification: pass
@@ -24934,13 +24934,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-5-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-5-12.js
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-5-13.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-5-14.js
     expectedClassification: pass
@@ -24988,7 +24988,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-5-b-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-6-1.js
     expectedClassification: pass
@@ -25159,7 +25159,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/proto-from-ctor-realm.js
     expectedClassification: unsupported-profile-feature
@@ -26056,7 +26056,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/values/primitive-numbers.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/values/primitive-strings.js
     expectedClassification: pass
@@ -26341,7 +26341,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/resolve-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/resolve-element-function-prototype.js
     expectedClassification: pass
@@ -26581,7 +26581,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/reject-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/reject-element-function-prototype.js
     expectedClassification: pass
@@ -26614,7 +26614,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/resolve-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/resolve-element-function-prototype.js
     expectedClassification: pass
@@ -26890,7 +26890,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/reject-element-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/reject-element-function-prototype.js
     expectedClassification: pass
@@ -26995,7 +26995,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/executor-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/executor-function-prototype.js
     expectedClassification: pass
@@ -27022,7 +27022,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/proto-from-ctor-realm.js
     expectedClassification: unsupported-profile-feature
@@ -27664,7 +27664,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject-function-prototype.js
     expectedClassification: pass
@@ -27754,7 +27754,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/resolve-function-property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/resolve-function-prototype.js
     expectedClassification: pass
@@ -29374,7 +29374,7 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/match-indices/indices-property.js
     expectedClassification: pass
@@ -29434,10 +29434,10 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/groups-properties.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/lookbehind.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/named-groups/non-unicode-match.js
     expectedClassification: pass
@@ -37213,7 +37213,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/ThrowTypeError/property-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/ThrowTypeError/prototype.js
     expectedClassification: pass
@@ -47772,7 +47772,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, functions]
   - path: test/language/statements/class/definition/fn-length-static-precedence-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-length-static-precedence.js
     expectedClassification: pass
@@ -47784,7 +47784,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties, symbols]
   - path: test/language/statements/class/definition/fn-name-static-precedence-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-name-static-precedence.js
     expectedClassification: pass
@@ -51044,7 +51044,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-same-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,
@@ -54494,7 +54494,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-gen-decl-dstr-obj-rest-same-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,

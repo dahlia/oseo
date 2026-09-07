@@ -732,6 +732,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-create" ||
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
+    fixture.name === "object-own-keys" ||
+    fixture.name === "object-own-keys-virtual-assignment" ||
+    fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||

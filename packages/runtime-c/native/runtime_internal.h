@@ -2174,14 +2174,36 @@ bool oseo_internal_own_descriptor(
 );
 /*
  * Reads the descriptor state of %String.prototype%'s virtual iterator.
- * Its value remains an Array.from implementation detail until the separate
- * string-iterator node lands, so ordinary reflective lookup stays unchanged.
+ * Its value stays unmaterialized until the separate string-iterator node
+ * lands, so the descriptor carries attributes only. Components that
+ * classify or rebuild the property use this directly; every reflective
+ * own-property query goes through
+ * oseo_internal_own_property_descriptor instead so that the virtual
+ * property cannot be visible to one query and absent from another.
  */
 bool oseo_internal_virtual_string_iterator_descriptor(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
     OseoPropertyAttributes *attributes
+);
+/*
+ * OrdinaryGetOwnProperty (10.1.5.1) over every own property a program can
+ * observe, including the virtual %String.prototype%[@@iterator]. The
+ * virtual property reports attributes with an undefined value, which is
+ * also what Get returns while the String iterator node has not
+ * materialized the function, so HasOwnProperty, propertyIsEnumerable,
+ * descriptor reads, redefinition rechecks, and assignment all agree on
+ * one answer.
+ */
+bool oseo_internal_own_property_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
 );
 /*
  * True when a String primitive or wrapper reaches %String.prototype%'s

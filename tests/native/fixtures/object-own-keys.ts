@@ -165,6 +165,60 @@ console.log(
 );
 const stringPrototype = Object.getPrototypeOf(Object(""));
 const laterStringSymbol = Symbol("later string symbol");
+/* Every own-property query has to give the same answer about the virtual
+ * %String.prototype% iterator, so one helper asks all of them at each
+ * stage. None of these queries reads a property value, so a stage that
+ * counts accessor reads stays undisturbed. */
+function reflectStringIterator(label) {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    stringPrototype,
+    Symbol.iterator,
+  );
+  console.log(
+    "string iterator reflection",
+    label,
+    Object.hasOwn(stringPrototype, Symbol.iterator),
+    Object.prototype.hasOwnProperty.call(stringPrototype, Symbol.iterator),
+    Object.prototype.propertyIsEnumerable.call(
+      stringPrototype,
+      Symbol.iterator,
+    ),
+    Symbol.iterator in stringPrototype,
+    Symbol.iterator in Object(""),
+    descriptor === undefined
+      ? "absent"
+      : "get" in descriptor
+        ? "accessor"
+        : "data",
+    descriptor === undefined ? "absent" : descriptor.enumerable,
+    descriptor === undefined ? "absent" : descriptor.configurable,
+  );
+}
+reflectStringIterator("untouched");
+const untouchedStringDescriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
+console.log(
+  "untouched string iterator value",
+  untouchedStringDescriptor.writable,
+  // The value stays unmaterialized until the String iterator node lands,
+  // so the descriptor agrees with an ordinary read rather than naming a
+  // function this realm cannot yet create.
+  untouchedStringDescriptor.value === stringPrototype[Symbol.iterator],
+  untouchedStringDescriptor.value === Object("")[Symbol.iterator],
+);
+const plantedObjectIterator = function () {};
+Object.prototype[Symbol.iterator] = plantedObjectIterator;
+console.log(
+  "untouched string iterator shadowing",
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+  stringPrototype[Symbol.iterator] === plantedObjectIterator,
+  ""[Symbol.iterator] === plantedObjectIterator,
+  Object("")[Symbol.iterator] === plantedObjectIterator,
+  ({})[Symbol.iterator] === plantedObjectIterator,
+);
+delete Object.prototype[Symbol.iterator];
 let stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   enumerable: true,
@@ -202,6 +256,15 @@ console.log(
   virtualStringAssigned[Symbol.iterator] ===
     stringPrototype[Symbol.iterator],
   render(stringSymbolAccessLog),
+);
+reflectStringIterator("enumerable");
+const spreadStringPrototype = { ...stringPrototype };
+console.log(
+  "virtual string iterator spread",
+  Object.hasOwn(spreadStringPrototype, Symbol.iterator),
+  spreadStringPrototype[Symbol.iterator] ===
+    stringPrototype[Symbol.iterator],
+  Object.hasOwn(spreadStringPrototype, laterStringSymbol),
 );
 const wrapperCallbacks = [];
 const groupedWrapperString = Object.groupBy(
@@ -256,6 +319,7 @@ console.log(
   stringIteratorReads,
   render(stringSymbolAccessLog),
 );
+reflectStringIterator("replaced");
 const replacedStringGroups = Object.groupBy(
   new String("ignored"),
   (value) => value,
@@ -288,6 +352,7 @@ console.log(
   deletedStringDescriptor === undefined,
   Object.hasOwn(deletedStringDescriptors, Symbol.iterator),
 );
+reflectStringIterator("deleted");
 let deletedStringIteratorCalls = 0;
 try {
   Object.groupBy(new String("ignored"), () => {
@@ -315,6 +380,7 @@ console.log(
   redefinedStringSymbols[0] === laterStringSymbol,
   redefinedStringSymbols[1] === Symbol.iterator,
 );
+reflectStringIterator("redefined");
 const numberPrototype = Object.getPrototypeOf(Object(0));
 let numberIteratorReads = 0;
 Object.defineProperty(numberPrototype, Symbol.iterator, {
@@ -410,6 +476,185 @@ while (guardTurn < 2) {
   guardTurn = guardTurn + 1;
 }
 console.log("method stable", String.prototype.charAt === originalCharAt);
+`,
+  },
+  {
+    globalScriptReference: true,
+    name: "object-own-keys-virtual-assignment",
+    source: `
+/* Ordinary assignment is the one own-property write that never passes
+ * through Object.defineProperty, so it needs its own realm: assigning to
+ * the virtual %String.prototype% iterator has to replace it in place,
+ * keep its attributes and its symbol chronology, and stay reachable to
+ * every later read. */
+const stringPrototype = Object.getPrototypeOf(Object(""));
+const laterStringSymbol = Symbol("later assignment symbol");
+Object.defineProperty(stringPrototype, laterStringSymbol, {
+  configurable: true,
+  enumerable: true,
+  value: 1,
+  writable: true,
+});
+const beforeSymbols = Object.getOwnPropertySymbols(stringPrototype);
+console.log(
+  "before assignment",
+  beforeSymbols.length,
+  beforeSymbols[0] === Symbol.iterator,
+  beforeSymbols[1] === laterStringSymbol,
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+  Object.prototype.propertyIsEnumerable.call(stringPrototype, Symbol.iterator),
+);
+/* A writable data property on the prototype makes an assignment through a
+ * wrapper create a nearer own property instead of writing through. */
+const wrapper = Object("ab");
+const wrapperIterator = function () {};
+wrapper[Symbol.iterator] = wrapperIterator;
+const wrapperDescriptor = Object.getOwnPropertyDescriptor(
+  wrapper,
+  Symbol.iterator,
+);
+console.log(
+  "wrapper receiver assignment",
+  Object.hasOwn(wrapper, Symbol.iterator),
+  wrapper[Symbol.iterator] === wrapperIterator,
+  wrapperDescriptor.configurable,
+  wrapperDescriptor.enumerable,
+  wrapperDescriptor.writable,
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+  stringPrototype[Symbol.iterator] === wrapperIterator,
+);
+const assignedIterator = function () {
+  let done = false;
+  return {
+    next: function () {
+      if (done) return { done: true };
+      done = true;
+      return { done: false, value: "assigned" };
+    },
+  };
+};
+stringPrototype[Symbol.iterator] = assignedIterator;
+const assignedDescriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
+const afterSymbols = Object.getOwnPropertySymbols(stringPrototype);
+console.log(
+  "prototype assignment",
+  stringPrototype[Symbol.iterator] === assignedIterator,
+  ""[Symbol.iterator] === assignedIterator,
+  Object("")[Symbol.iterator] === assignedIterator,
+  assignedDescriptor.configurable,
+  assignedDescriptor.enumerable,
+  assignedDescriptor.writable,
+  afterSymbols.length,
+  afterSymbols[0] === Symbol.iterator,
+  afterSymbols[1] === laterStringSymbol,
+  Object.prototype.hasOwnProperty.call(stringPrototype, Symbol.iterator),
+  Object.prototype.propertyIsEnumerable.call(stringPrototype, Symbol.iterator),
+  Symbol.iterator in stringPrototype,
+);
+const iterated = [];
+for (const part of "ignored") iterated.push(part);
+console.log("assigned iteration", iterated.length, iterated[0]);
+const grouped = Object.groupBy(new String("ignored"), (value) => value);
+const groupedKeys = Object.keys(grouped);
+console.log("assigned grouping", groupedKeys.length, groupedKeys[0]);
+`,
+  },
+  {
+    globalScriptReference: true,
+    name: "object-own-keys-virtual-read-only",
+    source: `
+/* A read-only virtual iterator has to refuse an assignment the way an
+ * ordinary read-only data property does, and a non-configurable one has
+ * to accept a redefinition that repeats the value it already models. */
+const stringPrototype = Object.getPrototypeOf(Object(""));
+Object.defineProperty(stringPrototype, Symbol.iterator, { writable: false });
+const readOnlyDescriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
+const originalIterator = stringPrototype[Symbol.iterator];
+console.log(
+  "read-only virtual descriptor",
+  readOnlyDescriptor.configurable,
+  readOnlyDescriptor.enumerable,
+  readOnlyDescriptor.writable,
+  readOnlyDescriptor.value === originalIterator,
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+);
+stringPrototype[Symbol.iterator] = function () {};
+console.log(
+  "read-only sloppy assignment",
+  stringPrototype[Symbol.iterator] === originalIterator,
+  Object.getOwnPropertyDescriptor(stringPrototype, Symbol.iterator).writable,
+);
+function strictAssignment() {
+  "use strict";
+  stringPrototype[Symbol.iterator] = function () {};
+}
+try {
+  strictAssignment();
+  console.log("read-only strict assignment", "no throw");
+} catch (error) {
+  console.log("read-only strict assignment", error instanceof TypeError);
+}
+const wrapper = Object("ab");
+wrapper[Symbol.iterator] = function () {};
+console.log(
+  "read-only blocks the receiver",
+  Object.hasOwn(wrapper, Symbol.iterator),
+  wrapper[Symbol.iterator] === originalIterator,
+);
+Object.defineProperty(stringPrototype, Symbol.iterator, {
+  configurable: false,
+});
+const frozenDescriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
+try {
+  Object.defineProperty(stringPrototype, Symbol.iterator, frozenDescriptor);
+  console.log("frozen round trip", "ok");
+} catch (error) {
+  console.log("frozen round trip", error instanceof TypeError);
+}
+try {
+  Object.defineProperty(stringPrototype, Symbol.iterator, {
+    value: frozenDescriptor.value,
+  });
+  console.log("frozen same value", "ok");
+} catch (error) {
+  console.log("frozen same value", error instanceof TypeError);
+}
+try {
+  Object.defineProperty(stringPrototype, Symbol.iterator, { value: 1 });
+  console.log("frozen other value", "ok");
+} catch (error) {
+  console.log("frozen other value", error instanceof TypeError);
+}
+console.log(
+  "frozen descriptor",
+  frozenDescriptor.configurable,
+  frozenDescriptor.enumerable,
+  frozenDescriptor.writable,
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+  stringPrototype[Symbol.iterator] === originalIterator,
+);
+/* A redefinition that changes nothing must leave the default String
+ * iteration alone, so grouping a String wrapper still consumes its code
+ * points instead of finding an unmaterialized value. */
+const groupedAfterRoundTrip = Object.groupBy(
+  new String("ab"),
+  (value) => value,
+);
+console.log(
+  "frozen default iteration",
+  Object.keys(groupedAfterRoundTrip).join(","),
+  Object.hasOwn(stringPrototype, Symbol.iterator),
+  Object.getOwnPropertyDescriptor(stringPrototype, Symbol.iterator).writable,
+);
 `,
   },
 ];

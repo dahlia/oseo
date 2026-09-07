@@ -284,10 +284,6 @@ families:
     owner: tests/property/m5-array-prototype-species-mapping.property.test.ts
     start: 0x60004400
     end: 0x600044ff
-  - family: m5-object-own-keys
-    owner: tests/property/m5-object-own-keys.property.test.ts
-    start: 0x60004500
-    end: 0x600045ff
   - family: m5-string-prototype-match-and-split
     owner: tests/property/m5-string-prototype-match-and-split.property.test.ts
     start: 0x60004600
@@ -392,3 +388,7 @@ families:
     owner: tests/property/m5-array-prototype-predicate-search.property.test.ts
     start: 0x60006000
     end: 0x600060ff
+  - family: m5-object-own-keys
+    owner: tests/property/m5-object-own-keys.property.test.ts
+    start: 0x60006100
+    end: 0x600061ff

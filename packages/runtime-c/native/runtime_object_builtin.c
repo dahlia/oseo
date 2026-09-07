@@ -121,19 +121,12 @@ static OseoResult object_prototype_property_is_enumerable(
         return normal(oseo_boolean(enumerable));
     }
     if (!is_object(receiver)) return normal(oseo_boolean(false));
-    if (function_has_prototype_property(receiver) &&
-        oseo_internal_string_is_ascii(key.value, "prototype")) {
-        return normal(oseo_boolean(false));
-    }
-    if (is_array(receiver) &&
-        oseo_internal_string_is_ascii(key.value, "length")) {
-        return normal(oseo_boolean(false));
-    }
     OseoValue ignored = oseo_undefined();
     OseoValue ignored_getter = oseo_undefined();
     OseoValue ignored_setter = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
-    bool own = oseo_internal_own_descriptor(
+    bool own = oseo_internal_own_property_descriptor(
+        context,
         receiver,
         key.value,
         &ignored,
@@ -1256,6 +1249,14 @@ static bool rest_key_is_excluded(
     return false;
 }
 
+/*
+ * The own-key order CopyDataProperties walks. Of the own properties that
+ * live outside the property vector, only the virtual
+ * %String.prototype%[@@iterator] can become enumerable, so it is the one
+ * synthetic key this snapshot has to place; an array's `length` and a
+ * function's `prototype` are permanently non-enumerable and the copy
+ * would skip them anyway.
+ */
 static OseoResult snapshot_rest_keys(
     OseoContext *context,
     OseoRootFrame *frame,
@@ -1304,6 +1305,19 @@ static OseoResult snapshot_rest_keys(
         frame->slots[3u + output] = key;
         output += 1u;
     }
+    if (ordinary_object(frame->slots[0])->virtual_string_iterator) {
+        /* The untouched String iterator leads every symbol a program can
+         * add, exactly as it does in the ordinary own-key snapshot. */
+        OseoResult key = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        frame->slots[3u + output] = key.value;
+        output += 1u;
+    }
+    /* The virtual-key lookup above may allocate, so reacquire the object
+     * before reading its property vector. */
     object = ordinary_object(frame->slots[0]);
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         OseoValue key = object->properties[index].key;
@@ -1334,7 +1348,8 @@ static OseoResult copy_data_properties(
     size_t key_count = is_string(source)
         ? string_object(source)->length
         : is_object(source)
-            ? ordinary_object(source)->property_count
+            ? ordinary_object(source)->property_count +
+                (ordinary_object(source)->virtual_string_iterator ? 1u : 0u)
             : 0u;
     if (key_count > SIZE_MAX - 3u) {
         return failure(context, "OSEO2001", "Own-key snapshot is too large.");
@@ -1358,7 +1373,8 @@ static OseoResult copy_data_properties(
         OseoValue ignored_setter = oseo_undefined();
         bool exists = is_string(frame.slots[0])
             ? oseo_internal_string_own_property(frame.slots[0], key, NULL)
-            : oseo_internal_own_descriptor(
+            : oseo_internal_own_property_descriptor(
+                context,
                 frame.slots[0],
                 key,
                 &ignored,
@@ -1598,7 +1614,8 @@ static OseoResult define_converted_property(
     OseoPropertyAttributes current_attributes = {false, false, false, false};
     OseoValue current_getter = oseo_undefined();
     OseoValue current_setter = oseo_undefined();
-    bool exists = oseo_internal_own_descriptor(
+    bool exists = oseo_internal_own_property_descriptor(
+        context,
         object_value,
         key,
         &current_value,
@@ -1606,14 +1623,6 @@ static OseoResult define_converted_property(
         &current_getter,
         &current_setter
     );
-    if (!exists) {
-        exists = oseo_internal_virtual_string_iterator_descriptor(
-            context,
-            object_value,
-            key,
-            &current_attributes
-        );
-    }
     /* A descriptor with no value field keeps the property's current
      * value, which a cell-backed property holds in its binding cell. */
     if (exists &&
@@ -1772,39 +1781,6 @@ static OseoResult from_property_descriptor(
     return normal(frame->slots[0]);
 }
 
-/* The virtual String iterator participates in descriptor queries and
- * rechecks even though the later String iterator node has not
- * materialized its value. */
-static bool object_own_descriptor(
-    OseoContext *context,
-    OseoValue object_value,
-    OseoValue key,
-    OseoValue *value,
-    OseoPropertyAttributes *attributes,
-    OseoValue *getter,
-    OseoValue *setter
-) {
-    if (oseo_internal_own_descriptor(
-            object_value,
-            key,
-            value,
-            attributes,
-            getter,
-            setter
-        )) {
-        return true;
-    }
-    *value = oseo_undefined();
-    *getter = oseo_undefined();
-    *setter = oseo_undefined();
-    return oseo_internal_virtual_string_iterator_descriptor(
-        context,
-        object_value,
-        key,
-        attributes
-    );
-}
-
 OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoContext *context,
     size_t argument_count,
@@ -1831,7 +1807,7 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoValue setter = oseo_undefined();
     bool exists = false;
     if (result.status == OSEO_STATUS_NORMAL && is_object(object_value)) {
-        exists = object_own_descriptor(
+        exists = oseo_internal_own_property_descriptor(
             context,
             object_value,
             frame.slots[1],
@@ -2104,7 +2080,8 @@ static OseoResult object_enumerable_own_properties(
         OseoValue ignored_getter = oseo_undefined();
         OseoValue ignored_setter = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
-        if (!oseo_internal_own_descriptor(
+        if (!oseo_internal_own_property_descriptor(
+                context,
                 frame.slots[0],
                 key,
                 &ignored,
@@ -2196,7 +2173,7 @@ static OseoResult object_assign(
             OseoValue ignored_getter = oseo_undefined();
             OseoValue ignored_setter = oseo_undefined();
             OseoPropertyAttributes attributes = {false, false, false, false};
-            if (!object_own_descriptor(
+            if (!oseo_internal_own_property_descriptor(
                     context,
                     frame.slots[0],
                     key,
@@ -2281,17 +2258,7 @@ static OseoResult object_has_own(
     OseoResult result = oseo_property_key(context, slots[1]);
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoPropertyAttributes attributes = {false, false, false, false};
-        if (oseo_internal_virtual_string_iterator_descriptor(
-                context,
-                slots[0],
-                slots[1],
-                &attributes
-            )) {
-            result = normal(oseo_boolean(true));
-        } else {
-            result = oseo_object_has_own(context, slots[0], slots[1]);
-        }
+        result = oseo_object_has_own(context, slots[0], slots[1]);
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -2605,7 +2572,7 @@ static OseoResult object_get_own_property_descriptors(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (!object_own_descriptor(
+        if (!oseo_internal_own_property_descriptor(
                 context,
                 frame.slots[0],
                 key,
@@ -2717,7 +2684,8 @@ static OseoResult object_define_properties(
         OseoValue ignored_setter = oseo_undefined();
         /* A getter an earlier key ran may have removed this key or made
          * it non-enumerable, so the descriptor is re-read per key. */
-        if (!oseo_internal_own_descriptor(
+        if (!oseo_internal_own_property_descriptor(
+                context,
                 frame.slots[0],
                 key,
                 &ignored,

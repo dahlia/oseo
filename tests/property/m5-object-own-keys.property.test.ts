@@ -171,6 +171,32 @@ String.prototype.objectOwnKeysPropertyMarker = 1;
 console.log("guard", hinted("guard"));
 const stringPrototype = Object.getPrototypeOf(Object(""));
 const laterStringSymbol = Symbol("later string symbol");
+function reflectStringIterator(label) {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    stringPrototype,
+    Symbol.iterator,
+  );
+  console.log(
+    "string iterator reflection",
+    label,
+    Object.hasOwn(stringPrototype, Symbol.iterator),
+    Object.prototype.hasOwnProperty.call(stringPrototype, Symbol.iterator),
+    Object.prototype.propertyIsEnumerable.call(
+      stringPrototype,
+      Symbol.iterator,
+    ),
+    Symbol.iterator in stringPrototype,
+    Symbol.iterator in Object(""),
+    descriptor === undefined
+      ? "absent"
+      : "get" in descriptor
+        ? "accessor"
+        : "data",
+    descriptor === undefined ? "absent" : descriptor.enumerable,
+    descriptor === undefined ? "absent" : descriptor.configurable,
+  );
+}
+reflectStringIterator("untouched");
 let stringSymbolAccessLog = [];
 Object.defineProperty(stringPrototype, Symbol.iterator, {
   enumerable: ${String(testCase.virtualIteratorEnumerable)},
@@ -216,6 +242,7 @@ console.log(
     ? "none"
     : render(stringSymbolAccessLog),
 );
+reflectStringIterator("enumerable");
 const wrapperCallbacks = [];
 const groupedWrapperString = Object.groupBy(
   new String(${JSON.stringify(testCase.wrapperParts.join(""))}),
@@ -229,6 +256,45 @@ console.log(
   render(wrapperCallbacks),
   render(groupedWrapperString.wrapper),
 );
+const assignedStringIterator = function () {
+  let done = false;
+  return {
+    next: function () {
+      if (done) return { done: true };
+      done = true;
+      return { done: false, value: "assigned" };
+    },
+  };
+};
+const assignmentWrapper = Object("z");
+const wrapperOwnIterator = function () {};
+assignmentWrapper[Symbol.iterator] = wrapperOwnIterator;
+stringPrototype[Symbol.iterator] = assignedStringIterator;
+const assignedStringSymbols = Object.getOwnPropertySymbols(stringPrototype);
+const assignedStringDescriptor = Object.getOwnPropertyDescriptor(
+  stringPrototype,
+  Symbol.iterator,
+);
+const assignedStringGroups = Object.groupBy(
+  new String("ignored"),
+  (value) => value,
+);
+const assignedStringKeys = Object.keys(assignedStringGroups);
+console.log(
+  "assigned string iterator",
+  Object.hasOwn(assignmentWrapper, Symbol.iterator),
+  assignmentWrapper[Symbol.iterator] === wrapperOwnIterator,
+  stringPrototype[Symbol.iterator] === assignedStringIterator,
+  assignedStringDescriptor.configurable,
+  assignedStringDescriptor.enumerable,
+  assignedStringDescriptor.writable,
+  assignedStringSymbols.length,
+  assignedStringSymbols[0] === Symbol.iterator,
+  assignedStringSymbols[1] === laterStringSymbol,
+  assignedStringKeys.length,
+  assignedStringKeys[0],
+);
+reflectStringIterator("assigned");
 let stringIteratorReads = 0;
 let replacementReceiverIsWrapper = false;
 stringSymbolAccessLog = [];
@@ -269,6 +335,7 @@ console.log(
   stringIteratorReads,
   render(stringSymbolAccessLog),
 );
+reflectStringIterator("replaced");
 const replacedStringGroups = Object.groupBy(
   new String("ignored"),
   (value) => value,
@@ -298,6 +365,7 @@ console.log(
   deletedStringDescriptor === undefined,
   Object.hasOwn(deletedStringDescriptors, Symbol.iterator),
 );
+reflectStringIterator("deleted");
 let deletedStringIteratorCalls = 0;
 try {
   Object.groupBy(new String("ignored"), () => {
@@ -325,6 +393,7 @@ console.log(
   redefinedStringSymbols[0] === laterStringSymbol,
   redefinedStringSymbols[1] === Symbol.iterator,
 );
+reflectStringIterator("redefined");
 const numberIteratorValues = ${JSON.stringify(testCase.numberIteratorValues)};
 const numberPrototype = Object.getPrototypeOf(Object(0));
 let numberIteratorReads = 0;
@@ -485,20 +554,37 @@ function expected(testCase: PropertyCase): string {
     "false hint m",
     "guard g",
     "guard g",
+    "string iterator reflection untouched true true false true true " +
+      "data false true",
     "virtual string reflection 2 true true true " +
       `${String(testCase.virtualIteratorEnumerable)} true ` +
       `${String(testCase.virtualIteratorEnumerable)} true ` +
       `${String(testCase.virtualIteratorEnumerable)} true ` +
       (testCase.laterSymbolEnumerable ? "later" : "none"),
+    "string iterator reflection enumerable true true " +
+      `${String(testCase.virtualIteratorEnumerable)} true true data ` +
+      `${String(testCase.virtualIteratorEnumerable)} true`,
     `group wrapper string ${testCase.wrapperParts
       .map((part, index) => `${index}:${part}`)
       .join(",")} ${testCase.wrapperParts.join(",")}`,
+    "assigned string iterator true true true true " +
+      `${String(testCase.virtualIteratorEnumerable)} true 2 true true ` +
+      "1 assigned",
+    "string iterator reflection assigned true true " +
+      `${String(testCase.virtualIteratorEnumerable)} true true data ` +
+      `${String(testCase.virtualIteratorEnumerable)} true`,
     "replaced string reflection 2 true true true true true true 1 " +
       (testCase.laterSymbolEnumerable ? "iterator,later" : "iterator"),
+    "string iterator reflection replaced true true true true true " +
+      "accessor true true",
     "group replaced string iterator 2 true replacement",
     "deleted string reflection 1 true false false true false",
+    "string iterator reflection deleted false false false false false " +
+      "absent absent absent",
     "group deleted string iterator true 0",
     "redefined string iterator order 2 true true",
+    "string iterator reflection redefined true true true true true " +
+      "data true true",
     `group primitive number 1 ${testCase.numberIteratorValues.join(",")}`,
     `for of primitive number 2 ${testCase.numberIteratorValues.join(",")}`,
     `from entries primitive boolean 1 ${testCase.booleanEntryValue}`,
@@ -630,18 +716,25 @@ test(
           "one to six distinct integer, string, and symbol own properties; " +
           "enumerable and hidden descriptors; bounded integer values; zero " +
           "to five grouped values; one to four String wrapper code points; " +
-          "virtual, enumerable, replaced, deleted, and redefined String " +
-          "iterators ordered against a generated later symbol; " +
+          "virtual, enumerable, assigned, replaced, deleted, and " +
+          "redefined String iterators ordered against a generated later " +
+          "symbol, an ordinary assignment through a String wrapper, and " +
+          "an ordinary assignment that replaces the virtual property in " +
+          "place, each stage " +
+          "cross-checked through Object.hasOwn, inherited hasOwnProperty, " +
+          "propertyIsEnumerable, the in operator, and the own descriptor; " +
           "inherited Number and Boolean iterators through built-in and " +
           "generated consumers; nullish and absent-iterator failures; a " +
           "false hint and one shape-guard miss",
         numRuns: 16,
         profile: "M5 Object own-key statics",
-        seed: 0x6000_4500,
+        seed: 0x6000_6100,
         sizeLimit:
           "at most six own properties, five grouped values, nine static " +
           "observations, four Number iterator values, four String wrapper " +
-          "code points, six String iterator observations, two Boolean " +
+          "code points, six String iterator observations, six String " +
+          "iterator reflection observations, eleven assignment " +
+          "observations, two Boolean " +
           "iterator observations, four nullish " +
           "observations, three invalid for-of observations, and four " +
           "specialization observations",
