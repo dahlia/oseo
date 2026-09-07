@@ -183,8 +183,11 @@ static OseoResult define_data_property(
     OseoValue key,
     OseoValue value,
     OseoPropertyAttributes attributes,
-    bool has_value
+    bool has_value,
+    bool absent_writable,
+    const char **refusal
 ) {
+    *refusal = NULL;
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) {
@@ -196,19 +199,17 @@ static OseoResult define_data_property(
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
-            return type_error(
-                context,
-                "Cannot redefine the prototype property."
-            );
+            *refusal =
+                "Cannot redefine the prototype property.";
+            return normal(object_value);
         }
         OseoFunction *function = function_object(object_value);
         if (!function->prototype_writable &&
             (attributes.writable ||
              !oseo_internal_same_value(function->prototype_object, value))) {
-            return type_error(
-                context,
-                "Cannot redefine the prototype property."
-            );
+            *refusal =
+                "Cannot redefine the prototype property.";
+            return normal(object_value);
         }
         function->prototype_object = value;
         function->prototype_writable = attributes.writable;
@@ -235,10 +236,9 @@ static OseoResult define_data_property(
              (!virtual_attributes.writable && attributes.writable) ||
              (!virtual_attributes.writable && has_value &&
               !oseo_internal_same_value(value, oseo_undefined())))) {
-            return type_error(
-                context,
-                "Cannot redefine a non-configurable property."
-            );
+            *refusal =
+                "Cannot redefine a non-configurable property.";
+            return normal(object_value);
         }
         /* A non-configurable, non-writable property cannot change: the
          * validation above rejected every descriptor that would alter its
@@ -271,36 +271,55 @@ static OseoResult define_data_property(
             );
             if (converted.status != OSEO_STATUS_NORMAL) return converted;
         }
+        if (absent_writable) {
+            /* A descriptor without a [[Writable]] field keeps the
+             * property's current one, and ToArrayLength above is the
+             * one step of a definition that runs user code, so that
+             * field is read here rather than by the caller. Array
+             * `length` is always non-configurable and non-enumerable,
+             * so no other field can have gone stale. */
+            attributes.writable = object->length_writable;
+        }
         if (attributes.configurable || attributes.enumerable) {
-            return type_error(
-                context,
-                "Cannot redefine the array length property."
-            );
+            *refusal =
+                "Cannot redefine the array length property.";
+            return normal(object_value);
         }
         if (!object->length_writable && attributes.writable) {
-            return type_error(
-                context,
-                "Cannot redefine the array length property."
-            );
+            *refusal =
+                "Cannot redefine the array length property.";
+            return normal(object_value);
         }
         if (!has_value) {
             object->length_writable = attributes.writable;
             return normal(object_value);
         }
+        /* ArraySetLength runs with the already converted length, so it
+         * reaches no user code and cannot report a conversion error.
+         * Its non-strict form leaves the array length above the
+         * requested one exactly when the specification returns false,
+         * which is the refusal this reports and the partial truncation
+         * it keeps. */
         bool valid_length = false;
         OseoResult changed = oseo_internal_set_array_length(
             context,
             object,
             oseo_number(requested),
-            true,
+            false,
             true,
             &valid_length
         );
-        if (changed.status != OSEO_STATUS_NORMAL) {
+        if (changed.status != OSEO_STATUS_NORMAL) return changed;
+        object = ordinary_object(object_value);
+        if (object->array_length != requested) {
+            const char *cause = object->length_writable
+                ? "Cannot truncate past a non-configurable element."
+                : "Cannot redefine the array length property.";
             if (valid_length && !attributes.writable) {
                 object->length_writable = false;
             }
-            return changed;
+            *refusal = cause;
+            return normal(object_value);
         }
         object->length_writable = attributes.writable;
         return normal(object_value);
@@ -310,18 +329,16 @@ static OseoResult define_data_property(
         oseo_internal_array_index(key, &defined_index) &&
         defined_index >= object->array_length;
     if (extends_array && !object->length_writable) {
-        return type_error(
-            context,
-            "Cannot extend an array with a read-only length."
-        );
+        *refusal =
+            "Cannot extend an array with a read-only length.";
+        return normal(object_value);
     }
     size_t index = oseo_internal_own_property_index(object, key);
     if (object->module_namespace) {
         if (index == SIZE_MAX) {
-            return type_error(
-                context,
-                "Cannot define a module namespace property."
-            );
+            *refusal =
+                "Cannot define a module namespace property.";
+            return normal(object_value);
         }
         OseoProperty *property = &object->properties[index];
         OseoValue current_value = property->value;
@@ -337,10 +354,9 @@ static OseoResult define_data_property(
             attributes.enumerable != property->attributes.enumerable ||
             attributes.writable != property->attributes.writable ||
             !oseo_internal_same_value(current_value, value)) {
-            return type_error(
-                context,
-                "Cannot define a module namespace property."
-            );
+            *refusal =
+                "Cannot define a module namespace property.";
+            return normal(object_value);
         }
         return normal(object_value);
     }
@@ -365,10 +381,9 @@ static OseoResult define_data_property(
              (!property->attributes.writable && attributes.writable) ||
              (!property->attributes.writable &&
               !oseo_internal_same_value(current_value, value)))) {
-            return type_error(
-                context,
-                "Cannot redefine a non-configurable property."
-            );
+            *refusal =
+                "Cannot redefine a non-configurable property.";
+            return normal(object_value);
         }
         if (cell_backed) {
             /* The binding stays the one storage location the property
@@ -408,10 +423,9 @@ static OseoResult define_data_property(
         return normal(object_value);
     }
     if (!object->extensible && !replaces_virtual) {
-        return type_error(
-            context,
-            "Cannot define a property on a non-extensible object."
-        );
+        *refusal =
+            "Cannot define a property on a non-extensible object.";
+        return normal(object_value);
     }
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
@@ -461,7 +475,7 @@ OseoResult oseo_object_define(
     OseoValue value,
     OseoPropertyAttributes attributes
 ) {
-    return define_data_property(
+    return oseo_internal_object_define_data(
         context,
         object_value,
         key,
@@ -479,17 +493,44 @@ OseoResult oseo_internal_object_define_data(
     OseoPropertyAttributes attributes,
     bool has_value
 ) {
+    const char *refusal = NULL;
+    OseoResult result = define_data_property(
+        context,
+        object_value,
+        key,
+        value,
+        attributes,
+        has_value,
+        false,
+        &refusal
+    );
+    if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
+    return type_error(context, refusal);
+}
+
+OseoResult oseo_internal_define_data_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes,
+    bool has_value,
+    bool absent_writable,
+    const char **refusal
+) {
     return define_data_property(
         context,
         object_value,
         key,
         value,
         attributes,
-        has_value
+        has_value,
+        absent_writable,
+        refusal
     );
 }
 
-OseoResult oseo_object_define_accessor(
+static OseoResult define_accessor_property(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
@@ -497,8 +538,10 @@ OseoResult oseo_object_define_accessor(
     OseoValue setter,
     bool has_getter,
     bool has_setter,
-    OseoPropertyAttributes attributes
+    OseoPropertyAttributes attributes,
+    const char **refusal
 ) {
+    *refusal = NULL;
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) {
@@ -508,17 +551,15 @@ OseoResult oseo_object_define_accessor(
         );
     }
     if (ordinary_object(object_value)->module_namespace) {
-        return type_error(
-            context,
-            "Cannot define a module namespace property."
-        );
+        *refusal =
+            "Cannot define a module namespace property.";
+        return normal(object_value);
     }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
-        return type_error(
-            context,
-            "Cannot redefine the prototype property."
-        );
+        *refusal =
+            "Cannot redefine the prototype property.";
+        return normal(object_value);
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     OseoPropertyAttributes virtual_attributes = {false, false, false, false};
@@ -531,28 +572,25 @@ OseoResult oseo_object_define_accessor(
         );
     if (replaces_virtual) {
         if (!virtual_attributes.configurable) {
-            return type_error(
-                context,
-                "Cannot redefine a non-configurable property."
-            );
+            *refusal =
+                "Cannot redefine a non-configurable property.";
+            return normal(object_value);
         }
     }
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
-        return type_error(
-            context,
-            "Cannot redefine the array length property."
-        );
+        *refusal =
+            "Cannot redefine the array length property.";
+        return normal(object_value);
     }
     uint32_t defined_index = 0u;
     bool extends_array = is_array(object_value) &&
         oseo_internal_array_index(key, &defined_index) &&
         defined_index >= object->array_length;
     if (extends_array && !object->length_writable) {
-        return type_error(
-            context,
-            "Cannot extend an array with a read-only length."
-        );
+        *refusal =
+            "Cannot extend an array with a read-only length.";
+        return normal(object_value);
     }
     size_t index = oseo_internal_own_property_index(object, key);
     OseoValue new_getter = has_getter ? getter : oseo_undefined();
@@ -573,10 +611,9 @@ OseoResult oseo_object_define_accessor(
               !oseo_internal_same_value(existing_getter, new_getter)) ||
              (has_setter &&
               !oseo_internal_same_value(existing_setter, new_setter)))) {
-            return type_error(
-                context,
-                "Cannot redefine a non-configurable property."
-            );
+            *refusal =
+                "Cannot redefine a non-configurable property.";
+            return normal(object_value);
         }
         property->attributes = attributes;
         property->value = oseo_undefined();
@@ -589,10 +626,9 @@ OseoResult oseo_object_define_accessor(
         return normal(object_value);
     }
     if (!object->extensible && !replaces_virtual) {
-        return type_error(
-            context,
-            "Cannot define a property on a non-extensible object."
-        );
+        *refusal =
+            "Cannot define a property on a non-extensible object.";
+        return normal(object_value);
     }
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
@@ -608,6 +644,56 @@ OseoResult oseo_object_define_accessor(
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;
     return normal(object_value);
+}
+
+OseoResult oseo_object_define_accessor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue getter,
+    OseoValue setter,
+    bool has_getter,
+    bool has_setter,
+    OseoPropertyAttributes attributes
+) {
+    const char *refusal = NULL;
+    OseoResult result = define_accessor_property(
+        context,
+        object_value,
+        key,
+        getter,
+        setter,
+        has_getter,
+        has_setter,
+        attributes,
+        &refusal
+    );
+    if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
+    return type_error(context, refusal);
+}
+
+OseoResult oseo_internal_define_accessor_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue getter,
+    OseoValue setter,
+    bool has_getter,
+    bool has_setter,
+    OseoPropertyAttributes attributes,
+    const char **refusal
+) {
+    return define_accessor_property(
+        context,
+        object_value,
+        key,
+        getter,
+        setter,
+        has_getter,
+        has_setter,
+        attributes,
+        refusal
+    );
 }
 
 OseoResult oseo_object_delete(

@@ -107,6 +107,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_regexp_symbol.c"],
       ["source", "runtime_math.c"],
       ["source", "runtime_uri.c"],
+      ["source", "runtime_reflect.c"],
     ],
   );
 });

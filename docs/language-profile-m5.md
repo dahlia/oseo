@@ -5699,6 +5699,145 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 point, and does not change the graph's orchestration state.
 
 
+Reflect namespace
+-----------------
+
+M5b node `reflect-namespace` materializes the `Reflect` namespace object of
+28.1. `Reflect` is an ordinary object whose `[[Prototype]]` is the realm's
+`%Object.prototype%`; it has neither `[[Call]]` nor `[[Construct]]`, so
+calling or constructing it throws a `TypeError`. The global object binds it as
+a writable, non-enumerable, configurable property, so the compiler treats it
+as a property-owned replaceable intrinsic exactly as it treats `Math`, and a
+program may replace, delete, or shadow it. Its `@@toStringTag` value property
+is the String `"Reflect"` with the specified non-writable, non-enumerable,
+configurable attributes, so `Object.prototype.toString` reports
+`"[object Reflect]"`.
+
+Its thirteen function properties expose one essential internal method each:
+`apply`, `construct`, `defineProperty`, `deleteProperty`, `get`,
+`getOwnPropertyDescriptor`, `getPrototypeOf`, `has`, `isExtensible`,
+`ownKeys`, `preventExtensions`, `set`, and `setPrototypeOf`. Each is an
+ordinary built-in function whose `[[Prototype]]` is `%Function.prototype%`,
+with its specified name and `length`, no `prototype` property, and no
+`[[Construct]]`, and each is a writable, non-enumerable, configurable
+property created in that order.
+
+Every function but `apply` and `construct` requires an object target and
+throws a `TypeError` for every primitive, including a `Symbol`, rather than
+coercing it the way the matching `Object` static does. Each then reports the
+internal method's own result. `defineProperty`, `deleteProperty`, `set`,
+`setPrototypeOf`, and `preventExtensions` report the specification's boolean
+where `Object.defineProperty`, strict `delete`, a strict assignment, and
+`Object.setPrototypeOf` raise a `TypeError`, and the two agree on exactly
+which cases refuse. To keep one set of refusal rules rather than two, the
+descriptor, property, and object components now report a refusal as a message
+the throwing forms turn back into that `TypeError` while the `Reflect`
+function turns it into `false`. An abrupt completion that no boolean can
+carry, such as a `ToPropertyKey` conversion, a descriptor accessor, a setter,
+or the `RangeError` an invalid array length raises, still propagates.
+
+`get` and `set` take an explicit receiver, which defaults to the target, so a
+getter or setter found on the target or its prototype chain runs against the
+receiver and a created or updated own property lands on it. `ownKeys` returns
+one fresh array in OrdinaryOwnPropertyKeys order, integer indices in ascending
+numeric order, then the remaining String keys in creation order, then the
+Symbol keys in creation order, sharing the ordering
+`Object.getOwnPropertyNames` and `Object.getOwnPropertySymbols` already use.
+`getOwnPropertyDescriptor` shares FromPropertyDescriptor with
+`Object.getOwnPropertyDescriptor` and reports `undefined` for a missing key.
+
+`apply` requires a callable target and converts its argument list through
+CreateListFromArrayLike, so a non-object list is a `TypeError` and an
+array-like object contributes its `length` and index reads;
+`Function.prototype.apply` now shares that operation, keeping only its own
+nullish shortcut. `construct` requires a constructor target, defaults the new
+target to the target, requires that to be a constructor too, and only then
+converts the argument list. The prototype the created receiver takes is the
+one the target's `[[Construct]]` would read: a bound target replaces the new
+target with its own target at every layer at which the two are the same
+function. For an ordinary or class target the read is a real
+`Get(newTarget, "prototype")`, because a bound function has no own
+`prototype` and a program may define an accessor one on it. For a built-in
+target the position of OrdinaryCreateFromConstructor belongs to the clause
+that defines the constructor, so the built-in performs that read itself.
+`Object` and `Promise` now do, `Object` before any other step and `Promise`
+after its executor callability check, joining `Array`, `ArrayBuffer`,
+`DataView`, and `RegExp`; the known gap below records the three constructors
+and one family that still take the prototype from the new target's internal
+slot.
+
+Two adjacent corrections land with the node because admitting these functions
+makes already reviewed behavior observable. `%Object.prototype%` becomes an
+immutable prototype exotic object under 10.4.7, so its `[[SetPrototypeOf]]`
+accepts only the null prototype it already has and reports `false` for any
+other, joining the module namespace objects that already had that behavior.
+And OrdinarySetWithOwnDescriptor now finishes with the receiver's
+`[[DefineOwnProperty]]` for a value-only descriptor rather than a second
+ordinary assignment, so an array `length` write whose value coercion makes
+`length` non-writable reports `false` after both of its specified hint reads.
+
+The runtime gains one component, *runtime\_reflect.c*, and one built-in code
+range whose thirteen IDs count down from the range last in the order the
+namespace creates its properties, so the dispatch reads an index rather than a
+table. The namespace is one lazily created intrinsic. The node adds no
+generated-code entry point and owns no property, descriptor, or call semantics
+of its own: OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with the
+`Object` component, ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
+the descriptor component, `[[Get]]` and `[[Set]]` with the property component,
+`[[SetPrototypeOf]]` with the object component, and CreateListFromArrayLike
+with the function component.
+
+The reviewed *isConstructor.js* harness include becomes available with this
+node. Its one operation is a `Reflect.construct` call whose abrupt completion
+it catches, so the include had no reviewed implementation before and every
+case that named it stayed outside the reviewed subset or recorded an explicit
+`Reflect.construct` prerequisite.
+
+`Proxy` stays outside the profile, so the reflective results a `Proxy` trap
+would produce are not observable here and the reviewed cases that need one
+retain that explicit prerequisite.
+
+Fixed native and generated differential evidence at property seed
+`0x60006200` covers the namespace identity, descriptor, and `@@toStringTag`,
+the thirteen function identities, names, lengths, descriptors, and `new`
+rejections, the object-target `TypeError` for six primitive kinds across every
+function that requires one, integer-index, String, and Symbol own-key
+ordering, data and accessor descriptors across every writable, enumerable,
+configurable, and setter combination, own and missing probe keys, extensible
+and non-extensible targets, the boolean-versus-`TypeError` agreement with the
+matching `Object` static for definition, assignment, deletion, and prototype
+writes, the explicit receiver of `get` and `set`, array-like and array
+argument lists, `construct` with and without a distinct new target, a bound
+target and a bound new target, an abrupt `prototype` accessor, the
+array `length` coercion order, the immutable `%Object.prototype%`, both
+specialization policies, collection forced at every safepoint, a false number
+hint, a deliberate global-object shape guard miss with generic fallback, and
+the global write, delete, restore, assignment-target, and strict
+missing-property sequences the replaceable binding admits. The generated
+oracle models own-key order, descriptor validation, and OrdinarySet directly
+rather than calling the host's own `Reflect`.
+
+Of the 153 paths under the node's inventory root, 152 are reviewed: 139 pass
+and 13 retain explicit prerequisite boundaries, ten for `Proxy` and three for
+the `Function` constructor and the `Date` intrinsic their bodies reach.
+*ownKeys/return-on-corresponding-order-large-index.js* stays outside the
+subset: its frontmatter names only admitted features, but its body needs the
+`Symbol` registry the separately owned `symbol-intrinsic` node holds, and the
+own-key order it measures already agrees with the reference hosts.
+Two hundred and seventy-six reviewed cases outside that root also move from
+unsupported profile feature to pass, and no reviewed row moves away from pass.
+Most of them detect a non-constructor through the *isConstructor.js* include
+this node makes available, and the rest read a `Reflect` function directly.
+The manifest reaches 17,356 cases: 13,716 passes, 1,556 expected negatives,
+and 2,084 unsupported profile features with no semantic, harness, or
+infrastructure failures, up from 17,204 cases with 13,301 passes and 2,347
+unsupported profile features. The suite revision, 41,091-path inventory,
+manifest schema, and zero-override policy are unchanged; the dependency
+vocabulary adds the `reflect-namespace` evidence tag. The admitted runtime
+checkpoint moves the runtime ABI to `oseo-runtime-m5-95` without adding a
+generated-code entry point or changing the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -5720,10 +5859,9 @@ complete. The remaining gaps retain their existing owners.
     connection: the M5b `data-view` node now consumes `ToBigInt` for its two
     64-bit element types, while typed arrays, `Atomics`, and `JSON` keep their
     own object and concurrency prerequisites. `BigInt` now has the specified
-    throwing `[[Construct]]`, but reviewed cases that require the separately
-    unadmitted
-    `Reflect.construct` namespace remain `unsupported-profile-feature` instead
-    of borrowing a partial result. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
+    throwing `[[Construct]]`, and the reviewed cases that detect it through
+    `Reflect.construct` execute now that the `reflect-namespace` node admits
+    that namespace. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
     delivery items 8 through 10.
  -  Regular expression allocation, initialization, `lastIndex`, dynamic
     validation, and intrinsic identity are admitted by the M5b
@@ -5783,6 +5921,24 @@ complete. The remaining gaps retain their existing owners.
     hosts convert the function into an empty descriptor. The
     `string-iterator` graph node materializes the value and closes the gap.
     Owner: the intrinsics and built-in objects stream.
+ -  The `Number`, `String`, and `Map` constructors and the eight `Error`
+    constructors take the created object's prototype from the new target's
+    internal `prototype` slot instead of performing the observable
+    `Get(newTarget, "prototype")` that GetPrototypeFromConstructor specifies.
+    `Object`, `Promise`, `Array`, `ArrayBuffer`, `DataView`, and `RegExp`
+    perform that read. The two agree for every new target that owns the
+    synthetic `prototype` property, which is every ordinary function and
+    class, so only a new target whose ordinary `Get("prototype")` differs
+    from that slot can tell them apart: a bound function, whose own
+    `prototype` a program may define as a data or accessor property or
+    inherit through its own prototype chain, and which only
+    `Reflect.construct(BuiltIn, args, boundFunction)` can supply as a new
+    target. The caller cannot close this by reading the property itself,
+    because each clause specifies its own position for that read relative to
+    its argument validation, which reviewed cases under
+    *test/built-ins/ArrayBuffer/*, *test/built-ins/DataView/*, and
+    *test/built-ins/Promise/* measure. Owner: the intrinsics and built-in
+    objects stream.
  -  A `super` property reference in a class body without `extends` and in an
     object literal method stays rejected until the `super-without-extends`
     graph node lands. The object prototype root is now populated, but that
@@ -5810,9 +5966,9 @@ complete. The remaining gaps retain their existing owners.
     `Promise`, and `String` identities. The
     `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
     `encodeURI`, and `encodeURIComponent` as four more replaceable
-    properties of the same object, and the `global-numeric-functions`
-    node adds `isFinite`, `isNaN`, `parseFloat`, and `parseInt` the same
-    way. Because this realm
+    properties of the same object, the `global-numeric-functions` node
+    adds `isFinite`, `isNaN`, `parseFloat`, and `parseInt` the same way,
+    and the `reflect-namespace` node adds `Reflect`. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

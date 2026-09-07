@@ -396,3 +396,7 @@ families:
     owner: tests/property/m5-global-numeric-functions.property.test.ts
     start: 0x60006200
     end: 0x600062ff
+  - family: m5-reflect-namespace
+    owner: tests/property/m5-reflect-namespace.property.test.ts
+    start: 0x60006300
+    end: 0x600063ff

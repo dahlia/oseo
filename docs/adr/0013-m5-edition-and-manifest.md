@@ -299,6 +299,25 @@ under the node's inventory roots carry it. Whether reviewed rows outside those
 roots that also observe own-key order gain this tag is a separate reviewed
 change; when they do, they gain it alongside the tags they already carry.
 
+The M5b `reflect-namespace` node extends the vocabulary with
+`reflect-namespace`. The tag identifies the `Reflect` namespace object and the
+thirteen function properties that expose one essential internal method each:
+`apply`, `construct`, `defineProperty`, `deleteProperty`, `get`,
+`getOwnPropertyDescriptor`, `getPrototypeOf`, `has`, `isExtensible`,
+`ownKeys`, `preventExtensions`, `set`, and `setPrototypeOf`. One tag covers
+all thirteen because each requires an object target and reports the
+specification's boolean or its raw internal-method result rather than the
+language error the matching `Object` static raises, which is the contract the
+node adds. The node needs a tag distinct from `object-properties`, which names
+property definition and descriptor semantics without naming the reflective
+entry points that reach them, and from `object-own-keys`, which names the
+`Object` statics that coerce their target and answer with strings or values
+instead of an internal method's own result. The 152 reviewed rows under the
+node's inventory root carry it. Whether reviewed rows outside that root that
+also call a `Reflect` function gain this tag is a separate reviewed change;
+when they do, they gain it alongside the tags they already carry. Admitting
+the tag moves no classification.
+
 
 Alternatives considered
 -----------------------

@@ -25,7 +25,6 @@ results:
     unsupportedFeatures:
       - cross-realm
       - iterator-helpers
-      - Reflect
   - case:
       async: false
       features:

@@ -426,10 +426,14 @@ results:
       - functions
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "test/built-ins/Array/prototype/slice/create-species-non-ctor.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/slice/create-species-no\
+        n-ctor.js:125:17: error[OSEO1001]: Unknown binding
+        'parseInt'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-    unsupportedFeatures:
-      - Reflect.construct
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

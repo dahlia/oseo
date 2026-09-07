@@ -197,6 +197,43 @@ test("reads the replaceable Math value through its global property", () => {
   );
 });
 
+test("reads the Reflect namespace through its global property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof Reflect, Reflect.has({ a: 1 }, 'a'), " +
+      "Reflect.ownKeys({ a: 1 }).length);",
+    sourceId: "reflect-namespace.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\*intrinsic global object\* = this global/u);
+  assert.match(hir, /"Reflect" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["Reflect"\]/u);
+  assert.match(mir, /global-this global this/u);
+  assert.match(mir, /read \*missing intrinsic:Reflect\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete Reflect;",
+    sourceId: "delete-reflect.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["Reflect"\]/u);
+
+  const withWrite = compileSource(babelFrontend, {
+    source: "with ({}) { Reflect = 1; }",
+    sourceId: "with-reflect-write.ts",
+  });
+  assert.equal(withWrite.mir, undefined);
+  assert.match(
+    withWrite.diagnostics[0]?.message ?? "",
+    /Assigning property-owned intrinsic 'Reflect' through a with fallback/u,
+  );
+});
+
 test("reads the four URI handling functions as global properties", () => {
   const result = compileSource(babelFrontend, {
     source:

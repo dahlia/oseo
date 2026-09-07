@@ -1206,6 +1206,7 @@ static OseoResult iterator_helper_create(
     helper->ordinary.length_writable = false;
     helper->ordinary.extensible = true;
     helper->ordinary.module_namespace = false;
+    helper->ordinary.immutable_prototype = false;
     helper->ordinary.global_object = false;
     helper->ordinary.error_data = false;
     helper->ordinary.number_data = false;

@@ -119,6 +119,10 @@ const deepEqualHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/deepEqual.js",
 );
+const isConstructorHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/isConstructor.js",
+);
 const detachArrayBufferHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/detachArrayBuffer.js",
@@ -1659,6 +1663,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
         "detachArrayBuffer.js",
         await readFile(detachArrayBufferHarnessPath, "utf8"),
       ],
+      ["isConstructor.js", await readFile(isConstructorHarnessPath, "utf8")],
       ["nans.js", await readFile(nansHarnessPath, "utf8")],
       ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],

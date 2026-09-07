@@ -341,21 +341,23 @@ OseoResult oseo_object_set(
     return normal(value);
 }
 
-OseoResult oseo_super_set(
+OseoResult oseo_internal_set_with_receiver(
     OseoContext *context,
     OseoValue base,
     OseoValue key,
     OseoValue value,
     OseoValue receiver,
-    bool strict
+    const char **refusal
 ) {
+    *refusal = NULL;
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
-    if (!is_object(base)) {
-        return type_error(
-            context,
-            "Cannot set properties of a nullish or primitive value."
-        );
+    if (ordinary_object(base)->module_namespace) {
+        /* A module namespace's [[Set]] (10.4.6.9) reports false for
+         * every key and every receiver, so no write reaches either
+         * object. */
+        *refusal = "Cannot assign to a module namespace property.";
+        return normal(value);
     }
     /* The lookup walks `base` only to decide whether a setter runs.
      * Every other outcome, including a data property found on the walk,
@@ -371,12 +373,7 @@ OseoResult oseo_super_set(
             &setter)) {
             if (attributes.accessor) {
                 if (!is_function(setter)) {
-                    if (strict) {
-                        return type_error(
-                            context,
-                            "Cannot set a property that has only a getter."
-                        );
-                    }
+                    *refusal = "Cannot set a property that has only a getter.";
                     return normal(value);
                 }
                 OseoRootFrame frame = {NULL, NULL, 0u};
@@ -397,12 +394,7 @@ OseoResult oseo_super_set(
                 return normal(value);
             }
             if (!attributes.writable) {
-                if (strict) {
-                    return type_error(
-                        context,
-                        "Cannot assign to a read-only property."
-                    );
-                }
+                *refusal = "Cannot assign to a read-only property.";
                 return normal(value);
             }
             break;
@@ -410,12 +402,7 @@ OseoResult oseo_super_set(
         current = ordinary_object(current)->prototype;
     }
     if (!is_object(receiver)) {
-        if (strict) {
-            return type_error(
-                context,
-                "Cannot set properties of a nullish or primitive value."
-            );
-        }
+        *refusal = "Cannot set properties of a nullish or primitive value.";
         return normal(value);
     }
     OseoValue receiver_value = oseo_undefined();
@@ -432,37 +419,76 @@ OseoResult oseo_super_set(
         &receiver_setter
     )) {
         if (receiver_attributes.accessor) {
-            if (strict) {
-                return type_error(
-                    context,
-                    "Cannot assign to an accessor property of the receiver."
-                );
-            }
+            *refusal = "Cannot assign to an accessor property of the receiver.";
             return normal(value);
         }
         if (!receiver_attributes.writable) {
-            if (strict) {
-                return type_error(
-                    context,
-                    "Cannot assign to a read-only property."
-                );
-            }
+            *refusal = "Cannot assign to a read-only property.";
             return normal(value);
         }
-        /* The receiver owns the property, so the ordinary assignment
-         * finds it on its first step and never walks a prototype. */
-        OseoResult assigned =
-            oseo_object_set(context, receiver, key, value, strict);
+        /* OrdinarySetWithOwnDescriptor finishes with
+         * Receiver.[[DefineOwnProperty]](P, { [[Value]]: V }), which
+         * keeps every other attribute the property already has and
+         * routes an array `length` write through ArraySetLength. That
+         * definition can still report a refusal, because coercing the
+         * written value runs user code that may make the property
+         * non-writable. */
+        OseoPropertyAttributes attributes = receiver_attributes;
+        attributes.accessor = false;
+        OseoResult assigned = oseo_internal_define_data_reported(
+            context,
+            receiver,
+            key,
+            value,
+            attributes,
+            true,
+            true,
+            refusal
+        );
         if (assigned.status != OSEO_STATUS_NORMAL) return assigned;
         return normal(value);
     }
-    OseoResult created = oseo_object_define(
+    /* CreateDataProperty on the receiver, which reports false rather
+     * than throwing when the receiver refuses a new own property. */
+    OseoResult created = oseo_internal_define_data_reported(
         context,
         receiver,
         key,
         value,
-        (OseoPropertyAttributes){true, true, true, false}
+        (OseoPropertyAttributes){true, true, true, false},
+        true,
+        false,
+        refusal
     );
     if (created.status != OSEO_STATUS_NORMAL) return created;
     return normal(value);
+}
+
+OseoResult oseo_super_set(
+    OseoContext *context,
+    OseoValue base,
+    OseoValue key,
+    OseoValue value,
+    OseoValue receiver,
+    bool strict
+) {
+    OseoResult valid = oseo_internal_require_property_key(context, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(base)) {
+        return type_error(
+            context,
+            "Cannot set properties of a nullish or primitive value."
+        );
+    }
+    const char *refusal = NULL;
+    OseoResult result = oseo_internal_set_with_receiver(
+        context,
+        base,
+        key,
+        value,
+        receiver,
+        &refusal
+    );
+    if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
+    return strict ? type_error(context, refusal) : normal(value);
 }

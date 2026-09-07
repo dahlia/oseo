@@ -84,6 +84,7 @@ static OseoResult object_create(
     object->length_writable = false;
     object->extensible = true;
     object->module_namespace = false;
+    object->immutable_prototype = false;
     object->global_object = false;
     object->error_data = false;
     object->number_data = false;
@@ -246,6 +247,47 @@ void oseo_property_cache_update(
     }
 }
 
+OseoResult oseo_internal_set_prototype_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue prototype,
+    const char **refusal
+) {
+    *refusal = NULL;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (object->module_namespace || object->immutable_prototype) {
+        /* SetImmutablePrototype (10.4.7.1) accepts only the prototype
+         * the object already has. Both a module namespace and
+         * %Object.prototype% start with a null one. */
+        if (!oseo_internal_same_value(prototype, object->prototype)) {
+            *refusal = object->module_namespace
+                ? "Cannot change a namespace prototype."
+                : "Cannot change an immutable prototype.";
+        }
+        return normal(object_value);
+    }
+    if (object->prototype == prototype) {
+        return normal(object_value);
+    }
+    if (!object->extensible) {
+        *refusal = "Cannot change a non-extensible object's prototype.";
+        return normal(object_value);
+    }
+    OseoValue current = prototype;
+    while (is_object(current)) {
+        if (current == object_value) {
+            *refusal = "Cyclic prototype chains are not allowed.";
+            return normal(object_value);
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    object->prototype = prototype;
+    object->dictionary = true;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(object_value);
+}
+
 OseoResult oseo_object_set_prototype(
     OseoContext *context,
     OseoValue object_value,
@@ -258,36 +300,15 @@ OseoResult oseo_object_set_prototype(
             "Object.setPrototypeOf requires an object prototype."
         );
     }
-    if (ordinary_object(object_value)->module_namespace) {
-        return tag_of(prototype) == OSEO_TAG_NULL
-            ? normal(object_value)
-            : type_error(context, "Cannot change a namespace prototype.");
-    }
-    OseoOrdinaryObject *object = ordinary_object(object_value);
-    if (object->prototype == prototype) {
-        return normal(object_value);
-    }
-    if (!object->extensible) {
-        return type_error(
-            context,
-            "Cannot change a non-extensible object's prototype."
-        );
-    }
-    OseoValue current = prototype;
-    while (is_object(current)) {
-        if (current == object_value) {
-            return type_error(
-                context,
-                "Cyclic prototype chains are not allowed."
-            );
-        }
-        current = ordinary_object(current)->prototype;
-    }
-    object->prototype = prototype;
-    object->dictionary = true;
-    object->shape_id = context->next_shape_id;
-    context->next_shape_id += 1u;
-    return normal(object_value);
+    const char *refusal = NULL;
+    OseoResult result = oseo_internal_set_prototype_reported(
+        context,
+        object_value,
+        prototype,
+        &refusal
+    );
+    if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
+    return type_error(context, refusal);
 }
 
 OseoResult oseo_object_literal_set_prototype(

@@ -122,6 +122,7 @@ static OseoResult map_allocate(
     map->ordinary.length_writable = false;
     map->ordinary.extensible = true;
     map->ordinary.module_namespace = false;
+    map->ordinary.immutable_prototype = false;
     map->ordinary.global_object = false;
     map->ordinary.error_data = false;
     map->ordinary.number_data = false;
@@ -707,6 +708,7 @@ static OseoResult map_create_iterator(
     iterator->ordinary.length_writable = false;
     iterator->ordinary.extensible = true;
     iterator->ordinary.module_namespace = false;
+    iterator->ordinary.immutable_prototype = false;
     iterator->ordinary.global_object = false;
     iterator->ordinary.error_data = false;
     iterator->ordinary.number_data = false;

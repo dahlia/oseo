@@ -1251,6 +1251,7 @@ static void regexp_initialize_ordinary(
     object->length_writable = false;
     object->extensible = true;
     object->module_namespace = false;
+    object->immutable_prototype = false;
     object->global_object = false;
     object->error_data = false;
     object->number_data = false;

@@ -1,0 +1,59 @@
+version: 1
+id: reflect-namespace
+title: "Reflect namespace object"
+scope:
+  - "The Reflect namespace object and its thirteen function properties,
+    apply, construct, defineProperty, deleteProperty, get,
+    getOwnPropertyDescriptor, getPrototypeOf, has, isExtensible, ownKeys,
+    preventExtensions, set, and setPrototypeOf, each requiring an object
+    target and reporting the essential internal method's own result rather
+    than the language error the matching Object static raises. It includes
+    CreateListFromArrayLike for both call forms, the explicit receiver of
+    get and set, the new target of construct, the immutable prototype
+    %Object.prototype% carries, and the @@toStringTag value property."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/reflect-namespace.ts
+      - tests/property/m5-reflect-namespace.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/reflect-namespace.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/reflect-namespace.ts
+      - tests/property/m5-reflect-namespace.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-reflect-namespace.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/reflect-namespace.ts
+      - tests/property/m5-reflect-namespace.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/reflect-namespace.ts
+      - tests/property/m5-reflect-namespace.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_reflect.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

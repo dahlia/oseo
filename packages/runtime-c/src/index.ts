@@ -178,6 +178,11 @@ const runtimeInput: RuntimeInput = {
       name: "runtime_uri.c",
       url: new URL("../native/runtime_uri.c", import.meta.url),
     },
+    {
+      kind: "source",
+      name: "runtime_reflect.c",
+      url: new URL("../native/runtime_reflect.c", import.meta.url),
+    },
   ],
 };
 

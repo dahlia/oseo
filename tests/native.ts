@@ -96,6 +96,8 @@ const { uriHandlingFunctionFixtures } =
   await import("./native/fixtures/uri-handling-functions.ts");
 const { globalNumericFunctionFixtures } =
   await import("./native/fixtures/global-numeric-functions.ts");
+const { reflectNamespaceFixtures } =
+  await import("./native/fixtures/reflect-namespace.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
 const { regexpSymbolMethodsFixtures } =
@@ -187,6 +189,7 @@ const fixtures: readonly Fixture[] = [
   ...mathNamespaceFixtures,
   ...uriHandlingFunctionFixtures,
   ...globalNumericFunctionFixtures,
+  ...reflectNamespaceFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -638,6 +641,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "math-namespace" ||
     fixture.name === "uri-handling-functions" ||
     fixture.name === "global-numeric-functions" ||
+    fixture.name === "reflect-namespace" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -727,6 +731,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "math-namespace" ||
     fixture.name === "uri-handling-functions" ||
     fixture.name === "global-numeric-functions" ||
+    fixture.name === "reflect-namespace" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -867,6 +872,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
+    fixture.name === "reflect-namespace" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {
@@ -1156,6 +1162,17 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
+          if (fixture.name === "reflect-namespace") {
+            // Every reflective answer allocates a key, a descriptor, or
+            // a key array while the collector runs at every safepoint,
+            // and reading Reflect through the realm's global object
+            // misses its shape guard once the fixture adds a global
+            // property.
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
           if (fixture.name === "object-literal-prototype-setter") {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1165,10 +1182,10 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the ten standard-object and
-            // value-property allocations plus twenty-six admitted standard
-            // global property names shared by every Script, the four
-            // global numeric functions being the ones this node adds.
-            assert.equal(native.counters.allocations, 42);
+            // value-property allocations plus twenty-seven admitted
+            // standard global property names shared by every Script, the
+            // Reflect namespace being the one this node adds.
+            assert.equal(native.counters.allocations, 43);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {
