@@ -21,7 +21,7 @@ results:
     observation:
       detail: 'test/built-ins/GeneratorFunction/instance-name.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/built-ins/GeneratorFunction/instance-name.js:357:18:
+        stderr="test/built-ins/GeneratorFunction/instance-name.js:435:18:
         error[OSEO1001]: GeneratorFunction compiles source text at run
         time, which is outside the admitted profile.\n"'
       unsupportedCapability: profile-syntax

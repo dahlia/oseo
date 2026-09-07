@@ -5579,6 +5579,126 @@ runtime ABI to `oseo-runtime-m5-94` without adding a generated-code entry point
 or changing the graph's orchestration state.
 
 
+Global numeric functions
+------------------------
+
+M5b node `global-numeric-functions` materializes the four global numeric
+function properties of 19.2. `isFinite`, `isNaN`, `parseFloat`, and
+`parseInt` are ordinary built-in functions whose `[[Prototype]]` is the
+realm's `%Function.prototype%`, each with its specified name, a `length` of
+1 except for `parseInt`, whose `length` is 2, and no `prototype` property.
+None of them is a constructor, so `new isNaN(1)` throws a `TypeError`
+before its argument is converted. The global object binds each as a
+writable, non-enumerable, configurable property, so the compiler treats all
+four as property-owned replaceable intrinsics exactly as it treats `Number`
+and the URI handling functions, and a program may replace, delete, or
+shadow any of them. The global `parseFloat` and `parseInt` properties are
+the `%parseFloat%` and `%parseInt%` function objects `Number.parseFloat`
+and `Number.parseInt` already name, so the two reads compare identical and
+replacing one global property leaves the static untouched.
+
+`parseInt`, 19.2.5, converts its string operand with `ToString` and then
+its radix operand with `ToInt32`, in that order, so a throwing string
+conversion is observed before the radix is read. It strips every leading
+`StrWhiteSpaceChar`, which includes the line terminators, the byte-order
+mark, and the `Zs` category but not U+180E, reads one optional sign,
+defaults a zero radix to 10 and rejects any other radix outside 2 to 36
+with `NaN`, strips a `0x` or `0X` prefix only when the radix is 10 by
+default or exactly 16, and converts the longest prefix of digits under the
+radix, in either letter case, to its exact mathematical value before one
+Number rounding, so 21 hexadecimal digits still round once. No digit gives
+`NaN`, and a zero result carries the sign, so `parseInt("-0")` is `-0`.
+
+`parseFloat`, 19.2.4, converts its operand with `ToString`, strips the same
+whitespace, and takes the longest prefix that is a `StrDecimalLiteral`:
+a sign, then `Infinity` or decimal digits with an optional fraction and an
+exponent that counts only when at least one digit follows its marker. A
+hexadecimal prefix, a numeric separator, and every trailing character stop
+the prefix, an empty prefix gives `NaN`, and `-0` and `-0.0e5` give `-0`.
+
+`isNaN` and `isFinite`, 19.2.3 and 19.2.2, convert their operand with
+`ToNumber` before they inspect it, which is what separates them from the
+`Number.isNaN` and `Number.isFinite` statics. An object therefore runs its
+`ToPrimitive` protocol with the `number` hint, a String is read through
+`StringToNumber`, an absent argument is `NaN`, `null` is 0, and a `Symbol`
+or `BigInt` operand throws the `TypeError` `ToNumber` raises. A throwing or
+non-primitive `Symbol.toPrimitive` result propagates the abrupt completion
+unchanged.
+
+The runtime adds no component. The two predicates take two code IDs inside
+the existing Number range and are two lazily created intrinsics of
+*runtime\_number.c*, the parsers reuse the intrinsics the Number statics
+already create, and one installation binds all four global properties
+after the URI handling functions. The node adds no numeric or string
+conversion of its own; its one generated-code entry point is the SuperCall
+check above.
+
+The reviewed *propertyHelper.js* harness gains the upstream
+`verifyCallableProperty` and `verifyPrimordialCallableProperty` helpers in
+the reviewed style, because this node's four `prop-desc.js` cases are the
+first reviewed paths that name them. Each checks the function-valued
+property and then the function's own `name` and `length` through the
+existing always-restoring `verifyProperty`.
+
+Binding `parseInt` also makes one reviewed class case executable for the
+first time, and it exposed a SuperCall ordering gap. 13.3.7.1 reads the
+super constructor with `GetSuperConstructor` at step 3, evaluates the
+`super(...)` arguments at step 4, and checks `IsConstructor` only at step
+5, while the runtime lookup threw the `TypeError` before the arguments were
+evaluated, so an argument side effect was lost when the class's
+`[[Prototype]]` was a non-constructor such as `parseInt`. The lookup now
+never throws and still precedes the arguments, and the super construct
+operation performs the check after them through the new generated-code
+entry point `oseo_super_constructor_check`. The fixed fixture observes the
+argument, the `TypeError`, and the `ReferenceError` the uninitialized
+`this` then raises, in that order. One recorded divergence follows from
+the lookup order: when an argument replaces the derived class's
+`[[Prototype]]`, this profile constructs the constructor read before the
+arguments, as the clause prescribes, while V8 on both reference hosts
+constructs the replacement. The generated suite compares the references
+against V8's answer and the native program against the clause's answer on
+that one line.
+
+Fixed native and generated differential evidence at property seed
+`0x60006200` covers the four function identities, descriptors, names, and
+lengths, the identity of the two global parsers with the Number statics,
+eighteen radix operands including `ToInt32` wrapping and out-of-range
+values, both prefix letter cases, every `StrWhiteSpaceChar` class, U+180E
+as a non-whitespace unit, the digit alphabet in both letter cases, exact
+rounding of long digit strings, signed zero, the decimal, fraction,
+exponent, and `Infinity` forms with every trailing terminator the grammar
+stops at, nine `ToNumber` operand kinds, the `ToPrimitive` call order,
+`Symbol` and `BigInt` rejection, abrupt conversion, the `new` rejection,
+both specialization policies, collection forced at every safepoint, a
+false number hint, a deliberate global-object shape guard miss with generic
+fallback, and the global write, delete, restore, assignment-target, and
+strict missing-property sequences the replaceable bindings admit. The
+generated `parseInt` oracle accumulates the digit prefix exactly and rounds
+once, and the `parseFloat` and predicate oracles convert through the host's
+own `StringToNumber` rather than through the functions under test.
+
+All 139 paths under the node's four inventory roots are reviewed: 132 pass
+and seven retain explicit prerequisite boundaries, four for the
+`Reflect.construct` prerequisite their *isConstructor.js* include needs and
+three for the unadmitted `Boolean` constructor. Sixteen reviewed paths
+outside the roots move from `unsupported-profile-feature` to `pass`, and
+none moves away from `pass`: *Number/parseFloat.js* and
+*Number/parseInt.js* compare the static against the global identity that
+now exists; *super/call-proto-not-ctor.js* needs `parseInt` as a
+non-constructor and the SuperCall order fixed above; and thirteen cases
+under *Array/prototype*, *Infinity*, and the two `Number` infinity
+constants were waiting only on `isNaN`, `isFinite`, or `parseInt`. The
+manifest moves from 17,204 to 17,343 cases and from 13,301 to 13,449
+passes, keeps 1,556 expected negatives, and moves from 2,347 to 2,338
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 126 to 127 domains and seeds and
+from 5,406 to 5,418 ordinary cases. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-95`, adds the `oseo_super_constructor_check` entry
+point, and does not change the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -5690,7 +5810,9 @@ complete. The remaining gaps retain their existing owners.
     `Promise`, and `String` identities. The
     `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
     `encodeURI`, and `encodeURIComponent` as four more replaceable
-    properties of the same object. Because this realm
+    properties of the same object, and the `global-numeric-functions`
+    node adds `isFinite`, `isNaN`, `parseFloat`, and `parseInt` the same
+    way. Because this realm
     still binds none of the other unadmitted clause 19 standard globals, a
     Script
     top-level `var` declaration of such a name creates the fresh

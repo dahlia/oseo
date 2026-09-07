@@ -107,6 +107,38 @@ static OseoResult number_is_nan(
     return normal(oseo_boolean(result));
 }
 
+/*
+ * The global isFinite and isNaN functions, 19.2.2 and 19.2.3. Unlike the
+ * Number statics of the same names, each converts its operand with
+ * ToNumber first, so an object's ToPrimitive protocol runs and a Symbol
+ * or BigInt operand throws the TypeError that conversion raises.
+ */
+static OseoResult global_is_finite(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult converted = oseo_internal_to_number(
+        context,
+        argument_count == 0u ? oseo_undefined() : arguments[0]
+    );
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    return normal(oseo_boolean(isfinite(number_value(converted.value))));
+}
+
+static OseoResult global_is_nan(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult converted = oseo_internal_to_number(
+        context,
+        argument_count == 0u ? oseo_undefined() : arguments[0]
+    );
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    return normal(oseo_boolean(isnan(number_value(converted.value))));
+}
+
 static bool number_matches(
     const OseoString *string,
     size_t start,
@@ -1595,6 +1627,12 @@ OseoResult oseo_internal_number_builtin_dispatch(
     if (code_id == OSEO_NUMBER_PARSE_INT_CODE_ID) {
         return number_parse_int(context, argument_count, arguments);
     }
+    if (code_id == OSEO_GLOBAL_IS_FINITE_CODE_ID) {
+        return global_is_finite(context, argument_count, arguments);
+    }
+    if (code_id == OSEO_GLOBAL_IS_NAN_CODE_ID) {
+        return global_is_nan(context, argument_count, arguments);
+    }
     return oseo_unknown_function(context, code_id);
 }
 
@@ -1899,4 +1937,86 @@ OseoResult oseo_internal_install_number_global(
     return result.status == OSEO_STATUS_NORMAL
         ? normal(slots[0])
         : result;
+}
+
+OseoResult oseo_internal_global_numeric_intrinsic(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+) {
+    OseoValue *slot = &context->intrinsics[intrinsic];
+    if (is_object(*slot)) return normal(*slot);
+    bool finite = intrinsic == OSEO_INTRINSIC_IS_FINITE;
+    if (!finite && intrinsic != OSEO_INTRINSIC_IS_NAN) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Unknown global numeric intrinsic."
+        );
+    }
+    size_t entry_allocations = context->allocations;
+    OseoResult result = create_number_function(
+        context,
+        finite ? OSEO_GLOBAL_IS_FINITE_CODE_ID : OSEO_GLOBAL_IS_NAN_CODE_ID,
+        finite ? "isFinite" : "isNaN",
+        1u,
+        OSEO_FUNCTION_INTERNAL
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    *slot = result.value;
+    if (context->observe_specialization) {
+        context->allocations = entry_allocations;
+    }
+    return normal(*slot);
+}
+
+/*
+ * The four global numeric function properties of 19.2 in the order the
+ * clause lists them. `isFinite` and `isNaN` are this component's own
+ * lazily created intrinsics; `parseFloat` and `parseInt` are the
+ * %parseFloat% and %parseInt% objects `Number.parseFloat` and
+ * `Number.parseInt` already name, so the global property and the static
+ * are one function.
+ */
+OseoResult oseo_internal_install_global_numeric_functions(
+    OseoContext *context,
+    OseoValue global
+) {
+    static const OseoIntrinsic intrinsics[] = {
+        OSEO_INTRINSIC_IS_FINITE,
+        OSEO_INTRINSIC_IS_NAN,
+        OSEO_INTRINSIC_NUMBER_PARSE_FLOAT,
+        OSEO_INTRINSIC_NUMBER_PARSE_INT,
+    };
+    static const char *const names[] = {
+        "isFinite",
+        "isNaN",
+        "parseFloat",
+        "parseInt",
+    };
+    _Static_assert(
+        sizeof(intrinsics) / sizeof(intrinsics[0]) ==
+        sizeof(names) / sizeof(names[0]),
+        "Global numeric function tables must stay aligned."
+    );
+    OseoValue slots[2] = {global, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(slots[0]);
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < sizeof(names) / sizeof(names[0]);
+         index += 1u) {
+        result = oseo_internal_intrinsic(context, intrinsics[index]);
+        slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_number_property(
+            context,
+            slots[0],
+            names[index],
+            slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL ? normal(slots[0]) : result;
 }

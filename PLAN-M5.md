@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-16,912 reviewed cases: 13,022 passes, 1,556 expected negatives, and 2,334
+17,343 reviewed cases: 13,449 passes, 1,556 expected negatives, and 2,338
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 109 indexed records in the normative
+M5a is complete. The 111 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-13,022 passes across 16,912 paths, and the property inventory records 125
-domains, 125 seeds, and an ordinary case budget of 5,390.
+13,449 passes across 17,343 paths, and the property inventory records 127
+domains, 127 seeds, and an ordinary case budget of 5,418.
 
 
 M5a implementation history
@@ -5559,6 +5559,85 @@ manifest moves from 16,912 to 17,204 paths, from 13,022 to 13,301 passes, from
 negatives. No reviewed row moves away from pass. The admitted runtime
 checkpoint moves the runtime ABI to `oseo-runtime-m5-94` without adding a
 generated-code entry point or changing the graph's orchestration state.
+
+Implemented M5b node `global-numeric-functions` materializes `isFinite`,
+`isNaN`, `parseFloat`, and `parseInt` as the four global numeric function
+properties of 19.2, each an ordinary built-in function with its specified
+name, a `length` of 1 except for `parseInt` with 2, `%Function.prototype%`
+as its `[[Prototype]]`, and no `prototype` property, and none of them a
+constructor. The global object binds each as a writable, non-enumerable,
+configurable property the compiler resolves as a property-owned
+replaceable intrinsic. The global `parseFloat` and `parseInt` are the
+`%parseFloat%` and `%parseInt%` objects `Number.parseFloat` and
+`Number.parseInt` already name, so the static and the global property are
+one function.
+
+`parseInt` converts its string operand with `ToString` before its radix
+with `ToInt32`, strips every `StrWhiteSpaceChar` but not U+180E, reads one
+sign, defaults a zero radix to 10, rejects a radix outside 2 to 36 with
+`NaN`, strips a `0x` or `0X` prefix only for the default radix or exactly
+16, and converts the longest digit prefix under the radix to its exact
+mathematical value before one rounding, returning `-0` for a negative
+zero. `parseFloat` takes the longest `StrDecimalLiteral` prefix, including
+`Infinity` and an exponent that counts only when a digit follows it, and
+gives `NaN` for an empty prefix. `isNaN` and `isFinite` convert with
+`ToNumber` first, unlike the Number statics of the same names, so an object
+runs `ToPrimitive`, a `Symbol` or `BigInt` throws a `TypeError`, and an
+abrupt conversion propagates.
+
+The runtime adds no component: the two predicates take two code IDs inside
+the existing Number range as two lazily created intrinsics of
+*runtime\_number.c*, the parsers reuse the Number static intrinsics, and one
+installation binds the four global properties after the URI handling
+functions. The reviewed *propertyHelper.js* harness gains the upstream
+`verifyCallableProperty` and `verifyPrimordialCallableProperty` helpers in
+the reviewed style, because this node's `prop-desc.js` cases are the first
+reviewed paths that name them. Binding `parseInt` also made one reviewed
+class case executable and exposed a SuperCall ordering gap: the runtime
+lookup threw for a non-constructor super constructor before the
+`super(...)` arguments were evaluated, where 13.3.7.1 reads the super
+constructor at step 3, evaluates the arguments at step 4, and checks
+`IsConstructor` at step 5. The lookup now never throws and the super
+construct operation checks constructibility after the arguments through
+the new `oseo_super_constructor_check` entry point. The fixed fixture
+observes the argument side effect, the `TypeError`, and the following
+`ReferenceError` in that order, and the generated suite records the one
+divergence the lookup order creates: V8 constructs a `[[Prototype]]` an
+argument replaced, while this profile constructs the one read first.
+
+Fixed native and generated differential evidence at property seed
+`0x60006200` covers the four identities, descriptors, names, and lengths,
+the parser identity with the Number statics, eighteen radix operands, both
+prefix and digit letter cases, every `StrWhiteSpaceChar` class, exact
+rounding of long digit strings, signed zero, the decimal, fraction,
+exponent, and `Infinity` forms with each trailing terminator, nine
+`ToNumber` operand kinds, the `ToPrimitive` call order, `Symbol` and
+`BigInt` rejection, abrupt conversion, the `new` rejection, both
+specialization policies, collection forced at every safepoint, a false
+number hint, a deliberate global-object shape guard miss with generic
+fallback, and the global write, delete, restore, assignment-target, and
+strict missing-property sequences the replaceable bindings admit.
+
+All 139 paths under the node's four inventory roots are reviewed: 132 pass
+and seven retain explicit prerequisite boundaries, four for
+`Reflect.construct` and three for the unadmitted `Boolean` constructor.
+Sixteen reviewed paths outside the roots move from
+`unsupported-profile-feature` to `pass` and none moves away from `pass`:
+*Number/parseFloat.js* and *Number/parseInt.js* compare against the global
+identities that now exist, *super/call-proto-not-ctor.js* needs `parseInt`
+as a non-constructor and the SuperCall order fixed, and thirteen cases
+under *Array/prototype*, *Infinity*, and the `Number` infinity constants
+were waiting only on `isNaN`, `isFinite`, or `parseInt`. The manifest moves
+from 17,204 to 17,343 paths and from 13,301 to 13,449 passes, keeps 1,556
+expected negatives, and moves from 2,347 to 2,338 unsupported profile
+features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 126 to 127 domains and seeds and
+from 5,406 to 5,418 ordinary cases. The admitted runtime checkpoint moves
+the ABI to `oseo-runtime-m5-95`, adds the `oseo_super_constructor_check`
+generated-code entry point, and does not change the graph's orchestration
+state. The reviewed test262 revision,
+41,091-path applicable inventory, ADR 0013 vocabulary, inventory policy,
+and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

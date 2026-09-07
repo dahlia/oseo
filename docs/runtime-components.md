@@ -111,10 +111,14 @@ Ownership follows the plan's target layout:
     `Object.keys`, and `Object.setPrototypeOf` entry points;
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
     numeric constants, predicate statics, parser statics, the standard
-    global constructor property, and the `%Number.prototype%` formatting
-    methods `toString`, `toFixed`, `toExponential`, `toPrecision`,
-    `toLocaleString`, and `valueOf`, including the exact bignum arithmetic
-    their rounding and radix conversion share;
+    global constructor property, the global `isFinite`, `isNaN`,
+    `parseFloat`, and `parseInt` function properties of 19.2, of which the
+    two parsers are the same function objects as the Number statics and
+    the two predicates convert their operand with `ToNumber` first, and
+    the `%Number.prototype%` formatting methods `toString`, `toFixed`,
+    `toExponential`, `toPrecision`, `toLocaleString`, and `valueOf`,
+    including the exact bignum arithmetic their rounding and radix
+    conversion share;
  -  *runtime\_array\_buffer.c*: the `ArrayBuffer` constructor, the Data
     Block one buffer owns, `isView`, the `Symbol.species` accessor, the
     `byteLength`, `detached`, `maxByteLength`, and `resizable` accessors,
@@ -308,6 +312,8 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_number_builtin_dispatch`             | *runtime\_number.c*           |
 | `oseo_internal_number_intrinsic`                    | *runtime\_number.c*           |
 | `oseo_internal_install_number_global`               | *runtime\_number.c*           |
+| `oseo_internal_global_numeric_intrinsic`            | *runtime\_number.c*           |
+| `oseo_internal_install_global_numeric_functions`    | *runtime\_number.c*           |
 | `oseo_internal_math_builtin_dispatch`               | *runtime\_math.c*             |
 | `oseo_internal_math_intrinsic`                      | *runtime\_math.c*             |
 | `oseo_internal_install_math_global`                 | *runtime\_math.c*             |

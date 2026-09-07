@@ -222,6 +222,10 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "isFinite" ||
+    name === "isNaN" ||
+    name === "parseFloat" ||
+    name === "parseInt" ||
     name === "undefined"
   );
 }

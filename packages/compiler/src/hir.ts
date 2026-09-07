@@ -381,6 +381,10 @@ export function intrinsicGlobalKind(
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "isFinite" ||
+    name === "isNaN" ||
+    name === "parseFloat" ||
+    name === "parseInt" ||
     errorIntrinsicName(name) != null
   ) {
     return "replaceable";

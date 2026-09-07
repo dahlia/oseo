@@ -879,6 +879,10 @@ export const emittedC = {
     resultAssignOseoSuperConstructorContext: [
       ["result = oseo_super_constructor(context, callee)", ";"],
     ],
+    resultAssignOseoSuperConstructorCheckContextRoots: [
+      ["result = oseo_super_constructor_check(context, roots["],
+      ["]);"],
+    ],
   },
   thisBind: {
     resultAssignOseoBindThisContextResultValue: [

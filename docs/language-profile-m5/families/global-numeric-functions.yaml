@@ -1,0 +1,67 @@
+version: 1
+id: global-numeric-functions
+title: "Global numeric functions"
+scope:
+  - "The four global numeric function properties of 19.2, meaning
+    isFinite, isNaN, parseFloat, and parseInt, their names, lengths,
+    [[Prototype]], absent prototype property, and the writable,
+    non-enumerable, configurable global-object properties that bind them,
+    including the identity of parseFloat and parseInt with the
+    Number.parseFloat and Number.parseInt statics."
+  - "parseInt, 19.2.5: the ToString conversion of the string operand, the
+    ToInt32 conversion of the radix operand, StrWhiteSpaceChar stripping,
+    the sign, the radix defaults and the 2 to 36 range, the 0x and 0X
+    prefix stripping, the longest digit prefix under the radix, the exact
+    mathematical value of that prefix, and the signed zero result."
+  - "parseFloat, 19.2.4: the ToString conversion, StrWhiteSpaceChar
+    stripping, the longest StrDecimalLiteral prefix including Infinity,
+    the decimal and exponent forms, the signed zero result, and the NaN
+    result when no prefix parses."
+  - "isNaN and isFinite, 19.2.3 and 19.2.2: the ToNumber conversion each
+    performs before it inspects its operand, including the ToPrimitive
+    protocol an object runs, the TypeError a Symbol or BigInt operand
+    raises, and the abrupt completion a throwing conversion propagates."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/global-numeric-functions.ts
+      - tests/property/m5-global-numeric-functions.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/global-numeric-functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/global-numeric-functions.ts
+      - tests/property/m5-global-numeric-functions.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-global-numeric-functions.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/global-numeric-functions.ts
+      - tests/property/m5-global-numeric-functions.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/global-numeric-functions.ts
+      - tests/property/m5-global-numeric-functions.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

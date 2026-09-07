@@ -294,7 +294,9 @@ typedef enum {
     OSEO_INTRINSIC_DECODE_URI_COMPONENT = 179,
     OSEO_INTRINSIC_ENCODE_URI = 180,
     OSEO_INTRINSIC_ENCODE_URI_COMPONENT = 181,
-    OSEO_INTRINSIC_COUNT = 182,
+    OSEO_INTRINSIC_IS_FINITE = 182,
+    OSEO_INTRINSIC_IS_NAN = 183,
+    OSEO_INTRINSIC_COUNT = 184,
 } OseoIntrinsic;
 
 typedef struct {
@@ -1167,13 +1169,23 @@ OseoResult oseo_super_set(
  */
 OseoResult oseo_super_property_delete(OseoContext *context);
 /*
- * GetSuperConstructor: the running constructor's own [[Prototype]].
- * Throws a TypeError when that is not a constructor, which is how
- * `class C extends null {}` rejects `super()`.
+ * GetSuperConstructor: the running constructor's own [[Prototype]],
+ * read before the `super(...)` arguments are evaluated, 13.3.7.1 step 3.
+ * It never throws; the value may be any object or undefined.
  */
 OseoResult oseo_super_constructor(
     OseoContext *context,
     OseoValue callee
+);
+/*
+ * SuperCall step 5: throws a TypeError when the value GetSuperConstructor
+ * read is not a constructor, which is how `class C extends null {}`
+ * rejects `super()`. It runs after the arguments are evaluated, so an
+ * argument side effect is observed even when the call then throws.
+ */
+OseoResult oseo_super_constructor_check(
+    OseoContext *context,
+    OseoValue parent
 );
 /*
  * BindThisValue. A derived constructor's `this` cell starts

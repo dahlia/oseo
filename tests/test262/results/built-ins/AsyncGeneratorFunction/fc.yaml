@@ -46,7 +46,7 @@ results:
     observation:
       detail: 'test/built-ins/AsyncGeneratorFunction/instance-prototype.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorFunction/instance-prototype.js:360:16:
+        stderr="test/built-ins/AsyncGeneratorFunction/instance-prototype.js:438:16:
         error[OSEO1001]: AsyncGeneratorFunction compiles source text at
         run time, which is outside the admitted profile.\n"'
       unsupportedCapability: profile-syntax
