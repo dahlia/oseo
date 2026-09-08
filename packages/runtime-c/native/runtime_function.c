@@ -1367,6 +1367,10 @@ OseoResult oseo_function_create(
     function->element_capacity = 0u;
     function->code_id = code_id;
     function->function_kind = function_kind;
+    /* ClassDefinitionEvaluation marks a constructor derived only when
+     * the definition has a ClassHeritage, which oseo_class_heritage
+     * records. */
+    function->derived_constructor = false;
     /* A class's `prototype` is non-writable, non-enumerable, and
      * non-configurable, unlike an ordinary function's writable one. */
     function->prototype_writable = function_kind != OSEO_FUNCTION_CLASS;
@@ -1649,6 +1653,98 @@ OseoResult oseo_constructor_receiver(
     return oseo_object_create(context, fallback.value);
 }
 
+/*
+ * OrdinaryCreateFromConstructor on behalf of a caller that performs
+ * `target.[[Construct]]`'s receiver allocation itself, which is what
+ * both `super()` and `Reflect.construct` do.
+ *
+ * The [[Construct]] that will actually run belongs to the innermost
+ * bound target, and a bound function's [[Construct]] replaces the new
+ * target with its own target whenever the two are the same function, so
+ * the effective new target is found by walking the same chain and
+ * unwrapping only while it still names the new target.
+ *
+ * Which receiver that clause needs then follows from the constructor's
+ * kind. A derived class constructor creates none: 10.2.2 skips
+ * OrdinaryCreateFromConstructor for [[ConstructorKind]] derived and
+ * leaves both the read and the allocation to the `super()` inside its
+ * body, so this reports `undefined` and reads nothing. An ordinary or
+ * base class constructor runs OrdinaryCreateFromConstructor before its
+ * body, so reading `prototype` here is at the specified position and
+ * the read is a real Get: a bound function has no own `prototype`, so a
+ * program can define an accessor one on it and observe it. A built-in
+ * constructor performs OrdinaryCreateFromConstructor at its own
+ * position, after the argument validation its clause specifies, so this
+ * reads only the synthetic `prototype` slot and leaves the observable
+ * Get to the component that owns the constructor.
+ */
+OseoResult oseo_internal_construct_receiver(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue new_target
+) {
+    OseoValue effective = new_target;
+    OseoValue constructor = target;
+    while (is_function(constructor) &&
+           function_object(constructor)->function_kind ==
+               OSEO_FUNCTION_BOUND) {
+        if (constructor == effective) {
+            effective = function_object(constructor)->bound_target;
+        }
+        constructor = function_object(constructor)->bound_target;
+    }
+    if (is_function(constructor) &&
+        function_object(constructor)->derived_constructor) {
+        return normal(oseo_undefined());
+    }
+    size_t code_id = 0u;
+    OseoResult identified = oseo_function_code_id(
+        context,
+        constructor,
+        &code_id
+    );
+    if (identified.status != OSEO_STATUS_NORMAL) return identified;
+    OseoValue slots[2] = {effective, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result;
+    if (oseo_internal_builtin_code_id(code_id)) {
+        result = normal(
+            function_has_prototype_property(slots[0])
+                ? function_object(slots[0])->prototype_object
+                : oseo_undefined()
+        );
+    } else {
+        result = oseo_internal_ascii_string(context, "prototype");
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[1]);
+        }
+    }
+    /* A `prototype` accessor can return a fresh object, so the read
+     * lands in a rooted slot before the receiver allocation. */
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_constructor_receiver(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * SuperCall's receiver allocation. `parent` is the super constructor
+ * SuperCall step 3 read and step 5 checked; the receiver comes from the
+ * running constructor's new target, and stays undefined when the super
+ * constructor is itself derived and creates its own.
+ */
+OseoResult oseo_super_constructor_receiver(
+    OseoContext *context,
+    OseoValue parent,
+    OseoValue new_target
+) {
+    return oseo_internal_construct_receiver(context, parent, new_target);
+}
+
 OseoResult oseo_constructor_result(
     OseoContext *context,
     OseoValue returned,
@@ -1686,6 +1782,9 @@ OseoResult oseo_class_heritage(
     if (!is_function(constructor)) {
         return failure(context, "OSEO2001", "Class heritage needs a class.");
     }
+    /* A ClassHeritage, `extends null` included, makes the constructor
+     * derived: its [[Construct]] leaves the receiver to `super()`. */
+    function_object(constructor)->derived_constructor = true;
     if (tag_of(heritage) == OSEO_TAG_NULL) {
         OseoValue class_prototype =
             function_object(constructor)->prototype_object;

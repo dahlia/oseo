@@ -139,68 +139,6 @@ static OseoResult reflect_apply(
     return result;
 }
 
-/*
- * GetPrototypeFromConstructor over the new target `target.[[Construct]]`
- * actually receives. A bound function's [[Construct]] replaces the new
- * target with its own target whenever the two are the same function, and
- * it repeats that at every layer of a bound chain, so the effective new
- * target is found by walking the target's bound chain and unwrapping
- * only while it still names the new target.
- *
- * The prototype itself is read differently for the two kinds of
- * constructor, which is decided by the innermost bound target, because
- * that is the function whose clause defines the [[Construct]] this
- * reaches. An ordinary or class constructor runs
- * OrdinaryCreateFromConstructor before its body, so reading
- * `prototype` here is at the specified position and the read is a real
- * Get: a bound function has no own `prototype`, so a program can define
- * an accessor one on it and observe it. A built-in constructor performs
- * OrdinaryCreateFromConstructor at its own position, after the argument
- * validation its clause specifies, so this reads only the synthetic
- * `prototype` slot and leaves the observable Get to the component that
- * owns the constructor.
- */
-static OseoResult reflect_new_target_prototype(
-    OseoContext *context,
-    OseoValue target,
-    OseoValue new_target
-) {
-    OseoValue effective = new_target;
-    OseoValue constructor = target;
-    while (is_function(constructor) &&
-           function_object(constructor)->function_kind ==
-               OSEO_FUNCTION_BOUND) {
-        if (constructor == effective) {
-            effective = function_object(constructor)->bound_target;
-        }
-        constructor = function_object(constructor)->bound_target;
-    }
-    size_t code_id = 0u;
-    OseoResult identified = oseo_function_code_id(
-        context,
-        constructor,
-        &code_id
-    );
-    if (identified.status != OSEO_STATUS_NORMAL) return identified;
-    if (oseo_internal_builtin_code_id(code_id)) {
-        return normal(
-            function_has_prototype_property(effective)
-                ? function_object(effective)->prototype_object
-                : oseo_undefined()
-        );
-    }
-    OseoValue slots[2] = {effective, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_ascii_string(context, "prototype");
-    slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[1]);
-    }
-    oseo_roots_pop(context, &frame);
-    return result;
-}
-
 /* Reflect.construct(target, argumentsList [, newTarget]). */
 static OseoResult reflect_construct(
     OseoContext *context,
@@ -223,8 +161,9 @@ static OseoResult reflect_construct(
     }
     /*
      * Slots: 0 target, 1 new target, 2 the array-like source, 3 the
-     * collected argument list, 4 the receiver OrdinaryCreateFromConstructor
-     * builds from the new target's `prototype`.
+     * collected argument list, 4 the receiver
+     * OrdinaryCreateFromConstructor builds from the new target's
+     * `prototype`, undefined when the target's own clause creates it.
      */
     OseoValue slots[5] = {
         target,
@@ -241,13 +180,15 @@ static OseoResult reflect_construct(
         &slots[3]
     );
     if (result.status == OSEO_STATUS_NORMAL) {
-        /* A `prototype` accessor can return a fresh object, so the read
-         * lands in a rooted slot before the receiver allocation. */
-        result = reflect_new_target_prototype(context, slots[0], slots[1]);
-        slots[4] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_constructor_receiver(context, slots[4]);
+        /* OrdinaryCreateFromConstructor on the target's behalf, which
+         * reads nothing and creates nothing when the target is a
+         * derived class constructor, because its own `super()` does
+         * both once the body reaches it. */
+        result = oseo_internal_construct_receiver(
+            context,
+            slots[0],
+            slots[1]
+        );
         slots[4] = result.value;
     }
     size_t forwarded_count = 0u;

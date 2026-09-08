@@ -5655,20 +5655,28 @@ that the throwing forms turn back into that `TypeError`, while an abrupt
 completion no boolean can carry still propagates. `get` and `set` take the
 explicit receiver, `ownKeys` shares OrdinaryOwnPropertyKeys with the `Object`
 statics, `apply` and `construct` share CreateListFromArrayLike with
-`Function.prototype.apply`, and `construct` derives the created receiver's
-prototype from the new target a bound target's `[[Construct]]` would actually
-receive, reading it as a real `Get` for an ordinary or class target and
-leaving a built-in target's own clause to perform that read at its specified
-position, which `Object` and `Promise` now do alongside `Array`,
-`ArrayBuffer`, `DataView`, and `RegExp`, and which the profile's known gaps
-record for the three constructors and one family that still read the slot.
-Admitting the namespace makes two already reviewed behaviors observable, so the
-node also gives `%Object.prototype%` the immutable prototype of 10.4.7 and
-finishes OrdinarySetWithOwnDescriptor with the receiver's
-`[[DefineOwnProperty]]`, which is what reports `false` for an array `length`
-write whose coercion makes `length` non-writable.
+`Function.prototype.apply`, and `construct` performs the target's own
+OrdinaryCreateFromConstructor over the new target a bound target's
+`[[Construct]]` would actually receive. A derived class constructor creates
+no receiver there, because 10.2.2 leaves both the read and the allocation to
+the `super()` in its body; `super()` now performs the same operation, so a
+derived construction reads the new target only once its body reaches
+`super()`, and a chain of derived constructors reads it once at its
+innermost base. An ordinary or base
+class target keeps the real `Get` before the body, and a built-in target's own
+clause performs that read at its specified position, which `Object` and
+`Promise` now do alongside `Array`, `ArrayBuffer`, `DataView`, and `RegExp`,
+and which the profile's known gaps record for the three constructors and one
+family that still read the slot. Admitting the namespace makes three already
+reviewed behaviors observable, so the node also gives `%Object.prototype%` the
+immutable prototype of 10.4.7, finishes OrdinarySetWithOwnDescriptor with the
+receiver's `[[DefineOwnProperty]]`, which is what reports `false` for an array
+`length` write whose coercion makes `length` non-writable, and keeps the
+module namespace `[[Set]]` refusal when the walk reaches a namespace on an
+ordinary object's prototype chain rather than only as the write target.
 
-Fixed native and generated differential evidence at seed `0x60006200` covers
+Fixed native and generated differential evidence at seeds `0x60006300` and
+`0x60006301` covers
 the namespace and function identities, descriptors, names, lengths, and `new`
 rejections, the object-target `TypeError` over six primitive kinds, own-key
 ordering across all three key groups, data and accessor descriptors over every
@@ -5676,23 +5684,33 @@ attribute combination, own and missing keys, extensible and non-extensible
 targets, the boolean-versus-`TypeError` agreement with each matching `Object`
 static, explicit receivers, array-like argument lists, `construct` with and
 without a distinct new target, bound targets and bound new targets, an abrupt
-`prototype` accessor, both specialization policies, forced collection at every
+`prototype` accessor, the observed order of derived, base, built-in-parent,
+and derived-parent constructions against a bound new target whose `prototype`
+is an accessor, a module namespace reached as the write target, as a
+prototype, and as a grandparent under both `Reflect.set` and the strict
+assignment form, both specialization policies, forced collection at every
 safepoint, false hints, deliberate shape-guard misses, and generic fallback.
+The two reference hosts disagree about every generated shape whose walk
+reaches the namespace with a receiver that is not that namespace, because the
+V8 Node.js 24 bundles applies the exotic clause only to a write whose receiver
+is the namespace, so that domain records both answers, accepts a reference
+against either rather than pinning one host's version, and holds the native
+program to the clause.
 Of the 153 paths under the node's inventory root, 152 are reviewed: 139 pass
 and 13 retain explicit `Proxy`, `Function` constructor, and `Date`
 prerequisites, while the large-index own-key ordering case stays outside the
 subset because its body needs the `Symbol` registry. The reviewed
 *isConstructor.js* harness include becomes available with this node, which is
-what lets 276 already reviewed rows outside the node's root move from
+what lets 285 already reviewed rows outside the node's root move from
 unsupported profile feature to pass; no reviewed row moves away from pass.
-The manifest moves from 17,204 to 17,356 cases and from 13,301 to 13,716
-passes, keeps 1,556 expected negatives, and moves from 2,347 to 2,084
+The manifest moves from 17,343 to 17,495 cases and from 13,449 to 13,873
+passes, keeps 1,556 expected negatives, and moves from 2,338 to 2,066
 unsupported profile features, with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 126 to 127 domains and seeds and
-from 5,406 to 5,418 ordinary cases. The admitted runtime checkpoint moves the
-runtime ABI to `oseo-runtime-m5-95` and allocates thirteen code IDs in one new
-range without adding a generated-code entry point or changing the graph's
-orchestration state.
+failures. The property ratchet moves from 127 to 129 domains and seeds and
+from 5,418 to 5,454 ordinary cases. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-96`, allocates thirteen code IDs in one new
+range, adds the `oseo_super_constructor_receiver` generated-code entry point,
+and does not change the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

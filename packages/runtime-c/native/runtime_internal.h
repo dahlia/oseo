@@ -1156,6 +1156,15 @@ typedef struct {
     size_t element_capacity;
     size_t code_id;
     OseoFunctionKind function_kind;
+    /*
+     * ClassDefinitionEvaluation's [[ConstructorKind]]: true exactly when
+     * the class definition had a ClassHeritage, including `extends
+     * null`. A derived constructor's [[Construct]] creates no
+     * `this` before the body; its `super()` does, so a caller must not
+     * create a receiver for it or read the new target's `prototype` at
+     * its own position.
+     */
+    bool derived_constructor;
     bool prototype_writable;
     /*
      * Where the synthetic `prototype` sits in OrdinaryOwnPropertyKeys
@@ -1771,6 +1780,19 @@ OseoResult oseo_internal_function_builtin_dispatch(
  * ordinary receiver must not read `newTarget`'s `prototype` for it.
  */
 bool oseo_internal_builtin_code_id(size_t code_id);
+
+/*
+ * OrdinaryCreateFromConstructor for a caller that performs
+ * `target.[[Construct]]`'s receiver allocation itself. The result is
+ * the fresh receiver, or undefined when `target` is a derived class
+ * constructor whose `super()` creates it instead. Defined in
+ * runtime_function.c.
+ */
+OseoResult oseo_internal_construct_receiver(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue new_target
+);
 /* OrdinaryHasInstance, shared by instanceof and @@hasInstance dispatch. */
 OseoResult oseo_internal_ordinary_has_instance(
     OseoContext *context,

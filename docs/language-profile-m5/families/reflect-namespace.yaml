@@ -9,8 +9,13 @@ scope:
     target and reporting the essential internal method's own result rather
     than the language error the matching Object static raises. It includes
     CreateListFromArrayLike for both call forms, the explicit receiver of
-    get and set, the new target of construct, the immutable prototype
-    %Object.prototype% carries, and the @@toStringTag value property."
+    get and set, the new target of construct and the
+    OrdinaryCreateFromConstructor it performs on the target's behalf, which
+    a derived class constructor leaves to the super() in its body, the
+    immutable prototype %Object.prototype% carries, the module namespace
+    [[Set]] refusal the ordinary walk preserves wherever it reaches a
+    namespace, and the
+    @@toStringTag value property."
 owners:
   - PLAN-M5.md
 evidence:

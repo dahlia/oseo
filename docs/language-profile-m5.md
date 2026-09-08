@@ -5752,35 +5752,61 @@ array-like object contributes its `length` and index reads;
 `Function.prototype.apply` now shares that operation, keeping only its own
 nullish shortcut. `construct` requires a constructor target, defaults the new
 target to the target, requires that to be a constructor too, and only then
-converts the argument list. The prototype the created receiver takes is the
-one the target's `[[Construct]]` would read: a bound target replaces the new
-target with its own target at every layer at which the two are the same
-function. For an ordinary or class target the read is a real
-`Get(newTarget, "prototype")`, because a bound function has no own
-`prototype` and a program may define an accessor one on it. For a built-in
-target the position of OrdinaryCreateFromConstructor belongs to the clause
-that defines the constructor, so the built-in performs that read itself.
-`Object` and `Promise` now do, `Object` before any other step and `Promise`
-after its executor callability check, joining `Array`, `ArrayBuffer`,
-`DataView`, and `RegExp`; the known gap below records the three constructors
-and one family that still take the prototype from the new target's internal
-slot.
+converts the argument list. It then performs the target's own
+OrdinaryCreateFromConstructor on the target's behalf, and which receiver
+that produces follows from the constructor the innermost bound target
+names: a bound target replaces the new target with its own target at every
+layer at which the two are the same function.
 
-Two adjacent corrections land with the node because admitting these functions
-makes already reviewed behavior observable. `%Object.prototype%` becomes an
-immutable prototype exotic object under 10.4.7, so its `[[SetPrototypeOf]]`
-accepts only the null prototype it already has and reports `false` for any
-other, joining the module namespace objects that already had that behavior.
-And OrdinarySetWithOwnDescriptor now finishes with the receiver's
-`[[DefineOwnProperty]]` for a value-only descriptor rather than a second
-ordinary assignment, so an array `length` write whose value coercion makes
-`length` non-writable reports `false` after both of its specified hint reads.
+A derived class constructor, one whose class definition had a
+ClassHeritage including `extends null`, creates no receiver at all. 10.2.2
+skips OrdinaryCreateFromConstructor for `[[ConstructorKind]]` derived and
+leaves both the read and the allocation to the `super()` inside the body,
+so nothing is read before the body runs and an observable `prototype`
+accessor on the new target runs at the position `super()` gives it. Each
+`super()` performs the same operation against the super constructor it read
+and the running constructor's new target, so a chain of derived
+constructors reads the new target exactly once, at its innermost base.
+
+For an ordinary or base class constructor the read is a real
+`Get(newTarget, "prototype")` before the body, because a bound function has
+no own `prototype` and a program may define an accessor one on it. For a
+built-in target the position of OrdinaryCreateFromConstructor belongs to the
+clause that defines the constructor, so the built-in performs that read
+itself. `Object` and `Promise` now do, `Object` before any other step and
+`Promise` after its executor callability check, joining `Array`,
+`ArrayBuffer`, `DataView`, and `RegExp`; the known gap below records the
+three constructors and one family that still take the prototype from the new
+target's internal slot.
+
+Three adjacent corrections land with the node because admitting these
+functions makes already reviewed behavior observable. `%Object.prototype%`
+becomes an immutable prototype exotic object under 10.4.7, so its
+`[[SetPrototypeOf]]` accepts only the null prototype it already has and
+reports `false` for any other, joining the module namespace objects that
+already had that behavior. OrdinarySetWithOwnDescriptor now finishes with the
+receiver's `[[DefineOwnProperty]]` for a value-only descriptor rather than a
+second ordinary assignment, so an array `length` write whose value coercion
+makes `length` non-writable reports `false` after both of its specified hint
+reads. And OrdinarySetWithOwnDescriptor hands an absent own property to the
+parent's own `[[Set]]` rather than continuing one flattened walk, so a module
+namespace reached anywhere on an ordinary object's prototype chain answers
+with its exotic `[[Set]]` of 10.4.6.9 and refuses every key and every
+receiver, exactly as one reached as the target itself already did. Both
+reference hosts refuse a write whose receiver is the namespace, and they
+disagree about every shape whose walk reaches a namespace some other way: the
+V8 that Node.js 24 bundles applies the exotic clause only to that one case,
+while Deno's newer V8 and this profile apply 10.4.6.9 wherever the walk
+reaches the namespace.
 
 The runtime gains one component, *runtime\_reflect.c*, and one built-in code
 range whose thirteen IDs count down from the range last in the order the
 namespace creates its properties, so the dispatch reads an index rather than a
-table. The namespace is one lazily created intrinsic. The node adds no
-generated-code entry point and owns no property, descriptor, or call semantics
+table. The namespace is one lazily created intrinsic. The node adds one
+generated-code entry point, `oseo_super_constructor_receiver`, because
+`Reflect.construct` and `super()` now share one OrdinaryCreateFromConstructor
+in *runtime\_function.c* instead of each reading the new target its own way.
+It owns no property, descriptor, or call semantics
 of its own: OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with the
 `Object` component, ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
 the descriptor component, `[[Get]]` and `[[Set]]` with the property component,
@@ -5797,8 +5823,9 @@ case that named it stayed outside the reviewed subset or recorded an explicit
 would produce are not observable here and the reviewed cases that need one
 retain that explicit prerequisite.
 
-Fixed native and generated differential evidence at property seed
-`0x60006200` covers the namespace identity, descriptor, and `@@toStringTag`,
+Fixed native and generated differential evidence at property seeds
+`0x60006300` and `0x60006301` covers the namespace identity, descriptor, and
+`@@toStringTag`,
 the thirteen function identities, names, lengths, descriptors, and `new`
 rejections, the object-target `TypeError` for six primitive kinds across every
 function that requires one, integer-index, String, and Symbol own-key
@@ -5808,8 +5835,12 @@ and non-extensible targets, the boolean-versus-`TypeError` agreement with the
 matching `Object` static for definition, assignment, deletion, and prototype
 writes, the explicit receiver of `get` and `set`, array-like and array
 argument lists, `construct` with and without a distinct new target, a bound
-target and a bound new target, an abrupt `prototype` accessor, the
-array `length` coercion order, the immutable `%Object.prototype%`, both
+target and a bound new target, an abrupt `prototype` accessor, the observed
+order of a derived, base, built-in-parent, and derived-parent construction
+against a bound new target whose `prototype` is an accessor, the
+array `length` coercion order, the immutable `%Object.prototype%`, a module
+namespace reached as the write target, as a prototype, and as a grandparent
+under both `Reflect.set` and the strict assignment form, both
 specialization policies, collection forced at every safepoint, a false number
 hint, a deliberate global-object shape guard miss with generic fallback, and
 the global write, delete, restore, assignment-target, and strict
@@ -5824,18 +5855,19 @@ the `Function` constructor and the `Date` intrinsic their bodies reach.
 subset: its frontmatter names only admitted features, but its body needs the
 `Symbol` registry the separately owned `symbol-intrinsic` node holds, and the
 own-key order it measures already agrees with the reference hosts.
-Two hundred and seventy-six reviewed cases outside that root also move from
+Two hundred and eighty-five reviewed cases outside that root also move from
 unsupported profile feature to pass, and no reviewed row moves away from pass.
 Most of them detect a non-constructor through the *isConstructor.js* include
 this node makes available, and the rest read a `Reflect` function directly.
-The manifest reaches 17,356 cases: 13,716 passes, 1,556 expected negatives,
-and 2,084 unsupported profile features with no semantic, harness, or
-infrastructure failures, up from 17,204 cases with 13,301 passes and 2,347
+The manifest reaches 17,495 cases: 13,873 passes, 1,556 expected negatives,
+and 2,066 unsupported profile features with no semantic, harness, or
+infrastructure failures, up from 17,343 cases with 13,449 passes and 2,338
 unsupported profile features. The suite revision, 41,091-path inventory,
 manifest schema, and zero-override policy are unchanged; the dependency
 vocabulary adds the `reflect-namespace` evidence tag. The admitted runtime
-checkpoint moves the runtime ABI to `oseo-runtime-m5-95` without adding a
-generated-code entry point or changing the graph's orchestration state.
+checkpoint moves the runtime ABI to `oseo-runtime-m5-96`, adds the
+`oseo_super_constructor_receiver` generated-code entry point, and does not
+change the graph's orchestration state.
 
 
 Known gaps inside the claim

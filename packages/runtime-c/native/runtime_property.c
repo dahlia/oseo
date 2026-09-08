@@ -219,6 +219,18 @@ OseoResult oseo_object_set(
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *owner = ordinary_object(current);
+        if (owner->module_namespace) {
+            /* The receiver itself was answered above; a namespace
+             * reached later on the walk owns the [[Set]] the absent own
+             * property hands the parent, and it refuses every key. */
+            if (strict) {
+                return type_error(
+                    context,
+                    "Cannot assign to a module namespace property."
+                );
+            }
+            return normal(value);
+        }
         OseoValue own_value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -352,18 +364,21 @@ OseoResult oseo_internal_set_with_receiver(
     *refusal = NULL;
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
-    if (ordinary_object(base)->module_namespace) {
-        /* A module namespace's [[Set]] (10.4.6.9) reports false for
-         * every key and every receiver, so no write reaches either
-         * object. */
-        *refusal = "Cannot assign to a module namespace property.";
-        return normal(value);
-    }
     /* The lookup walks `base` only to decide whether a setter runs.
      * Every other outcome, including a data property found on the walk,
      * leaves the write to the receiver. */
     OseoValue current = base;
     while (is_object(current)) {
+        if (ordinary_object(current)->module_namespace) {
+            /* OrdinarySetWithOwnDescriptor hands an absent own property
+             * to the parent's own [[Set]], so a module namespace
+             * anywhere on the walk answers with its exotic [[Set]]
+             * (10.4.6.9) rather than with this ordinary continuation.
+             * That reports false for every key and every receiver, so
+             * no write reaches either object. */
+            *refusal = "Cannot assign to a module namespace property.";
+            return normal(value);
+        }
         OseoValue own_value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();

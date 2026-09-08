@@ -1189,6 +1189,21 @@ OseoResult oseo_super_constructor_check(
     OseoValue parent
 );
 /*
+ * SuperCall's OrdinaryCreateFromConstructor: the receiver the super
+ * constructor's [[Construct]] starts from, taken from the running
+ * constructor's new target. The `prototype` read is a real Get when the
+ * super constructor is an ordinary or base class constructor, whose
+ * clause performs it at this position, and the synthetic slot when it
+ * is a built-in, whose clause performs its own Get later. The result is
+ * undefined when the super constructor is itself derived, because that
+ * clause creates no receiver at all.
+ */
+OseoResult oseo_super_constructor_receiver(
+    OseoContext *context,
+    OseoValue parent,
+    OseoValue new_target
+);
+/*
  * BindThisValue. A derived constructor's `this` cell starts
  * uninitialized, so a second `super()` in the same invocation throws a
  * ReferenceError rather than replacing the receiver.

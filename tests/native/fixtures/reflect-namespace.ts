@@ -428,6 +428,130 @@ try {
 } catch (error) {
   console.log("construct abrupt prototype", error instanceof RangeError);
 }
+/* A derived class constructor creates no receiver: 10.2.2 skips
+ * OrdinaryCreateFromConstructor for [[ConstructorKind]] derived and
+ * leaves both the new target's prototype read and the allocation to
+ * the super() inside the body. An observable accessor on a bound new
+ * target therefore runs at the super() the body reaches, and the
+ * receiver carries what that read returned rather than a read taken
+ * before the body started. */
+const derivedOrder = [];
+class DerivedBase { constructor() { derivedOrder.push("base"); } }
+class DerivedChild extends DerivedBase {
+  constructor() { derivedOrder.push("body"); super(); }
+}
+const latePrototype = { tag: "late" };
+const derivedNewTarget = DerivedChild.bind(null);
+Object.defineProperty(derivedNewTarget, "prototype", {
+  get() { derivedOrder.push("get"); return latePrototype; },
+});
+const derivedInstance = Reflect.construct(DerivedChild, [], derivedNewTarget);
+console.log(
+  "construct derived order",
+  render(derivedOrder),
+  Object.getPrototypeOf(derivedInstance) === latePrototype,
+);
+/* Only the innermost super() that reaches a base constructor reads the
+ * new target, so a chain of derived constructors reads it once. */
+const chainOrder = [];
+class ChainA { constructor() { chainOrder.push("a"); } }
+class ChainB extends ChainA {
+  constructor() { chainOrder.push("b"); super(); }
+}
+class ChainC extends ChainB {
+  constructor() { chainOrder.push("c"); super(); }
+}
+const chainPrototype = { tag: "chain" };
+const chainNewTarget = ChainC.bind(null);
+Object.defineProperty(chainNewTarget, "prototype", {
+  get() { chainOrder.push("get"); return chainPrototype; },
+});
+const chainInstance = Reflect.construct(ChainC, [], chainNewTarget);
+console.log(
+  "construct derived chain",
+  render(chainOrder),
+  Object.getPrototypeOf(chainInstance) === chainPrototype,
+);
+/* A built-in super constructor performs GetPrototypeFromConstructor at
+ * its own position, so the derived body defers to it and the accessor
+ * still runs exactly once. */
+const builtinOrder = [];
+class DerivedObject extends Object {
+  constructor() { builtinOrder.push("body"); super(); }
+}
+const builtinPrototype = { tag: "builtin" };
+const builtinNewTarget = DerivedObject.bind(null);
+Object.defineProperty(builtinNewTarget, "prototype", {
+  get() { builtinOrder.push("get"); return builtinPrototype; },
+});
+const builtinInstance = Reflect.construct(
+  DerivedObject,
+  [],
+  builtinNewTarget,
+);
+console.log(
+  "construct derived builtin",
+  render(builtinOrder),
+  Object.getPrototypeOf(builtinInstance) === builtinPrototype,
+);
+/* A base class constructor keeps the read before its body, so the same
+ * accessor runs first. */
+const baseOrder = [];
+class BaseOnly { constructor() { baseOrder.push("body"); } }
+const basePrototype = { tag: "base" };
+const baseNewTarget = BaseOnly.bind(null);
+Object.defineProperty(baseNewTarget, "prototype", {
+  get() { baseOrder.push("get"); return basePrototype; },
+});
+const baseInstance = Reflect.construct(BaseOnly, [], baseNewTarget);
+console.log(
+  "construct base order",
+  render(baseOrder),
+  Object.getPrototypeOf(baseInstance) === basePrototype,
+);
+/* extends null makes the constructor derived without giving it a super
+ * constructor to reach, so a body that returns an object never reads
+ * the new target's prototype at all. */
+const nullOrder = [];
+class NullHeritage extends null {
+  constructor() { nullOrder.push("body"); return { tag: "null" }; }
+}
+const nullNewTarget = NullHeritage.bind(null);
+Object.defineProperty(nullNewTarget, "prototype", {
+  get() { nullOrder.push("get"); return { tag: "unread" }; },
+});
+const nullInstance = Reflect.construct(NullHeritage, [], nullNewTarget);
+console.log("construct null heritage", render(nullOrder), nullInstance.tag);
+/* A bound derived target still resolves to the derived constructor its
+ * innermost bound target names, and the bound [[Construct]] replaces
+ * the defaulted new target with that constructor, so super() reads the
+ * class rather than the bound function. */
+const boundOrder = [];
+class BoundBase { constructor() { boundOrder.push("base"); } }
+class BoundChild extends BoundBase {
+  constructor() { boundOrder.push("body"); super(); }
+}
+const boundDerived = BoundChild.bind(null);
+const boundInstance = Reflect.construct(boundDerived, []);
+console.log(
+  "construct bound derived",
+  render(boundOrder),
+  Object.getPrototypeOf(boundInstance) === BoundChild.prototype,
+);
+/* new on a derived class reaches the same super() path, so the class
+ * itself is the new target and its own prototype is what the receiver
+ * carries. */
+const plainOrder = [];
+class PlainBase { constructor() { plainOrder.push("base"); } }
+class PlainChild extends PlainBase {
+  constructor() { plainOrder.push("body"); super(); }
+}
+const plainInstance = new PlainChild();
+console.log(
+  "construct derived new",
+  render(plainOrder),
+  Object.getPrototypeOf(plainInstance) === PlainChild.prototype,
+);
 const constructOrder = [];
 try {
   Reflect.construct(function () {}, [], () => {});

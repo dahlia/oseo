@@ -7,6 +7,7 @@ import test from "node:test";
 import fc from "fast-check";
 
 import { cBackend } from "../../packages/backend-c/src/index.ts";
+import { runNativeCli } from "../../packages/cli/src/index.ts";
 import {
   compileSource,
   describeTarget,
@@ -582,6 +583,293 @@ test(
           "observations, and one global assignment-target and deletion " +
           "sequence",
         timeLimitMilliseconds: 360_000,
+      },
+    );
+  },
+);
+
+/**
+ * One generated module-namespace write. A module namespace object's
+ * [[Set]] (10.4.6.9) reports false for every key and every receiver, and
+ * OrdinarySetWithOwnDescriptor hands an absent own property to the
+ * parent's own [[Set]], so a namespace anywhere on the walk answers with
+ * that clause instead of continuing the ordinary chain.
+ */
+interface NamespaceChainCase {
+  /**
+   * How many ordinary objects sit between the write target and the
+   * namespace. Zero makes the namespace the target itself.
+   */
+  readonly depth: 0 | 1 | 2;
+  /** Whether the written key is one the namespace exports. */
+  readonly exportedKey: boolean;
+  /**
+   * Whether the object closest to the namespace owns the key as a
+   * writable data property, which ends the walk before the namespace.
+   */
+  readonly shadowed: boolean;
+  /** Whether Reflect.set takes a receiver distinct from the target. */
+  readonly separateReceiver: boolean;
+  readonly value: number;
+}
+
+const namespaceChainArbitrary: fc.Arbitrary<NamespaceChainCase> = fc
+  .record({
+    depth: fc.constantFrom<0 | 1 | 2>(0, 1, 2),
+    exportedKey: fc.boolean(),
+    shadowed: fc.boolean(),
+    separateReceiver: fc.boolean(),
+    value: fc.integer({ max: 9, min: 0 }),
+  })
+  .map((generated) =>
+    Object.assign({}, generated, {
+      shadowed: generated.depth === 0 ? false : generated.shadowed,
+    }),
+  );
+
+/** The value the generated dependency module exports. */
+const exportedValue = 11;
+
+/** The value a shadowing own data property carries before the write. */
+const shadowValue = 22;
+
+function namespaceKey(testCase: NamespaceChainCase): string {
+  return testCase.exportedKey ? "exported" : "absent";
+}
+
+function namespaceDependencySource(): string {
+  return [`export const exported = ${exportedValue};`, ""].join("\n");
+}
+
+/**
+ * The generated entry module. Both the Reflect.set form and the strict
+ * assignment form run against separately built chains of the same shape,
+ * so one program observes the reported boolean and the language error
+ * the same refusal produces.
+ */
+function namespaceEntrySource(testCase: NamespaceChainCase): string {
+  const key = namespaceKey(testCase);
+  const shadow = [
+    `  Object.defineProperty(holder, "${key}", {`,
+    "    configurable: true,",
+    "    enumerable: true,",
+    `    value: ${shadowValue},`,
+    "    writable: true,",
+    "  });",
+  ];
+  const build =
+    testCase.depth === 0
+      ? ["  return ns;"]
+      : testCase.depth === 1
+        ? [
+            "  const holder = Object.create(ns);",
+            ...(testCase.shadowed ? shadow : []),
+            "  return holder;",
+          ]
+        : [
+            "  const holder = Object.create(ns);",
+            ...(testCase.shadowed ? shadow : []),
+            "  return Object.create(holder);",
+          ];
+  return [
+    'import * as ns from "./dependency.mjs";',
+    "",
+    "function build() {",
+    ...build,
+    "}",
+    "",
+    "function names(object) {",
+    "  return Object.getOwnPropertyNames(object).length;",
+    "}",
+    "",
+    "const target = build();",
+    testCase.separateReceiver
+      ? "const receiver = {};"
+      : "const receiver = target;",
+    testCase.separateReceiver
+      ? `const reported = Reflect.set(target, "${key}", ` +
+        `${testCase.value}, receiver);`
+      : `const reported = Reflect.set(target, "${key}", ${testCase.value});`,
+    'console.log("reflect", reported);',
+    `console.log("target", names(target), String(target["${key}"]));`,
+    `console.log("receiver", names(receiver), String(receiver["${key}"]));`,
+    "const assigned = build();",
+    "let outcome;",
+    "try {",
+    `  assigned["${key}"] = ${testCase.value};`,
+    '  outcome = "ok";',
+    "} catch (error) {",
+    '  outcome = error instanceof TypeError ? "TypeError" : "other";',
+    "}",
+    'console.log("assignment", outcome, names(assigned),',
+    `  String(assigned["${key}"]));`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * Which answer one reference host gives. `refused` is what 10.4.6.9 and
+ * OrdinarySetWithOwnDescriptor prescribe and what the native program
+ * must produce: a namespace reached as the target or anywhere on the
+ * walk refuses every key and every receiver. `flattened` is the answer
+ * a V8 that applies the exotic clause only to a write whose receiver is
+ * the namespace itself gives, so it continues the ordinary walk past a
+ * namespace on the chain and lets a distinct receiver take the write.
+ * Node.js 24's bundled V8 13.6 answers that way and Deno's V8 14.9 does
+ * not, so the two reference hosts disagree on every generated case whose
+ * walk reaches the namespace with a receiver that is not that namespace,
+ * and agree on the rest. Each reference is therefore accepted against
+ * either recorded answer, rather than pinned to one host's version,
+ * while the native program is held to the clause.
+ */
+type NamespaceAnswer = "flattened" | "refused";
+
+function namespaceExpected(
+  testCase: NamespaceChainCase,
+  answer: NamespaceAnswer,
+): string {
+  const clauseWrites = testCase.depth !== 0 && testCase.shadowed;
+  const reflectWrites =
+    answer === "flattened"
+      ? testCase.depth !== 0 || testCase.separateReceiver
+      : clauseWrites;
+  const assignmentWrites =
+    answer === "flattened" ? testCase.depth !== 0 : clauseWrites;
+  const inherited = testCase.shadowed
+    ? String(shadowValue)
+    : testCase.exportedKey
+      ? String(exportedValue)
+      : "undefined";
+  const ownBefore = testCase.depth === 1 && testCase.shadowed ? 1 : 0;
+  const targetNames =
+    testCase.depth === 0
+      ? 1
+      : reflectWrites && !testCase.separateReceiver
+        ? 1
+        : ownBefore;
+  const targetValue =
+    testCase.depth === 0
+      ? testCase.exportedKey
+        ? String(exportedValue)
+        : "undefined"
+      : reflectWrites && !testCase.separateReceiver
+        ? String(testCase.value)
+        : inherited;
+  const receiverNames = testCase.separateReceiver
+    ? reflectWrites
+      ? 1
+      : 0
+    : targetNames;
+  const receiverValue = testCase.separateReceiver
+    ? reflectWrites
+      ? String(testCase.value)
+      : "undefined"
+    : targetValue;
+  const assignedNames =
+    testCase.depth === 0 ? 1 : assignmentWrites ? 1 : ownBefore;
+  const assignedValue =
+    testCase.depth === 0
+      ? testCase.exportedKey
+        ? String(exportedValue)
+        : "undefined"
+      : assignmentWrites
+        ? String(testCase.value)
+        : inherited;
+  return (
+    `reflect ${String(reflectWrites)}\n` +
+    `target ${targetNames} ${targetValue}\n` +
+    `receiver ${receiverNames} ${receiverValue}\n` +
+    `assignment ${assignmentWrites ? "ok" : "TypeError"} ${assignedNames} ` +
+    `${assignedValue}\n`
+  );
+}
+
+test(
+  "generated module namespace writes keep the exotic refusal",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "a module namespace on the walk refuses every Reflect.set and " +
+        "every assignment",
+      fc.asyncProperty(namespaceChainArbitrary, async (testCase) => {
+        const directory = await host.makeTemporaryDirectory(
+          "oseo-reflect-namespace-chain-",
+        );
+        const entryPath = `${directory}/entry.mjs`;
+        await host.writeTextFile(
+          `${directory}/dependency.mjs`,
+          namespaceDependencySource(),
+        );
+        await host.writeTextFile(entryPath, namespaceEntrySource(testCase));
+        const refused = namespaceExpected(testCase, "refused");
+        const flattened = namespaceExpected(testCase, "flattened");
+        try {
+          for (const reference of [
+            await host.run({
+              args: [entryPath],
+              command: process.execPath,
+              cwd: directory,
+            }),
+            await host.run({
+              args: ["run", "--quiet", entryPath],
+              command: "deno",
+              cwd: directory,
+            }),
+          ]) {
+            assert.equal(reference.exitStatus, 0, reference.stderr);
+            assert.ok(
+              reference.stdout === refused || reference.stdout === flattened,
+              `reference answered neither recorded result:\n` +
+                `${reference.stdout}`,
+            );
+          }
+          for (const specialization of ["disabled", "enabled"] as const) {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              const native = await runNativeCli(
+                {
+                  args: [
+                    ...(specialization === "disabled"
+                      ? ["--no-specialization"]
+                      : []),
+                    entryPath,
+                  ],
+                  version: "0.1.0",
+                },
+                host,
+              );
+              assertMatchingObservations([
+                { exitStatus: 0, stderr: "", stdout: refused },
+                native,
+              ]);
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        } finally {
+          await host.remove(directory);
+        }
+      }),
+      {
+        context: [
+          "module-goal=closed graph",
+          "native-collector=forced",
+          "reference-divergence=V8 13.6 flattens the namespace walk",
+        ],
+        domain:
+          "one module namespace reached as the write target itself, as an " +
+          "ordinary object's prototype, or as its grandparent, an exported " +
+          "or absent key, an optional writable shadow on the object " +
+          "closest to the namespace, a Reflect.set receiver that is or is " +
+          "not the target, and the strict assignment form of the same " +
+          "write",
+        numRuns: 24,
+        profile: "M5 Reflect namespace",
+        seed: 0x6000_6301,
+        sizeLimit:
+          "one dependency module, one entry module, two chains of at most " +
+          "three objects, and one written integer",
+        timeLimitMilliseconds: 300_000,
       },
     );
   },

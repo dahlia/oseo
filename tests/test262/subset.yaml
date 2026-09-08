@@ -844,7 +844,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-species-non-extensible-spreadable.js
     expectedClassification: pass
@@ -2419,7 +2419,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-species-null.js
     expectedClassification: pass
@@ -5389,7 +5389,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-species-null.js
     expectedClassification: pass
@@ -7417,7 +7417,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-species-null.js
     expectedClassification: pass
@@ -8449,7 +8449,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-species-null.js
     expectedClassification: pass
@@ -38216,7 +38216,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/isFinite/not-a-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/isFinite/prop-desc.js
     expectedClassification: pass
@@ -38261,7 +38261,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/isNaN/not-a-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/isNaN/prop-desc.js
     expectedClassification: pass
@@ -38411,7 +38411,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/parseFloat/not-a-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/parseFloat/prop-desc.js
     expectedClassification: pass
@@ -38621,7 +38621,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/parseInt/not-a-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]
   - path: test/built-ins/parseInt/prop-desc.js
     expectedClassification: pass

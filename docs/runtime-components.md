@@ -442,6 +442,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_same_value`                          | *runtime\_descriptor.c*       |
 | `oseo_internal_ordinary_has_instance`               | *runtime\_function.c*         |
 | `oseo_internal_array_like_list`                     | *runtime\_function.c*         |
+| `oseo_internal_construct_receiver`                  | *runtime\_function.c*         |
 | `oseo_internal_builtin_code_id`                     | *runtime\_function.c*         |
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
