@@ -287,6 +287,39 @@ test("populates Array index search methods with both comparisons", () => {
   assert.doesNotMatch(at, /oseo_has_property/u);
 });
 
+test("materializes all three Array iterator result kinds", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+
+  for (const method of ["entries", "keys", "values"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["ENTRIES", "KEYS", "VALUES"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+  for (const intrinsic of ["ARRAY_ENTRIES", "ARRAY_KEYS", "ARRAY_VALUES"]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+
+  assert.match(
+    iteratorSource,
+    /oseo_internal_array_iterator_create[\s\S]*oseo_internal_to_object/u,
+  );
+  assert.match(
+    iteratorSource,
+    /OSEO_ARRAY_ITERATOR_KEY[\s\S]*OSEO_ARRAY_ITERATOR_KEY_AND_VALUE/u,
+  );
+  assert.match(
+    iteratorSource,
+    /OSEO_ARRAY_ITERATOR_KEY_AND_VALUE[\s\S]*oseo_array_create/u,
+  );
+  assert.match(iteratorSource, /"Array Iterator"/u);
+  assert.match(arraySource, /OSEO_INTRINSIC_ARRAY_VALUES/u);
+  assert.match(arraySource, /OSEO_WELL_KNOWN_ITERATOR/u);
+});
+
 test("populates Array predicate search methods over one loop", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 109
+M5a is complete. The normative family records described below inventory 113
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 16,912 reviewed cases: 13,022 passes, 1,556
-expected negatives, and 2,334 unsupported profile features. It records no
+The current manifest contains 17,570 reviewed cases: 13,929 passes, 1,556
+expected negatives, and 2,085 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -5888,6 +5888,58 @@ vocabulary adds the `reflect-namespace` evidence tag. The admitted runtime
 checkpoint moves the runtime ABI to `oseo-runtime-m5-96`, adds the
 `oseo_super_constructor_receiver` generated-code entry point, and does not
 change the graph's orchestration state.
+
+
+Array prototype iterators
+-------------------------
+
+M5b node `array-prototype-iterators` adds ordinary `entries`, `keys`, and
+`values` functions to the realm-owned `%Array.prototype%` and makes its
+`Symbol.iterator` property reference the exact `values` function object.
+Each method applies ToObject to its receiver and returns a branded object over
+the materialized `%ArrayIteratorPrototype%`, so primitive and ordinary
+array-like receivers work and a nullish receiver throws before iterator
+creation. The shared prototype inherits from `%IteratorPrototype%`, owns the
+ordinary `next` function, and has a configurable, non-writable,
+non-enumerable `Symbol.toStringTag` whose value is `"Array Iterator"`.
+
+The iterator record stores the converted receiver, its cursor, and a key,
+value, or key-value result kind. Each `next` reads the live array-like length.
+Keys yield the numeric cursor without reading an indexed property, values use
+Get so holes and inherited properties are visible, and entries allocate a
+fresh two-element Array holding that same index and value. The cursor advances
+before an element Get, so an abrupt getter resumes at the next index. A length
+getter that reenters the same iterator does not change the current step's
+snapshotted index. Crossing the live length clears the target, making
+exhaustion permanent even if the receiver later grows. The iterator, target,
+current value, and pending entry Array remain rooted across every allocation
+and user-code boundary.
+
+The realm's `Array.prototype[Symbol.unscopables]` remains the already-installed
+null-prototype object with its complete edition name set and non-writable,
+non-enumerable, configurable descriptor. This family owns its fixed descriptor
+and reviewed standards evidence. The `with-statement` family continues to own
+the dynamic name-lookup behavior that consumes it.
+
+Fixed native and generated differential evidence at property seed
+`0x60006400` covers all three methods over zero through six sparse Array or
+ordinary array-like entries, live append and truncation, metadata and
+prototype identity, primitive and nullish receivers, branding, permanent
+exhaustion, abrupt and reentrant reads, both specialization policies,
+collection forced at every safepoint, false hints, deliberate shape-guard
+misses, and generic fallback. The generated family has a 12-case ordinary
+budget and an independent cursor and live-length model. All 75 paths under the
+node's inventory roots are reviewed: 56 pass and 19 retain explicit
+prerequisite boundaries. Nine need resizable ArrayBuffer behavior, and ten
+need TypedArray iterator behavior including detachment. The four
+constructor-detection paths execute now that `Reflect.construct` is admitted.
+The manifest moves from 17,495 to 17,570 cases and from 13,873 to 13,929
+passes, keeps 1,556 expected negatives, and moves from 2,066 to 2,085
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 130 to 131 domains and seeds and
+from 5,466 to 5,478 ordinary cases. The runtime ABI moves to
+`oseo-runtime-m5-97`, adds two internal Array method code IDs and intrinsic
+slots, and adds no generated-code entry point.
 
 
 Known gaps inside the claim

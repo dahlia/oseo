@@ -129,8 +129,20 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
             arguments
         );
     }
-    if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
-        return oseo_internal_array_values(context, receiver);
+    if (code_id == OSEO_ARRAY_VALUES_CODE_ID ||
+        code_id == OSEO_ARRAY_KEYS_CODE_ID ||
+        code_id == OSEO_ARRAY_ENTRIES_CODE_ID) {
+        OseoArrayIteratorKind kind = OSEO_ARRAY_ITERATOR_VALUE;
+        if (code_id == OSEO_ARRAY_KEYS_CODE_ID) {
+            kind = OSEO_ARRAY_ITERATOR_KEY;
+        } else if (code_id == OSEO_ARRAY_ENTRIES_CODE_ID) {
+            kind = OSEO_ARRAY_ITERATOR_KEY_AND_VALUE;
+        }
+        return oseo_internal_array_iterator_create(
+            context,
+            receiver,
+            kind
+        );
     }
     if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
         return oseo_internal_array_iterator_next(context, receiver);
@@ -215,6 +227,10 @@ OseoResult oseo_internal_iterator_method(
     const uint16_t return_units[] = {'r', 'e', 't', 'u', 'r', 'n'};
     const uint16_t throw_units[] = {'t', 'h', 'r', 'o', 'w'};
     const uint16_t values_units[] = {'v', 'a', 'l', 'u', 'e', 's'};
+    const uint16_t keys_units[] = {'k', 'e', 'y', 's'};
+    const uint16_t entries_units[] = {
+        'e', 'n', 't', 'r', 'i', 'e', 's'
+    };
     static const uint16_t symbol_iterator_units[] = {
         '[', 'S', 'y', 'm', 'b', 'o', 'l', '.',
         'i', 't', 'e', 'r', 'a', 't', 'o', 'r', ']'
@@ -248,6 +264,14 @@ OseoResult oseo_internal_iterator_method(
         intrinsic = OSEO_INTRINSIC_ARRAY_VALUES;
         name = values_units;
         name_length = 6u;
+    } else if (code_id == OSEO_ARRAY_KEYS_CODE_ID) {
+        intrinsic = OSEO_INTRINSIC_ARRAY_KEYS;
+        name = keys_units;
+        name_length = 4u;
+    } else if (code_id == OSEO_ARRAY_ENTRIES_CODE_ID) {
+        intrinsic = OSEO_INTRINSIC_ARRAY_ENTRIES;
+        name = entries_units;
+        name_length = 7u;
     } else {
         intrinsic = OSEO_INTRINSIC_ITERATOR_SELF;
         name = symbol_iterator_units;
@@ -599,6 +623,26 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             frame.slots[7],
             frame.slots[3],
             frame.slots[4]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "Array Iterator");
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[7],
+            frame.slots[3],
+            frame.slots[4],
+            (OseoPropertyAttributes){true, false, false, false}
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1251,7 +1295,7 @@ static OseoResult iterator_helper_create(
     helper->ordinary.virtual_string_iterator_configurable = false;
     helper->ordinary.virtual_string_iterator_enumerable = false;
     helper->ordinary.virtual_string_iterator_writable = false;
-    helper->ordinary.array_iterator = false;
+    helper->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
     helper->ordinary.iterator_array = oseo_undefined();
     helper->ordinary.iterator_index = 0u;
     helper->ordinary.regexp_string_iterator = false;
@@ -1739,28 +1783,29 @@ static OseoResult array_like_length(
     return normal(oseo_undefined());
 }
 
-OseoResult oseo_internal_array_values(
+OseoResult oseo_internal_array_iterator_create(
     OseoContext *context,
-    OseoValue array
+    OseoValue receiver,
+    OseoArrayIteratorKind kind
 ) {
-    if (!is_object(array)) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "Array iteration requires an object receiver."
-        );
+    if (kind == OSEO_ARRAY_ITERATOR_NONE) {
+        return failure(context, "OSEO2001", "Array iterator kind is missing.");
     }
-    OseoValue slots[2] = {array, oseo_undefined()};
+    OseoValue slots[2] = {receiver, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_array_iterator_prototype(context);
+    OseoResult result = oseo_internal_to_object(context, slots[0]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_array_iterator_prototype(context);
+    }
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, slots[1]);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoOrdinaryObject *iterator = ordinary_object(result.value);
-        iterator->array_iterator = true;
+        iterator->array_iterator_kind = kind;
         iterator->iterator_array = slots[0];
         iterator->iterator_index = 0u;
     }
@@ -1833,9 +1878,15 @@ OseoResult oseo_internal_array_iterator_next(
     if (!is_object(state->iterator_array)) {
         return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
-    OseoValue slots[3] = {iterator, oseo_undefined(), state->iterator_array};
+    OseoValue slots[4] = {
+        iterator,
+        oseo_undefined(),
+        state->iterator_array,
+        oseo_undefined(),
+    };
     const size_t index = state->iterator_index;
-    OseoRootFrame frame = {NULL, slots, 3u};
+    const OseoArrayIteratorKind kind = state->array_iterator_kind;
+    OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
     double length = 0.0;
     OseoResult result = array_like_length(context, slots[2], &length);
@@ -1849,10 +1900,30 @@ OseoResult oseo_internal_array_iterator_next(
         return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
     ordinary_object(slots[0])->iterator_index = index + 1u;
-    result = oseo_property_key(context, oseo_number((double)index));
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[2], result.value);
-        slots[1] = result.value;
+    if (kind == OSEO_ARRAY_ITERATOR_KEY) {
+        slots[1] = oseo_number((double)index);
+    } else {
+        result = oseo_property_key(context, oseo_number((double)index));
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[2], result.value);
+            slots[1] = result.value;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        kind == OSEO_ARRAY_ITERATOR_KEY_AND_VALUE) {
+        result = oseo_array_create(context, 0u);
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_array_append(
+                context,
+                slots[3],
+                oseo_number((double)index)
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_array_append(context, slots[3], slots[1]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) slots[1] = slots[3];
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_result(context, slots[1], false);

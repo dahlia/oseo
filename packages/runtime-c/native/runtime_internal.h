@@ -163,6 +163,10 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 18u)
 #define OSEO_ITERATOR_HELPER_RETURN_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 19u)
+#define OSEO_ARRAY_KEYS_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 20u)
+#define OSEO_ARRAY_ENTRIES_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 21u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -969,6 +973,14 @@ typedef struct {
     OseoPrivateElementKind kind;
 } OseoPrivateElement;
 
+/* Which result shape one %ArrayIteratorPrototype% instance emits. */
+typedef enum {
+    OSEO_ARRAY_ITERATOR_NONE = 0,
+    OSEO_ARRAY_ITERATOR_KEY = 1,
+    OSEO_ARRAY_ITERATOR_VALUE = 2,
+    OSEO_ARRAY_ITERATOR_KEY_AND_VALUE = 3,
+} OseoArrayIteratorKind;
+
 typedef struct {
     OseoHeapObject header;
     OseoValue prototype;
@@ -1022,9 +1034,9 @@ typedef struct {
     bool virtual_string_iterator_configurable;
     bool virtual_string_iterator_enumerable;
     bool virtual_string_iterator_writable;
-    /* Array iterator state: a flagged object backs a default array's
-     * values iterator, tracing the array and stepping the index. */
-    bool array_iterator;
+    /* Array iterator state: the kind brands the object and selects the
+     * key, value, or key-and-value result shape. */
+    OseoArrayIteratorKind array_iterator_kind;
     OseoValue iterator_array;
     size_t iterator_index;
     /*
@@ -1606,7 +1618,8 @@ static inline bool is_private_name(OseoValue value) {
 static inline bool is_array_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
-        ordinary_object(value)->array_iterator;
+        ordinary_object(value)->array_iterator_kind !=
+            OSEO_ARRAY_ITERATOR_NONE;
 }
 static inline bool is_regexp_string_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2903,9 +2916,10 @@ OseoResult oseo_internal_iterator_result(
     OseoValue value,
     bool done
 );
-OseoResult oseo_internal_array_values(
+OseoResult oseo_internal_array_iterator_create(
     OseoContext *context,
-    OseoValue array
+    OseoValue receiver,
+    OseoArrayIteratorKind kind
 );
 OseoResult oseo_internal_array_iterator_next(
     OseoContext *context,

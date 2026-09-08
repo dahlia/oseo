@@ -5,6 +5,7 @@ supportedFeatures:
   - Array.prototype.flat
   - Array.prototype.flatMap
   - Array.prototype.includes
+  - Array.prototype.values
   - ArrayBuffer
   - BigInt
   - DataView
@@ -666,6 +667,24 @@ tests:
   - path: test/built-ins/Array/proto.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/Symbol.iterator/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/Symbol.unscopables/array-find-from-last.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/Symbol.unscopables/change-array-by-copy.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/Symbol.unscopables/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/Symbol.unscopables/value.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/at/coerced-index-resize.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
@@ -912,6 +931,9 @@ tests:
   - path: test/built-ins/Array/prototype/concat/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/copyWithin/call-with-boolean.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
@@ -1029,6 +1051,42 @@ tests:
   - path: test/built-ins/Array/prototype/copyWithin/undefined-end.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/entries/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/name.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/returns-iterator-from-object.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/entries/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-0-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -1671,6 +1729,9 @@ tests:
   - path: test/built-ins/Array/prototype/every/prop-desc.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/exotic-array.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/fill/call-with-boolean.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
@@ -4194,6 +4255,42 @@ tests:
   - path: test/built-ins/Array/prototype/join/resizable-buffer.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/keys/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/name.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/returns-iterator-from-object.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/keys/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -4788,6 +4885,9 @@ tests:
   - path: test/built-ins/Array/prototype/lastIndexOf/resizable-buffer.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -5436,6 +5536,9 @@ tests:
   - path: test/built-ins/Array/prototype/map/target-array-with-non-writable-property.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/methods-called-as-functions.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/pop/S15.4.4.6_A1.1_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -5505,6 +5608,12 @@ tests:
   - path: test/built-ins/Array/prototype/pop/throws-with-string-receiver.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/push/S15.4.4.7_A1_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -8700,6 +8809,42 @@ tests:
   - path: test/built-ins/Array/prototype/unshift/throws-with-string-receiver.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/values/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/name.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/returns-iterator-from-object.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/values/this-val-non-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayBuffer/Symbol.species/length.js
     expectedClassification: pass
     dependencies: [array-buffer]
@@ -9276,6 +9421,87 @@ tests:
   - path: test/built-ins/ArrayBuffer/zero-length.js
     expectedClassification: pass
     dependencies: [array-buffer]
+  - path: test/built-ins/ArrayIteratorPrototype/Symbol.toStringTag/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/Symbol.toStringTag/value-direct.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/Symbol.toStringTag/value-from-to-string.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Float32Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Float64Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Int16Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Int32Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Int8Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Uint16Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Uint32Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Uint8Array.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/Uint8ClampedArray.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-mapped-expansion-after-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-mapped-expansion-before-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-mapped-iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-mapped-truncation-before-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-unmapped-expansion-after-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-unmapped-expansion-before-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-unmapped-iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/args-unmapped-truncation-before-exhaustion.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/detach-typedarray-in-progress.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/iteration.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/length.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/name.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/non-own-slots.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/ArrayIteratorPrototype/next/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
