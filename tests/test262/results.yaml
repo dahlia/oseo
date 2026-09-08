@@ -1232,6 +1232,84 @@ partitions:
   - group: built-ins/ArrayBuffer
     key: fe
     path: results/built-ins/ArrayBuffer/fe.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "01"
+    path: results/built-ins/ArrayIteratorPrototype/01.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: 0b
+    path: results/built-ins/ArrayIteratorPrototype/0b.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "23"
+    path: results/built-ins/ArrayIteratorPrototype/23.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "25"
+    path: results/built-ins/ArrayIteratorPrototype/25.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "26"
+    path: results/built-ins/ArrayIteratorPrototype/26.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "29"
+    path: results/built-ins/ArrayIteratorPrototype/29.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: 2f
+    path: results/built-ins/ArrayIteratorPrototype/2f.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "50"
+    path: results/built-ins/ArrayIteratorPrototype/50.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "52"
+    path: results/built-ins/ArrayIteratorPrototype/52.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "60"
+    path: results/built-ins/ArrayIteratorPrototype/60.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "61"
+    path: results/built-ins/ArrayIteratorPrototype/61.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: 6a
+    path: results/built-ins/ArrayIteratorPrototype/6a.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: 6b
+    path: results/built-ins/ArrayIteratorPrototype/6b.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: 6d
+    path: results/built-ins/ArrayIteratorPrototype/6d.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "76"
+    path: results/built-ins/ArrayIteratorPrototype/76.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "77"
+    path: results/built-ins/ArrayIteratorPrototype/77.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "82"
+    path: results/built-ins/ArrayIteratorPrototype/82.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "86"
+    path: results/built-ins/ArrayIteratorPrototype/86.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: "95"
+    path: results/built-ins/ArrayIteratorPrototype/95.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: bc
+    path: results/built-ins/ArrayIteratorPrototype/bc.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: cb
+    path: results/built-ins/ArrayIteratorPrototype/cb.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: d4
+    path: results/built-ins/ArrayIteratorPrototype/d4.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: d5
+    path: results/built-ins/ArrayIteratorPrototype/d5.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: da
+    path: results/built-ins/ArrayIteratorPrototype/da.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: dc
+    path: results/built-ins/ArrayIteratorPrototype/dc.yaml
+  - group: built-ins/ArrayIteratorPrototype
+    key: f6
+    path: results/built-ins/ArrayIteratorPrototype/f6.yaml
   - group: built-ins/AsyncFromSyncIteratorPrototype
     key: "02"
     path: results/built-ins/AsyncFromSyncIteratorPrototype/02.yaml
@@ -12652,9 +12730,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 13873
+  passes: 13929
   semanticFailures: 0
-  unsupportedProfileFeatures: 2066
+  unsupportedProfileFeatures: 2085
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -12751,9 +12829,9 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3897
+      passes: 3953
       semanticFailures: 0
-      unsupportedProfileFeatures: 922
+      unsupportedProfileFeatures: 941
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -12765,9 +12843,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1050
+      passes: 1106
       semanticFailures: 0
-      unsupportedProfileFeatures: 245
+      unsupportedProfileFeatures: 264
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -12800,9 +12878,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9167
+      passes: 9223
       semanticFailures: 0
-      unsupportedProfileFeatures: 688
+      unsupportedProfileFeatures: 707
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -12842,9 +12920,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 527
+      passes: 583
       semanticFailures: 0
-      unsupportedProfileFeatures: 63
+      unsupportedProfileFeatures: 82
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -12871,9 +12949,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2615
+      passes: 2654
       semanticFailures: 0
-      unsupportedProfileFeatures: 237
+      unsupportedProfileFeatures: 246
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -12881,6 +12959,13 @@ summary:
       passes: 149
       semanticFailures: 0
       unsupportedProfileFeatures: 43
+    - group: built-ins/ArrayIteratorPrototype
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 17
+      semanticFailures: 0
+      unsupportedProfileFeatures: 10
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

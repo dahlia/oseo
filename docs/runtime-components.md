@@ -1030,6 +1030,27 @@ hits and misses, generic fallback, and collection at every safepoint. The
 node adds no generated-code entry point, allocates four code IDs inside the
 existing Array range, and moves `abiVersion` to `m5-93`.
 
+M5b node `array-prototype-iterators` completes the Array iterator cluster
+across *runtime\_array.c* and *runtime\_iterator.c*. The Array component
+installs ordinary `entries`, `keys`, and `values` functions on the
+materialized `%Array.prototype%` and gives `Symbol.iterator` the exact cached
+`values` function. The iterator component owns the materialized
+`%ArrayIteratorPrototype%`, its `next` and `Symbol.toStringTag` properties,
+and the branded iterator record's key, value, and key-value result kinds.
+
+Each step reads the target's live array-like length, advances the cursor before
+an observable element Get, and clears the target at exhaustion. Keys avoid the
+element read, values preserve sparse and inherited lookup, and entries allocate
+and root a fresh pair Array. The existing object layout's iterator state
+changes from a Boolean brand to an enum kind, and the collector follows the
+target for every nonzero kind. Fixed and generated native differential
+evidence covers metadata, prototype identities, all three result kinds,
+generic and sparse receivers, live mutation, reentrancy, abrupt completion,
+both specialization policies, deliberate guard hits and misses, generic
+fallback, and collection at every safepoint. The node adds no component or
+generated-code entry point, allocates two IDs inside the existing iterator
+range and two realm intrinsic slots, and moves `abiVersion` to `m5-97`.
+
 ### Lazy iterator helper evidence
 
 M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and

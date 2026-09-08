@@ -1,0 +1,67 @@
+version: 1
+id: array-prototype-iterators
+title: "Array prototype iterators"
+scope:
+  - "Array.prototype entries, keys, values, and Symbol.iterator, including
+    receiver conversion, live array-like length reads, sparse and inherited
+    elements, iterator cursor advancement, permanent exhaustion, abrupt
+    completion, and the exact identity of Symbol.iterator with values."
+  - "The materialized %ArrayIteratorPrototype%, including the next method,
+    Array Iterator Symbol.toStringTag, inheritance from %IteratorPrototype%,
+    iterator branding, and key, value, and key-value result kinds."
+  - "The realm-owned Array.prototype Symbol.unscopables data property,
+    including its descriptor, null-prototype value, and complete edition name
+    set. The with-statement family exclusively owns the dynamic name-lookup
+    behavior that consumes this record."
+  - "Reviewed standards coverage is all 75 upstream paths under the node's
+    Array prototype and ArrayIteratorPrototype inventory roots: 56 pass and
+    19 retain explicit prerequisite boundaries for resizable ArrayBuffer or
+    TypedArray behavior. The four constructor-detection paths pass through
+    the admitted Reflect.construct harness."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-iterators.ts
+      - tests/property/m5-array-prototype-iterators.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-iterators.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-iterators.ts
+      - tests/property/m5-array-prototype-iterators.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-iterators.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-iterators.ts
+      - tests/property/m5-array-prototype-iterators.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-iterators.ts
+      - tests/property/m5-array-prototype-iterators.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_iterator.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

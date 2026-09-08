@@ -78,7 +78,7 @@ static void trace_object(
         if (ordinary->primitive_data) {
             mark_value(ordinary->primitive_value, worklist);
         }
-        if (ordinary->array_iterator) {
+        if (ordinary->array_iterator_kind != OSEO_ARRAY_ITERATOR_NONE) {
             mark_value(ordinary->iterator_array, worklist);
         }
         if (ordinary->regexp_string_iterator) {

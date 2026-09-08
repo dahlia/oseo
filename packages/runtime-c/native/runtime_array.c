@@ -512,7 +512,7 @@ static OseoResult array_create_with_prototype(
     array->virtual_string_iterator_configurable = false;
     array->virtual_string_iterator_enumerable = false;
     array->virtual_string_iterator_writable = false;
-    array->array_iterator = false;
+    array->array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;
     array->regexp_string_iterator = false;
@@ -2986,14 +2986,44 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             method
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    static const size_t iterator_codes[] = {
+        OSEO_ARRAY_ENTRIES_CODE_ID,
+        OSEO_ARRAY_KEYS_CODE_ID,
+        OSEO_ARRAY_VALUES_CODE_ID,
+    };
+    static const char *const iterator_names[] = {
+        "entries",
+        "keys",
+        "values",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         index += 1u) {
         result = oseo_internal_iterator_method(
             context,
-            OSEO_ARRAY_VALUES_CODE_ID
+            iterator_codes[index]
         );
         frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                iterator_names[index]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                method
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[2] =
+            context->intrinsics[OSEO_INTRINSIC_ARRAY_VALUES];
         result = oseo_internal_well_known_symbol(
             context,
             OSEO_WELL_KNOWN_ITERATOR

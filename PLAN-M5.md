@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-17,343 reviewed cases: 13,449 passes, 1,556 expected negatives, and 2,338
+17,570 reviewed cases: 13,929 passes, 1,556 expected negatives, and 2,085
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 111 indexed records in the normative
+M5a is complete. The 113 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-13,449 passes across 17,343 paths, and the property inventory records 127
-domains, 127 seeds, and an ordinary case budget of 5,418.
+13,929 passes across 17,570 paths, and the property inventory records 131
+domains, 131 seeds, and an ordinary case budget of 5,478.
 
 
 M5a implementation history
@@ -5725,6 +5725,58 @@ from 5,418 to 5,466 ordinary cases. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-96`, allocates thirteen code IDs in one new
 range, adds the `oseo_super_constructor_receiver` generated-code entry point,
 and does not change the graph's orchestration state.
+
+Implemented M5b node `array-prototype-iterators` completes the realm-owned
+Array iterator cluster. `%Array.prototype%` now has ordinary `entries`,
+`keys`, and `values` functions, and its `Symbol.iterator` property names the
+same function object as `values`. Each method converts its receiver with
+ToObject and returns an object over the materialized
+`%ArrayIteratorPrototype%`; a nullish receiver throws before any iterator is
+created, while primitive and ordinary array-like receivers are supported.
+The shared prototype inherits from `%IteratorPrototype%`, owns the ordinary
+`next` function, and has a configurable, non-writable, non-enumerable
+`Symbol.toStringTag` whose value is `"Array Iterator"`.
+
+One branded iterator record stores the converted receiver, cursor, and key,
+value, or key-value result kind. Each `next` reads the receiver's length
+again, so appends and truncation are visible until exhaustion; once exhausted,
+the cleared receiver keeps every later call done. Keys do not read indexed
+properties, values read each index through Get so holes and inherited values
+become observable, and entries allocate a fresh two-element Array containing
+the index and value. The cursor advances before an element Get, so an abrupt
+accessor is not retried. The target and cursor are snapshotted before a
+reentrant length getter, preserving the current step's index. Iterator state,
+the receiver, the current value, and a pending entry Array stay rooted across
+every allocation and user-code boundary.
+
+`Array.prototype[Symbol.unscopables]` keeps the already-installed
+null-prototype object and complete edition name set. This node owns its fixed
+descriptor and standards evidence; the `with-statement` family remains the
+exclusive owner of dynamic name-lookup consumption. Fixed native and
+generated differential evidence at seed `0x60006400` covers all three result
+kinds over zero through six sparse Array or ordinary array-like entries, live
+append and truncation, metadata and prototype identities, primitive and
+nullish receivers, branding, permanent exhaustion, abrupt and reentrant
+reads, both specialization policies, collection forced at every safepoint,
+false hints, deliberate shape-guard misses, and generic fallback. The
+generated family has a 12-case ordinary budget and an independent cursor and
+length model.
+
+All 75 paths under the node's inventory roots are reviewed: 56 pass and 19
+retain explicit prerequisite boundaries. Nine need resizable ArrayBuffer
+behavior, and ten need TypedArray iterator behavior including detachment. The
+four constructor-detection paths execute now that `Reflect.construct` is
+admitted. No reviewed path outside the roots moves away from `pass`. The
+manifest moves from 17,495 to 17,570 paths and from 13,873 to 13,929 passes,
+keeps 1,556 expected negatives, and moves from 2,066 to 2,085 unsupported
+profile features, with no semantic, harness, or infrastructure failures. The
+property ratchet moves from 130 to 131 domains and seeds and from 5,466 to
+5,478 ordinary cases. The admitted runtime checkpoint moves the ABI to
+`oseo-runtime-m5-97`, allocates two code IDs and two intrinsic slots for
+`keys` and `entries`, adds no generated-code entry point, and does not change
+the graph's orchestration state. The reviewed test262 revision, 41,091-path
+applicable inventory, ADR 0013 vocabulary, inventory policy, forced-collection
+policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

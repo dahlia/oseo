@@ -400,3 +400,7 @@ families:
     owner: tests/property/m5-reflect-namespace.property.test.ts
     start: 0x60006300
     end: 0x600063ff
+  - family: m5-array-prototype-iterators
+    owner: tests/property/m5-array-prototype-iterators.property.test.ts
+    start: 0x60006400
+    end: 0x600064ff

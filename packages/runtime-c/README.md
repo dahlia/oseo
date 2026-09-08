@@ -746,6 +746,21 @@ stays virtual through it. The
 generated-code ABI gains no entry point; the added intrinsic code IDs remain
 runtime-internal.
 
+The `m5-97` ABI completes the realm-owned Array iterator cluster. Ordinary
+`entries`, `keys`, and `values` functions live on `%Array.prototype%`, whose
+`Symbol.iterator` property references the exact `values` function object.
+Their results share the materialized `%ArrayIteratorPrototype%`, which owns
+`next` and the `"Array Iterator"` `Symbol.toStringTag` while inheriting the
+iterator protocol from `%IteratorPrototype%`.
+
+One internal enum distinguishes key, value, and key-value records. Every step
+reads the converted receiver's live array-like length, advances the cursor
+before an element Get, and clears the target permanently at exhaustion. Keys
+avoid indexed reads, values preserve sparse and inherited lookup, and entries
+allocate a fresh two-element Array. The iterator target and pending result stay
+collector-rooted throughout. Two code IDs and two intrinsic slots are added;
+the generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
