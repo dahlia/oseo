@@ -6803,6 +6803,363 @@ partitions:
   - group: built-ins/Promise
     key: ff
     path: results/built-ins/Promise/ff.yaml
+  - group: built-ins/Reflect
+    key: "02"
+    path: results/built-ins/Reflect/02.yaml
+  - group: built-ins/Reflect
+    key: "04"
+    path: results/built-ins/Reflect/04.yaml
+  - group: built-ins/Reflect
+    key: "05"
+    path: results/built-ins/Reflect/05.yaml
+  - group: built-ins/Reflect
+    key: "07"
+    path: results/built-ins/Reflect/07.yaml
+  - group: built-ins/Reflect
+    key: 0c
+    path: results/built-ins/Reflect/0c.yaml
+  - group: built-ins/Reflect
+    key: 0d
+    path: results/built-ins/Reflect/0d.yaml
+  - group: built-ins/Reflect
+    key: 0e
+    path: results/built-ins/Reflect/0e.yaml
+  - group: built-ins/Reflect
+    key: 0f
+    path: results/built-ins/Reflect/0f.yaml
+  - group: built-ins/Reflect
+    key: "11"
+    path: results/built-ins/Reflect/11.yaml
+  - group: built-ins/Reflect
+    key: "12"
+    path: results/built-ins/Reflect/12.yaml
+  - group: built-ins/Reflect
+    key: "13"
+    path: results/built-ins/Reflect/13.yaml
+  - group: built-ins/Reflect
+    key: "15"
+    path: results/built-ins/Reflect/15.yaml
+  - group: built-ins/Reflect
+    key: "18"
+    path: results/built-ins/Reflect/18.yaml
+  - group: built-ins/Reflect
+    key: 1e
+    path: results/built-ins/Reflect/1e.yaml
+  - group: built-ins/Reflect
+    key: 1f
+    path: results/built-ins/Reflect/1f.yaml
+  - group: built-ins/Reflect
+    key: "20"
+    path: results/built-ins/Reflect/20.yaml
+  - group: built-ins/Reflect
+    key: "22"
+    path: results/built-ins/Reflect/22.yaml
+  - group: built-ins/Reflect
+    key: "24"
+    path: results/built-ins/Reflect/24.yaml
+  - group: built-ins/Reflect
+    key: "27"
+    path: results/built-ins/Reflect/27.yaml
+  - group: built-ins/Reflect
+    key: 2a
+    path: results/built-ins/Reflect/2a.yaml
+  - group: built-ins/Reflect
+    key: 2d
+    path: results/built-ins/Reflect/2d.yaml
+  - group: built-ins/Reflect
+    key: "30"
+    path: results/built-ins/Reflect/30.yaml
+  - group: built-ins/Reflect
+    key: "31"
+    path: results/built-ins/Reflect/31.yaml
+  - group: built-ins/Reflect
+    key: "33"
+    path: results/built-ins/Reflect/33.yaml
+  - group: built-ins/Reflect
+    key: "34"
+    path: results/built-ins/Reflect/34.yaml
+  - group: built-ins/Reflect
+    key: "35"
+    path: results/built-ins/Reflect/35.yaml
+  - group: built-ins/Reflect
+    key: "37"
+    path: results/built-ins/Reflect/37.yaml
+  - group: built-ins/Reflect
+    key: "38"
+    path: results/built-ins/Reflect/38.yaml
+  - group: built-ins/Reflect
+    key: "39"
+    path: results/built-ins/Reflect/39.yaml
+  - group: built-ins/Reflect
+    key: 3b
+    path: results/built-ins/Reflect/3b.yaml
+  - group: built-ins/Reflect
+    key: 3d
+    path: results/built-ins/Reflect/3d.yaml
+  - group: built-ins/Reflect
+    key: 3e
+    path: results/built-ins/Reflect/3e.yaml
+  - group: built-ins/Reflect
+    key: "41"
+    path: results/built-ins/Reflect/41.yaml
+  - group: built-ins/Reflect
+    key: "42"
+    path: results/built-ins/Reflect/42.yaml
+  - group: built-ins/Reflect
+    key: "43"
+    path: results/built-ins/Reflect/43.yaml
+  - group: built-ins/Reflect
+    key: "45"
+    path: results/built-ins/Reflect/45.yaml
+  - group: built-ins/Reflect
+    key: "47"
+    path: results/built-ins/Reflect/47.yaml
+  - group: built-ins/Reflect
+    key: "48"
+    path: results/built-ins/Reflect/48.yaml
+  - group: built-ins/Reflect
+    key: 4b
+    path: results/built-ins/Reflect/4b.yaml
+  - group: built-ins/Reflect
+    key: 4e
+    path: results/built-ins/Reflect/4e.yaml
+  - group: built-ins/Reflect
+    key: 4f
+    path: results/built-ins/Reflect/4f.yaml
+  - group: built-ins/Reflect
+    key: "52"
+    path: results/built-ins/Reflect/52.yaml
+  - group: built-ins/Reflect
+    key: "53"
+    path: results/built-ins/Reflect/53.yaml
+  - group: built-ins/Reflect
+    key: "54"
+    path: results/built-ins/Reflect/54.yaml
+  - group: built-ins/Reflect
+    key: "56"
+    path: results/built-ins/Reflect/56.yaml
+  - group: built-ins/Reflect
+    key: "57"
+    path: results/built-ins/Reflect/57.yaml
+  - group: built-ins/Reflect
+    key: "58"
+    path: results/built-ins/Reflect/58.yaml
+  - group: built-ins/Reflect
+    key: 5c
+    path: results/built-ins/Reflect/5c.yaml
+  - group: built-ins/Reflect
+    key: 5e
+    path: results/built-ins/Reflect/5e.yaml
+  - group: built-ins/Reflect
+    key: "60"
+    path: results/built-ins/Reflect/60.yaml
+  - group: built-ins/Reflect
+    key: "62"
+    path: results/built-ins/Reflect/62.yaml
+  - group: built-ins/Reflect
+    key: "64"
+    path: results/built-ins/Reflect/64.yaml
+  - group: built-ins/Reflect
+    key: "65"
+    path: results/built-ins/Reflect/65.yaml
+  - group: built-ins/Reflect
+    key: "66"
+    path: results/built-ins/Reflect/66.yaml
+  - group: built-ins/Reflect
+    key: "69"
+    path: results/built-ins/Reflect/69.yaml
+  - group: built-ins/Reflect
+    key: 6d
+    path: results/built-ins/Reflect/6d.yaml
+  - group: built-ins/Reflect
+    key: 6e
+    path: results/built-ins/Reflect/6e.yaml
+  - group: built-ins/Reflect
+    key: 6f
+    path: results/built-ins/Reflect/6f.yaml
+  - group: built-ins/Reflect
+    key: "70"
+    path: results/built-ins/Reflect/70.yaml
+  - group: built-ins/Reflect
+    key: "73"
+    path: results/built-ins/Reflect/73.yaml
+  - group: built-ins/Reflect
+    key: "74"
+    path: results/built-ins/Reflect/74.yaml
+  - group: built-ins/Reflect
+    key: "76"
+    path: results/built-ins/Reflect/76.yaml
+  - group: built-ins/Reflect
+    key: 7c
+    path: results/built-ins/Reflect/7c.yaml
+  - group: built-ins/Reflect
+    key: 7d
+    path: results/built-ins/Reflect/7d.yaml
+  - group: built-ins/Reflect
+    key: "83"
+    path: results/built-ins/Reflect/83.yaml
+  - group: built-ins/Reflect
+    key: "85"
+    path: results/built-ins/Reflect/85.yaml
+  - group: built-ins/Reflect
+    key: "87"
+    path: results/built-ins/Reflect/87.yaml
+  - group: built-ins/Reflect
+    key: "88"
+    path: results/built-ins/Reflect/88.yaml
+  - group: built-ins/Reflect
+    key: "89"
+    path: results/built-ins/Reflect/89.yaml
+  - group: built-ins/Reflect
+    key: 8a
+    path: results/built-ins/Reflect/8a.yaml
+  - group: built-ins/Reflect
+    key: 8b
+    path: results/built-ins/Reflect/8b.yaml
+  - group: built-ins/Reflect
+    key: 8d
+    path: results/built-ins/Reflect/8d.yaml
+  - group: built-ins/Reflect
+    key: "96"
+    path: results/built-ins/Reflect/96.yaml
+  - group: built-ins/Reflect
+    key: "97"
+    path: results/built-ins/Reflect/97.yaml
+  - group: built-ins/Reflect
+    key: "99"
+    path: results/built-ins/Reflect/99.yaml
+  - group: built-ins/Reflect
+    key: 9b
+    path: results/built-ins/Reflect/9b.yaml
+  - group: built-ins/Reflect
+    key: 9c
+    path: results/built-ins/Reflect/9c.yaml
+  - group: built-ins/Reflect
+    key: a0
+    path: results/built-ins/Reflect/a0.yaml
+  - group: built-ins/Reflect
+    key: a1
+    path: results/built-ins/Reflect/a1.yaml
+  - group: built-ins/Reflect
+    key: a2
+    path: results/built-ins/Reflect/a2.yaml
+  - group: built-ins/Reflect
+    key: a4
+    path: results/built-ins/Reflect/a4.yaml
+  - group: built-ins/Reflect
+    key: a5
+    path: results/built-ins/Reflect/a5.yaml
+  - group: built-ins/Reflect
+    key: a6
+    path: results/built-ins/Reflect/a6.yaml
+  - group: built-ins/Reflect
+    key: a7
+    path: results/built-ins/Reflect/a7.yaml
+  - group: built-ins/Reflect
+    key: a9
+    path: results/built-ins/Reflect/a9.yaml
+  - group: built-ins/Reflect
+    key: aa
+    path: results/built-ins/Reflect/aa.yaml
+  - group: built-ins/Reflect
+    key: ac
+    path: results/built-ins/Reflect/ac.yaml
+  - group: built-ins/Reflect
+    key: ad
+    path: results/built-ins/Reflect/ad.yaml
+  - group: built-ins/Reflect
+    key: af
+    path: results/built-ins/Reflect/af.yaml
+  - group: built-ins/Reflect
+    key: b3
+    path: results/built-ins/Reflect/b3.yaml
+  - group: built-ins/Reflect
+    key: b6
+    path: results/built-ins/Reflect/b6.yaml
+  - group: built-ins/Reflect
+    key: b7
+    path: results/built-ins/Reflect/b7.yaml
+  - group: built-ins/Reflect
+    key: b8
+    path: results/built-ins/Reflect/b8.yaml
+  - group: built-ins/Reflect
+    key: ba
+    path: results/built-ins/Reflect/ba.yaml
+  - group: built-ins/Reflect
+    key: bb
+    path: results/built-ins/Reflect/bb.yaml
+  - group: built-ins/Reflect
+    key: bc
+    path: results/built-ins/Reflect/bc.yaml
+  - group: built-ins/Reflect
+    key: c0
+    path: results/built-ins/Reflect/c0.yaml
+  - group: built-ins/Reflect
+    key: c5
+    path: results/built-ins/Reflect/c5.yaml
+  - group: built-ins/Reflect
+    key: c9
+    path: results/built-ins/Reflect/c9.yaml
+  - group: built-ins/Reflect
+    key: cb
+    path: results/built-ins/Reflect/cb.yaml
+  - group: built-ins/Reflect
+    key: cd
+    path: results/built-ins/Reflect/cd.yaml
+  - group: built-ins/Reflect
+    key: cf
+    path: results/built-ins/Reflect/cf.yaml
+  - group: built-ins/Reflect
+    key: d1
+    path: results/built-ins/Reflect/d1.yaml
+  - group: built-ins/Reflect
+    key: d2
+    path: results/built-ins/Reflect/d2.yaml
+  - group: built-ins/Reflect
+    key: d3
+    path: results/built-ins/Reflect/d3.yaml
+  - group: built-ins/Reflect
+    key: d9
+    path: results/built-ins/Reflect/d9.yaml
+  - group: built-ins/Reflect
+    key: da
+    path: results/built-ins/Reflect/da.yaml
+  - group: built-ins/Reflect
+    key: df
+    path: results/built-ins/Reflect/df.yaml
+  - group: built-ins/Reflect
+    key: e1
+    path: results/built-ins/Reflect/e1.yaml
+  - group: built-ins/Reflect
+    key: e4
+    path: results/built-ins/Reflect/e4.yaml
+  - group: built-ins/Reflect
+    key: e8
+    path: results/built-ins/Reflect/e8.yaml
+  - group: built-ins/Reflect
+    key: ea
+    path: results/built-ins/Reflect/ea.yaml
+  - group: built-ins/Reflect
+    key: ee
+    path: results/built-ins/Reflect/ee.yaml
+  - group: built-ins/Reflect
+    key: ef
+    path: results/built-ins/Reflect/ef.yaml
+  - group: built-ins/Reflect
+    key: f0
+    path: results/built-ins/Reflect/f0.yaml
+  - group: built-ins/Reflect
+    key: f3
+    path: results/built-ins/Reflect/f3.yaml
+  - group: built-ins/Reflect
+    key: f4
+    path: results/built-ins/Reflect/f4.yaml
+  - group: built-ins/Reflect
+    key: f7
+    path: results/built-ins/Reflect/f7.yaml
+  - group: built-ins/Reflect
+    key: fa
+    path: results/built-ins/Reflect/fa.yaml
   - group: built-ins/RegExp
     key: "00"
     path: results/built-ins/RegExp/00.yaml
@@ -12295,24 +12652,24 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 13449
+  passes: 13873
   semanticFailures: 0
-  unsupportedProfileFeatures: 2338
+  unsupportedProfileFeatures: 2066
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 141
+      passes: 151
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 7
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 580
+      passes: 624
       semanticFailures: 0
-      unsupportedProfileFeatures: 162
+      unsupportedProfileFeatures: 118
     - dependency: async-functions
       expectedNegatives: 161
       harnessFailures: 0
@@ -12324,23 +12681,23 @@ summary:
       expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1180
+      passes: 1182
       semanticFailures: 0
-      unsupportedProfileFeatures: 108
+      unsupportedProfileFeatures: 106
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 236
+      passes: 246
       semanticFailures: 0
-      unsupportedProfileFeatures: 40
+      unsupportedProfileFeatures: 30
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 858
+      passes: 866
       semanticFailures: 0
-      unsupportedProfileFeatures: 71
+      unsupportedProfileFeatures: 63
     - dependency: control-flow
       expectedNegatives: 225
       harnessFailures: 0
@@ -12352,9 +12709,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 443
+      passes: 475
       semanticFailures: 0
-      unsupportedProfileFeatures: 107
+      unsupportedProfileFeatures: 75
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -12387,30 +12744,30 @@ summary:
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 271
+      passes: 272
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 35
     - dependency: functions
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3754
+      passes: 3897
       semanticFailures: 0
-      unsupportedProfileFeatures: 1065
+      unsupportedProfileFeatures: 922
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 330
+      passes: 333
       semanticFailures: 0
-      unsupportedProfileFeatures: 21
+      unsupportedProfileFeatures: 18
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1037
+      passes: 1050
       semanticFailures: 0
-      unsupportedProfileFeatures: 258
+      unsupportedProfileFeatures: 245
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -12429,30 +12786,30 @@ summary:
       expectedNegatives: 12
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 385
+      passes: 386
       semanticFailures: 0
-      unsupportedProfileFeatures: 33
+      unsupportedProfileFeatures: 32
     - dependency: object-own-keys
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 259
+      passes: 269
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 26
     - dependency: object-properties
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8994
+      passes: 9167
       semanticFailures: 0
-      unsupportedProfileFeatures: 861
+      unsupportedProfileFeatures: 688
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 904
+      passes: 919
       semanticFailures: 0
-      unsupportedProfileFeatures: 74
+      unsupportedProfileFeatures: 59
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0
@@ -12460,13 +12817,20 @@ summary:
       passes: 40
       semanticFailures: 0
       unsupportedProfileFeatures: 25
+    - dependency: reflect-namespace
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 139
+      semanticFailures: 0
+      unsupportedProfileFeatures: 13
     - dependency: regular-expressions
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 491
+      passes: 497
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 10
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -12478,9 +12842,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 520
+      passes: 527
       semanticFailures: 0
-      unsupportedProfileFeatures: 70
+      unsupportedProfileFeatures: 63
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -12507,16 +12871,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2572
+      passes: 2615
       semanticFailures: 0
-      unsupportedProfileFeatures: 280
+      unsupportedProfileFeatures: 237
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 137
+      passes: 149
       semanticFailures: 0
-      unsupportedProfileFeatures: 55
+      unsupportedProfileFeatures: 43
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -12556,16 +12920,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 61
+      passes: 67
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 10
     - group: built-ins/DataView
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 443
+      passes: 475
       semanticFailures: 0
-      unsupportedProfileFeatures: 107
+      unsupportedProfileFeatures: 75
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -12577,9 +12941,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 151
+      passes: 158
       semanticFailures: 0
-      unsupportedProfileFeatures: 179
+      unsupportedProfileFeatures: 172
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -12591,9 +12955,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 58
+      passes: 61
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 0
     - group: built-ins/Infinity
       expectedNegatives: 0
       harnessFailures: 0
@@ -12612,9 +12976,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 137
+      passes: 148
       semanticFailures: 0
-      unsupportedProfileFeatures: 33
+      unsupportedProfileFeatures: 22
     - group: built-ins/MapIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -12626,9 +12990,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 280
+      passes: 316
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 0
     - group: built-ins/NaN
       expectedNegatives: 0
       harnessFailures: 0
@@ -12647,30 +13011,37 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 318
+      passes: 331
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 9
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2945
+      passes: 2987
       semanticFailures: 0
-      unsupportedProfileFeatures: 378
+      unsupportedProfileFeatures: 336
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 548
+      passes: 563
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 57
+    - group: built-ins/Reflect
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 139
+      semanticFailures: 0
+      unsupportedProfileFeatures: 13
     - group: built-ins/RegExp
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1190
+      passes: 1202
       semanticFailures: 0
-      unsupportedProfileFeatures: 496
+      unsupportedProfileFeatures: 484
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -12682,9 +13053,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1058
+      passes: 1090
       semanticFailures: 0
-      unsupportedProfileFeatures: 96
+      unsupportedProfileFeatures: 64
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0
@@ -12703,58 +13074,58 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 54
+      passes: 55
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/decodeURIComponent
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 55
+      passes: 56
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/encodeURI
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 30
+      passes: 31
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/encodeURIComponent
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 30
+      passes: 31
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/isFinite
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 15
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/isNaN
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 15
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 0
     - group: built-ins/parseFloat
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 52
+      passes: 53
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 1
     - group: built-ins/parseInt
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 52
+      passes: 53
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 2
     - group: built-ins/undefined
       expectedNegatives: 0
       harnessFailures: 0
@@ -12801,9 +13172,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1447
+      passes: 1456
       semanticFailures: 0
-      unsupportedProfileFeatures: 144
+      unsupportedProfileFeatures: 135
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -12871,6 +13242,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1213
+      passes: 1217
       semanticFailures: 0
-      unsupportedProfileFeatures: 83
+      unsupportedProfileFeatures: 79

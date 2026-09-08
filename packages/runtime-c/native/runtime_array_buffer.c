@@ -135,6 +135,7 @@ static OseoResult array_buffer_allocate(
     buffer->ordinary.length_writable = false;
     buffer->ordinary.extensible = true;
     buffer->ordinary.module_namespace = false;
+    buffer->ordinary.immutable_prototype = false;
     buffer->ordinary.global_object = false;
     buffer->ordinary.error_data = false;
     buffer->ordinary.number_data = false;

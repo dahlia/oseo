@@ -332,6 +332,7 @@ static OseoResult data_view_allocate(
     view->ordinary.length_writable = false;
     view->ordinary.extensible = true;
     view->ordinary.module_namespace = false;
+    view->ordinary.immutable_prototype = false;
     view->ordinary.global_object = false;
     view->ordinary.error_data = false;
     view->ordinary.number_data = false;

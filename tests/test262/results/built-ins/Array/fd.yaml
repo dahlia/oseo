@@ -449,8 +449,8 @@ results:
         limit-proxied-array.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/slice/length-exceeding-\
-        integer-limit-proxied-array.js:118:12: error[OSEO1001]: Unknown
-        binding 'Reflect'.\\n\""
+        integer-limit-proxied-array.js:114:17: error[OSEO1001]: Unknown
+        binding 'Proxy'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

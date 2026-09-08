@@ -382,19 +382,22 @@ OseoResult oseo_internal_error_construct(
     /* OrdinaryCreateFromConstructor takes the prototype from the new
      * target, so `class E extends Error {}` gives its instances
      * `E.prototype`. A plain call supplies no new target, and `new Error`
-     * supplies the callee itself, so both keep the callee's prototype. */
-    OseoValue source = is_function(new_target) ? new_target : callee;
-    OseoValue prototype = is_function(source)
-        ? function_object(source)->prototype_object
-        : oseo_undefined();
-    if (is_object(prototype)) {
-        result = normal(prototype);
-    } else {
+     * supplies the callee itself, so both keep the callee's prototype.
+     * 20.5.1.1 runs this before ToString(message), and the read is a
+     * real Get: `Reflect.construct` can name a bound function, which
+     * owns no synthetic `prototype` slot and can carry an observable
+     * accessor instead. */
+    frame.slots[4] = is_function(new_target) ? new_target : callee;
+    result = oseo_internal_constructor_prototype(context, frame.slots[4]);
+    frame.slots[4] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[4])) {
         result = oseo_internal_error_prototype(context, kind);
+        frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_create(context, result.value);
+        result = oseo_object_create(context, frame.slots[4]);
         frame.slots[3] = result.value;
+        frame.slots[4] = oseo_undefined();
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         ordinary_object(frame.slots[3])->error_data = true;

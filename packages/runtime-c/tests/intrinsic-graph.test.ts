@@ -992,6 +992,51 @@ test("populates the realm-owned global numeric functions", () => {
   );
 });
 
+test("populates the realm-owned Reflect namespace object", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const reflectSource = sources.get("runtime_reflect.c") ?? "";
+
+  assert.match(header, /OSEO_INTRINSIC_REFLECT/u);
+  assert.match(internalHeader, /oseo_internal_install_reflect_global/u);
+  assert.match(bindingSource, /oseo_internal_install_reflect_global/u);
+  // The enum member is public, so a direct `oseo_intrinsic` request
+  // reaches the same materialization the global installation uses.
+  assert.match(
+    functionSource,
+    /OSEO_INTRINSIC_REFLECT\)[\s\S]{0,60}oseo_internal_reflect_intrinsic/u,
+  );
+  for (const property of [
+    "apply",
+    "construct",
+    "defineProperty",
+    "deleteProperty",
+    "get",
+    "getOwnPropertyDescriptor",
+    "getPrototypeOf",
+    "has",
+    "isExtensible",
+    "ownKeys",
+    "preventExtensions",
+    "set",
+    "setPrototypeOf",
+  ]) {
+    assert.match(reflectSource, new RegExp(`"${property}"`, "u"));
+  }
+  // The namespace is an ordinary object, so it never becomes a function
+  // and its thirteen methods share one dense code-ID range.
+  assert.match(
+    reflectSource,
+    /oseo_object_create\(context, frame\.slots\[0\]\)/u,
+  );
+  assert.match(reflectSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(reflectSource, /OSEO_REFLECT_FUNCTION_CODE_ID_LAST - code_id/u);
+  assert.match(reflectSource, /OSEO_FUNCTION_INTERNAL/u);
+  assert.doesNotMatch(reflectSource, /OSEO_FUNCTION_ORDINARY/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

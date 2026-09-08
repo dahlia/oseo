@@ -1,0 +1,1177 @@
+/* eslint-disable no-await-in-loop -- Native observations are isolated. */
+
+import assert from "node:assert/strict";
+import process from "node:process";
+import test from "node:test";
+
+import fc from "fast-check";
+
+import { cBackend } from "../../packages/backend-c/src/index.ts";
+import { runNativeCli } from "../../packages/cli/src/index.ts";
+import {
+  compileSource,
+  describeTarget,
+  printMir,
+  targetForExecutionHost,
+} from "../../packages/compiler/src/index.ts";
+import { createNodeHost } from "../../packages/host/src/index.ts";
+import { babelFrontend } from "../../packages/parser-babel/src/index.ts";
+import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
+import {
+  assertMatchingObservations,
+  withNativeFixture,
+} from "../../packages/testkit/src/index.ts";
+import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+
+const { assertAsyncProperty } = await import(
+  ["../../packages/testkit/tests/", "property-support.ts"].join("")
+);
+
+/**
+ * Which own key one generated property carries. The three kinds are the
+ * three OrdinaryOwnPropertyKeys groups, so a case that mixes them
+ * observes the complete ordering rule.
+ */
+type KeyKind = "index" | "string" | "symbol";
+
+/**
+ * One generated own property. A data property's value and an accessor
+ * property's getter result are both derived from the property's index,
+ * so the oracle names the observed value without consulting the host.
+ */
+interface GeneratedProperty {
+  readonly accessor: boolean;
+  readonly configurable: boolean;
+  readonly enumerable: boolean;
+  readonly hasSetter: boolean;
+  readonly keyKind: KeyKind;
+  readonly writable: boolean;
+}
+
+interface ReflectCase {
+  /** Argument values one generated `apply` and `construct` list carries. */
+  readonly argumentValues: readonly number[];
+  /** Whether the generated target stays extensible. */
+  readonly extensible: boolean;
+  /** Whether `setPrototypeOf` writes null instead of a fresh object. */
+  readonly nullPrototype: boolean;
+  readonly properties: readonly GeneratedProperty[];
+  /**
+   * The key every single-key operation uses: an index into `properties`,
+   * or `properties.length` for a key the target does not own.
+   */
+  readonly probe: number;
+  /** Whether `construct` passes a new target distinct from the target. */
+  readonly separateNewTarget: boolean;
+}
+
+const propertyArbitrary: fc.Arbitrary<GeneratedProperty> = fc.record({
+  accessor: fc.boolean(),
+  configurable: fc.boolean(),
+  enumerable: fc.boolean(),
+  hasSetter: fc.boolean(),
+  keyKind: fc.constantFrom<KeyKind>("index", "string", "symbol"),
+  writable: fc.boolean(),
+});
+
+const caseArbitrary: fc.Arbitrary<ReflectCase> = fc
+  .record({
+    argumentValues: fc.array(fc.integer({ max: 9, min: 0 }), {
+      maxLength: 3,
+      minLength: 0,
+    }),
+    extensible: fc.boolean(),
+    nullPrototype: fc.boolean(),
+    properties: fc.array(propertyArbitrary, { maxLength: 4, minLength: 1 }),
+    probe: fc.integer({ max: 4, min: 0 }),
+    separateNewTarget: fc.boolean(),
+  })
+  .map((generated) =>
+    Object.assign({}, generated, {
+      probe: Math.min(generated.probe, generated.properties.length),
+    }),
+  );
+
+const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
+
+/** The property key expression the generated source uses for one index. */
+function keyExpression(property: GeneratedProperty, index: number): string {
+  if (property.keyKind === "index") return `"${index}"`;
+  if (property.keyKind === "string") return `"k${index}"`;
+  return `symbols[${index}]`;
+}
+
+/** The key text `String(key)` prints for one generated property. */
+function keyText(property: GeneratedProperty, index: number): string {
+  if (property.keyKind === "index") return `${index}`;
+  if (property.keyKind === "string") return `k${index}`;
+  return `Symbol(s${index})`;
+}
+
+/** The value a generated data property stores. */
+function dataValue(index: number): number {
+  return 100 + index;
+}
+
+/** The value a generated accessor property's getter reports. */
+function accessorValue(index: number): number {
+  return 200 + index;
+}
+
+/** OrdinaryOwnPropertyKeys over the generated properties. */
+function ownKeyOrder(testCase: ReflectCase): readonly string[] {
+  const groups: readonly KeyKind[] = ["index", "string", "symbol"];
+  return groups.flatMap((kind) =>
+    testCase.properties.flatMap((property, index) =>
+      property.keyKind === kind ? [keyText(property, index)] : [],
+    ),
+  );
+}
+
+/** The generated property the probe names, or undefined for a missing key. */
+function probed(testCase: ReflectCase): GeneratedProperty | undefined {
+  return testCase.properties[testCase.probe];
+}
+
+function descriptorSource(property: GeneratedProperty, index: number): string {
+  if (!property.accessor) {
+    return (
+      `{ value: ${dataValue(index)}, writable: ${property.writable}, ` +
+      `enumerable: ${property.enumerable}, ` +
+      `configurable: ${property.configurable} }`
+    );
+  }
+  const setter = property.hasSetter
+    ? "set(value) { this.written = value; }, "
+    : "";
+  return (
+    `{ get() { return ${accessorValue(index)}; }, ${setter}` +
+    `enumerable: ${property.enumerable}, ` +
+    `configurable: ${property.configurable} }`
+  );
+}
+
+function printCase(testCase: ReflectCase): string {
+  const symbols = testCase.properties
+    .map((_, index) => `Symbol("s${index}")`)
+    .join(", ");
+  const definitions = testCase.properties
+    .map(
+      (property, index) =>
+        `  Object.defineProperty(target, ${keyExpression(property, index)}, ` +
+        `${descriptorSource(property, index)});`,
+    )
+    .join("\n");
+  const prevent = testCase.extensible
+    ? ""
+    : "\n  Object.preventExtensions(target);";
+  const probeProperty = probed(testCase);
+  const probeKey =
+    probeProperty == null
+      ? '"missing"'
+      : keyExpression(probeProperty, testCase.probe);
+  const argumentList = testCase.argumentValues.join(", ");
+  const prototype = testCase.nullPrototype ? "null" : "{}";
+  const constructArgument = testCase.argumentValues[0] ?? 0;
+  return `
+const reflectGlobalObject = this;
+const originalReflect = Reflect;
+const symbols = [${symbols}];
+function makeTarget() {
+  const target = {};
+${definitions}${prevent}
+  return target;
+}
+function render(values) {
+  let text = "";
+  for (let index = 0; index < values.length; index = index + 1) {
+    if (index > 0) text = text + ",";
+    text = text + String(values[index]);
+  }
+  return text;
+}
+const probeKey = ${probeKey};
+console.log("own keys", render(Reflect.ownKeys(makeTarget()).map(String)));
+console.log(
+  "read",
+  Reflect.has(makeTarget(), probeKey),
+  String(Reflect.get(makeTarget(), probeKey)),
+);
+const descriptor = Reflect.getOwnPropertyDescriptor(makeTarget(), probeKey);
+console.log(
+  "descriptor",
+  descriptor === undefined ? "none" : render(Reflect.ownKeys(descriptor)),
+  descriptor === undefined ? "none" : String(descriptor.enumerable),
+  descriptor === undefined ? "none" : String(descriptor.configurable),
+);
+const defineTarget = makeTarget();
+const defined = Reflect.defineProperty(defineTarget, probeKey, {
+  value: 7,
+  writable: true,
+  enumerable: true,
+  configurable: true,
+});
+let defineThrew = false;
+try {
+  Object.defineProperty(makeTarget(), probeKey, {
+    value: 7,
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+} catch (error) {
+  defineThrew = error instanceof TypeError;
+}
+console.log("define", defined, defineThrew, String(defineTarget[probeKey]));
+const setTarget = makeTarget();
+const setResult = Reflect.set(setTarget, probeKey, 8);
+let setThrew = false;
+try {
+  (function () { "use strict"; makeTarget()[probeKey] = 8; })();
+} catch (error) {
+  setThrew = error instanceof TypeError;
+}
+console.log("set", setResult, setThrew, String(setTarget[probeKey]));
+const receiverTarget = makeTarget();
+const receiver = {};
+const receiverResult = Reflect.set(receiverTarget, probeKey, 9, receiver);
+console.log(
+  "receiver",
+  receiverResult,
+  String(receiver[probeKey]),
+  String(receiver.written),
+  String(receiverTarget[probeKey]),
+);
+const deleteTarget = makeTarget();
+const deleted = Reflect.deleteProperty(deleteTarget, probeKey);
+let deleteThrew = false;
+try {
+  (function () { "use strict"; delete makeTarget()[probeKey]; })();
+} catch (error) {
+  deleteThrew = error instanceof TypeError;
+}
+console.log(
+  "delete",
+  deleted,
+  deleteThrew,
+  Reflect.has(deleteTarget, probeKey),
+);
+const extensibleTarget = makeTarget();
+console.log(
+  "extensible",
+  Reflect.isExtensible(extensibleTarget),
+  Reflect.preventExtensions(extensibleTarget),
+  Reflect.isExtensible(extensibleTarget),
+);
+const prototypeTarget = makeTarget();
+const prototype = ${prototype};
+const prototypeResult = Reflect.setPrototypeOf(prototypeTarget, prototype);
+let prototypeThrew = false;
+try {
+  Object.setPrototypeOf(makeTarget(), prototype);
+} catch (error) {
+  prototypeThrew = error instanceof TypeError;
+}
+console.log(
+  "prototype",
+  prototypeResult,
+  prototypeThrew,
+  Reflect.getPrototypeOf(prototypeTarget) === prototype,
+);
+function collect() { return render(Array.prototype.slice.call(arguments)); }
+const list = [${argumentList}];
+console.log(
+  "apply",
+  Reflect.apply(collect, null, list),
+  Reflect.apply(collect, null, { length: list.length, ...list }),
+  Reflect.apply(function () { return this.tag; }, { tag: "receiver" }, list),
+);
+function Built(value) {
+  this.value = value;
+  this.tag = new.target === Built ? "base" : "other";
+}
+class Other extends Built {}
+const constructed = Reflect.construct(
+  Built,
+  [${constructArgument}],
+  ${testCase.separateNewTarget ? "Other" : "Built"},
+);
+console.log(
+  "construct",
+  String(constructed.value),
+  constructed.tag,
+  Object.getPrototypeOf(constructed) ===
+    ${testCase.separateNewTarget ? "Other" : "Built"}.prototype,
+);
+try {
+  Reflect.get(1, probeKey);
+} catch (error) {
+  console.log("target", error instanceof TypeError);
+}
+try {
+  new Reflect.get({}, "a");
+} catch (error) {
+  console.log("not a constructor", error instanceof TypeError);
+}
+/** @param {number} operand @param {number} addend */
+function hinted(operand, addend) { return operand + addend; }
+console.log(
+  "hint",
+  hinted(2, 1),
+  hinted(Reflect.ownKeys(makeTarget()).length, 1),
+  hinted(String(Reflect.has(makeTarget(), probeKey)), 1),
+);
+let turn = 0;
+while (turn < 2) {
+  console.log("guard", Reflect.has(makeTarget(), probeKey));
+  if (turn === 0) reflectGlobalObject.marker = 1;
+  turn = turn + 1;
+}
+console.log(
+  "marker",
+  reflectGlobalObject.marker,
+  delete reflectGlobalObject.marker,
+);
+({ value: Reflect } = { value: 7 });
+console.log("object target", Reflect, this.Reflect === Reflect);
+[Reflect] = [8];
+console.log("array target", Reflect, this.Reflect === Reflect);
+for (Reflect of [9]) {}
+console.log("for-of target", Reflect, this.Reflect === Reflect);
+Reflect = originalReflect;
+console.log("target restore", Reflect === originalReflect);
+this.Reflect = 10;
+console.log("global write", this.Reflect === Reflect, Reflect);
+this.Reflect = originalReflect;
+console.log("global restore", this.Reflect === Reflect);
+console.log("global delete", delete this.Reflect, typeof Reflect);
+try { Reflect; } catch (error) {
+  console.log("global deleted read", error instanceof ReferenceError);
+}
+function strictDeletedSet() { "use strict"; Reflect = 1; }
+try { strictDeletedSet(); } catch (error) {
+  console.log("global deleted strict set", error instanceof ReferenceError);
+}
+({ value: Reflect } = { value: originalReflect });
+console.log("global deleted pattern restore", this.Reflect === Reflect);
+function strictDeleteDuringSet() {
+  "use strict";
+  Reflect = (delete reflectGlobalObject.Reflect, 11);
+}
+try { strictDeleteDuringSet(); } catch (error) {
+  console.log("global strict set race", error instanceof ReferenceError);
+}
+Reflect = originalReflect;
+console.log("global race restore", this.Reflect === Reflect);
+`;
+}
+
+function expected(testCase: ReflectCase): string {
+  const property = probed(testCase);
+  const index = testCase.probe;
+  const present = property != null;
+  const currentValue = !present
+    ? "undefined"
+    : property.accessor
+      ? `${accessorValue(index)}`
+      : `${dataValue(index)}`;
+  const defined = present ? property.configurable : testCase.extensible;
+  const setApplied = present
+    ? property.accessor
+      ? property.hasSetter
+      : property.writable
+    : testCase.extensible;
+  const setValue = !setApplied
+    ? currentValue
+    : present && property.accessor
+      ? currentValue
+      : "8";
+  const receiverApplied = present
+    ? property.accessor
+      ? property.hasSetter
+      : property.writable
+    : true;
+  const receiverOwn =
+    receiverApplied && !(present && property.accessor) ? "9" : "undefined";
+  const receiverWritten =
+    receiverApplied && present && property.accessor ? "9" : "undefined";
+  const deleted = present ? property.configurable : true;
+  const descriptorFields = !present
+    ? "none"
+    : property.accessor
+      ? "get,set,enumerable,configurable"
+      : "value,writable,enumerable,configurable";
+  const applied = testCase.argumentValues.join(",");
+  const constructTag = testCase.separateNewTarget ? "other" : "base";
+  const constructValue = `${testCase.argumentValues[0] ?? 0}`;
+  const keyCount = testCase.properties.length;
+  return [
+    `own keys ${ownKeyOrder(testCase).join(",")}`,
+    `read ${present} ${currentValue}`,
+    `descriptor ${descriptorFields} ` +
+      (present
+        ? `${property.enumerable} ${property.configurable}`
+        : "none none"),
+    `define ${defined} ${!defined} ${defined ? "7" : currentValue}`,
+    `set ${setApplied} ${!setApplied} ${setValue}`,
+    `receiver ${receiverApplied} ${receiverOwn} ${receiverWritten} ` +
+      currentValue,
+    `delete ${deleted} ${!deleted} ${!deleted}`,
+    `extensible ${testCase.extensible} true false`,
+    `prototype ${testCase.extensible} ${!testCase.extensible} ` +
+      `${testCase.extensible}`,
+    `apply ${applied} ${applied} receiver`,
+    `construct ${constructValue} ${constructTag} true`,
+    "target true",
+    "not a constructor true",
+    `hint 3 ${keyCount + 1} ${present}1`,
+    `guard ${present}`,
+    `guard ${present}`,
+    "marker 1 true",
+    "object target 7 true",
+    "array target 8 true",
+    "for-of target 9 true",
+    "target restore true",
+    "global write true 10",
+    "global restore true",
+    "global delete true undefined",
+    "global deleted read true",
+    "global deleted strict set true",
+    "global deleted pattern restore true",
+    "global strict set race true",
+    "global race restore true",
+    "",
+  ].join("\n");
+}
+
+async function references(source: string): Promise<
+  readonly [
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+  ]
+> {
+  const directory = await host.makeTemporaryDirectory(
+    "oseo-reflect-namespace-property-",
+  );
+  const sourcePath = `${directory}/case.ts`;
+  let succeeded = false;
+  try {
+    await host.writeTextFile(
+      sourcePath,
+      `(0, eval)(${JSON.stringify(source)});\n`,
+    );
+    const observations = [
+      await host.run({
+        args: [sourcePath],
+        command: process.execPath,
+        cwd: directory,
+      }),
+      await host.run({
+        args: ["run", "--quiet", sourcePath],
+        command: "deno",
+        cwd: directory,
+      }),
+    ] as const;
+    succeeded = true;
+    return observations;
+  } finally {
+    if (succeeded) await host.remove(directory);
+  }
+}
+
+test(
+  "generated Reflect reflection matches the M5 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "every Reflect function reports the internal method's own result",
+      fc.asyncProperty(caseArbitrary, async (testCase) => {
+        const source = printCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-reflect-namespace.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-smi/u);
+            assert.match(mir, /guard-shape/u);
+            assert.match(mir, /add-smi-checked/u);
+            assert.match(mir, /generic-fallback/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-(?:smi|shape)/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one target of one to four own properties drawn from integer " +
+          "index, string, and symbol keys and from data and accessor " +
+          "descriptors with every writable, enumerable, configurable, and " +
+          "setter combination, an extensible or non-extensible target, one " +
+          "probe key that is own or missing, an argument list of zero to " +
+          "three values, an object or null written prototype, a construct " +
+          "new target that is or is not the target, a false number hint, " +
+          "one global-object shape guard miss, and one global Reflect " +
+          "write, restore, delete, assignment-target, and strict " +
+          "missing-property sequence",
+        numRuns: 12,
+        profile: "M5 Reflect namespace",
+        seed: 0x6000_6300,
+        sizeLimit:
+          "one target of at most four own properties, one probe key, at " +
+          "most three argument values, two repeated global property " +
+          "observations, and one global assignment-target and deletion " +
+          "sequence",
+        timeLimitMilliseconds: 360_000,
+      },
+    );
+  },
+);
+
+/**
+ * One generated module-namespace write. A module namespace object's
+ * [[Set]] (10.4.6.9) reports false for every key and every receiver, and
+ * OrdinarySetWithOwnDescriptor hands an absent own property to the
+ * parent's own [[Set]], so a namespace anywhere on the walk answers with
+ * that clause instead of continuing the ordinary chain.
+ */
+interface NamespaceChainCase {
+  /**
+   * How many ordinary objects sit between the write target and the
+   * namespace. Zero makes the namespace the target itself.
+   */
+  readonly depth: 0 | 1 | 2;
+  /** Whether the written key is one the namespace exports. */
+  readonly exportedKey: boolean;
+  /**
+   * Whether the object closest to the namespace owns the key as a
+   * writable data property, which ends the walk before the namespace.
+   */
+  readonly shadowed: boolean;
+  /** Whether Reflect.set takes a receiver distinct from the target. */
+  readonly separateReceiver: boolean;
+  readonly value: number;
+}
+
+const namespaceChainArbitrary: fc.Arbitrary<NamespaceChainCase> = fc
+  .record({
+    depth: fc.constantFrom<0 | 1 | 2>(0, 1, 2),
+    exportedKey: fc.boolean(),
+    shadowed: fc.boolean(),
+    separateReceiver: fc.boolean(),
+    value: fc.integer({ max: 9, min: 0 }),
+  })
+  .map((generated) =>
+    Object.assign({}, generated, {
+      shadowed: generated.depth === 0 ? false : generated.shadowed,
+    }),
+  );
+
+/** The value the generated dependency module exports. */
+const exportedValue = 11;
+
+/** The value a shadowing own data property carries before the write. */
+const shadowValue = 22;
+
+function namespaceKey(testCase: NamespaceChainCase): string {
+  return testCase.exportedKey ? "exported" : "absent";
+}
+
+function namespaceDependencySource(): string {
+  return [`export const exported = ${exportedValue};`, ""].join("\n");
+}
+
+/**
+ * The generated entry module. Both the Reflect.set form and the strict
+ * assignment form run against separately built chains of the same shape,
+ * so one program observes the reported boolean and the language error
+ * the same refusal produces.
+ */
+function namespaceEntrySource(testCase: NamespaceChainCase): string {
+  const key = namespaceKey(testCase);
+  const shadow = [
+    `  Object.defineProperty(holder, "${key}", {`,
+    "    configurable: true,",
+    "    enumerable: true,",
+    `    value: ${shadowValue},`,
+    "    writable: true,",
+    "  });",
+  ];
+  const build =
+    testCase.depth === 0
+      ? ["  return ns;"]
+      : testCase.depth === 1
+        ? [
+            "  const holder = Object.create(ns);",
+            ...(testCase.shadowed ? shadow : []),
+            "  return holder;",
+          ]
+        : [
+            "  const holder = Object.create(ns);",
+            ...(testCase.shadowed ? shadow : []),
+            "  return Object.create(holder);",
+          ];
+  return [
+    'import * as ns from "./dependency.mjs";',
+    "",
+    "function build() {",
+    ...build,
+    "}",
+    "",
+    "function names(object) {",
+    "  return Object.getOwnPropertyNames(object).length;",
+    "}",
+    "",
+    "const target = build();",
+    testCase.separateReceiver
+      ? "const receiver = {};"
+      : "const receiver = target;",
+    testCase.separateReceiver
+      ? `const reported = Reflect.set(target, "${key}", ` +
+        `${testCase.value}, receiver);`
+      : `const reported = Reflect.set(target, "${key}", ${testCase.value});`,
+    'console.log("reflect", reported);',
+    `console.log("target", names(target), String(target["${key}"]));`,
+    `console.log("receiver", names(receiver), String(receiver["${key}"]));`,
+    "const assigned = build();",
+    "let outcome;",
+    "try {",
+    `  assigned["${key}"] = ${testCase.value};`,
+    '  outcome = "ok";',
+    "} catch (error) {",
+    '  outcome = error instanceof TypeError ? "TypeError" : "other";',
+    "}",
+    'console.log("assignment", outcome, names(assigned),',
+    `  String(assigned["${key}"]));`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * Which answer one reference host gives. `refused` is what 10.4.6.9 and
+ * OrdinarySetWithOwnDescriptor prescribe and what the native program
+ * must produce: a namespace reached as the target or anywhere on the
+ * walk refuses every key and every receiver. `flattened` is the answer
+ * a V8 that applies the exotic clause only to a write whose receiver is
+ * the namespace itself gives, so it continues the ordinary walk past a
+ * namespace on the chain and lets a distinct receiver take the write.
+ * Node.js 24's bundled V8 13.6 answers that way and Deno's V8 14.9 does
+ * not, so the two reference hosts disagree on every generated case whose
+ * walk reaches the namespace with a receiver that is not that namespace,
+ * and agree on the rest. Each reference is therefore accepted against
+ * either recorded answer, rather than pinned to one host's version,
+ * while the native program is held to the clause.
+ */
+type NamespaceAnswer = "flattened" | "refused";
+
+function namespaceExpected(
+  testCase: NamespaceChainCase,
+  answer: NamespaceAnswer,
+): string {
+  const clauseWrites = testCase.depth !== 0 && testCase.shadowed;
+  const reflectWrites =
+    answer === "flattened"
+      ? testCase.depth !== 0 || testCase.separateReceiver
+      : clauseWrites;
+  const assignmentWrites =
+    answer === "flattened" ? testCase.depth !== 0 : clauseWrites;
+  const inherited = testCase.shadowed
+    ? String(shadowValue)
+    : testCase.exportedKey
+      ? String(exportedValue)
+      : "undefined";
+  const ownBefore = testCase.depth === 1 && testCase.shadowed ? 1 : 0;
+  const targetNames =
+    testCase.depth === 0
+      ? 1
+      : reflectWrites && !testCase.separateReceiver
+        ? 1
+        : ownBefore;
+  const targetValue =
+    testCase.depth === 0
+      ? testCase.exportedKey
+        ? String(exportedValue)
+        : "undefined"
+      : reflectWrites && !testCase.separateReceiver
+        ? String(testCase.value)
+        : inherited;
+  const receiverNames = testCase.separateReceiver
+    ? reflectWrites
+      ? 1
+      : 0
+    : targetNames;
+  const receiverValue = testCase.separateReceiver
+    ? reflectWrites
+      ? String(testCase.value)
+      : "undefined"
+    : targetValue;
+  const assignedNames =
+    testCase.depth === 0 ? 1 : assignmentWrites ? 1 : ownBefore;
+  const assignedValue =
+    testCase.depth === 0
+      ? testCase.exportedKey
+        ? String(exportedValue)
+        : "undefined"
+      : assignmentWrites
+        ? String(testCase.value)
+        : inherited;
+  return (
+    `reflect ${String(reflectWrites)}\n` +
+    `target ${targetNames} ${targetValue}\n` +
+    `receiver ${receiverNames} ${receiverValue}\n` +
+    `assignment ${assignmentWrites ? "ok" : "TypeError"} ${assignedNames} ` +
+    `${assignedValue}\n`
+  );
+}
+
+test(
+  "generated module namespace writes keep the exotic refusal",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "a module namespace on the walk refuses every Reflect.set and " +
+        "every assignment",
+      fc.asyncProperty(namespaceChainArbitrary, async (testCase) => {
+        const directory = await host.makeTemporaryDirectory(
+          "oseo-reflect-namespace-chain-",
+        );
+        const entryPath = `${directory}/entry.mjs`;
+        await host.writeTextFile(
+          `${directory}/dependency.mjs`,
+          namespaceDependencySource(),
+        );
+        await host.writeTextFile(entryPath, namespaceEntrySource(testCase));
+        const refused = namespaceExpected(testCase, "refused");
+        const flattened = namespaceExpected(testCase, "flattened");
+        try {
+          for (const reference of [
+            await host.run({
+              args: [entryPath],
+              command: process.execPath,
+              cwd: directory,
+            }),
+            await host.run({
+              args: ["run", "--quiet", entryPath],
+              command: "deno",
+              cwd: directory,
+            }),
+          ]) {
+            assert.equal(reference.exitStatus, 0, reference.stderr);
+            assert.ok(
+              reference.stdout === refused || reference.stdout === flattened,
+              `reference answered neither recorded result:\n` +
+                `${reference.stdout}`,
+            );
+          }
+          for (const specialization of ["disabled", "enabled"] as const) {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              const native = await runNativeCli(
+                {
+                  args: [
+                    ...(specialization === "disabled"
+                      ? ["--no-specialization"]
+                      : []),
+                    entryPath,
+                  ],
+                  version: "0.1.0",
+                },
+                host,
+              );
+              assertMatchingObservations([
+                { exitStatus: 0, stderr: "", stdout: refused },
+                native,
+              ]);
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        } finally {
+          await host.remove(directory);
+        }
+      }),
+      {
+        context: [
+          "module-goal=closed graph",
+          "native-collector=forced",
+          "reference-divergence=V8 13.6 flattens the namespace walk",
+        ],
+        domain:
+          "one module namespace reached as the write target itself, as an " +
+          "ordinary object's prototype, or as its grandparent, an exported " +
+          "or absent key, an optional writable shadow on the object " +
+          "closest to the namespace, a Reflect.set receiver that is or is " +
+          "not the target, and the strict assignment form of the same " +
+          "write",
+        numRuns: 24,
+        profile: "M5 Reflect namespace",
+        seed: 0x6000_6301,
+        sizeLimit:
+          "one dependency module, one entry module, two chains of at most " +
+          "three objects, and one written integer",
+        timeLimitMilliseconds: 300_000,
+      },
+    );
+  },
+);
+
+/**
+ * Which built-in constructor one generated case names. Each one fixes
+ * the position of its own OrdinaryCreateFromConstructor: `Number` and
+ * `String` convert the argument first, `Error` reads the prototype
+ * before ToString(message), and the rest read before anything else a
+ * program can observe. `Iterator` is reached through a derived class,
+ * because 27.1.2.1 rejects the abstract constructor itself.
+ */
+type BuiltinConstructor =
+  | "Array"
+  | "Iterator"
+  | "Map"
+  | "Number"
+  | "Object"
+  | "String"
+  | "TypeError";
+
+/**
+ * Which new target one generated case passes. `accessor` is a bound
+ * function carrying an observable own `prototype`, which only a real
+ * Get reaches; `plain` is a bound function with no `prototype` at all,
+ * so the read reports undefined and the clause falls back; `default`
+ * omits the argument, leaving the target as its own new target.
+ */
+type NewTargetKind = "accessor" | "default" | "plain";
+
+/** What an observable `prototype` accessor answers. */
+type PrototypeAnswer = "abrupt" | "object" | "primitive";
+
+interface BuiltinTargetCase {
+  readonly builtin: BuiltinConstructor;
+  readonly newTargetKind: NewTargetKind;
+  /**
+   * Whether the argument carries an observable conversion, which orders
+   * the clause's own conversions against the prototype read. Only the
+   * three constructors that convert an argument admit one.
+   */
+  readonly observableArgument: boolean;
+  readonly prototypeAnswer: PrototypeAnswer;
+}
+
+const builtinTargetArbitrary: fc.Arbitrary<BuiltinTargetCase> = fc
+  .record({
+    builtin: fc.constantFrom<BuiltinConstructor>(
+      "Array",
+      "Iterator",
+      "Map",
+      "Number",
+      "Object",
+      "String",
+      "TypeError",
+    ),
+    newTargetKind: fc.constantFrom<NewTargetKind>(
+      "accessor",
+      "default",
+      "plain",
+    ),
+    observableArgument: fc.boolean(),
+    prototypeAnswer: fc.constantFrom<PrototypeAnswer>(
+      "abrupt",
+      "object",
+      "primitive",
+    ),
+  })
+  .map((generated) =>
+    Object.assign({}, generated, {
+      observableArgument:
+        generated.observableArgument && convertsArgument(generated.builtin),
+    }),
+  );
+
+/** True for the constructors whose clause converts an argument. */
+function convertsArgument(builtin: BuiltinConstructor): boolean {
+  return (
+    builtin === "Number" || builtin === "String" || builtin === "TypeError"
+  );
+}
+
+/** The expression that names the constructed target. */
+function targetExpression(builtin: BuiltinConstructor): string {
+  return builtin === "Iterator" ? "GeneratedIterator" : builtin;
+}
+
+/** The expression that names the clause's intrinsic default prototype. */
+function realmPrototype(builtin: BuiltinConstructor): string {
+  return `${builtin}.prototype`;
+}
+
+/** The argument list the generated case passes. */
+function constructedArguments(testCase: BuiltinTargetCase): string {
+  if (testCase.builtin === "Array") return "[2]";
+  /* A Map takes a heap-allocated iterable, so the entries stay
+   * reachable across the accessor the prototype read runs and across
+   * the allocation that follows it. */
+  if (testCase.builtin === "Map") return "[[[1, 2], [3, 4]]]";
+  if (testCase.builtin === "Number") {
+    return testCase.observableArgument
+      ? '[{ valueOf() { order.push("arg"); return 7; } }]'
+      : "[7]";
+  }
+  if (testCase.builtin === "String") {
+    return testCase.observableArgument
+      ? '[{ toString() { order.push("arg"); return "hi"; } }]'
+      : '["hi"]';
+  }
+  if (testCase.builtin === "TypeError") {
+    return testCase.observableArgument
+      ? '[{ toString() { order.push("arg"); return "boom"; } }]'
+      : '["boom"]';
+  }
+  return "[]";
+}
+
+/** The body one generated `prototype` accessor runs. */
+function accessorBody(answer: PrototypeAnswer): string {
+  if (answer === "object") return "return custom;";
+  if (answer === "primitive") return "return 5;";
+  return 'throw new RangeError("prototype");';
+}
+
+function printBuiltinTargetCase(testCase: BuiltinTargetCase): string {
+  const target = targetExpression(testCase.builtin);
+  const accessor =
+    testCase.newTargetKind === "accessor"
+      ? [
+          '  Object.defineProperty(bound, "prototype", {',
+          `    get() { order.push("get"); ` +
+            `${accessorBody(testCase.prototypeAnswer)} },`,
+          "  });",
+        ]
+      : [];
+  const construct =
+    testCase.newTargetKind === "default"
+      ? `  const instance = Reflect.construct(${target}, ` +
+        `${constructedArguments(testCase)});`
+      : `  const instance = Reflect.construct(${target}, ` +
+        `${constructedArguments(testCase)}, makeNewTarget());`;
+  return [
+    "const order = [];",
+    /* A Map built from an iterable reads its `set` adder off the
+     * prototype the read produced, so the generated custom prototype
+     * inherits from %Map.prototype% rather than from %Object.prototype%. */
+    testCase.builtin === "Map"
+      ? "const custom = Object.create(Map.prototype);"
+      : 'const custom = { tag: "custom" };',
+    "function render(values) {",
+    '  let text = "";',
+    "  for (let index = 0; index < values.length; index = index + 1) {",
+    '    if (index > 0) text = text + ",";',
+    "    text = text + String(values[index]);",
+    "  }",
+    "  return text;",
+    "}",
+    "class GeneratedIterator extends Iterator {}",
+    "function makeNewTarget() {",
+    "  const bound = (function () {}).bind(null);",
+    ...accessor,
+    "  return bound;",
+    "}",
+    "function tag(prototype) {",
+    '  if (prototype === custom) return "custom";',
+    `  if (prototype === ${realmPrototype(testCase.builtin)}) return "realm";`,
+    `  if (prototype === ${target}.prototype) return "own";`,
+    '  return "other";',
+    "}",
+    'let outcome = "ok";',
+    'let observed = "-";',
+    "try {",
+    construct,
+    "  observed = tag(Object.getPrototypeOf(instance));",
+    "} catch (error) {",
+    '  outcome = error instanceof RangeError ? "RangeError" : "other";',
+    "}",
+    'console.log("order", render(order));',
+    'console.log("result", outcome, observed);',
+    "/** @param {number} operand @param {number} addend */",
+    "function hinted(operand, addend) { return operand + addend; }",
+    'console.log("hint", hinted(2, 1),',
+    '  hinted(String(outcome === "ok"), 1));',
+    "",
+  ].join("\n");
+}
+
+function builtinTargetExpected(testCase: BuiltinTargetCase): string {
+  const reads = testCase.newTargetKind === "accessor";
+  const abrupt = reads && testCase.prototypeAnswer === "abrupt";
+  const argumentFirst =
+    testCase.builtin === "Number" || testCase.builtin === "String";
+  const steps: string[] = [];
+  if (testCase.observableArgument && (argumentFirst || !reads)) {
+    steps.push("arg");
+  }
+  if (reads) steps.push("get");
+  if (testCase.observableArgument && !argumentFirst && reads && !abrupt) {
+    steps.push("arg");
+  }
+  const observed = abrupt
+    ? "-"
+    : reads && testCase.prototypeAnswer === "object"
+      ? "custom"
+      : testCase.newTargetKind === "default" && testCase.builtin === "Iterator"
+        ? "own"
+        : "realm";
+  const outcome = abrupt ? "RangeError" : "ok";
+  return [
+    `order ${steps.join(",")}`,
+    `result ${outcome} ${observed}`,
+    `hint 3 ${abrupt ? "false" : "true"}1`,
+    "",
+  ].join("\n");
+}
+
+test(
+  "generated built-in new targets read prototype where the clause says",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "a built-in constructor performs its own GetPrototypeFromConstructor",
+      fc.asyncProperty(builtinTargetArbitrary, async (testCase) => {
+        const source = printBuiltinTargetCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: builtinTargetExpected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-builtin-new-target.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-smi/u);
+            assert.match(mir, /generic-fallback/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-smi/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                "native-collector=forced",
+              ],
+        domain:
+          "one of Array, Iterator through a derived class, Map, Number, " +
+          "Object, String, and TypeError constructed through " +
+          "Reflect.construct, a new target that is a bound function " +
+          "carrying an observable prototype accessor, a bound function " +
+          "with no prototype at all, or the target itself, an accessor " +
+          "that answers with an object, with a primitive, or abruptly, " +
+          "and an argument that does or does not carry an observable " +
+          "conversion",
+        numRuns: 12,
+        profile: "M5 Reflect namespace",
+        seed: 0x6000_6302,
+        sizeLimit:
+          "one constructed instance, one bound new target, one accessor " +
+          "read, and one argument conversion",
+        timeLimitMilliseconds: 360_000,
+      },
+    );
+  },
+);

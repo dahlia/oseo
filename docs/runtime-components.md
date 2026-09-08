@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-five reviewed assets in this order:
+The runtime input now lists thirty-six reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -32,14 +32,15 @@ The runtime input now lists thirty-five reviewed assets in this order:
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
-*runtime\_math.c*, and *runtime\_uri.c*. The M5
+*runtime\_math.c*, *runtime\_uri.c*, and *runtime\_reflect.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
-RegExp-symbol-methods, and URI-handling-functions units each
+RegExp-symbol-methods, URI-handling-functions, and
+Reflect-namespace units each
 added one
 component the same
 way. The M5b
@@ -162,6 +163,16 @@ Ownership follows the plan's target layout:
     owns no string representation of its own: `ToString`, the growable
     UTF-16 builder, and string allocation stay with
     *runtime\_primitive.c* and *runtime\_string.c*;
+ -  *runtime\_reflect.c*: the `Reflect` namespace object of 28.1 and its
+    thirteen function properties, each of which requires an object target
+    and reports the internal method's own result rather than the language
+    error the matching `Object` static raises. It owns no property
+    semantics of its own: OrdinaryOwnPropertyKeys and
+    ToPropertyDescriptor stay with *runtime\_object\_builtin.c*,
+    ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
+    *runtime\_descriptor.c*, `[[Get]]` and `[[Set]]` with
+    *runtime\_property.c*, `[[SetPrototypeOf]]` with *runtime\_object.c*,
+    and CreateListFromArrayLike with *runtime\_function.c*;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -292,7 +303,7 @@ one.
 
 ### Internal helpers
 
-One hundred and fifty-six helpers cross a translation-unit
+One hundred and seventy helpers cross a translation-unit
 boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -320,6 +331,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_uri_builtin_dispatch`                | *runtime\_uri.c*              |
 | `oseo_internal_uri_intrinsic`                       | *runtime\_uri.c*              |
 | `oseo_internal_install_uri_global`                  | *runtime\_uri.c*              |
+| `oseo_internal_reflect_builtin_dispatch`            | *runtime\_reflect.c*          |
+| `oseo_internal_reflect_intrinsic`                   | *runtime\_reflect.c*          |
+| `oseo_internal_install_reflect_global`              | *runtime\_reflect.c*          |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
@@ -378,6 +392,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_grow_properties`                     | *runtime\_object.c*           |
 | `oseo_internal_cell_backed_property`                | *runtime\_object.c*           |
 | `oseo_internal_require_property_key`                | *runtime\_property.c*         |
+| `oseo_internal_set_with_receiver`                   | *runtime\_property.c*         |
 | `oseo_internal_set_array_length`                    | *runtime\_array.c*            |
 | `oseo_internal_promise_aggregate_settle`            | *runtime\_promise.c*          |
 | `oseo_internal_promise_finally_continuation_create` | *runtime\_promise.c*          |
@@ -393,6 +408,8 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_number_to_uint32`                    | *runtime\_primitive.c*        |
 | `oseo_internal_to_primitive`                        | *runtime\_primitive.c*        |
 | `oseo_internal_to_object`                           | *runtime\_object\_builtin.c*  |
+| `oseo_internal_own_key_array`                       | *runtime\_object\_builtin.c*  |
+| `oseo_internal_define_from_descriptor`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_to_object_for_property`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_install_primitive_wrapper_methods`   | *runtime\_object\_builtin.c*  |
 | `oseo_internal_symbol_create`                       | *runtime\_symbol.c*           |
@@ -424,6 +441,10 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_array_iterator_prototype`            | *runtime\_iterator.c*         |
 | `oseo_internal_same_value`                          | *runtime\_descriptor.c*       |
 | `oseo_internal_ordinary_has_instance`               | *runtime\_function.c*         |
+| `oseo_internal_array_like_list`                     | *runtime\_function.c*         |
+| `oseo_internal_construct_receiver`                  | *runtime\_function.c*         |
+| `oseo_internal_constructor_prototype`               | *runtime\_function.c*         |
+| `oseo_internal_builtin_code_id`                     | *runtime\_function.c*         |
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c*        |
@@ -458,6 +479,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_array_buffer_release`                | *runtime\_array\_buffer.c*    |
 | `oseo_internal_install_array_buffer_global`         | *runtime\_array\_buffer.c*    |
 | `oseo_internal_object_define_data`                  | *runtime\_descriptor.c*       |
+| `oseo_internal_define_data_reported`                | *runtime\_descriptor.c*       |
+| `oseo_internal_define_accessor_reported`            | *runtime\_descriptor.c*       |
+| `oseo_internal_set_prototype_reported`              | *runtime\_object.c*           |
 | `oseo_internal_virtual_string_iterator_descriptor`  | *runtime\_descriptor.c*       |
 | `oseo_internal_primitive_wrapper_prototype`         | *runtime\_object\_builtin.c*  |
 

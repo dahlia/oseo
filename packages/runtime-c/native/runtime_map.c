@@ -122,6 +122,7 @@ static OseoResult map_allocate(
     map->ordinary.length_writable = false;
     map->ordinary.extensible = true;
     map->ordinary.module_namespace = false;
+    map->ordinary.immutable_prototype = false;
     map->ordinary.global_object = false;
     map->ordinary.error_data = false;
     map->ordinary.number_data = false;
@@ -183,19 +184,32 @@ static OseoResult map_create(OseoContext *context) {
  * OrdinaryCreateFromConstructor(newTarget, "%Map.prototype%"). A
  * subclass constructor carries its own `prototype` object, so
  * `new Subclass(iterable)` gives its instance that object while a plain
- * `new Map(iterable)` keeps the realm prototype.
+ * `new Map(iterable)` keeps the realm prototype. 24.1.1.1 performs this
+ * before it reads the `set` adder, and the `prototype` read is a real
+ * Get: `Reflect.construct` can name a bound function, which owns no
+ * synthetic slot and can carry an observable accessor instead.
  */
 static OseoResult map_create_from_constructor(
     OseoContext *context,
     OseoValue new_target
 ) {
-    OseoValue prototype = is_function(new_target)
-        ? function_object(new_target)->prototype_object
-        : oseo_undefined();
-    if (is_object(prototype)) return map_allocate(context, prototype);
-    OseoResult fallback = map_prototype_intrinsic(context);
-    if (fallback.status != OSEO_STATUS_NORMAL) return fallback;
-    return map_allocate(context, fallback.value);
+    OseoValue slots[2] = {new_target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_constructor_prototype(
+        context,
+        slots[0]
+    );
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = map_prototype_intrinsic(context);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = map_allocate(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 /*
@@ -329,40 +343,55 @@ static OseoResult map_add_entries_from_iterable(
     return result.status == OSEO_STATUS_NORMAL ? normal(map_result) : result;
 }
 
+/*
+ * Slots: 0 the new target, 1 the iterable, 2 the created map, 3 the
+ * adder. OrdinaryCreateFromConstructor runs the new target's
+ * `prototype` accessor and then allocates, so both the argument and the
+ * new target are rooted across it rather than held in C locals.
+ */
 static OseoResult map_construct_with_target(
     OseoContext *context,
     OseoValue new_target,
     OseoValue iterable
 ) {
-    OseoResult created = map_create_from_constructor(context, new_target);
-    if (created.status != OSEO_STATUS_NORMAL) return created;
-    if (is_nullish(iterable)) return created;
-    OseoValue slots[3] = {created.value, iterable, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 3u};
+    OseoValue slots[4] = {
+        new_target,
+        iterable,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
-    static const uint16_t set_units[] = {'s', 'e', 't'};
-    OseoResult result = oseo_string_from_units(context, set_units, 3u);
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], result.value);
-        slots[2] = result.value;
+    OseoResult result = map_create_from_constructor(context, slots[0]);
+    slots[2] = result.value;
+    bool adds = result.status == OSEO_STATUS_NORMAL && !is_nullish(slots[1]);
+    if (adds) {
+        static const uint16_t set_units[] = {'s', 'e', 't'};
+        result = oseo_string_from_units(context, set_units, 3u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[2], result.value);
+            slots[3] = result.value;
+        }
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[2])) {
+    if (adds && result.status == OSEO_STATUS_NORMAL &&
+        !is_function(slots[3])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
             "The Map adder property is not callable."
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (adds && result.status == OSEO_STATUS_NORMAL) {
         result = map_add_entries_from_iterable(
             context,
-            slots[0],
+            slots[2],
             slots[1],
-            slots[2]
+            slots[3]
         );
     }
+    OseoValue map_value = slots[2];
     oseo_roots_pop(context, &frame);
-    return result;
+    return result.status == OSEO_STATUS_NORMAL ? normal(map_value) : result;
 }
 
 /*
@@ -707,6 +736,7 @@ static OseoResult map_create_iterator(
     iterator->ordinary.length_writable = false;
     iterator->ordinary.extensible = true;
     iterator->ordinary.module_namespace = false;
+    iterator->ordinary.immutable_prototype = false;
     iterator->ordinary.global_object = false;
     iterator->ordinary.error_data = false;
     iterator->ordinary.number_data = false;

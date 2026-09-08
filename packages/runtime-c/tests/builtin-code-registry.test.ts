@@ -35,6 +35,7 @@ const components = [
   "REGEXP",
   "MATH",
   "URI",
+  "REFLECT",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

@@ -386,6 +386,7 @@ static OseoResult promise_allocate(
     promise->ordinary.length_writable = false;
     promise->ordinary.extensible = true;
     promise->ordinary.module_namespace = false;
+    promise->ordinary.immutable_prototype = false;
     promise->ordinary.global_object = false;
     promise->ordinary.error_data = false;
     promise->ordinary.number_data = false;
@@ -444,18 +445,36 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
  * OrdinaryCreateFromConstructor(newTarget, "%Promise.prototype%"). A
  * subclass constructor carries its own `prototype` object, so
  * `new Subclass(executor)` gives its instance that object while a plain
- * `new Promise(executor)` keeps the realm prototype. The read matches
- * the one `oseo_internal_error_construct` performs, so both built-in
- * constructors take the prototype from the same place.
+ * `new Promise(executor)` keeps the realm prototype.
+ *
+ * GetPrototypeFromConstructor is a real Get, not a read of the
+ * synthetic `prototype` slot, because a new target this reaches need not
+ * own one: `Reflect.construct(Promise, args, boundFunction)` can hand it
+ * a bound function whose own `prototype` a program defined as an
+ * accessor. This runs at the position 27.2.3.1 gives it, after the
+ * executor's callability check, so an abrupt read reports after that
+ * TypeError rather than before it.
  */
 static OseoResult promise_create_from_constructor(
     OseoContext *context,
     OseoValue new_target
 ) {
-    OseoValue prototype = is_function(new_target)
-        ? function_object(new_target)->prototype_object
-        : oseo_undefined();
-    if (is_object(prototype)) return promise_allocate(context, prototype);
+    OseoValue slots[2] = {new_target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    if (is_object(slots[0])) {
+        result = oseo_internal_ascii_string(context, "prototype");
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[1]);
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (is_object(result.value)) {
+        return promise_allocate(context, result.value);
+    }
     OseoResult fallback = oseo_internal_promise_prototype(context);
     if (fallback.status != OSEO_STATUS_NORMAL) return fallback;
     return promise_allocate(context, fallback.value);

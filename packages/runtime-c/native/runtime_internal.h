@@ -663,6 +663,23 @@
 #define OSEO_URI_FUNCTION_CODE_ID_FIRST \
     (OSEO_URI_CODE_ID_RANGE_LAST - (OSEO_URI_FUNCTION_COUNT - 1u))
 
+#define OSEO_REFLECT_CODE_ID_RANGE_INDEX ((size_t)19u)
+#define OSEO_REFLECT_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_REFLECT_CODE_ID_RANGE_INDEX)
+#define OSEO_REFLECT_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_REFLECT_CODE_ID_RANGE_INDEX)
+/*
+ * The thirteen Reflect function properties keep one dense order, so a
+ * code ID is the range last minus that function's index in
+ * `reflect_functions` and the dispatch needs no separate table. The
+ * first and last IDs bound the range the builder and the dispatcher
+ * both walk.
+ */
+#define OSEO_REFLECT_FUNCTION_COUNT ((size_t)13u)
+#define OSEO_REFLECT_FUNCTION_CODE_ID_LAST OSEO_REFLECT_CODE_ID_RANGE_LAST
+#define OSEO_REFLECT_FUNCTION_CODE_ID_FIRST \
+    (OSEO_REFLECT_CODE_ID_RANGE_LAST - (OSEO_REFLECT_FUNCTION_COUNT - 1u))
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -974,6 +991,13 @@ typedef struct {
     bool extensible;
     bool module_namespace;
     /*
+     * An immutable prototype exotic object, whose [[SetPrototypeOf]]
+     * accepts only the prototype it already has. ECMA-262 gives this
+     * behavior to %Object.prototype% as well as to module namespaces,
+     * which carry it through `module_namespace` above.
+     */
+    bool immutable_prototype;
+    /*
      * The realm's global this value, whose var-scoped Script bindings
      * are own properties storing the binding cell instead of the value.
      * Every operation that reads or writes such a property goes through
@@ -1132,6 +1156,15 @@ typedef struct {
     size_t element_capacity;
     size_t code_id;
     OseoFunctionKind function_kind;
+    /*
+     * ClassDefinitionEvaluation's [[ConstructorKind]]: true exactly when
+     * the class definition had a ClassHeritage, including `extends
+     * null`. A derived constructor's [[Construct]] creates no
+     * `this` before the body; its `super()` does, so a caller must not
+     * create a receiver for it or read the new target's `prototype` at
+     * its own position.
+     */
+    bool derived_constructor;
     bool prototype_writable;
     /*
      * Where the synthetic `prototype` sits in OrdinaryOwnPropertyKeys
@@ -1739,11 +1772,64 @@ OseoResult oseo_internal_function_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+/*
+ * True when `code_id` names one of the reserved built-in ranges, so the
+ * function that carries it runs a runtime component rather than
+ * generated code. A built-in constructor owns the position at which it
+ * performs GetPrototypeFromConstructor, so a caller that pre-creates the
+ * ordinary receiver must not read `newTarget`'s `prototype` for it.
+ */
+bool oseo_internal_builtin_code_id(size_t code_id);
+
+/*
+ * GetPrototypeFromConstructor's observable step, Get(constructor,
+ * "prototype"), for a built-in constructor that performs
+ * OrdinaryCreateFromConstructor at the position its own clause gives
+ * it. A bound function owns no `prototype`, so a program can define an
+ * accessor one on it and observe both the call and an abrupt
+ * completion; reading the synthetic slot would observe neither. The
+ * caller applies the intrinsic default for a non-object result, because
+ * each clause names its own and several of them are built lazily.
+ * Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_constructor_prototype(
+    OseoContext *context,
+    OseoValue constructor
+);
+
+/*
+ * OrdinaryCreateFromConstructor for a caller that performs
+ * `target.[[Construct]]`'s receiver allocation itself. The result is
+ * the fresh receiver, or undefined when `target` creates its own: a
+ * derived class constructor whose `super()` creates it, and every
+ * built-in constructor, which owns the position of its own
+ * GetPrototypeFromConstructor. Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_construct_receiver(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue new_target
+);
 /* OrdinaryHasInstance, shared by instanceof and @@hasInstance dispatch. */
 OseoResult oseo_internal_ordinary_has_instance(
     OseoContext *context,
     OseoValue target,
     OseoValue value
+);
+/*
+ * CreateListFromArrayLike (7.3.18). `source` and the slot `list`
+ * addresses must both already be rooted by the caller, because the
+ * element reads and the list growth are safepoints. On a normal
+ * completion `*list` holds one argument list whose elements
+ * `oseo_argument_list_view` reports, and a source that is not an object
+ * is a TypeError. `Function.prototype.apply` reaches this only after
+ * its own nullish shortcut, while `Reflect.apply` and
+ * `Reflect.construct` reach it for every argument list they receive.
+ */
+OseoResult oseo_internal_array_like_list(
+    OseoContext *context,
+    OseoValue source,
+    OseoValue *list
 );
 OseoResult oseo_internal_promise_builtin_dispatch(
     OseoContext *context,
@@ -1845,6 +1931,15 @@ OseoResult oseo_internal_math_builtin_dispatch(
     OseoValue new_target
 );
 OseoResult oseo_internal_uri_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_reflect_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
     OseoValue callee,
@@ -2287,6 +2382,73 @@ OseoResult oseo_internal_require_property_key(
     OseoValue key
 );
 /*
+ * OrdinarySet (10.1.9) with an explicit receiver, reporting the
+ * specification's boolean through `*refusal` rather than as the
+ * language error an assignment raises. `*refusal` is NULL when the
+ * write applied and otherwise names why [[Set]] returned false, so
+ * `super.x = v` can throw that exact TypeError in strict code, ignore
+ * it otherwise, and `Reflect.set` can report `false`. An abrupt
+ * completion comes only from a setter this ran or from a conversion no
+ * boolean can carry. `base` must be an object.
+ */
+OseoResult oseo_internal_set_with_receiver(
+    OseoContext *context,
+    OseoValue base,
+    OseoValue key,
+    OseoValue value,
+    OseoValue receiver,
+    const char **refusal
+);
+/*
+ * [[SetPrototypeOf]] (10.1.2 and 10.4.6.1) reporting the
+ * specification's boolean through `*refusal` rather than as the
+ * TypeError `Object.setPrototypeOf` raises. `object_value` must be an
+ * object and `prototype` must be an object or null; the caller owns
+ * both of those TypeErrors, which stay thrown for `Reflect` too.
+ */
+OseoResult oseo_internal_set_prototype_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue prototype,
+    const char **refusal
+);
+/*
+ * OrdinaryDefineOwnProperty (10.1.6) for a data and an accessor
+ * descriptor, reporting a refusal through `*refusal` instead of raising
+ * it. `*refusal` is NULL when the definition applied and otherwise
+ * names why ValidateAndApplyPropertyDescriptor returned false.
+ * `oseo_object_define`, `oseo_internal_object_define_data`, and
+ * `oseo_object_define_accessor` are the throwing forms of these, so the
+ * refusal rules stay in one place for both.
+ *
+ * `absent_writable` says the applied descriptor carried no [[Writable]]
+ * field, so `attributes.writable` is the property's current one. An
+ * array `length` definition coerces its value, which is the one step of
+ * a definition that runs user code, so it reads that field again after
+ * the coercion instead of trusting the caller's copy.
+ */
+OseoResult oseo_internal_define_data_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes,
+    bool has_value,
+    bool absent_writable,
+    const char **refusal
+);
+OseoResult oseo_internal_define_accessor_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue getter,
+    OseoValue setter,
+    bool has_getter,
+    bool has_setter,
+    OseoPropertyAttributes attributes,
+    const char **refusal
+);
+/*
  * The array `length` property's shared [[Set]] and [[DefineOwnProperty]]
  * body, including the descending truncation that stops at the first
  * non-configurable element. `allow_same_value` admits a redefinition
@@ -2540,6 +2702,46 @@ OseoResult oseo_internal_install_object_global(
     OseoContext *context,
     OseoValue global
 );
+/* Which own keys one OrdinaryOwnPropertyKeys snapshot keeps. */
+typedef enum {
+    OSEO_OWN_KEY_ALL = 0,
+    OSEO_OWN_KEY_STRINGS = 1,
+    OSEO_OWN_KEY_SYMBOLS = 2,
+} OseoOwnKeyFilter;
+
+/*
+ * OrdinaryOwnPropertyKeys (10.1.11.1) over an object, as one fresh
+ * array in the profile's own-key order: integer indices in ascending
+ * numeric order, then the remaining string keys in creation order, then
+ * the symbol keys in creation order. `filter` selects which of them the
+ * array keeps, so `Object.getOwnPropertyNames`,
+ * `Object.getOwnPropertySymbols`, and `Reflect.ownKeys` share one
+ * ordering rather than three.
+ */
+OseoResult oseo_internal_own_key_array(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoOwnKeyFilter filter
+);
+
+/*
+ * ToPropertyDescriptor (6.2.6.5) followed by the target's
+ * [[DefineOwnProperty]], reporting a refusal through `*refusal` rather
+ * than as a thrown error. `*refusal` is NULL when the definition
+ * applied and otherwise names why ValidateAndApplyPropertyDescriptor
+ * returned false, which is what lets `Object.defineProperty` throw that
+ * exact TypeError while `Reflect.defineProperty` reports `false`. An
+ * abrupt completion is a conversion, allocation, or user-code failure
+ * that no boolean can carry. `object_value` must be an object and both
+ * it and `key` must already be rooted by the caller.
+ */
+OseoResult oseo_internal_define_from_descriptor(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue descriptor_value,
+    const char **refusal
+);
 OseoResult oseo_internal_number_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_number_global(
     OseoContext *context,
@@ -2580,6 +2782,18 @@ OseoResult oseo_internal_uri_intrinsic(
     OseoIntrinsic intrinsic
 );
 OseoResult oseo_internal_install_uri_global(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * The realm's lazily created Reflect namespace object and the global
+ * installation that binds it as a writable, non-enumerable,
+ * configurable property. Reflect is an ordinary object with neither
+ * [[Call]] nor [[Construct]], so the namespace and each of its thirteen
+ * function properties are created together.
+ */
+OseoResult oseo_internal_reflect_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_reflect_global(
     OseoContext *context,
     OseoValue global
 );

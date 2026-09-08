@@ -85,5 +85,4 @@ results:
       passed: false
     unsupportedFeatures:
       - Promise.prototype.finally
-      - Reflect.construct
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

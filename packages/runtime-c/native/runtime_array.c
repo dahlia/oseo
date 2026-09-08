@@ -501,6 +501,7 @@ static OseoResult array_create_with_prototype(
     array->length_writable = true;
     array->extensible = true;
     array->module_namespace = false;
+    array->immutable_prototype = false;
     array->global_object = false;
     array->error_data = false;
     array->number_data = false;

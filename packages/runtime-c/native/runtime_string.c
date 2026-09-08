@@ -1600,49 +1600,68 @@ static OseoResult string_raw(
 /*
  * The String constructor (22.1.1.1). A call with a Symbol argument
  * renders SymbolDescriptiveString instead of throwing, which is the one
- * conversion difference between calling and constructing; construction
- * brands the ordinary receiver the caller created from the new target
- * with [[StringData]] and gives it the exotic own properties.
+ * conversion difference between calling and constructing. Construction
+ * runs StringCreate, which takes its prototype from
+ * GetPrototypeFromConstructor(NewTarget, "%String.prototype%") after
+ * the argument's ToString, then brands the object it creates with
+ * [[StringData]] and gives it the exotic own properties. A new target
+ * whose `prototype` is an accessor therefore observes that order, and
+ * an abrupt getter reports after the conversion. The read is a real Get
+ * because `Reflect.construct` can name a bound function, which owns no
+ * synthetic `prototype` slot.
  */
 static OseoResult string_construct(
     OseoContext *context,
-    OseoValue receiver,
+    OseoValue new_target,
     size_t argument_count,
     const OseoValue *arguments,
     bool constructing
 ) {
+    /* Slots: 0 the new target, 1 the converted string, 2 the wrapper.
+     * The conversion is a safepoint and can run arbitrary code, so the
+     * new target is rooted across it. */
+    OseoValue slots[3] = {new_target, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    bool descriptive =
+        argument_count > 0u && !constructing && is_symbol(arguments[0]);
     OseoResult result;
-    if (argument_count == 0u) {
+    if (descriptive) {
+        result = oseo_internal_symbol_text(context, arguments[0]);
+    } else if (argument_count == 0u) {
         result = oseo_internal_allocate_string(context, NULL, 0u);
-    } else if (!constructing && is_symbol(arguments[0])) {
-        return oseo_internal_symbol_text(context, arguments[0]);
     } else {
         result = oseo_internal_value_string(context, arguments[0]);
     }
-    if (result.status != OSEO_STATUS_NORMAL || !constructing) return result;
-    if (!is_object(receiver)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "String receiver is not an object."
-        );
+    slots[1] = result.value;
+    if (!descriptive && result.status == OSEO_STATUS_NORMAL && constructing) {
+        result = oseo_internal_constructor_prototype(context, slots[0]);
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_STRING_PROTOTYPE
+            );
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_create(context, slots[2]);
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoOrdinaryObject *wrapper = ordinary_object(slots[2]);
+            wrapper->primitive_data = true;
+            wrapper->primitive_value = slots[1];
+            result = oseo_internal_string_wrapper_properties(
+                context,
+                slots[1],
+                slots[2]
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[2]);
     }
-    OseoValue slots[2] = {result.value, receiver};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoOrdinaryObject *wrapper = ordinary_object(slots[1]);
-    wrapper->primitive_data = true;
-    wrapper->primitive_value = slots[0];
-    result = oseo_internal_string_wrapper_properties(
-        context,
-        slots[0],
-        slots[1]
-    );
-    OseoValue wrapper_value = slots[1];
     oseo_roots_pop(context, &frame);
-    return result.status == OSEO_STATUS_NORMAL
-        ? normal(wrapper_value)
-        : result;
+    return result;
 }
 
 OseoResult oseo_internal_string_builtin_dispatch(
@@ -1658,7 +1677,7 @@ OseoResult oseo_internal_string_builtin_dispatch(
     if (code_id == OSEO_STRING_CONSTRUCTOR_CODE_ID) {
         return string_construct(
             context,
-            receiver,
+            new_target,
             argument_count,
             arguments,
             tag_of(new_target) != OSEO_TAG_UNDEFINED

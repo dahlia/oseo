@@ -78,15 +78,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - isConstructor.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - Reflect.construct
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -136,7 +148,7 @@ results:
       detail: "test/built-ins/Array/prototype/flat/proxy-access-count.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/flat/proxy-access-count\
-        .js:109:55: error[OSEO1001]: Unknown binding 'Reflect'.\\n\""
+        .js:113:19: error[OSEO1001]: Unknown binding 'Proxy'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

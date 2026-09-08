@@ -210,6 +210,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "Reflect" ||
     name === "RegExp" ||
     name === "RangeError" ||
     name === "ReferenceError" ||

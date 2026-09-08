@@ -67,7 +67,6 @@ results:
       passed: false
     unsupportedFeatures:
       - cross-realm
-      - Reflect
   - case:
       async: false
       features: []

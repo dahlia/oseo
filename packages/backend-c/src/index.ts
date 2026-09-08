@@ -1582,9 +1582,10 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   } else if (target.kind === "super") {
     // The super constructor was read before the arguments; SuperCall
     // step 5 checks that it is a constructor only now, after they are
-    // evaluated. Each super() call then allocates a fresh receiver from
-    // new.target's prototype and invokes the super constructor with that
-    // receiver.
+    // evaluated. Each super() call then performs the super
+    // constructor's OrdinaryCreateFromConstructor over new.target and
+    // invokes it with that receiver, which stays undefined when the
+    // super constructor is itself derived and creates its own.
     const parent = operationArgument(operation, 0);
     const newTarget = renderC(emittedC.functionCreate.newTarget);
     line(
@@ -1599,15 +1600,10 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     line(
       state,
       renderC(
-        emittedC.common.resultAssignOseoFunctionPrototypeContextValue,
+        emittedC.superConstructor
+          .resultAssignOseoSuperConstructorReceiverContextRoots,
+        parent,
         newTarget,
-      ),
-    );
-    line(state, renderC(emittedC.common.statusNormalOpen));
-    line(
-      state,
-      renderC(
-        emittedC.constructReceiver.resultAssignOseoConstructorReceiverContext,
       ),
     );
     line(
@@ -1617,7 +1613,6 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         operation.id,
       ),
     );
-    line(state, renderC(emittedC.common.closeBlock));
     line(state, renderC(emittedC.common.statusNormalOpen));
     line(
       state,

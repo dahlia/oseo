@@ -135,10 +135,6 @@ export const emittedC = {
       ["result = oseo_function_prototype(context, roots["],
       ["]);"],
     ],
-    resultAssignOseoFunctionPrototypeContextValue: [
-      ["result = oseo_function_prototype(context, "],
-      [");"],
-    ],
     rootsAssignResultValueIfStatusNormal: [
       ["if (result.status == OSEO_STATUS_NORMAL) roots["],
       ["] = result.value;"],
@@ -882,6 +878,11 @@ export const emittedC = {
     resultAssignOseoSuperConstructorCheckContextRoots: [
       ["result = oseo_super_constructor_check(context, roots["],
       ["]);"],
+    ],
+    resultAssignOseoSuperConstructorReceiverContextRoots: [
+      ["result = oseo_super_constructor_receiver(context", ", roots["],
+      ["], "],
+      [");"],
     ],
   },
   thisBind: {

@@ -39,6 +39,39 @@ static OseoResult iterator_helper_return(
     OseoValue receiver
 );
 
+/*
+ * OrdinaryCreateFromConstructor(newTarget, "%Iterator.prototype%").
+ * 27.1.2.1 rejects the abstract constructor first and creates the
+ * object second, and the `prototype` read is a real Get, because
+ * `Reflect.construct` can name a bound function, which owns no
+ * synthetic slot and can carry an observable accessor instead.
+ */
+static OseoResult iterator_create_from_constructor(
+    OseoContext *context,
+    OseoValue new_target
+) {
+    OseoValue slots[2] = {new_target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_constructor_prototype(
+        context,
+        slots[0]
+    );
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_ITERATOR_PROTOTYPE
+        );
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_iterator_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -56,7 +89,7 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
                 "Iterator must be constructed through a derived class."
             );
         }
-        return normal(receiver);
+        return iterator_create_from_constructor(context, new_target);
     }
     if (code_id == OSEO_ITERATOR_FROM_CODE_ID) {
         OseoValue value = argument_count > 0u
@@ -1206,6 +1239,7 @@ static OseoResult iterator_helper_create(
     helper->ordinary.length_writable = false;
     helper->ordinary.extensible = true;
     helper->ordinary.module_namespace = false;
+    helper->ordinary.immutable_prototype = false;
     helper->ordinary.global_object = false;
     helper->ordinary.error_data = false;
     helper->ordinary.number_data = false;

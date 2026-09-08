@@ -444,7 +444,6 @@ results:
       passed: false
     unsupportedFeatures:
       - Proxy
-      - Reflect
   - case:
       async: false
       features: []

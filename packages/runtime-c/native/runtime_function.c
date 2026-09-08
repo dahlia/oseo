@@ -166,6 +166,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_URI_CODE_ID_RANGE_FIRST,
      OSEO_URI_CODE_ID_RANGE_LAST,
      oseo_internal_uri_builtin_dispatch},
+    {OSEO_REFLECT_CODE_ID_RANGE_FIRST,
+     OSEO_REFLECT_CODE_ID_RANGE_LAST,
+     oseo_internal_reflect_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -180,6 +183,10 @@ static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
         }
     }
     return NULL;
+}
+
+bool oseo_internal_builtin_code_id(size_t code_id) {
+    return builtin_dispatcher(code_id) != NULL;
 }
 
 static bool is_argument_list(OseoValue value) {
@@ -311,7 +318,7 @@ static OseoResult array_like_length(
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "Function.prototype.apply requires an object argument list."
+            "An array-like argument list must be an object."
         );
     }
     if (is_array(value)) {
@@ -338,6 +345,49 @@ static OseoResult array_like_length(
         ? 9007199254740991.0
         : number;
     return normal(value);
+}
+
+OseoResult oseo_internal_array_like_list(
+    OseoContext *context,
+    OseoValue source,
+    OseoValue *list
+) {
+    OseoValue slots[3] = {source, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    double length = 0.0;
+    OseoResult result = array_like_length(context, slots[0], &length);
+    if (result.status == OSEO_STATUS_NORMAL && length > (double)SIZE_MAX) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "An array-like argument list is too large."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+        slots[1] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && (double)index < length;
+         index += 1u) {
+        result = oseo_property_key(context, oseo_number((double)index));
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[2]);
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context,
+                slots[1],
+                slots[2]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) *list = slots[1];
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 static OseoResult function_prototype_call(
@@ -391,45 +441,19 @@ static OseoResult function_prototype_apply(
             oseo_undefined()
         );
     }
-    OseoValue slots[5] = {
+    OseoValue slots[4] = {
         target,
         receiver,
         source,
         oseo_undefined(),
-        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 5u};
+    OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
-    double length = 0.0;
-    OseoResult result = array_like_length(context, slots[2], &length);
-    if (result.status == OSEO_STATUS_NORMAL && length > (double)SIZE_MAX) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "Function.prototype.apply argument list is too large."
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_argument_list_create(context);
-        slots[3] = result.value;
-    }
-    for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && (double)index < length;
-         index += 1u) {
-        result = oseo_property_key(context, oseo_number((double)index));
-        slots[4] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_get(context, slots[2], slots[4]);
-            slots[4] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_argument_list_append(
-                context,
-                slots[3],
-                slots[4]
-            );
-        }
-    }
+    OseoResult result = oseo_internal_array_like_list(
+        context,
+        slots[2],
+        &slots[3]
+    );
     size_t forwarded_count = 0u;
     const OseoValue *forwarded = NULL;
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -737,6 +761,10 @@ static OseoResult intrinsic_graph_root(OseoContext *context) {
     frame.slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] = frame.slots[0];
+        /* %Object.prototype% is an immutable prototype exotic object
+         * (10.4.7), so its [[SetPrototypeOf]] accepts only the null it
+         * already has. */
+        ordinary_object(frame.slots[0])->immutable_prototype = true;
         result = oseo_function_create(
             context,
             OSEO_FUNCTION_PROTOTYPE_CODE_ID,
@@ -1054,6 +1082,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_DECODE_URI &&
                intrinsic <= OSEO_INTRINSIC_ENCODE_URI_COMPONENT) {
         materialized = oseo_internal_uri_intrinsic(context, intrinsic);
+    } else if (intrinsic == OSEO_INTRINSIC_REFLECT) {
+        materialized = oseo_internal_reflect_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
@@ -1293,6 +1323,7 @@ OseoResult oseo_function_create(
     function->ordinary.length_writable = false;
     function->ordinary.extensible = true;
     function->ordinary.module_namespace = false;
+    function->ordinary.immutable_prototype = false;
     function->ordinary.global_object = false;
     function->ordinary.error_data = false;
     function->ordinary.number_data = false;
@@ -1336,6 +1367,10 @@ OseoResult oseo_function_create(
     function->element_capacity = 0u;
     function->code_id = code_id;
     function->function_kind = function_kind;
+    /* ClassDefinitionEvaluation marks a constructor derived only when
+     * the definition has a ClassHeritage, which oseo_class_heritage
+     * records. */
+    function->derived_constructor = false;
     /* A class's `prototype` is non-writable, non-enumerable, and
      * non-configurable, unlike an ordinary function's writable one. */
     function->prototype_writable = function_kind != OSEO_FUNCTION_CLASS;
@@ -1618,6 +1653,113 @@ OseoResult oseo_constructor_receiver(
     return oseo_object_create(context, fallback.value);
 }
 
+/*
+ * Get(constructor, "prototype"), the observable half of
+ * GetPrototypeFromConstructor. The caller decides the intrinsic default
+ * for a non-object result, because every clause names its own and
+ * several of those prototypes are built lazily.
+ */
+OseoResult oseo_internal_constructor_prototype(
+    OseoContext *context,
+    OseoValue constructor
+) {
+    OseoValue slots[2] = {constructor, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "prototype");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * OrdinaryCreateFromConstructor on behalf of a caller that performs
+ * `target.[[Construct]]`'s receiver allocation itself, which is what
+ * both `super()` and `Reflect.construct` do.
+ *
+ * The [[Construct]] that will actually run belongs to the innermost
+ * bound target, and a bound function's [[Construct]] replaces the new
+ * target with its own target whenever the two are the same function, so
+ * the effective new target is found by walking the same chain and
+ * unwrapping only while it still names the new target.
+ *
+ * Which receiver that clause needs then follows from the constructor's
+ * kind. A derived class constructor creates none: 10.2.2 skips
+ * OrdinaryCreateFromConstructor for [[ConstructorKind]] derived and
+ * leaves both the read and the allocation to the `super()` inside its
+ * body, so this reports `undefined` and reads nothing. An ordinary or
+ * base class constructor runs OrdinaryCreateFromConstructor before its
+ * body, so reading `prototype` here is at the specified position and
+ * the read is a real Get: a bound function has no own `prototype`, so a
+ * program can define an accessor one on it and observe it. A built-in
+ * constructor also creates its own, because its clause fixes the
+ * position of its GetPrototypeFromConstructor relative to the argument
+ * conversions that precede it, so this reports `undefined` and reads
+ * nothing there as well.
+ */
+OseoResult oseo_internal_construct_receiver(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue new_target
+) {
+    OseoValue effective = new_target;
+    OseoValue constructor = target;
+    while (is_function(constructor) &&
+           function_object(constructor)->function_kind ==
+               OSEO_FUNCTION_BOUND) {
+        if (constructor == effective) {
+            effective = function_object(constructor)->bound_target;
+        }
+        constructor = function_object(constructor)->bound_target;
+    }
+    if (is_function(constructor) &&
+        function_object(constructor)->derived_constructor) {
+        return normal(oseo_undefined());
+    }
+    size_t code_id = 0u;
+    OseoResult identified = oseo_function_code_id(
+        context,
+        constructor,
+        &code_id
+    );
+    if (identified.status != OSEO_STATUS_NORMAL) return identified;
+    if (oseo_internal_builtin_code_id(code_id)) {
+        return normal(oseo_undefined());
+    }
+    OseoValue slots[2] = {effective, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_constructor_prototype(
+        context,
+        slots[0]
+    );
+    /* A `prototype` accessor can return a fresh object, so the read
+     * lands in a rooted slot before the receiver allocation. */
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_constructor_receiver(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * SuperCall's receiver allocation. `parent` is the super constructor
+ * SuperCall step 3 read and step 5 checked; the receiver comes from the
+ * running constructor's new target, and stays undefined when the super
+ * constructor is itself derived and creates its own.
+ */
+OseoResult oseo_super_constructor_receiver(
+    OseoContext *context,
+    OseoValue parent,
+    OseoValue new_target
+) {
+    return oseo_internal_construct_receiver(context, parent, new_target);
+}
+
 OseoResult oseo_constructor_result(
     OseoContext *context,
     OseoValue returned,
@@ -1655,6 +1797,9 @@ OseoResult oseo_class_heritage(
     if (!is_function(constructor)) {
         return failure(context, "OSEO2001", "Class heritage needs a class.");
     }
+    /* A ClassHeritage, `extends null` included, makes the constructor
+     * derived: its [[Construct]] leaves the receiver to `super()`. */
+    function_object(constructor)->derived_constructor = true;
     if (tag_of(heritage) == OSEO_TAG_NULL) {
         OseoValue class_prototype =
             function_object(constructor)->prototype_object;
