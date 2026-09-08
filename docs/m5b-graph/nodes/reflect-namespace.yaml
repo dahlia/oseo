@@ -12,5 +12,5 @@ dependencies:
   - object-define-property
   - object-descriptor-queries
   - object-own-keys
-landed: false
+landed: true
 status: ready
