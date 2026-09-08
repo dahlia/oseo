@@ -5773,11 +5773,17 @@ For an ordinary or base class constructor the read is a real
 no own `prototype` and a program may define an accessor one on it. For a
 built-in target the position of OrdinaryCreateFromConstructor belongs to the
 clause that defines the constructor, so the built-in performs that read
-itself. `Object` and `Promise` now do, `Object` before any other step and
-`Promise` after its executor callability check, joining `Array`,
-`ArrayBuffer`, `DataView`, and `RegExp`; the known gap below records the
-three constructors and one family that still take the prototype from the new
-target's internal slot.
+itself and `Reflect.construct` creates no receiver for it, exactly as it
+creates none for a derived class constructor. Every constructible built-in
+in the profile now performs it: `Object` before any other step, `Number` and
+`String` after the argument conversion their clause runs first, the eight
+`Error` constructors before ToString of the message, `Map` before it reads
+the `set` adder, `Iterator` after it rejects the abstract constructor
+itself, and `Promise` after its executor callability check, joining `Array`,
+`ArrayBuffer`, `DataView`, and `RegExp`. A non-object result falls back to
+the intrinsic prototype the clause names, and an abrupt one reports at that
+position. `Symbol`, `BigInt`, and `Function` create nothing, because each
+rejects the construction before reaching that step.
 
 Three adjacent corrections land with the node because admitting these
 functions makes already reviewed behavior observable. `%Object.prototype%`
@@ -5805,7 +5811,10 @@ namespace creates its properties, so the dispatch reads an index rather than a
 table. The namespace is one lazily created intrinsic. The node adds one
 generated-code entry point, `oseo_super_constructor_receiver`, because
 `Reflect.construct` and `super()` now share one OrdinaryCreateFromConstructor
-in *runtime\_function.c* instead of each reading the new target its own way.
+in *runtime\_function.c* instead of each reading the new target its own way,
+and one shared internal helper, `oseo_internal_constructor_prototype`,
+performs the `Get(newTarget, "prototype")` that every built-in clause needs
+at its own position.
 It owns no property, descriptor, or call semantics
 of its own: OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with the
 `Object` component, ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
@@ -5824,7 +5833,8 @@ would produce are not observable here and the reviewed cases that need one
 retain that explicit prerequisite.
 
 Fixed native and generated differential evidence at property seeds
-`0x60006300` and `0x60006301` covers the namespace identity, descriptor, and
+`0x60006300`, `0x60006301`, and `0x60006302` covers the namespace identity,
+descriptor, and
 `@@toStringTag`,
 the thirteen function identities, names, lengths, descriptors, and `new`
 rejections, the object-target `TypeError` for six primitive kinds across every
@@ -5838,6 +5848,16 @@ argument lists, `construct` with and without a distinct new target, a bound
 target and a bound new target, an abrupt `prototype` accessor, the observed
 order of a derived, base, built-in-parent, and derived-parent construction
 against a bound new target whose `prototype` is an accessor, the
+`Array`, `Iterator`, `Map`, `Number`, `Object`, `String`, and `TypeError`
+constructions against a bound new target whose `prototype` is an accessor
+answering with an object, with a primitive, or abruptly, against a bound new
+target that owns no `prototype` at all, and against a defaulted one, each
+with and without an observable argument conversion to order against the
+read, a bound `TypeError` whose inherited `prototype` the specified Get
+reaches through its target's own chain, a bound and a twice-bound built-in
+target, an `AggregateError` new target read before both the message
+conversion and the errors iterable, a `Symbol` and a `BigInt` construction
+that rejects before reading the new target at all, the
 array `length` coercion order, the immutable `%Object.prototype%`, a module
 namespace reached as the write target, as a prototype, and as a grandparent
 under both `Reflect.set` and the strict assignment form, both
@@ -5953,24 +5973,6 @@ complete. The remaining gaps retain their existing owners.
     hosts convert the function into an empty descriptor. The
     `string-iterator` graph node materializes the value and closes the gap.
     Owner: the intrinsics and built-in objects stream.
- -  The `Number`, `String`, and `Map` constructors and the eight `Error`
-    constructors take the created object's prototype from the new target's
-    internal `prototype` slot instead of performing the observable
-    `Get(newTarget, "prototype")` that GetPrototypeFromConstructor specifies.
-    `Object`, `Promise`, `Array`, `ArrayBuffer`, `DataView`, and `RegExp`
-    perform that read. The two agree for every new target that owns the
-    synthetic `prototype` property, which is every ordinary function and
-    class, so only a new target whose ordinary `Get("prototype")` differs
-    from that slot can tell them apart: a bound function, whose own
-    `prototype` a program may define as a data or accessor property or
-    inherit through its own prototype chain, and which only
-    `Reflect.construct(BuiltIn, args, boundFunction)` can supply as a new
-    target. The caller cannot close this by reading the property itself,
-    because each clause specifies its own position for that read relative to
-    its argument validation, which reviewed cases under
-    *test/built-ins/ArrayBuffer/*, *test/built-ins/DataView/*, and
-    *test/built-ins/Promise/* measure. Owner: the intrinsics and built-in
-    objects stream.
  -  A `super` property reference in a class body without `extends` and in an
     object literal method stays rejected until the `super-without-extends`
     graph node lands. The object prototype root is now populated, but that

@@ -552,6 +552,245 @@ console.log(
   render(plainOrder),
   Object.getPrototypeOf(plainInstance) === PlainChild.prototype,
 );
+/* A built-in constructor performs OrdinaryCreateFromConstructor at the
+ * position its own clause gives it, and that read is a real
+ * Get(newTarget, "prototype"). A bound new target owns no 'prototype',
+ * so an accessor defined on it observes the call, the returned
+ * prototype, and an abrupt completion, and its position relative to the
+ * argument conversions the clause performs first. */
+function boundNewTarget(getter) {
+  const bound = (function () {}).bind(null);
+  Object.defineProperty(bound, "prototype", { get: getter });
+  return bound;
+}
+const newTargetPrototype = { tag: "builtin new target" };
+const numberOrder = [];
+const numberInstance = Reflect.construct(
+  Number,
+  [{ valueOf() { numberOrder.push("valueOf"); return 7; } }],
+  boundNewTarget(() => { numberOrder.push("get"); return newTargetPrototype; }),
+);
+console.log(
+  "construct number new target",
+  render(numberOrder),
+  Object.getPrototypeOf(numberInstance) === newTargetPrototype,
+  Number.prototype.valueOf.call(numberInstance),
+);
+const numberAbrupt = [];
+try {
+  Reflect.construct(
+    Number,
+    [{ valueOf() { numberAbrupt.push("valueOf"); return 1; } }],
+    boundNewTarget(() => { throw new RangeError("number"); }),
+  );
+} catch (error) {
+  console.log(
+    "construct number abrupt",
+    render(numberAbrupt),
+    error instanceof RangeError,
+  );
+}
+const stringOrder = [];
+const stringInstance = Reflect.construct(
+  String,
+  [{ toString() { stringOrder.push("toString"); return "hi"; } }],
+  boundNewTarget(() => { stringOrder.push("get"); return newTargetPrototype; }),
+);
+console.log(
+  "construct string new target",
+  render(stringOrder),
+  Object.getPrototypeOf(stringInstance) === newTargetPrototype,
+  stringInstance.length,
+  stringInstance[0],
+  String.prototype.valueOf.call(stringInstance),
+);
+const mapOrder = [];
+const mapInstance = Reflect.construct(
+  Map,
+  [],
+  boundNewTarget(() => { mapOrder.push("get"); return newTargetPrototype; }),
+);
+console.log(
+  "construct map new target",
+  render(mapOrder),
+  Object.getPrototypeOf(mapInstance) === newTargetPrototype,
+  Map.prototype.set.call(mapInstance, 1, 2) === mapInstance,
+  Map.prototype.get.call(mapInstance, 1),
+);
+/* A Map built from an iterable reads its set adder off the prototype
+ * the read produced and allocates before draining the entries, so the
+ * iterable stays reachable across both. */
+const mapEntriesOrder = [];
+const mapEntriesPrototype = Object.create(Map.prototype);
+const mapWithEntries = Reflect.construct(
+  Map,
+  [[[1, 2], [3, 4]]],
+  boundNewTarget(() => {
+    mapEntriesOrder.push("get");
+    return mapEntriesPrototype;
+  }),
+);
+console.log(
+  "construct map entries",
+  render(mapEntriesOrder),
+  Object.getPrototypeOf(mapWithEntries) === mapEntriesPrototype,
+  mapWithEntries.size,
+  mapWithEntries.get(3),
+);
+const errorOrder = [];
+const errorInstance = Reflect.construct(
+  TypeError,
+  [{ toString() { errorOrder.push("toString"); return "boom"; } }],
+  boundNewTarget(() => { errorOrder.push("get"); return newTargetPrototype; }),
+);
+console.log(
+  "construct error new target",
+  render(errorOrder),
+  Object.getPrototypeOf(errorInstance) === newTargetPrototype,
+  errorInstance.message,
+);
+const arrayOrder = [];
+const arrayInstance = Reflect.construct(
+  Array,
+  [2],
+  boundNewTarget(() => { arrayOrder.push("get"); return newTargetPrototype; }),
+);
+console.log(
+  "construct array new target",
+  render(arrayOrder),
+  Object.getPrototypeOf(arrayInstance) === newTargetPrototype,
+  arrayInstance.length,
+);
+class ReflectIterator extends Iterator {}
+const iteratorOrder = [];
+const iteratorInstance = Reflect.construct(
+  ReflectIterator,
+  [],
+  boundNewTarget(() => {
+    iteratorOrder.push("get");
+    return newTargetPrototype;
+  }),
+);
+console.log(
+  "construct iterator new target",
+  render(iteratorOrder),
+  Object.getPrototypeOf(iteratorInstance) === newTargetPrototype,
+);
+/* A non-object read falls back to the realm prototype the clause
+ * names, and each built-in names its own. */
+console.log(
+  "construct new target fallback",
+  Object.getPrototypeOf(
+    Reflect.construct(Number, [3], boundNewTarget(() => 5)),
+  ) === Number.prototype,
+  Object.getPrototypeOf(
+    Reflect.construct(String, ["a"], boundNewTarget(() => 5)),
+  ) === String.prototype,
+  Object.getPrototypeOf(
+    Reflect.construct(Map, [], boundNewTarget(() => 5)),
+  ) === Map.prototype,
+  Object.getPrototypeOf(
+    Reflect.construct(TypeError, [], boundNewTarget(() => 5)),
+  ) === TypeError.prototype,
+);
+/* A defaulted new target and a plain 'new' keep the realm prototypes,
+ * and a subclass keeps its own, so the receiver a built-in creates for
+ * itself replaces the one its caller used to hand it. */
+console.log(
+  "construct built-in defaults",
+  Object.getPrototypeOf(Reflect.construct(Number, [2])) === Number.prototype,
+  Object.getPrototypeOf(Reflect.construct(Object, [])) === Object.prototype,
+  Object.getPrototypeOf(Reflect.construct(Map, [])) === Map.prototype,
+  Object.getPrototypeOf(new Number(2)) === Number.prototype,
+  Object.getPrototypeOf(new String("ab")) === String.prototype,
+  new String("ab").length,
+  Object.getPrototypeOf(new Error("x")) === Error.prototype,
+);
+class ReflectNumber extends Number {}
+class ReflectString extends String {}
+class ReflectMap extends Map {}
+class ReflectError extends Error {}
+console.log(
+  "construct built-in subclass",
+  Object.getPrototypeOf(new ReflectNumber(4)) === ReflectNumber.prototype,
+  new ReflectNumber(4).valueOf(),
+  Object.getPrototypeOf(new ReflectString("zz")) === ReflectString.prototype,
+  new ReflectString("zz").length,
+  Object.getPrototypeOf(new ReflectMap()) === ReflectMap.prototype,
+  Object.getPrototypeOf(new ReflectError("m")) === ReflectError.prototype,
+);
+/* A bound function inherits its target's [[Prototype]], so a bound
+ * NativeError constructor reaches %Error.prototype% through that chain.
+ * The specified Get reports it where a read of the synthetic slot would
+ * have reported nothing and fallen back to %TypeError.prototype%. */
+const boundTypeError = TypeError.bind(null);
+const inheritedError = Reflect.construct(TypeError, ["m"], boundTypeError);
+console.log(
+  "construct inherited prototype",
+  Object.getPrototypeOf(inheritedError) === Error.prototype,
+  Object.getPrototypeOf(inheritedError) === TypeError.prototype,
+  inheritedError.message,
+);
+/* A bound built-in target still resolves to the built-in its innermost
+ * bound target names, and the bound [[Construct]] replaces a new target
+ * that is the bound function itself at every layer, so the read reaches
+ * the built-in rather than a bound function that owns no prototype. */
+const boundNumber = Number.bind(null);
+const boundNumberTwice = boundNumber.bind(null);
+console.log(
+  "construct bound built-in",
+  Object.getPrototypeOf(Reflect.construct(boundNumber, [1])) ===
+    Number.prototype,
+  Object.getPrototypeOf(
+    Reflect.construct(boundNumberTwice, [1], boundNumberTwice),
+  ) === Number.prototype,
+  Object.getPrototypeOf(new boundNumber(1)) === Number.prototype,
+);
+/* AggregateError reads the new target before ToString of the message
+ * and before it drains the errors iterable. */
+const aggregate = Reflect.construct(
+  AggregateError,
+  [[1, 2], "m"],
+  boundNewTarget(() => newTargetPrototype),
+);
+console.log(
+  "construct aggregate new target",
+  Object.getPrototypeOf(aggregate) === newTargetPrototype,
+  aggregate.message,
+  aggregate.errors.length,
+);
+/* Symbol and BigInt reject the construction before creating anything,
+ * so neither reads the new target at all. */
+const rejected = [];
+const unreadNewTarget = boundNewTarget(() => {
+  rejected.push("get");
+  return newTargetPrototype;
+});
+try {
+  Reflect.construct(Symbol, [], unreadNewTarget);
+} catch (error) {
+  rejected.push(error instanceof TypeError);
+}
+try {
+  Reflect.construct(BigInt, [1], unreadNewTarget);
+} catch (error) {
+  rejected.push(error instanceof TypeError);
+}
+console.log("construct non-constructor built-ins", render(rejected));
+/* Iterator is abstract: 27.1.2.1 rejects a new target that is the
+ * constructor itself before it reads anything. */
+const abstractOrder = [];
+try {
+  Reflect.construct(Iterator, [], Iterator);
+} catch (error) {
+  abstractOrder.push(error instanceof TypeError);
+}
+try {
+  new Iterator();
+} catch (error) {
+  abstractOrder.push(error instanceof TypeError);
+}
+console.log("construct iterator abstract", render(abstractOrder));
 const constructOrder = [];
 try {
   Reflect.construct(function () {}, [], () => {});

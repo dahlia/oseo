@@ -5663,11 +5663,16 @@ the `super()` in its body; `super()` now performs the same operation, so a
 derived construction reads the new target only once its body reaches
 `super()`, and a chain of derived constructors reads it once at its
 innermost base. An ordinary or base
-class target keeps the real `Get` before the body, and a built-in target's own
-clause performs that read at its specified position, which `Object` and
-`Promise` now do alongside `Array`, `ArrayBuffer`, `DataView`, and `RegExp`,
-and which the profile's known gaps record for the three constructors and one
-family that still read the slot. Admitting the namespace makes three already
+class target keeps the real `Get` before the body, and a built-in target
+creates no receiver there either, because its own clause performs that read
+at its specified position: `Number` and `String` after the argument
+conversion, the eight `Error` constructors before ToString of the message,
+`Map` before the `set` adder, `Iterator` after the abstract-constructor
+rejection, and `Object` and `Promise` alongside `Array`, `ArrayBuffer`,
+`DataView`, and `RegExp`. One shared helper,
+`oseo_internal_constructor_prototype`, performs that `Get`, so the profile's
+known gap for the constructors that read the synthetic slot is closed.
+Admitting the namespace makes three already
 reviewed behaviors observable, so the node also gives `%Object.prototype%` the
 immutable prototype of 10.4.7, finishes OrdinarySetWithOwnDescriptor with the
 receiver's `[[DefineOwnProperty]]`, which is what reports `false` for an array
@@ -5675,8 +5680,8 @@ receiver's `[[DefineOwnProperty]]`, which is what reports `false` for an array
 module namespace `[[Set]]` refusal when the walk reaches a namespace on an
 ordinary object's prototype chain rather than only as the write target.
 
-Fixed native and generated differential evidence at seeds `0x60006300` and
-`0x60006301` covers
+Fixed native and generated differential evidence at seeds `0x60006300`,
+`0x60006301`, and `0x60006302` covers
 the namespace and function identities, descriptors, names, lengths, and `new`
 rejections, the object-target `TypeError` over six primitive kinds, own-key
 ordering across all three key groups, data and accessor descriptors over every
@@ -5686,7 +5691,16 @@ static, explicit receivers, array-like argument lists, `construct` with and
 without a distinct new target, bound targets and bound new targets, an abrupt
 `prototype` accessor, the observed order of derived, base, built-in-parent,
 and derived-parent constructions against a bound new target whose `prototype`
-is an accessor, a module namespace reached as the write target, as a
+is an accessor, the `Array`, `Iterator`, `Map`, `Number`, `Object`, `String`,
+and `TypeError` constructions against a bound new target whose `prototype`
+accessor answers with an object, with a primitive, or abruptly, against a
+bound new target owning no `prototype`, and against a defaulted one, each
+with and without an observable argument conversion, a bound `TypeError`
+whose inherited `prototype` the Get reaches through its target's own chain,
+a bound and a twice-bound built-in target, an `AggregateError` read before
+its message and its errors iterable, a `Symbol` and a `BigInt` construction
+that rejects before any read, a module namespace
+reached as the write target, as a
 prototype, and as a grandparent under both `Reflect.set` and the strict
 assignment form, both specialization policies, forced collection at every
 safepoint, false hints, deliberate shape-guard misses, and generic fallback.
@@ -5706,8 +5720,8 @@ unsupported profile feature to pass; no reviewed row moves away from pass.
 The manifest moves from 17,343 to 17,495 cases and from 13,449 to 13,873
 passes, keeps 1,556 expected negatives, and moves from 2,338 to 2,066
 unsupported profile features, with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 127 to 129 domains and seeds and
-from 5,418 to 5,454 ordinary cases. The admitted runtime checkpoint moves the
+failures. The property ratchet moves from 127 to 130 domains and seeds and
+from 5,418 to 5,466 ordinary cases. The admitted runtime checkpoint moves the
 runtime ABI to `oseo-runtime-m5-96`, allocates thirteen code IDs in one new
 range, adds the `oseo_super_constructor_receiver` generated-code entry point,
 and does not change the graph's orchestration state.

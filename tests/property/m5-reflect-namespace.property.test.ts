@@ -874,3 +874,304 @@ test(
     );
   },
 );
+
+/**
+ * Which built-in constructor one generated case names. Each one fixes
+ * the position of its own OrdinaryCreateFromConstructor: `Number` and
+ * `String` convert the argument first, `Error` reads the prototype
+ * before ToString(message), and the rest read before anything else a
+ * program can observe. `Iterator` is reached through a derived class,
+ * because 27.1.2.1 rejects the abstract constructor itself.
+ */
+type BuiltinConstructor =
+  | "Array"
+  | "Iterator"
+  | "Map"
+  | "Number"
+  | "Object"
+  | "String"
+  | "TypeError";
+
+/**
+ * Which new target one generated case passes. `accessor` is a bound
+ * function carrying an observable own `prototype`, which only a real
+ * Get reaches; `plain` is a bound function with no `prototype` at all,
+ * so the read reports undefined and the clause falls back; `default`
+ * omits the argument, leaving the target as its own new target.
+ */
+type NewTargetKind = "accessor" | "default" | "plain";
+
+/** What an observable `prototype` accessor answers. */
+type PrototypeAnswer = "abrupt" | "object" | "primitive";
+
+interface BuiltinTargetCase {
+  readonly builtin: BuiltinConstructor;
+  readonly newTargetKind: NewTargetKind;
+  /**
+   * Whether the argument carries an observable conversion, which orders
+   * the clause's own conversions against the prototype read. Only the
+   * three constructors that convert an argument admit one.
+   */
+  readonly observableArgument: boolean;
+  readonly prototypeAnswer: PrototypeAnswer;
+}
+
+const builtinTargetArbitrary: fc.Arbitrary<BuiltinTargetCase> = fc
+  .record({
+    builtin: fc.constantFrom<BuiltinConstructor>(
+      "Array",
+      "Iterator",
+      "Map",
+      "Number",
+      "Object",
+      "String",
+      "TypeError",
+    ),
+    newTargetKind: fc.constantFrom<NewTargetKind>(
+      "accessor",
+      "default",
+      "plain",
+    ),
+    observableArgument: fc.boolean(),
+    prototypeAnswer: fc.constantFrom<PrototypeAnswer>(
+      "abrupt",
+      "object",
+      "primitive",
+    ),
+  })
+  .map((generated) =>
+    Object.assign({}, generated, {
+      observableArgument:
+        generated.observableArgument && convertsArgument(generated.builtin),
+    }),
+  );
+
+/** True for the constructors whose clause converts an argument. */
+function convertsArgument(builtin: BuiltinConstructor): boolean {
+  return (
+    builtin === "Number" || builtin === "String" || builtin === "TypeError"
+  );
+}
+
+/** The expression that names the constructed target. */
+function targetExpression(builtin: BuiltinConstructor): string {
+  return builtin === "Iterator" ? "GeneratedIterator" : builtin;
+}
+
+/** The expression that names the clause's intrinsic default prototype. */
+function realmPrototype(builtin: BuiltinConstructor): string {
+  return `${builtin}.prototype`;
+}
+
+/** The argument list the generated case passes. */
+function constructedArguments(testCase: BuiltinTargetCase): string {
+  if (testCase.builtin === "Array") return "[2]";
+  /* A Map takes a heap-allocated iterable, so the entries stay
+   * reachable across the accessor the prototype read runs and across
+   * the allocation that follows it. */
+  if (testCase.builtin === "Map") return "[[[1, 2], [3, 4]]]";
+  if (testCase.builtin === "Number") {
+    return testCase.observableArgument
+      ? '[{ valueOf() { order.push("arg"); return 7; } }]'
+      : "[7]";
+  }
+  if (testCase.builtin === "String") {
+    return testCase.observableArgument
+      ? '[{ toString() { order.push("arg"); return "hi"; } }]'
+      : '["hi"]';
+  }
+  if (testCase.builtin === "TypeError") {
+    return testCase.observableArgument
+      ? '[{ toString() { order.push("arg"); return "boom"; } }]'
+      : '["boom"]';
+  }
+  return "[]";
+}
+
+/** The body one generated `prototype` accessor runs. */
+function accessorBody(answer: PrototypeAnswer): string {
+  if (answer === "object") return "return custom;";
+  if (answer === "primitive") return "return 5;";
+  return 'throw new RangeError("prototype");';
+}
+
+function printBuiltinTargetCase(testCase: BuiltinTargetCase): string {
+  const target = targetExpression(testCase.builtin);
+  const accessor =
+    testCase.newTargetKind === "accessor"
+      ? [
+          '  Object.defineProperty(bound, "prototype", {',
+          `    get() { order.push("get"); ` +
+            `${accessorBody(testCase.prototypeAnswer)} },`,
+          "  });",
+        ]
+      : [];
+  const construct =
+    testCase.newTargetKind === "default"
+      ? `  const instance = Reflect.construct(${target}, ` +
+        `${constructedArguments(testCase)});`
+      : `  const instance = Reflect.construct(${target}, ` +
+        `${constructedArguments(testCase)}, makeNewTarget());`;
+  return [
+    "const order = [];",
+    /* A Map built from an iterable reads its `set` adder off the
+     * prototype the read produced, so the generated custom prototype
+     * inherits from %Map.prototype% rather than from %Object.prototype%. */
+    testCase.builtin === "Map"
+      ? "const custom = Object.create(Map.prototype);"
+      : 'const custom = { tag: "custom" };',
+    "function render(values) {",
+    '  let text = "";',
+    "  for (let index = 0; index < values.length; index = index + 1) {",
+    '    if (index > 0) text = text + ",";',
+    "    text = text + String(values[index]);",
+    "  }",
+    "  return text;",
+    "}",
+    "class GeneratedIterator extends Iterator {}",
+    "function makeNewTarget() {",
+    "  const bound = (function () {}).bind(null);",
+    ...accessor,
+    "  return bound;",
+    "}",
+    "function tag(prototype) {",
+    '  if (prototype === custom) return "custom";',
+    `  if (prototype === ${realmPrototype(testCase.builtin)}) return "realm";`,
+    `  if (prototype === ${target}.prototype) return "own";`,
+    '  return "other";',
+    "}",
+    'let outcome = "ok";',
+    'let observed = "-";',
+    "try {",
+    construct,
+    "  observed = tag(Object.getPrototypeOf(instance));",
+    "} catch (error) {",
+    '  outcome = error instanceof RangeError ? "RangeError" : "other";',
+    "}",
+    'console.log("order", render(order));',
+    'console.log("result", outcome, observed);',
+    "/** @param {number} operand @param {number} addend */",
+    "function hinted(operand, addend) { return operand + addend; }",
+    'console.log("hint", hinted(2, 1),',
+    '  hinted(String(outcome === "ok"), 1));',
+    "",
+  ].join("\n");
+}
+
+function builtinTargetExpected(testCase: BuiltinTargetCase): string {
+  const reads = testCase.newTargetKind === "accessor";
+  const abrupt = reads && testCase.prototypeAnswer === "abrupt";
+  const argumentFirst =
+    testCase.builtin === "Number" || testCase.builtin === "String";
+  const steps: string[] = [];
+  if (testCase.observableArgument && (argumentFirst || !reads)) {
+    steps.push("arg");
+  }
+  if (reads) steps.push("get");
+  if (testCase.observableArgument && !argumentFirst && reads && !abrupt) {
+    steps.push("arg");
+  }
+  const observed = abrupt
+    ? "-"
+    : reads && testCase.prototypeAnswer === "object"
+      ? "custom"
+      : testCase.newTargetKind === "default" && testCase.builtin === "Iterator"
+        ? "own"
+        : "realm";
+  const outcome = abrupt ? "RangeError" : "ok";
+  return [
+    `order ${steps.join(",")}`,
+    `result ${outcome} ${observed}`,
+    `hint 3 ${abrupt ? "false" : "true"}1`,
+    "",
+  ].join("\n");
+}
+
+test(
+  "generated built-in new targets read prototype where the clause says",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "a built-in constructor performs its own GetPrototypeFromConstructor",
+      fc.asyncProperty(builtinTargetArbitrary, async (testCase) => {
+        const source = printBuiltinTargetCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: builtinTargetExpected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-builtin-new-target.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-smi/u);
+            assert.match(mir, /generic-fallback/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-smi/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                "native-collector=forced",
+              ],
+        domain:
+          "one of Array, Iterator through a derived class, Map, Number, " +
+          "Object, String, and TypeError constructed through " +
+          "Reflect.construct, a new target that is a bound function " +
+          "carrying an observable prototype accessor, a bound function " +
+          "with no prototype at all, or the target itself, an accessor " +
+          "that answers with an object, with a primitive, or abruptly, " +
+          "and an argument that does or does not carry an observable " +
+          "conversion",
+        numRuns: 12,
+        profile: "M5 Reflect namespace",
+        seed: 0x6000_6302,
+        sizeLimit:
+          "one constructed instance, one bound new target, one accessor " +
+          "read, and one argument conversion",
+        timeLimitMilliseconds: 360_000,
+      },
+    );
+  },
+);

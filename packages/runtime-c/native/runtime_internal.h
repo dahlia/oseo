@@ -1782,11 +1782,28 @@ OseoResult oseo_internal_function_builtin_dispatch(
 bool oseo_internal_builtin_code_id(size_t code_id);
 
 /*
+ * GetPrototypeFromConstructor's observable step, Get(constructor,
+ * "prototype"), for a built-in constructor that performs
+ * OrdinaryCreateFromConstructor at the position its own clause gives
+ * it. A bound function owns no `prototype`, so a program can define an
+ * accessor one on it and observe both the call and an abrupt
+ * completion; reading the synthetic slot would observe neither. The
+ * caller applies the intrinsic default for a non-object result, because
+ * each clause names its own and several of them are built lazily.
+ * Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_constructor_prototype(
+    OseoContext *context,
+    OseoValue constructor
+);
+
+/*
  * OrdinaryCreateFromConstructor for a caller that performs
  * `target.[[Construct]]`'s receiver allocation itself. The result is
- * the fresh receiver, or undefined when `target` is a derived class
- * constructor whose `super()` creates it instead. Defined in
- * runtime_function.c.
+ * the fresh receiver, or undefined when `target` creates its own: a
+ * derived class constructor whose `super()` creates it, and every
+ * built-in constructor, which owns the position of its own
+ * GetPrototypeFromConstructor. Defined in runtime_function.c.
  */
 OseoResult oseo_internal_construct_receiver(
     OseoContext *context,

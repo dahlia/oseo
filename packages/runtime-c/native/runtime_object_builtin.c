@@ -522,12 +522,11 @@ static OseoResult object_create_from_constructor(
     OseoValue slots[2] = {new_target, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_ascii_string(context, "prototype");
+    OseoResult result = oseo_internal_constructor_prototype(
+        context,
+        slots[0]
+    );
     slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[1]);
-        slots[1] = result.value;
-    }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
         result = oseo_internal_intrinsic(
             context,
@@ -545,7 +544,6 @@ static OseoResult object_create_from_constructor(
 static OseoResult object_constructor(
     OseoContext *context,
     OseoValue callee,
-    OseoValue receiver,
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
@@ -555,10 +553,11 @@ static OseoResult object_constructor(
     }
     OseoValue value = builtin_argument(argument_count, arguments, 0u);
     if (!is_nullish(value)) return oseo_internal_to_object(context, value);
-    /* The new target is the active function, so the receiver the caller
-     * already created carries %Object.prototype% and is exactly the
-     * object OrdinaryObjectCreate would produce here. */
-    if (tag_of(new_target) != OSEO_TAG_UNDEFINED) return normal(receiver);
+    /* The new target is absent or the active function itself, so
+     * 20.1.1.1 step 2 creates an ordinary object over the realm
+     * prototype rather than reading anything. A built-in [[Construct]]
+     * never adopts the receiver its caller made, so this creates one
+     * even when the caller already had. */
     OseoResult prototype = oseo_internal_intrinsic(
         context,
         OSEO_INTRINSIC_OBJECT_PROTOTYPE
@@ -741,7 +740,6 @@ OseoResult oseo_internal_object_builtin_dispatch(
         return object_constructor(
             context,
             callee,
-            receiver,
             argument_count,
             arguments,
             new_target

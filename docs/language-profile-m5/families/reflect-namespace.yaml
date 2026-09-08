@@ -11,7 +11,10 @@ scope:
     CreateListFromArrayLike for both call forms, the explicit receiver of
     get and set, the new target of construct and the
     OrdinaryCreateFromConstructor it performs on the target's behalf, which
-    a derived class constructor leaves to the super() in its body, the
+    a derived class constructor leaves to the super() in its body and a
+    built-in constructor performs itself at the position its own clause
+    gives it, reading the observable Get of the new target's prototype
+    property there rather than the synthetic slot, the
     immutable prototype %Object.prototype% carries, the module namespace
     [[Set]] refusal the ordinary walk preserves wherever it reaches a
     namespace, and the

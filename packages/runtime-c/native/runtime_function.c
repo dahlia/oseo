@@ -1654,6 +1654,28 @@ OseoResult oseo_constructor_receiver(
 }
 
 /*
+ * Get(constructor, "prototype"), the observable half of
+ * GetPrototypeFromConstructor. The caller decides the intrinsic default
+ * for a non-object result, because every clause names its own and
+ * several of those prototypes are built lazily.
+ */
+OseoResult oseo_internal_constructor_prototype(
+    OseoContext *context,
+    OseoValue constructor
+) {
+    OseoValue slots[2] = {constructor, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "prototype");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
  * OrdinaryCreateFromConstructor on behalf of a caller that performs
  * `target.[[Construct]]`'s receiver allocation itself, which is what
  * both `super()` and `Reflect.construct` do.
@@ -1673,10 +1695,10 @@ OseoResult oseo_constructor_receiver(
  * body, so reading `prototype` here is at the specified position and
  * the read is a real Get: a bound function has no own `prototype`, so a
  * program can define an accessor one on it and observe it. A built-in
- * constructor performs OrdinaryCreateFromConstructor at its own
- * position, after the argument validation its clause specifies, so this
- * reads only the synthetic `prototype` slot and leaves the observable
- * Get to the component that owns the constructor.
+ * constructor also creates its own, because its clause fixes the
+ * position of its GetPrototypeFromConstructor relative to the argument
+ * conversions that precede it, so this reports `undefined` and reads
+ * nothing there as well.
  */
 OseoResult oseo_internal_construct_receiver(
     OseoContext *context,
@@ -1704,23 +1726,16 @@ OseoResult oseo_internal_construct_receiver(
         &code_id
     );
     if (identified.status != OSEO_STATUS_NORMAL) return identified;
+    if (oseo_internal_builtin_code_id(code_id)) {
+        return normal(oseo_undefined());
+    }
     OseoValue slots[2] = {effective, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
-    OseoResult result;
-    if (oseo_internal_builtin_code_id(code_id)) {
-        result = normal(
-            function_has_prototype_property(slots[0])
-                ? function_object(slots[0])->prototype_object
-                : oseo_undefined()
-        );
-    } else {
-        result = oseo_internal_ascii_string(context, "prototype");
-        slots[1] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_get(context, slots[0], slots[1]);
-        }
-    }
+    OseoResult result = oseo_internal_constructor_prototype(
+        context,
+        slots[0]
+    );
     /* A `prototype` accessor can return a fresh object, so the read
      * lands in a rooted slot before the receiver allocation. */
     slots[1] = result.value;

@@ -50,28 +50,54 @@ static OseoResult number_argument(
     return result;
 }
 
+/*
+ * 21.1.1.1. The argument conversion runs first and
+ * OrdinaryCreateFromConstructor follows it, so a new target whose
+ * `prototype` is an accessor observes that order: a valueOf on the
+ * argument runs before the getter, and an abrupt getter reports after
+ * the conversion rather than before it. The read is a real Get because
+ * `Reflect.construct` can name a bound function, which owns no
+ * synthetic `prototype` slot to read.
+ */
 static OseoResult number_construct(
     OseoContext *context,
-    OseoValue receiver,
+    OseoValue new_target,
     size_t argument_count,
     const OseoValue *arguments,
     bool constructing
 ) {
+    /* Slots: 0 the new target, 1 the prototype the read produced. The
+     * argument conversion is a safepoint and can run arbitrary code, so
+     * the new target is rooted across it; the converted number stays a
+     * local because a Number is an immediate value. */
+    OseoValue slots[2] = {new_target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
     OseoResult result = number_argument(context, argument_count, arguments);
-    if (result.status != OSEO_STATUS_NORMAL || !constructing) return result;
-    if (!is_object(receiver)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Number receiver is not an object."
-        );
+    OseoValue data = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && constructing) {
+        result = oseo_internal_constructor_prototype(context, slots[0]);
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_NUMBER_PROTOTYPE
+            );
+            slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_create(context, slots[1]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoOrdinaryObject *object = ordinary_object(result.value);
+            object->number_data = true;
+            object->number_value = data;
+            object->primitive_data = true;
+            object->primitive_value = data;
+        }
     }
-    OseoOrdinaryObject *object = ordinary_object(receiver);
-    object->number_data = true;
-    object->number_value = result.value;
-    object->primitive_data = true;
-    object->primitive_value = result.value;
-    return normal(receiver);
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 static OseoResult number_is_finite(
@@ -1568,7 +1594,7 @@ OseoResult oseo_internal_number_builtin_dispatch(
     if (code_id == OSEO_NUMBER_CONSTRUCTOR_CODE_ID) {
         return number_construct(
             context,
-            receiver,
+            new_target,
             argument_count,
             arguments,
             tag_of(new_target) != OSEO_TAG_UNDEFINED
