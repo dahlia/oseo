@@ -14,5 +14,5 @@ dependencies:
   - intrinsic-graph-root
   - number-intrinsic
   - string-prototype-access
-landed: false
+landed: true
 status: ready
