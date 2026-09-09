@@ -850,12 +850,15 @@ typedef struct {
  * check that the key it is about to report is still reachable, which is
  * what makes a property deleted before it is processed ignored. A string
  * receiver stands for the String exotic object ToObject would create,
- * whose own index properties the string itself describes.
+ * whose own index properties the string itself describes. The Proxy
+ * descriptor cache prevents that reachability check from repeating an
+ * observable [[GetOwnProperty]] trap that collection already invoked.
  */
 typedef struct {
     OseoHeapObject header;
     OseoValue receiver;
     OseoValue keys;
+    OseoValue proxy_descriptors;
     size_t index;
 } OseoEnumeration;
 

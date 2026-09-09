@@ -82,6 +82,44 @@ console.log(
 );
 console.log("operations", operations.join("|"));
 
+const enumerationOperations = [];
+let enumerationDescriptorCalls = 0;
+const secondDescriptorError = new Error("second descriptor read");
+const enumerationTarget = Object.create(null);
+enumerationTarget.enumerated = 1;
+const enumerationProxy = new Proxy(enumerationTarget, {
+  ownKeys(value) {
+    enumerationOperations.push("ownKeys");
+    return Reflect.ownKeys(value);
+  },
+  getOwnPropertyDescriptor(value, key) {
+    enumerationOperations.push("getOwn:" + String(key));
+    if (key === "enumerated") {
+      enumerationDescriptorCalls = enumerationDescriptorCalls + 1;
+      if (enumerationDescriptorCalls === 2) throw secondDescriptorError;
+    }
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  getPrototypeOf(value) {
+    enumerationOperations.push("getPrototypeOf");
+    return Reflect.getPrototypeOf(value);
+  },
+});
+const enumeratedKeys = [];
+let enumerationThrew = false;
+try {
+  for (const key in enumerationProxy) enumeratedKeys.push(key);
+} catch (error) {
+  enumerationThrew = error === secondDescriptorError;
+}
+console.log(
+  "for-in descriptor",
+  enumeratedKeys.join(","),
+  enumerationDescriptorCalls,
+  enumerationThrew,
+  enumerationOperations.join("|"),
+);
+
 function callable(a, b) {
   if (new.target) this.total = a + b;
   return this.base + a + b;
@@ -143,6 +181,75 @@ console.log(
   constructionOperations.join("|"),
   speciesConstructed.receivedLength,
   speciesOperations.join("|"),
+);
+
+const reflectConstructionCalls = [];
+function ReflectConstructionTarget(a, b, c) {
+  this.total = a + b + (c === undefined ? 0 : c);
+}
+let reflectConstructionProxy;
+reflectConstructionProxy = new Proxy(ReflectConstructionTarget, {
+  construct(value, argumentsList, newTarget) {
+    reflectConstructionCalls.push(
+      argumentsList.join(",") + ":" +
+        String(newTarget === reflectConstructionProxy),
+    );
+    return Reflect.construct(value, argumentsList, newTarget);
+  },
+});
+const directReflectConstruction = Reflect.construct(
+  reflectConstructionProxy,
+  [2, 3],
+);
+const onceBoundConstruction = Function.prototype.bind.call(
+  reflectConstructionProxy,
+  null,
+  4,
+);
+const twiceBoundConstruction = onceBoundConstruction.bind(null, 5);
+const chainedReflectConstruction = Reflect.construct(
+  twiceBoundConstruction,
+  [6],
+);
+console.log(
+  "reflect proxy construction",
+  directReflectConstruction.total,
+  chainedReflectConstruction.total,
+  reflectConstructionCalls.join("|"),
+);
+
+const bindOperations = [];
+let bindState = 0;
+const initialBoundPrototype = {};
+const changedBoundPrototype = {};
+function BindTarget(left, right) { return left + right; }
+Object.defineProperty(BindTarget, "length", {
+  configurable: true,
+  get() {
+    bindOperations.push("length getter");
+    bindState = 1;
+    return 2;
+  },
+});
+const bindProxy = new Proxy(BindTarget, {
+  getPrototypeOf() {
+    bindOperations.push("prototype:" + String(bindState));
+    return bindState === 0 ? initialBoundPrototype : changedBoundPrototype;
+  },
+  getOwnPropertyDescriptor(value, key) {
+    bindOperations.push("descriptor:" + String(key));
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  get(value, key, receiver) {
+    bindOperations.push("get:" + String(key));
+    return Reflect.get(value, key, receiver);
+  },
+});
+const orderedBound = Function.prototype.bind.call(bindProxy, null);
+console.log(
+  "bind order",
+  Object.getPrototypeOf(orderedBound) === initialBoundPrototype,
+  bindOperations.join("|"),
 );
 
 const coercionOperations = [];

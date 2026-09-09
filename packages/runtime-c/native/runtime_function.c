@@ -525,13 +525,17 @@ static OseoResult function_prototype_bind(
     OseoResult result = require_callable(context, target);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 7u);
+    result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = target;
     frame.slots[1] = argument_count == 0u
         ? oseo_undefined()
         : arguments[0];
-    result = oseo_argument_list_create(context);
+    result = oseo_internal_get_prototype(context, frame.slots[0]);
+    frame.slots[7] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+    }
     frame.slots[2] = result.value;
     for (size_t index = 1u;
          result.status == OSEO_STATUS_NORMAL && index < argument_count;
@@ -624,16 +628,11 @@ static OseoResult function_prototype_bind(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoFunction *bound = function_object(frame.slots[6]);
-        result = oseo_internal_get_prototype(context, frame.slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            bound->ordinary.prototype = result.value;
-        }
+        bound->ordinary.prototype = frame.slots[7];
         bound->bound_target = frame.slots[0];
         bound->bound_this = frame.slots[1];
         bound->bound_arguments = frame.slots[2];
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = normal(frame.slots[6]);
-        }
+        result = normal(frame.slots[6]);
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -1776,6 +1775,7 @@ OseoResult oseo_internal_construct_receiver(
         }
         constructor = function_object(constructor)->bound_target;
     }
+    if (is_proxy(constructor)) return normal(oseo_undefined());
     if (is_function(constructor) &&
         function_object(constructor)->derived_constructor) {
         return normal(oseo_undefined());

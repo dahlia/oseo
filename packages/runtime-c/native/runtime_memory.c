@@ -57,12 +57,13 @@ static void trace_object(
             mark_value(list->values[index], worklist);
         }
     } else if (object->kind == OSEO_HEAP_ENUMERATION) {
-        /* The collected key list and the receiver each step consults
-         * are reachable only through the record a for-in head roots, so
-         * a suspended body keeps both alive. */
+        /* The collected keys, receiver, and cached Proxy descriptors are
+         * reachable only through the record a for-in head roots, so a
+         * suspended body keeps all three alive. */
         OseoEnumeration *enumeration = (OseoEnumeration *)object;
         mark_value(enumeration->receiver, worklist);
         mark_value(enumeration->keys, worklist);
+        mark_value(enumeration->proxy_descriptors, worklist);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||
