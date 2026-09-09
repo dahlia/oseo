@@ -1,0 +1,11 @@
+version: 1
+id: date-nio-clock-integration
+title: "Date native clock integration"
+delivers: "Replaces the Date family's initial clock boundary with the
+  PLAN-NIO epoch-real-time capability and aligns scheduler wakeups with its
+  monotonic clock checkpoint."
+dependencies:
+  - date-family
+  - nio-clock-wakeup-checkpoint
+landed: false
+status: blocked

@@ -735,12 +735,14 @@ Delivery order
     admit an ignore-case closure over a non-ASCII class and a Unicode
     property escape that the runtime's own pattern compiler still refuses.
 8.  Run the matcher-strategy, external-component, Unicode-table, resource, and
-    code-size probes. Record the selected backend and runtime split in an
-    architecture decision before it becomes a later family dependency.
-9.  Add measured direct-C, automaton, string-search, or representation fast
+    code-size probes and report the measurements without selecting a backend.
+9.  After maintainer review of that report, record the selected backend and
+    runtime split in an architecture decision before it becomes a later family
+    dependency.
+10. Add measured direct-C, automaton, string-search, or representation fast
     paths one at a time. Each lands with a structural guard or applicability
     proof and generic comparison.
-10. Expand the reviewed and generated corpus to the complete
+11. Expand the reviewed and generated corpus to the complete
     candidate-edition boundary, update the M5 profile and compatibility
     manifest, and remove the regular expression gap only when no applicable
     unsupported result remains.

@@ -75,10 +75,11 @@ buffers keep explicit close, completion, and ownership rules. Collection may
 make an unreachable wrapper eligible for cleanup, but a finalizer cannot prove
 that a kernel or worker has stopped using a resource.
 
-This plan does not make weak references, finalization, or ephemerons available
-to JavaScript. Their language semantics enter through M5 with their own
-standards evidence. The tracing interface should leave room to classify weak
-edges without exposing them early.
+This plan does not itself expose weak references, finalization, or ephemerons
+to JavaScript. The M5 `ephemeron-tracing-checkpoint` first designs and
+implements weak-edge tracing, clearing, and finalization scheduling here.
+WeakMap, WeakSet, WeakRef, and FinalizationRegistry then expose that collector
+contract with their own standards evidence.
 
 
 Implemented baseline

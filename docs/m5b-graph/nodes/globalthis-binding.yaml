@@ -1,8 +1,9 @@
 version: 1
 id: globalthis-binding
 title: "globalThis binding"
-delivers: "Would expose the global object as a value, admitting dynamically
-  created global bindings."
+delivers: "Exposes the global object as a value, retains property-backed cells
+  for known globals, and falls back to realm global-object lookup for an
+  unresolved global reference."
 inventory:
   included: 29
   roots:
@@ -10,8 +11,4 @@ inventory:
 dependencies:
   - global-object-record
 landed: false
-status: parked
-reason: "Admitting it needs an accepted architecture decision reconciling a
-  mutable global object with closed-world name resolution, which
-  docs/language-profile-m5.md assigns to this stream. That decision is costly
-  to reverse and is maintainer judgment, not implementation work."
+status: ready

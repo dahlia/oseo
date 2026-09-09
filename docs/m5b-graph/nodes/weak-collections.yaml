@@ -1,7 +1,7 @@
 version: 1
 id: weak-collections
 title: "Weak collections"
-delivers: "Would add WeakMap, WeakSet, WeakRef, and FinalizationRegistry."
+delivers: "Adds WeakMap, WeakSet, WeakRef, and FinalizationRegistry."
 inventory:
   included: 262
   roots:
@@ -10,11 +10,8 @@ inventory:
     - test/built-ins/WeakRef/
     - test/built-ins/WeakSet/
 dependencies:
+  - ephemeron-tracing-checkpoint
   - map-intrinsic
   - set-intrinsic
 landed: false
-status: parked
-reason: "The family needs the ephemeron tracing and finalization that
-  PLAN-GC.md leaves out. That plan assigns their language semantics to M5, and
-  no M5 document owns the collector contract behind them, so nothing in M5b
-  can supply it."
+status: blocked

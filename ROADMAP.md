@@ -178,10 +178,12 @@ and maintained portable libraries remain candidates rather than commitments.
 Windows IOCP and I/O Ring are future-target candidates; this track does not add
 Windows to the supported target set by itself.
 
-Before M5 exposes its `Date` family, the native clock checkpoint supplies epoch
-real time and moves existing production timer waits to monotonic elapsed time in
-the same release. M6 can begin its pure-data API groups earlier; its timer and
-performance work standardizes the APIs over that clock contract. `fetch()`
+M5 first exposes its `Date` family through a deliberately direct clock
+boundary. The native clock checkpoint then supplies epoch real time and moves
+existing production timer waits to monotonic elapsed time, after which a
+separate Date integration unit adopts that contract before M5 completes. M6
+can begin its pure-data API groups earlier; its timer and performance work
+standardizes the APIs over that clock contract. `fetch()`
 waits for accepted and implemented socket and name-resolution backends plus an
 M6-owned TLS client and trust-store decision on both supported execution
 targets. Selected M7 file APIs later extend the same operation, cancellation,
@@ -649,8 +651,9 @@ result manifest's observations.
 M5b adds the intrinsic graph, the global object, and the built-in families,
 including the BigInt intrinsic owned by
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md), the regular expression family owned by
-[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), and the `Date` family that depends on the
-clock gate in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c closes the remaining results
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), and the `Date` family followed by the
+clock gate and Date integration in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c closes
+the remaining results
 in the inventory or covers them with a record that authorizes the exclusion.
 
 The reviewed evidence gates grow with the corpus these checkpoints admit.

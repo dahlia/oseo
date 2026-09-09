@@ -1,0 +1,10 @@
+version: 1
+id: nio-clock-wakeup-checkpoint
+title: "Native clock and wakeup checkpoint"
+delivers: "Implements the PLAN-NIO epoch-real-time, monotonic-deadline, and
+  scheduler-wakeup boundary after its platform probes and architecture
+  decision."
+dependencies:
+  - date-family
+landed: false
+status: blocked

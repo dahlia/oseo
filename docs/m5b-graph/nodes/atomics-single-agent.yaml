@@ -1,0 +1,16 @@
+version: 1
+id: atomics-single-agent
+title: "Single-agent Atomics and SharedArrayBuffer"
+delivers: "Adds SharedArrayBuffer and the Atomics namespace with semantics
+  observable in one agent, while cases that require $262.agent retain their
+  explicit capability boundary."
+inventory:
+  included: 479
+  roots:
+    - test/built-ins/Atomics/
+    - test/built-ins/SharedArrayBuffer/
+dependencies:
+  - array-buffer
+  - typed-array-core
+landed: false
+status: blocked

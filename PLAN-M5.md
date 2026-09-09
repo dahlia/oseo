@@ -3489,22 +3489,24 @@ profile can already express may instead be self-hosted in the compiled
 subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
 primitive operations in the C runtime.
 
-The `Date` family depends on the completed clock and wakeup integration
-checkpoint in [*PLAN-NIO.md*](./PLAN-NIO.md), not only on an epoch-based
-real-time read. That checkpoint enables the real-time capability and routes
-existing production timer waits through the separate monotonic clock in the
-same release. `Date.now()` and `Date` operations that obtain the current time
-read real time; elapsed scheduling uses monotonic time. Tests inject both clock
-domains explicitly. A built-in must not read the bootstrap host's clock or
-derive epoch time from the M4 logical scheduler.
+The `Date` family first lands with a deliberately direct clock boundary so its
+constructor, statics, prototype, parsing, formatting, and time-value arithmetic
+can be measured independently. A separate clock and wakeup checkpoint in
+[*PLAN-NIO.md*](./PLAN-NIO.md) then supplies epoch real time and moves existing
+production timer waits to a monotonic clock. A final Date integration unit
+replaces the initial boundary with that adapter. `Date.now()` and Date
+operations that obtain the current time then read real time, while elapsed
+scheduling uses monotonic time. Tests inject both clock domains explicitly.
 
 The global object enters through this stream in dependency order:
 standard constructors become real intrinsic values first, the global
 binding model then connects top-level Script `var` and function
 declarations to global-object properties while Script lexical
 declarations stay declarative and module bindings stay module-scoped, and
-`globalThis` is admitted last, after an architecture decision resolves
-dynamically created global bindings against closed-world name resolution.
+`globalThis` is admitted last. Known globals retain their property-backed
+cells, while an unresolved global reference falls back to lookup on the
+realm's global object. This preserves compiled access to known names and gives
+dynamically created global properties the required runtime lookup path.
 The M6 surface audit in [*PLAN-M6.md*](./PLAN-M6.md) depends on this
 order. The future dynamic-source capability track in
 [*PLAN-DYN.md*](./PLAN-DYN.md) and interactive session in
@@ -3588,14 +3590,12 @@ encodes are recorded here with their reasons.
     the schema expresses that, so it is an operational rule instead: land
     `builtin-code-registry` early, and before running built-in-function nodes
     concurrently.
- -  `weak-collections` and `date-family` are parked, not blocked. Weak
-    collections need the ephemeron tracing and finalization that
-    [*PLAN-GC.md*](./PLAN-GC.md) leaves out; that plan assigns their language
-    semantics to M5, and no M5 document owns the collector contract behind
-    them. `Date` depends on the clock and wakeup integration checkpoint in
-    [*PLAN-NIO.md*](./PLAN-NIO.md), whose probe work has not started and whose
-    real-time and monotonic-domain choices need maintainer judgment. Neither
-    becomes ready by landing anything else in this graph.
+ -  Weak collections first depend on `ephemeron-tracing-checkpoint`, which
+    designs and implements the collector contract before the JavaScript
+    objects expose it. `date-family` instead lands with a direct clock
+    boundary. It opens `nio-clock-wakeup-checkpoint`, which in turn opens
+    `date-nio-clock-integration`, preserving the maintainer-selected sequence
+    without making native I/O design a prerequisite of Date semantics.
  -  Annex B block-level function hoisting and indirect `eval` var bindings are
     not prerequisites of `global-object-record`.
     [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) already
@@ -3604,14 +3604,12 @@ encodes are recorded here with their reasons.
     an authorized exclusion under
     [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) and
     [ADR 0019](./docs/adr/0019-m5-claim-closure.md).
- -  A node whose next step is an architecture decision is parked rather than
-    made ready, because recording a costly-to-reverse choice is maintainer
-    judgment. That covers `globalthis-binding`, which needs the decision
-    reconciling a mutable global object with closed-world name resolution, and
-    `regexp-matcher-backend-probes`, which ends in the backend selection
-    [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) defers until its probes compare the
-    candidates. `atomics-and-shared-memory` is parked for a missing capability
-    instead: agent clusters and shared memory have no `$262` harness support.
+ -  `regexp-matcher-backend-probes` is probe-only. Its report precedes the
+    separate `regexp-matcher-backend-selection` decision. Atomics is split at
+    the observable capability boundary: `atomics-single-agent` owns
+    SharedArrayBuffer and the Atomics semantics one agent can exercise, then
+    `atomics-and-shared-memory` adds agent clusters, cross-agent execution, and
+    the missing `$262.agent` harness support.
 
 The graph admits no language semantics of its own. Implemented M5b node
 `builtin-code-registry` reserves one stable 256-ID range for each runtime

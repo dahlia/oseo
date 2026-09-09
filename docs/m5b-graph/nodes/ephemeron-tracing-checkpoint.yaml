@@ -1,0 +1,9 @@
+version: 1
+id: ephemeron-tracing-checkpoint
+title: "Ephemeron tracing checkpoint"
+delivers: "Designs and implements the collector's ephemeron tracing,
+  weak-reference clearing, and finalization scheduling contract before the
+  JavaScript weak collections expose it."
+dependencies: []
+landed: false
+status: ready
