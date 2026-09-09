@@ -843,22 +843,19 @@ typedef struct {
  * from ECMAScript code, so it has no prototype, no `next` property, and
  * no close: a for-in head steps it directly.
  *
- * `keys` is the ordered enumerable string key list collected once, when
- * the enumeration was acquired, across the whole prototype chain with
- * every nearer own key suppressing the same name behind it. `receiver`
- * is the value that chain was collected from, kept so each step can
- * check that the key it is about to report is still reachable, which is
- * what makes a property deleted before it is processed ignored. A string
- * receiver stands for the String exotic object ToObject would create,
- * whose own index properties the string itself describes. The Proxy
- * descriptor cache prevents that reachability check from repeating an
- * observable [[GetOwnProperty]] trap that collection already invoked.
+ * `candidates` is the flattened level and own-key list snapshotted when
+ * the enumeration is acquired. `visited` records each key whose live
+ * descriptor has been found while stepping, whether or not that descriptor
+ * was enumerable, so nearer properties suppress equal inherited keys. A
+ * candidate reads its descriptor only when it is processed, which makes a
+ * deletion before that step visible without repeating an observable Proxy
+ * [[GetOwnProperty]] trap in the same step.
  */
 typedef struct {
     OseoHeapObject header;
     OseoValue receiver;
-    OseoValue keys;
-    OseoValue proxy_descriptors;
+    OseoValue candidates;
+    OseoValue visited;
     size_t index;
 } OseoEnumeration;
 

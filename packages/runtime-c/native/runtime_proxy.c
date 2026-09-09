@@ -664,33 +664,28 @@ OseoResult oseo_internal_proxy_get_own_property(
             &target_setter
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        tag_of(slots[2]) == OSEO_TAG_UNDEFINED) {
-        if (target_found && !target_attributes.configurable) {
-            result = type_error(
-                context,
-                "Proxy getOwnPropertyDescriptor trap violated an invariant.");
-        } else if (target_found) {
-            OseoResult extensible = target_is_extensible(
-                context, proxy_object(slots[0])->target);
-            if (extensible.status != OSEO_STATUS_NORMAL) result = extensible;
-            else if (!oseo_to_boolean(extensible.value)) {
-                result = type_error(
-                    context,
-                    "Proxy getOwnPropertyDescriptor trap violated "
-                    "an invariant.");
-            }
-        }
-        result = result.status == OSEO_STATUS_NORMAL
-            ? normal(oseo_undefined())
-            : result;
-        return proxy_complete(context, &frame, result);
-    }
     OseoResult extensible = normal(oseo_boolean(false));
     if (result.status == OSEO_STATUS_NORMAL) {
         extensible = target_is_extensible(
             context, proxy_object(slots[0])->target);
         if (extensible.status != OSEO_STATUS_NORMAL) result = extensible;
+    }
+    if (tag_of(slots[2]) == OSEO_TAG_UNDEFINED) {
+        if (result.status == OSEO_STATUS_NORMAL && target_found &&
+            !target_attributes.configurable) {
+            result = type_error(
+                context,
+                "Proxy getOwnPropertyDescriptor trap violated an invariant.");
+        } else if (result.status == OSEO_STATUS_NORMAL && target_found &&
+                   !oseo_to_boolean(extensible.value)) {
+            result = type_error(
+                context,
+                "Proxy getOwnPropertyDescriptor trap violated an invariant.");
+        }
+        result = result.status == OSEO_STATUS_NORMAL
+            ? normal(oseo_undefined())
+            : result;
+        return proxy_complete(context, &frame, result);
     }
     OseoConvertedDescriptor descriptor = {0};
     if (result.status == OSEO_STATUS_NORMAL) {

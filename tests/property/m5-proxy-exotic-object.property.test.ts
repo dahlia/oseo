@@ -34,6 +34,11 @@ interface ProxyCase {
   readonly writable: boolean;
 }
 
+interface MissingDescriptorCase {
+  readonly abrupt: boolean;
+  readonly targetKind: "absent" | "fixed";
+}
+
 const caseArbitrary: fc.Arbitrary<ProxyCase> = fc.record({
   configurable: fc.boolean(),
   initial: fc.integer({ max: 9, min: -9 }),
@@ -41,6 +46,12 @@ const caseArbitrary: fc.Arbitrary<ProxyCase> = fc.record({
   nullPrototype: fc.boolean(),
   writable: fc.boolean(),
 });
+
+const missingDescriptorArbitrary: fc.Arbitrary<MissingDescriptorCase> =
+  fc.record({
+    abrupt: fc.boolean(),
+    targetKind: fc.constantFrom("absent", "fixed"),
+  });
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -123,6 +134,36 @@ console.log(
 console.log("extensions", Reflect.preventExtensions(proxy));
 console.log("extensible", Reflect.isExtensible(proxy));
 console.log("operations", operations.join("|"));
+
+const enumerationOperations = [];
+const enumerationTarget = {
+  first: ${testCase.initial},
+  second: ${testCase.next},
+};
+const enumerationProxy = new Proxy(enumerationTarget, {
+  ownKeys(value) {
+    enumerationOperations.push("ownKeys");
+    return Reflect.ownKeys(value);
+  },
+  getOwnPropertyDescriptor(value, key) {
+    enumerationOperations.push("getOwn:" + String(key));
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  getPrototypeOf(value) {
+    enumerationOperations.push("getPrototypeOf");
+    return Reflect.getPrototypeOf(value);
+  },
+});
+const enumerationKeys = [];
+for (const key in enumerationProxy) {
+  enumerationKeys.push(key);
+  if (key === "first") delete enumerationTarget.second;
+}
+console.log(
+  "enumeration deletion",
+  enumerationKeys.join(","),
+  enumerationOperations.join("|"),
+);
 
 function callable(left, right) { return this.base + left + right; }
 const callableProxy = new Proxy(callable, {
@@ -213,6 +254,7 @@ try {
 } catch (error) {
   invalidOwnKeyError = error instanceof TypeError;
 }
+
 console.log("ownKeys validation", invalidOwnKeyError, ownKeyReads.join("|"));
 
 const arrayTarget = [];
@@ -308,6 +350,65 @@ Promise.resolve(${testCase.initial}).then(new Proxy((value) => {
   console.log("promise callback", value + 1);
 }, {}));
 `;
+}
+
+function printMissingDescriptorCase(testCase: MissingDescriptorCase): string {
+  const defineTarget =
+    testCase.targetKind === "fixed"
+      ? `
+Object.defineProperty(ordinaryTarget, "key", {
+  value: 1,
+  configurable: false,
+});`
+      : "";
+  return `
+const operations = [];
+const extensibilityError = new Error("nested extensibility");
+const ordinaryTarget = {};
+${defineTarget}
+const nestedTarget = new Proxy(ordinaryTarget, {
+  getOwnPropertyDescriptor(value, key) {
+    operations.push("target:getOwn");
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  isExtensible(value) {
+    operations.push("target:isExtensible");
+    if (${testCase.abrupt}) throw extensibilityError;
+    return Reflect.isExtensible(value);
+  },
+});
+const proxy = new Proxy(nestedTarget, {
+  getOwnPropertyDescriptor() {
+    operations.push("proxy:getOwn");
+    return undefined;
+  },
+});
+try {
+  const descriptor = Object.getOwnPropertyDescriptor(proxy, "key");
+  console.log("missing", descriptor === undefined);
+} catch (error) {
+  console.log(
+    ${testCase.abrupt ? '"abrupt"' : '"invariant"'},
+    ${
+      testCase.abrupt
+        ? "error === extensibilityError"
+        : "error instanceof TypeError"
+    },
+  );
+}
+console.log(operations.join("|"));
+`;
+}
+
+function expectedMissingDescriptorCase(
+  testCase: MissingDescriptorCase,
+): string {
+  const result = testCase.abrupt
+    ? "abrupt true"
+    : testCase.targetKind === "fixed"
+      ? "invariant true"
+      : "missing true";
+  return `${result}\nproxy:getOwn|target:getOwn|target:isExtensible\n`;
 }
 
 async function references(source: string): Promise<
@@ -413,12 +514,83 @@ test(
         domain:
           "all thirteen Proxy traps, revocation, writable and configurable " +
           "target states, null and object prototypes, specialization on and " +
-          "off, a false numeric hint, and an intentional shape-guard miss",
+          "off, live for-in deletion, a false numeric hint, and an " +
+          "intentional shape-guard miss",
         numRuns: 12,
         profile: "M5 Proxy exotic objects",
         seed: 0x6000_6500,
         sizeLimit: "one target, one proxy, two properties, and two arguments",
         timeLimitMilliseconds: 360_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated missing Proxy descriptors observe target extensibility",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "undefined descriptor traps observe nested target extensibility",
+      fc.asyncProperty(missingDescriptorArbitrary, async (testCase) => {
+        const source = printMissingDescriptorCase(testCase);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            {
+              source,
+              sourceId: "generated-proxy-missing-descriptor.ts",
+            },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assert.equal(
+                  native.stdout,
+                  expectedMissingDescriptorCase(testCase),
+                );
+                assert.equal(native.exitStatus, 0, native.stderr);
+                assert.equal(native.stderr, "");
+                assert.ok(native.counters != null);
+                assert.ok(native.counters.collections > 0);
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                "native-collector=forced",
+              ],
+        domain:
+          "absent and non-configurable nested Proxy target properties, " +
+          "normal and abrupt isExtensible traps, specialization on and off",
+        numRuns: 4,
+        profile: "M5 Proxy missing descriptor target invariants",
+        seed: 0x6000_6501,
+        sizeLimit: "one nested Proxy target and one property",
+        timeLimitMilliseconds: 180_000,
       },
     );
   },

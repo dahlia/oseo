@@ -100,7 +100,7 @@ const { globalNumericFunctionFixtures } =
   await import("./native/fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
   await import("./native/fixtures/reflect-namespace.ts");
-const { proxyExoticObjectFixtures } =
+const { proxyExoticObjectFixtures, proxyMissingDescriptorExtensibilitySource } =
   await import("./native/fixtures/proxy-exotic-object.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
@@ -567,6 +567,40 @@ async function references(fixture: Fixture): Promise<
     ];
   } finally {
     await host.remove(directory);
+  }
+}
+
+const proxyMissingDescriptorExpected =
+  "absent missing true\n" +
+  "absent-abrupt abrupt true\n" +
+  "fixed invariant true\n" +
+  "fixed-abrupt abrupt true\n" +
+  "absent:proxy:getOwn|absent:target:getOwn|" +
+  "absent:target:isExtensible|absent-abrupt:proxy:getOwn|" +
+  "absent-abrupt:target:getOwn|absent-abrupt:target:isExtensible|" +
+  "fixed:proxy:getOwn|fixed:target:getOwn|fixed:target:isExtensible|" +
+  "fixed-abrupt:proxy:getOwn|fixed-abrupt:target:getOwn|" +
+  "fixed-abrupt:target:isExtensible\n";
+for (const specializationArgs of [[], ["--no-specialization"]] as const) {
+  process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+  try {
+    const native = await runNativeCli(
+      {
+        args: [
+          ...specializationArgs,
+          "proxy-missing-descriptor-extensibility.ts",
+        ],
+        source: proxyMissingDescriptorExtensibilitySource,
+        sourceId: "proxy-missing-descriptor-extensibility.ts",
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(native.exitStatus, 0, native.stderr);
+    assert.equal(native.stdout, proxyMissingDescriptorExpected);
+    assert.equal(native.stderr, "");
+  } finally {
+    delete process.env.OSEO_GC_EVERY_SAFEPOINT;
   }
 }
 

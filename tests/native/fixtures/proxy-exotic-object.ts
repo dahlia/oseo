@@ -120,6 +120,33 @@ console.log(
   enumerationOperations.join("|"),
 );
 
+const deletionOperations = [];
+const deletionTarget = { a: 1, b: 2 };
+const deletionProxy = new Proxy(deletionTarget, {
+  ownKeys(value) {
+    deletionOperations.push("ownKeys");
+    return Reflect.ownKeys(value);
+  },
+  getOwnPropertyDescriptor(value, key) {
+    deletionOperations.push("getOwn:" + String(key));
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  getPrototypeOf(value) {
+    deletionOperations.push("getPrototypeOf");
+    return Reflect.getPrototypeOf(value);
+  },
+});
+const deletionKeys = [];
+for (const key in deletionProxy) {
+  deletionKeys.push(key);
+  if (key === "a") delete deletionTarget.b;
+}
+console.log(
+  "for-in deletion",
+  deletionKeys.join(","),
+  deletionOperations.join("|"),
+);
+
 function callable(a, b) {
   if (new.target) this.total = a + b;
   return this.base + a + b;
@@ -331,6 +358,7 @@ const invariantCases = [
     new Proxy(target, { isExtensible() { return true; } }),
   ),
 ];
+
 let invariantErrors = 0;
 for (const check of invariantCases) {
   try {
@@ -532,7 +560,7 @@ const earlyTarget = new Proxy({}, {
 });
 console.log(
   "early returns",
-  Object.getOwnPropertyDescriptor(new Proxy(earlyTarget, {
+  Object.getOwnPropertyDescriptor(new Proxy({}, {
     getOwnPropertyDescriptor() { return undefined; },
   }), "missing") === undefined,
   "missing" in new Proxy(earlyTarget, { has() { return false; } }),
@@ -580,3 +608,51 @@ while (shapeTurn < 2) {
 `,
   },
 ];
+
+export const proxyMissingDescriptorExtensibilitySource = `
+const observations = [];
+
+function observe(kind, abrupt) {
+  const extensibilityError = new Error("nested extensibility");
+  const ordinaryTarget = {};
+  if (kind === "fixed" || kind === "fixed-abrupt") {
+    Object.defineProperty(ordinaryTarget, "key", {
+      value: 1,
+      configurable: false,
+    });
+  }
+  const nestedTarget = new Proxy(ordinaryTarget, {
+    getOwnPropertyDescriptor(value, key) {
+      observations.push(kind + ":target:getOwn");
+      return Reflect.getOwnPropertyDescriptor(value, key);
+    },
+    isExtensible(value) {
+      observations.push(kind + ":target:isExtensible");
+      if (abrupt) throw extensibilityError;
+      return Reflect.isExtensible(value);
+    },
+  });
+  const proxy = new Proxy(nestedTarget, {
+    getOwnPropertyDescriptor() {
+      observations.push(kind + ":proxy:getOwn");
+      return undefined;
+    },
+  });
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(proxy, "key");
+    console.log(kind, "missing", descriptor === undefined);
+  } catch (error) {
+    console.log(
+      kind,
+      abrupt ? "abrupt" : "invariant",
+      abrupt ? error === extensibilityError : error instanceof TypeError,
+    );
+  }
+}
+
+observe("absent", false);
+observe("absent-abrupt", true);
+observe("fixed", false);
+observe("fixed-abrupt", true);
+console.log(observations.join("|"));
+`;
