@@ -680,16 +680,23 @@ static OseoResult iterator_type_error(
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
-static bool inherits_iterator_prototype(
+static OseoResult inherits_iterator_prototype(
+    OseoContext *context,
     OseoValue iterator,
     OseoValue iterator_prototype
 ) {
-    OseoValue current = ordinary_object(iterator)->prototype;
-    while (is_object(current)) {
-        if (current == iterator_prototype) return true;
-        current = ordinary_object(current)->prototype;
+    OseoResult prototype = oseo_internal_get_prototype(context, iterator);
+    OseoValue current = prototype.value;
+    while (prototype.status == OSEO_STATUS_NORMAL && is_object(current)) {
+        if (current == iterator_prototype) {
+            return normal(oseo_boolean(true));
+        }
+        prototype = oseo_internal_get_prototype(context, current);
+        current = prototype.value;
     }
-    return false;
+    return prototype.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_boolean(false))
+        : prototype;
 }
 
 static OseoResult iterator_from(
@@ -765,8 +772,15 @@ static OseoResult iterator_from(
         );
         frame.slots[4] = result.value;
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = inherits_iterator_prototype(
+            context,
+            frame.slots[2],
+            frame.slots[4]
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL &&
-        inherits_iterator_prototype(frame.slots[2], frame.slots[4])) {
+        oseo_to_boolean(result.value)) {
         result = normal(frame.slots[2]);
     } else if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_intrinsic(

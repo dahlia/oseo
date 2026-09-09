@@ -385,6 +385,33 @@ console.log(
   { valueOf: valueOfProxy } + 1,
   Array.from(callableIterator).join(","),
 );
+
+let iteratorPrototypeReads = 0;
+const inheritedIteratorProxy = new Proxy(
+  Object.assign(Object.create(Iterator.prototype), {
+    next() { return { done: true }; },
+  }),
+  {
+    getPrototypeOf(value) {
+      iteratorPrototypeReads = iteratorPrototypeReads + 1;
+      return Reflect.getPrototypeOf(value);
+    },
+  },
+);
+console.log(
+  "iterator proxy prototype",
+  Iterator.from(inheritedIteratorProxy) === inheritedIteratorProxy,
+  iteratorPrototypeReads,
+);
+const iteratorPrototypeError = new Error("iterator prototype");
+const abruptIteratorProxy = new Proxy(inheritedIteratorProxy, {
+  getPrototypeOf() { throw iteratorPrototypeError; },
+});
+try {
+  Iterator.from(abruptIteratorProxy);
+} catch (error) {
+  console.log("iterator proxy abrupt", error === iteratorPrototypeError);
+}
 Promise.resolve(3).then(new Proxy((value) => {
   console.log("promise callback", value + 1);
 }, {}));
