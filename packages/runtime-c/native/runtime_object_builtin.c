@@ -665,14 +665,16 @@ static OseoResult object_set_integrity_level(
         for (size_t index = 0u;
              proxy_result.status == OSEO_STATUS_NORMAL && index < key_count;
              index += 1u) {
-            bool found = false;
+            bool found = true;
             OseoValue value = oseo_undefined();
             OseoPropertyAttributes attributes = {false, false, false, false};
             OseoValue getter = oseo_undefined();
             OseoValue setter = oseo_undefined();
-            proxy_result = oseo_internal_proxy_get_own_property(
-                context, slots[0], keys[index], &found, &value, &attributes,
-                &getter, &setter);
+            if (frozen) {
+                proxy_result = oseo_internal_proxy_get_own_property(
+                    context, slots[0], keys[index], &found, &value,
+                    &attributes, &getter, &setter);
+            }
             if (proxy_result.status != OSEO_STATUS_NORMAL || !found) continue;
             OseoConvertedDescriptor descriptor = {
                 false, false, true, false,

@@ -1,5 +1,6 @@
 #include "runtime_internal.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,6 +50,16 @@ static OseoResult proxy_trap(
         result = type_error(context, "A Proxy trap must be callable.");
     }
     oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult proxy_complete(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    OseoResult result
+) {
+    oseo_roots_pop(context, frame);
+    oseo_call_leave(context);
     return result;
 }
 
@@ -172,6 +183,8 @@ OseoResult oseo_internal_proxy_get(
     OseoValue key,
     OseoValue receiver
 ) {
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[5] = {
         proxy, key, receiver, oseo_undefined(), oseo_undefined(),
     };
@@ -186,8 +199,7 @@ OseoResult oseo_internal_proxy_get(
             slots[1],
             slots[2]
         );
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[3] = {
         proxy_object(slots[0])->target, slots[1], slots[2],
@@ -227,8 +239,7 @@ OseoResult oseo_internal_proxy_get(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[4];
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_proxy_set(
@@ -240,6 +251,8 @@ OseoResult oseo_internal_proxy_set(
     const char **refusal
 ) {
     *refusal = NULL;
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[5] = {
         proxy, key, value, receiver, oseo_undefined(),
     };
@@ -256,8 +269,7 @@ OseoResult oseo_internal_proxy_set(
             slots[3],
             refusal
         );
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[4] = {
         proxy_object(slots[0])->target, slots[1], slots[2], slots[3],
@@ -300,8 +312,7 @@ OseoResult oseo_internal_proxy_set(
         *refusal = "Proxy set trap returned false.";
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[2];
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_proxy_has(
@@ -309,6 +320,8 @@ OseoResult oseo_internal_proxy_has(
     OseoValue proxy,
     OseoValue key
 ) {
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[3] = {proxy, key, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
@@ -317,8 +330,7 @@ OseoResult oseo_internal_proxy_has(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[2])) {
         result = oseo_has_property(
             context, slots[1], proxy_object(slots[0])->target);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[2] = {
         proxy_object(slots[0])->target, slots[1],
@@ -362,8 +374,7 @@ OseoResult oseo_internal_proxy_has(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_boolean(present));
     }
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_get_prototype(
@@ -373,6 +384,8 @@ OseoResult oseo_internal_get_prototype(
     if (!is_proxy(object_value)) {
         return normal(ordinary_object(object_value)->prototype);
     }
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[3] = {object_value, oseo_undefined(), oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
@@ -381,8 +394,7 @@ OseoResult oseo_internal_get_prototype(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
         result = oseo_internal_get_prototype(
             context, proxy_object(slots[0])->target);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[1] = {proxy_object(slots[0])->target};
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -410,8 +422,7 @@ OseoResult oseo_internal_get_prototype(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[2];
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_proxy_set_prototype(
@@ -421,6 +432,8 @@ OseoResult oseo_internal_proxy_set_prototype(
     const char **refusal
 ) {
     *refusal = NULL;
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[3] = {proxy, prototype, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
@@ -433,8 +446,7 @@ OseoResult oseo_internal_proxy_set_prototype(
             slots[1],
             refusal
         );
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[2] = {
         proxy_object(slots[0])->target, slots[1],
@@ -463,8 +475,7 @@ OseoResult oseo_internal_proxy_set_prototype(
         *refusal = "Proxy setPrototypeOf trap returned false.";
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = proxy;
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_is_extensible(
@@ -474,6 +485,8 @@ OseoResult oseo_internal_is_extensible(
     if (!is_proxy(object_value)) {
         return normal(oseo_boolean(ordinary_object(object_value)->extensible));
     }
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[2] = {object_value, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -482,8 +495,7 @@ OseoResult oseo_internal_is_extensible(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
         result = oseo_internal_is_extensible(
             context, proxy_object(slots[0])->target);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[1] = {proxy_object(slots[0])->target};
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -503,8 +515,7 @@ OseoResult oseo_internal_is_extensible(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_boolean(answer));
     }
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_prevent_extensions_reported(
@@ -517,6 +528,8 @@ OseoResult oseo_internal_prevent_extensions_reported(
         ordinary_object(object_value)->extensible = false;
         return normal(object_value);
     }
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[2] = {object_value, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -525,8 +538,7 @@ OseoResult oseo_internal_prevent_extensions_reported(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
         result = oseo_internal_prevent_extensions_reported(
             context, proxy_object(slots[0])->target, refusal);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[1] = {proxy_object(slots[0])->target};
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -547,8 +559,7 @@ OseoResult oseo_internal_prevent_extensions_reported(
         *refusal = "Proxy preventExtensions trap returned false.";
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = object_value;
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 static bool compatible_descriptor(
@@ -598,6 +609,8 @@ OseoResult oseo_internal_proxy_get_own_property(
     OseoValue *setter
 ) {
     *found = false;
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[6] = {
         proxy, key, oseo_undefined(), oseo_undefined(), oseo_undefined(),
         oseo_undefined(),
@@ -618,8 +631,7 @@ OseoResult oseo_internal_proxy_get_own_property(
             getter,
             setter
         );
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[2] = {
         proxy_object(slots[0])->target, slots[1],
@@ -669,10 +681,10 @@ OseoResult oseo_internal_proxy_get_own_property(
                     "an invariant.");
             }
         }
-        oseo_roots_pop(context, &frame);
-        return result.status == OSEO_STATUS_NORMAL
+        result = result.status == OSEO_STATUS_NORMAL
             ? normal(oseo_undefined())
             : result;
+        return proxy_complete(context, &frame, result);
     }
     OseoResult extensible = normal(oseo_boolean(false));
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -749,8 +761,7 @@ OseoResult oseo_internal_proxy_get_own_property(
             accessor,
         };
     }
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 static OseoResult define_descriptor_field(
@@ -822,6 +833,8 @@ OseoResult oseo_internal_proxy_define_own_property(
     const char **refusal
 ) {
     *refusal = NULL;
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[7] = {
         proxy, key, value, getter, setter, oseo_undefined(), oseo_undefined(),
     };
@@ -840,8 +853,7 @@ OseoResult oseo_internal_proxy_define_own_property(
             slots[4],
             refusal
         );
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = descriptor_object(
@@ -911,8 +923,7 @@ OseoResult oseo_internal_proxy_define_own_property(
             context, "Proxy defineProperty trap violated an invariant.");
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = proxy;
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 OseoResult oseo_internal_proxy_delete(
@@ -921,6 +932,8 @@ OseoResult oseo_internal_proxy_delete(
     OseoValue key,
     bool strict
 ) {
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[3] = {proxy, key, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
@@ -929,8 +942,7 @@ OseoResult oseo_internal_proxy_delete(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[2])) {
         result = oseo_object_delete(
             context, proxy_object(slots[0])->target, slots[1], strict);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[2] = {
         proxy_object(slots[0])->target, slots[1],
@@ -979,8 +991,7 @@ OseoResult oseo_internal_proxy_delete(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_boolean(accepted));
     }
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 static bool list_contains(
@@ -994,11 +1005,82 @@ static bool list_contains(
     return false;
 }
 
+/* CreateListFromArrayLike with the ownKeys element-type check at each Get. */
+static OseoResult property_key_list(
+    OseoContext *context,
+    OseoValue source,
+    OseoValue *list
+) {
+    if (!is_object(source)) {
+        return type_error(context, "Proxy ownKeys trap must return an object.");
+    }
+    OseoValue slots[4] = {
+        source, oseo_undefined(), oseo_undefined(), oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    double length = 0.0;
+    OseoResult result = normal(slots[0]);
+    if (is_array(slots[0])) {
+        length = (double)ordinary_object(slots[0])->array_length;
+    } else {
+        result = oseo_internal_ascii_string(context, "length");
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[2]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_to_number(context, result.value);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            double number = number_value(result.value);
+            if (number > 0.0) {
+                length = floor(number);
+                if (length > 9007199254740991.0) {
+                    length = 9007199254740991.0;
+                }
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && length > (double)SIZE_MAX) {
+        result = failure(
+            context, "OSEO2001", "A Proxy ownKeys result is too large.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+        slots[1] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && (double)index < length;
+         index += 1u) {
+        result = oseo_property_key(context, oseo_number((double)index));
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[2]);
+            slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !is_string(slots[3]) && !is_symbol(slots[3])) {
+            result = type_error(
+                context, "Proxy ownKeys trap returned an invalid key.");
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context, slots[1], slots[3]);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) *list = slots[1];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_proxy_own_keys(
     OseoContext *context,
     OseoValue proxy,
     OseoOwnKeyFilter filter
 ) {
+    OseoResult entry = oseo_call_enter(context);
+    if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[6] = {
         proxy, oseo_undefined(), oseo_undefined(), oseo_undefined(),
         oseo_undefined(), oseo_undefined(),
@@ -1010,8 +1092,7 @@ OseoResult oseo_internal_proxy_own_keys(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
         result = oseo_internal_own_key_array(
             context, proxy_object(slots[0])->target, filter);
-        oseo_roots_pop(context, &frame);
-        return result;
+        return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[1] = {proxy_object(slots[0])->target};
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1019,7 +1100,7 @@ OseoResult oseo_internal_proxy_own_keys(
         slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_array_like_list(context, slots[2], &slots[3]);
+        result = property_key_list(context, slots[2], &slots[3]);
     }
     size_t trap_count = 0u;
     const OseoValue *trap_values = NULL;
@@ -1030,9 +1111,7 @@ OseoResult oseo_internal_proxy_own_keys(
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < trap_count;
          index += 1u) {
-        if ((!is_string(trap_values[index]) &&
-             !is_symbol(trap_values[index])) ||
-            list_contains(trap_values, index, trap_values[index])) {
+        if (list_contains(trap_values, index, trap_values[index])) {
             result = type_error(
                 context, "Proxy ownKeys trap returned invalid keys.");
         }
@@ -1099,8 +1178,7 @@ OseoResult oseo_internal_proxy_own_keys(
         result = oseo_array_append(context, slots[1], key);
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];
-    oseo_roots_pop(context, &frame);
-    return result;
+    return proxy_complete(context, &frame, result);
 }
 
 static OseoResult array_from_arguments(
@@ -1214,6 +1292,9 @@ static OseoResult create_builtin(
     OseoValue environment
 ) {
     size_t name_length = strlen(name);
+    if (name_length > 16u) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
     uint16_t units[16];
     for (size_t index = 0u; index < name_length; index += 1u) {
         units[index] = (uint16_t)(unsigned char)name[index];

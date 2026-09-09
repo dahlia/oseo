@@ -5995,7 +5995,10 @@ collection forced at every safepoint, a false numeric hint, and an intentional
 shape-guard miss that reaches the generic fallback. It also covers callable
 proxies in callback and protocol-method positions and the bound and nested
 Proxy walk that makes built-in constructor fallback throw when its new target
-reaches a revoked Proxy. The inventory contains 311 included paths under
+reaches a revoked Proxy. Constructor regressions pin the construct-trap and
+prototype-read order for ordinary `new` and Array species construction, while
+coercion regressions pin Proxy `[[Get]]` followed by a callable
+`Symbol.toPrimitive`. The inventory contains 311 included paths under
 *test/built-ins/Proxy/*. The reviewed Test262 manifest advances 90 dependent
 paths to `pass`, moving from 13,929 to 14,019 passes and from 2,085 to 1,995
 unsupported profile features while keeping 1,556 expected negatives and zero

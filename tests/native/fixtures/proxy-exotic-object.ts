@@ -105,6 +105,113 @@ console.log(
   calls.join("|"),
 );
 
+const constructionOperations = [];
+function ConstructionTarget(value) { this.value = value; }
+const constructionPrototype = {};
+const constructionProxy = new Proxy(ConstructionTarget, {
+  construct(value, argumentsList, newTarget) {
+    constructionOperations.push("construct");
+    return Reflect.construct(value, argumentsList, newTarget);
+  },
+  get(value, key, receiver) {
+    constructionOperations.push("get:" + String(key));
+    if (key === "prototype") return constructionPrototype;
+    return Reflect.get(value, key, receiver);
+  },
+});
+const constructed = new constructionProxy(9);
+const speciesOperations = [];
+const speciesConstructor = new Proxy(function(length) {
+  this.receivedLength = length;
+}, {
+  construct(value, argumentsList, newTarget) {
+    speciesOperations.push("construct:" + argumentsList.join(","));
+    return Reflect.construct(value, argumentsList, newTarget);
+  },
+  get(value, key, receiver) {
+    speciesOperations.push("get:" + String(key));
+    return Reflect.get(value, key, receiver);
+  },
+});
+const speciesSource = [1, 2];
+speciesSource.constructor = { [Symbol.species]: speciesConstructor };
+const speciesConstructed = speciesSource.slice(0, 1);
+console.log(
+  "construction paths",
+  constructed.value,
+  Object.getPrototypeOf(constructed) === constructionPrototype,
+  constructionOperations.join("|"),
+  speciesConstructed.receivedLength,
+  speciesOperations.join("|"),
+);
+
+const coercionOperations = [];
+const coercionProxy = new Proxy({
+  [Symbol.toPrimitive](hint) {
+    coercionOperations.push("call:" + hint);
+    return 41;
+  },
+}, {
+  get(value, key, receiver) {
+    coercionOperations.push(
+      key === Symbol.toPrimitive ? "get:toPrimitive" : "get:" + String(key),
+    );
+    return Reflect.get(value, key, receiver);
+  },
+});
+console.log(
+  "proxy to primitive",
+  coercionProxy + 1,
+  coercionOperations.join("|"),
+);
+
+const sealOperations = [];
+const sealTarget = { value: 1 };
+const sealProxy = new Proxy(sealTarget, {
+  preventExtensions(value) {
+    sealOperations.push("preventExtensions");
+    return Reflect.preventExtensions(value);
+  },
+  ownKeys(value) {
+    sealOperations.push("ownKeys");
+    return Reflect.ownKeys(value);
+  },
+  getOwnPropertyDescriptor(value, key) {
+    sealOperations.push("getOwn:" + String(key));
+    return Reflect.getOwnPropertyDescriptor(value, key);
+  },
+  defineProperty(value, key, descriptor) {
+    sealOperations.push("define:" + String(key));
+    return Reflect.defineProperty(value, key, descriptor);
+  },
+});
+Object.seal(sealProxy);
+console.log(
+  "proxy seal",
+  Object.isSealed(sealTarget),
+  sealOperations.join("|"),
+);
+
+const ownKeyReads = [];
+const invalidOwnKeys = {
+  length: 2,
+  get 0() {
+    ownKeyReads.push("zero");
+    return 1;
+  },
+  get 1() {
+    ownKeyReads.push("one");
+    return "later";
+  },
+};
+let invalidOwnKeyError = false;
+try {
+  Reflect.ownKeys(new Proxy({}, { ownKeys() { return invalidOwnKeys; } }));
+} catch (error) {
+  invalidOwnKeyError = error instanceof TypeError;
+}
+console.log("ownKeys validation", invalidOwnKeyError, ownKeyReads.join("|"));
+
 const invariantCases = [
   () => new Proxy(target, { get() { return 9; } }).fixed,
   () => "fixed" in new Proxy(target, { has() { return false; } }),

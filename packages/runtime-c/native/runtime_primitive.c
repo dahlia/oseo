@@ -951,8 +951,7 @@ static OseoResult to_primitive_value(
      */
     OseoValue exotic_key =
         context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
-    if (tag_of(exotic_key) != OSEO_TAG_UNDEFINED &&
-        conversion_property_exists(frame.slots[0], exotic_key)) {
+    if (tag_of(exotic_key) != OSEO_TAG_UNDEFINED) {
         result = oseo_object_get(context, frame.slots[0], exotic_key);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) {

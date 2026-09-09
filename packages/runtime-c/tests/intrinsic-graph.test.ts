@@ -1104,6 +1104,8 @@ test("populates Proxy and routes every essential internal method", () => {
   }
   assert.match(proxySource, /oseo_internal_proxy_define_own_property/u);
   assert.match(proxySource, /oseo_internal_proxy_own_keys/u);
+  assert.equal(proxySource.match(/oseo_call_enter\(context\)/gu)?.length, 11);
+  assert.match(proxySource, /static OseoResult proxy_complete/u);
   assert.match(proxySource, /OSEO_PROXY_REVOKE_CODE_ID/u);
   assert.match(proxySource, /OSEO_FUNCTION_INTERNAL/u);
 });

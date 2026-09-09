@@ -1607,11 +1607,16 @@ OseoResult oseo_function_prototype(
             "Constructed value is not a constructor."
         );
     }
-    while (
-        function_object(function_value)->function_kind == OSEO_FUNCTION_BOUND
-    ) {
+    /* A Proxy owns [[Construct]] and allocates or returns its receiver
+     * there. Returning no prototype makes legacy callers' eager receiver
+     * irrelevant without reading a function record through the Proxy's
+     * shorter heap layout. */
+    while (is_function(function_value) &&
+           function_object(function_value)->function_kind ==
+               OSEO_FUNCTION_BOUND) {
         function_value = function_object(function_value)->bound_target;
     }
+    if (is_proxy(function_value)) return normal(oseo_undefined());
     return normal(function_object(function_value)->prototype_object);
 }
 
