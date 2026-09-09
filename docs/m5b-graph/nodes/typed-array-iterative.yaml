@@ -17,8 +17,4 @@ dependencies:
   - array-prototype-species-mapping
   - typed-array-core
 landed: false
-status: parked
-reason: "Its typed-array-core prerequisite is parked behind the
-  typed-array-constructors review finding. The array-constructor and
-  string-intrinsic parkings that also blocked it were lifted; this one
-  is what remains."
+status: blocked
