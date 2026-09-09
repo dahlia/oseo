@@ -468,16 +468,21 @@ static OseoResult promise_create_from_constructor(
         slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_get(context, slots[0], slots[1]);
+            slots[1] = result.value;
         }
     }
-    oseo_roots_pop(context, &frame);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (is_object(result.value)) {
-        return promise_allocate(context, result.value);
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_promise_prototype(context);
+        }
+        slots[1] = result.value;
     }
-    OseoResult fallback = oseo_internal_promise_prototype(context);
-    if (fallback.status != OSEO_STATUS_NORMAL) return fallback;
-    return promise_allocate(context, fallback.value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = promise_allocate(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 OseoResult oseo_internal_promise_method_function(

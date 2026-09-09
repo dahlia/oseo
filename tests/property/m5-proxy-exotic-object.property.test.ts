@@ -264,6 +264,11 @@ console.log(
   revokedBuiltinRealm(String, ["${testCase.next}"]),
   revokedBuiltinRealm(Error, ["${testCase.initial}"]),
   revokedBuiltinRealm(Iterator, []),
+  revokedBuiltinRealm(Array, []),
+  revokedBuiltinRealm(Promise, [function() {}]),
+  revokedBuiltinRealm(ArrayBuffer, [0]),
+  revokedBuiltinRealm(DataView, [new ArrayBuffer(0)]),
+  revokedBuiltinRealm(RegExp, []),
 );
 
 const callbackProxy = new Proxy((value) => value + ${testCase.next}, {});

@@ -1649,10 +1649,13 @@ static OseoResult array_constructor_prototype(
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_intrinsic(
-            context,
-            OSEO_INTRINSIC_ARRAY_PROTOTYPE
-        );
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_ARRAY_PROTOTYPE
+            );
+        }
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];

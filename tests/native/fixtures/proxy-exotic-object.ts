@@ -358,6 +358,11 @@ console.log(
   revokedBuiltinRealm(String, ["x"]),
   revokedBuiltinRealm(Error, ["x"]),
   revokedBuiltinRealm(Iterator, []),
+  revokedBuiltinRealm(Array, []),
+  revokedBuiltinRealm(Promise, [function() {}]),
+  revokedBuiltinRealm(ArrayBuffer, [0]),
+  revokedBuiltinRealm(DataView, [new ArrayBuffer(0)]),
+  revokedBuiltinRealm(RegExp, []),
 );
 
 const callbackProxy = new Proxy((value) => value + 1, {});
