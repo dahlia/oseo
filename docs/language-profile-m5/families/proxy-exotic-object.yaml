@@ -1,0 +1,55 @@
+version: 1
+id: proxy-exotic-object
+title: "Proxy exotic objects"
+scope:
+  - "The Proxy constructor, Proxy.revocable, revocation, all thirteen
+    essential internal methods and handler traps, forwarding to proxy and
+    ordinary targets, callable and constructible identity, and the target
+    invariants for prototypes, extensibility, property descriptors, values,
+    own keys, calls, and construction."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/proxy-exotic-object.ts
+      - tests/property/m5-proxy-exotic-object.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/proxy-exotic-object.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proxy-exotic-object.ts
+      - tests/property/m5-proxy-exotic-object.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-proxy-exotic-object.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proxy-exotic-object.ts
+      - tests/property/m5-proxy-exotic-object.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proxy-exotic-object.ts
+      - tests/property/m5-proxy-exotic-object.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_proxy.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

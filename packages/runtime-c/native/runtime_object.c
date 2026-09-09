@@ -254,6 +254,10 @@ OseoResult oseo_internal_set_prototype_reported(
     const char **refusal
 ) {
     *refusal = NULL;
+    if (is_proxy(object_value)) {
+        return oseo_internal_proxy_set_prototype(
+            context, object_value, prototype, refusal);
+    }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     if (object->module_namespace || object->immutable_prototype) {
         /* SetImmutablePrototype (10.4.7.1) accepts only the prototype

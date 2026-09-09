@@ -861,11 +861,12 @@ static OseoResult default_array_text(
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL &&
-            is_function(frame.slots[2])) {
-            OseoFunction *join = function_object(frame.slots[2]);
-            if (join->code_id == OSEO_ARRAY_JOIN_CODE_ID &&
+            is_callable(frame.slots[2])) {
+            if (is_function(frame.slots[2]) &&
+                function_object(frame.slots[2])->code_id ==
+                    OSEO_ARRAY_JOIN_CODE_ID &&
                 oseo_internal_string_is_ascii(
-                    join->initial_name,
+                    function_object(frame.slots[2])->initial_name,
                     "join"
                 )) {
                 result = array_join_text(
@@ -959,7 +960,7 @@ static OseoResult to_primitive_value(
             return result;
         }
         if (!is_nullish(frame.slots[2])) {
-            if (!is_function(frame.slots[2])) {
+            if (!is_callable(frame.slots[2])) {
                 result = oseo_internal_throw_error(
                     context,
                     OSEO_ERROR_TYPE,
@@ -1015,13 +1016,14 @@ static OseoResult to_primitive_value(
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (!is_function(frame.slots[2])) continue;
-        OseoFunction *method = function_object(frame.slots[2]);
+        if (!is_callable(frame.slots[2])) continue;
         if (trying_to_string &&
+            is_function(frame.slots[2]) &&
             conversion_reaches_array_prototype(context, frame.slots[0]) &&
-            method->code_id == OSEO_ARRAY_TO_STRING_CODE_ID &&
+            function_object(frame.slots[2])->code_id ==
+                OSEO_ARRAY_TO_STRING_CODE_ID &&
             oseo_internal_string_is_ascii(
-                method->initial_name,
+                function_object(frame.slots[2])->initial_name,
                 "toString"
             )) {
             result = default_array_text(
@@ -1107,7 +1109,7 @@ OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
     else if (is_bigint(value)) constant = "bigint";
     else if (is_string(value)) constant = "string";
     else if (is_symbol(value)) constant = "symbol";
-    else if (is_function(value)) constant = "function";
+    else if (is_callable(value)) constant = "function";
     else if (is_object(value)) constant = "object";
     if (constant == NULL) {
         return failure(context, "OSEO2001", "Value has no typeof text.");
@@ -1748,6 +1750,9 @@ OseoResult oseo_has_property(
     OseoValue property = converted.value;
     OseoValue current = slots[1];
     while (is_object(current)) {
+        if (is_proxy(current)) {
+            return oseo_internal_proxy_has(context, current, property);
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue ignored_getter = oseo_undefined();
@@ -1757,8 +1762,9 @@ OseoResult oseo_has_property(
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
-        OseoOrdinaryObject *object = ordinary_object(current);
-        current = object->prototype;
+        OseoResult prototype = oseo_internal_get_prototype(context, current);
+        if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
+        current = prototype.value;
     }
     return normal(oseo_boolean(false));
 }
@@ -1786,7 +1792,7 @@ OseoResult oseo_instanceof(
         slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_nullish(slots[3])) {
-        if (!is_function(slots[3])) {
+        if (!is_callable(slots[3])) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_TYPE,
@@ -1806,7 +1812,7 @@ OseoResult oseo_instanceof(
             }
         }
     } else if (result.status == OSEO_STATUS_NORMAL) {
-        if (!is_function(slots[1])) {
+        if (!is_callable(slots[1])) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_TYPE,

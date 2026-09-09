@@ -523,8 +523,12 @@ results:
       - functions
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "test/built-ins/Array/prototype/toString/non-callable-join-stri\
+        ng-tag.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Array/prototype/toString/non-callable-j\
+        oin-string-tag.js:122:52: error[OSEO1001]: Unknown binding
+        'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-    unsupportedFeatures:
-      - Proxy
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

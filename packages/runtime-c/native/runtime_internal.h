@@ -684,6 +684,15 @@
 #define OSEO_REFLECT_FUNCTION_CODE_ID_FIRST \
     (OSEO_REFLECT_CODE_ID_RANGE_LAST - (OSEO_REFLECT_FUNCTION_COUNT - 1u))
 
+#define OSEO_PROXY_CODE_ID_RANGE_INDEX ((size_t)20u)
+#define OSEO_PROXY_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_PROXY_CODE_ID_RANGE_INDEX)
+#define OSEO_PROXY_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_PROXY_CODE_ID_RANGE_INDEX)
+#define OSEO_PROXY_CONSTRUCTOR_CODE_ID OSEO_PROXY_CODE_ID_RANGE_LAST
+#define OSEO_PROXY_REVOCABLE_CODE_ID (OSEO_PROXY_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_PROXY_REVOKE_CODE_ID (OSEO_PROXY_CODE_ID_RANGE_LAST - 2u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -736,7 +745,20 @@ typedef enum {
     OSEO_HEAP_REGEXP_MATCHER = 22,
     OSEO_HEAP_REGEXP = 23,
     OSEO_HEAP_ITERATOR_HELPER = 24,
+    OSEO_HEAP_PROXY = 25,
 } OseoHeapKind;
+
+typedef struct {
+    bool has_enumerable;
+    bool enumerable;
+    bool has_configurable;
+    bool configurable;
+    bool has_writable;
+    bool writable;
+    bool has_value;
+    bool has_getter;
+    bool has_setter;
+} OseoConvertedDescriptor;
 
 struct OseoHeapObject {
     OseoHeapObject *next;
@@ -1083,6 +1105,16 @@ typedef struct {
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
 } OseoOrdinaryObject;
+
+/* A Proxy exotic retains its construction-time target and handler. */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue target;
+    OseoValue handler;
+    bool callable;
+    bool constructible;
+    bool revoked;
+} OseoProxy;
 
 /* One realm-local GetTemplateObject cache entry, keyed by a generated site. */
 typedef struct {
@@ -1536,6 +1568,9 @@ static inline OseoSymbol *symbol_object(OseoValue value) {
 static inline OseoFunction *function_object(OseoValue value) {
     return (OseoFunction *)heap_object(value);
 }
+static inline OseoProxy *proxy_object(OseoValue value) {
+    return (OseoProxy *)heap_object(value);
+}
 static inline OseoPromise *promise_object(OseoValue value) {
     return (OseoPromise *)heap_object(value);
 }
@@ -1640,14 +1675,28 @@ static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
 }
+static inline bool is_proxy(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_PROXY;
+}
+static inline bool is_callable(OseoValue value) {
+    return is_function(value) ||
+        (is_proxy(value) && proxy_object(value)->callable);
+}
 static inline bool function_is_constructible(OseoValue value) {
+    if (is_proxy(value)) return proxy_object(value)->constructible;
     if (!is_function(value)) return false;
     OseoFunctionKind kind;
     while (true) {
         kind = function_object(value)->function_kind;
         if (kind != OSEO_FUNCTION_BOUND) break;
         value = function_object(value)->bound_target;
+        if (is_proxy(value)) return proxy_object(value)->constructible;
         if (!is_function(value)) return false;
+    }
+    if (kind == OSEO_FUNCTION_INTERNAL &&
+        function_object(value)->code_id == OSEO_PROXY_CONSTRUCTOR_CODE_ID) {
+        return true;
     }
     return kind == OSEO_FUNCTION_ORDINARY || kind == OSEO_FUNCTION_CLASS;
 }
@@ -1735,7 +1784,8 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
         kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
-        kind == OSEO_HEAP_REGEXP || kind == OSEO_HEAP_ITERATOR_HELPER;
+        kind == OSEO_HEAP_REGEXP || kind == OSEO_HEAP_ITERATOR_HELPER ||
+        kind == OSEO_HEAP_PROXY;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -1806,6 +1856,18 @@ bool oseo_internal_builtin_code_id(size_t code_id);
  * Defined in runtime_function.c.
  */
 OseoResult oseo_internal_constructor_prototype(
+    OseoContext *context,
+    OseoValue constructor
+);
+
+/*
+ * GetFunctionRealm's bound-function and Proxy walk. Oseo currently has one
+ * realm, so a successful result needs no realm identity; the observable part
+ * is throwing when any Proxy reached by the walk has been revoked. Call this
+ * only after GetPrototypeFromConstructor produced a non-object prototype.
+ * Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_validate_function_realm(
     OseoContext *context,
     OseoValue constructor
 );
@@ -1953,6 +2015,15 @@ OseoResult oseo_internal_uri_builtin_dispatch(
     OseoValue new_target
 );
 OseoResult oseo_internal_reflect_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_proxy_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
     OseoValue callee,
@@ -2425,6 +2496,100 @@ OseoResult oseo_internal_set_prototype_reported(
     OseoValue prototype,
     const char **refusal
 );
+OseoResult oseo_internal_get_prototype(
+    OseoContext *context,
+    OseoValue object_value
+);
+OseoResult oseo_internal_is_extensible(
+    OseoContext *context,
+    OseoValue object_value
+);
+OseoResult oseo_internal_prevent_extensions_reported(
+    OseoContext *context,
+    OseoValue object_value,
+    const char **refusal
+);
+OseoResult oseo_internal_proxy_get(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key,
+    OseoValue receiver
+);
+OseoResult oseo_internal_proxy_set(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key,
+    OseoValue value,
+    OseoValue receiver,
+    const char **refusal
+);
+OseoResult oseo_internal_proxy_set_prototype(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue prototype,
+    const char **refusal
+);
+OseoResult oseo_internal_proxy_has(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key
+);
+OseoResult oseo_internal_proxy_get_own_property(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key,
+    bool *found,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+);
+OseoResult oseo_internal_proxy_define_own_property(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key,
+    const OseoConvertedDescriptor *descriptor,
+    OseoValue value,
+    OseoValue getter,
+    OseoValue setter,
+    const char **refusal
+);
+OseoResult oseo_internal_proxy_delete(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue key,
+    bool strict
+);
+OseoResult oseo_internal_proxy_call(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_is_array(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_internal_to_property_descriptor(
+    OseoContext *context,
+    OseoValue descriptor_value,
+    OseoValue *value_slot,
+    OseoValue *getter_slot,
+    OseoValue *setter_slot,
+    OseoConvertedDescriptor *descriptor
+);
+OseoResult oseo_internal_define_converted_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    const OseoConvertedDescriptor *descriptor,
+    OseoValue value,
+    OseoValue getter,
+    OseoValue setter,
+    const char **refusal
+);
 /*
  * OrdinaryDefineOwnProperty (10.1.6) for a data and an accessor
  * descriptor, reporting a refusal through `*refusal` instead of raising
@@ -2721,6 +2886,11 @@ typedef enum {
     OSEO_OWN_KEY_STRINGS = 1,
     OSEO_OWN_KEY_SYMBOLS = 2,
 } OseoOwnKeyFilter;
+OseoResult oseo_internal_proxy_own_keys(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoOwnKeyFilter filter
+);
 
 /*
  * OrdinaryOwnPropertyKeys (10.1.11.1) over an object, as one fresh
@@ -2807,6 +2977,11 @@ OseoResult oseo_internal_install_uri_global(
  */
 OseoResult oseo_internal_reflect_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_reflect_global(
+    OseoContext *context,
+    OseoValue global
+);
+OseoResult oseo_internal_proxy_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_proxy_global(
     OseoContext *context,
     OseoValue global
 );

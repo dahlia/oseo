@@ -494,7 +494,7 @@ OseoResult oseo_internal_object_define_data(
     bool has_value
 ) {
     const char *refusal = NULL;
-    OseoResult result = define_data_property(
+    OseoResult result = oseo_internal_define_data_reported(
         context,
         object_value,
         key,
@@ -518,6 +518,29 @@ OseoResult oseo_internal_define_data_reported(
     bool absent_writable,
     const char **refusal
 ) {
+    if (is_proxy(object_value)) {
+        OseoConvertedDescriptor descriptor = {
+            !absent_writable,
+            attributes.enumerable,
+            !absent_writable,
+            attributes.configurable,
+            !absent_writable,
+            attributes.writable,
+            has_value,
+            false,
+            false,
+        };
+        return oseo_internal_proxy_define_own_property(
+            context,
+            object_value,
+            key,
+            &descriptor,
+            value,
+            oseo_undefined(),
+            oseo_undefined(),
+            refusal
+        );
+    }
     return define_data_property(
         context,
         object_value,
@@ -657,7 +680,7 @@ OseoResult oseo_object_define_accessor(
     OseoPropertyAttributes attributes
 ) {
     const char *refusal = NULL;
-    OseoResult result = define_accessor_property(
+    OseoResult result = oseo_internal_define_accessor_reported(
         context,
         object_value,
         key,
@@ -683,6 +706,29 @@ OseoResult oseo_internal_define_accessor_reported(
     OseoPropertyAttributes attributes,
     const char **refusal
 ) {
+    if (is_proxy(object_value)) {
+        OseoConvertedDescriptor descriptor = {
+            true,
+            attributes.enumerable,
+            true,
+            attributes.configurable,
+            false,
+            false,
+            false,
+            has_getter,
+            has_setter,
+        };
+        return oseo_internal_proxy_define_own_property(
+            context,
+            object_value,
+            key,
+            &descriptor,
+            oseo_undefined(),
+            getter,
+            setter,
+            refusal
+        );
+    }
     return define_accessor_property(
         context,
         object_value,
@@ -717,6 +763,10 @@ OseoResult oseo_object_delete(
                 : normal(oseo_boolean(false));
         }
         return normal(oseo_boolean(true));
+    }
+    if (is_proxy(object_value)) {
+        return oseo_internal_proxy_delete(
+            context, object_value, key, strict);
     }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {

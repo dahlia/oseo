@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-six reviewed assets in this order:
+The runtime input now lists thirty-seven reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -32,7 +32,8 @@ The runtime input now lists thirty-six reviewed assets in this order:
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
-*runtime\_math.c*, *runtime\_uri.c*, and *runtime\_reflect.c*. The M5
+*runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*, and
+*runtime\_proxy.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
@@ -40,7 +41,7 @@ asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions, and
-Reflect-namespace units each
+Reflect-namespace and Proxy-exotic-object units each
 added one
 component the same
 way. The M5b
@@ -173,6 +174,11 @@ Ownership follows the plan's target layout:
     *runtime\_descriptor.c*, `[[Get]]` and `[[Set]]` with
     *runtime\_property.c*, `[[SetPrototypeOf]]` with *runtime\_object.c*,
     and CreateListFromArrayLike with *runtime\_function.c*;
+ -  *runtime\_proxy.c*: the `Proxy` constructor, `Proxy.revocable`, the
+    revocation closure, and the thirteen Proxy exotic internal methods. It
+    calls the handler's trap when present, delegates to the target otherwise,
+    and enforces the target invariants for prototypes, extensibility,
+    descriptors, property results, own keys, calls, and construction;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single

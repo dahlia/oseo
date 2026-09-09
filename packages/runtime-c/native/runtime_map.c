@@ -202,7 +202,10 @@ static OseoResult map_create_from_constructor(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = map_prototype_intrinsic(context);
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = map_prototype_intrinsic(context);
+        }
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -374,7 +377,7 @@ static OseoResult map_construct_with_target(
         }
     }
     if (adds && result.status == OSEO_STATUS_NORMAL &&
-        !is_function(slots[3])) {
+        !is_callable(slots[3])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -405,7 +408,7 @@ static OseoResult map_group_by(
     OseoValue items,
     OseoValue callback
 ) {
-    if (!is_function(callback)) {
+    if (!is_callable(callback)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -639,7 +642,7 @@ static OseoResult map_prototype_for_each(
             "Method Map.prototype.forEach called on incompatible receiver."
         );
     }
-    if (!is_function(callback)) {
+    if (!is_callable(callback)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,

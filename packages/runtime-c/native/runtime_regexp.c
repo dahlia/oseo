@@ -2320,7 +2320,7 @@ OseoResult oseo_internal_regexp_exec(
         "exec",
         &frame.slots[2]
     );
-    if (result.status == OSEO_STATUS_NORMAL && is_function(frame.slots[2])) {
+    if (result.status == OSEO_STATUS_NORMAL && is_callable(frame.slots[2])) {
         result = oseo_call_function(
             context,
             frame.slots[2],

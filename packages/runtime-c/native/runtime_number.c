@@ -79,10 +79,13 @@ static OseoResult number_construct(
         result = oseo_internal_constructor_prototype(context, slots[0]);
         slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_NUMBER_PROTOTYPE
-            );
+            result = oseo_internal_validate_function_realm(context, slots[0]);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_intrinsic(
+                    context,
+                    OSEO_INTRINSIC_NUMBER_PROTOTYPE
+                );
+            }
             slots[1] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {

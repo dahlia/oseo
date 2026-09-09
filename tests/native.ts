@@ -100,6 +100,8 @@ const { globalNumericFunctionFixtures } =
   await import("./native/fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
   await import("./native/fixtures/reflect-namespace.ts");
+const { proxyExoticObjectFixtures } =
+  await import("./native/fixtures/proxy-exotic-object.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
 const { regexpSymbolMethodsFixtures } =
@@ -193,6 +195,7 @@ const fixtures: readonly Fixture[] = [
   ...uriHandlingFunctionFixtures,
   ...globalNumericFunctionFixtures,
   ...reflectNamespaceFixtures,
+  ...proxyExoticObjectFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -646,6 +649,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "uri-handling-functions" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
+    fixture.name === "proxy-exotic-object" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -736,6 +740,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "uri-handling-functions" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
+    fixture.name === "proxy-exotic-object" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -878,6 +883,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "reflect-namespace" ||
+    fixture.name === "proxy-exotic-object" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {
@@ -1180,6 +1186,12 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
+          if (fixture.name === "proxy-exotic-object") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
           if (fixture.name === "object-literal-prototype-setter") {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1188,11 +1200,11 @@ for (const fixture of selectedFixtures) {
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
-            // Script global record contributes the ten standard-object and
-            // value-property allocations plus twenty-seven admitted
-            // standard global property names shared by every Script, the
-            // Reflect namespace being the one this node adds.
-            assert.equal(native.counters.allocations, 43);
+            // Script global record contributes the eleven standard-object
+            // and value-property allocations plus twenty-eight admitted
+            // standard global property names shared by every Script, with
+            // Proxy adding one allocation in each group.
+            assert.equal(native.counters.allocations, 45);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

@@ -189,7 +189,7 @@ OseoResult oseo_internal_array_builtin_dispatch(
         OseoValue value = argument_count == 0u
             ? oseo_undefined()
             : arguments[0];
-        return normal(oseo_boolean(is_array(value)));
+        return oseo_internal_is_array(context, value);
     }
     if (code_id == OSEO_ARRAY_OF_CODE_ID) {
         return array_of(context, receiver, argument_count, arguments);
@@ -712,10 +712,14 @@ static OseoResult array_is_concat_spreadable(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, slots[0], slots[1]);
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        *spreadable = tag_of(result.value) == OSEO_TAG_UNDEFINED
-            ? is_array(slots[0])
-            : oseo_to_boolean(result.value);
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(result.value) == OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_is_array(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            *spreadable = oseo_to_boolean(result.value);
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        *spreadable = oseo_to_boolean(result.value);
         result = normal(oseo_boolean(*spreadable));
     }
     oseo_roots_pop(context, &frame);
@@ -868,7 +872,7 @@ static OseoResult flatten_into_array(
         result = oseo_object_get(context, slots[1], slots[4]);
         slots[5] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (is_function(slots[2])) {
+        if (is_callable(slots[2])) {
             slots[6] = slots[5];
             slots[7] = oseo_number(source_index);
             OseoValue callback_arguments[3] = {
@@ -887,7 +891,15 @@ static OseoResult flatten_into_array(
             slots[5] = result.value;
             if (result.status != OSEO_STATUS_NORMAL) break;
         }
-        if (depth > 0.0 && is_array(slots[5])) {
+        bool flatten = false;
+        if (depth > 0.0) {
+            result = oseo_internal_is_array(context, slots[5]);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                flatten = oseo_to_boolean(result.value);
+            }
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (flatten) {
             if (recursion_depth >= OSEO_MAX_CALL_DEPTH) {
                 result = oseo_internal_throw_error(
                     context,
@@ -965,7 +977,7 @@ static OseoResult array_flattening(
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         code_id == OSEO_ARRAY_FLAT_MAP_CODE_ID &&
-        !is_function(slots[1])) {
+        !is_callable(slots[1])) {
         result = type_error(context, "Array flatMap callback is not callable.");
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1076,7 +1088,7 @@ static OseoResult array_join(
                 frame.slots[5] = result.value;
             }
             if (result.status == OSEO_STATUS_NORMAL &&
-                !is_function(frame.slots[5])) {
+                !is_callable(frame.slots[5])) {
                 result = type_error(
                     context,
                     "Element toLocaleString is not callable."
@@ -1221,7 +1233,7 @@ static OseoResult array_to_string(
         result = oseo_object_get(context, slots[0], slots[1]);
         slots[2] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[2])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[2])) {
         result = oseo_internal_intrinsic(
             context,
             OSEO_INTRINSIC_OBJECT_TO_STRING
@@ -1532,7 +1544,7 @@ static OseoResult array_sorting(
     bool copy
 ) {
     OseoValue comparator = builtin_argument(argument_count, arguments, 0u);
-    if (tag_of(comparator) != OSEO_TAG_UNDEFINED && !is_function(comparator)) {
+    if (tag_of(comparator) != OSEO_TAG_UNDEFINED && !is_callable(comparator)) {
         return type_error(
             context,
             copy
@@ -1807,7 +1819,7 @@ static OseoResult array_from_iterator(
     OseoContext *context,
     OseoRootFrame *frame
 ) {
-    if (!is_function(frame->slots[4])) {
+    if (!is_callable(frame->slots[4])) {
         return type_error(
             context,
             "The Symbol.iterator method is not callable."
@@ -1843,7 +1855,7 @@ static OseoResult array_from_iterator(
         frame->slots[6] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame->slots[6])) {
+        !is_callable(frame->slots[6])) {
         result = type_error(context, "The iterator next is not callable.");
     }
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -2116,7 +2128,7 @@ static OseoResult array_from(
     bool has_string_value = false;
     bool uses_virtual_string_iterator = false;
     if (tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED &&
-        !is_function(frame.slots[2])) {
+        !is_callable(frame.slots[2])) {
         result = type_error(context, "Array.from mapfn is not callable.");
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -3860,7 +3872,7 @@ static OseoResult array_iteration(
         result = array_like_length(context, frame.slots[0], &length);
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[1])) {
+        !is_callable(frame.slots[1])) {
         result = type_error(context, "Array callback is not callable.");
     }
     bool decided = false;
@@ -3950,7 +3962,7 @@ static OseoResult array_reduction(
         result = array_like_length(context, frame.slots[0], &length);
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[1])) {
+        !is_callable(frame.slots[1])) {
         result = type_error(context, "Array callback is not callable.");
     }
     bool has_accumulator = argument_count >= 2u;
@@ -4195,7 +4207,7 @@ static OseoResult array_predicate_search(
         result = array_like_length(context, frame.slots[0], &length);
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[1])) {
+        !is_callable(frame.slots[1])) {
         result = type_error(context, "Array predicate is not callable.");
     }
     bool found = false;
@@ -4257,7 +4269,12 @@ static OseoResult array_species_create(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = original;
     frame.slots[2] = oseo_number(length);
-    if (!is_array(frame.slots[0])) {
+    result = oseo_internal_is_array(context, frame.slots[0]);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (!oseo_to_boolean(result.value)) {
         result = length > (double)UINT32_MAX
             ? oseo_internal_throw_error(
                   context,
@@ -4341,7 +4358,7 @@ static OseoResult array_species_mapping(
         result = array_like_length(context, frame.slots[0], &length);
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[1])) {
+        !is_callable(frame.slots[1])) {
         result = type_error(context, "Array callback is not callable.");
     }
     if (result.status == OSEO_STATUS_NORMAL) {

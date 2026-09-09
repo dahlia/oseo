@@ -5,7 +5,9 @@ import {
 } from "./hir.ts";
 import type {
   Binding,
+  HirArrayBindingPattern,
   HirArrayElement,
+  HirAssignmentMemberTarget,
   HirBindingElement,
   HirBindingIdentifier,
   HirBindingPattern,
@@ -16,8 +18,6 @@ import type {
   HirClassField,
   HirClassNameBinding,
   HirClassThisBinding,
-  HirArrayBindingPattern,
-  HirAssignmentMemberTarget,
   HirExpression,
   HirForDeclaration,
   HirForInTarget,
@@ -210,6 +210,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "Proxy" ||
     name === "Reflect" ||
     name === "RegExp" ||
     name === "RangeError" ||
@@ -586,6 +587,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "Number" ||
     name === "Object" ||
     name === "Promise" ||
+    name === "Proxy" ||
     name === "RegExp" ||
     name === "String" ||
     name === "Symbol" ||

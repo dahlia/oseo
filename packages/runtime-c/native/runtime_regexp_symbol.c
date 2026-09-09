@@ -1047,7 +1047,7 @@ static OseoResult regexp_symbol_replace(
         symbol_argument(argument_count, arguments, 0u)
     );
     frame.slots[1] = result.value;
-    bool functional = is_function(frame.slots[2]);
+    bool functional = is_callable(frame.slots[2]);
     if (result.status == OSEO_STATUS_NORMAL && !functional) {
         result = oseo_internal_value_string(context, frame.slots[2]);
         frame.slots[2] = result.value;

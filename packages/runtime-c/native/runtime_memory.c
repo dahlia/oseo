@@ -72,7 +72,8 @@ static void trace_object(
                object->kind == OSEO_HEAP_MAP_ITERATOR ||
                object->kind == OSEO_HEAP_DATA_VIEW ||
                object->kind == OSEO_HEAP_REGEXP ||
-               object->kind == OSEO_HEAP_ITERATOR_HELPER) {
+               object->kind == OSEO_HEAP_ITERATOR_HELPER ||
+               object->kind == OSEO_HEAP_PROXY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -180,6 +181,10 @@ static void trace_object(
             mark_value(helper->callback, worklist);
             mark_value(helper->inner_iterator, worklist);
             mark_value(helper->inner_next, worklist);
+        } else if (object->kind == OSEO_HEAP_PROXY) {
+            OseoProxy *proxy = (OseoProxy *)object;
+            mark_value(proxy->target, worklist);
+            mark_value(proxy->handler, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -222,7 +227,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_MAP_ITERATOR ||
         object->kind == OSEO_HEAP_DATA_VIEW ||
         object->kind == OSEO_HEAP_REGEXP ||
-        object->kind == OSEO_HEAP_ITERATOR_HELPER) {
+        object->kind == OSEO_HEAP_ITERATOR_HELPER ||
+        object->kind == OSEO_HEAP_PROXY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);
