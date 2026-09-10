@@ -11,10 +11,10 @@ usage: "One record per node lives in docs/m5b-graph/nodes. Take a node whose
   same file and should not run in parallel lanes. The backlog is what a lane
   takes when no node is ready, in the order listed."
 summary:
-  nodes: 91
-  ready: 75
-  blocked: 13
-  parked: 3
+  nodes: 92
+  ready: 76
+  blocked: 14
+  parked: 2
 serializationPoints:
   - path: packages/runtime-c/src/index.ts
     note: "Carries abiVersion, which every admitted checkpoint bumps. One

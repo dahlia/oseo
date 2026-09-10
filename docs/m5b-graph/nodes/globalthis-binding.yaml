@@ -10,9 +10,7 @@ inventory:
     - test/built-ins/global/
 dependencies:
   - global-object-record
+  - reviewed-evidence-direction-policy
+  - runtime-error-observation
 landed: false
-status: parked
-reason: "The runtime implementation is preserved in m5b-globalthis-binding,
-  but five reviewed global-code rows need a sound unavailable-$262 capability
-  boundary and four out-of-root negative rows require a policy decision before
-  they may move from unsupported-profile-feature to expected-negative."
+status: blocked

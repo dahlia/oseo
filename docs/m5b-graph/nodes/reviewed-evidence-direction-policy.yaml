@@ -1,0 +1,10 @@
+version: 1
+id: reviewed-evidence-direction-policy
+title: "Reviewed evidence direction policy"
+delivers: "Records and enforces when a node-caused improvement outside its
+  inventory roots may move between non-pass classifications without changing
+  the ADR 0013 manifest schema or classification vocabulary and without
+  weakening the global compatibility ratchet."
+dependencies: []
+landed: false
+status: ready
