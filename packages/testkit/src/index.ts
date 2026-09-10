@@ -2,9 +2,9 @@ import type {
   CompilerCacheLock,
   CompilerHost,
   ExecutionHostDescription,
+  MirProgram,
   NativeBackend,
   NativeToolchain,
-  MirProgram,
   ProcessEnvironment,
   ProcessObservation,
   ProcessRequest,
@@ -111,6 +111,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "object-properties",
   "promise-settlement",
   "property-enumeration",
+  "proxy-exotic-object",
   "reflect-namespace",
   "regular-expressions",
   "rest-parameters",
@@ -309,8 +310,9 @@ function splitCounters(observation: ProcessObservation) {
       : { observation: { ...observation, stderr: strippedStderr } };
   }
   const line = lines[index];
-  if (line == null)
+  if (line == null) {
     return { observation: { ...observation, stderr: strippedStderr } };
+  }
   // SAFETY: Every counter field is validated before the record is returned.
   const parsed = JSON.parse(
     line.slice(prefix.length),

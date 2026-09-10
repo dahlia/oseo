@@ -14,21 +14,20 @@
  *
  * Collection walks the chain outward. Each level's own string keys are
  * obtained in OrdinaryOwnPropertyKeys order, symbol keys are dropped,
- * and a key already recorded at a nearer level is skipped, whether or
- * not that nearer property was enumerable, which is the specified shadow
- * rule. A key that survives is reported only if its own property was
- * enumerable when the level was read.
+ * and the chain and keys are snapshotted before descriptors are read,
+ * matching both reference hosts' observable Proxy operation order.
  *
- * Each step then reports the next collected key if the receiver still
- * has a property of that name anywhere on its chain. That is what makes
- * a property deleted before it is processed ignored, as the rules
- * require, while a property added during the enumeration stays invisible
- * to it and no name is ever reported twice.
+ * Each step reads the next candidate's descriptor at the time the
+ * candidate is processed. A key deleted before that point is ignored, as
+ * the rules require, while a property added during the enumeration stays
+ * invisible to it. A descriptor found at a nearer level records the key,
+ * whether or not the property was enumerable, which applies the specified
+ * shadow rule without reporting any name twice.
  *
- * No step runs user code: this realm has no proxy and no exotic object
- * whose own-key, descriptor, or prototype access is observable, so the
- * enumeration cannot be reentered and reports no abrupt completion of
- * its own.
+ * Proxy own-key, descriptor, and prototype operations can run user code,
+ * reenter enumeration, and complete abruptly. Each observable operation
+ * therefore returns an OseoResult and the caller propagates its status.
+ * A candidate invokes [[GetOwnProperty]] only once in its processing step.
  */
 
 /* One level's own string keys in OrdinaryOwnPropertyKeys order. */
@@ -39,6 +38,18 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
     frame.slots[0] = level;
     result = oseo_argument_list_create(context);
     frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && is_proxy(frame.slots[0])) {
+        result = oseo_internal_proxy_own_keys(
+            context, frame.slots[0], OSEO_OWN_KEY_STRINGS);
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_array_like_list(
+                context, frame.slots[2], &frame.slots[1]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     if (result.status == OSEO_STATUS_NORMAL && is_string(frame.slots[0])) {
         /* A String exotic object owns one enumerable property per code
          * unit index, then a non-enumerable `length`. */
@@ -159,72 +170,141 @@ static bool enumeration_recorded(
     return false;
 }
 
+static OseoResult enumeration_cache_proxy_descriptor(
+    OseoContext *context, OseoValue cache, OseoValue proxy,
+    OseoValue key, bool found
+) {
+    OseoResult result = oseo_argument_list_append(context, cache, proxy);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_append(context, cache, key);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_append(context, cache, oseo_boolean(found));
+    }
+    return result;
+}
+
+static OseoResult enumeration_cached_proxy_descriptor(
+    OseoContext *context, OseoValue cache, OseoValue proxy,
+    OseoValue key, bool *cached, bool *found
+) {
+    *cached = false;
+    *found = false;
+    size_t count = 0u;
+    const OseoValue *values = NULL;
+    OseoResult result = oseo_argument_list_view(
+        context, cache, &count, &values);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    for (size_t index = 0u; index + 2u < count; index += 3u) {
+        if (values[index] == proxy &&
+            oseo_internal_property_key_equal(values[index + 1u], key)) {
+            *cached = true;
+            *found = oseo_to_boolean(values[index + 2u]);
+            break;
+        }
+    }
+    return normal(oseo_undefined());
+}
+
 /*
  * [[GetOwnProperty]] of one collected level, reduced to what collection
  * observes: whether the key is an own property, and whether it is
  * enumerable.
  */
-static bool enumeration_own_key(
+static OseoResult enumeration_own_key(
+    OseoContext *context,
     OseoValue level,
     OseoValue key,
+    bool *found,
     bool *enumerable
 ) {
+    *found = false;
     if (is_string(level)) {
         uint32_t index = 0u;
         if (oseo_internal_string_is_ascii(key, "length")) {
             *enumerable = false;
-            return true;
+            *found = true;
+            return normal(oseo_undefined());
         }
         if (oseo_internal_array_index(key, &index) &&
             index < string_object(level)->length) {
             *enumerable = true;
-            return true;
+            *found = true;
+            return normal(oseo_undefined());
         }
-        return false;
+        return normal(oseo_undefined());
     }
-    if (!is_object(level)) return false;
+    if (!is_object(level)) return normal(oseo_undefined());
     OseoValue value = oseo_undefined();
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
-    if (!oseo_internal_own_descriptor(
+    if (is_proxy(level)) {
+        OseoResult result = oseo_internal_proxy_get_own_property(
+            context, level, key, found, &value, &attributes, &getter, &setter);
+        if (result.status != OSEO_STATUS_NORMAL || !*found) return result;
+    } else if (!oseo_internal_own_descriptor(
             level,
             key,
             &value,
             &attributes,
             &getter,
             &setter
-        )) return false;
+        )) return normal(oseo_undefined());
+    else *found = true;
     *enumerable = attributes.enumerable;
-    return true;
+    return normal(oseo_undefined());
 }
 
-/*
- * HasProperty over the receiver's chain, which runs no user code here.
- * A collected own key whose deletion uncovers an inherited property of
- * the same name stays reportable.
- */
-static bool enumeration_reachable(
-    OseoValue receiver,
-    OseoValue key
+static OseoResult enumeration_reachable(
+    OseoContext *context, OseoValue receiver, OseoValue key,
+    OseoValue proxy_descriptors
 ) {
+    bool found = false;
     bool enumerable = false;
     if (is_string(receiver)) {
-        return enumeration_own_key(receiver, key, &enumerable);
+        OseoResult result = enumeration_own_key(
+            context, receiver, key, &found, &enumerable);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result.value = oseo_boolean(found);
+        }
+        return result;
     }
     OseoValue current = receiver;
     while (is_object(current)) {
-        if (enumeration_own_key(current, key, &enumerable)) return true;
-        current = ordinary_object(current)->prototype;
+        OseoResult result = normal(oseo_undefined());
+        bool cached = false;
+        if (is_proxy(current)) {
+            result = enumeration_cached_proxy_descriptor(
+                context, proxy_descriptors, current, key, &cached, &found);
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !cached) {
+            result = enumeration_own_key(
+                context, current, key, &found, &enumerable);
+        }
+        if (result.status != OSEO_STATUS_NORMAL || found) {
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result.value = oseo_boolean(true);
+            }
+            return result;
+        }
+        result = oseo_internal_get_prototype(context, current);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        current = result.value;
     }
-    return false;
+    return normal(oseo_boolean(false));
 }
 
 /* The next level of the chain, or a non-object when the walk ends. */
-static OseoValue enumeration_parent(OseoValue level) {
+static OseoResult enumeration_parent(
+    OseoContext *context,
+    OseoValue level
+) {
     /* A string level stands for a String exotic object whose
      * %String.prototype% this realm never creates. */
-    return is_object(level) ? ordinary_object(level)->prototype : oseo_null();
+    return is_object(level)
+        ? oseo_internal_get_prototype(context, level)
+        : normal(oseo_null());
 }
 
 /*
@@ -243,47 +323,74 @@ static OseoResult enumeration_collect(
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_argument_list_create(context);
-        frame.slots[2] = result.value;
+        frame.slots[4] = result.value;
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            (is_object(frame.slots[0]) || is_string(frame.slots[0]))) {
         result = enumeration_keys(context, frame.slots[0]);
-        frame.slots[3] = result.value;
+        frame.slots[2] = result.value;
         for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {
             size_t count = 0u;
             const OseoValue *values = NULL;
             result = oseo_argument_list_view(
                 context,
-                frame.slots[3],
+                frame.slots[2],
                 &count,
                 &values
             );
             if (result.status != OSEO_STATUS_NORMAL || index >= count) break;
-            frame.slots[4] = values[index];
+            frame.slots[3] = values[index];
             index += 1u;
-            if (enumeration_recorded(context, frame.slots[2], frame.slots[4])) {
-                continue;
-            }
-            bool enumerable = false;
-            if (!enumeration_own_key(
-                    frame.slots[0],
+            result = oseo_argument_list_append(
+                context,
+                frame.slots[4],
+                frame.slots[0]
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_argument_list_append(
+                    context,
                     frame.slots[4],
-                    &enumerable
-                )) continue;
-            result = oseo_argument_list_append(
-                context,
-                frame.slots[2],
-                frame.slots[4]
-            );
-            if (result.status != OSEO_STATUS_NORMAL || !enumerable) continue;
-            result = oseo_argument_list_append(
-                context,
-                frame.slots[1],
-                frame.slots[4]
-            );
+                    frame.slots[3]
+                );
+            }
         }
         if (result.status != OSEO_STATUS_NORMAL) break;
-        frame.slots[0] = enumeration_parent(frame.slots[0]);
+        result = enumeration_parent(context, frame.slots[0]);
+        frame.slots[0] = result.value;
+    }
+    for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {
+        size_t count = 0u;
+        const OseoValue *values = NULL;
+        result = oseo_argument_list_view(
+            context, frame.slots[4], &count, &values);
+        if (result.status != OSEO_STATUS_NORMAL || index >= count) break;
+        frame.slots[0] = values[index];
+        frame.slots[3] = values[index + 1u];
+        index += 2u;
+        bool found = false;
+        bool enumerable = false;
+        if (!is_proxy(frame.slots[0])) {
+            result = enumeration_own_key(
+                context, frame.slots[0], frame.slots[3],
+                &found, &enumerable);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context, frame.slots[1], frame.slots[0]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context, frame.slots[1], frame.slots[3]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context, frame.slots[1], is_proxy(frame.slots[0])
+                    ? oseo_undefined() : oseo_boolean(found));
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context, frame.slots[1], oseo_boolean(enumerable));
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
     oseo_roots_release(context, &frame);
@@ -303,7 +410,7 @@ OseoResult oseo_enumerate_get(
      * without a ToObject conversion. */
     if (is_nullish(subject)) return normal(oseo_undefined());
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     /*
      * ToObject, modeled rather than materialized while primitive wrapper
@@ -327,6 +434,10 @@ OseoResult oseo_enumerate_get(
     result = enumeration_collect(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         OseoEnumeration *enumeration = oseo_internal_allocate_heap_bytes(
             context,
             sizeof(*enumeration)
@@ -339,7 +450,8 @@ OseoResult oseo_enumerate_get(
             );
         } else {
             enumeration->receiver = frame.slots[0];
-            enumeration->keys = frame.slots[1];
+            enumeration->candidates = frame.slots[1];
+            enumeration->visited = frame.slots[2];
             enumeration->index = 0u;
             result = oseo_internal_publish_heap(
                 context,
@@ -371,26 +483,73 @@ OseoResult oseo_enumerate_next(
             "Enumeration step requires an enumeration record."
         );
     }
-    OseoEnumeration *enumeration = enumeration_object(record);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = record;
+    result = oseo_argument_list_create(context);
+    frame.slots[3] = result.value;
+    OseoEnumeration *enumeration = enumeration_object(frame.slots[0]);
     size_t count = 0u;
     const OseoValue *values = NULL;
-    OseoResult result = oseo_argument_list_view(
+    if (result.status == OSEO_STATUS_NORMAL) result = oseo_argument_list_view(
         context,
-        enumeration->keys,
+        enumeration->candidates,
         &count,
         &values
     );
-    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     while (enumeration->index < count) {
-        OseoValue candidate = values[enumeration->index];
-        enumeration->index += 1u;
-        /* A key deleted before it is processed is ignored. */
-        if (!enumeration_reachable(enumeration->receiver, candidate)) {
+        frame.slots[1] = values[enumeration->index];
+        frame.slots[2] = values[enumeration->index + 1u];
+        OseoValue found_state = values[enumeration->index + 2u];
+        bool enumerable = oseo_to_boolean(
+            values[enumeration->index + 3u]);
+        enumeration->index += 4u;
+        if (enumeration_recorded(
+                context, enumeration->visited, frame.slots[2])) continue;
+        bool pending = tag_of(found_state) == OSEO_TAG_UNDEFINED;
+        bool found = pending ? false : oseo_to_boolean(found_state);
+        if (pending) {
+            result = enumeration_own_key(
+                context, frame.slots[1], frame.slots[2],
+                &found, &enumerable);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = enumeration_cache_proxy_descriptor(
+                    context, frame.slots[3], frame.slots[1],
+                    frame.slots[2], found);
+            }
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!found) {
+            /* The reference hosts advance a missing Proxy candidate with a
+             * live [[GetPrototypeOf]] observation. The snapshotted candidate
+             * list still decides which previously collected keys can run. */
+            if (pending) {
+                result = enumeration_parent(context, frame.slots[1]);
+                if (result.status != OSEO_STATUS_NORMAL) break;
+            }
             continue;
         }
-        *key = candidate;
+        result = oseo_argument_list_append(
+            context,
+            enumeration->visited,
+            frame.slots[2]
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!enumerable) continue;
+        result = enumeration_reachable(
+            context, enumeration->receiver, frame.slots[2], frame.slots[3]);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!oseo_to_boolean(result.value)) continue;
+        *key = frame.slots[2];
         *done = false;
         break;
     }
-    return normal(oseo_undefined());
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(oseo_undefined());
+    oseo_roots_release(context, &frame);
+    return result;
 }

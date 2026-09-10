@@ -468,16 +468,21 @@ static OseoResult promise_create_from_constructor(
         slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_get(context, slots[0], slots[1]);
+            slots[1] = result.value;
         }
     }
-    oseo_roots_pop(context, &frame);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (is_object(result.value)) {
-        return promise_allocate(context, result.value);
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_promise_prototype(context);
+        }
+        slots[1] = result.value;
     }
-    OseoResult fallback = oseo_internal_promise_prototype(context);
-    if (fallback.status != OSEO_STATUS_NORMAL) return fallback;
-    return promise_allocate(context, fallback.value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = promise_allocate(context, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 OseoResult oseo_internal_promise_method_function(
@@ -1138,7 +1143,7 @@ OseoResult oseo_promise_resolve_into(
             result.value
         );
     } else if (result.status == OSEO_STATUS_NORMAL &&
-               is_function(frame.slots[2])) {
+               is_callable(frame.slots[2])) {
         result = enqueue_job(
             context,
             OSEO_JOB_THENABLE,
@@ -1329,7 +1334,7 @@ static OseoResult new_promise_capability(
          index += 1u) {
         result = oseo_environment_get(context, frame.slots[1], index);
         if (result.status == OSEO_STATUS_NORMAL &&
-            !is_function(result.value)) {
+            !is_callable(result.value)) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_TYPE,
@@ -1807,7 +1812,7 @@ static OseoResult promise_combine(
         frame.slots[15] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[15])) {
+        !is_callable(frame.slots[15])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -2391,7 +2396,7 @@ OseoResult oseo_internal_promise_finally_invoke(
      * `onFinally` is not callable. */
     result = promise_species_constructor(context, frame.slots[0]);
     frame.slots[4] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[1])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(frame.slots[1])) {
         result = oseo_internal_promise_invoke_then(
             context,
             frame.slots[0],
@@ -2670,7 +2675,7 @@ static OseoResult promise_construct_with_target(
     OseoValue new_target,
     OseoValue executor
 ) {
-    if (!is_function(executor)) return oseo_internal_throw_error(
+    if (!is_callable(executor)) return oseo_internal_throw_error(
         context,
         OSEO_ERROR_TYPE,
         "The promise executor is not a function."
@@ -2742,11 +2747,11 @@ static OseoResult promise_then_with_capability(
         "The receiver is not a promise."
     );
     if (tag_of(on_fulfilled) != OSEO_TAG_UNDEFINED &&
-        !is_function(on_fulfilled)) {
+        !is_callable(on_fulfilled)) {
         on_fulfilled = oseo_undefined();
     }
     if (tag_of(on_rejected) != OSEO_TAG_UNDEFINED &&
-        !is_function(on_rejected)) {
+        !is_callable(on_rejected)) {
         on_rejected = oseo_undefined();
     }
     OseoRootFrame frame = {NULL, NULL, 0u};

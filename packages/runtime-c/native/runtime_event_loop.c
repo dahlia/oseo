@@ -22,7 +22,7 @@ OseoResult oseo_set_timeout(
     size_t argument_count,
     const OseoValue *arguments
 ) {
-    if (argument_count == 0u || !is_function(arguments[0])) {
+    if (argument_count == 0u || !is_callable(arguments[0])) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,

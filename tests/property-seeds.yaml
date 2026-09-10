@@ -404,3 +404,7 @@ families:
     owner: tests/property/m5-array-prototype-iterators.property.test.ts
     start: 0x60006400
     end: 0x600064ff
+  - family: m5-proxy-exotic-object
+    owner: tests/property/m5-proxy-exotic-object.property.test.ts
+    start: 0x60006500
+    end: 0x600065ff

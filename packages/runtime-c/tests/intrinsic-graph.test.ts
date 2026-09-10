@@ -1070,6 +1070,46 @@ test("populates the realm-owned Reflect namespace object", () => {
   assert.doesNotMatch(reflectSource, /OSEO_FUNCTION_ORDINARY/u);
 });
 
+test("populates Proxy and routes every essential internal method", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const proxySource = sources.get("runtime_proxy.c") ?? "";
+
+  assert.match(header, /OSEO_INTRINSIC_PROXY/u);
+  assert.match(internalHeader, /OSEO_HEAP_PROXY/u);
+  assert.match(internalHeader, /OSEO_PROXY_CODE_ID_RANGE_INDEX/u);
+  assert.match(bindingSource, /oseo_internal_install_proxy_global/u);
+  assert.match(
+    functionSource,
+    /OSEO_INTRINSIC_PROXY\)[\s\S]{0,60}oseo_internal_proxy_intrinsic/u,
+  );
+  for (const trap of [
+    "apply",
+    "construct",
+    "defineProperty",
+    "deleteProperty",
+    "get",
+    "getOwnPropertyDescriptor",
+    "getPrototypeOf",
+    "has",
+    "isExtensible",
+    "ownKeys",
+    "preventExtensions",
+    "set",
+    "setPrototypeOf",
+  ]) {
+    assert.match(proxySource, new RegExp(`"${trap}"`, "u"));
+  }
+  assert.match(proxySource, /oseo_internal_proxy_define_own_property/u);
+  assert.match(proxySource, /oseo_internal_proxy_own_keys/u);
+  assert.equal(proxySource.match(/oseo_call_enter\(context\)/gu)?.length, 11);
+  assert.match(proxySource, /static OseoResult proxy_complete/u);
+  assert.match(proxySource, /OSEO_PROXY_REVOKE_CODE_ID/u);
+  assert.match(proxySource, /OSEO_FUNCTION_INTERNAL/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

@@ -387,11 +387,19 @@ OseoResult oseo_internal_error_construct(
      * real Get: `Reflect.construct` can name a bound function, which
      * owns no synthetic `prototype` slot and can carry an observable
      * accessor instead. */
-    frame.slots[4] = is_function(new_target) ? new_target : callee;
-    result = oseo_internal_constructor_prototype(context, frame.slots[4]);
+    frame.slots[7] = function_is_constructible(new_target)
+        ? new_target
+        : callee;
+    result = oseo_internal_constructor_prototype(context, frame.slots[7]);
     frame.slots[4] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[4])) {
-        result = oseo_internal_error_prototype(context, kind);
+        result = oseo_internal_validate_function_realm(
+            context,
+            frame.slots[7]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_error_prototype(context, kind);
+        }
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {

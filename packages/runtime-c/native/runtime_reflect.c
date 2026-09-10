@@ -99,7 +99,7 @@ static OseoResult reflect_apply(
     const OseoValue *arguments
 ) {
     OseoValue target = reflect_argument(argument_count, arguments, 0u);
-    if (!is_function(target)) {
+    if (!is_callable(target)) {
         return type_error(context, "Reflect.apply requires a callable target.");
     }
     OseoValue slots[4] = {
@@ -406,7 +406,7 @@ static OseoResult reflect_call(
                 arguments
             );
         case OSEO_REFLECT_GET_PROTOTYPE_OF:
-            return normal(ordinary_object(target)->prototype);
+            return oseo_internal_get_prototype(context, target);
         case OSEO_REFLECT_HAS: {
             OseoValue slots[2] = {target, oseo_undefined()};
             OseoRootFrame frame = {NULL, slots, 2u};
@@ -423,7 +423,7 @@ static OseoResult reflect_call(
             return result;
         }
         case OSEO_REFLECT_IS_EXTENSIBLE:
-            return normal(oseo_boolean(ordinary_object(target)->extensible));
+            return oseo_internal_is_extensible(context, target);
         case OSEO_REFLECT_OWN_KEYS:
             return oseo_internal_own_key_array(
                 context,
@@ -431,10 +431,13 @@ static OseoResult reflect_call(
                 OSEO_OWN_KEY_ALL
             );
         case OSEO_REFLECT_PREVENT_EXTENSIONS:
-            /* OrdinaryPreventExtensions never refuses, so the reported
-             * boolean is always true. */
-            ordinary_object(target)->extensible = false;
-            return normal(oseo_boolean(true));
+        {
+            const char *refusal = NULL;
+            OseoResult result = oseo_internal_prevent_extensions_reported(
+                context, target, &refusal);
+            if (result.status != OSEO_STATUS_NORMAL) return result;
+            return normal(oseo_boolean(refusal == NULL));
+        }
         default: break;
     }
     return failure(context, "OSEO2001", "Unknown Reflect operation.");

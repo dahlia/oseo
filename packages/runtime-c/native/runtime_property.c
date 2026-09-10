@@ -69,6 +69,10 @@ static OseoResult object_get(
     }
     OseoValue current = object_value;
     while (is_object(current)) {
+        if (is_proxy(current)) {
+            return oseo_internal_proxy_get(
+                context, current, key, receiver);
+        }
         OseoOrdinaryObject *object = ordinary_object(current);
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
@@ -77,7 +81,7 @@ static OseoResult object_get(
         if (oseo_internal_own_property_descriptor(
             context, current, key, &value, &attributes, &getter, &setter)) {
             if (attributes.accessor) {
-                if (!is_function(getter)) return normal(oseo_undefined());
+                if (!is_callable(getter)) return normal(oseo_undefined());
                 OseoRootFrame frame = {NULL, NULL, 0u};
                 OseoResult result = oseo_roots_allocate(context, &frame, 1u);
                 if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -147,6 +151,21 @@ OseoResult oseo_object_has_own(
     OseoPropertyAttributes attributes = {false, false, false, false};
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
+    if (is_proxy(object_value)) {
+        bool found = false;
+        OseoResult result = oseo_internal_proxy_get_own_property(
+            context,
+            object_value,
+            key,
+            &found,
+            &value,
+            &attributes,
+            &getter,
+            &setter
+        );
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        return normal(oseo_boolean(found));
+    }
     return normal(oseo_boolean(oseo_internal_own_property_descriptor(
         context,
         object_value,
@@ -175,6 +194,15 @@ OseoResult oseo_object_set(
             );
         }
         return normal(value);
+    }
+    if (is_proxy(object_value)) {
+        const char *refusal = NULL;
+        OseoResult result = oseo_internal_proxy_set(
+            context, object_value, key, value, object_value, &refusal);
+        if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) {
+            return result;
+        }
+        return strict ? type_error(context, refusal) : normal(value);
     }
     if (ordinary_object(object_value)->module_namespace) {
         if (strict) {
@@ -218,6 +246,21 @@ OseoResult oseo_object_set(
         receiver_index >= receiver->array_length;
     OseoValue current = object_value;
     while (is_object(current)) {
+        if (is_proxy(current)) {
+            const char *refusal = NULL;
+            OseoResult result = oseo_internal_proxy_set(
+                context,
+                current,
+                key,
+                value,
+                object_value,
+                &refusal
+            );
+            if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) {
+                return result;
+            }
+            return strict ? type_error(context, refusal) : normal(value);
+        }
         OseoOrdinaryObject *owner = ordinary_object(current);
         if (owner->module_namespace) {
             /* The receiver itself was answered above; a namespace
@@ -239,7 +282,7 @@ OseoResult oseo_object_set(
             context, current, key, &own_value, &attributes, &getter,
             &setter)) {
             if (attributes.accessor) {
-                if (!is_function(setter)) {
+                if (!is_callable(setter)) {
                     if (strict) {
                         return type_error(
                             context,
@@ -369,6 +412,10 @@ OseoResult oseo_internal_set_with_receiver(
      * leaves the write to the receiver. */
     OseoValue current = base;
     while (is_object(current)) {
+        if (is_proxy(current)) {
+            return oseo_internal_proxy_set(
+                context, current, key, value, receiver, refusal);
+        }
         if (ordinary_object(current)->module_namespace) {
             /* OrdinarySetWithOwnDescriptor hands an absent own property
              * to the parent's own [[Set]], so a module namespace
@@ -387,7 +434,7 @@ OseoResult oseo_internal_set_with_receiver(
             context, current, key, &own_value, &attributes, &getter,
             &setter)) {
             if (attributes.accessor) {
-                if (!is_function(setter)) {
+                if (!is_callable(setter)) {
                     *refusal = "Cannot set a property that has only a getter.";
                     return normal(value);
                 }
@@ -424,15 +471,31 @@ OseoResult oseo_internal_set_with_receiver(
     OseoPropertyAttributes receiver_attributes = {false, false, false, false};
     OseoValue receiver_getter = oseo_undefined();
     OseoValue receiver_setter = oseo_undefined();
-    if (oseo_internal_own_property_descriptor(
-        context,
-        receiver,
-        key,
-        &receiver_value,
-        &receiver_attributes,
-        &receiver_getter,
-        &receiver_setter
-    )) {
+    bool receiver_found = false;
+    OseoResult receiver_result = is_proxy(receiver)
+        ? oseo_internal_proxy_get_own_property(
+            context,
+            receiver,
+            key,
+            &receiver_found,
+            &receiver_value,
+            &receiver_attributes,
+            &receiver_getter,
+            &receiver_setter
+        )
+        : normal(oseo_boolean(
+            (receiver_found = oseo_internal_own_property_descriptor(
+                context,
+                receiver,
+                key,
+                &receiver_value,
+                &receiver_attributes,
+                &receiver_getter,
+                &receiver_setter
+            ))
+        ));
+    if (receiver_result.status != OSEO_STATUS_NORMAL) return receiver_result;
+    if (receiver_found) {
         if (receiver_attributes.accessor) {
             *refusal = "Cannot assign to an accessor property of the receiver.";
             return normal(value);

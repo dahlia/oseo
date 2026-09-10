@@ -1221,10 +1221,16 @@ static OseoResult regexp_prototype_from_target(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_intrinsic(
+        result = oseo_internal_validate_function_realm(
             context,
-            OSEO_INTRINSIC_REGEXP_PROTOTYPE
+            frame.slots[0]
         );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_REGEXP_PROTOTYPE
+            );
+        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -2320,7 +2326,7 @@ OseoResult oseo_internal_regexp_exec(
         "exec",
         &frame.slots[2]
     );
-    if (result.status == OSEO_STATUS_NORMAL && is_function(frame.slots[2])) {
+    if (result.status == OSEO_STATUS_NORMAL && is_callable(frame.slots[2])) {
         result = oseo_call_function(
             context,
             frame.slots[2],

@@ -40,8 +40,8 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "Not executed: unsupported harness nativeFunctionMatcher.js."
       passed: false
-    unsupportedFeatures:
-      - Proxy
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

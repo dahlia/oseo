@@ -225,7 +225,7 @@ static OseoResult string_protocol_method(
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         !is_nullish(frame.slots[3])) {
-        if (!is_function(frame.slots[3])) {
+        if (!is_callable(frame.slots[3])) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_TYPE,
@@ -298,7 +298,7 @@ static OseoResult string_regexp_dispatch(
         result = oseo_object_get(context, frame.slots[2], frame.slots[3]);
         frame.slots[3] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[3])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(frame.slots[3])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -1010,7 +1010,7 @@ static OseoResult string_replace(
         );
         frame.slots[1] = result.value;
     }
-    bool functional = is_function(frame.slots[2]);
+    bool functional = is_callable(frame.slots[2]);
     if (result.status == OSEO_STATUS_NORMAL && !functional) {
         result = oseo_internal_value_string(context, frame.slots[2]);
         frame.slots[2] = result.value;

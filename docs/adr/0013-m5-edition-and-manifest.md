@@ -318,6 +318,20 @@ also call a `Reflect` function gain this tag is a separate reviewed change;
 when they do, they gain it alongside the tags they already carry. Admitting
 the tag moves no classification.
 
+The M5b `proxy-exotic-object` node extends the vocabulary with
+`proxy-exotic-object`. The tag identifies `Proxy`, `Proxy.revocable`, and the
+thirteen proxy internal methods whose handler traps interpose on prototype,
+extensibility, property, own-key, call, and construction operations. One tag
+covers the cluster because revocation and the target invariants apply across
+those operations and because the constructor is the only way to create the
+exotic object. The tag is distinct from `reflect-namespace`: Reflect exposes
+essential internal methods on ordinary targets, while this tag names an
+object whose internal methods dispatch to user traps and validate their
+answers. The node's inventory root contains 311 included paths. Assigning the
+tag to reviewed rows that observe a proxy is a separate reviewed change; when
+they gain it, they gain it alongside the tags they already carry. Admitting
+the tag moves no classification.
+
 
 Alternatives considered
 -----------------------

@@ -125,15 +125,30 @@ static OseoResult object_prototype_property_is_enumerable(
     OseoValue ignored_getter = oseo_undefined();
     OseoValue ignored_setter = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
-    bool own = oseo_internal_own_property_descriptor(
-        context,
-        receiver,
-        key.value,
-        &ignored,
-        &attributes,
-        &ignored_getter,
-        &ignored_setter
-    );
+    bool own = false;
+    OseoResult result = is_proxy(receiver)
+        ? oseo_internal_proxy_get_own_property(
+            context,
+            receiver,
+            key.value,
+            &own,
+            &ignored,
+            &attributes,
+            &ignored_getter,
+            &ignored_setter
+        )
+        : normal(oseo_boolean(
+            (own = oseo_internal_own_property_descriptor(
+                context,
+                receiver,
+                key.value,
+                &ignored,
+                &attributes,
+                &ignored_getter,
+                &ignored_setter
+            ))
+        ));
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(oseo_boolean(own && attributes.enumerable));
 }
 
@@ -149,10 +164,14 @@ static OseoResult object_prototype_is_prototype_of(
         return type_error(context, "Cannot convert a nullish value to object.");
     }
     if (!is_object(receiver)) return normal(oseo_boolean(false));
-    OseoValue current = ordinary_object(value)->prototype;
+    OseoResult prototype = oseo_internal_get_prototype(context, value);
+    if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
+    OseoValue current = prototype.value;
     while (is_object(current)) {
         if (current == receiver) return normal(oseo_boolean(true));
-        current = ordinary_object(current)->prototype;
+        prototype = oseo_internal_get_prototype(context, current);
+        if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
+        current = prototype.value;
     }
     return normal(oseo_boolean(false));
 }
@@ -160,7 +179,7 @@ static OseoResult object_prototype_is_prototype_of(
 static const char *object_builtin_tag(OseoValue receiver) {
     if (is_array(receiver)) return "Array";
     if (is_regexp(receiver)) return "RegExp";
-    if (is_function(receiver)) return "Function";
+    if (is_callable(receiver)) return "Function";
     if (is_object(receiver) && ordinary_object(receiver)->arguments_object) {
         return "Arguments";
     }
@@ -237,7 +256,20 @@ static OseoResult object_prototype_to_string(
     if (tag_of(receiver) == OSEO_TAG_NULL) {
         return object_tag_text(context, oseo_undefined(), "Null");
     }
-    const char *fallback = object_builtin_tag(receiver);
+    OseoValue tag_target = receiver;
+    bool proxy_array = false;
+    while (is_proxy(tag_target)) {
+        if (proxy_object(tag_target)->revoked) {
+            return type_error(context, "Cannot inspect a revoked Proxy.");
+        }
+        tag_target = proxy_object(tag_target)->target;
+    }
+    if (is_proxy(receiver)) proxy_array = is_array(tag_target);
+    const char *fallback = proxy_array
+        ? "Array"
+        : is_callable(receiver)
+            ? "Function"
+            : object_builtin_tag(is_proxy(receiver) ? receiver : tag_target);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -297,7 +329,7 @@ static OseoResult object_prototype_to_locale_string(
         );
         frame.slots[2] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[2])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(frame.slots[2])) {
         result = type_error(context, "The toString property is not callable.");
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -528,10 +560,13 @@ static OseoResult object_create_from_constructor(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_intrinsic(
-            context,
-            OSEO_INTRINSIC_OBJECT_PROTOTYPE
-        );
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_OBJECT_PROTOTYPE
+            );
+        }
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -576,7 +611,7 @@ static OseoResult object_get_prototype_of(
         builtin_argument(argument_count, arguments, 0u)
     );
     if (object.status != OSEO_STATUS_NORMAL) return object;
-    return normal(ordinary_object(object.value)->prototype);
+    return oseo_internal_get_prototype(context, object.value);
 }
 
 static OseoResult object_is(
@@ -600,6 +635,67 @@ static OseoResult object_set_integrity_level(
     OseoValue object_value,
     bool frozen
 ) {
+    if (is_proxy(object_value)) {
+        OseoValue slots[3] = {
+            object_value, oseo_undefined(), oseo_undefined(),
+        };
+        OseoRootFrame proxy_frame = {NULL, slots, 3u};
+        oseo_roots_push(context, &proxy_frame);
+        const char *refusal = NULL;
+        OseoResult proxy_result = oseo_internal_prevent_extensions_reported(
+            context, slots[0], &refusal);
+        if (proxy_result.status == OSEO_STATUS_NORMAL && refusal != NULL) {
+            proxy_result = type_error(context, refusal);
+        }
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_internal_proxy_own_keys(
+                context, slots[0], OSEO_OWN_KEY_ALL);
+            slots[1] = proxy_result.value;
+        }
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_internal_array_like_list(
+                context, slots[1], &slots[2]);
+        }
+        size_t key_count = 0u;
+        const OseoValue *keys = NULL;
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_argument_list_view(
+                context, slots[2], &key_count, &keys);
+        }
+        for (size_t index = 0u;
+             proxy_result.status == OSEO_STATUS_NORMAL && index < key_count;
+             index += 1u) {
+            bool found = true;
+            OseoValue value = oseo_undefined();
+            OseoPropertyAttributes attributes = {false, false, false, false};
+            OseoValue getter = oseo_undefined();
+            OseoValue setter = oseo_undefined();
+            if (frozen) {
+                proxy_result = oseo_internal_proxy_get_own_property(
+                    context, slots[0], keys[index], &found, &value,
+                    &attributes, &getter, &setter);
+            }
+            if (proxy_result.status != OSEO_STATUS_NORMAL || !found) continue;
+            OseoConvertedDescriptor descriptor = {
+                false, false, true, false,
+                frozen && !attributes.accessor, false,
+                false, false, false,
+            };
+            refusal = NULL;
+            proxy_result = oseo_internal_proxy_define_own_property(
+                context, slots[0], keys[index], &descriptor,
+                oseo_undefined(), oseo_undefined(), oseo_undefined(),
+                &refusal);
+            if (proxy_result.status == OSEO_STATUS_NORMAL && refusal != NULL) {
+                proxy_result = type_error(context, refusal);
+            }
+        }
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result.value = slots[0];
+        }
+        oseo_roots_pop(context, &proxy_frame);
+        return proxy_result;
+    }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     object->extensible = false;
     if (object->virtual_string_iterator) {
@@ -664,26 +760,84 @@ static OseoResult object_set_integrity_level(
 }
 
 /* TestIntegrityLevel (7.3.16), including the two virtual own properties. */
-static bool object_test_integrity_level(OseoValue value, bool frozen) {
+static OseoResult object_test_integrity_level(
+    OseoContext *context,
+    OseoValue value,
+    bool frozen
+) {
+    if (is_proxy(value)) {
+        OseoValue slots[3] = {value, oseo_undefined(), oseo_undefined()};
+        OseoRootFrame frame = {NULL, slots, 3u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_is_extensible(context, slots[0]);
+        if (result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value)) {
+            oseo_roots_pop(context, &frame);
+            return normal(oseo_boolean(false));
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_proxy_own_keys(
+                context, slots[0], OSEO_OWN_KEY_ALL);
+            slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_array_like_list(
+                context, slots[1], &slots[2]);
+        }
+        size_t key_count = 0u;
+        const OseoValue *keys = NULL;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_view(
+                context, slots[2], &key_count, &keys);
+        }
+        bool intact = true;
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && intact &&
+                 index < key_count;
+             index += 1u) {
+            bool found = false;
+            OseoValue property = oseo_undefined();
+            OseoPropertyAttributes attributes = {false, false, false, false};
+            OseoValue getter = oseo_undefined();
+            OseoValue setter = oseo_undefined();
+            result = oseo_internal_proxy_get_own_property(
+                context, slots[0], keys[index], &found, &property, &attributes,
+                &getter, &setter);
+            if (result.status == OSEO_STATUS_NORMAL && found &&
+                (attributes.configurable ||
+                 (frozen && !attributes.accessor && attributes.writable))) {
+                intact = false;
+            }
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(oseo_boolean(intact));
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
     OseoOrdinaryObject *object = ordinary_object(value);
-    if (object->extensible) return false;
-    if (frozen && is_array(value) && object->length_writable) return false;
+    if (object->extensible) return normal(oseo_boolean(false));
+    if (frozen && is_array(value) && object->length_writable) {
+        return normal(oseo_boolean(false));
+    }
     if (frozen && function_has_prototype_property(value) &&
-        function_object(value)->prototype_writable) return false;
+        function_object(value)->prototype_writable) {
+        return normal(oseo_boolean(false));
+    }
     if (object->virtual_string_iterator &&
         (object->virtual_string_iterator_configurable ||
          (frozen && object->virtual_string_iterator_writable))) {
-        return false;
+        return normal(oseo_boolean(false));
     }
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         OseoPropertyAttributes attributes =
             object->properties[index].attributes;
         if (attributes.configurable ||
             (frozen && !attributes.accessor && attributes.writable)) {
-            return false;
+            return normal(oseo_boolean(false));
         }
     }
-    return true;
+    return normal(oseo_boolean(true));
 }
 
 static OseoResult object_integrity_transition(
@@ -698,33 +852,40 @@ static OseoResult object_integrity_transition(
 }
 
 static OseoResult object_integrity_query(
+    OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments,
     bool frozen
 ) {
     OseoValue value = builtin_argument(argument_count, arguments, 0u);
-    return normal(oseo_boolean(
-        !is_object(value) || object_test_integrity_level(value, frozen)
-    ));
+    return !is_object(value)
+        ? normal(oseo_boolean(true))
+        : object_test_integrity_level(context, value, frozen);
 }
 
 static OseoResult object_is_extensible(
+    OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
     OseoValue value = builtin_argument(argument_count, arguments, 0u);
-    return normal(oseo_boolean(
-        is_object(value) && ordinary_object(value)->extensible
-    ));
+    return is_object(value)
+        ? oseo_internal_is_extensible(context, value)
+        : normal(oseo_boolean(false));
 }
 
 static OseoResult object_prevent_extensions(
+    OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
     OseoValue value = builtin_argument(argument_count, arguments, 0u);
-    if (is_object(value)) ordinary_object(value)->extensible = false;
-    return normal(value);
+    if (!is_object(value)) return normal(value);
+    const char *refusal = NULL;
+    OseoResult result = oseo_internal_prevent_extensions_reported(
+        context, value, &refusal);
+    if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
+    return type_error(context, refusal);
 }
 
 OseoResult oseo_internal_object_builtin_dispatch(
@@ -811,16 +972,18 @@ OseoResult oseo_internal_object_builtin_dispatch(
             context, argument_count, arguments, true);
     }
     if (code_id == OSEO_OBJECT_IS_EXTENSIBLE_CODE_ID) {
-        return object_is_extensible(argument_count, arguments);
+        return object_is_extensible(context, argument_count, arguments);
     }
     if (code_id == OSEO_OBJECT_IS_FROZEN_CODE_ID) {
-        return object_integrity_query(argument_count, arguments, true);
+        return object_integrity_query(
+            context, argument_count, arguments, true);
     }
     if (code_id == OSEO_OBJECT_IS_SEALED_CODE_ID) {
-        return object_integrity_query(argument_count, arguments, false);
+        return object_integrity_query(
+            context, argument_count, arguments, false);
     }
     if (code_id == OSEO_OBJECT_PREVENT_EXTENSIONS_CODE_ID) {
-        return object_prevent_extensions(argument_count, arguments);
+        return object_prevent_extensions(context, argument_count, arguments);
     }
     if (code_id == OSEO_OBJECT_SEAL_CODE_ID) {
         return object_integrity_transition(
@@ -1285,6 +1448,54 @@ static bool rest_key_is_excluded(
     return false;
 }
 
+/* Materialize a Proxy [[OwnPropertyKeys]] result in the frame shape used
+ * by the ordinary own-key consumers below. */
+static OseoResult proxy_own_key_frame(
+    OseoContext *context,
+    OseoValue proxy,
+    OseoRootFrame *frame,
+    size_t *key_count
+) {
+    OseoValue slots[3] = {
+        proxy, oseo_undefined(), oseo_undefined(),
+    };
+    OseoRootFrame temporary = {NULL, slots, 3u};
+    oseo_roots_push(context, &temporary);
+    OseoResult result = oseo_internal_proxy_own_keys(
+        context, slots[0], OSEO_OWN_KEY_ALL);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_array_like_list(
+            context, slots[1], &slots[2]);
+    }
+    const OseoValue *keys = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_view(
+            context, slots[2], key_count, &keys);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        *key_count > SIZE_MAX - 3u) {
+        result = failure(
+            context, "OSEO2001", "Own-key snapshot is too large.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_roots_allocate(context, frame, *key_count + 3u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame->slots[0] = slots[0];
+        for (size_t index = 0u; index < *key_count; index += 1u) {
+            frame->slots[3u + index] = keys[index];
+        }
+        /* The dynamic frame was pushed above the temporary roots. The
+         * copied key values let it replace those roots in the chain. */
+        frame->previous = temporary.previous;
+        temporary.previous = NULL;
+    } else {
+        oseo_roots_pop(context, &temporary);
+    }
+    return result;
+}
+
 /*
  * The own-key order CopyDataProperties walks. Of the own properties that
  * live outside the property vector, only the virtual
@@ -1381,21 +1592,32 @@ static OseoResult copy_data_properties(
     size_t excluded_count,
     const OseoValue *excluded_keys
 ) {
-    size_t key_count = is_string(source)
-        ? string_object(source)->length
-        : is_object(source)
-            ? ordinary_object(source)->property_count +
-                (ordinary_object(source)->virtual_string_iterator ? 1u : 0u)
-            : 0u;
-    if (key_count > SIZE_MAX - 3u) {
-        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    size_t key_count = 0u;
+    OseoResult result = normal(oseo_undefined());
+    if (is_proxy(source)) {
+        result = proxy_own_key_frame(context, source, &frame, &key_count);
+    } else {
+        key_count = is_string(source)
+            ? string_object(source)->length
+            : is_object(source)
+                ? ordinary_object(source)->property_count +
+                    (ordinary_object(source)->virtual_string_iterator
+                        ? 1u
+                        : 0u)
+                : 0u;
+        if (key_count > SIZE_MAX - 3u) {
+            return failure(
+                context, "OSEO2001", "Own-key snapshot is too large.");
+        }
+        result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    }
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = source;
     frame.slots[1] = target;
-    result = snapshot_rest_keys(context, &frame, key_count);
+    if (!is_proxy(frame.slots[0])) {
+        result = snapshot_rest_keys(context, &frame, key_count);
+    }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < key_count;
          index += 1u) {
@@ -1407,9 +1629,24 @@ static OseoResult copy_data_properties(
         OseoValue ignored = oseo_undefined();
         OseoValue ignored_getter = oseo_undefined();
         OseoValue ignored_setter = oseo_undefined();
-        bool exists = is_string(frame.slots[0])
-            ? oseo_internal_string_own_property(frame.slots[0], key, NULL)
-            : oseo_internal_own_property_descriptor(
+        bool exists = false;
+        if (is_string(frame.slots[0])) {
+            exists = oseo_internal_string_own_property(
+                frame.slots[0], key, NULL);
+        } else if (is_proxy(frame.slots[0])) {
+            result = oseo_internal_proxy_get_own_property(
+                context,
+                frame.slots[0],
+                key,
+                &exists,
+                &ignored,
+                &attributes,
+                &ignored_getter,
+                &ignored_setter
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        } else {
+            exists = oseo_internal_own_property_descriptor(
                 context,
                 frame.slots[0],
                 key,
@@ -1418,6 +1655,7 @@ static OseoResult copy_data_properties(
                 &ignored_getter,
                 &ignored_setter
             );
+        }
         bool enumerable = is_string(frame.slots[0])
             ? exists && !oseo_internal_string_is_ascii(key, "length")
             : exists && attributes.enumerable;
@@ -1544,18 +1782,6 @@ OseoResult oseo_object_builtin_create(
  * record; ToBoolean runs no user code, so the three attribute fields
  * hold their converted results directly.
  */
-typedef struct {
-    bool has_enumerable;
-    bool enumerable;
-    bool has_configurable;
-    bool configurable;
-    bool has_writable;
-    bool writable;
-    bool has_value;
-    bool has_getter;
-    bool has_setter;
-} OseoConvertedDescriptor;
-
 /*
  * ToPropertyDescriptor (6.2.6.5) over a descriptor object the caller has
  * already checked and rooted. The fields are read in ECMA-262's fixed
@@ -1568,7 +1794,7 @@ typedef struct {
  * descriptor mixing accessor and data fields throw the specified
  * TypeError.
  */
-static OseoResult to_property_descriptor(
+OseoResult oseo_internal_to_property_descriptor(
     OseoContext *context,
     OseoValue descriptor_value,
     OseoValue *value_slot,
@@ -1605,7 +1831,7 @@ static OseoResult to_property_descriptor(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     if (descriptor->has_getter &&
         tag_of(*getter_slot) != OSEO_TAG_UNDEFINED &&
-        !is_function(*getter_slot)) {
+        !is_callable(*getter_slot)) {
         return type_error(context, "A property descriptor 'get' field must "
             "be undefined or callable.");
     }
@@ -1615,7 +1841,7 @@ static OseoResult to_property_descriptor(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     if (descriptor->has_setter &&
         tag_of(*setter_slot) != OSEO_TAG_UNDEFINED &&
-        !is_function(*setter_slot)) {
+        !is_callable(*setter_slot)) {
         return type_error(context, "A property descriptor 'set' field must "
             "be undefined or callable.");
     }
@@ -1637,7 +1863,7 @@ static OseoResult to_property_descriptor(
  * descriptor component stays authoritative for compatibility and
  * mutation.
  */
-static OseoResult define_converted_property(
+OseoResult oseo_internal_define_converted_property(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
@@ -1648,6 +1874,18 @@ static OseoResult define_converted_property(
     const char **refusal
 ) {
     *refusal = NULL;
+    if (is_proxy(object_value)) {
+        return oseo_internal_proxy_define_own_property(
+            context,
+            object_value,
+            key,
+            descriptor,
+            value,
+            getter,
+            setter,
+            refusal
+        );
+    }
     OseoValue current_value = oseo_undefined();
     OseoPropertyAttributes current_attributes = {false, false, false, false};
     OseoValue current_getter = oseo_undefined();
@@ -1739,7 +1977,7 @@ OseoResult oseo_internal_define_from_descriptor(
     frame.slots[0] = object_value;
     frame.slots[1] = key;
     OseoConvertedDescriptor descriptor;
-    result = to_property_descriptor(
+    result = oseo_internal_to_property_descriptor(
         context,
         descriptor_value,
         &frame.slots[2],
@@ -1748,7 +1986,7 @@ OseoResult oseo_internal_define_from_descriptor(
         &descriptor
     );
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_converted_property(
+        result = oseo_internal_define_converted_property(
             context,
             frame.slots[0],
             frame.slots[1],
@@ -1884,15 +2122,31 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
     OseoValue setter = oseo_undefined();
     bool exists = false;
     if (result.status == OSEO_STATUS_NORMAL && is_object(object_value)) {
-        exists = oseo_internal_own_property_descriptor(
-            context,
-            object_value,
-            frame.slots[1],
-            &value,
-            &attributes,
-            &getter,
-            &setter
-        );
+        result = is_proxy(object_value)
+            ? oseo_internal_proxy_get_own_property(
+                context,
+                object_value,
+                frame.slots[1],
+                &exists,
+                &value,
+                &attributes,
+                &getter,
+                &setter
+            )
+            : normal(oseo_boolean(
+                (exists = oseo_internal_own_property_descriptor(
+                    context,
+                    object_value,
+                    frame.slots[1],
+                    &value,
+                    &attributes,
+                    &getter,
+                    &setter
+                ))
+            ));
+        /* The normal value is ignored; only the abrupt completion and
+         * the descriptor outputs are observable here. */
+        (void)result.value;
     } else if (result.status == OSEO_STATUS_NORMAL &&
                is_string(object_value)) {
         if (oseo_internal_string_is_ascii(frame.slots[1], "length")) {
@@ -2073,6 +2327,9 @@ OseoResult oseo_internal_own_key_array(
     OseoValue object_value,
     OseoOwnKeyFilter filter
 ) {
+    if (is_proxy(object_value)) {
+        return oseo_internal_proxy_own_keys(context, object_value, filter);
+    }
     OseoValue rooted = object_value;
     OseoRootFrame root = {NULL, &rooted, 1u};
     oseo_roots_push(context, &root);
@@ -2142,6 +2399,88 @@ static OseoResult object_enumerable_own_properties(
         builtin_argument(argument_count, arguments, 0u)
     );
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    if (is_proxy(converted.value)) {
+        OseoValue slots[5] = {
+            converted.value,
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+            oseo_undefined(),
+        };
+        OseoRootFrame proxy_frame = {NULL, slots, 5u};
+        oseo_roots_push(context, &proxy_frame);
+        OseoResult proxy_result = oseo_internal_proxy_own_keys(
+            context, slots[0], OSEO_OWN_KEY_STRINGS);
+        slots[1] = proxy_result.value;
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_internal_array_like_list(
+                context, slots[1], &slots[2]);
+        }
+        size_t proxy_count = 0u;
+        const OseoValue *proxy_keys = NULL;
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_argument_list_view(
+                context, slots[2], &proxy_count, &proxy_keys);
+        }
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result = oseo_array_create(context, 0u);
+            slots[3] = proxy_result.value;
+        }
+        for (size_t index = 0u;
+             proxy_result.status == OSEO_STATUS_NORMAL &&
+                 index < proxy_count;
+             index += 1u) {
+            bool found = false;
+            OseoValue descriptor_value = oseo_undefined();
+            OseoValue descriptor_getter = oseo_undefined();
+            OseoValue descriptor_setter = oseo_undefined();
+            OseoPropertyAttributes descriptor = {false, false, false, false};
+            proxy_result = oseo_internal_proxy_get_own_property(
+                context,
+                slots[0],
+                proxy_keys[index],
+                &found,
+                &descriptor_value,
+                &descriptor,
+                &descriptor_getter,
+                &descriptor_setter
+            );
+            if (proxy_result.status != OSEO_STATUS_NORMAL ||
+                !found || !descriptor.enumerable) continue;
+            if (kind == OSEO_ENUMERABLE_KEYS) {
+                proxy_result = oseo_array_append(
+                    context, slots[3], proxy_keys[index]);
+                continue;
+            }
+            proxy_result = oseo_object_get(
+                context, slots[0], proxy_keys[index]);
+            slots[4] = proxy_result.value;
+            if (proxy_result.status != OSEO_STATUS_NORMAL) break;
+            if (kind == OSEO_ENUMERABLE_VALUES) {
+                proxy_result = oseo_array_append(
+                    context, slots[3], slots[4]);
+                continue;
+            }
+            OseoResult pair = oseo_array_create(context, 0u);
+            slots[1] = pair.value;
+            if (pair.status == OSEO_STATUS_NORMAL) {
+                pair = oseo_array_append(
+                    context, slots[1], proxy_keys[index]);
+            }
+            if (pair.status == OSEO_STATUS_NORMAL) {
+                pair = oseo_array_append(context, slots[1], slots[4]);
+            }
+            if (pair.status == OSEO_STATUS_NORMAL) {
+                pair = oseo_array_append(context, slots[3], slots[1]);
+            }
+            proxy_result = pair;
+        }
+        if (proxy_result.status == OSEO_STATUS_NORMAL) {
+            proxy_result.value = slots[3];
+        }
+        oseo_roots_pop(context, &proxy_frame);
+        return proxy_result;
+    }
     OseoValue rooted = converted.value;
     OseoRootFrame root = {NULL, &rooted, 1u};
     oseo_roots_push(context, &root);
@@ -2243,19 +2582,27 @@ static OseoResult object_assign(
         OseoValue source = converted.value;
         OseoRootFrame source_root = {NULL, &source, 1u};
         oseo_roots_push(context, &source_root);
-        size_t key_count = own_key_count(source);
-        if (key_count > SIZE_MAX - 3u) {
-            result = failure(
-                context, "OSEO2001", "Own-key snapshot is too large.");
-        }
+        size_t key_count = 0u;
         OseoRootFrame frame = {NULL, NULL, 0u};
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (is_proxy(source)) {
+            result = proxy_own_key_frame(
+                context, source, &frame, &key_count);
+        } else {
+            key_count = own_key_count(source);
+            if (key_count > SIZE_MAX - 3u) {
+                result = failure(
+                    context, "OSEO2001", "Own-key snapshot is too large.");
+            }
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !is_proxy(source)) {
             result = oseo_roots_allocate(context, &frame, key_count + 3u);
         }
         if (result.status == OSEO_STATUS_NORMAL) {
             frame.slots[0] = source;
             frame.slots[1] = target;
-            result = snapshot_own_keys(context, &frame, key_count);
+            if (!is_proxy(frame.slots[0])) {
+                result = snapshot_own_keys(context, &frame, key_count);
+            }
         }
         for (size_t index = 0u;
              result.status == OSEO_STATUS_NORMAL && index < key_count;
@@ -2265,7 +2612,21 @@ static OseoResult object_assign(
             OseoValue ignored_getter = oseo_undefined();
             OseoValue ignored_setter = oseo_undefined();
             OseoPropertyAttributes attributes = {false, false, false, false};
-            if (!oseo_internal_own_property_descriptor(
+            bool exists = false;
+            if (is_proxy(frame.slots[0])) {
+                result = oseo_internal_proxy_get_own_property(
+                    context,
+                    frame.slots[0],
+                    key,
+                    &exists,
+                    &ignored,
+                    &attributes,
+                    &ignored_getter,
+                    &ignored_setter
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+            } else {
+                exists = oseo_internal_own_property_descriptor(
                     context,
                     frame.slots[0],
                     key,
@@ -2273,8 +2634,9 @@ static OseoResult object_assign(
                     &attributes,
                     &ignored_getter,
                     &ignored_setter
-                ) ||
-                !attributes.enumerable) {
+                );
+            }
+            if (!exists || !attributes.enumerable) {
                 continue;
             }
             result = oseo_object_get(context, frame.slots[0], key);
@@ -2624,7 +2986,7 @@ static OseoResult object_group_by(
     OseoResult result = normal(oseo_undefined());
     if (is_nullish(slots[0])) {
         result = type_error(context, "Object.groupBy requires an iterable.");
-    } else if (!is_function(slots[1])) {
+    } else if (!is_callable(slots[1])) {
         result = type_error(
             context,
             "Object.groupBy callback is not callable."
@@ -2722,16 +3084,24 @@ static OseoResult object_get_own_property_descriptors(
     }
     OseoResult converted = oseo_internal_to_object(context, value);
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
-    size_t key_count = own_key_count(converted.value);
-    if (key_count > SIZE_MAX - 3u) {
-        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
-    }
+    size_t key_count = 0u;
     /* The key frame roots the conversion result, the reported object,
      * the one synthesized key string, and the whole key snapshot. The
      * descriptor frame is the four-slot scratch every
      * FromPropertyDescriptor call reuses. */
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    OseoResult result = normal(oseo_undefined());
+    if (is_proxy(converted.value)) {
+        result = proxy_own_key_frame(
+            context, converted.value, &frame, &key_count);
+    } else {
+        key_count = own_key_count(converted.value);
+        if (key_count > SIZE_MAX - 3u) {
+            return failure(
+                context, "OSEO2001", "Own-key snapshot is too large.");
+        }
+        result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    }
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = converted.value;
     OseoRootFrame descriptor = {NULL, NULL, 0u};
@@ -2740,7 +3110,9 @@ static OseoResult object_get_own_property_descriptors(
         oseo_roots_release(context, &frame);
         return result;
     }
-    result = snapshot_own_keys(context, &frame, key_count);
+    if (!is_proxy(frame.slots[0])) {
+        result = snapshot_own_keys(context, &frame, key_count);
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_literal_create(context);
         frame.slots[1] = result.value;
@@ -2753,7 +3125,21 @@ static OseoResult object_get_own_property_descriptors(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        if (!oseo_internal_own_property_descriptor(
+        bool exists = false;
+        if (is_proxy(frame.slots[0])) {
+            result = oseo_internal_proxy_get_own_property(
+                context,
+                frame.slots[0],
+                key,
+                &exists,
+                &own,
+                &attributes,
+                &getter,
+                &setter
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        } else {
+            exists = oseo_internal_own_property_descriptor(
                 context,
                 frame.slots[0],
                 key,
@@ -2761,7 +3147,9 @@ static OseoResult object_get_own_property_descriptors(
                 &attributes,
                 &getter,
                 &setter
-            )) continue;
+            );
+        }
+        if (!exists) continue;
         descriptor.slots[2] = attributes.accessor ? getter : own;
         descriptor.slots[3] = setter;
         if (oseo_internal_cell_backed_property(frame.slots[0], own)) {
@@ -2815,19 +3203,31 @@ static OseoResult object_define_properties(
         builtin_argument(argument_count, arguments, 1u)
     );
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
-    size_t key_count = own_key_count(converted.value);
-    if (key_count > SIZE_MAX - 3u ||
-        key_count > (SIZE_MAX - 1u) / 4u) {
-        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
-    }
+    size_t key_count = 0u;
     /* The key frame roots the properties object, the target, the one
      * synthesized key string, and the whole key snapshot. The collected
      * frame holds four slots per collected descriptor, in the order
      * key, value, getter, setter, and one final slot that roots each
      * descriptor object while its fields are read. */
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    OseoResult result = normal(oseo_undefined());
+    if (is_proxy(converted.value)) {
+        result = proxy_own_key_frame(
+            context, converted.value, &frame, &key_count);
+    } else {
+        key_count = own_key_count(converted.value);
+        if (key_count > SIZE_MAX - 3u) {
+            return failure(
+                context, "OSEO2001", "Own-key snapshot is too large.");
+        }
+        result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    }
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (key_count > (SIZE_MAX - 1u) / 4u) {
+        oseo_roots_release(context, &frame);
+        return failure(
+            context, "OSEO2001", "Own-key snapshot is too large.");
+    }
     frame.slots[0] = converted.value;
     frame.slots[1] = object_value;
     OseoRootFrame collected_frame = {NULL, NULL, 0u};
@@ -2851,7 +3251,8 @@ static OseoResult object_define_properties(
             );
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_proxy(frame.slots[0])) {
         result = snapshot_own_keys(context, &frame, key_count);
     }
     size_t collected = 0u;
@@ -2865,7 +3266,21 @@ static OseoResult object_define_properties(
         OseoValue ignored_setter = oseo_undefined();
         /* A getter an earlier key ran may have removed this key or made
          * it non-enumerable, so the descriptor is re-read per key. */
-        if (!oseo_internal_own_property_descriptor(
+        bool exists = false;
+        if (is_proxy(frame.slots[0])) {
+            result = oseo_internal_proxy_get_own_property(
+                context,
+                frame.slots[0],
+                key,
+                &exists,
+                &ignored,
+                &attributes,
+                &ignored_getter,
+                &ignored_setter
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        } else {
+            exists = oseo_internal_own_property_descriptor(
                 context,
                 frame.slots[0],
                 key,
@@ -2873,8 +3288,9 @@ static OseoResult object_define_properties(
                 &attributes,
                 &ignored_getter,
                 &ignored_setter
-            ) ||
-            !attributes.enumerable) {
+            );
+        }
+        if (!exists || !attributes.enumerable) {
             continue;
         }
         result = oseo_object_get(context, frame.slots[0], key);
@@ -2889,7 +3305,7 @@ static OseoResult object_define_properties(
         }
         OseoValue *slots = &collected_frame.slots[4u * collected];
         slots[0] = key;
-        result = to_property_descriptor(
+        result = oseo_internal_to_property_descriptor(
             context,
             collected_frame.slots[4u * key_count],
             &slots[1],
@@ -2905,7 +3321,7 @@ static OseoResult object_define_properties(
          result.status == OSEO_STATUS_NORMAL && index < collected;
          index += 1u) {
         OseoValue *slots = &collected_frame.slots[4u * index];
-        result = define_converted_property(
+        result = oseo_internal_define_converted_property(
             context,
             frame.slots[1],
             slots[0],

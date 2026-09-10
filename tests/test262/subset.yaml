@@ -24,6 +24,7 @@ supportedFeatures:
   - Object.is
   - Promise.allSettled
   - Promise.any
+  - Proxy
   - Reflect
   - Reflect.construct
   - Reflect.set
@@ -494,10 +495,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/proxy-revoked.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/length.js
     expectedClassification: pass
@@ -632,7 +633,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/of/return-abrupt-from-data-property-using-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/of/return-abrupt-from-data-property.js
     expectedClassification: pass
@@ -830,7 +831,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/arg-length-exceeding-integer-limit.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/arg-length-near-integer-limit.js
     expectedClassification: pass
@@ -854,10 +855,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-species-abrupt.js
     expectedClassification: pass
@@ -902,13 +903,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-is-array-proxy-revoked.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-proxy-revoked.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/is-concat-spreadable-val-falsey.js
     expectedClassification: pass
@@ -1004,7 +1005,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/return-abrupt-from-delete-proxy-target.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/return-abrupt-from-delete-target.js
     expectedClassification: pass
@@ -1019,7 +1020,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/return-abrupt-from-has-start.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/return-abrupt-from-set-target-value.js
     expectedClassification: pass
@@ -2471,10 +2472,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-species-abrupt.js
     expectedClassification: pass
@@ -2849,7 +2850,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flat/proxy-access-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flat/symbol-object-create-null-depth-throws.js
     expectedClassification: pass
@@ -2903,7 +2904,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/proxy-access-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/target-array-non-extensible.js
     expectedClassification: pass
@@ -3509,7 +3510,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/get-prop.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/length-boundaries.js
     expectedClassification: pass
@@ -4151,7 +4152,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/calls-only-has-on-prototype-after-length-zeroed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/coerced-searchelement-fromindex-grow.js
     expectedClassification: unsupported-profile-feature
@@ -4853,7 +4854,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/calls-only-has-on-prototype-after-length-zeroed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/coerced-position-grow.js
     expectedClassification: unsupported-profile-feature
@@ -5480,10 +5481,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-species-abrupt.js
     expectedClassification: pass
@@ -5498,7 +5499,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-species-undef-invalid-len.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-species-undef.js
     expectedClassification: pass
@@ -7511,13 +7512,13 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-proxied-array-invalid-len.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-species-abrupt.js
     expectedClassification: pass
@@ -7541,7 +7542,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/length-exceeding-integer-limit-proxied-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/length-exceeding-integer-limit.js
     expectedClassification: pass
@@ -8546,10 +8547,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-species-abrupt.js
     expectedClassification: pass
@@ -8567,7 +8568,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-species-undef-invalid-len.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-species-undef.js
     expectedClassification: pass
@@ -8597,7 +8598,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/property-traps-order-with-species.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/set_length_no_args.js
     expectedClassification: pass
@@ -11820,7 +11821,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/internals/Construct/derived-return-val-realm.js
     expectedClassification: unsupported-profile-feature
@@ -11937,7 +11938,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-get-prototype-of-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/Symbol.hasInstance/value-negative.js
     expectedClassification: pass
@@ -12777,7 +12778,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/toString/proxy-non-callable-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/toString/setter-class-expression-static.js
     expectedClassification: unsupported-profile-feature
@@ -16566,22 +16567,22 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/source-own-prop-desc-missing.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/source-own-prop-error.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/source-own-prop-keys-error.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/strings-and-symbol-order-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/strings-and-symbol-order.js
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/target-Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/target-is-frozen-accessor-property-set-succeeds.js
     expectedClassification: pass
@@ -19467,7 +19468,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/typedarray-backed-by-resizable-buffer.js
     expectedClassification: unsupported-profile-feature
@@ -22896,7 +22897,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/entries/observable-operations.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/entries/order-after-define-property-with-function.js
     expectedClassification: pass
@@ -23061,7 +23062,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/abrupt-completion.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/frozen-object-contains-symbol-properties-non-strict.js
     expectedClassification: pass
@@ -23076,13 +23077,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/proxy-with-defineProperty-handler.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/throws-when-false.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/typedarray-backed-by-resizable-buffer.js
     expectedClassification: unsupported-profile-feature
@@ -24069,7 +24070,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/observable-operations.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/order-after-define-property.js
     expectedClassification: pass
@@ -24087,10 +24088,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/proxy-undefined-descriptor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptors/symbols-included.js
     expectedClassification: pass
@@ -24222,16 +24223,16 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-absent-not-configurable-symbol-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-duplicate-symbol-entry.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-not-extensible-absent-symbol-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertyNames/proxy-invariant-not-extensible-extra-symbol-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertySymbols/length.js
     expectedClassification: pass
@@ -24258,16 +24259,16 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-absent-not-configurable-string-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-duplicate-string-entry.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-not-extensible-absent-string-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getOwnPropertySymbols/proxy-invariant-not-extensible-extra-string-key.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-0-1.js
     expectedClassification: pass
@@ -24987,7 +24988,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-0-1.js
     expectedClassification: pass
@@ -25086,7 +25087,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/keys/15.2.3.14-0-1.js
     expectedClassification: pass
@@ -25248,19 +25249,19 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/property-traps-order-with-proxied-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/proxy-keys.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/proxy-non-enumerable-prop-invariant-3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/return-order.js
     expectedClassification: pass
@@ -25368,7 +25369,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/abrupt-completion.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/name.js
     expectedClassification: pass
@@ -25383,7 +25384,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/throws-when-false.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prop-desc.js
     expectedClassification: pass
@@ -25620,7 +25621,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/isPrototypeOf/arg-is-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/isPrototypeOf/builtin.js
     expectedClassification: pass
@@ -25809,19 +25810,19 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/proxy-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/proxy-function-async.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/proxy-function.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/proxy-revoked-during-get-call.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/proxy-revoked.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-array-builtin.js
     expectedClassification: unsupported-profile-feature
@@ -25839,7 +25840,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-non-str-proxy-function.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-non-str.js
     expectedClassification: pass
@@ -25932,7 +25933,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/abrupt-completion.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/configurable-attribute-all-own-properties-set-from-true-to-false-property-are-unaltered.js
     expectedClassification: pass
@@ -26055,10 +26056,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/proxy-no-ownkeys-returned-keys-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/proxy-with-defineProperty-handler.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-aggregateerror.js
     expectedClassification: pass
@@ -26139,7 +26140,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-rangeerror.js
     expectedClassification: pass
@@ -26202,7 +26203,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/throws-when-false.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/setPrototypeOf/bigint.js
     expectedClassification: pass
@@ -26229,7 +26230,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/setPrototypeOf/set-error.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/setPrototypeOf/set-failure-cycle.js
     expectedClassification: pass
@@ -26277,10 +26278,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/values/observable-operations.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/values/order-after-define-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/values/primitive-booleans.js
     expectedClassification: pass
@@ -28251,7 +28252,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/defineProperty/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/defineProperty/return-boolean.js
     expectedClassification: pass
@@ -28284,7 +28285,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/deleteProperty/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/deleteProperty/return-boolean.js
     expectedClassification: pass
@@ -28347,7 +28348,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/getOwnPropertyDescriptor/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/getOwnPropertyDescriptor/return-from-accessor-descriptor.js
     expectedClassification: pass
@@ -28386,7 +28387,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/getPrototypeOf/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/getPrototypeOf/return-prototype.js
     expectedClassification: pass
@@ -28416,7 +28417,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/has/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/has/return-boolean.js
     expectedClassification: pass
@@ -28443,7 +28444,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/isExtensible/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/isExtensible/return-boolean.js
     expectedClassification: pass
@@ -28473,7 +28474,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/ownKeys/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/ownKeys/return-array-with-own-keys-only.js
     expectedClassification: pass
@@ -28512,10 +28513,10 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/preventExtensions/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/preventExtensions/return-boolean-from-proxy-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/preventExtensions/target-is-not-object-throws.js
     expectedClassification: pass
@@ -28596,7 +28597,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/setPrototypeOf/return-abrupt-from-result.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/setPrototypeOf/return-false-if-target-and-proto-are-the-same.js
     expectedClassification: pass
@@ -42894,7 +42895,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-fields-proxy-default-handler-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-generator-method-name.js
     expectedClassification: pass
@@ -49585,7 +49586,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/public-class-field-initialization-is-visible-to-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/public-class-field-initialization-on-super-class-with-setter.js
     expectedClassification: pass

@@ -169,6 +169,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_REFLECT_CODE_ID_RANGE_FIRST,
      OSEO_REFLECT_CODE_ID_RANGE_LAST,
      oseo_internal_reflect_builtin_dispatch},
+    {OSEO_PROXY_CODE_ID_RANGE_FIRST,
+     OSEO_PROXY_CODE_ID_RANGE_LAST,
+     oseo_internal_proxy_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -300,7 +303,7 @@ static OseoResult require_callable(
     OseoContext *context,
     OseoValue value
 ) {
-    if (is_function(value)) return normal(value);
+    if (is_callable(value)) return normal(value);
     return oseo_internal_throw_error(
         context,
         OSEO_ERROR_TYPE,
@@ -522,13 +525,17 @@ static OseoResult function_prototype_bind(
     OseoResult result = require_callable(context, target);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    result = oseo_roots_allocate(context, &frame, 7u);
+    result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = target;
     frame.slots[1] = argument_count == 0u
         ? oseo_undefined()
         : arguments[0];
-    result = oseo_argument_list_create(context);
+    result = oseo_internal_get_prototype(context, frame.slots[0]);
+    frame.slots[7] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+    }
     frame.slots[2] = result.value;
     for (size_t index = 1u;
          result.status == OSEO_STATUS_NORMAL && index < argument_count;
@@ -621,8 +628,7 @@ static OseoResult function_prototype_bind(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoFunction *bound = function_object(frame.slots[6]);
-        bound->ordinary.prototype =
-            ordinary_object(frame.slots[0])->prototype;
+        bound->ordinary.prototype = frame.slots[7];
         bound->bound_target = frame.slots[0];
         bound->bound_this = frame.slots[1];
         bound->bound_arguments = frame.slots[2];
@@ -692,6 +698,10 @@ static OseoResult function_prototype_to_string(
 ) {
     OseoResult callable = require_callable(context, target);
     if (callable.status != OSEO_STATUS_NORMAL) return callable;
+    if (is_proxy(target)) {
+        return oseo_internal_ascii_string(
+            context, "function () { [native code] }");
+    }
     OseoValue source = function_object(target)->source_text;
     if (is_string(source)) return normal(source);
     return native_function_text(context, target);
@@ -1084,6 +1094,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         materialized = oseo_internal_uri_intrinsic(context, intrinsic);
     } else if (intrinsic == OSEO_INTRINSIC_REFLECT) {
         materialized = oseo_internal_reflect_intrinsic(context);
+    } else if (intrinsic == OSEO_INTRINSIC_PROXY) {
+        materialized = oseo_internal_proxy_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_ITERATOR_PROTOTYPE ||
                intrinsic == OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_ITERATOR &&
@@ -1594,11 +1606,16 @@ OseoResult oseo_function_prototype(
             "Constructed value is not a constructor."
         );
     }
-    while (
-        function_object(function_value)->function_kind == OSEO_FUNCTION_BOUND
-    ) {
+    /* A Proxy owns [[Construct]] and allocates or returns its receiver
+     * there. Returning no prototype makes legacy callers' eager receiver
+     * irrelevant without reading a function record through the Proxy's
+     * shorter heap layout. */
+    while (is_function(function_value) &&
+           function_object(function_value)->function_kind ==
+               OSEO_FUNCTION_BOUND) {
         function_value = function_object(function_value)->bound_target;
     }
+    if (is_proxy(function_value)) return normal(oseo_undefined());
     return normal(function_object(function_value)->prototype_object);
 }
 
@@ -1607,8 +1624,9 @@ OseoResult oseo_internal_ordinary_has_instance(
     OseoValue target,
     OseoValue value
 ) {
-    if (!is_function(target)) return normal(oseo_boolean(false));
-    if (function_object(target)->function_kind == OSEO_FUNCTION_BOUND) {
+    if (!is_callable(target)) return normal(oseo_boolean(false));
+    if (is_function(target) &&
+        function_object(target)->function_kind == OSEO_FUNCTION_BOUND) {
         return oseo_instanceof(
             context,
             value,
@@ -1633,16 +1651,21 @@ OseoResult oseo_internal_ordinary_has_instance(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoValue current = ordinary_object(slots[1])->prototype;
+        OseoResult prototype = oseo_internal_get_prototype(
+            context, slots[1]);
+        OseoValue current = prototype.value;
         bool found = false;
-        while (is_object(current)) {
+        while (prototype.status == OSEO_STATUS_NORMAL && is_object(current)) {
             if (current == slots[2]) {
                 found = true;
                 break;
             }
-            current = ordinary_object(current)->prototype;
+            prototype = oseo_internal_get_prototype(context, current);
+            current = prototype.value;
         }
-        result = normal(oseo_boolean(found));
+        result = prototype.status == OSEO_STATUS_NORMAL
+            ? normal(oseo_boolean(found))
+            : prototype;
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -1685,6 +1708,32 @@ OseoResult oseo_internal_constructor_prototype(
     return result;
 }
 
+OseoResult oseo_internal_validate_function_realm(
+    OseoContext *context,
+    OseoValue constructor
+) {
+    OseoValue current = constructor;
+    while (true) {
+        if (is_proxy(current)) {
+            if (proxy_object(current)->revoked) {
+                return oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Cannot get the realm of a revoked Proxy."
+                );
+            }
+            current = proxy_object(current)->target;
+            continue;
+        }
+        if (is_function(current) &&
+            function_object(current)->function_kind == OSEO_FUNCTION_BOUND) {
+            current = function_object(current)->bound_target;
+            continue;
+        }
+        return normal(current);
+    }
+}
+
 /*
  * OrdinaryCreateFromConstructor on behalf of a caller that performs
  * `target.[[Construct]]`'s receiver allocation itself, which is what
@@ -1715,6 +1764,7 @@ OseoResult oseo_internal_construct_receiver(
     OseoValue target,
     OseoValue new_target
 ) {
+    if (is_proxy(target)) return normal(oseo_undefined());
     OseoValue effective = new_target;
     OseoValue constructor = target;
     while (is_function(constructor) &&
@@ -1725,6 +1775,7 @@ OseoResult oseo_internal_construct_receiver(
         }
         constructor = function_object(constructor)->bound_target;
     }
+    if (is_proxy(constructor)) return normal(oseo_undefined());
     if (is_function(constructor) &&
         function_object(constructor)->derived_constructor) {
         return normal(oseo_undefined());
@@ -1749,6 +1800,9 @@ OseoResult oseo_internal_construct_receiver(
     /* A `prototype` accessor can return a fresh object, so the read
      * lands in a rooted slot before the receiver allocation. */
     slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = oseo_internal_validate_function_realm(context, slots[0]);
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_constructor_receiver(context, slots[1]);
     }
@@ -2712,6 +2766,20 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 ) {
+    if (is_proxy(callee)) {
+        OseoResult entered = oseo_call_enter(context);
+        if (entered.status != OSEO_STATUS_NORMAL) return entered;
+        OseoResult result = oseo_internal_proxy_call(
+            context,
+            callee,
+            receiver,
+            argument_count,
+            arguments,
+            new_target
+        );
+        oseo_call_leave(context);
+        return result;
+    }
     /* A class constructor has [[IsClassConstructor]] true, so [[Call]]
      * always throws; only [[Construct]], which supplies a new target,
      * reaches its body. */

@@ -5828,9 +5828,9 @@ it catches, so the include had no reviewed implementation before and every
 case that named it stayed outside the reviewed subset or recorded an explicit
 `Reflect.construct` prerequisite.
 
-`Proxy` stays outside the profile, so the reflective results a `Proxy` trap
-would produce are not observable here and the reviewed cases that need one
-retain that explicit prerequisite.
+The later `proxy-exotic-object` node admits `Proxy`, so reflective operations
+now observe its traps and validate their answers against the target invariants
+described in the following section.
 
 Fixed native and generated differential evidence at property seeds
 `0x60006300`, `0x60006301`, and `0x60006302` covers the namespace identity,
@@ -5940,6 +5940,75 @@ failures. The property ratchet moves from 130 to 131 domains and seeds and
 from 5,466 to 5,478 ordinary cases. The runtime ABI moves to
 `oseo-runtime-m5-97`, adds two internal Array method code IDs and intrinsic
 slots, and adds no generated-code entry point.
+
+
+Proxy exotic objects
+--------------------
+
+M5b node `proxy-exotic-object` admits the `Proxy` constructor and
+`Proxy.revocable`. `Proxy` is a constructible built-in with no own
+`prototype` property and throws when called without `new`. Both its target and
+handler must be objects. `Proxy.revocable` returns an ordinary object whose
+`proxy` and `revoke` properties are writable, enumerable, and configurable;
+the idempotent revoke function marks the proxy revoked, after which every
+essential internal method throws a `TypeError` while the proxy retains its
+original callable and constructible identity.
+
+The proxy exotic supplies all thirteen essential internal methods:
+`[[GetPrototypeOf]]`, `[[SetPrototypeOf]]`, `[[IsExtensible]]`,
+`[[PreventExtensions]]`, `[[GetOwnProperty]]`, `[[DefineOwnProperty]]`,
+`[[HasProperty]]`, `[[Get]]`, `[[Set]]`, `[[Delete]]`, `[[OwnPropertyKeys]]`,
+`[[Call]]`, and `[[Construct]]`. Each first reads the corresponding handler
+trap. An absent trap delegates to the target's same internal method, including
+another proxy target. A present trap receives the target plus the operation's
+key, receiver, descriptor, argument list, or new target in specification
+order. Boolean traps apply `ToBoolean`; `construct` requires an object result;
+`getPrototypeOf` requires an object or null; descriptor and own-key traps
+validate their result shape before it is used.
+
+Every successful trap answer is checked against the target. A
+non-configurable property cannot disappear, change enumerable or accessor
+identity, contradict a frozen data value, or be deleted. A non-extensible
+target cannot acquire a reported property, lose an existing property, accept
+an extra own key, or report a different prototype. `ownKeys` requires only
+String and Symbol values, rejects duplicates, preserves the trap's order, and
+requires all non-configurable keys plus every key of a non-extensible target.
+When `getOwnPropertyDescriptor` reports `undefined`, the target descriptor
+settles absence and non-configurability before a present configurable property
+requires the target's `[[IsExtensible]]` result.
+The `get` and `set` traps preserve non-configurable, non-writable data values
+and undefined accessor halves. The `isExtensible` and `preventExtensions`
+answers must agree with the target's actual extensibility.
+
+The runtime represents a proxy as a collector-traced heap object retaining
+its target, handler, and the callable and constructible decisions made at
+creation. *runtime\_proxy.c* owns construction, revocation, trap dispatch, and
+invariant checks; the property, descriptor, object, enumeration, function,
+and `Object` built-in components route their generic internal methods through
+it. The component has its own fixed built-in code range for `Proxy`,
+`Proxy.revocable`, and the revoke closure. The runtime ABI advances to
+`oseo-runtime-m5-98`; no dynamic-source entry point or generated-code ABI is
+added.
+
+Fixed native and generated differential evidence at property seed
+`0x60006500` covers all thirteen traps, forwarding and abrupt paths,
+revocation, callable and constructible targets, writable, configurable,
+extensible, and prototype combinations, specialization enabled and disabled,
+collection forced at every safepoint, a false numeric hint, and an intentional
+shape-guard miss that reaches the generic fallback. It also covers callable
+proxies in callback and protocol-method positions and the bound and nested
+Proxy walk that makes built-in constructor fallback throw when its new target
+reaches a revoked Proxy. Constructor regressions pin the construct-trap and
+prototype-read order for ordinary `new` and Array species construction, while
+coercion regressions pin Proxy `[[Get]]` followed by a callable
+`Symbol.toPrimitive`. The inventory contains 311 included paths under
+*test/built-ins/Proxy/*. The reviewed Test262 manifest advances 90 dependent
+paths to `pass`, moving from 13,929 to 14,019 passes and from 2,085 to 1,995
+unsupported profile features while keeping 1,556 expected negatives and zero
+semantic, harness, or infrastructure failures. The property ratchet moves
+from 131 to 132 domains and seeds and from 5,478 to 5,490 ordinary cases. The
+suite revision, manifest schema, classification vocabulary, and zero-override
+policy remain unchanged.
 
 
 Known gaps inside the claim
