@@ -612,13 +612,13 @@ while (shapeTurn < 2) {
 export const proxyMissingDescriptorExtensibilitySource = `
 const observations = [];
 
-function observe(kind, abrupt) {
+function observe(kind, targetKind, abrupt) {
   const extensibilityError = new Error("nested extensibility");
   const ordinaryTarget = {};
-  if (kind === "fixed" || kind === "fixed-abrupt") {
+  if (targetKind !== "absent") {
     Object.defineProperty(ordinaryTarget, "key", {
       value: 1,
-      configurable: false,
+      configurable: targetKind === "configurable",
     });
   }
   const nestedTarget = new Proxy(ordinaryTarget, {
@@ -644,15 +644,19 @@ function observe(kind, abrupt) {
   } catch (error) {
     console.log(
       kind,
-      abrupt ? "abrupt" : "invariant",
-      abrupt ? error === extensibilityError : error instanceof TypeError,
+      targetKind === "configurable" && abrupt ? "abrupt" : "invariant",
+      targetKind === "configurable" && abrupt
+        ? error === extensibilityError
+        : error instanceof TypeError,
     );
   }
 }
 
-observe("absent", false);
-observe("absent-abrupt", true);
-observe("fixed", false);
-observe("fixed-abrupt", true);
+observe("absent", "absent", false);
+observe("absent-abrupt", "absent", true);
+observe("nonconfigurable", "nonconfigurable", false);
+observe("nonconfigurable-abrupt", "nonconfigurable", true);
+observe("configurable", "configurable", false);
+observe("configurable-abrupt", "configurable", true);
 console.log(observations.join("|"));
 `;

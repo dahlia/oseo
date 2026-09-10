@@ -572,15 +572,20 @@ async function references(fixture: Fixture): Promise<
 
 const proxyMissingDescriptorExpected =
   "absent missing true\n" +
-  "absent-abrupt abrupt true\n" +
-  "fixed invariant true\n" +
-  "fixed-abrupt abrupt true\n" +
+  "absent-abrupt missing true\n" +
+  "nonconfigurable invariant true\n" +
+  "nonconfigurable-abrupt invariant true\n" +
+  "configurable missing true\n" +
+  "configurable-abrupt abrupt true\n" +
   "absent:proxy:getOwn|absent:target:getOwn|" +
-  "absent:target:isExtensible|absent-abrupt:proxy:getOwn|" +
-  "absent-abrupt:target:getOwn|absent-abrupt:target:isExtensible|" +
-  "fixed:proxy:getOwn|fixed:target:getOwn|fixed:target:isExtensible|" +
-  "fixed-abrupt:proxy:getOwn|fixed-abrupt:target:getOwn|" +
-  "fixed-abrupt:target:isExtensible\n";
+  "absent-abrupt:proxy:getOwn|absent-abrupt:target:getOwn|" +
+  "nonconfigurable:proxy:getOwn|nonconfigurable:target:getOwn|" +
+  "nonconfigurable-abrupt:proxy:getOwn|" +
+  "nonconfigurable-abrupt:target:getOwn|" +
+  "configurable:proxy:getOwn|configurable:target:getOwn|" +
+  "configurable:target:isExtensible|configurable-abrupt:proxy:getOwn|" +
+  "configurable-abrupt:target:getOwn|" +
+  "configurable-abrupt:target:isExtensible\n";
 for (const specializationArgs of [[], ["--no-specialization"]] as const) {
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   try {

@@ -36,7 +36,7 @@ interface ProxyCase {
 
 interface MissingDescriptorCase {
   readonly abrupt: boolean;
-  readonly targetKind: "absent" | "fixed";
+  readonly targetKind: "absent" | "configurable" | "nonconfigurable";
 }
 
 const caseArbitrary: fc.Arbitrary<ProxyCase> = fc.record({
@@ -50,7 +50,7 @@ const caseArbitrary: fc.Arbitrary<ProxyCase> = fc.record({
 const missingDescriptorArbitrary: fc.Arbitrary<MissingDescriptorCase> =
   fc.record({
     abrupt: fc.boolean(),
-    targetKind: fc.constantFrom("absent", "fixed"),
+    targetKind: fc.constantFrom("absent", "configurable", "nonconfigurable"),
   });
 
 const host = createNodeHost();
@@ -354,11 +354,11 @@ Promise.resolve(${testCase.initial}).then(new Proxy((value) => {
 
 function printMissingDescriptorCase(testCase: MissingDescriptorCase): string {
   const defineTarget =
-    testCase.targetKind === "fixed"
+    testCase.targetKind !== "absent"
       ? `
 Object.defineProperty(ordinaryTarget, "key", {
   value: 1,
-  configurable: false,
+  configurable: ${testCase.targetKind === "configurable"},
 });`
       : "";
   return `
@@ -388,9 +388,13 @@ try {
   console.log("missing", descriptor === undefined);
 } catch (error) {
   console.log(
-    ${testCase.abrupt ? '"abrupt"' : '"invariant"'},
     ${
-      testCase.abrupt
+      testCase.targetKind === "configurable" && testCase.abrupt
+        ? '"abrupt"'
+        : '"invariant"'
+    },
+    ${
+      testCase.targetKind === "configurable" && testCase.abrupt
         ? "error === extensibilityError"
         : "error instanceof TypeError"
     },
@@ -403,12 +407,17 @@ console.log(operations.join("|"));
 function expectedMissingDescriptorCase(
   testCase: MissingDescriptorCase,
 ): string {
-  const result = testCase.abrupt
-    ? "abrupt true"
-    : testCase.targetKind === "fixed"
-      ? "invariant true"
-      : "missing true";
-  return `${result}\nproxy:getOwn|target:getOwn|target:isExtensible\n`;
+  const result =
+    testCase.targetKind === "absent"
+      ? "missing true"
+      : testCase.targetKind === "nonconfigurable"
+        ? "invariant true"
+        : testCase.abrupt
+          ? "abrupt true"
+          : "missing true";
+  const extensibilityOperation =
+    testCase.targetKind === "configurable" ? "|target:isExtensible" : "";
+  return `${result}\nproxy:getOwn|target:getOwn${extensibilityOperation}\n`;
 }
 
 async function references(source: string): Promise<
@@ -527,11 +536,11 @@ test(
 );
 
 test(
-  "generated missing Proxy descriptors observe target extensibility",
+  "generated missing Proxy descriptors observe required target state",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "undefined descriptor traps observe nested target extensibility",
+      "undefined descriptor traps order nested target observations",
       fc.asyncProperty(missingDescriptorArbitrary, async (testCase) => {
         const source = printMissingDescriptorCase(testCase);
         for (const specialization of ["disabled", "enabled"] as const) {
@@ -584,9 +593,10 @@ test(
                 "native-collector=forced",
               ],
         domain:
-          "absent and non-configurable nested Proxy target properties, " +
-          "normal and abrupt isExtensible traps, specialization on and off",
-        numRuns: 4,
+          "absent, configurable, and non-configurable nested Proxy target " +
+          "properties, normal and abrupt isExtensible traps, " +
+          "specialization on and off",
+        numRuns: 6,
         profile: "M5 Proxy missing descriptor target invariants",
         seed: 0x6000_6501,
         sizeLimit: "one nested Proxy target and one property",

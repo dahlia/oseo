@@ -5973,6 +5973,9 @@ target cannot acquire a reported property, lose an existing property, accept
 an extra own key, or report a different prototype. `ownKeys` requires only
 String and Symbol values, rejects duplicates, preserves the trap's order, and
 requires all non-configurable keys plus every key of a non-extensible target.
+When `getOwnPropertyDescriptor` reports `undefined`, the target descriptor
+settles absence and non-configurability before a present configurable property
+requires the target's `[[IsExtensible]]` result.
 The `get` and `set` traps preserve non-configurable, non-writable data values
 and undefined accessor halves. The `isExtensible` and `preventExtensions`
 answers must agree with the target's actual extensibility.
