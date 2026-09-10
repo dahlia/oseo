@@ -10,5 +10,5 @@ inventory:
 dependencies:
   - object-integrity-levels
   - reflect-namespace
-landed: false
+landed: true
 status: ready
