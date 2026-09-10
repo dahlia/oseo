@@ -607,6 +607,15 @@ while (shapeTurn < 2) {
 }
 `,
   },
+  {
+    globalScriptReference: true,
+    name: "proxy-object-rest-collection",
+    source: `
+const source = new Proxy({ kept: 1, copied: 2 }, {});
+const { kept, ...rest } = source;
+console.log(kept, rest.copied);
+`,
+  },
 ];
 
 export const proxyMissingDescriptorExtensibilitySource = `
