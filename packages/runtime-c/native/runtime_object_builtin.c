@@ -1686,15 +1686,17 @@ OseoResult oseo_object_rest(
     if (is_nullish(source)) {
         return type_error(context, "Cannot destructure a nullish value.");
     }
+    /* Slot 1 keeps the fresh target alive while Proxy traps can collect. */
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = source;
     result = oseo_object_literal_create(context);
+    frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = copy_data_properties(
             context,
-            result.value,
+            frame.slots[1],
             frame.slots[0],
             excluded_count,
             excluded_keys

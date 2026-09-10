@@ -5988,7 +5988,8 @@ and `Object` built-in components route their generic internal methods through
 it. The component has its own fixed built-in code range for `Proxy`,
 `Proxy.revocable`, and the revoke closure. The runtime ABI advances to
 `oseo-runtime-m5-98`; no dynamic-source entry point or generated-code ABI is
-added.
+added. Object binding rest roots its fresh copy target before Proxy own-key,
+descriptor, or value traps can collect.
 
 Fixed native and generated differential evidence at property seed
 `0x60006500` covers all thirteen traps, forwarding and abrupt paths,

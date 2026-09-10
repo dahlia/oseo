@@ -689,6 +689,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
+    fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -923,6 +924,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
+    fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {
@@ -1225,7 +1227,10 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
-          if (fixture.name === "proxy-exotic-object") {
+          if (
+            fixture.name === "proxy-exotic-object" ||
+            fixture.name === "proxy-object-rest-collection"
+          ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
               assert.ok(native.counters.guardMisses > 0);
