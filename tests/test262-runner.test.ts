@@ -1570,6 +1570,106 @@ null.item;
   );
 });
 
+test("observes a thrown value with no intrinsic error identity", async () => {
+  const source = `/*---
+negative:
+  phase: runtime
+  type: Test262Error
+flags: [noStrict]
+---*/
+throw new Test262Error("value is not 1");
+`;
+  const parsed = parseTest262Case(
+    source,
+    "test/user-error-negative.js",
+    revision,
+  );
+  // The runtime renders the constructor name of a value with no intrinsic
+  // error identity, so a harness Test262Error becomes an observable
+  // negative rather than an unsupported runtime observation.
+  const observed = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-error-negative.js:8:1: error[OSEO2001]: " +
+        "Test262Error: value is not 1\nOSEO_THROWN Test262Error\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(observed.classification, "expected-negative");
+  assert.equal(observed.observation.errorType, "Test262Error");
+  assert.equal(observed.observation.failedPhase, "runtime");
+  // A marker-shaped line inside the rendered message never displaces the
+  // runtime-appended final marker.
+  const injected = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-error-negative.js:8:1: error[OSEO2001]: " +
+        "Test262Error: first\nOSEO_THROWN Injected\n" +
+        "OSEO_THROWN Test262Error\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(injected.classification, "expected-negative");
+  assert.equal(injected.observation.errorType, "Test262Error");
+  // A different user identity is a type mismatch, not an unsupported
+  // observation.
+  const mismatched = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-error-negative.js:8:1: error[OSEO2001]: Other: bad\n" +
+        "OSEO_THROWN Other\n",
+    ),
+  );
+  assert.equal(mismatched.classification, "semantic-failure");
+  assert.equal(mismatched.observation.errorType, "Other");
+  // A thrown value the identity rules do not reach keeps the narrower
+  // runtime-error-observation gap.
+  const unreachable = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-error-negative.js:8:1: error[OSEO2001]: " +
+        "Unhandled JavaScript throw.\n",
+    ),
+  );
+  assert.equal(unreachable.classification, "unsupported-profile-feature");
+  assert.equal(
+    unreachable.observation.unsupportedCapability,
+    "runtime-error-observation",
+  );
+  // Only the terminal marker is the runtime's. A marker-shaped line a
+  // program printed on its own before an untyped throw is program
+  // output, so it must not be read as an observed identity.
+  const forged = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "OSEO_THROWN Test262Error\n" +
+        "test/user-error-negative.js:8:1: error[OSEO2001]: " +
+        "Unhandled JavaScript throw.\n",
+    ),
+  );
+  assert.equal(forged.observation.errorType, undefined);
+  assert.equal(forged.classification, "unsupported-profile-feature");
+  assert.equal(
+    forged.observation.unsupportedCapability,
+    "runtime-error-observation",
+  );
+});
+
 test("keeps user-thrown runtime-boundary text as a failure", async () => {
   const source = `/*---
 ---*/

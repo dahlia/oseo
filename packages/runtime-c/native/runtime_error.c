@@ -641,17 +641,131 @@ static size_t error_instance_kind(OseoContext *context, OseoValue thrown) {
     return OSEO_ERROR_KIND_COUNT;
 }
 
+/*
+ * Read one ASCII-named ordinary property of a thrown value. The key
+ * string is allocated and rooted across the read, which can run a user
+ * getter, so the caller only needs the receiver itself rooted.
+ */
+static OseoResult thrown_property(
+    OseoContext *context,
+    OseoValue receiver,
+    const char *name
+) {
+    OseoResult key = ascii_runtime_string(context, name);
+    if (key.status != OSEO_STATUS_NORMAL) return key;
+    OseoValue slots[2] = {receiver, key.value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_object_get(context, slots[0], slots[1]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Whether a string can be the machine-readable marker of a thrown value
+ * with no intrinsic error identity. The marker is one whitespace-free
+ * token on its own line, so only an ASCII identifier has a
+ * representation there. A name outside that shape suppresses both the
+ * marker and the rendered text, which keeps the human diagnostic and the
+ * marker of such a value in agreement.
+ */
+static bool identifier_marker(OseoValue value) {
+    if (!is_string(value)) return false;
+    OseoString *string = string_object(value);
+    if (string->length == 0u) return false;
+    for (size_t index = 0u; index < string->length; index += 1u) {
+        uint16_t unit = string->units[index];
+        if ((unit >= 'A' && unit <= 'Z') || (unit >= 'a' && unit <= 'z') ||
+            unit == '_' || unit == '$') {
+            continue;
+        }
+        if (index > 0u && unit >= '0' && unit <= '9') continue;
+        return false;
+    }
+    return true;
+}
+
+/*
+ * The identity of a thrown object that is not an intrinsic error
+ * instance, taken from the name of its `constructor` property. A user
+ * error class such as the test262 harness `Test262Error` has no
+ * intrinsic identity, so that constructor name is the only identity
+ * ECMAScript exposes for it. The result is an identifier-shaped string,
+ * or undefined when no such name is reachable.
+ */
+static OseoValue thrown_identity(OseoContext *context, OseoValue thrown) {
+    OseoResult result = thrown_property(context, thrown, "constructor");
+    if (result.status != OSEO_STATUS_NORMAL || !is_object(result.value)) {
+        return oseo_undefined();
+    }
+    OseoValue slots[1] = {result.value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    result = thrown_property(context, slots[0], "name");
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return oseo_undefined();
+    return identifier_marker(result.value) ? result.value : oseo_undefined();
+}
+
+/*
+ * The rendered text of a thrown object with an identity but no intrinsic
+ * error identity: `identity: message` with the generic string conversion
+ * applied to a present `message` property, and the identity alone when
+ * no message renders. The caller keeps `identity` rooted.
+ */
+static OseoResult thrown_text(
+    OseoContext *context,
+    OseoValue thrown,
+    OseoValue identity
+) {
+    OseoResult message = thrown_property(context, thrown, "message");
+    if (message.status != OSEO_STATUS_NORMAL ||
+        tag_of(message.value) == OSEO_TAG_UNDEFINED) {
+        return normal(identity);
+    }
+    OseoValue slots[2] = {identity, message.value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult text = oseo_internal_value_string(context, slots[1]);
+    if (text.status == OSEO_STATUS_NORMAL && is_string(text.value)) {
+        slots[1] = text.value;
+        text = error_text(context, slots[0], slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    if (text.status != OSEO_STATUS_NORMAL || !is_string(text.value)) {
+        return normal(identity);
+    }
+    return text;
+}
+
 void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
     size_t kind = error_instance_kind(context, thrown);
-    if (context->has_diagnostic || kind >= OSEO_ERROR_KIND_COUNT) {
+    bool identified = kind < OSEO_ERROR_KIND_COUNT;
+    if (context->has_diagnostic || (!identified && !is_object(thrown))) {
         oseo_context_print_error(context);
         return;
     }
     /*
-     * Converting an object-valued name or message runs user JavaScript,
-     * which moves the context's source location. The original throw or
-     * rejection site is restored so the diagnostic points there rather
-     * than into the conversion method.
+     * The stored diagnostic is the only thing that distinguishes an
+     * unhandled throw from an unhandled rejection. An unhandled
+     * rejection is its own reviewed host-policy boundary, reported by
+     * that text rather than by the rejected value, so a value with no
+     * intrinsic error identity leaves the rejection path exactly as it
+     * was: the boundary text alone, with no identity read and no
+     * marker. Only an ordinary throw renders the value.
+     */
+    bool render_identity = context->error_message != NULL &&
+        strcmp(context->error_message, OSEO_UNHANDLED_THROW_MESSAGE) == 0;
+    if (!identified && !render_identity) {
+        oseo_context_print_error(context);
+        return;
+    }
+    /*
+     * Converting an object-valued name or message, and reading the
+     * constructor identity of a value that is not an error instance, run
+     * user JavaScript, which moves the context's source location. The
+     * original throw or rejection site is restored so the diagnostic
+     * points there rather than into the conversion method.
      */
     const char *error_code = context->error_code;
     const char *error_message = context->error_message;
@@ -659,11 +773,19 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
     size_t source_id_length = context->source_id_length;
     size_t line = context->line;
     size_t column = context->column;
-    OseoValue slots[2] = {thrown, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
+    OseoValue slots[3] = {thrown, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    OseoResult result = oseo_internal_error_to_string(context, slots[0]);
-    slots[1] = result.value;
+    OseoResult result;
+    if (identified) {
+        result = oseo_internal_error_to_string(context, slots[0]);
+    } else {
+        slots[1] = thrown_identity(context, slots[0]);
+        result = tag_of(slots[1]) == OSEO_TAG_UNDEFINED
+            ? normal(oseo_undefined())
+            : thrown_text(context, slots[0], slots[1]);
+    }
+    slots[2] = result.value;
     oseo_roots_pop(context, &frame);
     context->error_code = error_code;
     context->error_message = error_message;
@@ -672,12 +794,12 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
     context->line = line;
     context->column = column;
     context->has_diagnostic = false;
-    if (result.status != OSEO_STATUS_NORMAL || !is_string(slots[1]) ||
-        string_object(slots[1])->length == 0u) {
+    if (result.status != OSEO_STATUS_NORMAL || !is_string(slots[2]) ||
+        string_object(slots[2])->length == 0u) {
         /*
          * An empty or failed rendering falls back to the stored
-         * diagnostic, but the error is still a typed instance, so the
-         * marker is printed either way.
+         * diagnostic. An error instance keeps its typed marker either
+         * way, and a value whose identity was read keeps that marker.
          */
         oseo_context_print_error(context);
     } else {
@@ -694,15 +816,25 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
             context->column,
             context->error_code
         );
-        write_stderr_string(slots[1]);
+        write_stderr_string(slots[2]);
         (void)fprintf(stderr, "\n");
     }
     /*
-     * A stable machine-readable marker records the intrinsic error kind
-     * separately from the human diagnostic, whose name and message can
-     * be mutated to arbitrary or non-identifier values. Tooling reads
-     * this for throw detection and type comparison and strips it before
-     * comparing observable output.
+     * A stable machine-readable marker records the thrown value's
+     * identity separately from the human diagnostic, whose name and
+     * message can be mutated to arbitrary or non-identifier values. An
+     * error instance reports its intrinsic kind; any other object
+     * reports its identifier-shaped constructor name, which is what
+     * makes a thrown value such as a test262 `Test262Error` observable.
+     * It is the last line the process ever writes, which is what lets
+     * tooling tell it apart from a marker-shaped line a rendered
+     * message or the program itself produced.
      */
-    (void)fprintf(stderr, "OSEO_THROWN %s\n", error_names[kind]);
+    if (identified) {
+        (void)fprintf(stderr, "OSEO_THROWN %s\n", error_names[kind]);
+    } else if (tag_of(slots[1]) != OSEO_TAG_UNDEFINED) {
+        (void)fprintf(stderr, "OSEO_THROWN ");
+        write_stderr_string(slots[1]);
+        (void)fprintf(stderr, "\n");
+    }
 }

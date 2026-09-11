@@ -5776,6 +5776,72 @@ the graph's orchestration state. The reviewed test262 revision, 41,091-path
 applicable inventory, ADR 0013 vocabulary, inventory policy, forced-collection
 policy, and zero-override policy are unchanged.
 
+Implemented M5b node `runtime-error-observation` gives an unhandled thrown
+value that is not an intrinsic error instance a rendered identity and
+message. The identity is the `name` of the value's `constructor`, read with
+ordinary property access, which is the only identity ECMAScript gives a user
+error class such as the test262 harness `Test262Error`. The message is the
+value's `message` property converted through the admitted generic string
+coercion. The owned diagnostic reads `identity: message`, or the identity
+alone when no message text renders, and the stable `OSEO_THROWN` marker line
+reports the same identity, so the test262 runner reads an observed negative
+type where it previously saw none.
+
+The marker is one whitespace-free token on its own line, so an identity
+outside the ASCII identifier shape has no representation there. Such a value,
+a value whose `constructor` or `name` lookup is abrupt or reaches a non-object
+or a non-string, and a thrown primitive all keep the untyped-throw diagnostic
+and print no marker; the human diagnostic and the marker of an unidentified
+value therefore appear together or not at all. An intrinsic error instance
+keeps its existing name-and-message rendering and its intrinsic kind marker,
+both independent of the mutable `name` property. Reading the identity and
+converting the message run user JavaScript after the program has already
+completed abruptly, so the throw or rejection site is restored around them
+and the thrown value stays collector-rooted. Neither nested completion
+replaces the reported diagnostic, and the two differ: an abrupt or unusable
+identity read leaves the value unidentified, so it keeps the untyped-throw
+diagnostic and prints no marker, while an abrupt message read or conversion
+keeps the identity already established and renders it alone. The rendering
+applies to the unhandled-throw diagnostic only. An unhandled rejection is a
+separate reviewed host-policy boundary, reported by its own text rather than
+by the rejected value, so a rejected value with no intrinsic error identity
+leaves that path byte-identical to what it was before this node: the
+boundary text alone, with no identity read and no marker. A rejected
+intrinsic error instance keeps the rendering and marker it already had. The
+fifteen reviewed Promise combinator rows that classify on that boundary
+therefore keep their recorded classification.
+
+Fixed native evidence covers a `Test262Error` with and without a message, an
+ordinary object, a null-prototype object, a non-identifier constructor name,
+an object-valued message converted through the generic coercion, an empty
+message, a non-string name, a non-object constructor, abrupt `constructor`,
+`name`, and `message` reads, an abrupt message conversion, identity getters
+that allocate both the holder and the name they return, a proxied thrown
+value, a marker-shaped line inside a rendered message, and an unhandled
+rejection of a user error, of an unidentified value, and of an intrinsic
+error holding the rejection boundary, each under both
+specialization policies with collection forced at every safepoint. A generated
+property at seed `0x60006600` samples eight identity shapes crossed with six
+message shapes over generated identifier and non-identifier names, weighted
+toward a reachable identity rather than enumerating the product, and the two
+reference hosts hold the identity and message model that the owned diagnostic
+renders. The runner's negative classification path is proved directly,
+including the narrowed `runtime-error-observation` capability that a value
+with no reachable identity still reports, and that only the terminal marker is
+read as an identity.
+
+The node has no inventory root and moves no reviewed row: the manifest keeps
+17,570 paths, 14,019 passes, 1,556 expected negatives, and 1,995 unsupported
+profile features, with no semantic, harness, or infrastructure failures. The
+property ratchet moves from 133 to 134 domains and seeds and from 5,496 to
+5,508 ordinary cases, and the evidence inventory moves from 114 to 115
+families. The admitted runtime checkpoint moves the ABI to
+`oseo-runtime-m5-99`, adds no component, code ID, realm intrinsic, or
+generated-code entry point, and does not change the graph's orchestration
+state. The reviewed test262 revision, applicable inventory, ADR 0013
+vocabulary, inventory policy, forced-collection policy, and zero-override
+policy are unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

@@ -588,6 +588,263 @@ throw boom;
     /^thrown-converted-message\.ts:4:1: error\[OSEO2001\]: Error: converted/u,
   );
 
+  // A thrown value with no intrinsic error identity renders the identity
+  // its `constructor` name gives it together with its `message`, which is
+  // what makes a runtime negative whose thrown value is a harness
+  // `Test262Error` observable. Each case runs under both specialization
+  // policies with a collection forced at every safepoint, because reading
+  // the identity and converting the message both allocate and run user
+  // code between the throw and the rendered diagnostic. Every source puts
+  // its `throw` on its own line at column one, so the expected location
+  // is read from the source rather than repeated beside it.
+  const userErrorDefinition =
+    "function Test262Error(message) {\n  this.message = message;\n}\n";
+  const userBoomDefinition =
+    "function Boom(message) {\n  this.message = message;\n}\n";
+  for (const [name, source, text, marker] of [
+    [
+      "thrown-user-error.ts",
+      `${userErrorDefinition}throw new Test262Error("value is not 1");\n`,
+      "Test262Error: value is not 1",
+      "Test262Error",
+    ],
+    [
+      "thrown-user-error-no-message.ts",
+      `${userErrorDefinition}throw new Test262Error();\n`,
+      "Test262Error",
+      "Test262Error",
+    ],
+    ["thrown-ordinary-object.ts", "throw {};\n", "Object", "Object"],
+    [
+      "thrown-null-prototype.ts",
+      "throw Object.create(null);\n",
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      // A reachable but non-identifier name suppresses the rendering as
+      // well as the marker, so the two never disagree.
+      "thrown-non-identifier-name.ts",
+      `${userBoomDefinition}` +
+        'Object.defineProperty(Boom, "name", { value: "not one" });\n' +
+        'throw new Boom("hidden");\n',
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      "thrown-converted-user-message.ts",
+      `${userBoomDefinition}` +
+        'const converted = { toString: function () { return "text"; } };\n' +
+        "throw new Boom(converted);\n",
+      "Boom: text",
+      "Boom",
+    ],
+    [
+      // An abrupt `constructor` read leaves the value unidentified.
+      "thrown-constructor-getter.ts",
+      "const noConstructor = {};\n" +
+        'Object.defineProperty(noConstructor, "constructor", {\n' +
+        '  get: function () { throw new RangeError("no identity"); },\n});\n' +
+        "throw noConstructor;\n",
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      // An abrupt `name` read leaves the value unidentified the same way,
+      // even though the `constructor` read itself succeeded.
+      "thrown-name-getter.ts",
+      "const noName = {};\n" +
+        'Object.defineProperty(noName, "name", {\n' +
+        '  get: function () { throw new RangeError("no name"); },\n});\n' +
+        "throw Object.create({ constructor: noName });\n",
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      // The constructor getter returns a holder it allocates on the spot,
+      // whose own name getter allocates the name, and the message is
+      // allocated too. Nothing user code returns here has a binding of its
+      // own, so each result has to become rooted before the next read
+      // allocates its key string.
+      "thrown-allocating-identity.ts",
+      'let allocatingHead = "Bo";\nlet allocatingTail = "om";\n' +
+        "const allocatingProto = {};\n" +
+        'Object.defineProperty(allocatingProto, "constructor", {\n' +
+        "  get: function () {\n    const fresh = {};\n" +
+        '    Object.defineProperty(fresh, "name", {\n' +
+        "      get: function () {\n" +
+        "        return allocatingHead + allocatingTail;\n      },\n" +
+        "    });\n    return fresh;\n  },\n});\n" +
+        "const allocated = Object.create(allocatingProto);\n" +
+        'allocated.message = "fresh" + " text";\n' +
+        "throw allocated;\n",
+      "Boom: fresh text",
+      "Boom",
+    ],
+    [
+      // A plain holder object answers the constructor lookup as well as a
+      // function does; only the reachable name matters.
+      "thrown-holder-object.ts",
+      'throw Object.create({ constructor: { name: "Holder" } });\n',
+      "Holder",
+      "Holder",
+    ],
+    [
+      // A reachable constructor whose name is not a string leaves the
+      // value unidentified.
+      "thrown-non-string-name.ts",
+      "throw Object.create({ constructor: { name: 9 } });\n",
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      // So does a constructor that is not an object at all.
+      "thrown-primitive-constructor.ts",
+      "throw Object.create({ constructor: 9 });\n",
+      "Unhandled JavaScript throw.",
+      undefined,
+    ],
+    [
+      // An empty message renders the identity alone, the same as an
+      // absent one.
+      "thrown-empty-message.ts",
+      `${userBoomDefinition}throw new Boom("");\n`,
+      "Boom",
+      "Boom",
+    ],
+    [
+      // An abrupt `message` read keeps the identity already established
+      // and renders it alone.
+      "thrown-message-getter.ts",
+      "function Boom() {}\n" +
+        'Object.defineProperty(Boom.prototype, "message", {\n' +
+        '  get: function () { throw new RangeError("no message"); },\n});\n' +
+        "throw new Boom();\n",
+      "Boom",
+      "Boom",
+    ],
+    [
+      // An abrupt conversion of a present message does the same, so the
+      // nested completion never replaces the reported diagnostic.
+      "thrown-abrupt-coercion.ts",
+      `${userBoomDefinition}` +
+        "const abrupt = { toString: function () { throw new Error(1); } };\n" +
+        "throw new Boom(abrupt);\n",
+      "Boom",
+      "Boom",
+    ],
+    [
+      "thrown-proxy-user-error.ts",
+      `${userBoomDefinition}throw new Proxy(new Boom("through proxy"), {});\n`,
+      "Boom: through proxy",
+      "Boom",
+    ],
+    [
+      // A marker-shaped line inside the rendered message keeps the real
+      // marker last, so tooling that reads the terminal marker is
+      // unaffected.
+      "thrown-marker-in-message.ts",
+      `${userErrorDefinition}` +
+        'throw new Test262Error("first\\nOSEO_THROWN Injected");\n',
+      "Test262Error: first\nOSEO_THROWN Injected",
+      "Test262Error",
+    ],
+  ] as const) {
+    const throwLine =
+      source.split("\n").findIndex((line) => line.startsWith("throw ")) + 1;
+    assert.ok(throwLine > 0, `${name} has a throw statement of its own`);
+    for (const specialization of ["disabled", "enabled"] as const) {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+      try {
+        const observed = await runNativeCli(
+          {
+            args: [
+              ...(specialization === "disabled" ? ["--no-specialization"] : []),
+              name,
+            ],
+            source,
+            sourceId: name,
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(observed.exitStatus, 1, observed.stderr);
+        assert.equal(observed.stdout, "");
+        assert.equal(
+          observed.stderr,
+          `${name}:${throwLine}:1: error[OSEO2001]: ${text}\n` +
+            (marker == null ? "" : `OSEO_THROWN ${marker}\n`),
+          `${name} ${specialization}`,
+        );
+      } finally {
+        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      }
+    }
+  }
+
+  // An unhandled rejection is its own reviewed host-policy boundary,
+  // reported by the boundary text rather than by the rejected value, so
+  // a value with no intrinsic error identity leaves that path exactly as
+  // it was: the boundary text alone, with no identity read and no
+  // marker. Only an ordinary throw renders the value.
+  for (const [name, source, text, marker] of [
+    [
+      "rejected-user-error.ts",
+      `${userErrorDefinition}` +
+        'Promise.reject(new Test262Error("value is not 1"));\n',
+      "Unhandled promise rejection.",
+      undefined,
+    ],
+    [
+      "rejected-unidentified.ts",
+      "Promise.reject(Object.create(null));\n",
+      "Unhandled promise rejection.",
+      undefined,
+    ],
+    [
+      // An intrinsic error instance keeps the rendering it already had
+      // on this path, which is what makes the boundary rule specific to
+      // a value with no intrinsic error identity.
+      "rejected-intrinsic-error.ts",
+      'Promise.reject(new TypeError("bad"));\n',
+      "TypeError: bad",
+      "TypeError",
+    ],
+  ] as const) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+      try {
+        const observed = await runNativeCli(
+          {
+            args: [
+              ...(specialization === "disabled" ? ["--no-specialization"] : []),
+              name,
+            ],
+            source,
+            sourceId: name,
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(observed.exitStatus, 1, observed.stderr);
+        assert.equal(observed.stdout, "");
+        const lines = observed.stderr.split("\n");
+        assert.ok(
+          lines[0]?.startsWith(`${name}:`) === true &&
+            lines[0]?.endsWith(`: error[OSEO2001]: ${text}`) === true,
+          `${name} ${specialization}: ${observed.stderr}`,
+        );
+        assert.deepEqual(
+          lines.slice(1),
+          marker == null ? [""] : [`OSEO_THROWN ${marker}`, ""],
+          `${name} ${specialization}`,
+        );
+      } finally {
+        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      }
+    }
+  }
+
   const wideBindings = Array.from(
     { length: 3_000 },
     (_, index) => `const value${index} = ${index};`,

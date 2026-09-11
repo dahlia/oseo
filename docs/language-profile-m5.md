@@ -744,8 +744,10 @@ current evidence assessment. Those live only in the indexed records above.
     now executes runtime negatives by comparing the rendered error name
     against the expected type, replacing the former blanket
     `runtime-error-types` capability gap with the narrower
-    `runtime-error-observation` classification for thrown values without
-    error identity. A directly generated property with seed `0x60002f00`
+    `runtime-error-observation` classification for a thrown value with no
+    error identity. The unhandled-throw rendering admitted below narrows
+    that classification again, to the values it cannot identify.
+    A directly generated property with seed `0x60002f00`
     covers arrays and custom iterables, message and cause variants, ordering,
     both specialization policies, and forced collection against independent
     Node.js and Deno observations. Fixed native differential evidence covers
@@ -753,6 +755,49 @@ current evidence assessment. Those live only in the indexed records above.
     deliberate absence of a specialized guard path. Fifteen reviewed test262
     cases under the AggregateError, Error, and NativeErrors inventory roots
     pin the standards surface.
+ -  An unhandled thrown value that is not an intrinsic error instance
+    renders the identity and message it exposes. The identity is the
+    `name` of the value's `constructor`, read with ordinary property
+    access, which is the only identity ECMAScript gives a user error class
+    such as the test262 harness `Test262Error`; the message is the value's
+    `message` property converted through the admitted generic string
+    coercion. The owned diagnostic reads `identity: message`, or the
+    identity alone when no message text renders, and a stable
+    `OSEO_THROWN` marker line reports the same identity so tooling never
+    depends on the mutable rendered text. That marker is one
+    whitespace-free token, so an identity outside the ASCII identifier
+    shape has no representation there: such a value, a value whose
+    `constructor` or `name` lookup is abrupt or reaches a non-object or a
+    non-string, and a thrown primitive all keep the untyped-throw
+    diagnostic and print no marker, which keeps the diagnostic and the
+    marker of an unidentified value in agreement. Reading the identity and
+    converting the message run user JavaScript after the program's abrupt
+    completion, so the throw or rejection site is restored around them and
+    the thrown value stays collector-rooted. Neither nested completion
+    replaces the reported diagnostic, and the two differ: an abrupt or
+    unusable identity read leaves the value unidentified, so it keeps the
+    untyped-throw diagnostic and prints no marker, while an abrupt message
+    read or conversion keeps the identity already established and renders
+    it alone. An intrinsic error instance keeps its
+    existing name-and-message rendering and its intrinsic kind marker.
+    The rendering applies to the unhandled-throw diagnostic only. An
+    unhandled rejection is a separate reviewed host-policy boundary,
+    reported by its own text rather than by the rejected value, so a
+    rejected value with no intrinsic error identity leaves that path
+    unchanged: the boundary text alone, with no identity read and no
+    marker. A rejected intrinsic error instance keeps the rendering and
+    marker it already had.
+    Fixed native evidence under both specialization policies with
+    collection forced at every safepoint covers every named shape: a
+    reachable, an empty, and an absent message, a null-prototype, a
+    non-identifier, a non-string, and a non-object identity, abrupt
+    `constructor`, `name`, and `message` reads, an abrupt message
+    conversion, identity getters that allocate both the holder and the name
+    they return, a proxied thrown value, and a marker-shaped line inside a
+    rendered message. A generated property with seed `0x60006600`
+    samples the same shapes over generated names and message text rather
+    than enumerating them, and the two reference hosts hold the identity
+    and message model the owned diagnostic renders.
  -  Generic `ToPrimitive` for object operands, implementing
     `OrdinaryToPrimitive`: user-reachable `valueOf` and `toString` run in
     hint order with the receiver, an object result falls through to the next
@@ -6108,10 +6153,11 @@ complete. The remaining gaps retain their existing owners.
     `ArrayBuffer.isView` reports `true` for a `DataView` and `false` for
     every other value this profile can produce; the node that admits a
     TypedArray extends it with that kind's brand.
-    No built-in dispatches through `Symbol.hasInstance` yet. test262 runtime
-    negatives whose
-    thrown value has no error identity, such as a thrown
-    `Test262Error`, classify as unsupported with the
+    No built-in dispatches through `Symbol.hasInstance` yet. A test262
+    runtime negative whose thrown value exposes an identity, including a
+    thrown `Test262Error`, is now observable. One whose thrown value is a
+    primitive, or whose constructor name is unreachable or outside the
+    ASCII identifier shape, still classifies as unsupported with the
     `runtime-error-observation` capability named. Owner: the intrinsics
     and built-in objects stream.
  -  The `globalThis` binding does not exist. M5a Unit 8.1d gives Script
