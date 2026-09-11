@@ -622,14 +622,20 @@ Derived from those observations:
  -  One match attempt over a subject of 493 to 512 code units costs
     about 4.9 us, from `literal-match` over 38,000 attempts against a
     baseline process of 2.0 ms.
- -  Compiling one pattern at run time costs about 3.2 us, from
+ -  Constructing one pattern from source at run time costs about
+    3.2 us more than evaluating a compiled literal, from
     `dynamic-construct` against `literal-match` over the same 38,000
-    attempts. Those two are the pair that differ only in compilation:
-    each evaluates a fresh object for every attempt, where
+    attempts. Both evaluate a fresh object for every attempt, so the
+    allocation cancels, but what is left is a whole `new RegExp`
+    evaluation rather than compilation alone: the constructor call, its
+    two string arguments, and the argument handling the edition
+    specifies sit inside the figure beside the pattern compiler.
     `dynamic-match` reuses one object it hoisted out of the loop, so
     `dynamic-construct` against `dynamic-match` would charge the
-    allocation to compilation as well. That is the first-use cost an
-    ahead-of-time literal removes.
+    allocation to construction as well. That is the first-use cost an
+    ahead-of-time literal removes. Separating the compiler from the
+    rest of the constructor needs instrumentation this probe does not
+    have.
  -  Allocating a fresh object for each evaluation of a literal costs
     about 0.4 us, from `literal-match` against `dynamic-match` over the
     same attempts. It is the smallest of the three per-attempt figures
@@ -704,11 +710,17 @@ is exercised rather than assumed.
 The newline convention is set to `PCRE2_NEWLINE_ANY` rather than left at
 whatever the installed component was built with, so that a comparison
 does not depend on how a host configured its PCRE2. It stays an
-approximation. The edition's LineTerminator is LF, CR, U+2028, and
-U+2029; `PCRE2_NEWLINE_ANY` adds VT, FF, and NEL. The corpus carries
-`line-terminator-class` so that the remaining difference is a measured
-row. This build reports 2 as its own default and compiled every corpus
-pattern under 4.
+approximation in two ways. The edition's LineTerminator is LF, CR,
+U+2028, and U+2029; `PCRE2_NEWLINE_ANY` adds VT, FF, and NEL, and the
+corpus carries `line-terminator-class` so that this difference is a
+measured row. `PCRE2_NEWLINE_ANY` also treats CRLF as one newline
+sequence, where the edition treats CR and LF as two independent
+LineTerminator code units, so a multiline `^` answers between them for
+the edition and not for this component. No newline convention this
+component offers reproduces the per-code-unit behavior, and no corpus
+subject carries CRLF, so that difference is named below rather than
+measured. This build reports 2 as its own default and compiled every
+corpus pattern under 4.
 
 Of 52 corpus cases, 38 agreed with the owned matcher, 8 were refused at
 compile time, 4 produced different captures, and 2 produced a different
@@ -784,12 +796,19 @@ each row is what carries.
 
 The remaining rows compare compile cost and compiled size. PCRE2
 compiles one corpus pattern in 0.1 to 24.3 us into 166 to 1,042 bytes.
-The compiler-side artifact builder takes 2.8 to 243.9 us, and the
-runtime's own pattern compiler takes about 3.2 us as measured natively
-above.
+The compiler-side artifact builder takes 2.8 to 243.9 us, and run-time
+construction from source costs about 3.2 us as measured natively above,
+which holds the runtime's own pattern compiler together with the rest
+of the constructor rather than the compiler alone.
 
 What this probe could not answer on one host:
 
+ -  CRLF as a multiline boundary. The corpus carries no CRLF subject,
+    so the difference the newline convention leaves is described above
+    rather than measured. A component decision needs a corpus case such
+    as `/^a/m` over `"\r\na"` and the owned code that closing the
+    difference would take, which is the same unmeasured cost every
+    other mismatch here carries.
  -  Static linking. The installed component ships as
     */lib64/libpcre2-16.so.0* at 670,880 bytes with no *libpcre2-16.a*
     beside it, so no static-link or binary-size figure for a linked
@@ -875,7 +894,8 @@ They settle five things, none of which is a backend:
     index is charged, and pattern construction already costs 337,784
     bytes of executable before any table is added.
 5.  Ahead-of-time compilation removes about 3.2 us for each evaluation
-    that would otherwise compile a pattern, and costs 1,717 bytes of
+    that would otherwise construct a pattern from source, and costs
+    1,717 bytes of
     generated C and 1,149 bytes of executable for each literal, none of
     it in `.text`.
 
@@ -912,8 +932,10 @@ Limits of this run
  -  The native programs measure matching through JavaScript, so a
     per-attempt figure includes the call, the receiver, and, for a
     literal, the fresh object each evaluation allocates. It is not a
-    measurement of the C executor alone, and the three per-attempt
-    figures are differences between whole-process durations.
+    measurement of the C executor alone, the construction figure holds a
+    whole `new RegExp` evaluation rather than the pattern compiler
+    alone, and the three per-attempt figures are differences between
+    whole-process durations.
  -  PCRE2 was measured as installed rather than as it would be vendored,
     which leaves static linking, cross-targets, sanitizers, Unicode
     pinning, license review, and thread and locale assumptions open.
