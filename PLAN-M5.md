@@ -5842,6 +5842,23 @@ state. The reviewed test262 revision, applicable inventory, ADR 0013
 vocabulary, inventory policy, forced-collection policy, and zero-override
 policy are unchanged.
 
+Implemented M5b node `regexp-matcher-backend-probes` runs the five probes
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) delivery item 8 requires and records
+them in
+[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md). It is a
+measurement checkpoint rather than a semantic one: it admits no behavior,
+adds no runtime component, generated-code entry point, code ID, or intrinsic
+slot, leaves the runtime ABI where it was, and moves no manifest,
+evidence-record, or property count. `mise run probe:regexp` measures the
+matcher strategy, resource behavior, Unicode table layouts, code size and
+first-use cost, and one external component over one reviewed 29-pattern
+corpus whose test262 entries cite reviewed subset paths, and
+*tests/regexp-probes.test.ts* keeps the host-independent half of that report
+reproducible inside the ordinary gate. The report selects no backend, which
+is delivery item 9, and it names what one host could not measure, including
+direct generated C and every external-component fact that needs a source
+build.
+
 
 Ahead-of-time challenge boundary
 --------------------------------
