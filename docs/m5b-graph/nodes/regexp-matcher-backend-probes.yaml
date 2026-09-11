@@ -6,5 +6,5 @@ delivers: "Runs the matcher-strategy, external-component, Unicode-table,
   selecting a backend."
 dependencies:
   - regexp-literal-aot
-landed: false
+landed: true
 status: ready

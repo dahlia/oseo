@@ -6,4 +6,4 @@ delivers: "Records the maintainer-selected owned, external, or composed
 dependencies:
   - regexp-matcher-backend-probes
 landed: false
-status: blocked
+status: ready
