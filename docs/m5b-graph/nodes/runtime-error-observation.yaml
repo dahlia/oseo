@@ -7,5 +7,5 @@ delivers: "Renders a thrown value's identity and message so a runtime negative
 dependencies:
   - error-aggregate-and-options
   - generic-string-coercion
-landed: false
+landed: true
 status: ready
