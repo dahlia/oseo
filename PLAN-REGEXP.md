@@ -532,7 +532,7 @@ into the runtime before that boundary can move.
 It measured that demand. Reaching every admitted property from a run-time
 pattern is a 311,460-byte table payload, against 1,976 bytes of resolved
 sets for the whole 29-pattern corpus compiled ahead of time, and reaching
-pattern construction at all already costs 337,792 bytes of executable.
+pattern construction at all already costs 337,784 bytes of executable.
 Inversion lists, delta-encoded lists, per-set tries, and shared classifiers
 over the enumerated properties all have measured sizes and lookup costs in the
 report.
