@@ -1,0 +1,96 @@
+version: 1
+id: runtime-error-observation
+title: "Runtime negative error observation"
+scope:
+  - "The owned diagnostic and machine-readable marker an unhandled thrown
+    value that is not an intrinsic error instance produces. The identity is
+    the `name` of the value's `constructor`, read with ordinary property
+    access, so a user error class such as the test262 harness
+    `Test262Error` reports the only identity ECMAScript exposes for it. The
+    message is the value's `message` property converted through the
+    admitted generic string coercion, and the diagnostic renders
+    `identity: message`, or the identity alone when no message text
+    renders."
+  - "The marker is one whitespace-free token on its own line, so an
+    identity outside the ASCII identifier shape has no representation
+    there. Such a value, a value whose `constructor` or `name` lookup is
+    abrupt or reaches a non-object or non-string, and a thrown primitive
+    all keep the untyped-throw diagnostic and print no marker; the human
+    diagnostic and the marker of a value with no intrinsic error identity
+    therefore appear together or not at all. An intrinsic error instance
+    keeps its existing name-and-message rendering and its intrinsic kind
+    marker, which stay independent of the mutable `name` property."
+  - "The rendering applies to the unhandled-throw diagnostic only. An
+    unhandled rejection is a separate reviewed host-policy boundary,
+    reported by its own text rather than by the rejected value, so a
+    rejected value with no intrinsic error identity leaves that path
+    unchanged: the boundary text alone, with no identity read and no
+    marker. A rejected intrinsic error instance keeps the rendering and
+    marker it already had, so this node moves no reviewed row that
+    classifies on the rejection boundary."
+  - "Reading the identity and converting the message run user JavaScript
+    after the program's abrupt completion, so the throw or rejection site
+    is restored around them and the thrown value stays collector-rooted.
+    Neither nested completion replaces the reported diagnostic, and the two
+    differ: an abrupt or unusable identity read leaves the value
+    unidentified, so it keeps the untyped-throw diagnostic and prints no
+    marker, while an abrupt message read or conversion keeps the identity
+    already established and renders it alone. The test262 runner reads the
+    terminal marker as the observed negative type, which is what makes a
+    runtime negative whose thrown value is a `Test262Error` observable
+    instead of an unsupported runtime observation."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/property/m5-runtime-error-observation.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-1.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-1.ts
+      - tests/property/m5-runtime-error-observation.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-runtime-error-observation.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The rendering runs after the program's abrupt completion and
+      owns no specialized path or family-specific guard, so a deliberate
+      guard miss has nothing to fall back to here."
+    replacements:
+      - tests/native/scenarios/shard-1.ts
+      - tests/property/m5-runtime-error-observation.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-1.ts
+      - tests/property/m5-runtime-error-observation.property.test.ts
+  standards:
+    status: omitted
+    reason: "The node has no inventory root and moves no reviewed row: the
+      reviewed corpus contains no runtime negative whose thrown value lacks
+      an intrinsic error identity. Its standards contract is the runner's
+      negative classification path, which is proved directly."
+    replacements:
+      - tests/test262-runner.test.ts
+  structural:
+    status: omitted
+    reason: "The node adds no IR construct, generated-C shape, or realm
+      intrinsic; its contract is the exact stderr the native host writes and
+      the terminal-marker rule the test262 runner applies to that stderr. A
+      fixture observation never carries a marker, because the runtime writes
+      one only on the failure path and a failed execution is rejected before
+      it becomes an observation, so the fixture reader leaves a
+      marker-shaped line alone."
+    replacements:
+      - packages/testkit/tests/index.test.ts
+      - tests/native/scenarios/shard-1.ts
+      - tests/test262-runner.test.ts

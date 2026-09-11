@@ -70,8 +70,7 @@ callable and constructible, builds an instance with an own hidden
 `message` property, honors the ES2022 `cause` option, and shares one
 `Error.prototype.toString`. `oseo_context_print_thrown` renders an
 unhandled thrown error instance as `Name: message` in the owned
-diagnostic format and falls back to the stored diagnostic for every
-other value.
+diagnostic format.
 The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive`
 behind the numeric, string, addition, relational, loose-equality,
 property-key, console, error-message, and timer-delay conversions.
@@ -760,6 +759,28 @@ avoid indexed reads, values preserve sparse and inherited lookup, and entries
 allocate a fresh two-element Array. The iterator target and pending result stay
 collector-rooted throughout. Two code IDs and two intrinsic slots are added;
 the generated-code ABI gains no entry point.
+
+The `m5-99` ABI extends `oseo_context_print_thrown` to a thrown value with
+no intrinsic error identity. The identity is the `name` of the value's
+`constructor` read with ordinary property access, and the message is its
+`message` property converted through the generic string coercion, so a
+user error class such as a test262 harness `Test262Error` renders as
+`Name: message` and reports the same identity in its `OSEO_THROWN` marker.
+The marker is one whitespace-free token, so an identity outside the ASCII
+identifier shape, an abrupt or non-object `constructor` or non-string
+`name`, and a thrown primitive all keep the untyped-throw diagnostic and
+print no marker. The identity read and message conversion run user
+JavaScript, so the throw site is restored around them and the thrown value
+stays rooted. An abrupt or unusable identity read leaves the value
+unidentified and keeps the untyped-throw diagnostic, while an abrupt
+message read or conversion keeps the established identity and renders it
+alone. The rendering applies to the unhandled-throw diagnostic only. An
+unhandled rejection is a separate reviewed host-policy boundary reported
+by its own text, so a rejected value with no intrinsic error identity
+leaves that path unchanged: the boundary text alone, with no identity
+read and no marker. An intrinsic error instance keeps the rendering and
+marker it already had on both paths. No component, code ID, or
+generated-code entry point is added.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

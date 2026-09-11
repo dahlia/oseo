@@ -557,16 +557,24 @@ function retryableInfrastructureFailure(result: CliResult): boolean {
 const untypedThrowMessage = "error[OSEO2001]: Unhandled JavaScript throw.";
 
 /**
- * The intrinsic error kind of an unhandled thrown value, read from the
- * stable machine-readable marker the native host prints for an error
- * instance. This is independent of the mutable name and message the
- * human diagnostic renders. A thrown non-error value has no marker.
+ * The identity of an unhandled thrown value, read from the stable
+ * machine-readable marker the native host prints. An error instance
+ * reports its intrinsic kind and any other object reports its
+ * identifier-shaped constructor name, so a thrown value such as a
+ * `Test262Error` is observable. Both are independent of the mutable name
+ * and message the human diagnostic renders. A thrown primitive and an
+ * object with no identifier-shaped constructor name have no marker.
  */
 export function unhandledErrorType(stderr: string): string | undefined {
-  // The runtime appends the marker as the final line, so a marker-shaped
-  // line injected earlier by a rendered message is ignored.
-  const matches = [...stderr.matchAll(/^OSEO_THROWN ([A-Za-z]+)$/gmu)];
-  return matches.at(-1)?.[1];
+  // The runtime writes the marker as the very last line it ever writes,
+  // so only a terminal marker is the runtime's. A marker-shaped line
+  // anywhere earlier is program output or rendered message text, whether
+  // it appears inside a diagnostic or on a line of its own, and must not
+  // be read as an identity.
+  const match = /(?:^|\n)OSEO_THROWN ([A-Za-z_$][A-Za-z0-9_$]*)\n$/u.exec(
+    stderr,
+  );
+  return match?.[1];
 }
 
 function detail(

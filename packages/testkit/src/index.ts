@@ -293,26 +293,15 @@ function errorMessage(cause: unknown): string {
 
 function splitCounters(observation: ProcessObservation) {
   const prefix = "OSEO_OBSERVATIONS ";
+  // The runtime writes the machine-readable thrown-value identity marker
+  // only on the failure path, and a fixture whose execution failed is
+  // rejected before it reaches this point, so no observation here can
+  // carry one. A marker-shaped line is therefore output the program
+  // printed itself, and it stays observable.
   const lines = observation.stderr.split(/(?<=\n)/u);
-  // The machine-readable thrown-error marker is appended as the final
-  // line; only that runtime-appended marker is removed before comparing
-  // observable output, so a marker-shaped line inside a rendered message
-  // is preserved.
-  const markerIndex = lines.findLastIndex((line) =>
-    /^OSEO_THROWN [A-Za-z]+\n?$/u.test(line),
-  );
-  if (markerIndex >= 0) lines.splice(markerIndex, 1);
-  const strippedStderr = lines.join("");
   const index = lines.findLastIndex((line) => line.startsWith(prefix));
-  if (index < 0) {
-    return strippedStderr === observation.stderr
-      ? { observation }
-      : { observation: { ...observation, stderr: strippedStderr } };
-  }
-  const line = lines[index];
-  if (line == null) {
-    return { observation: { ...observation, stderr: strippedStderr } };
-  }
+  const line = index < 0 ? undefined : lines[index];
+  if (line == null) return { observation };
   // SAFETY: Every counter field is validated before the record is returned.
   const parsed = JSON.parse(
     line.slice(prefix.length),

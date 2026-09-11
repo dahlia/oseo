@@ -408,3 +408,7 @@ families:
     owner: tests/property/m5-proxy-exotic-object.property.test.ts
     start: 0x60006500
     end: 0x600065ff
+  - family: m5-runtime-error-observation
+    owner: tests/property/m5-runtime-error-observation.property.test.ts
+    start: 0x60006600
+    end: 0x600066ff

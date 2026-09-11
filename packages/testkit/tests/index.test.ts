@@ -235,6 +235,25 @@ test("separates private runtime counters from fixture stderr", async () => {
   });
 });
 
+test("keeps a fixture's own thrown-marker text observable", async () => {
+  // The runtime writes the thrown-value identity marker only on the
+  // failure path, and a failed execution never becomes a fixture
+  // observation, so a marker-shaped line here is output the program
+  // printed itself and must survive comparison.
+  const state = memoryHost([
+    { exitStatus: 0, stderr: "", stdout: "compiler output" },
+    {
+      exitStatus: 0,
+      stderr: "OSEO_THROWN Test262Error\n",
+      stdout: "native output",
+    },
+  ]);
+  await withNativeFixture(fixtureOptions(state.host, ["compile"]), (native) => {
+    assert.equal(native.stderr, "OSEO_THROWN Test262Error\n");
+    assert.equal(native.counters, undefined);
+  });
+});
+
 test("passes runtime sources to the toolchain in asset order", async () => {
   const state = memoryHost([
     { exitStatus: 0, stderr: "", stdout: "compiler output" },
