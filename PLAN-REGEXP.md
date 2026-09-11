@@ -4,9 +4,14 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1 through 3 and 7, the Unicode property
-escape checkpoint, the RegExp intrinsic checkpoint, and the prototype and
-built-in execution checkpoint landed. Probe work has not started.
+Implementation status: delivery items 1 through 3 and 7, the Unicode
+property escape checkpoint, the RegExp intrinsic checkpoint, and the
+prototype and built-in execution checkpoint landed. Delivery item 8 is
+under way rather than complete: its five probes exist, and one run of
+them is recorded in
+[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md),
+while measurements that item requires remain unperformed. No backend is
+selected, which is delivery item 9.
 This plan defines the M5 semantic and compilation boundary for ECMAScript
 regular expressions. The active language profile admits the callable and
 constructible `RegExp` intrinsic, initialization, `lastIndex` state,
@@ -393,6 +398,14 @@ The first probes compare representations rather than choosing one by taste.
 They use patterns drawn from test262, real dependency-free packages, and
 reviewed stress cases.
 
+They have run once. `mise run probe:regexp` performs all five over the
+reviewed corpus in *tools/regexp-probes/*, and
+[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md) is one
+recorded run of it with the host facts, commands, repetition counts, and
+limits of that run. The paragraphs below name what each probe measured
+and what it did not; the report holds the numbers, selects no backend,
+and leaves an unreached requirement open rather than optional.
+
 ### Matcher strategy
 
 At least three implementation shapes need comparison:
@@ -413,6 +426,22 @@ A pure DFA is accepted only for a proven subset and only with a size limit.
 State explosion must select another reviewed representation at build time
 instead of exhausting the compiler or silently truncating behavior.
 
+The probe measured what each shape could take and what the ordered matcher
+does today, and built no automaton and no C lowering, so every number about
+those two is a property of the artifact rather than a measurement of an
+implementation. Over the reviewed corpus the ordered matcher takes every
+pattern; a backreference and a lookaround are outside the automaton path
+the probe models, so those patterns need the fallback this item requires,
+and a counted repetition is where state explosion starts, with
+`a{0,2000}b` reaching 4,001 configurations from one artifact loop and one
+register. The comparison runs both ways: the ordered matcher answers
+`choice-graph` over 3,072 characters in 40 steps, which is the whole cost
+another shape could remove there, and takes 7,339,932 steps on a nested
+quantifier where the ceiling on a simulation of the same program is 20. Direct
+generated C stays unmeasured because no lowering exists to measure, so the
+report records the size budget one would have to fit, 1,149 bytes of executable
+for each literal, rather than a number for it.
+
 ### Owned implementation or external component
 
 An external engine probe must cover the complete candidate grammar and match
@@ -425,6 +454,24 @@ Missing observable behavior is not filled with unreviewed wrappers around the
 library. The probe lists each mismatch and measures the owned code needed to
 close it. An architecture decision then selects an owned implementation, an
 external component behind an Oseo adapter, or a composed design.
+
+The probe compared PCRE2 in its 16-bit form over the reviewed corpus. It
+agreed on 38 of 52 cases, refused unbounded-length lookbehind, class set
+notation, and a lone surrogate in a class, and kept a capture the edition
+resets, which is the edition's own worked example. It also missed three
+class and flag rules the edition states and no mode of the component
+reproduces: `\s`, `\w` under `i` with a unicode-mode flag, and the
+line-terminator set. One refusal is caused by the mapping itself: the option
+that makes a reference to a non-participating group match the empty string also
+makes a backreference variable-length, so a lookbehind containing one is
+refused, and two rules the edition states independently cannot both be honored
+at once. The engine also answered two patterns in nanoseconds where the owned
+matcher spends millions of steps, and reproduced the same exponential growth on
+a nested quantifier, so an external component removes the missing optimizations
+rather than the exponential case. Static linking, both execution targets, the
+AArch64 Linux cross-link, sanitizer behavior, Unicode pinning, thread and
+locale assumptions, and a license review of the exact source tree stay
+unmeasured: they need a source build the probe did not perform.
 
 ### Matcher artifact and backend boundary
 
@@ -482,6 +529,14 @@ dynamic pattern compiler retains its located boundary for a property or class
 set that needs them. The probe still owns what a dynamic pattern must carry
 into the runtime before that boundary can move.
 
+It measured that demand. Reaching every admitted property from a run-time
+pattern is a 311,460-byte table payload, against 1,976 bytes of resolved
+sets for the whole 29-pattern corpus compiled ahead of time, and reaching
+pattern construction at all already costs 337,784 bytes of executable.
+Inversion lists, delta-encoded lists, per-set tries, and shared classifiers
+over the enumerated properties all have measured sizes and lookup costs in the
+report.
+
 ### Resource behavior
 
 The probe includes patterns known to cause large backtracking trees, large
@@ -507,6 +562,22 @@ answer with that failure rather than with a different match.
 The runtime applies the same boundaries to the program it compiles from a
 dynamic pattern, and a reached boundary is one source-located `OSEO2001`
 diagnostic rather than an observable language value.
+
+The probe measured those boundaries by searching for the smallest limits at
+which an attempt still reaches its ordinary answer. The matcher work area is
+not what a pathological pattern consumes: the largest matcher work area the
+runtime reserves in the corpus is 99,360 bytes of stacks, trail, and
+registers, and the patterns that burn millions of steps stay in a few
+thousand with no measurable growth in backtracking depth. Compile work has one
+outlier, the ignore-case backreference that carries a 9,352-byte
+canonicalization table. Reaching a boundary is deterministic, and a program
+whose literal reaches one exits with a located `OSEO2001` diagnostic, so
+both implementations answer the same input at the same boundary. Native
+stack use and cleanup after failure are the two properties named above that
+the probe did not measure: the executor keeps its choices in an explicit
+stack rather than the C call stack, and the runtime work area a failed
+match releases is what the reviewed native gates observe under their
+sanitizers.
 
 
 Optimization contract
@@ -736,6 +807,28 @@ Delivery order
     property escape that the runtime's own pattern compiler still refuses.
 8.  Run the matcher-strategy, external-component, Unicode-table, resource, and
     code-size probes and report the measurements without selecting a backend.
+    Open. The M5b `regexp-matcher-backend-probes` node built the five probes
+    and recorded one run of them, which is what that node delivers.
+    `mise run probe:regexp` measures all five over one reviewed corpus of 29
+    patterns, and
+    [*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md)
+    records that run with its host facts, commands, repetition counts, raw
+    observations, derived values, and limits. The probes add no semantics,
+    no runtime component, and no reviewed evidence path, and the report
+    selects nothing. Six measurements the items above require are absent
+    from that record, so this item is not complete: direct generated C,
+    which has no lowering to measure; the owned code each
+    external-component mismatch would need to close, where each mismatch
+    the run reached is measured but the code is not; the external
+    component's CRLF newline boundary, a semantic difference the option
+    mapping leaves and no corpus subject exercises; native stack use;
+    cleanup after failure;
+    and the external-component facts that need a vendored PCRE2 source
+    build this run did not perform, which are static linking, both
+    execution targets, the AArch64 Linux cross-link, sanitizer behavior,
+    Unicode pinning, thread and locale assumptions, and a license review
+    of the exact source tree. None of them is optional, and this item
+    closes when they are measured and recorded beside that run.
 9.  After maintainer review of that report, record the selected backend and
     runtime split in an architecture decision before it becomes a later family
     dependency.

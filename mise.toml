@@ -189,6 +189,12 @@ printf '%s\\n' \\
 chmod +x "$hooks/commit-msg"
 """
 
+[tasks."probe:regexp"]
+description = "Measure the regular expression matcher backend candidates"
+depends = ["build"]
+raw_args = true
+run = "node tools/regexp-probes.ts"
+
 [tasks.test]
 depends = ["test:deno", "test:native", "test:node", "test:test262"]
 
