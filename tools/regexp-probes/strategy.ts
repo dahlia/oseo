@@ -65,23 +65,28 @@ export interface AutomatonMeasurement {
  * One measured match attempt.
  *
  * `steps` is the executor's own deterministic work counter, so it is the
- * same on every host. The two bounds beside it describe what a parallel
- * simulation of the same program would have to do, and neither is a
- * measurement of one:
+ * same on every host. Neither column beside it measures this executor,
+ * and only one of the two is a bound:
  *
- *  -  `positionFloor` is the number of input positions any engine has to
- *     read before it can give this answer, which is every position in
- *     the subject when there is no match and the positions up to the end
- *     of the match when there is one; and
+ *  -  `positionSpan` is a coordinate of the reported answer, not work
+ *     any engine has to perform. It is the positions up to the end of
+ *     the match when the attempt matched, and the subject's whole
+ *     position count when it reported no match; an attempt that reached
+ *     a reviewed boundary has no answer to describe and reports nothing
+ *     here. Reading it as a cost is wrong in both directions: a sticky
+ *     or an anchored failure is settled at the first position and still
+ *     prints the whole subject, and a pattern such as `$` reports a
+ *     match at an end that no engine has to read through to find; and
  *  -  `configurationCeiling` is the consuming configurations times one
  *     more than the subject's position count, which bounds the
- *     configuration visits a simulation performs. It excludes the
- *     epsilon-closure work one visit needs, so it understates the cost
- *     of a visit while it overstates how many of them happen.
+ *     configuration visits a parallel simulation of the same program
+ *     performs. It excludes the epsilon-closure work one visit needs, so
+ *     it understates the cost of a visit while it overstates how many of
+ *     them happen.
  *
  * A position is not always a code unit. In unicode mode the matcher
  * advances over a surrogate pair once, so `positions` counts code points
- * there and code units otherwise, and both bounds are counted in
+ * there and code units otherwise, and both columns are counted in
  * positions. `characters` stays the subject's code-unit length, which is
  * its size and the unit every capture index is measured in.
  */
@@ -91,7 +96,7 @@ export interface StrategyExecution {
   readonly inputId: string;
   readonly nanosecondsPerAttempt: number;
   readonly outcome: string;
-  readonly positionFloor: number;
+  readonly positionSpan: number | undefined;
   readonly positions: number;
   readonly repetitions: number;
   readonly steps: number;
@@ -555,7 +560,10 @@ export function measureStrategy(
     const unicodeMode = artifact.program.unicodeMode;
     const positions = positionCount(text, text.length, unicodeMode);
     const end = matched?.end ?? text.length;
-    const reached = positionCount(text, end, unicodeMode);
+    const span =
+      attempt.outcome === "limit"
+        ? undefined
+        : positionCount(text, end, unicodeMode);
     return {
       characters: text.length,
       configurationCeiling:
@@ -563,7 +571,7 @@ export function measureStrategy(
       inputId: input.id,
       nanosecondsPerAttempt: timing.nanoseconds,
       outcome: attempt.outcome,
-      positionFloor: reached,
+      positionSpan: span,
       positions,
       repetitions: timing.repetitions,
       steps: attempt.steps,

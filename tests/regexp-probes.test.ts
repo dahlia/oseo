@@ -29,6 +29,7 @@ import {
   probeInputText,
   regExpProbeCorpus,
 } from "../tools/regexp-probes/corpus.ts";
+import type { RegExpProbeCase } from "../tools/regexp-probes/corpus.ts";
 import { measureExternal } from "../tools/regexp-probes/external.ts";
 import {
   boundaryDiagnostic,
@@ -41,6 +42,7 @@ import { measureResources } from "../tools/regexp-probes/resource.ts";
 import {
   defaultAutomatonCaps,
   measureAutomaton,
+  measureStrategy,
 } from "../tools/regexp-probes/strategy.ts";
 import { measureUnicodeTables } from "../tools/regexp-probes/unicode.ts";
 
@@ -102,6 +104,54 @@ test("the automaton measurement is stable and names its blockers", () => {
     defaultAutomatonCaps,
   );
   assert.deepEqual(repeated, bounded);
+});
+
+test("a reported span is the answer rather than mandatory work", () => {
+  // A sticky pattern whose first position fails is the case the column
+  // must not overstate: the attempt is settled at position 0, so no
+  // engine has to read the other 511 positions, and the span the row
+  // prints is the whole subject only because an unmatched attempt has
+  // no match end to report. Asserting the step count against it keeps
+  // the column descriptive: a reading of it as a lower bound on work
+  // would have to survive 2 steps over a 512-position subject.
+  const sticky: RegExpProbeCase = {
+    flags: "y",
+    id: "sticky-first-position",
+    inputs: [
+      { id: "reject", repeat: 512, unit: "b" },
+      { id: "accept", repeat: 1, suffix: "b".repeat(511), unit: "a" },
+    ],
+    note: "A sticky pattern that fails at the first position.",
+    origin: "stress",
+    provenance: "tests/regexp-probes.test.ts",
+    source: "a",
+  };
+  const row = measureStrategy(buildProbeArtifact(sticky), defaultAutomatonCaps);
+  const rejected = row.executions[0];
+  assert.equal(rejected?.outcome, "unmatched");
+  assert.equal(rejected?.positions, 512);
+  assert.equal(rejected?.positionSpan, 512);
+  assert.ok((rejected?.steps ?? 0) < 512, String(rejected?.steps));
+  // A matched attempt is the half that names a match end, which is the
+  // only row where the column describes a prefix of the subject rather
+  // than the whole of it.
+  const accepted = row.executions[1];
+  assert.equal(accepted?.outcome, "matched");
+  assert.equal(accepted?.positions, 512);
+  assert.equal(accepted?.positionSpan, 1);
+  // An attempt that reaches a reviewed boundary has no answer at all,
+  // so it describes none: reporting the subject there would print a
+  // span for a row that never decided anything.
+  const bounded = regExpProbeCorpus.find(
+    (current) => current.id === "empty-repetition",
+  );
+  if (bounded == null) throw new Error("the empty-repetition case is present");
+  const limited = measureStrategy(
+    buildProbeArtifact(bounded),
+    defaultAutomatonCaps,
+  ).executions[0];
+  assert.equal(limited?.outcome, "limit");
+  assert.equal(limited?.positionSpan, undefined);
 });
 
 test("a measured peak is the smallest sufficient limit", () => {

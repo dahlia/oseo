@@ -56,7 +56,7 @@ Measurement environment
 
 | Fact              | Value                                      |
 | ----------------- | ------------------------------------------ |
-| Commit            | `d9db53e0d402e0643d0fd75ed089c24d3f791ef1` |
+| Base commit       | `d9db53e0d402e0643d0fd75ed089c24d3f791ef1` |
 | Operating system  | Linux 7.1.12-200.fc44.x86\_64              |
 | Processor         | AMD Ryzen 7 7700X, 8 cores, 16 threads     |
 | Memory            | 61 GiB total, 41 GiB available             |
@@ -67,6 +67,14 @@ Measurement environment
 | System C compiler | GCC 16.2.1 (Red Hat 16.2.1-2)              |
 | PCRE2             | 10.47, 16-bit, shared library              |
 | Unicode tables    | 17.0.0, pinned by `@oseo/unicode`          |
+
+The base commit is the parent this node builds on, not a tree that can
+run the probes: *tools/regexp-probes/*, the task, and this report reach
+the repository in this node's own commits, so the tree that produced
+every number here is that parent with this node applied to it. Checking
+this node out and running `mise run probe:regexp` is what reproduces the
+run; the later correction to this node renamed one column and changed no
+measurement.
 
 Four environment choices change what the numbers mean and are
 deliberate:
@@ -236,16 +244,20 @@ the program.
 | `ignore-case-closure`      | 9            | 4         | 1              | 3                    | 9       | none                      |
 
 The ordered matcher takes all 29, which is what makes it the semantic
-authority. A backreference or a lookaround has no automaton
-representation at all, and that is 4 of the 29 here: `lookbehind-greedy`,
+authority. The automaton path this probe models refuses a backreference
+and a lookaround instead of transforming either, so 4 of the 29 here
+need the fallback the strategy item requires: `lookbehind-greedy`,
 `lookbehind-backreference`, `deep-lookaround`, and
-`unset-backreference`. An assertion is a weaker blocker: a simulation
-evaluates `^`, `$`, and `\b` at each position, so the 9 patterns blocked
-only by an assertion stay available to an automaton path, while a
-deterministic automaton would have to widen its state with the preceding
-character class to keep them. This probe does not measure that widening,
-so those rows report a configuration count and no deterministic state
-count. A deterministic state count includes the dead state a failed
+`unset-backreference`. That is this probe's modeled path rather than a
+result about automata: a lookaround over a regular subexpression and
+some backreference patterns do denote regular languages, and a path that
+transformed them would have to be built and measured separately. An assertion
+is a weaker blocker: a simulation evaluates `^`, `$`, and `\b` at each
+position, so the 9 patterns blocked only by an assertion stay available to an
+automaton path, while a deterministic automaton would have to widen its state
+with the preceding character class to keep them. This probe does not measure
+that widening, so those rows report a configuration count and no deterministic
+state count. A deterministic state count includes the dead state a failed
 transition leads to.
 
 An alphabet symbol is the representative of one interval the program's
@@ -265,25 +277,30 @@ alphabet symbols, so no row in this corpus was capped.
 ### What the ordered matcher does today
 
 `steps` is the executor's own deterministic work counter, so it is the
-same on every host. The two columns beside it are bounds on a simulation
-rather than measurements of one. `floor` is the number of input
-positions any engine has to read before it can give this answer, which
-is every position in the subject when there is no match and the
-positions up to the end of the match when there is one. `ceiling` is the
-configurations times one more than the subject's position count, which
-bounds the configuration visits a simulation performs; it excludes the
-epsilon-closure work each visit needs, so it understates the cost of a
-visit while it overstates how many of them happen.
+same on every host. Neither column beside it measures this executor, and
+only one of the two is a bound. `span` is a coordinate of the reported
+answer rather than work: it is the positions up to the end of the match
+on a matched row, the subject's whole position count on a row that
+reported no match, and nothing on a row that reached a boundary and so
+has no answer to describe. Reading it as a cost is wrong in both
+directions: a sticky or an anchored failure is settled at the first
+position and still prints the whole subject, and a pattern such as `$`
+reports a match at an end that no engine has to read through to find.
+`ceiling` is the configurations times one more than the subject's
+position count, which bounds the configuration visits a simulation
+performs; it excludes the epsilon-closure work each visit needs, so it
+understates the cost of a visit while it overstates how many of them
+happen.
 
 A position is not always a code unit. In unicode mode the matcher
 advances over a surrogate pair once, so `positions` counts code points
-there and code units otherwise, and both bounds are counted in
+there and code units otherwise, and both columns are counted in
 positions. `units` stays the subject's code-unit length, which is its
 size and the unit every capture index is measured in. Only
 `property-escape-negated` over its `mixed` subject separates the two in
 this corpus, at 704 units and 640 positions.
 
-| Pattern                    | Input       | Outcome   | Units | Positions | Steps      | Floor | Ceiling | Attempt      |
+| Pattern                    | Input       | Outcome   | Units | Positions | Steps      | Span  | Ceiling | Attempt      |
 | -------------------------- | ----------- | --------- | ----- | --------- | ---------- | ----- | ------- | ------------ |
 | `choice-graph`             | `long`      | matched   | 3,072 | 3,072     | 40         | 4     | 36,876  | 1.3 us       |
 | `capture-reset`            | `long`      | matched   | 2,560 | 2,560     | 133        | 10    | 40,976  | 4.7 us       |
@@ -300,7 +317,7 @@ this corpus, at 704 units and 640 positions.
 | `ambiguous-alternation`    | `reject-16` | unmatched | 17    | 17        | 42,820     | 17    | 54      | 1,210.2 us   |
 | `large-bounded-repetition` | `reject`    | unmatched | 10    | 10        | 341        | 10    | 44,011  | 13.6 us      |
 | `many-captures`            | `accept`    | matched   | 40    | 40        | 203        | 40    | 3,280   | 7.1 us       |
-| `empty-repetition`         | `reject`    | limit     | 24    | 24        | 16,777,216 | 24    | 50      | 514,294.3 us |
+| `empty-repetition`         | `reject`    | limit     | 24    | 24        | 16,777,216 | -     | 50      | 514,294.3 us |
 | `lazy-any-scan`            | `late`      | unmatched | 2,560 | 2,560     | 16,734,726 | 2,560 | 7,683   | 565,766.8 us |
 | `script-run`               | `greek`     | matched   | 512   | 512       | 36         | 7     | 1,539   | 1.6 us       |
 
@@ -308,12 +325,12 @@ The complete table is in the task's own output; the rows above are the
 ones the comparison turns on. Two things follow from them, and the
 second is the reason this probe exists:
 
- -  On an ordinary pattern the ordered matcher already works close to
-    the floor, so an automaton path has little to win. It answers
+ -  On an ordinary pattern the ordered matcher already spends almost
+    nothing, so an automaton path has little to win. It answers
     `choice-graph` over 3,072 characters in 40 steps and `word-scan`
     over 3,456 characters in 21, because an attempt stops at the first
-    match and never reads the rest of the subject, and both are within
-    a small factor of the positions any engine must read.
+    match and never reads the rest of the subject, and those 40 and 21
+    steps are the whole cost another shape could remove.
  -  On an adversarial pattern the ratio inverts without limit.
     `nested-quantifier` takes 1,834,918 steps where the ceiling on a
     simulation of the same program is 18, and two more input characters
@@ -756,9 +773,10 @@ offset that maps to a message, which is what an Oseo adapter would
 translate into a located diagnostic.
 
 Two further candidates were not measured and are named here so the item
-9 decision knows what this run does not cover. RE2 and any other
-automaton-only engine cannot take the 4 corpus patterns that use a
-backreference or a lookaround, which the strategy probe already counts.
+9 decision knows what this run does not cover. RE2 and any other engine
+restricted to an automaton needs a transformation or a fallback for the
+4 corpus patterns that use a backreference or a lookaround, which the
+strategy probe counts and this run measured no engine against.
 A JIT-compiled engine, including PCRE2's own, generates executable
 memory at run time, which
 [*PLAN-REGEXP.md*](../PLAN-REGEXP.md) already refuses for a dynamic
@@ -772,17 +790,17 @@ What the measurements settle
 They settle five things, none of which is a backend:
 
 1.  The ordered matcher covers the whole admitted grammar, and every
-    other candidate shape has a measured gap: an automaton loses 4 of
-    29 corpus patterns outright, and PCRE2 loses 4 of 29 to grammar and
-    4 more to class, flag, and capture rules, with one of those grammar
-    losses caused by the option the edition's own backreference rule
-    needs.
+    other candidate shape has a measured gap: the modeled automaton
+    path needs a fallback for 4 of 29 corpus patterns, and PCRE2 loses
+    4 of 29 to grammar and 4 more to class, flag, and capture rules,
+    with one of those grammar losses caused by the option the edition's
+    own backreference rule needs.
 2.  An automaton path would help where the ordered matcher is worst and
     has little headroom where it is best. On `nested-quantifier` the
     ordered matcher takes 1,834,918 steps against a ceiling of 18 on a
     simulation of the same program; on `choice-graph` it takes 40 steps
-    over 3,072 characters, which is already within a small factor of
-    the 4 positions any engine must read.
+    over 3,072 characters, which is the whole cost another shape could
+    remove there.
 3.  Pathological patterns cost time, not matcher work area. The largest
     the runtime reserves for one attempt in the corpus is 99,360 bytes
     of stacks, trail, and registers, and the reviewed step boundary is

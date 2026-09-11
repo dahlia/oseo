@@ -427,16 +427,17 @@ The probe measured what each shape could take and what the ordered matcher
 does today, and built no automaton and no C lowering, so every number about
 those two is a property of the artifact rather than a measurement of an
 implementation. Over the reviewed corpus the ordered matcher takes every
-pattern; a backreference or a lookaround removes an automaton path
-outright, and a counted repetition is where state explosion starts, with
+pattern; a backreference and a lookaround are outside the automaton path
+the probe models, so those patterns need the fallback this item requires,
+and a counted repetition is where state explosion starts, with
 `a{0,2000}b` reaching 4,001 configurations from one artifact loop and one
 register. The comparison runs both ways: the ordered matcher answers
-`choice-graph` over 3,072 characters in 40 steps, already within a small
-factor of the positions any engine must read, and takes 7,339,932 steps on
-a nested quantifier where the ceiling on a simulation of the same program
-is 20. Direct generated C stays unmeasured because no lowering exists to
-measure, so the report records the size budget one would have to fit, 1,149
-bytes of executable for each literal, rather than a number for it.
+`choice-graph` over 3,072 characters in 40 steps, which is the whole cost
+another shape could remove there, and takes 7,339,932 steps on a nested
+quantifier where the ceiling on a simulation of the same program is 20. Direct
+generated C stays unmeasured because no lowering exists to measure, so the
+report records the size budget one would have to fit, 1,149 bytes of executable
+for each literal, rather than a number for it.
 
 ### Owned implementation or external component
 
