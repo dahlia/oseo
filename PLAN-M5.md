@@ -5858,11 +5858,12 @@ reproducible inside the ordinary gate.
 
 The probes and that record are what this node delivers; they do not complete
 delivery item 8, which stays open. The report selects no backend, which is
-delivery item 9, and five measurements the item requires are absent from it:
+delivery item 9, and six measurements the item requires are absent from it:
 direct generated C, which has no lowering to measure; the owned code each
-external-component mismatch would need to close; native stack use; cleanup
-after failure; and every external-component fact that needs a vendored source
-build. The report names each one as an open limit, and
+external-component mismatch would need to close; the external component's
+CRLF newline boundary; native stack use; cleanup after failure; and every
+external-component fact that needs a vendored source build. The report names
+each one as an open limit, and
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) keeps the item open until they are
 measured.
 

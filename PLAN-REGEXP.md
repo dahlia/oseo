@@ -815,11 +815,14 @@ Delivery order
     records that run with its host facts, commands, repetition counts, raw
     observations, derived values, and limits. The probes add no semantics,
     no runtime component, and no reviewed evidence path, and the report
-    selects nothing. Five measurements the items above require are absent
+    selects nothing. Six measurements the items above require are absent
     from that record, so this item is not complete: direct generated C,
     which has no lowering to measure; the owned code each
-    external-component mismatch would need to close, where only the
-    mismatch itself is measured; native stack use; cleanup after failure;
+    external-component mismatch would need to close, where each mismatch
+    the run reached is measured but the code is not; the external
+    component's CRLF newline boundary, a semantic difference the option
+    mapping leaves and no corpus subject exercises; native stack use;
+    cleanup after failure;
     and the external-component facts that need a vendored PCRE2 source
     build this run did not perform, which are static linking, both
     execution targets, the AArch64 Linux cross-link, sanitizer behavior,

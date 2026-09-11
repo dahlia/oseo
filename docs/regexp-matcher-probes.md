@@ -10,13 +10,13 @@ runs the matcher-strategy, external-component, Unicode-table, resource,
 and code-size probes over one reviewed corpus and reports what each one
 measured.
 
-It does not complete that item, which stays open. Five measurements the
+It does not complete that item, which stays open. Six measurements the
 item's own requirements name are absent from this record: direct
 generated C, the owned code each external-component mismatch would need
-to close, native stack use, cleanup after failure, and every
-external-component fact that needs a source build. Each is named where
-the probe reached it and again under the limits at the end, and none of
-them is optional.
+to close, the external component's CRLF newline boundary, native stack
+use, cleanup after failure, and every external-component fact that needs
+a source build. Each is named where the probe reached it and again under
+the limits at the end, and none of them is optional.
 
 This document selects nothing. Delivery item 9 is the architecture
 decision that reads it, and until that decision lands, no measurement
@@ -806,9 +806,10 @@ What this probe could not answer on one host:
  -  CRLF as a multiline boundary. The corpus carries no CRLF subject,
     so the difference the newline convention leaves is described above
     rather than measured. A component decision needs a corpus case such
-    as `/^a/m` over `"\r\na"` and the owned code that closing the
-    difference would take, which is the same unmeasured cost every
-    other mismatch here carries.
+    as `/^\n/m` over `"a\r\n"`, which the edition matches between the
+    two code units and this component does not, and the owned code that
+    closing the difference would take, which is the same unmeasured cost
+    every other mismatch here carries.
  -  Static linking. The installed component ships as
     */lib64/libpcre2-16.so.0* at 670,880 bytes with no *libpcre2-16.a*
     beside it, so no static-link or binary-size figure for a linked
@@ -940,7 +941,8 @@ Limits of this run
     which leaves static linking, cross-targets, sanitizers, Unicode
     pinning, license review, and thread and locale assumptions open.
  -  The owned code each external-component mismatch would need is
-    unmeasured. This run names the nine cases where the two disagree and
-    what each costs the component; the plan also asks what closing one
-    would cost Oseo, and that is a design for each behavior rather than
+    unmeasured. This run names the nine cases it reached where the two
+    disagree and what each costs the component, and the CRLF boundary as
+    a tenth it did not reach; the plan also asks what closing one would
+    cost Oseo, and that is a design for each behavior rather than
     another run of this probe.
