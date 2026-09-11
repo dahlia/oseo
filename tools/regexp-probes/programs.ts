@@ -62,7 +62,7 @@ export function sharedPatterns(): SharedPatterns {
 }
 
 /** One JavaScript string literal holding exactly this text. */
-function stringLiteral(text: string): string {
+export function stringLiteral(text: string): string {
   let escaped = "";
   for (const character of text) {
     const code = character.codePointAt(0) ?? 0;
@@ -98,24 +98,28 @@ function subject(entry: RegExpProbeCase): string {
   return probeInputText({ ...first, repeat: 1 });
 }
 
-/** The largest subject a timed program embeds. */
-const timedSubjectLimit = 512;
+/** The largest subject, in code units, a timed program embeds. */
+export const timedSubjectLimit = 512;
 
 /**
  * The subject one timed program repeats.
  *
- * The first input is repeated until it reaches the embedded-subject
- * limit, so a timed program measures a match over an ordinary subject
- * rather than over one character.
+ * The unit of the first input is repeated until one more copy would
+ * pass the embedded-subject limit, so a timed program measures a match
+ * over an ordinary subject rather than over the few characters a corpus
+ * entry happens to name. The input's own repetition count is not a
+ * ceiling here: it is chosen for the semantic case the entry makes, and
+ * most of the corpus names one repetition, which would leave a timed
+ * program measuring a subject of a handful of characters. The suffix is
+ * charged against the limit rather than added past it, because the
+ * limit is on the subject the program embeds.
  */
-function timedSubject(entry: RegExpProbeCase): string {
+export function timedSubject(entry: RegExpProbeCase): string {
   const first = entry.inputs[0];
   if (first == null) return "";
   const unit = first.unit === "" ? " " : first.unit;
-  const repeat = Math.max(
-    1,
-    Math.min(first.repeat, Math.floor(timedSubjectLimit / unit.length)),
-  );
+  const room = timedSubjectLimit - (first.suffix ?? "").length;
+  const repeat = Math.max(1, Math.floor(room / unit.length));
   return probeInputText({ ...first, repeat });
 }
 
@@ -212,6 +216,32 @@ function timedProgram(
 }
 
 /**
+ * The corpus entries whose own first input reaches an owned boundary.
+ *
+ * A boundary program evaluates the input its corpus entry names rather
+ * than the extended subject a timed program builds, so the selection is
+ * made over that same input. Reading it off the timed exclusions
+ * instead would admit an entry that only reaches a boundary once the
+ * subject is extended, and that program would print an ordinary answer
+ * where the probe requires a located diagnostic.
+ */
+export function boundaryPatterns(): readonly RegExpProbeCase[] {
+  const boundary: RegExpProbeCase[] = [];
+  for (const entry of regExpProbeCorpus) {
+    const input = entry.inputs[0];
+    if (input == null) continue;
+    const artifact = buildProbeArtifact(entry);
+    const attempt = searchRegExpMatcher({
+      program: artifact.program,
+      startIndex: 0,
+      text: probeInputText(input),
+    });
+    if (attempt.outcome === "limit") boundary.push(entry);
+  }
+  return boundary;
+}
+
+/**
  * The diagnostic a boundary program has to print.
  *
  * The runtime reports a reached matcher limit as one located
@@ -248,7 +278,14 @@ function boundaryBody(entry: RegExpProbeCase): string {
  * A control keeps the statements, the subjects, and the descriptor count
  * of the program it is paired with and replaces only the pattern, so the
  * difference between them is what the corpus artifacts cost above the
- * smallest artifact there is.
+ * smallest artifact there is. Three controls are built, over no pattern,
+ * one pattern, and the whole corpus, because a program pays both a fixed
+ * cost for reaching the matcher at all and a cost for each evaluation it
+ * writes, and one control cannot separate them. The difference between
+ * two of them is what one more evaluation costs, and the one with no
+ * evaluation is the only program that keeps the statements around them
+ * while linking no matcher, so what is left of the one-pattern control
+ * against it is the fixed cost alone.
  */
 const controlPattern: RegExpProbeCase = {
   flags: "",
@@ -292,13 +329,8 @@ function dynamicConstruction(entry: RegExpProbeCase): string {
 /** The programs the code-size probe builds, in report order. */
 export function sizePrograms(): readonly SizeProgram[] {
   const { shared } = sharedPatterns();
-  const { excluded, timed } = timedPatterns();
-  const boundary = regExpProbeCorpus.filter((entry) =>
-    excluded.some(
-      (dropped) =>
-        dropped.id === entry.id && dropped.reason.startsWith("reaches the"),
-    ),
-  );
+  const { timed } = timedPatterns();
+  const boundary = boundaryPatterns();
   const first = regExpProbeCorpus.slice(0, 1);
   const hoisted = timed.map(
     (entry, index) => `const pattern${index} = ${dynamicConstruction(entry)};`,
@@ -325,6 +357,18 @@ export function sizePrograms(): readonly SizeProgram[] {
       source: programBody(regExpProbeCorpus, () =>
         regExpLiteral(controlPattern),
       ),
+    },
+    {
+      attempts: 0,
+      id: "literal-control-none",
+      patterns: 0,
+      source: programBody([], regExpLiteral),
+    },
+    {
+      attempts: first.length,
+      id: "literal-control-one",
+      patterns: first.length,
+      source: programBody(first, () => regExpLiteral(controlPattern)),
     },
     {
       attempts: shared.length,

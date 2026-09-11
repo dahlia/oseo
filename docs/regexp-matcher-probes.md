@@ -10,6 +10,14 @@ runs the matcher-strategy, external-component, Unicode-table, resource,
 and code-size probes over one reviewed corpus and reports what each one
 measured.
 
+It does not complete that item, which stays open. Five measurements the
+item's own requirements name are absent from this record: direct
+generated C, the owned code each external-component mismatch would need
+to close, native stack use, cleanup after failure, and every
+external-component fact that needs a source build. Each is named where
+the probe reached it and again under the limits at the end, and none of
+them is optional.
+
 This document selects nothing. Delivery item 9 is the architecture
 decision that reads it, and until that decision lands, no measurement
 here is a commitment to a matcher backend, a runtime split, or a fast
@@ -39,7 +47,7 @@ The probe corpus, the analysis, and the external harness live under
 host-independent half of the report reproducible inside the ordinary
 gate.
 
-The whole run took 40 seconds on the measurement host, and it compiles
+The whole run took 42 seconds on the measurement host, and it compiles
 no runtime source that the ordinary gates do not already compile. Every
 artifact it builds for its own measurements lives in a temporary
 directory it removes on every exit. Three things are written elsewhere
@@ -73,8 +81,9 @@ run the probes: *tools/regexp-probes/*, the task, and this report reach
 the repository in this node's own commits, so the tree that produced
 every number here is that parent with this node applied to it. Checking
 this node out and running `mise run probe:regexp` is what reproduces the
-run; the later correction to this node renamed one column and changed no
-measurement.
+run. Every correction this node has made is folded into the numbers
+below rather than left beside them, so the tables are one run of the
+tree as it now stands and not a run with later amendments attached.
 
 Four environment choices change what the numbers mean and are
 deliberate:
@@ -90,7 +99,7 @@ deliberate:
     would let a variable such as `CPATH` reach the compiler, so the
     report says which of the two happened; this run used the snapshot.
  -  The Zig compilation cache was warm, in the lane cache directory
-    `ZIG_GLOBAL_CACHE_DIR`. The runtime archive took 0.43 s to build
+    `ZIG_GLOBAL_CACHE_DIR`. The runtime archive took 0.33 s to build
     from that cache. A cold cache takes minutes, and the first link in
     one working directory pays a one-time cost that the probe discards
     by building a warm-up program before it measures.
@@ -167,12 +176,20 @@ Two of the probes run over a subset of the corpus and say why:
     `ignore-case-closure` for a non-ASCII ignore-case closure. An
     ahead-of-time literal has no such boundary because its descriptor
     carries the resolved sets.
- -  A timed program repeats 20 of those 25. It excludes `word-scan` and
-    `sticky-attempt` because a reused object keeps a `lastIndex` cursor
-    that would be measured instead of the match, `empty-repetition`
-    because the attempt reaches an owned boundary, and
-    `nested-quantifier` and `lazy-any-scan` because one attempt costs
-    1,834,918 and 667,851 steps, which would measure only themselves.
+ -  A timed program repeats 19 of those 25. It builds its own subject
+    rather than using the one its corpus entry names: the entry's unit
+    is repeated until one more copy would pass 512 code units, because
+    most entries name a single repetition and a timed program would
+    otherwise measure a match over a handful of characters. It excludes
+    `word-scan` and `sticky-attempt` because a reused object keeps a
+    `lastIndex` cursor that would be measured instead of the match,
+    `nested-quantifier`, `ambiguous-alternation`, and `empty-repetition`
+    because one attempt over that subject reaches an owned boundary, and
+    `lazy-any-scan` because one attempt costs 667,851 steps, which would
+    measure only itself. Three of those four exclusions are a property
+    of the longer subject rather than of the entry's own input: over the
+    input each entry names, `nested-quantifier` spends 1,834,918 steps
+    and `ambiguous-alternation` 16,366 without reaching a boundary.
 
 
 Artifact storage
@@ -302,23 +319,23 @@ this corpus, at 704 units and 640 positions.
 
 | Pattern                    | Input       | Outcome   | Units | Positions | Steps      | Span  | Ceiling | Attempt      |
 | -------------------------- | ----------- | --------- | ----- | --------- | ---------- | ----- | ------- | ------------ |
-| `choice-graph`             | `long`      | matched   | 3,072 | 3,072     | 40         | 4     | 36,876  | 1.3 us       |
+| `choice-graph`             | `long`      | matched   | 3,072 | 3,072     | 40         | 4     | 36,876  | 1.4 us       |
 | `capture-reset`            | `long`      | matched   | 2,560 | 2,560     | 133        | 10    | 40,976  | 4.7 us       |
-| `class-pair`               | `long`      | matched   | 7,168 | 7,168     | 41         | 14    | 14,338  | 3.0 us       |
-| `lookbehind-greedy`        | `long`      | matched   | 2,816 | 2,816     | 225        | 11    | -       | 11.0 us      |
-| `yaml-control-characters`  | `plain`     | unmatched | 704   | 704       | 1,410      | 704   | 705     | 167.6 us     |
-| `yaml-tag-split`           | `long`      | matched   | 336   | 336       | 1,393      | 336   | 1,011   | 47.2 us      |
-| `property-escape-negated`  | `ascii`     | unmatched | 1,024 | 1,024     | 2,050      | 1,024 | 1,025   | 220.0 us     |
-| `semver`                   | `reject`    | unmatched | 7     | 7         | 70         | 7     | 280     | 10.8 us      |
-| `email-address`            | `reject`    | unmatched | 29    | 29        | 301        | 29    | 704,970 | 21.9 us      |
+| `class-pair`               | `long`      | matched   | 7,168 | 7,168     | 41         | 14    | 14,338  | 3.2 us       |
+| `lookbehind-greedy`        | `long`      | matched   | 2,816 | 2,816     | 225        | 11    | -       | 10.9 us      |
+| `yaml-control-characters`  | `plain`     | unmatched | 704   | 704       | 1,410      | 704   | 705     | 159.2 us     |
+| `yaml-tag-split`           | `long`      | matched   | 336   | 336       | 1,393      | 336   | 1,011   | 46.6 us      |
+| `property-escape-negated`  | `ascii`     | unmatched | 1,024 | 1,024     | 2,050      | 1,024 | 1,025   | 234.7 us     |
+| `semver`                   | `reject`    | unmatched | 7     | 7         | 70         | 7     | 280     | 10.9 us      |
+| `email-address`            | `reject`    | unmatched | 29    | 29        | 301        | 29    | 704,970 | 22.1 us      |
 | `word-scan`                | `prose`     | matched   | 3,456 | 3,456     | 21         | 3     | 3,457   | 1.0 us       |
-| `nested-quantifier`        | `reject-16` | unmatched | 17    | 17        | 1,834,918  | 17    | 18      | 58,271.8 us  |
-| `nested-quantifier`        | `reject-18` | unmatched | 19    | 19        | 7,339,932  | 19    | 20      | 228,024.2 us |
-| `ambiguous-alternation`    | `reject-16` | unmatched | 17    | 17        | 42,820     | 17    | 54      | 1,210.2 us   |
-| `large-bounded-repetition` | `reject`    | unmatched | 10    | 10        | 341        | 10    | 44,011  | 13.6 us      |
-| `many-captures`            | `accept`    | matched   | 40    | 40        | 203        | 40    | 3,280   | 7.1 us       |
-| `empty-repetition`         | `reject`    | limit     | 24    | 24        | 16,777,216 | -     | 50      | 514,294.3 us |
-| `lazy-any-scan`            | `late`      | unmatched | 2,560 | 2,560     | 16,734,726 | 2,560 | 7,683   | 565,766.8 us |
+| `nested-quantifier`        | `reject-16` | unmatched | 17    | 17        | 1,834,918  | 17    | 18      | 56,836.8 us  |
+| `nested-quantifier`        | `reject-18` | unmatched | 19    | 19        | 7,339,932  | 19    | 20      | 229,818.7 us |
+| `ambiguous-alternation`    | `reject-16` | unmatched | 17    | 17        | 42,820     | 17    | 54      | 1,215.5 us   |
+| `large-bounded-repetition` | `reject`    | unmatched | 10    | 10        | 341        | 10    | 44,011  | 13.7 us      |
+| `many-captures`            | `accept`    | matched   | 40    | 40        | 203        | 40    | 3,280   | 7.2 us       |
+| `empty-repetition`         | `reject`    | limit     | 24    | 24        | 16,777,216 | -     | 50      | 523,251.9 us |
+| `lazy-any-scan`            | `late`      | unmatched | 2,560 | 2,560     | 16,734,726 | 2,560 | 7,683   | 570,499.4 us |
 | `script-run`               | `greek`     | matched   | 512   | 512       | 36         | 7     | 1,539   | 1.6 us       |
 
 The complete table is in the task's own output; the rows above are the
@@ -395,18 +412,18 @@ rather than about a process, and is drawn from `arrays` rather than from
 
 | Pattern                    | Input        | Outcome      | Steps      | Backtrack peak | Trail peak | Packed | Arrays | Build    |
 | -------------------------- | ------------ | ------------ | ---------- | -------------- | ---------- | ------ | ------ | -------- |
-| `capture-reset`            | `spec`       | matched      | 133        | 11             | 106        | 1,448  | 2,736  | 18.6 us  |
-| `lookbehind-backreference` | `short`      | matched      | 59         | 1              | 7          | 100    | 1,848  | 245.7 us |
-| `yaml-tag-split`           | `long`       | matched      | 1,393      | 337            | 678        | 13,528 | 20,560 | 10.2 us  |
-| `semver`                   | `prerelease` | matched      | 136        | 14             | 56         | 896    | 2,128  | 60.4 us  |
-| `uri-reference`            | `absolute`   | matched      | 163        | 28             | 101        | 1,660  | 2,864  | 28.8 us  |
-| `email-address`            | `reject`     | unmatched    | 301        | 25             | 61         | 1,132  | 1,904  | 30.3 us  |
-| `nested-quantifier`        | `reject-18`  | unmatched    | 7,339,932  | 18             | 172        | 2,352  | 4,160  | 5.5 us   |
-| `ambiguous-alternation`    | `reject-16`  | unmatched    | 42,820     | 33             | 103        | 1,764  | 2,608  | 11.6 us  |
-| `many-captures`            | `accept`     | matched      | 203        | 21             | 82         | 1,320  | 3,216  | 90.3 us  |
-| `empty-repetition`         | `reject`     | limit: steps | 16,777,216 | 46             | 198        | 3,112  | 4,160  | 5.6 us   |
-| `lazy-any-scan`            | `late`       | unmatched    | 16,734,726 | 1              | 5,124      | 61,504 | 99,360 | 6.3 us   |
-| `deep-lookaround`          | `accept`     | matched      | 15         | 3              | 5          | 108    | 1,832  | 5.7 us   |
+| `capture-reset`            | `spec`       | matched      | 133        | 11             | 106        | 1,448  | 2,736  | 22.6 us  |
+| `lookbehind-backreference` | `short`      | matched      | 59         | 1              | 7          | 100    | 1,848  | 239.6 us |
+| `yaml-tag-split`           | `long`       | matched      | 1,393      | 337            | 678        | 13,528 | 20,560 | 10.7 us  |
+| `semver`                   | `prerelease` | matched      | 136        | 14             | 56         | 896    | 2,128  | 59.0 us  |
+| `uri-reference`            | `absolute`   | matched      | 163        | 28             | 101        | 1,660  | 2,864  | 27.1 us  |
+| `email-address`            | `reject`     | unmatched    | 301        | 25             | 61         | 1,132  | 1,904  | 28.2 us  |
+| `nested-quantifier`        | `reject-18`  | unmatched    | 7,339,932  | 18             | 172        | 2,352  | 4,160  | 5.6 us   |
+| `ambiguous-alternation`    | `reject-16`  | unmatched    | 42,820     | 33             | 103        | 1,764  | 2,608  | 6.8 us   |
+| `many-captures`            | `accept`     | matched      | 203        | 21             | 82         | 1,320  | 3,216  | 79.6 us  |
+| `empty-repetition`         | `reject`     | limit: steps | 16,777,216 | 46             | 198        | 3,112  | 4,160  | 5.3 us   |
+| `lazy-any-scan`            | `late`       | unmatched    | 16,734,726 | 1              | 5,124      | 61,504 | 99,360 | 23.2 us  |
+| `deep-lookaround`          | `accept`     | matched      | 15         | 3              | 5          | 108    | 1,832  | 23.9 us  |
 | `unset-backreference`      | `unset`      | matched      | 9          | 1              | 2          | 40     | 1,824  | 5.5 us   |
 
 Every row is stable: the measured peak is sufficient on a repeat and one
@@ -425,8 +442,8 @@ Three results matter for the decision:
     counterpart, keeping 5,124 register writes over a 2,560-character
     scan.
  -  Compile work is small and has one outlier.
-    `lookbehind-backreference` costs 245.7 us to build against 2.8 to
-    90.3 us for every other pattern, because `i` with a backreference is
+    `lookbehind-backreference` costs 239.6 us to build against 2.9 to
+    79.6 us for every other pattern, because `i` with a backreference is
     the one shape that has to carry a complete `Canonicalize` table into
     the artifact.
  -  The owned boundary behaves as the plan requires. `(a*)*b` reaches
@@ -514,31 +531,55 @@ environment snapshot. The runtime archive is 4,715,322 bytes and is
 built once for every program. The C compilation of the generated source
 and the link against that archive are separate timed steps.
 
-| Program             | Patterns | Generated C | Object    | Object text | Executable | Text      | Compile | Link  | Run      |
-| ------------------- | -------- | ----------- | --------- | ----------- | ---------- | --------- | ------- | ----- | -------- |
-| `baseline`          | 0        | 2,866       | 15,288    | 2,477       | 6,484,952  | 896,378   | 33 ms   | 24 ms | 1.9 ms   |
-| `literal-one`       | 1        | 9,074       | 46,840    | 12,090      | 6,503,296  | 905,994   | 42 ms   | 24 ms | 2.4 ms   |
-| `literal-all`       | 29       | 160,050     | 627,408   | 201,864     | 6,867,760  | 1,095,770 | 210 ms  | 23 ms | 2.3 ms   |
-| `literal-control`   | 29       | 110,248     | 590,584   | 201,860     | 6,834,440  | 1,095,770 | 207 ms  | 22 ms | 2.3 ms   |
-| `literal-shared`    | 25       | 141,931     | 546,552   | 174,752     | 6,817,848  | 1,068,650 | 171 ms  | 21 ms | 2.2 ms   |
-| `dynamic-shared`    | 25       | 179,134     | 1,135,336 | 418,881     | 7,155,640  | 1,312,794 | 409 ms  | 21 ms | 2.5 ms   |
-| `literal-match`     | 20       | 154,757     | 623,856   | 210,484     | 6,865,344  | 1,104,394 | 216 ms  | 24 ms | 199.6 ms |
-| `dynamic-match`     | 20       | 198,799     | 1,205,816 | 450,570     | 7,202,304  | 1,344,474 | 392 ms  | 23 ms | 175.4 ms |
-| `dynamic-construct` | 20       | 178,021     | 1,092,208 | 406,594     | 7,132,416  | 1,300,506 | 346 ms  | 22 ms | 306.2 ms |
-| `literal-boundary`  | 1        | 7,711       | 40,480    | 9,651       | 6,499,400  | 903,562   | 69 ms   | 20 ms | 45.2 ms  |
+| Program                             | Patterns | Generated C | Object    | Object text | Executable | Text      | Compile | Link  | Run      |
+| ----------------------------------- | -------- | ----------- | --------- | ----------- | ---------- | --------- | ------- | ----- | -------- |
+| `baseline`                          | 0        | 2,866       | 15,288    | 2,477       | 6,484,952  | 896,378   | 35 ms   | 22 ms | 1.8 ms   |
+| `literal-one`                       | 1        | 9,074       | 46,840    | 12,090      | 6,503,296  | 905,994   | 37 ms   | 21 ms | 2.3 ms   |
+| `literal-all`                       | 29       | 160,050     | 627,408   | 201,864     | 6,867,760  | 1,095,770 | 180 ms  | 21 ms | 2.1 ms   |
+| `literal-control`                   | 29       | 110,248     | 590,584   | 201,860     | 6,834,440  | 1,095,770 | 170 ms  | 22 ms | 2.1 ms   |
+| `literal-control-none`              | 0        | 4,520       | 23,792    | 5,303       | 6,489,960  | 899,210   | 37 ms   | 21 ms | 2.1 ms   |
+| `literal-control-one`               | 1        | 8,062       | 45,824    | 12,090      | 6,502,512  | 905,994   | 39 ms   | 21 ms | 2.1 ms   |
+| `literal-shared`                    | 25       | 141,931     | 546,552   | 174,752     | 6,817,848  | 1,068,650 | 163 ms  | 21 ms | 2.4 ms   |
+| `dynamic-shared`                    | 25       | 179,134     | 1,135,336 | 418,881     | 7,155,640  | 1,312,794 | 351 ms  | 20 ms | 2.6 ms   |
+| `literal-match`                     | 19       | 187,943     | 613,784   | 200,798     | 6,865,864  | 1,094,698 | 182 ms  | 22 ms | 187.0 ms |
+| `dynamic-match`                     | 19       | 228,310     | 1,166,152 | 429,020     | 7,185,344  | 1,322,922 | 372 ms  | 21 ms | 175.7 ms |
+| `dynamic-construct`                 | 19       | 208,572     | 1,058,232 | 387,238     | 7,118,960  | 1,281,146 | 335 ms  | 28 ms | 303.6 ms |
+| `literal-boundary-empty-repetition` | 1        | 7,711       | 40,480    | 9,651       | 6,499,400  | 903,562   | 66 ms   | 22 ms | 45.4 ms  |
 
-A timed program performs 2,000 rounds over 20 patterns, which is 40,000
+A timed program performs 2,000 rounds over 19 patterns, which is 38,000
 match attempts, and prints how many of them matched as one count for
 each pattern in corpus order. Every other program answers each pattern
 once and prints one digit for each. Both shapes are compared pattern by
 pattern rather than by a sum in which two disagreements could cancel.
 
-`literal-control` is the paired control the per-literal figures come
-from. It keeps the statements, the subjects, and the descriptor count of
-`literal-all` and replaces only the pattern, in every case with the
-smallest artifact there is. The difference between the two is therefore
-what the corpus patterns cost above that floor, without the fixed cost
-of reaching the matcher at all.
+A timed program embeds its own subject rather than the one its corpus
+entry names, repeating the entry's unit until one more copy would pass
+512 code units, which lands each subject between 493 and 512 of them.
+That is why the three timed programs carry more generated C than
+`literal-all` does over ten more patterns: the subject is the larger
+half of a timed statement. It is also why they carry six fewer patterns
+than `literal-shared`, three of them because an attempt over 512 code
+units is what takes `nested-quantifier`, `ambiguous-alternation`, and
+`empty-repetition` past an owned boundary.
+
+`literal-control` and `literal-control-one` are the paired controls the
+per-literal figures come from. Each keeps the statements, the subjects,
+and the descriptor count of the program it is paired with, `literal-all`
+and `literal-one`, and replaces only the pattern, in every case with the
+smallest artifact there is. The difference within a pair is therefore
+what the corpus patterns cost above that floor.
+
+`literal-control-none` is the third of that series and the one that
+separates a fixed cost from a per-evaluation one. It keeps the
+statements the others wrap around their evaluations, the answer string
+and the line that prints it, and makes no evaluation at all, so it links
+no matcher while costing everything else those programs cost. The
+difference between two controls is then what one more evaluation costs,
+and what is left of `literal-control-one` against `literal-control-none`
+is the fixed cost alone. `baseline` cannot play that part: it prints a
+constant and does not build an answer, so a difference against it also
+carries statements that have nothing to do with the matcher, which is
+5,008 bytes of executable and 2,832 bytes of text here.
 
 The three separately compiled runtime components that own this family
 are *runtime\_regexp.c* at 220,584 object bytes and 21,783 text bytes,
@@ -553,25 +594,36 @@ Derived from those observations:
     29 patterns.
  -  A literal costs no executable text at all. Those two programs report
     the same 1,095,770 text bytes and differ by 4 object text bytes over
-    29 patterns, which says the artifact a literal adds is data the
-    linker places outside `.text` rather than code. A candidate that
-    lowered a pattern to C control flow instead would spend text where
-    this one spends none, and 1,149 bytes for each pattern is the budget
-    it would have to fit.
- -  Reaching the matcher at all costs 349,488 bytes of executable and
-    199,392 bytes of text, from `baseline` against `literal-control`.
-    That is the fixed cost a program pays for its first literal, and it
-    is 304 times what one more literal then costs.
+    29 patterns, and the one-pattern pair reports the same 905,994 text
+    bytes and the same 12,090 object text bytes, which says the artifact
+    a literal adds is data the linker places outside `.text` rather than
+    code. A candidate that lowered a pattern to C control flow instead
+    would spend text where this one spends none, and 1,149 bytes for
+    each pattern is the budget it would have to fit.
+ -  One evaluation of the smallest artifact there is costs 11,855 bytes
+    of executable and 6,778 bytes of text, from `literal-control-one`
+    against `literal-control` over 28 more evaluations. That is the site
+    rather than the pattern: the statement, the fresh object, the call,
+    and the answer it appends.
+ -  Reaching the matcher at all then costs about 697 bytes of executable
+    and 6 bytes of text, which is what is left of `literal-control-one`
+    against `literal-control-none` once one evaluation is charged at the
+    figure above. Almost nothing about this family is a one-time cost a
+    program pays before its first literal: what a program pays for is
+    each site that evaluates one. The 349,488-byte difference between
+    `baseline` and `literal-control` is 29 of those sites and the
+    statements around them, not a step a first literal takes.
  -  Reaching pattern construction costs a further 337,792 bytes of
     executable and 244,144 bytes of text, from `literal-shared` against
     `dynamic-shared` over the same 25 patterns. The two programs link
     the same archive, so this is the code a literal-only program does
-    not retain. It also costs 238 ms more C compilation and 588,784 more
+    not retain. It also costs 188 ms more C compilation and 588,784 more
     object bytes for the generated source itself.
- -  One match attempt costs about 4.9 us, from `literal-match` over
-    40,000 attempts against a baseline process of 1.9 ms.
- -  Compiling one pattern at run time costs about 2.7 us, from
-    `dynamic-construct` against `literal-match` over the same 40,000
+ -  One match attempt over a subject of 493 to 512 code units costs
+    about 4.9 us, from `literal-match` over 38,000 attempts against a
+    baseline process of 1.8 ms.
+ -  Compiling one pattern at run time costs about 3.1 us, from
+    `dynamic-construct` against `literal-match` over the same 38,000
     attempts. Those two are the pair that differ only in compilation:
     each evaluates a fresh object for every attempt, where
     `dynamic-match` reuses one object it hoisted out of the loop, so
@@ -579,15 +631,17 @@ Derived from those observations:
     allocation to compilation as well. That is the first-use cost an
     ahead-of-time literal removes.
  -  Allocating a fresh object for each evaluation of a literal costs
-    about 0.6 us, from `literal-match` against `dynamic-match` over the
+    about 0.3 us, from `literal-match` against `dynamic-match` over the
     same attempts. It is the smallest of the three per-attempt figures
     and the least stable.
 
 `literal-shared` and `dynamic-shared` print the same 25 digits, so the
 ahead-of-time path and the dynamic path agree on every one of the
 patterns and subjects they share. The three timed programs print the
-same 20 counts, so they answered the same work before their durations
-are compared.
+same 19 counts, so they answered the same work before their durations
+are compared. Three of those counts are zero, because a pattern is
+repeated here for its cost rather than for its answer and a subject
+built to a length is not built to match.
 
 `literal-boundary-empty-repetition` is the one program whose failure is
 the observation. It evaluates `(a*)*b` over 24 characters of `a`, which
@@ -607,9 +661,9 @@ diagnostic rather than as a language value.
 
 The three per-attempt figures are the least stable numbers in this
 document. They are differences between whole-process durations of a few
-hundred milliseconds, so the smallest of them, the 0.6 us allocation,
-rests on a 24 ms gap and should be read as an order of magnitude rather
-than a value.
+hundred milliseconds, so the smallest of them, the 0.3 us allocation,
+rests on an 11.3 ms gap and should be read as an order of magnitude
+rather than a value.
 
 
 External component
@@ -663,10 +717,10 @@ outcome.
 | Case                       | Verdict            | Detail                                                                    |
 | -------------------------- | ------------------ | ------------------------------------------------------------------------- |
 | `capture-reset`            | different captures | Group 4 is unset for the edition and `4,7` for PCRE2                      |
-| `lookbehind-greedy`        | compile refused    | Error 125 at 0, the length of the lookbehind assertion is not limited     |
-| `lookbehind-backreference` | compile refused    | Error 125 at 8, for the reason below                                      |
-| `class-set-difference`     | compile refused    | Error 150 at 22, invalid range in character class                         |
-| `yaml-control-characters`  | compile refused    | Error 173 at 36, disallowed code point in `D800` through `DFFF`           |
+| `lookbehind-greedy`        | compile refused    | Error 125 at 0, `length of lookbehind assertion is not limited`           |
+| `lookbehind-backreference` | compile refused    | Error 125 at 8, the same message, for the reason below                    |
+| `class-set-difference`     | compile refused    | Error 150 at 22, `invalid range in character class`                       |
+| `yaml-control-characters`  | compile refused    | Error 173 at 36, `disallowed Unicode code point (>= 0xd800 && <= 0xdfff)` |
 | `unicode-whitespace`       | different captures | The edition matches `0,4` where PCRE2 matches `3,4`                       |
 | `folded-word-character`    | different captures | The edition matches `0,5` where PCRE2 matches `0,1`                       |
 | `line-terminator-class`    | different outcome  | PCRE2 matches after a vertical tab where the edition does not             |
@@ -708,14 +762,14 @@ measurement in this section, because it is not about semantics:
 
 | Case                       | Input       | PCRE2       | Owned matcher |
 | -------------------------- | ----------- | ----------- | ------------- |
-| `empty-repetition`         | `reject`    | 30 ns       | 514,294.3 us  |
-| `lazy-any-scan`            | `late`      | 19.5 us     | 565,766.8 us  |
-| `large-bounded-repetition` | `reject`    | 30 ns       | 13.6 us       |
-| `property-escape-negated`  | `ascii`     | 20.2 us     | 220.0 us      |
-| `nested-quantifier`        | `reject-18` | 12,060.3 us | 228,024.2 us  |
+| `empty-repetition`         | `reject`    | 30 ns       | 523,251.9 us  |
+| `lazy-any-scan`            | `late`      | 19.1 us     | 570,499.4 us  |
+| `large-bounded-repetition` | `reject`    | 30 ns       | 13.7 us       |
+| `property-escape-negated`  | `ascii`     | 25.0 us     | 234.7 us      |
+| `nested-quantifier`        | `reject-18` | 11,853.3 us | 229,818.7 us  |
 
 PCRE2 is an ordered backtracking engine too, and `nested-quantifier`
-shows it: 3,134,415 ns at 16 characters and 12,060,320 ns at 18, the
+shows it: 3,062,628 ns at 16 characters and 11,853,313 ns at 18, the
 same factor of four for each character pair the owned matcher shows. So
 the exponential case is a property of ordered matching rather than of
 this implementation, and an external component does not remove it. What
@@ -729,9 +783,9 @@ ratio is not a measurement of the runtime's own C executor; the shape of
 each row is what carries.
 
 The remaining rows compare compile cost and compiled size. PCRE2
-compiles one corpus pattern in 0.1 to 14.5 us into 166 to 1,042 bytes.
-The compiler-side artifact builder takes 2.8 to 245.7 us, and the
-runtime's own pattern compiler takes about 2.7 us as measured natively
+compiles one corpus pattern in 0.1 to 16.6 us into 166 to 1,042 bytes.
+The compiler-side artifact builder takes 2.9 to 239.6 us, and the
+runtime's own pattern compiler takes about 3.1 us as measured natively
 above.
 
 What this probe could not answer on one host:
@@ -768,9 +822,15 @@ What this probe could not answer on one host:
 Allocator injection and error translation were measured and both work.
 Every compile and match ran through a general context whose allocator
 the harness owns, and that allocator handed the engine 970,504 bytes
-over the corpus. Every refusal came back as a numeric error code with an
-offset that maps to a message, which is what an Oseo adapter would
-translate into a located diagnostic.
+over the corpus. Every refusal came back as a numeric code with an
+offset into the pattern, and the harness asked the component to
+translate each code rather than looking one up: the messages quoted in
+the table above are what `pcre2_get_error_message` returned for the
+codes this run observed. A code, an offset, and a message is exactly
+what an Oseo adapter would carry into a located diagnostic. What this
+run does not show is a code the component cannot translate: every code
+the corpus reached has a message, and the harness reports an untranslated
+one as no message rather than as an empty one.
 
 Two further candidates were not measured and are named here so the item
 9 decision knows what this run does not cover. RE2 and any other engine
@@ -814,7 +874,7 @@ They settle five things, none of which is a backend:
     pattern is a 311,460-byte table payload before any name table or
     index is charged, and pattern construction already costs 337,792
     bytes of executable before any table is added.
-5.  Ahead-of-time compilation removes about 2.7 us for each evaluation
+5.  Ahead-of-time compilation removes about 3.1 us for each evaluation
     that would otherwise compile a pattern, and costs 1,717 bytes of
     generated C and 1,149 bytes of executable for each literal, none of
     it in `.text`.
@@ -835,7 +895,7 @@ Limits of this run
     are derived from those counts afterward. It allocates one machine
     for each attempt, so a scan over many start positions measures that
     allocation: `property-escape-negated` over 1,024 characters spends
-    220.0 us on 2,050 steps, against about 30 ns for each step
+    234.7 us on 2,050 steps, against about 30 ns for each step
     elsewhere.
  -  The configuration walk treats `edge` and `boundary` as passable, so
     a configuration count is an upper bound on what a position-aware
@@ -857,3 +917,8 @@ Limits of this run
  -  PCRE2 was measured as installed rather than as it would be vendored,
     which leaves static linking, cross-targets, sanitizers, Unicode
     pinning, license review, and thread and locale assumptions open.
+ -  The owned code each external-component mismatch would need is
+    unmeasured. This run names the nine cases where the two disagree and
+    what each costs the component; the plan also asks what closing one
+    would cost Oseo, and that is a design for each behavior rather than
+    another run of this probe.

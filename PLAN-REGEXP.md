@@ -4,12 +4,14 @@ Regular expression plan
 Status
 ------
 
-Implementation status: delivery items 1 through 3, 7, and 8, the Unicode
+Implementation status: delivery items 1 through 3 and 7, the Unicode
 property escape checkpoint, the RegExp intrinsic checkpoint, and the
-prototype and built-in execution checkpoint landed. The probes ran and
-recorded their measurements in
-[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md); no
-backend is selected, which is delivery item 9.
+prototype and built-in execution checkpoint landed. Delivery item 8 is
+under way rather than complete: its five probes exist, and one run of
+them is recorded in
+[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md),
+while measurements that item requires remain unperformed. No backend is
+selected, which is delivery item 9.
 This plan defines the M5 semantic and compilation boundary for ECMAScript
 regular expressions. The active language profile admits the callable and
 constructible `RegExp` intrinsic, initialization, `lastIndex` state,
@@ -396,12 +398,13 @@ The first probes compare representations rather than choosing one by taste.
 They use patterns drawn from test262, real dependency-free packages, and
 reviewed stress cases.
 
-They have run. `mise run probe:regexp` performs all five over the reviewed
-corpus in *tools/regexp-probes/*, and
+They have run once. `mise run probe:regexp` performs all five over the
+reviewed corpus in *tools/regexp-probes/*, and
 [*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md) is one
 recorded run of it with the host facts, commands, repetition counts, and
-limits of that run. The paragraphs below name what each probe measured;
-the report holds the numbers, and neither selects a backend.
+limits of that run. The paragraphs below name what each probe measured
+and what it did not; the report holds the numbers, selects no backend,
+and leaves an unreached requirement open rather than optional.
 
 ### Matcher strategy
 
@@ -804,15 +807,25 @@ Delivery order
     property escape that the runtime's own pattern compiler still refuses.
 8.  Run the matcher-strategy, external-component, Unicode-table, resource, and
     code-size probes and report the measurements without selecting a backend.
-    Landed, in the M5b `regexp-matcher-backend-probes` node.
+    Open. The M5b `regexp-matcher-backend-probes` node built the five probes
+    and recorded one run of them, which is what that node delivers.
     `mise run probe:regexp` measures all five over one reviewed corpus of 29
     patterns, and
     [*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md)
-    records one run with its host facts, commands, repetition counts, raw
+    records that run with its host facts, commands, repetition counts, raw
     observations, derived values, and limits. The probes add no semantics,
-    no runtime component, and no reviewed evidence path; the report selects
-    nothing, and names what it could not measure, including direct generated
-    C and every external-component fact that needs a source build.
+    no runtime component, and no reviewed evidence path, and the report
+    selects nothing. Five measurements the items above require are absent
+    from that record, so this item is not complete: direct generated C,
+    which has no lowering to measure; the owned code each
+    external-component mismatch would need to close, where only the
+    mismatch itself is measured; native stack use; cleanup after failure;
+    and the external-component facts that need a vendored PCRE2 source
+    build this run did not perform, which are static linking, both
+    execution targets, the AArch64 Linux cross-link, sanitizer behavior,
+    Unicode pinning, thread and locale assumptions, and a license review
+    of the exact source tree. None of them is optional, and this item
+    closes when they are measured and recorded beside that run.
 9.  After maintainer review of that report, record the selected backend and
     runtime split in an architecture decision before it becomes a later family
     dependency.

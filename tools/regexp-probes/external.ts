@@ -78,6 +78,28 @@ export interface ExternalMeasurement {
 
 const harnessPath = fileURLToPath(new URL("./pcre2-probe.c", import.meta.url));
 
+/**
+ * The text one hexadecimal UTF-16 field holds.
+ *
+ * `-` is the harness's answer for a code it could not translate, which
+ * is not a message and is reported as none rather than as an empty one.
+ */
+function decodeUnits(hex: string, id: string): string | undefined {
+  if (hex === "-") return undefined;
+  if (!/^(?:[0-9a-f]{4})+$/u.test(hex)) {
+    throw new Error(
+      `The harness answered ${id} with "${hex}" where a field holds ` +
+        "hexadecimal UTF-16 code units.",
+    );
+  }
+  let text = "";
+  for (let index = 0; index < hex.length; index += 4) {
+    const unit = Number.parseInt(hex.slice(index, index + 4), 16);
+    text += String.fromCharCode(unit);
+  }
+  return text;
+}
+
 function encodeUnits(text: string): string {
   let encoded = "";
   for (let index = 0; index < text.length; index += 1) {
@@ -179,18 +201,21 @@ function requireFields(
 function parseAnswer(fields: readonly string[], id: string): Answer {
   const status = fields[1] ?? "";
   if (status === "compile-error") {
-    requireFields(fields, 4, id);
+    requireFields(fields, 5, id);
+    const message = decodeUnits(fields[4] ?? "", id);
     return {
       captures: [],
       compileNanoseconds: undefined,
       compiledBytes: undefined,
-      detail: `${count(fields, 2, id)} at ${count(fields, 3, id)}`,
+      detail:
+        `${count(fields, 2, id)} at ${count(fields, 3, id)}` +
+        (message == null ? "" : `, ${message}`),
       matchNanoseconds: undefined,
       status,
     };
   }
   if (status === "match-error") {
-    requireFields(fields, 3, id);
+    requireFields(fields, 4, id);
     const code = fields[2];
     // The harness prints this status only where the component returned
     // a negative error code, so zero, a positive count, and a value this
@@ -206,11 +231,12 @@ function parseAnswer(fields: readonly string[], id: string): Answer {
           "the component's negative error codes.",
       );
     }
+    const message = decodeUnits(fields[3] ?? "", id);
     return {
       captures: [],
       compileNanoseconds: undefined,
       compiledBytes: undefined,
-      detail: code,
+      detail: message == null ? code : `${code}, ${message}`,
       matchNanoseconds: undefined,
       status,
     };

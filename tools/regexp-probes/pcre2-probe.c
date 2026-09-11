@@ -10,8 +10,13 @@
  * Every request line is `id`, `flags`, `pattern`, and `subject`
  * separated by tabs, where a pattern and a subject are hexadecimal
  * UTF-16 code units, four digits each. Every answer line is `id`
- * followed by one of `compile-error`, `no-match`, or `match`, the
- * measured nanoseconds of one attempt, and the capture spans.
+ * followed by one of `compile-error`, `no-match`, `match`, or
+ * `match-error`, the measured nanoseconds of one attempt, and the
+ * capture spans. A refusal also carries the component's own numeric
+ * code and, in the same encoding a request uses, the message that code
+ * maps to, so that error translation is observed rather than assumed:
+ * an Oseo adapter would carry exactly that pair into a located
+ * diagnostic.
  *
  * The option mapping is the closest PCRE2 offers to the edition:
  *
@@ -96,6 +101,29 @@ static PCRE2_UCHAR16 *decode_units(const char *text, size_t *length) {
     units[count] = 0;
     *length = count;
     return units;
+}
+
+/*
+ * Print the message one error code maps to, as hexadecimal UTF-16.
+ *
+ * This is the half of error translation the component owns. A code the
+ * component does not recognize prints `-`, which is not a message, so
+ * that an absent translation is never read as an empty one.
+ */
+static void print_error_message(int code) {
+    PCRE2_UCHAR16 message[256];
+    int written = pcre2_get_error_message(
+        code,
+        message,
+        sizeof(message) / sizeof(message[0])
+    );
+    if (written <= 0) {
+        printf("-");
+        return;
+    }
+    for (int index = 0; index < written; index += 1) {
+        printf("%04x", (unsigned)message[index]);
+    }
 }
 
 static uint64_t now_nanoseconds(void) {
@@ -211,11 +239,13 @@ static int run_case(
     uint64_t compile_nanoseconds = now_nanoseconds() - compile_started;
     if (code == NULL) {
         printf(
-            "%s\tcompile-error\t%d\t%lu\n",
+            "%s\tcompile-error\t%d\t%lu\t",
             id,
             error,
             (unsigned long)offset
         );
+        print_error_message(error);
+        printf("\n");
         pcre2_compile_context_free(context);
         free(pattern);
         free(subject);
@@ -251,7 +281,9 @@ static int run_case(
             (unsigned long)compiled_size
         );
     } else if (count < 0) {
-        printf("%s\tmatch-error\t%d\n", id, count);
+        printf("%s\tmatch-error\t%d\t", id, count);
+        print_error_message(count);
+        printf("\n");
     } else {
         uint32_t pairs = 0;
         pcre2_pattern_info(code, PCRE2_INFO_CAPTURECOUNT, &pairs);

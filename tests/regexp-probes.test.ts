@@ -20,6 +20,10 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import {
+  defaultRegExpExecutionLimits,
+  searchRegExpMatcher,
+} from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import {
   buildProbeArtifact,
@@ -33,10 +37,14 @@ import type { RegExpProbeCase } from "../tools/regexp-probes/corpus.ts";
 import { measureExternal } from "../tools/regexp-probes/external.ts";
 import {
   boundaryDiagnostic,
+  boundaryPatterns,
   sharedPatterns,
   sizePrograms,
+  stringLiteral,
   timedIterations,
   timedPatterns,
+  timedSubject,
+  timedSubjectLimit,
 } from "../tools/regexp-probes/programs.ts";
 import { measureResources } from "../tools/regexp-probes/resource.ts";
 import {
@@ -175,6 +183,44 @@ test("a measured peak is the smallest sufficient limit", () => {
     again.map((row) => [row.steps, row.peakBacktrackEntries]),
     rows.map((row) => [row.steps, row.peakBacktrackEntries]),
   );
+  // Each peak is searched with the other dimension at its reviewed
+  // default, so the row's own claim is about the pair. Both are checked
+  // here: with the other peak held, one entry below either reaches that
+  // dimension's own boundary, and neither peak is sufficient by itself.
+  for (const row of rows) {
+    const backtrack = row.peakBacktrackEntries ?? 0;
+    const trail = row.peakTrailEntries ?? 0;
+    assert.ok(backtrack > 0 && trail > 0, row.inputId);
+    const input = entry.inputs.find((current) => current.id === row.inputId);
+    if (input == null) throw new Error(`the ${row.inputId} input is named`);
+    const text = probeInputText(input);
+    const run = (backtrackEntries: number, trailEntries: number) =>
+      searchRegExpMatcher({
+        limits: {
+          backtrackEntries,
+          steps: defaultRegExpExecutionLimits.steps,
+          trailEntries,
+        },
+        program: artifact.program,
+        startIndex: 0,
+        text,
+      });
+    assert.equal(run(backtrack, trail).outcome, row.outcome, row.inputId);
+    const belowBacktrack = run(backtrack - 1, trail);
+    assert.equal(belowBacktrack.outcome, "limit", row.inputId);
+    assert.equal(
+      belowBacktrack.outcome === "limit" ? belowBacktrack.limit : undefined,
+      "backtrack-entries",
+      row.inputId,
+    );
+    const belowTrail = run(backtrack, trail - 1);
+    assert.equal(belowTrail.outcome, "limit", row.inputId);
+    assert.equal(
+      belowTrail.outcome === "limit" ? belowTrail.limit : undefined,
+      "trail-entries",
+      row.inputId,
+    );
+  }
 });
 
 test("an owned boundary is reached deterministically", () => {
@@ -244,12 +290,14 @@ test("the generated programs partition the corpus with reasons", () => {
   }
   const programs = sizePrograms();
   assert.deepEqual(
-    programs.slice(0, 9).map((program) => program.id),
+    programs.slice(0, 11).map((program) => program.id),
     [
       "baseline",
       "literal-one",
       "literal-all",
       "literal-control",
+      "literal-control-none",
+      "literal-control-one",
       "literal-shared",
       "dynamic-shared",
       "literal-match",
@@ -258,8 +306,16 @@ test("the generated programs partition the corpus with reasons", () => {
     ],
   );
   for (const program of programs) {
-    if (program.id === "baseline") continue;
     assert.ok(program.source.includes("console.log"), program.id);
+    if (program.id === "baseline") continue;
+    // Only the two programs that exist to carry no pattern may report
+    // none: `baseline` links no matcher at all, and
+    // `literal-control-none` keeps the statements around an evaluation
+    // without making one.
+    if (program.id === "literal-control-none") {
+      assert.equal(program.patterns, 0, program.id);
+      continue;
+    }
     assert.ok(program.patterns > 0, program.id);
   }
   const timedProgram = programs.find(
@@ -267,7 +323,7 @@ test("the generated programs partition the corpus with reasons", () => {
   );
   assert.equal(timedProgram?.patterns, timedIdentifiers.size);
   assert.equal(timedProgram?.attempts, timedIdentifiers.size * timedIterations);
-  const boundaries = programs.slice(9);
+  const boundaries = programs.slice(11);
   assert.ok(boundaries.length > 0);
   for (const boundary of boundaries) {
     assert.ok(boundary.id.startsWith("literal-boundary-"), boundary.id);
@@ -302,9 +358,132 @@ test("a timed program answers pattern by pattern", () => {
   }
 });
 
+test("a timed subject fills the embedded-subject limit", () => {
+  const { timed } = timedPatterns();
+  assert.ok(timed.length > 0);
+  for (const entry of timed) {
+    const first = entry.inputs[0];
+    assert.notEqual(first, undefined, entry.id);
+    if (first == null) continue;
+    const text = timedSubject(entry);
+    // A corpus entry names the repetition its semantic case needs, and
+    // most of them name one, so a timed subject that stopped at that
+    // count would time a match over a handful of characters. It is the
+    // limit rather than the entry that decides how long this subject
+    // is: one more unit has to pass the limit, and the whole subject,
+    // suffix included, has to stay within it.
+    assert.ok(text.length <= timedSubjectLimit, `${entry.id} ${text.length}`);
+    assert.ok(
+      text.length + first.unit.length > timedSubjectLimit,
+      `${entry.id} ${text.length}`,
+    );
+    assert.ok(text.length >= probeInputText({ ...first, repeat: 1 }).length);
+    assert.ok(
+      text.startsWith(first.unit) && text.endsWith(first.suffix ?? ""),
+      entry.id,
+    );
+  }
+  const source = sizePrograms().find(
+    (program) => program.id === "literal-match",
+  )?.source;
+  assert.notEqual(source, undefined);
+  // The subject the program embeds is the one measured above, so a
+  // change that filled only the measurement would still be caught.
+  for (const entry of timed) {
+    assert.ok(
+      source?.includes(`.test(${stringLiteral(timedSubject(entry))})`),
+      entry.id,
+    );
+  }
+});
+
+test("each control program is paired with one measured program", () => {
+  const programs = sizePrograms();
+  const byId = new Map(programs.map((program) => [program.id, program]));
+  // A control keeps the statements, the subjects, and the pattern count
+  // of the program it is paired with and replaces only the pattern, so
+  // a pair that stopped matching would silently turn a per-literal
+  // figure into a difference between two different programs.
+  for (const [measured, control] of [
+    ["literal-all", "literal-control"],
+    ["literal-one", "literal-control-one"],
+  ] as const) {
+    const left = byId.get(measured);
+    const right = byId.get(control);
+    assert.notEqual(left, undefined, measured);
+    assert.notEqual(right, undefined, control);
+    assert.equal(left?.patterns, right?.patterns, control);
+    assert.equal(left?.attempts, right?.attempts, control);
+    assert.equal(
+      left?.source.split("\n").length,
+      right?.source.split("\n").length,
+      control,
+    );
+  }
+  // The three controls differ only in how many evaluations they carry,
+  // which is what lets the fixed cost of reaching the matcher be
+  // separated from the cost of one more evaluation. The one with none
+  // keeps the statements around an evaluation and links no matcher, so
+  // it is the only program a fixed cost can be measured against.
+  const none = byId.get("literal-control-none");
+  const one = byId.get("literal-control-one");
+  const all = byId.get("literal-control");
+  assert.equal(none?.patterns, 0);
+  assert.equal(none?.attempts, 0);
+  assert.equal(one?.patterns, 1);
+  assert.equal(all?.patterns, regExpProbeCorpus.length);
+  assert.ok(!none?.source.includes(".test("));
+  assert.ok((none?.source.length ?? 0) < (one?.source.length ?? 0));
+  assert.ok((one?.source.length ?? 0) < (all?.source.length ?? 0));
+  for (const line of ['let answers = "";', "console.log(answers);"]) {
+    for (const control of [none, one, all]) {
+      assert.ok(control?.source.includes(line), control?.id);
+    }
+  }
+});
+
+test("a boundary program is selected by the input it evaluates", () => {
+  const boundary = boundaryPatterns();
+  assert.ok(boundary.length > 0);
+  const programs = sizePrograms().filter((program) =>
+    program.id.startsWith("literal-boundary-"),
+  );
+  assert.deepEqual(
+    programs.map((program) => program.id),
+    boundary.map((entry) => `literal-boundary-${entry.id}`),
+  );
+  for (const entry of boundary) {
+    const input = entry.inputs[0];
+    assert.notEqual(input, undefined, entry.id);
+    if (input == null) continue;
+    // A boundary program evaluates the input its entry names, so that
+    // input is what has to reach the boundary. Selecting on the longer
+    // subject a timed program builds would produce a program that
+    // printed an ordinary answer where the probe requires OSEO2001.
+    const attempt = searchRegExpMatcher({
+      program: buildProbeArtifact(entry).program,
+      startIndex: 0,
+      text: probeInputText(input),
+    });
+    assert.equal(attempt.outcome, "limit", entry.id);
+  }
+  const { excluded } = timedPatterns();
+  const reached = excluded
+    .filter((dropped) => dropped.reason.startsWith("reaches the"))
+    .map((dropped) => dropped.id);
+  // An entry whose extended timed subject reaches the boundary is not
+  // automatically a boundary program, which is the difference this
+  // selection exists for.
+  assert.ok(
+    reached.length > boundary.length,
+    `${reached.join(",")} against ${boundary.length}`,
+  );
+});
+
 test("the external harness answers or says why it did not", async () => {
-  const selected = regExpProbeCorpus.filter(
-    (entry) => entry.id === "class-pair" || entry.id === "capture-reset",
+  const refused = "class-set-difference";
+  const selected = regExpProbeCorpus.filter((entry) =>
+    ["capture-reset", "class-pair", refused].includes(entry.id),
   );
   const measurement = await measureExternal(
     createNodeHost(),
@@ -341,5 +520,15 @@ test("the external harness answers or says why it did not", async () => {
       ].includes(verdict),
       verdict,
     );
+  }
+  // Error translation is a requirement of this probe rather than a
+  // convenience, so a refusal has to carry the message the component
+  // itself maps its code to. A detail that stopped at the code would
+  // leave the report quoting a message nothing measured.
+  for (const row of measurement.rows) {
+    if (row.id !== refused) continue;
+    assert.equal(row.verdict, "compile-refused", row.inputId);
+    assert.match(row.detail, /^PCRE2 refused the pattern: error \d+ at \d+, /u);
+    assert.ok(row.detail.length > "PCRE2 refused the pattern: ".length + 12);
   }
 });

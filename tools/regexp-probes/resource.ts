@@ -16,12 +16,13 @@
  *
  * The entry counts are the measurement. The two byte figures beside them
  * are derived from those counts and from the runtime's own layout, and
- * both describe one attempt's five growing arrays and its registers
- * rather than everything a match holds. `workingBytes` is what the peaks
- * occupy packed. `reservedArrayBytes` is what the runtime requests for
- * those arrays: each is allocated at 64 entries, doubles when it fills,
- * and never shrinks within an attempt, so a peak is rounded up to 64 or
- * to the next power of two, and the register array is added.
+ * both describe one attempt's five growing arrays rather than everything
+ * a match holds. `workingBytes` is what the two peaks occupy packed, and
+ * it charges no register at all. `reservedArrayBytes` is what the
+ * runtime requests for those arrays: each is allocated at 64 entries,
+ * doubles when it fills, and never shrinks within an attempt, so a peak
+ * is rounded up to 64 or to the next power of two, and the register
+ * array is added to that.
  *
  * Neither is total memory. `reservedArrayBytes` charges no allocator
  * rounding or bookkeeping, no machine structure, and nothing the matcher
@@ -239,10 +240,21 @@ function measureInput(
       workingBytes: undefined,
     };
   }
+  // Each peak was found with the other dimension at its reviewed
+  // default, so the two are confirmed together here: at both peaks the
+  // attempt still reaches its ordinary answer, and one entry below
+  // either peak, with the other peak held, reaches exactly that
+  // dimension's own boundary. Confirming only one of them would leave
+  // the other's peak a claim about a search rather than about the pair
+  // the row reports.
   const belowBacktrack =
     backtrack === 0
       ? undefined
       : attempt(program, text, limitsWith(backtrack - 1, trail));
+  const belowTrail =
+    trail === 0
+      ? undefined
+      : attempt(program, text, limitsWith(backtrack, trail - 1));
   const atPeak = attempt(program, text, limitsWith(backtrack, trail));
   return {
     ...base,
@@ -252,7 +264,8 @@ function measureInput(
       reachedLimit(atPeak) === ordinaryLimit &&
       atPeak.steps === ordinary.steps &&
       (belowBacktrack == null ||
-        reachedLimit(belowBacktrack) === "backtrack-entries"),
+        reachedLimit(belowBacktrack) === "backtrack-entries") &&
+      (belowTrail == null || reachedLimit(belowTrail) === "trail-entries"),
     peakBacktrackEntries: backtrack,
     peakTrailEntries: trail,
     reservedArrayBytes:
