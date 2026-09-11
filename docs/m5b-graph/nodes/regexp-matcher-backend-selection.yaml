@@ -6,4 +6,8 @@ delivers: "Records the maintainer-selected owned, external, or composed
 dependencies:
   - regexp-matcher-backend-probes
 landed: false
-status: ready
+status: parked
+reason: "The probe report is complete, but delivery item 9 requires the
+  maintainer to select an owned, external, or composed matcher backend. The
+  decision request recommends an owned automaton fast path with the ordered
+  matcher retained as the semantic authority and fallback."
