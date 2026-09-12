@@ -26,7 +26,9 @@ scope:
     test/built-ins/Iterator/from/supports-iterable.js, and
     test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js as
     semantic failures, because all three iterate a String or a String
-    wrapper that the unlanded string-iterator node owns, and
+    wrapper. The string-iterator node now supplies that prerequisite, and
+    each of the three still declares the unsupported iterator-helpers
+    feature, and
     test/built-ins/Iterator/from/get-return-method-when-call-return.js,
     test/built-ins/Iterator/from/return-method-calls-base-return-method.js,
     and

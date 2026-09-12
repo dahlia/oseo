@@ -261,11 +261,10 @@ results:
       - property-enumeration
       - var-bindings
     observation:
-      detail: 'test/language/statements/for-in/scope-head-var-none.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/scope-head-var-none.js:110:9:
-        error[OSEO1001]: A for-in array pattern target is
-        unsupported.\n"'
+      detail: "test/language/statements/for-in/scope-head-var-none.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/for-in/scope-head-var-none.js\
+        :112:12: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -225,11 +225,9 @@ static OseoResult define_data_property(
             &virtual_attributes
         );
     if (replaces_virtual) {
-        /* The virtual property models an undefined value until the String
-         * iterator node materializes one, so a non-writable redefinition
-         * rejects only a value that is not SameValue to it. Reapplying the
-         * descriptor a frozen %String.prototype% reports must succeed, the
-         * way it does on Node.js and Deno. */
+        /* During intrinsic bootstrap the virtual property models an
+         * undefined value. The successful String initializer replaces it
+         * with the concrete iterator before user code can observe it. */
         if (!virtual_attributes.configurable &&
             (attributes.configurable ||
              attributes.enumerable != virtual_attributes.enumerable ||
@@ -240,12 +238,9 @@ static OseoResult define_data_property(
                 "Cannot redefine a non-configurable property.";
             return normal(object_value);
         }
-        /* A non-configurable, non-writable property cannot change: the
-         * validation above rejected every descriptor that would alter its
-         * attributes, and a value SameValue to the modeled `undefined`
-         * leaves the value alone. Keep the virtual representation instead
-         * of materializing an `undefined` the String iterator node has not
-         * produced, so default String iteration still works afterward. */
+        /* A non-configurable, non-writable bootstrap property cannot change:
+         * validation rejected every descriptor that would alter it, and a
+         * SameValue undefined leaves the placeholder representation intact. */
         bool read_only_no_op = !virtual_attributes.configurable &&
             !virtual_attributes.writable;
         if (!has_value || read_only_no_op) {

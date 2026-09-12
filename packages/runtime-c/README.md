@@ -823,6 +823,14 @@ the shared conversion *runtime\_primitive.c* now exports. One built-in code
 range, forty-eight code IDs, and two intrinsic slots are added; the
 generated-code ABI gains no entry point.
 
+The `m5-102` ABI materializes %String.prototype%[`Symbol.iterator`] and
+`%StringIteratorPrototype%`. The method snapshots `ToString(this)` and its
+branded iterator advances through UTF-16 by Unicode code point, pairing a lead
+and trailing surrogate while preserving lone surrogates. The iterator target
+is collector-traced and cleared at permanent exhaustion. Two code IDs are
+allocated inside the existing iterator range and three intrinsic slots are
+added; the generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

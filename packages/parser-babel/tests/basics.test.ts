@@ -2830,13 +2830,6 @@ test("keeps every super target composition this unit does not admit", () => {
       "class A { static m(it) { for (super.x of it) {} } }",
       /only valid in the body of a class element whose class has an/u,
     ],
-    // M5a Unit 8.5m admits the same `super` target inside an enumerate
-    // head's object pattern; an array pattern position keeps its own
-    // boundary there.
-    [
-      "class A {}\nclass B extends A { m(o) { for ([super.x] in o) {} } }",
-      /for-in array pattern target is unsupported/u,
-    ],
   ];
   for (const [source, message] of cases) {
     const result = compileSource(babelFrontend, {
@@ -2847,6 +2840,13 @@ test("keeps every super target composition this unit does not admit", () => {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(result.diagnostics[0]?.message ?? "", message, source);
   }
+  const admittedForIn = compileSource(babelFrontend, {
+    source:
+      "class A {}\nclass B extends A { m(o) { for ([super.x] in o) {} } }",
+    sourceId: "super-for-in-array-target.ts",
+  });
+  assert.deepEqual(admittedForIn.diagnostics, []);
+  assert.ok(admittedForIn.mir != null);
   // A private member in a target position stays an early error, and an
   // optional `super` reference stays a parse error.
   const earlyErrors: readonly string[] = [

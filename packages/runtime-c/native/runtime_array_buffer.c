@@ -147,8 +147,8 @@ static OseoResult array_buffer_allocate(
     buffer->ordinary.virtual_string_iterator_configurable = false;
     buffer->ordinary.virtual_string_iterator_enumerable = false;
     buffer->ordinary.virtual_string_iterator_writable = false;
-    buffer->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    buffer->ordinary.iterator_array = oseo_undefined();
+    buffer->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    buffer->ordinary.iterator_target = oseo_undefined();
     buffer->ordinary.iterator_index = 0u;
     buffer->ordinary.regexp_string_iterator = false;
     buffer->ordinary.regexp_iterator_regexp = oseo_undefined();

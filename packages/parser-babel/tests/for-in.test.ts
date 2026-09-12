@@ -210,11 +210,6 @@ test("binds a label to the for-in statement's own transfers", () => {
 
 test("keeps every for-in head this unit does not admit rejected", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["for (const [a] in {}) {}", /for-in array pattern target is unsupported/u],
-    [
-      "let a; for ([a] in {}) {}",
-      /for-in array pattern target is unsupported/u,
-    ],
     [
       "for (var a = 1 in {}) {}",
       /for-in declaration needs one uninitialized binding/u,
@@ -467,11 +462,9 @@ test("reports the head temporal dead zone of an object pattern head", () => {
   );
 });
 
-test("keeps every for-in array pattern position rejected", () => {
-  // The head always supplies a String key and this realm creates no
-  // string iterator, so every array pattern a for-in head could reach
-  // takes one boundary rather than answering with a TypeError where
-  // ECMA-262 destructures code units.
+test("admits every for-in array pattern position", () => {
+  // The String iterator lets the head's String key reach the existing
+  // recursive array binding and assignment lowering.
   const cases: readonly string[] = [
     "for (const [a] in {}) {}",
     "let a; for ([a] in {}) {}",
@@ -486,17 +479,11 @@ test("keeps every for-in array pattern position rejected", () => {
       source,
       sourceId: "for-in-array-pattern.ts",
     });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /for-in array pattern target is unsupported/u,
-      source,
-    );
+    assert.ok(result.mir != null, source);
+    assert.deepEqual(result.diagnostics, [], source);
   }
-  // A reserved word used as a binding name is an early error rather than
-  // a profile boundary, so it is reported wherever it appears in the
-  // head, including beside a rejected array pattern.
+  // A reserved word used as a binding name remains an early error wherever
+  // it appears in the head, including beside an admitted array pattern.
   const early: readonly string[] = [
     "for (const { a: this } in {}) {}",
     "for (const { a: this, b: [x] } in {}) {}",

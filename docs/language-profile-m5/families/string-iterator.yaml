@@ -1,0 +1,66 @@
+version: 1
+id: string-iterator
+title: "String iterator"
+scope:
+  - "String.prototype Symbol.iterator and the materialized
+    %StringIteratorPrototype%, including method metadata, descriptors,
+    prototype ancestry, branding, permanent exhaustion, and traversal by
+    Unicode code point while preserving lone surrogate code units."
+  - "Array binding and assignment patterns in a for-in head, whose String
+    keys now destructure through the ordinary iterator protocol."
+  - "The node inventory contains 13 applicable paths under
+    test/built-ins/String/prototype/Symbol.iterator/ and
+    test/built-ins/StringIteratorPrototype/, all promoted into the reviewed
+    manifest as passes. Six reviewed test/language/statements/for-in/ paths
+    outside those roots move from unsupported-profile-feature to pass because
+    their array-pattern heads are now admitted."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-iterator.ts
+      - tests/property/m5-string-iterator.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-iterator.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-iterator.ts
+      - tests/property/m5-string-iterator.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-string-iterator.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-iterator.ts
+      - tests/property/m5-string-iterator.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-iterator.ts
+      - tests/property/m5-string-iterator.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/src/hir-build.ts
+      - packages/parser-babel/src/convert.ts
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_iterator.c
+      - packages/runtime-c/native/runtime_memory.c
+      - packages/runtime-c/native/runtime_string.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

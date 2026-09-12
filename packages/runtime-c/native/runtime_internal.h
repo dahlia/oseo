@@ -182,6 +182,10 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 26u)
 #define OSEO_ITERATOR_FIND_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 27u)
+#define OSEO_STRING_PROTOTYPE_ITERATOR_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 28u)
+#define OSEO_STRING_ITERATOR_NEXT_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 29u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -1029,13 +1033,14 @@ typedef struct {
     OseoPrivateElementKind kind;
 } OseoPrivateElement;
 
-/* Which result shape one %ArrayIteratorPrototype% instance emits. */
+/* Which built-in sequence and result shape one iterator instance emits. */
 typedef enum {
-    OSEO_ARRAY_ITERATOR_NONE = 0,
+    OSEO_ITERATOR_NONE = 0,
     OSEO_ARRAY_ITERATOR_KEY = 1,
     OSEO_ARRAY_ITERATOR_VALUE = 2,
     OSEO_ARRAY_ITERATOR_KEY_AND_VALUE = 3,
-} OseoArrayIteratorKind;
+    OSEO_STRING_ITERATOR_VALUE = 4,
+} OseoIteratorKind;
 
 typedef struct {
     OseoHeapObject header;
@@ -1084,16 +1089,17 @@ typedef struct {
     OseoValue primitive_value;
     /* Internal installation state independent of mutable own properties. */
     bool primitive_wrapper_methods_initialized;
-    /* True only while %String.prototype%'s virtual iterator is untouched. */
+    /* Bootstrap descriptor used until String initialization installs the
+     * concrete iterator function into the ordinary property vector. */
     bool virtual_string_iterator;
     /* Descriptor state retained while the iterator remains virtual. */
     bool virtual_string_iterator_configurable;
     bool virtual_string_iterator_enumerable;
     bool virtual_string_iterator_writable;
-    /* Array iterator state: the kind brands the object and selects the
-     * key, value, or key-and-value result shape. */
-    OseoArrayIteratorKind array_iterator_kind;
-    OseoValue iterator_array;
+    /* Array and String iterator state: the kind brands the object, while
+     * the target and cursor are traced and advanced by that kind's next. */
+    OseoIteratorKind iterator_kind;
+    OseoValue iterator_target;
     size_t iterator_index;
     /*
      * RegExp String Iterator state (22.2.9.1). The iterating RegExp object
@@ -1755,8 +1761,14 @@ static inline bool is_private_name(OseoValue value) {
 static inline bool is_array_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
-        ordinary_object(value)->array_iterator_kind !=
-            OSEO_ARRAY_ITERATOR_NONE;
+        ordinary_object(value)->iterator_kind >= OSEO_ARRAY_ITERATOR_KEY &&
+        ordinary_object(value)->iterator_kind <=
+            OSEO_ARRAY_ITERATOR_KEY_AND_VALUE;
+}
+static inline bool is_string_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->iterator_kind == OSEO_STRING_ITERATOR_VALUE;
 }
 static inline bool is_regexp_string_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2473,11 +2485,10 @@ bool oseo_internal_own_descriptor(
     OseoValue *setter
 );
 /*
- * Reads the descriptor state of %String.prototype%'s virtual iterator.
- * Its value stays unmaterialized until the separate string-iterator node
- * lands, so the descriptor carries attributes only. Components that
- * classify or rebuild the property use this directly; every reflective
- * own-property query goes through
+ * Reads the bootstrap descriptor state of %String.prototype%'s iterator.
+ * The descriptor carries attributes only until String initialization
+ * installs the concrete function. Components that classify or rebuild the
+ * property use this directly; every reflective own-property query goes through
  * oseo_internal_own_property_descriptor instead so that the virtual
  * property cannot be visible to one query and absent from another.
  */
@@ -2490,11 +2501,9 @@ bool oseo_internal_virtual_string_iterator_descriptor(
 /*
  * OrdinaryGetOwnProperty (10.1.5.1) over every own property a program can
  * observe, including the virtual %String.prototype%[@@iterator]. The
- * virtual property reports attributes with an undefined value, which is
- * also what Get returns while the String iterator node has not
- * materialized the function, so HasOwnProperty, propertyIsEnumerable,
- * descriptor reads, redefinition rechecks, and assignment all agree on
- * one answer.
+ * bootstrap property reports attributes with an undefined value. No user code
+ * can observe that construction state, and the completed intrinsic exposes the
+ * concrete function through this ordinary descriptor path.
  */
 bool oseo_internal_own_property_descriptor(
     OseoContext *context,
@@ -2507,7 +2516,9 @@ bool oseo_internal_own_property_descriptor(
 );
 /*
  * True when a String primitive or wrapper reaches %String.prototype%'s
- * untouched virtual default iterator without a nearer own replacement.
+ * untouched virtual bootstrap iterator without a nearer own replacement.
+ * Materializing the String iterator installs an own property and makes this
+ * compatibility path dormant.
  */
 bool oseo_internal_uses_virtual_string_iterator(
     OseoValue source,
@@ -3231,12 +3242,21 @@ OseoResult oseo_internal_iterator_result(
 OseoResult oseo_internal_array_iterator_create(
     OseoContext *context,
     OseoValue receiver,
-    OseoArrayIteratorKind kind
+    OseoIteratorKind kind
 );
 OseoResult oseo_internal_array_iterator_next(
     OseoContext *context,
     OseoValue iterator
 );
+OseoResult oseo_internal_string_iterator_create(
+    OseoContext *context,
+    OseoValue receiver
+);
+OseoResult oseo_internal_string_iterator_next(
+    OseoContext *context,
+    OseoValue iterator
+);
+OseoResult oseo_internal_string_iterator_prototype(OseoContext *context);
 bool oseo_internal_iterator_key_matches(
     OseoContext *context,
     OseoValue key

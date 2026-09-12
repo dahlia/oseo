@@ -350,8 +350,8 @@ static OseoResult data_view_allocate(
     view->ordinary.virtual_string_iterator_configurable = false;
     view->ordinary.virtual_string_iterator_enumerable = false;
     view->ordinary.virtual_string_iterator_writable = false;
-    view->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    view->ordinary.iterator_array = oseo_undefined();
+    view->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    view->ordinary.iterator_target = oseo_undefined();
     view->ordinary.iterator_index = 0u;
     view->ordinary.regexp_string_iterator = false;
     view->ordinary.regexp_iterator_regexp = oseo_undefined();

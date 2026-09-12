@@ -152,7 +152,7 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     if (code_id == OSEO_ARRAY_VALUES_CODE_ID ||
         code_id == OSEO_ARRAY_KEYS_CODE_ID ||
         code_id == OSEO_ARRAY_ENTRIES_CODE_ID) {
-        OseoArrayIteratorKind kind = OSEO_ARRAY_ITERATOR_VALUE;
+        OseoIteratorKind kind = OSEO_ARRAY_ITERATOR_VALUE;
         if (code_id == OSEO_ARRAY_KEYS_CODE_ID) {
             kind = OSEO_ARRAY_ITERATOR_KEY;
         } else if (code_id == OSEO_ARRAY_ENTRIES_CODE_ID) {
@@ -166,6 +166,12 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     }
     if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
         return oseo_internal_array_iterator_next(context, receiver);
+    }
+    if (code_id == OSEO_STRING_PROTOTYPE_ITERATOR_CODE_ID) {
+        return oseo_internal_string_iterator_create(context, receiver);
+    }
+    if (code_id == OSEO_STRING_ITERATOR_NEXT_CODE_ID) {
+        return oseo_internal_string_iterator_next(context, receiver);
     }
     if (code_id == OSEO_ITERATOR_SELF_CODE_ID) return normal(receiver);
     OseoValue argument = argument_count > 0u
@@ -261,7 +267,16 @@ OseoResult oseo_internal_iterator_method(
      * declared parameter; every other intrinsic iterator method
      * declares none. */
     size_t parameter_count = 0u;
-    if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
+    if (code_id == OSEO_STRING_ITERATOR_NEXT_CODE_ID) {
+        intrinsic = OSEO_INTRINSIC_STRING_ITERATOR_NEXT;
+        name = next_units;
+        name_length = 4u;
+    } else if (code_id == OSEO_STRING_PROTOTYPE_ITERATOR_CODE_ID) {
+        intrinsic = OSEO_INTRINSIC_STRING_PROTOTYPE_ITERATOR;
+        name = symbol_iterator_units;
+        name_length = sizeof(symbol_iterator_units) /
+            sizeof(*symbol_iterator_units);
+    } else if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
         intrinsic = OSEO_INTRINSIC_ARRAY_ITERATOR_NEXT;
         name = next_units;
         name_length = 4u;
@@ -1359,8 +1374,8 @@ static OseoResult iterator_helper_create(
     helper->ordinary.virtual_string_iterator_configurable = false;
     helper->ordinary.virtual_string_iterator_enumerable = false;
     helper->ordinary.virtual_string_iterator_writable = false;
-    helper->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    helper->ordinary.iterator_array = oseo_undefined();
+    helper->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    helper->ordinary.iterator_target = oseo_undefined();
     helper->ordinary.iterator_index = 0u;
     helper->ordinary.regexp_string_iterator = false;
     helper->ordinary.regexp_iterator_regexp = oseo_undefined();
@@ -2057,9 +2072,9 @@ static OseoResult array_like_length(
 OseoResult oseo_internal_array_iterator_create(
     OseoContext *context,
     OseoValue receiver,
-    OseoArrayIteratorKind kind
+    OseoIteratorKind kind
 ) {
-    if (kind == OSEO_ARRAY_ITERATOR_NONE) {
+    if (kind == OSEO_ITERATOR_NONE || kind == OSEO_STRING_ITERATOR_VALUE) {
         return failure(context, "OSEO2001", "Array iterator kind is missing.");
     }
     OseoValue slots[2] = {receiver, oseo_undefined()};
@@ -2076,8 +2091,8 @@ OseoResult oseo_internal_array_iterator_create(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoOrdinaryObject *iterator = ordinary_object(result.value);
-        iterator->array_iterator_kind = kind;
-        iterator->iterator_array = slots[0];
+        iterator->iterator_kind = kind;
+        iterator->iterator_target = slots[0];
         iterator->iterator_index = 0u;
     }
     oseo_roots_pop(context, &frame);
@@ -2146,17 +2161,17 @@ OseoResult oseo_internal_array_iterator_next(
      * the following index rather than retrying the one it failed to read.
      */
     OseoOrdinaryObject *state = ordinary_object(iterator);
-    if (!is_object(state->iterator_array)) {
+    if (!is_object(state->iterator_target)) {
         return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
     OseoValue slots[4] = {
         iterator,
         oseo_undefined(),
-        state->iterator_array,
+        state->iterator_target,
         oseo_undefined(),
     };
     const size_t index = state->iterator_index;
-    const OseoArrayIteratorKind kind = state->array_iterator_kind;
+    const OseoIteratorKind kind = state->iterator_kind;
     OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
     double length = 0.0;
@@ -2166,7 +2181,7 @@ OseoResult oseo_internal_array_iterator_next(
         return result;
     }
     if ((double)index >= length) {
-        ordinary_object(slots[0])->iterator_array = oseo_undefined();
+        ordinary_object(slots[0])->iterator_target = oseo_undefined();
         oseo_roots_pop(context, &frame);
         return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
@@ -2198,6 +2213,163 @@ OseoResult oseo_internal_array_iterator_next(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_result(context, slots[1], false);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * The shared %StringIteratorPrototype% has one `next` method and inherits
+ * the iterator self method and helper surface from %IteratorPrototype%.
+ */
+OseoResult oseo_internal_string_iterator_prototype(OseoContext *context) {
+    OseoValue *cache =
+        &context->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_PROTOTYPE];
+    if (is_object(*cache)) return normal(*cache);
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_array_iterator_prototype(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[0] =
+            context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_method(
+            context,
+            OSEO_STRING_ITERATOR_NEXT_CODE_ID
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "next");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_data(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "String Iterator");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *cache = frame.slots[1];
+        result = normal(*cache);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    } else {
+        *cache = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_NEXT] =
+            oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/* CreateStringIterator after RequireObjectCoercible and ToString. */
+OseoResult oseo_internal_string_iterator_create(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_nullish(receiver)) {
+        return iterator_type_error(
+            context,
+            "String iterator receiver is nullish."
+        );
+    }
+    OseoValue slots[3] = {receiver, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_value_string(context, slots[0]);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_string_iterator_prototype(context);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, slots[2]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoOrdinaryObject *iterator = ordinary_object(result.value);
+        iterator->iterator_kind = OSEO_STRING_ITERATOR_VALUE;
+        iterator->iterator_target = slots[1];
+        iterator->iterator_index = 0u;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * StringIteratorNext advances by one UTF-16 code point. A leading surrogate
+ * pairs only with an immediately following trailing surrogate; every lone
+ * surrogate is yielded as its one-code-unit String unchanged.
+ */
+OseoResult oseo_internal_string_iterator_next(
+    OseoContext *context,
+    OseoValue iterator
+) {
+    if (!is_string_iterator(iterator)) {
+        return iterator_type_error(
+            context,
+            "String iterator next requires a String iterator receiver."
+        );
+    }
+    OseoOrdinaryObject *state = ordinary_object(iterator);
+    if (!is_string(state->iterator_target)) {
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+    }
+    OseoValue slots[2] = {iterator, state->iterator_target};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    const size_t index = state->iterator_index;
+    const OseoString *source = string_object(slots[1]);
+    if (index >= source->length) {
+        ordinary_object(slots[0])->iterator_target = oseo_undefined();
+        oseo_roots_pop(context, &frame);
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+    }
+    size_t length = 1u;
+    uint16_t first = source->units[index];
+    if (first >= UINT16_C(0xd800) && first <= UINT16_C(0xdbff) &&
+        index + 1u < source->length) {
+        uint16_t second = source->units[index + 1u];
+        if (second >= UINT16_C(0xdc00) && second <= UINT16_C(0xdfff)) {
+            length = 2u;
+        }
+    }
+    ordinary_object(slots[0])->iterator_index = index + length;
+    OseoResult result = oseo_string_from_units(
+        context,
+        &string_object(slots[1])->units[index],
+        length
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_result(context, result.value, false);
     }
     oseo_roots_pop(context, &frame);
     return result;

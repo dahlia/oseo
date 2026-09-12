@@ -5,7 +5,6 @@ import {
 } from "./hir.ts";
 import type {
   Binding,
-  HirArrayBindingPattern,
   HirArrayElement,
   HirAssignmentMemberTarget,
   HirBindingElement,
@@ -24,7 +23,6 @@ import type {
   HirForOfTarget,
   HirFunction,
   HirGlobalObjectBinding,
-  HirObjectBindingPattern,
   HirObjectBindingProperty,
   HirObjectProperty,
   HirOptionalChainLink,
@@ -3135,68 +3133,6 @@ function resolveBindingPattern(
 }
 
 /**
- * The first array pattern anywhere inside a resolved for-in head pattern.
- *
- * An object pattern's rest target is a leaf, so only a property's own
- * pattern can nest another pattern.
- */
-function forInArrayPattern(
-  pattern: HirBindingPattern,
-): HirArrayBindingPattern | undefined {
-  if (pattern.kind === "array-binding-pattern") return pattern;
-  if (pattern.kind !== "object-binding-pattern") return undefined;
-  for (const property of pattern.properties) {
-    const found = forInArrayPattern(property.pattern);
-    if (found != null) return found;
-  }
-  return undefined;
-}
-
-/**
- * Narrow a resolved for-in head pattern to the array-free object pattern
- * the head admits.
- *
- * Owned syntax keeps the head's own array pattern form unrepresentable,
- * but a nested one stays representable because it is an ordinary
- * recursive leaf of the object pattern. ForIn/OfBodyEvaluation always
- * supplies a String key and this realm creates no string iterator, so an
- * array pattern reached from a for-in head could only report a
- * `TypeError` where ECMA-262 destructures the key's code units. The
- * bootstrap frontend rejects both forms while converting; this boundary
- * repeats the rejection for any frontend, so no admitted head lowers to a
- * divergence.
- */
-function forInHeadPattern(
-  pattern: HirBindingPattern | undefined,
-  located: LocatedSyntax,
-  state: ResolveState,
-): { readonly pattern: HirObjectBindingPattern } | undefined {
-  if (pattern == null) return undefined;
-  if (pattern.kind !== "object-binding-pattern") {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        located,
-        "A for-in head pattern must be an object pattern.",
-      ),
-    );
-    return undefined;
-  }
-  const nested = forInArrayPattern(pattern);
-  if (nested != null) {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        nested,
-        "A for-in array pattern target is unsupported.",
-      ),
-    );
-    return undefined;
-  }
-  return { pattern };
-}
-
-/**
  * Resolve a for-in head target against the scopes outside the head's own
  * lexical environment.
  *
@@ -3226,8 +3162,7 @@ function resolveForInTarget(
       lexical ? "declare" : "write",
       false,
     );
-    const narrowed = forInHeadPattern(pattern, target.pattern, state);
-    return narrowed == null ? undefined : { ...target, ...narrowed };
+    return pattern == null ? undefined : { ...target, pattern };
   }
   if (target.kind === "assignment-pattern") {
     const pattern = resolveBindingPattern(
@@ -3237,8 +3172,7 @@ function resolveForInTarget(
       "write",
       true,
     );
-    const narrowed = forInHeadPattern(pattern, target.pattern, state);
-    return narrowed == null ? undefined : { ...target, ...narrowed };
+    return pattern == null ? undefined : { ...target, pattern };
   }
   if (target.kind === "declaration") {
     const binding = declaredBinding ?? findBinding(scopes, target.name);

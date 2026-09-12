@@ -319,7 +319,7 @@ one.
 
 ### Internal helpers
 
-One hundred and seventy-eight helpers cross a
+One hundred and eighty-one helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -459,6 +459,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_promise_global`              | *runtime\_promise.c*          |
 | `oseo_internal_array_prototype`                     | *runtime\_array.c*            |
 | `oseo_internal_array_iterator_prototype`            | *runtime\_iterator.c*         |
+| `oseo_internal_string_iterator_prototype`           | *runtime\_iterator.c*         |
+| `oseo_internal_string_iterator_create`              | *runtime\_iterator.c*         |
+| `oseo_internal_string_iterator_next`                | *runtime\_iterator.c*         |
 | `oseo_internal_same_value`                          | *runtime\_descriptor.c*       |
 | `oseo_internal_ordinary_has_instance`               | *runtime\_function.c*         |
 | `oseo_internal_array_like_list`                     | *runtime\_function.c*         |
@@ -1123,6 +1126,26 @@ empty-iterator `TypeError`, the early stop `some`, `every`, and `find`
 perform, close failures in both the abrupt and the normal-completion
 position, both specialization policies, deliberate guard hits and misses,
 generic fallback, and collection at every safepoint.
+
+### String iterator evidence
+
+M5b node `string-iterator` materializes %String.prototype%[`Symbol.iterator`]
+and `%StringIteratorPrototype%` in *runtime\_iterator.c*, which already owns
+the synchronous iterator protocol and `%ArrayIteratorPrototype%`. The String
+intrinsic component installs the method as an ordinary own property while it
+builds `%String.prototype%`, so the bootstrap virtual descriptor never reaches
+user code. The iterator reuses the ordinary object's shared iterator state: one
+kind field brands the object and selects the Array or String `next`, one traced
+target slot holds the snapshot String, and one cursor advances by Unicode code
+point. No heap kind or translation unit is added.
+
+The node allocates two code IDs inside the existing iterator range, adds three
+realm intrinsics, adds three internal helpers, and moves `abiVersion` to
+`m5-102`. Fixed and generated native differential evidence covers method and
+prototype metadata, receiver conversion, branding, BMP and astral code points,
+lone surrogates, permanent exhaustion, `for-in` array-pattern destructuring of
+each String key, both specialization policies, deliberate guard hits and
+misses, generic fallback, and collection at every safepoint.
 
 ### Function prototype evidence
 

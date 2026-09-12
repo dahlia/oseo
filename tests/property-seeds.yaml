@@ -420,3 +420,7 @@ families:
     owner: tests/property/m5-date-family.property.test.ts
     start: 0x60006800
     end: 0x600068ff
+  - family: m5-string-iterator
+    owner: tests/property/m5-string-iterator.property.test.ts
+    start: 0x60006900
+    end: 0x600069ff

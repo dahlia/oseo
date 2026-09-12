@@ -1345,8 +1345,8 @@ static OseoResult date_allocate(
     date->ordinary.virtual_string_iterator_configurable = false;
     date->ordinary.virtual_string_iterator_enumerable = false;
     date->ordinary.virtual_string_iterator_writable = false;
-    date->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    date->ordinary.iterator_array = oseo_undefined();
+    date->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    date->ordinary.iterator_target = oseo_undefined();
     date->ordinary.iterator_index = 0u;
     date->ordinary.regexp_string_iterator = false;
     date->ordinary.regexp_iterator_regexp = oseo_undefined();
