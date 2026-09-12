@@ -782,6 +782,47 @@ read and no marker. An intrinsic error instance keeps the rendering and
 marker it already had on both paths. No component, code ID, or
 generated-code entry point is added.
 
+The `m5-101` ABI adds the *runtime\_date.c* component and materializes
+`%Date%` and `%Date.prototype%`. `Date` is a constructor the global object
+binds as a writable, non-enumerable, configurable property; calling it
+without `new` ignores every argument and returns the current time as a
+String. Constructing it copies an existing Date's `[[DateValue]]` without
+converting it, parses a String argument, converts any other single argument
+through `ToPrimitive` then `ToNumber`, and otherwise converts each of the
+seven components in order before `OrdinaryCreateFromConstructor` reads the
+new target's `prototype`. `%Date.prototype%` is an ordinary object with no
+`[[DateValue]]`, so every slot-reading method rejects it.
+
+The realm's local time zone is UTC. `LocalTZA` is the constant +0, so
+`LocalTime` and `UTC` are identities on a finite time value,
+`getTimezoneOffset` reports +0, and every local getter agrees with its UTC
+counterpart. That is a host choice ECMA-262 permits and the deliberate
+boundary *PLAN-M5.md* gives this landing; the clock and wakeup checkpoint
+in *PLAN-NIO.md* owns the host time-zone and real-time adapter that
+replaces it. The component reads the host clock in exactly one place,
+through C11's `timespec_get` with a `time` fallback, and reports an owned
+`OSEO2001` diagnostic when the host answers neither.
+
+The forty-four prototype methods cover the eighteen getters, the fifteen
+setters, `toDateString`, `toISOString`, `toJSON`, the three locale methods,
+`toString`, `toTimeString`, `toUTCString`, `valueOf`, and
+`[Symbol.toPrimitive]`. Each component setter reads the receiver's
+`[[DateValue]]` first, then converts its first parameter whether or not the
+call supplied it and each supplied trailing parameter in order. The NaN test
+and every component the call does not supply read that one snapshot, so a
+conversion that stores a new time value into the same Date does not change
+the result; a year-first setter starts from +0 when the snapshot is NaN, and
+every other window leaves the slot untouched and reports NaN. ECMA-402 is
+outside this claim, so each locale method reports the text of the operation it
+localizes. `Date.parse` accepts the Date Time String Format of 21.4.1.32,
+including expanded years and UTC offsets, and additionally recovers this
+realm's own `toString` and `toUTCString` texts, which is the non-normative
+recommendation of 21.4.3.2. `Object.prototype.toString` reports the `Date`
+builtin tag, and `ToPrimitive` on a Date reaches `OrdinaryToPrimitive` through
+the shared conversion *runtime\_primitive.c* now exports. One built-in code
+range, forty-eight code IDs, and two intrinsic slots are added; the
+generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

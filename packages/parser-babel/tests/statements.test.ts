@@ -815,7 +815,7 @@ test("rejects typeof of an unshadowed runtime intrinsic name", () => {
 test("reads typeof of materialized intrinsics through properties", () => {
   // Each admitted realm value reads the global object's property rather
   // than rejecting the reference.
-  for (const name of ["Promise", "RegExp"]) {
+  for (const name of ["Promise", "RegExp", "Date"]) {
     const result = compileSource(babelFrontend, {
       source: `console.log(typeof ${name});`,
       sourceId: "typeof-intrinsic.ts",
@@ -835,7 +835,6 @@ test("rejects typeof of an unimplemented standard global name", () => {
     "console.log(typeof JSON);",
     "console.log(typeof eval);",
     "console.log(typeof globalThis);",
-    "console.log(typeof Date);",
     "with ({}) { console.log(typeof JSON); }",
   ]) {
     const result = compileSource(babelFrontend, {

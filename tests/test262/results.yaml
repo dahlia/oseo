@@ -2528,6 +2528,696 @@ partitions:
   - group: built-ins/DataView
     key: ff
     path: results/built-ins/DataView/ff.yaml
+  - group: built-ins/Date
+    key: "00"
+    path: results/built-ins/Date/00.yaml
+  - group: built-ins/Date
+    key: "01"
+    path: results/built-ins/Date/01.yaml
+  - group: built-ins/Date
+    key: "02"
+    path: results/built-ins/Date/02.yaml
+  - group: built-ins/Date
+    key: "04"
+    path: results/built-ins/Date/04.yaml
+  - group: built-ins/Date
+    key: "05"
+    path: results/built-ins/Date/05.yaml
+  - group: built-ins/Date
+    key: "06"
+    path: results/built-ins/Date/06.yaml
+  - group: built-ins/Date
+    key: "07"
+    path: results/built-ins/Date/07.yaml
+  - group: built-ins/Date
+    key: "08"
+    path: results/built-ins/Date/08.yaml
+  - group: built-ins/Date
+    key: 0b
+    path: results/built-ins/Date/0b.yaml
+  - group: built-ins/Date
+    key: 0c
+    path: results/built-ins/Date/0c.yaml
+  - group: built-ins/Date
+    key: 0d
+    path: results/built-ins/Date/0d.yaml
+  - group: built-ins/Date
+    key: 0e
+    path: results/built-ins/Date/0e.yaml
+  - group: built-ins/Date
+    key: 0f
+    path: results/built-ins/Date/0f.yaml
+  - group: built-ins/Date
+    key: "10"
+    path: results/built-ins/Date/10.yaml
+  - group: built-ins/Date
+    key: "11"
+    path: results/built-ins/Date/11.yaml
+  - group: built-ins/Date
+    key: "12"
+    path: results/built-ins/Date/12.yaml
+  - group: built-ins/Date
+    key: "13"
+    path: results/built-ins/Date/13.yaml
+  - group: built-ins/Date
+    key: "14"
+    path: results/built-ins/Date/14.yaml
+  - group: built-ins/Date
+    key: "15"
+    path: results/built-ins/Date/15.yaml
+  - group: built-ins/Date
+    key: "16"
+    path: results/built-ins/Date/16.yaml
+  - group: built-ins/Date
+    key: "17"
+    path: results/built-ins/Date/17.yaml
+  - group: built-ins/Date
+    key: "18"
+    path: results/built-ins/Date/18.yaml
+  - group: built-ins/Date
+    key: "19"
+    path: results/built-ins/Date/19.yaml
+  - group: built-ins/Date
+    key: 1a
+    path: results/built-ins/Date/1a.yaml
+  - group: built-ins/Date
+    key: 1b
+    path: results/built-ins/Date/1b.yaml
+  - group: built-ins/Date
+    key: 1d
+    path: results/built-ins/Date/1d.yaml
+  - group: built-ins/Date
+    key: 1e
+    path: results/built-ins/Date/1e.yaml
+  - group: built-ins/Date
+    key: 1f
+    path: results/built-ins/Date/1f.yaml
+  - group: built-ins/Date
+    key: "20"
+    path: results/built-ins/Date/20.yaml
+  - group: built-ins/Date
+    key: "21"
+    path: results/built-ins/Date/21.yaml
+  - group: built-ins/Date
+    key: "22"
+    path: results/built-ins/Date/22.yaml
+  - group: built-ins/Date
+    key: "23"
+    path: results/built-ins/Date/23.yaml
+  - group: built-ins/Date
+    key: "24"
+    path: results/built-ins/Date/24.yaml
+  - group: built-ins/Date
+    key: "25"
+    path: results/built-ins/Date/25.yaml
+  - group: built-ins/Date
+    key: "26"
+    path: results/built-ins/Date/26.yaml
+  - group: built-ins/Date
+    key: "27"
+    path: results/built-ins/Date/27.yaml
+  - group: built-ins/Date
+    key: "29"
+    path: results/built-ins/Date/29.yaml
+  - group: built-ins/Date
+    key: 2a
+    path: results/built-ins/Date/2a.yaml
+  - group: built-ins/Date
+    key: 2b
+    path: results/built-ins/Date/2b.yaml
+  - group: built-ins/Date
+    key: 2e
+    path: results/built-ins/Date/2e.yaml
+  - group: built-ins/Date
+    key: 2f
+    path: results/built-ins/Date/2f.yaml
+  - group: built-ins/Date
+    key: "30"
+    path: results/built-ins/Date/30.yaml
+  - group: built-ins/Date
+    key: "31"
+    path: results/built-ins/Date/31.yaml
+  - group: built-ins/Date
+    key: "32"
+    path: results/built-ins/Date/32.yaml
+  - group: built-ins/Date
+    key: "33"
+    path: results/built-ins/Date/33.yaml
+  - group: built-ins/Date
+    key: "34"
+    path: results/built-ins/Date/34.yaml
+  - group: built-ins/Date
+    key: "35"
+    path: results/built-ins/Date/35.yaml
+  - group: built-ins/Date
+    key: "36"
+    path: results/built-ins/Date/36.yaml
+  - group: built-ins/Date
+    key: "38"
+    path: results/built-ins/Date/38.yaml
+  - group: built-ins/Date
+    key: "39"
+    path: results/built-ins/Date/39.yaml
+  - group: built-ins/Date
+    key: 3a
+    path: results/built-ins/Date/3a.yaml
+  - group: built-ins/Date
+    key: 3b
+    path: results/built-ins/Date/3b.yaml
+  - group: built-ins/Date
+    key: 3c
+    path: results/built-ins/Date/3c.yaml
+  - group: built-ins/Date
+    key: 3d
+    path: results/built-ins/Date/3d.yaml
+  - group: built-ins/Date
+    key: 3e
+    path: results/built-ins/Date/3e.yaml
+  - group: built-ins/Date
+    key: 3f
+    path: results/built-ins/Date/3f.yaml
+  - group: built-ins/Date
+    key: "41"
+    path: results/built-ins/Date/41.yaml
+  - group: built-ins/Date
+    key: "43"
+    path: results/built-ins/Date/43.yaml
+  - group: built-ins/Date
+    key: "44"
+    path: results/built-ins/Date/44.yaml
+  - group: built-ins/Date
+    key: "45"
+    path: results/built-ins/Date/45.yaml
+  - group: built-ins/Date
+    key: "46"
+    path: results/built-ins/Date/46.yaml
+  - group: built-ins/Date
+    key: "47"
+    path: results/built-ins/Date/47.yaml
+  - group: built-ins/Date
+    key: "48"
+    path: results/built-ins/Date/48.yaml
+  - group: built-ins/Date
+    key: "49"
+    path: results/built-ins/Date/49.yaml
+  - group: built-ins/Date
+    key: 4a
+    path: results/built-ins/Date/4a.yaml
+  - group: built-ins/Date
+    key: 4b
+    path: results/built-ins/Date/4b.yaml
+  - group: built-ins/Date
+    key: 4c
+    path: results/built-ins/Date/4c.yaml
+  - group: built-ins/Date
+    key: 4d
+    path: results/built-ins/Date/4d.yaml
+  - group: built-ins/Date
+    key: 4e
+    path: results/built-ins/Date/4e.yaml
+  - group: built-ins/Date
+    key: 4f
+    path: results/built-ins/Date/4f.yaml
+  - group: built-ins/Date
+    key: "50"
+    path: results/built-ins/Date/50.yaml
+  - group: built-ins/Date
+    key: "51"
+    path: results/built-ins/Date/51.yaml
+  - group: built-ins/Date
+    key: "52"
+    path: results/built-ins/Date/52.yaml
+  - group: built-ins/Date
+    key: "53"
+    path: results/built-ins/Date/53.yaml
+  - group: built-ins/Date
+    key: "54"
+    path: results/built-ins/Date/54.yaml
+  - group: built-ins/Date
+    key: "56"
+    path: results/built-ins/Date/56.yaml
+  - group: built-ins/Date
+    key: "58"
+    path: results/built-ins/Date/58.yaml
+  - group: built-ins/Date
+    key: "59"
+    path: results/built-ins/Date/59.yaml
+  - group: built-ins/Date
+    key: 5a
+    path: results/built-ins/Date/5a.yaml
+  - group: built-ins/Date
+    key: 5b
+    path: results/built-ins/Date/5b.yaml
+  - group: built-ins/Date
+    key: 5d
+    path: results/built-ins/Date/5d.yaml
+  - group: built-ins/Date
+    key: 5e
+    path: results/built-ins/Date/5e.yaml
+  - group: built-ins/Date
+    key: 5f
+    path: results/built-ins/Date/5f.yaml
+  - group: built-ins/Date
+    key: "60"
+    path: results/built-ins/Date/60.yaml
+  - group: built-ins/Date
+    key: "61"
+    path: results/built-ins/Date/61.yaml
+  - group: built-ins/Date
+    key: "62"
+    path: results/built-ins/Date/62.yaml
+  - group: built-ins/Date
+    key: "63"
+    path: results/built-ins/Date/63.yaml
+  - group: built-ins/Date
+    key: "64"
+    path: results/built-ins/Date/64.yaml
+  - group: built-ins/Date
+    key: "65"
+    path: results/built-ins/Date/65.yaml
+  - group: built-ins/Date
+    key: "66"
+    path: results/built-ins/Date/66.yaml
+  - group: built-ins/Date
+    key: "67"
+    path: results/built-ins/Date/67.yaml
+  - group: built-ins/Date
+    key: "68"
+    path: results/built-ins/Date/68.yaml
+  - group: built-ins/Date
+    key: "69"
+    path: results/built-ins/Date/69.yaml
+  - group: built-ins/Date
+    key: 6a
+    path: results/built-ins/Date/6a.yaml
+  - group: built-ins/Date
+    key: 6b
+    path: results/built-ins/Date/6b.yaml
+  - group: built-ins/Date
+    key: 6c
+    path: results/built-ins/Date/6c.yaml
+  - group: built-ins/Date
+    key: 6d
+    path: results/built-ins/Date/6d.yaml
+  - group: built-ins/Date
+    key: 6f
+    path: results/built-ins/Date/6f.yaml
+  - group: built-ins/Date
+    key: "70"
+    path: results/built-ins/Date/70.yaml
+  - group: built-ins/Date
+    key: "71"
+    path: results/built-ins/Date/71.yaml
+  - group: built-ins/Date
+    key: "72"
+    path: results/built-ins/Date/72.yaml
+  - group: built-ins/Date
+    key: "73"
+    path: results/built-ins/Date/73.yaml
+  - group: built-ins/Date
+    key: "74"
+    path: results/built-ins/Date/74.yaml
+  - group: built-ins/Date
+    key: "75"
+    path: results/built-ins/Date/75.yaml
+  - group: built-ins/Date
+    key: "76"
+    path: results/built-ins/Date/76.yaml
+  - group: built-ins/Date
+    key: "77"
+    path: results/built-ins/Date/77.yaml
+  - group: built-ins/Date
+    key: "79"
+    path: results/built-ins/Date/79.yaml
+  - group: built-ins/Date
+    key: 7a
+    path: results/built-ins/Date/7a.yaml
+  - group: built-ins/Date
+    key: 7b
+    path: results/built-ins/Date/7b.yaml
+  - group: built-ins/Date
+    key: 7c
+    path: results/built-ins/Date/7c.yaml
+  - group: built-ins/Date
+    key: 7d
+    path: results/built-ins/Date/7d.yaml
+  - group: built-ins/Date
+    key: 7e
+    path: results/built-ins/Date/7e.yaml
+  - group: built-ins/Date
+    key: 7f
+    path: results/built-ins/Date/7f.yaml
+  - group: built-ins/Date
+    key: "80"
+    path: results/built-ins/Date/80.yaml
+  - group: built-ins/Date
+    key: "81"
+    path: results/built-ins/Date/81.yaml
+  - group: built-ins/Date
+    key: "82"
+    path: results/built-ins/Date/82.yaml
+  - group: built-ins/Date
+    key: "83"
+    path: results/built-ins/Date/83.yaml
+  - group: built-ins/Date
+    key: "84"
+    path: results/built-ins/Date/84.yaml
+  - group: built-ins/Date
+    key: "85"
+    path: results/built-ins/Date/85.yaml
+  - group: built-ins/Date
+    key: "86"
+    path: results/built-ins/Date/86.yaml
+  - group: built-ins/Date
+    key: "87"
+    path: results/built-ins/Date/87.yaml
+  - group: built-ins/Date
+    key: "88"
+    path: results/built-ins/Date/88.yaml
+  - group: built-ins/Date
+    key: "89"
+    path: results/built-ins/Date/89.yaml
+  - group: built-ins/Date
+    key: 8a
+    path: results/built-ins/Date/8a.yaml
+  - group: built-ins/Date
+    key: 8b
+    path: results/built-ins/Date/8b.yaml
+  - group: built-ins/Date
+    key: 8c
+    path: results/built-ins/Date/8c.yaml
+  - group: built-ins/Date
+    key: 8d
+    path: results/built-ins/Date/8d.yaml
+  - group: built-ins/Date
+    key: 8e
+    path: results/built-ins/Date/8e.yaml
+  - group: built-ins/Date
+    key: 8f
+    path: results/built-ins/Date/8f.yaml
+  - group: built-ins/Date
+    key: "90"
+    path: results/built-ins/Date/90.yaml
+  - group: built-ins/Date
+    key: "91"
+    path: results/built-ins/Date/91.yaml
+  - group: built-ins/Date
+    key: "92"
+    path: results/built-ins/Date/92.yaml
+  - group: built-ins/Date
+    key: "93"
+    path: results/built-ins/Date/93.yaml
+  - group: built-ins/Date
+    key: "95"
+    path: results/built-ins/Date/95.yaml
+  - group: built-ins/Date
+    key: "96"
+    path: results/built-ins/Date/96.yaml
+  - group: built-ins/Date
+    key: "97"
+    path: results/built-ins/Date/97.yaml
+  - group: built-ins/Date
+    key: "99"
+    path: results/built-ins/Date/99.yaml
+  - group: built-ins/Date
+    key: 9a
+    path: results/built-ins/Date/9a.yaml
+  - group: built-ins/Date
+    key: 9b
+    path: results/built-ins/Date/9b.yaml
+  - group: built-ins/Date
+    key: 9c
+    path: results/built-ins/Date/9c.yaml
+  - group: built-ins/Date
+    key: 9d
+    path: results/built-ins/Date/9d.yaml
+  - group: built-ins/Date
+    key: 9e
+    path: results/built-ins/Date/9e.yaml
+  - group: built-ins/Date
+    key: 9f
+    path: results/built-ins/Date/9f.yaml
+  - group: built-ins/Date
+    key: a0
+    path: results/built-ins/Date/a0.yaml
+  - group: built-ins/Date
+    key: a1
+    path: results/built-ins/Date/a1.yaml
+  - group: built-ins/Date
+    key: a2
+    path: results/built-ins/Date/a2.yaml
+  - group: built-ins/Date
+    key: a4
+    path: results/built-ins/Date/a4.yaml
+  - group: built-ins/Date
+    key: a5
+    path: results/built-ins/Date/a5.yaml
+  - group: built-ins/Date
+    key: a6
+    path: results/built-ins/Date/a6.yaml
+  - group: built-ins/Date
+    key: a7
+    path: results/built-ins/Date/a7.yaml
+  - group: built-ins/Date
+    key: a8
+    path: results/built-ins/Date/a8.yaml
+  - group: built-ins/Date
+    key: a9
+    path: results/built-ins/Date/a9.yaml
+  - group: built-ins/Date
+    key: aa
+    path: results/built-ins/Date/aa.yaml
+  - group: built-ins/Date
+    key: ab
+    path: results/built-ins/Date/ab.yaml
+  - group: built-ins/Date
+    key: ac
+    path: results/built-ins/Date/ac.yaml
+  - group: built-ins/Date
+    key: ad
+    path: results/built-ins/Date/ad.yaml
+  - group: built-ins/Date
+    key: ae
+    path: results/built-ins/Date/ae.yaml
+  - group: built-ins/Date
+    key: af
+    path: results/built-ins/Date/af.yaml
+  - group: built-ins/Date
+    key: b0
+    path: results/built-ins/Date/b0.yaml
+  - group: built-ins/Date
+    key: b1
+    path: results/built-ins/Date/b1.yaml
+  - group: built-ins/Date
+    key: b2
+    path: results/built-ins/Date/b2.yaml
+  - group: built-ins/Date
+    key: b3
+    path: results/built-ins/Date/b3.yaml
+  - group: built-ins/Date
+    key: b5
+    path: results/built-ins/Date/b5.yaml
+  - group: built-ins/Date
+    key: b6
+    path: results/built-ins/Date/b6.yaml
+  - group: built-ins/Date
+    key: b7
+    path: results/built-ins/Date/b7.yaml
+  - group: built-ins/Date
+    key: b8
+    path: results/built-ins/Date/b8.yaml
+  - group: built-ins/Date
+    key: b9
+    path: results/built-ins/Date/b9.yaml
+  - group: built-ins/Date
+    key: ba
+    path: results/built-ins/Date/ba.yaml
+  - group: built-ins/Date
+    key: bb
+    path: results/built-ins/Date/bb.yaml
+  - group: built-ins/Date
+    key: bc
+    path: results/built-ins/Date/bc.yaml
+  - group: built-ins/Date
+    key: bd
+    path: results/built-ins/Date/bd.yaml
+  - group: built-ins/Date
+    key: be
+    path: results/built-ins/Date/be.yaml
+  - group: built-ins/Date
+    key: bf
+    path: results/built-ins/Date/bf.yaml
+  - group: built-ins/Date
+    key: c0
+    path: results/built-ins/Date/c0.yaml
+  - group: built-ins/Date
+    key: c1
+    path: results/built-ins/Date/c1.yaml
+  - group: built-ins/Date
+    key: c2
+    path: results/built-ins/Date/c2.yaml
+  - group: built-ins/Date
+    key: c4
+    path: results/built-ins/Date/c4.yaml
+  - group: built-ins/Date
+    key: c5
+    path: results/built-ins/Date/c5.yaml
+  - group: built-ins/Date
+    key: c6
+    path: results/built-ins/Date/c6.yaml
+  - group: built-ins/Date
+    key: c7
+    path: results/built-ins/Date/c7.yaml
+  - group: built-ins/Date
+    key: c8
+    path: results/built-ins/Date/c8.yaml
+  - group: built-ins/Date
+    key: c9
+    path: results/built-ins/Date/c9.yaml
+  - group: built-ins/Date
+    key: ca
+    path: results/built-ins/Date/ca.yaml
+  - group: built-ins/Date
+    key: cc
+    path: results/built-ins/Date/cc.yaml
+  - group: built-ins/Date
+    key: cd
+    path: results/built-ins/Date/cd.yaml
+  - group: built-ins/Date
+    key: ce
+    path: results/built-ins/Date/ce.yaml
+  - group: built-ins/Date
+    key: cf
+    path: results/built-ins/Date/cf.yaml
+  - group: built-ins/Date
+    key: d1
+    path: results/built-ins/Date/d1.yaml
+  - group: built-ins/Date
+    key: d2
+    path: results/built-ins/Date/d2.yaml
+  - group: built-ins/Date
+    key: d3
+    path: results/built-ins/Date/d3.yaml
+  - group: built-ins/Date
+    key: d5
+    path: results/built-ins/Date/d5.yaml
+  - group: built-ins/Date
+    key: d6
+    path: results/built-ins/Date/d6.yaml
+  - group: built-ins/Date
+    key: d7
+    path: results/built-ins/Date/d7.yaml
+  - group: built-ins/Date
+    key: d8
+    path: results/built-ins/Date/d8.yaml
+  - group: built-ins/Date
+    key: d9
+    path: results/built-ins/Date/d9.yaml
+  - group: built-ins/Date
+    key: da
+    path: results/built-ins/Date/da.yaml
+  - group: built-ins/Date
+    key: db
+    path: results/built-ins/Date/db.yaml
+  - group: built-ins/Date
+    key: dc
+    path: results/built-ins/Date/dc.yaml
+  - group: built-ins/Date
+    key: dd
+    path: results/built-ins/Date/dd.yaml
+  - group: built-ins/Date
+    key: de
+    path: results/built-ins/Date/de.yaml
+  - group: built-ins/Date
+    key: df
+    path: results/built-ins/Date/df.yaml
+  - group: built-ins/Date
+    key: e0
+    path: results/built-ins/Date/e0.yaml
+  - group: built-ins/Date
+    key: e1
+    path: results/built-ins/Date/e1.yaml
+  - group: built-ins/Date
+    key: e2
+    path: results/built-ins/Date/e2.yaml
+  - group: built-ins/Date
+    key: e3
+    path: results/built-ins/Date/e3.yaml
+  - group: built-ins/Date
+    key: e4
+    path: results/built-ins/Date/e4.yaml
+  - group: built-ins/Date
+    key: e5
+    path: results/built-ins/Date/e5.yaml
+  - group: built-ins/Date
+    key: e6
+    path: results/built-ins/Date/e6.yaml
+  - group: built-ins/Date
+    key: e8
+    path: results/built-ins/Date/e8.yaml
+  - group: built-ins/Date
+    key: e9
+    path: results/built-ins/Date/e9.yaml
+  - group: built-ins/Date
+    key: ea
+    path: results/built-ins/Date/ea.yaml
+  - group: built-ins/Date
+    key: eb
+    path: results/built-ins/Date/eb.yaml
+  - group: built-ins/Date
+    key: ed
+    path: results/built-ins/Date/ed.yaml
+  - group: built-ins/Date
+    key: ee
+    path: results/built-ins/Date/ee.yaml
+  - group: built-ins/Date
+    key: ef
+    path: results/built-ins/Date/ef.yaml
+  - group: built-ins/Date
+    key: f1
+    path: results/built-ins/Date/f1.yaml
+  - group: built-ins/Date
+    key: f2
+    path: results/built-ins/Date/f2.yaml
+  - group: built-ins/Date
+    key: f3
+    path: results/built-ins/Date/f3.yaml
+  - group: built-ins/Date
+    key: f4
+    path: results/built-ins/Date/f4.yaml
+  - group: built-ins/Date
+    key: f5
+    path: results/built-ins/Date/f5.yaml
+  - group: built-ins/Date
+    key: f6
+    path: results/built-ins/Date/f6.yaml
+  - group: built-ins/Date
+    key: f7
+    path: results/built-ins/Date/f7.yaml
+  - group: built-ins/Date
+    key: f8
+    path: results/built-ins/Date/f8.yaml
+  - group: built-ins/Date
+    key: f9
+    path: results/built-ins/Date/f9.yaml
+  - group: built-ins/Date
+    key: fa
+    path: results/built-ins/Date/fa.yaml
+  - group: built-ins/Date
+    key: fb
+    path: results/built-ins/Date/fb.yaml
+  - group: built-ins/Date
+    key: fc
+    path: results/built-ins/Date/fc.yaml
+  - group: built-ins/Date
+    key: fd
+    path: results/built-ins/Date/fd.yaml
+  - group: built-ins/Date
+    key: fe
+    path: results/built-ins/Date/fe.yaml
+  - group: built-ins/Date
+    key: ff
+    path: results/built-ins/Date/ff.yaml
   - group: built-ins/Error
     key: "02"
     path: results/built-ins/Error/02.yaml
@@ -12901,17 +13591,17 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 14019
+  passes: 14743
   semanticFailures: 0
-  unsupportedProfileFeatures: 2168
+  unsupportedProfileFeatures: 2030
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 151
+      passes: 152
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 6
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -12937,9 +13627,9 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 246
+      passes: 247
       semanticFailures: 0
-      unsupportedProfileFeatures: 30
+      unsupportedProfileFeatures: 29
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
@@ -12961,6 +13651,13 @@ summary:
       passes: 475
       semanticFailures: 0
       unsupportedProfileFeatures: 75
+    - dependency: date
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 581
+      semanticFailures: 0
+      unsupportedProfileFeatures: 5
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -12993,16 +13690,16 @@ summary:
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 272
+      passes: 273
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 34
     - dependency: functions
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3985
+      passes: 4056
       semanticFailures: 0
-      unsupportedProfileFeatures: 909
+      unsupportedProfileFeatures: 889
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -13042,16 +13739,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 290
+      passes: 291
       semanticFailures: 0
-      unsupportedProfileFeatures: 5
+      unsupportedProfileFeatures: 4
     - dependency: object-properties
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9279
+      passes: 9556
       semanticFailures: 0
-      unsupportedProfileFeatures: 651
+      unsupportedProfileFeatures: 515
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -13070,16 +13767,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 149
+      passes: 152
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 4
     - dependency: regular-expressions
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 497
+      passes: 498
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 9
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -13091,9 +13788,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 583
+      passes: 639
       semanticFailures: 0
-      unsupportedProfileFeatures: 82
+      unsupportedProfileFeatures: 84
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -13120,9 +13817,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2683
+      passes: 2703
       semanticFailures: 0
-      unsupportedProfileFeatures: 217
+      unsupportedProfileFeatures: 197
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -13176,9 +13873,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 67
+      passes: 68
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 9
     - group: built-ins/DataView
       expectedNegatives: 0
       harnessFailures: 0
@@ -13186,6 +13883,13 @@ summary:
       passes: 475
       semanticFailures: 0
       unsupportedProfileFeatures: 75
+    - group: built-ins/Date
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 581
+      semanticFailures: 0
+      unsupportedProfileFeatures: 5
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -13197,9 +13901,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 161
+      passes: 163
       semanticFailures: 0
-      unsupportedProfileFeatures: 169
+      unsupportedProfileFeatures: 167
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -13267,16 +13971,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 331
+      passes: 333
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 7
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3033
+      passes: 3147
       semanticFailures: 0
-      unsupportedProfileFeatures: 290
+      unsupportedProfileFeatures: 176
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -13288,16 +13992,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 149
+      passes: 151
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 1
     - group: built-ins/RegExp
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1202
+      passes: 1203
       semanticFailures: 0
-      unsupportedProfileFeatures: 484
+      unsupportedProfileFeatures: 483
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -13428,9 +14132,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1457
+      passes: 1458
       semanticFailures: 0
-      unsupportedProfileFeatures: 134
+      unsupportedProfileFeatures: 133
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0

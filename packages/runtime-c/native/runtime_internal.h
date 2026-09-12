@@ -708,6 +708,24 @@
 #define OSEO_PROXY_REVOCABLE_CODE_ID (OSEO_PROXY_CODE_ID_RANGE_LAST - 1u)
 #define OSEO_PROXY_REVOKE_CODE_ID (OSEO_PROXY_CODE_ID_RANGE_LAST - 2u)
 
+#define OSEO_DATE_CODE_ID_RANGE_INDEX ((size_t)21u)
+#define OSEO_DATE_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_DATE_CODE_ID_RANGE_INDEX)
+#define OSEO_DATE_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_DATE_CODE_ID_RANGE_INDEX)
+#define OSEO_DATE_CONSTRUCTOR_CODE_ID OSEO_DATE_CODE_ID_RANGE_LAST
+#define OSEO_DATE_NOW_CODE_ID (OSEO_DATE_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_DATE_PARSE_CODE_ID (OSEO_DATE_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_DATE_UTC_CODE_ID (OSEO_DATE_CODE_ID_RANGE_LAST - 3u)
+/*
+ * The prototype methods count down from here in `date_methods` order, so
+ * an entry's index is the only identity the builder and the dispatcher
+ * share. `OSEO_DATE_METHOD_COUNT` closes the block.
+ */
+#define OSEO_DATE_METHOD_CODE_ID_LAST (OSEO_DATE_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_DATE_METHOD_CODE_ID_FIRST \
+    (OSEO_DATE_METHOD_CODE_ID_LAST - (OSEO_DATE_METHOD_COUNT - 1u))
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -761,6 +779,7 @@ typedef enum {
     OSEO_HEAP_REGEXP = 23,
     OSEO_HEAP_ITERATOR_HELPER = 24,
     OSEO_HEAP_PROXY = 25,
+    OSEO_HEAP_DATE = 26,
 } OseoHeapKind;
 
 typedef struct {
@@ -1329,6 +1348,74 @@ typedef struct {
 } OseoDataView;
 
 /*
+ * One `Date.prototype` method. The enumerator order is the order the
+ * prototype creates its properties in and the order the code IDs count
+ * down from `OSEO_DATE_METHOD_CODE_ID_LAST`, so an entry's index is the
+ * only identity the builder and the dispatcher share.
+ * `[Symbol.toPrimitive]` is last because it is the one entry keyed by a
+ * symbol rather than by its name.
+ */
+typedef enum {
+    OSEO_DATE_GET_DATE = 0,
+    OSEO_DATE_GET_DAY = 1,
+    OSEO_DATE_GET_FULL_YEAR = 2,
+    OSEO_DATE_GET_HOURS = 3,
+    OSEO_DATE_GET_MILLISECONDS = 4,
+    OSEO_DATE_GET_MINUTES = 5,
+    OSEO_DATE_GET_MONTH = 6,
+    OSEO_DATE_GET_SECONDS = 7,
+    OSEO_DATE_GET_TIME = 8,
+    OSEO_DATE_GET_TIMEZONE_OFFSET = 9,
+    OSEO_DATE_GET_UTC_DATE = 10,
+    OSEO_DATE_GET_UTC_DAY = 11,
+    OSEO_DATE_GET_UTC_FULL_YEAR = 12,
+    OSEO_DATE_GET_UTC_HOURS = 13,
+    OSEO_DATE_GET_UTC_MILLISECONDS = 14,
+    OSEO_DATE_GET_UTC_MINUTES = 15,
+    OSEO_DATE_GET_UTC_MONTH = 16,
+    OSEO_DATE_GET_UTC_SECONDS = 17,
+    OSEO_DATE_SET_DATE = 18,
+    OSEO_DATE_SET_FULL_YEAR = 19,
+    OSEO_DATE_SET_HOURS = 20,
+    OSEO_DATE_SET_MILLISECONDS = 21,
+    OSEO_DATE_SET_MINUTES = 22,
+    OSEO_DATE_SET_MONTH = 23,
+    OSEO_DATE_SET_SECONDS = 24,
+    OSEO_DATE_SET_TIME = 25,
+    OSEO_DATE_SET_UTC_DATE = 26,
+    OSEO_DATE_SET_UTC_FULL_YEAR = 27,
+    OSEO_DATE_SET_UTC_HOURS = 28,
+    OSEO_DATE_SET_UTC_MILLISECONDS = 29,
+    OSEO_DATE_SET_UTC_MINUTES = 30,
+    OSEO_DATE_SET_UTC_MONTH = 31,
+    OSEO_DATE_SET_UTC_SECONDS = 32,
+    OSEO_DATE_TO_DATE_STRING = 33,
+    OSEO_DATE_TO_ISO_STRING = 34,
+    OSEO_DATE_TO_JSON = 35,
+    OSEO_DATE_TO_LOCALE_DATE_STRING = 36,
+    OSEO_DATE_TO_LOCALE_STRING = 37,
+    OSEO_DATE_TO_LOCALE_TIME_STRING = 38,
+    OSEO_DATE_TO_STRING = 39,
+    OSEO_DATE_TO_TIME_STRING = 40,
+    OSEO_DATE_TO_UTC_STRING = 41,
+    OSEO_DATE_VALUE_OF = 42,
+    OSEO_DATE_TO_PRIMITIVE = 43,
+    OSEO_DATE_METHOD_COUNT = 44,
+} OseoDateMethod;
+
+/*
+ * One Date. `time_value` is [[DateValue]]: either NaN or an integral
+ * Number in the reviewed time-value range, which TimeClip establishes at
+ * every write. The slot holds no heap reference, so the collector traces
+ * a Date exactly as it traces an ordinary object and no release path
+ * owns anything beyond the ordinary property storage.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    double time_value;
+} OseoDate;
+
+/*
  * The outcome of validating or compiling one dynamic pattern.
  *
  * `INVALID` is the specified catchable `SyntaxError`, `UNSUPPORTED` is a
@@ -1767,6 +1854,13 @@ static inline bool is_data_view(OseoValue value) {
 static inline OseoDataView *data_view_object(OseoValue value) {
     return (OseoDataView *)heap_object(value);
 }
+static inline bool is_date(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_DATE;
+}
+static inline OseoDate *date_object(OseoValue value) {
+    return (OseoDate *)heap_object(value);
+}
 static inline bool is_regexp(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_REGEXP;
@@ -1799,8 +1893,8 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE ||
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
         kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
-        kind == OSEO_HEAP_REGEXP || kind == OSEO_HEAP_ITERATOR_HELPER ||
-        kind == OSEO_HEAP_PROXY;
+        kind == OSEO_HEAP_DATE || kind == OSEO_HEAP_REGEXP ||
+        kind == OSEO_HEAP_ITERATOR_HELPER || kind == OSEO_HEAP_PROXY;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2751,6 +2845,22 @@ OseoResult oseo_internal_data_view_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_date_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/* Materializes %Date% together with %Date.prototype% and every own
+ * property ECMA-262 gives them, and returns the constructor. */
+OseoResult oseo_internal_date_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_date_global(
+    OseoContext *context,
+    OseoValue global
+);
 /* Materializes %DataView% together with %DataView.prototype% and every
  * own property ECMA-262 gives them, and returns the constructor. */
 OseoResult oseo_internal_data_view_intrinsic(OseoContext *context);
@@ -3021,6 +3131,18 @@ OseoResult oseo_internal_to_index(
     double *index
 );
 OseoResult oseo_internal_to_primitive(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint
+);
+/*
+ * OrdinaryToPrimitive(O, hint), 7.1.1.1, without the @@toPrimitive
+ * dispatch ToPrimitive performs first. `Date.prototype[Symbol.toPrimitive]`
+ * is the one admitted caller: it is itself the method that dispatch would
+ * find, so it must reach the valueOf and toString lookups directly rather
+ * than re-entering ToPrimitive.
+ */
+OseoResult oseo_internal_ordinary_to_primitive(
     OseoContext *context,
     OseoValue value,
     OseoToPrimitiveHint hint

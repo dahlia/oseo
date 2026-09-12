@@ -36,6 +36,8 @@ const components = [
   "MATH",
   "URI",
   "REFLECT",
+  "PROXY",
+  "DATE",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

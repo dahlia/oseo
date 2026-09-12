@@ -474,7 +474,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-1-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/isArray/15.4.3.2-2-1.js
     expectedClassification: pass
@@ -1098,7 +1098,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-1-12.js
     expectedClassification: pass
@@ -1323,7 +1323,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-5-16.js
     expectedClassification: pass
@@ -1635,7 +1635,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-21.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/every/15.4.4.16-7-c-iii-22.js
     expectedClassification: pass
@@ -1806,7 +1806,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-12.js
     expectedClassification: pass
@@ -2040,7 +2040,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-5-16.js
     expectedClassification: pass
@@ -2406,7 +2406,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-22.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-9-c-iii-23.js
     expectedClassification: pass
@@ -2943,7 +2943,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-1-12.js
     expectedClassification: pass
@@ -3165,7 +3165,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/forEach/15.4.4.18-5-16.js
     expectedClassification: pass
@@ -3591,7 +3591,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/15.4.4.14-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/15.4.4.14-1-12.js
     expectedClassification: pass
@@ -4299,7 +4299,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-12.js
     expectedClassification: pass
@@ -4896,7 +4896,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-1-12.js
     expectedClassification: pass
@@ -5127,7 +5127,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/15.4.4.19-5-16.js
     expectedClassification: pass
@@ -5694,7 +5694,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/15.4.4.21-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/15.4.4.21-1-12.js
     expectedClassification: pass
@@ -6405,7 +6405,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/15.4.4.21-9-c-ii-31.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/15.4.4.21-9-c-ii-32.js
     expectedClassification: pass
@@ -6474,7 +6474,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/15.4.4.22-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/15.4.4.22-1-12.js
     expectedClassification: pass
@@ -7182,7 +7182,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/15.4.4.22-9-c-ii-31.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/15.4.4.22-9-c-ii-32.js
     expectedClassification: pass
@@ -7578,7 +7578,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-1-12.js
     expectedClassification: pass
@@ -7809,7 +7809,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-5-16.js
     expectedClassification: pass
@@ -8121,7 +8121,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-21.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/some/15.4.4.17-7-c-iii-22.js
     expectedClassification: pass
@@ -10107,7 +10107,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/wrapper-object-ordinary-toprimitive.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-properties]
   - path: test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws-sab.js
     expectedClassification: unsupported-profile-feature
@@ -11763,6 +11763,1764 @@ tests:
   - path: test/built-ins/DataView/toindex-byteoffset.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
+  - path: test/built-ins/Date/15.9.1.15-1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.2.1_A1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.2.1_A2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A1_T6.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A2_T6.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T1.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T1.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T2.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T2.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T3.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T3.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T4.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T4.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T5.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T5.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T6.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A3_T6.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T0.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A4_T6.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A5_T6.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A6_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A6_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A6_T3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A6_T4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.1_A6_T5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.2_A1_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.2_A2_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.2_A3_T1.1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.3.2_A3_T1.2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.4_A1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.4_A2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.4_A3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.4_A4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/S15.9.4_A5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/TimeClip_negative_zero.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/coercion-errors.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/fp-evaluation-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/infinity-make-day.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/infinity-make-time.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/UTC/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/UTC/nans.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/no-arg.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/non-integer-values.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/UTC/overflow-make-day.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/overflow-make-time.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/UTC/return-value.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/UTC/year-offset.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/coercion-errors.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/construct_with_date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/now/15.9.4.4-0-1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/now/15.9.4.4-0-2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/now/15.9.4.4-0-3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/now/15.9.4.4-0-4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/now/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/now/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/parse/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/parse/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/parse/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/parse/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/parse/time-value-maximum-range.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/parse/without-utc-offset.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/parse/year-zero.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/parse/zero.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/proto-from-ctor-realm-one.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [date, functions, reflect-namespace]
+  - path: test/built-ins/Date/proto-from-ctor-realm-two.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [date, functions, reflect-namespace]
+  - path: test/built-ins/Date/proto-from-ctor-realm-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [date, functions, reflect-namespace]
+  - path: test/built-ins/Date/prototype/S15.9.5_A01_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A02_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A03_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A04_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A05_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A06_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A07_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A08_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A09_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A10_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A11_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A12_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A13_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A14_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A15_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A16_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A17_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A18_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A19_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A20_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A21_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A22_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A23_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A24_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A25_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A26_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A27_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A28_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A29_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A30_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A31_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A32_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A33_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A34_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A35_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A36_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A37_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A38_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A39_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A40_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A41_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/S15.9.5_A42_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/called-as-function.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-default-first-invalid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-default-first-non-callable.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-default-first-valid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-default-no-callables.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-invalid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-number-first-invalid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-number-first-non-callable.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-number-first-valid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-number-no-callables.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-string-first-invalid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-string-first-non-callable.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-string-first-valid.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/hint-string-no-callables.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties, symbols]
+  - path: test/built-ins/Date/prototype/Symbol.toPrimitive/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/constructor/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDate/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDate/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDate/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getDate/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDate/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getDate/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getDate/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getDate/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getDay/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDay/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDay/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getDay/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getDay/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getDay/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getDay/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getDay/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getFullYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getFullYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getFullYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getFullYear/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getFullYear/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getFullYear/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getFullYear/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getFullYear/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getHours/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getHours/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getHours/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getHours/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getHours/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getHours/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getHours/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getHours/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMilliseconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMilliseconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMilliseconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getMilliseconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMilliseconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMilliseconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMilliseconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getMilliseconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMinutes/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMinutes/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMinutes/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getMinutes/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMinutes/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMinutes/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMinutes/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getMinutes/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMonth/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMonth/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMonth/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getMonth/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getMonth/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMonth/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getMonth/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getMonth/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getSeconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getSeconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getSeconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getSeconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getSeconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getSeconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getSeconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getSeconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTime/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTime/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTime/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getTime/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTime/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTime/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTime/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getTime/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getTimezoneOffset/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDate/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDate/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDate/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCDate/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDate/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDate/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDate/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCDate/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDay/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDay/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDay/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCDay/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCDay/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDay/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCDay/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCDay/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCFullYear/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCHours/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCHours/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCHours/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCHours/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCHours/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCHours/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCHours/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCHours/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCMilliseconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCMinutes/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMonth/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMonth/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMonth/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCMonth/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCMonth/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMonth/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCMonth/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCMonth/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/getUTCSeconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/no-date-value.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setDate/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/arg-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/arg-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setDate/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setDate/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setDate/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setDate/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setDate/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setDate/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/15.9.5.40_1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-date-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-date-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-month-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-month-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-year-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/arg-year-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setFullYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setFullYear/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setFullYear/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-valid-date-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-valid-date-month.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setFullYear/this-value-valid-date-year.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-hour-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-hour-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-min-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-min-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-ms-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-ms-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-sec-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/arg-sec-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setHours/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setHours/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setHours/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setHours/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setHours/this-value-valid-date-hour.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/this-value-valid-date-min.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/this-value-valid-date-ms.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setHours/this-value-valid-date-sec.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/arg-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/arg-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMilliseconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMilliseconds/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setMilliseconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMilliseconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMilliseconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setMilliseconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-min-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-min-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-ms-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-ms-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-sec-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/arg-sec-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMinutes/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMinutes/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setMinutes/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMinutes/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMinutes/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setMinutes/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/arg-date-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/arg-date-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/arg-month-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/arg-month-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMonth/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMonth/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setMonth/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setMonth/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setMonth/this-value-valid-date-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setMonth/this-value-valid-date-month.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/arg-ms-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/arg-ms-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/arg-sec-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/arg-sec-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setSeconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setSeconds/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setSeconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setSeconds/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setSeconds/this-value-valid-date-ms.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setSeconds/this-value-valid-date-sec.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/arg-to-number-err.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/arg-to-number.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setTime/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setTime/new-value-time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setTime/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setTime/this-value-invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/this-value-non-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setTime/this-value-non-object.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/setTime/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCDate/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCDate/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCDate/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCDate/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCDate/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCDate/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCDate/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCFullYear/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCHours/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCHours/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCHours/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCHours/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCHours/this-value-valid-date-hour.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/this-value-valid-date-min.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/this-value-valid-date-ms.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCHours/this-value-valid-date-sec.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMilliseconds/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMinutes/this-value-valid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMonth/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMonth/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMonth/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMonth/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMonth/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMonth/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCMonth/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCMonth/this-value-valid-date-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCMonth/this-value-valid-date-month.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/arg-coercion-order.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/this-value-valid-date-ms.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/setUTCSeconds/this-value-valid-date-sec.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toDateString/format.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toDateString/invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toDateString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toDateString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toDateString/negative-year.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toDateString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toDateString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-10.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-11.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-12.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-13.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-14.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-15.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-16.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-3.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-4.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-5.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-6.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-7.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-8.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/15.9.5.43-0-9.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toISOString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toISOString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toJSON/builtin.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/called-as-function.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/toJSON/invoke-abrupt.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/invoke-arguments.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/invoke-result.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toJSON/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toJSON/non-finite.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toJSON/to-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/toJSON/to-primitive-abrupt.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toJSON/to-primitive-symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/prototype/toJSON/to-primitive-value-of.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toLocaleDateString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleDateString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleDateString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toLocaleDateString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toLocaleString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleTimeString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleTimeString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toLocaleTimeString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toLocaleTimeString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toString/format.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toString/invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toString/negative-year.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toString/non-date-receiver.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toTimeString/format.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toTimeString/invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toTimeString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toTimeString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toTimeString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toTimeString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toUTCString/day-names.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toUTCString/format.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toUTCString/invalid-date.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toUTCString/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toUTCString/month-names.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toUTCString/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/toUTCString/negative-year.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/toUTCString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/toUTCString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/valueOf/S9.4_A3_T1.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/valueOf/S9.4_A3_T2.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/built-ins/Date/prototype/valueOf/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/valueOf/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/prototype/valueOf/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [date, functions]
+  - path: test/built-ins/Date/prototype/valueOf/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/built-ins/Date/subclassing.js
+    expectedClassification: pass
+    dependencies: [date, functions, reflect-namespace]
+  - path: test/built-ins/Date/value-get-symbol-to-prim-err.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-symbol-to-prim-err.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-symbol-to-prim-invocation.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-symbol-to-prim-return-obj.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-symbol-to-prim-return-prim.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-call-err.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-call.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-get-meth-err.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-result-faulty.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-result-non-string-prim.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/value-to-primitive-result-string.js
+    expectedClassification: pass
+    dependencies: [date, symbols]
+  - path: test/built-ins/Date/year-zero.js
+    expectedClassification: pass
+    dependencies: [date]
   - path: test/built-ins/Error/cause_property.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
@@ -12157,7 +13915,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/15.3.4.5-2-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/15.3.4.5-20-2.js
     expectedClassification: pass
@@ -12337,7 +14095,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/S15.3.4.5_A5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/bind/get-fn-realm-recursive.js
     expectedClassification: unsupported-profile-feature
@@ -16573,7 +18331,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Number/prototype/toString/S15.7.4.2_A4_T03.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/prototype/toString/S15.7.4.2_A4_T04.js
     expectedClassification: pass
@@ -16726,7 +18484,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Number/prototype/valueOf/S15.7.4.4_A2_T03.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Number/prototype/valueOf/S15.7.4.4_A2_T04.js
     expectedClassification: pass
@@ -16948,7 +18706,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/S15.2.2.1_A2_T5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/S15.2.2.1_A2_T6.js
     expectedClassification: pass
@@ -17203,7 +18961,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-110.js
     expectedClassification: pass
@@ -17230,7 +18988,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-118.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-119.js
     expectedClassification: pass
@@ -17311,7 +19069,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-143.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-144.js
     expectedClassification: pass
@@ -17401,7 +19159,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-171.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-172.js
     expectedClassification: pass
@@ -17482,7 +19240,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-197.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-198.js
     expectedClassification: pass
@@ -17566,7 +19324,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-222.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-223.js
     expectedClassification: pass
@@ -17650,7 +19408,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-249.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-25.js
     expectedClassification: pass
@@ -17761,7 +19519,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-285.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-286.js
     expectedClassification: pass
@@ -17797,7 +19555,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-297.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-298.js
     expectedClassification: pass
@@ -17869,7 +19627,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-34.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-35.js
     expectedClassification: pass
@@ -17971,7 +19729,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-65.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-66.js
     expectedClassification: pass
@@ -18052,7 +19810,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-90.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/create/15.2.3.5-4-91.js
     expectedClassification: pass
@@ -18127,7 +19885,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-12.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-2-13.js
     expectedClassification: pass
@@ -18205,7 +19963,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-13.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-a-14.js
     expectedClassification: pass
@@ -18259,7 +20017,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-103.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-104.js
     expectedClassification: pass
@@ -18349,7 +20107,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-131.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-132.js
     expectedClassification: pass
@@ -18430,7 +20188,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-157.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-158.js
     expectedClassification: pass
@@ -18511,7 +20269,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-182.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-183.js
     expectedClassification: pass
@@ -18604,7 +20362,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-210.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-211.js
     expectedClassification: pass
@@ -18709,7 +20467,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-245.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-246.js
     expectedClassification: pass
@@ -18724,7 +20482,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-25.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-252.js
     expectedClassification: pass
@@ -18838,7 +20596,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-50.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-51.js
     expectedClassification: pass
@@ -18925,7 +20683,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-78.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-5-b-79.js
     expectedClassification: pass
@@ -19261,7 +21019,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/15.2.3.7-6-a-180.js
     expectedClassification: pass
@@ -20221,7 +21979,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-117.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-118.js
     expectedClassification: pass
@@ -20326,10 +22084,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-145-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-145.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-146-1.js
     expectedClassification: pass
@@ -20443,10 +22201,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-171-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-171.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-172-1.js
     expectedClassification: pass
@@ -20536,7 +22294,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-196.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-197.js
     expectedClassification: pass
@@ -20647,10 +22405,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-224-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-224.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-225-1.js
     expectedClassification: pass
@@ -20770,10 +22528,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-254-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-254.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-255-1.js
     expectedClassification: pass
@@ -20869,10 +22627,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-39-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-39.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-4.js
     expectedClassification: pass
@@ -20965,7 +22723,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-64.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-65.js
     expectedClassification: pass
@@ -21073,10 +22831,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-92-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-92.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-3-93-1.js
     expectedClassification: pass
@@ -22258,7 +24016,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-39.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-390.js
     expectedClassification: pass
@@ -22267,7 +24025,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-392.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-393.js
     expectedClassification: pass
@@ -22315,7 +24073,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-408.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-409.js
     expectedClassification: pass
@@ -22333,13 +24091,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-413.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-414.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-415.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-416.js
     expectedClassification: pass
@@ -22981,7 +24739,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-584.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-585.js
     expectedClassification: pass
@@ -22996,7 +24754,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-589.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-59.js
     expectedClassification: pass
@@ -23005,7 +24763,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-591.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-592.js
     expectedClassification: pass
@@ -23110,13 +24868,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-622.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-623.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-624.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-4-625gs.js
     expectedClassification: pass
@@ -23557,7 +25315,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/15.2.3.9-2-d-6.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/15.2.3.9-2-d-7.js
     expectedClassification: pass
@@ -23926,151 +25684,151 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-114.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-115.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-116.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-117.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-118.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-120.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-121.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-122.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-123.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-124.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-125.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-126.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-127.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-128.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-129.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-130.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-131.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-132.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-133.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-134.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-135.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-136.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-138.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-139.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-14.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-140.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-141.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-142.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-143.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-144.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-145.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-146.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-147.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-148.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-149.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-15.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-150.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-151.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-152.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-153.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-154.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-156.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-157.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-158.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-159.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-16.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-160.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-161.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-162.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-163.js
     expectedClassification: pass
@@ -24217,7 +25975,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-210.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-211.js
     expectedClassification: pass
@@ -24862,7 +26620,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-25.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-26.js
     expectedClassification: pass
@@ -24898,7 +26656,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/15.2.3.2-2-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/getPrototypeOf/name.js
     expectedClassification: pass
@@ -25273,7 +27031,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-19.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-2.js
     expectedClassification: pass
@@ -25324,7 +27082,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/15.2.3.13-2-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isExtensible/name.js
     expectedClassification: pass
@@ -25432,10 +27190,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isFrozen/15.2.3.12-3-17.js
     expectedClassification: pass
@@ -25537,10 +27295,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-15.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-16.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/isSealed/15.2.3.11-4-17.js
     expectedClassification: pass
@@ -25753,7 +27511,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/15.2.3.14-6-5.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/keys/name.js
     expectedClassification: pass
@@ -25840,7 +27598,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-18.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-19.js
     expectedClassification: pass
@@ -25882,7 +27640,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/preventExtensions/15.2.3.10-3-9.js
     expectedClassification: pass
@@ -26281,7 +28039,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/Object.prototype.toString.call-date.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/Object.prototype.toString.call-error.js
     expectedClassification: pass
@@ -26494,7 +28252,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-o-is-a-date-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-o-is-a-function-object.js
     expectedClassification: pass
@@ -26545,7 +28303,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-p-is-own-property-of-a-date-object-that-uses-object-s-get-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/object-seal-p-is-own-property-of-a-function-object-that-uses-object-s-get-own-property.js
     expectedClassification: pass
@@ -26605,7 +28363,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-date.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-error.js
     expectedClassification: pass
@@ -28729,7 +30487,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/construct/newtarget-is-not-constructor-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/construct/not-a-constructor.js
     expectedClassification: pass
@@ -28741,7 +30499,7 @@ tests:
     expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/construct/target-is-not-constructor-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [reflect-namespace]
   - path: test/built-ins/Reflect/construct/use-arguments-list.js
     expectedClassification: pass
@@ -33142,7 +34900,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties, regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-non-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.split/species-ctor-species-undef.js
     expectedClassification: pass
@@ -46980,7 +48738,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/syntax.js
     expectedClassification: unsupported-profile-feature

@@ -1761,6 +1761,108 @@ test("populates the realm-owned DataView intrinsic cluster", () => {
   assert.match(bufferSource, /is_data_view\(arguments\[0\]\)/u);
 });
 
+test("populates the realm-owned Date intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const objectSource = sources.get("runtime_object_builtin.c") ?? "";
+  const primitiveSource = sources.get("runtime_primitive.c") ?? "";
+  const dateSource = sources.get("runtime_date.c") ?? "";
+
+  for (const intrinsic of ["DATE_PROTOTYPE", "DATE"]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic} =`, "u"));
+  }
+  for (const property of [
+    "Date",
+    "constructor",
+    "now",
+    "parse",
+    "UTC",
+    "getDate",
+    "getDay",
+    "getFullYear",
+    "getHours",
+    "getMilliseconds",
+    "getMinutes",
+    "getMonth",
+    "getSeconds",
+    "getTime",
+    "getTimezoneOffset",
+    "getUTCDate",
+    "getUTCDay",
+    "getUTCFullYear",
+    "getUTCHours",
+    "getUTCMilliseconds",
+    "getUTCMinutes",
+    "getUTCMonth",
+    "getUTCSeconds",
+    "setDate",
+    "setFullYear",
+    "setHours",
+    "setMilliseconds",
+    "setMinutes",
+    "setMonth",
+    "setSeconds",
+    "setTime",
+    "setUTCDate",
+    "setUTCFullYear",
+    "setUTCHours",
+    "setUTCMilliseconds",
+    "setUTCMinutes",
+    "setUTCMonth",
+    "setUTCSeconds",
+    "toDateString",
+    "toISOString",
+    "toJSON",
+    "toLocaleDateString",
+    "toLocaleString",
+    "toLocaleTimeString",
+    "toString",
+    "toTimeString",
+    "toUTCString",
+    "valueOf",
+    "[Symbol.toPrimitive]",
+  ]) {
+    assert.ok(
+      dateSource.includes(`"${property}"`),
+      `${property} needs an own-property definition`,
+    );
+  }
+  assert.match(dateSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(
+    dateSource,
+    /OseoFunction \*constructor = function_object\(frame\.slots\[1\]\)/u,
+  );
+  assert.match(dateSource, /constructor->prototype_writable = false/u);
+  assert.match(dateSource, /OSEO_WELL_KNOWN_TO_PRIMITIVE/u);
+  // A Date holds no heap reference of its own, so the collector traces it
+  // through the ordinary object path and nothing in the component frees.
+  assert.match(
+    memorySource,
+    new RegExp(String.raw`object->kind == OSEO_HEAP_DATE \|\|`, "u"),
+  );
+  assert.doesNotMatch(dateSource, /\bfree\s*\(/u);
+  // The realm's local time zone is UTC, and every LocalTime and UTC call
+  // routes through the one adjustment the later host adapter replaces.
+  assert.match(
+    dateSource,
+    /static double date_local_time_zone_adjustment\(void\) \{\s*return 0\.0;/u,
+  );
+  // The clock is read in exactly one place, and no other host facility
+  // reaches this component.
+  assert.equal(dateSource.match(/timespec_get\(/gu)?.length, 1);
+  assert.doesNotMatch(dateSource, /localtime|mktime|gmtime|tzset/u);
+  // Object.prototype.toString reports the Date builtinTag, the global
+  // property is installed from the binding record, and @@toPrimitive
+  // reaches OrdinaryToPrimitive without re-entering ToPrimitive.
+  assert.match(objectSource, /if \(is_date\(receiver\)\) return "Date";/u);
+  assert.match(internalHeader, /oseo_internal_install_date_global/u);
+  assert.match(bindingSource, /oseo_internal_install_date_global/u);
+  assert.match(primitiveSource, /oseo_internal_ordinary_to_primitive/u);
+  assert.match(dateSource, /oseo_internal_ordinary_to_primitive/u);
+});
+
 test("populates the realm-owned RegExp intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

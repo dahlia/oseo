@@ -784,4 +784,131 @@ setTimeout(task, delay);
     dataViewAllocation.stderr,
     /error\[OSEO2001\].*DataView allocation failed/u,
   );
+  // A Date owns no allocation beyond its own record, so a failed
+  // allocation there must report the owned OSEO2001 diagnostic and leave
+  // no partly built Date behind: the program prints nothing after the
+  // marker and exits nonzero.
+  const dateAllocationHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_date.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "OseoDate *date = oseo_internal_allocate_heap_bytes(" +
+          "context, sizeof(*date));",
+        "OseoDate *date = NULL;",
+      );
+      assert.notEqual(injected, source, "Date allocation failure injected");
+      return injected;
+    },
+  };
+  const dateAllocation = await runNativeCli(
+    {
+      args: ["date-allocation.ts"],
+      source: 'console.log("before");\nconsole.log(new Date(0).getTime());',
+      sourceId: "date-allocation.ts",
+      version: "0.1.0",
+    },
+    dateAllocationHost,
+  );
+  assert.equal(dateAllocation.exitStatus, 1);
+  assert.equal(dateAllocation.stdout, "before\n");
+  assert.match(
+    dateAllocation.stderr,
+    /error\[OSEO2001\].*Date allocation failed/u,
+  );
+
+  /*
+   * Four Date observations the reference hosts cannot answer for this
+   * profile, so they are native-only rather than differential fixtures.
+   *
+   * The three locale methods report the text of the operation they
+   * localize, because ECMA-402 is outside this claim while both
+   * reference hosts implement it. 21.4.3.2's non-normative
+   * recommendation that Date.parse recover a toString or toUTCString
+   * text holds for a negative year too, which both reference hosts
+   * decline. Clause 21.4.4 binds a setter's `t` to the receiver's
+   * [[DateValue]] before the argument conversions, so a conversion that
+   * stores a new time value into the same Date does not change the
+   * result; Deno agrees, while the pinned Node.js host rereads the slot,
+   * so the two references disagree and no differential fixture can hold
+   * the case. And Date()
+   * without new, Date.now(), and an argumentless construction read the
+   * host clock, whose value no fixed expectation can name; what is
+   * checked is that all three agree to the second and report a time
+   * value in the reviewed range.
+   */
+  const dateHostBoundaries = await runNativeCli(
+    {
+      args: ["date-host-boundaries.ts"],
+      source: `
+const value = new Date(-62198755200000);
+console.log(
+  "locale",
+  value.toLocaleString() === value.toString(),
+  value.toLocaleDateString() === value.toDateString(),
+  value.toLocaleTimeString() === value.toTimeString(),
+);
+console.log(
+  "negative year",
+  value.toString(),
+  Date.parse(value.toString()) === value.getTime(),
+  Date.parse(value.toUTCString()) === value.getTime(),
+  Date.parse(value.toISOString()) === value.getTime(),
+);
+const snapshot = new Date(0);
+const mutatingArgument = {
+  valueOf() {
+    snapshot.setTime(86400000 * 100);
+    return 5;
+  },
+};
+const snapshotReturn = snapshot.setUTCDate(mutatingArgument);
+const missing = new Date(NaN);
+const missingArgument = {
+  valueOf() {
+    missing.setTime(0);
+    return 5;
+  },
+};
+const missingReturn = missing.setUTCDate(missingArgument);
+console.log(
+  "snapshot",
+  snapshotReturn,
+  snapshot.getTime(),
+  missingReturn,
+  missing.getTime(),
+);
+const now = Date.now();
+const constructed = new Date().getTime();
+const called = Date.parse(Date());
+console.log(
+  "clock",
+  now === Math.trunc(now),
+  Math.abs(now) <= 8.64e15,
+  Math.abs(constructed - now) < 60000,
+  Math.abs(called - now) < 60000,
+  new Date(now).toISOString().length >= 24,
+);
+`,
+      sourceId: "date-host-boundaries.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(dateHostBoundaries.exitStatus, 0, dateHostBoundaries.stderr);
+  assert.equal(
+    dateHostBoundaries.stdout,
+    "locale true true true\n" +
+      "negative year Fri Jan 01 -0001 00:00:00 GMT+0000 " +
+      "(Coordinated Universal Time) true true true\n" +
+      "snapshot 345600000 345600000 NaN 0\n" +
+      "clock true true true true true\n",
+  );
+  assert.equal(dateHostBoundaries.stderr, "");
 }

@@ -103,9 +103,17 @@ const asyncHelpersHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/asyncHelpers.js",
 );
+const assertRelativeDateHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/assertRelativeDateMs.js",
+);
 const compareArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareArray.js",
+);
+const dateConstantsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/dateConstants.js",
 );
 const byteConversionHarnessPath = join(
   repositoryRoot,
@@ -1661,7 +1669,12 @@ async function readHarnesses(): Promise<Test262Harnesses> {
         "byteConversionValues.js",
         await readFile(byteConversionHarnessPath, "utf8"),
       ],
+      [
+        "assertRelativeDateMs.js",
+        await readFile(assertRelativeDateHarnessPath, "utf8"),
+      ],
       ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
+      ["dateConstants.js", await readFile(dateConstantsHarnessPath, "utf8")],
       [
         "compareIterator.js",
         await readFile(compareIteratorHarnessPath, "utf8"),

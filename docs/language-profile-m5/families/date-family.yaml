@@ -1,0 +1,148 @@
+version: 1
+id: date-family
+title: "Date constructor, statics, prototype, and time-value arithmetic"
+scope:
+  - "The `Date` constructor with both its call and its construct
+    behavior. Called without `new` it ignores every argument and returns
+    the current time as a String. Constructed with no argument it reads
+    the current time; with one argument it copies an existing Date's
+    `[[DateValue]]` without converting it, parses a String, and otherwise
+    runs `ToPrimitive` then `ToNumber`; with two or more it converts
+    every supplied component in order. Every conversion precedes the
+    `OrdinaryCreateFromConstructor` read of the new target's `prototype`,
+    and `MakeFullYear` maps a year from 0 through 99 into the twentieth
+    century."
+  - "The `now`, `parse`, and `UTC` statics with their names, lengths, and
+    descriptors, and `%Date.prototype%` as an ordinary object with no
+    `[[DateValue]]`, its `constructor` property, its forty-three named
+    methods, and its `[Symbol.toPrimitive]` method."
+  - "The eighteen getters, which report NaN for an invalid time value and
+    otherwise decompose the time value through `LocalTime` or directly,
+    and the fifteen setters. Each setter reads the receiver's
+    `[[DateValue]]` first, then converts its first parameter whether or
+    not the call supplied it and each supplied trailing parameter in
+    specification order. A year-first setter starts from +0 when that
+    snapshot is NaN; every other window leaves the slot untouched and
+    reports NaN. Every slot-reading method rejects a receiver without
+    `[[DateValue]]`, including `%Date.prototype%` itself."
+  - "Clause 21.4.4 binds `t` to the receiver's `[[DateValue]]` before
+    the argument conversions and uses that binding for the NaN test and
+    for every component the call does not supply, so a conversion that
+    stores a new time value into the same Date does not change the
+    result. Test262 pins that ordering in the
+    `date-value-read-before-tonumber-when-date-is-valid` and
+    `date-value-read-before-tonumber-when-date-is-invalid` files, which
+    pass. Deno agrees; the pinned Node.js host rereads the slot after the
+    conversions and answers differently, so the reviewed differential
+    corpus cannot compare the case and a direct native observation
+    records it instead."
+  - "The time-value arithmetic of 21.4.1: `Day`, `TimeWithinDay`,
+    `YearFromTime`, `MonthFromTime`, `DateFromTime`, `WeekDay`,
+    `HourFromTime`, `MinFromTime`, `SecFromTime`, `msFromTime`,
+    `MakeTime`, `MakeDay`, `MakeDate`, `TimeClip`, and `MakeFullYear`.
+    The calendar is exact integer era arithmetic over the proleptic
+    Gregorian year, so no intermediate leaves the exact range of the
+    representation, `TimeClip` reports NaN outside 100,000,000 days
+    either way from the epoch, and `TimeClip` of a negative fraction is
+    positive zero."
+  - "`Date.parse` over the Date Time String Format of 21.4.1.32,
+    including the date-only, date-time, and expanded-year forms, the `Z`
+    and offset representations, and the rejections that format requires:
+    `-000000` as an extended year, an hour of 24 with a nonzero minute,
+    second, or millisecond, an out-of-range component, and any trailing
+    text. It additionally recovers this realm's own `toString` and
+    `toUTCString` texts, including for a negative year, which is the
+    non-normative recommendation of 21.4.3.2. No other
+    implementation-defined text is accepted."
+  - "`toISOString`, which throws a `RangeError` for an invalid time
+    value; `toUTCString`; `toDateString`, `toTimeString`, and `toString`
+    over `DateString`, `TimeString`, and `TimeZoneString`; `toJSON`,
+    which is generic over an arbitrary object and invokes that object's
+    own `toISOString`; and `[Symbol.toPrimitive]`, which selects the hint
+    and reaches `OrdinaryToPrimitive` rather than re-entering
+    `ToPrimitive`. `Object.prototype.toString` reports the `Date` builtin
+    tag."
+  - "The realm's local time zone is UTC. `LocalTZA` is the constant +0,
+    so `LocalTime` and `UTC` are identities on a finite time value,
+    `getTimezoneOffset` reports +0, `TimeZoneString` is `+0000
+    (Coordinated Universal Time)`, and every local getter agrees with its
+    UTC counterpart. ECMA-262 leaves the local time zone to the host, so
+    this is a host choice rather than a gap in the claim; it is the
+    deliberate boundary PLAN-M5.md gives this landing, and the clock and
+    wakeup checkpoint in PLAN-NIO.md owns the adapter that replaces it.
+    The reviewed differential corpus therefore runs its reference hosts
+    in that zone, which makes the local-time observations differential
+    rather than machine-dependent."
+  - "The host clock is read in exactly one place, through C11's
+    `timespec_get` with a `time` fallback, and a host that answers
+    neither reports the owned non-catchable OSEO2001 diagnostic. That
+    read is the direct boundary PLAN-M5.md schedules for replacement by
+    the PLAN-NIO real-time capability. Because no fixed expectation can
+    name a current time, the evidence for `Date.now`, an argumentless
+    construction, and `Date()` is direct native observation that all
+    three agree to the second and report a time value in the reviewed
+    range."
+  - "ECMA-402 is outside the claim, so `toLocaleString`,
+    `toLocaleDateString`, and `toLocaleTimeString` report the text of the
+    operation each localizes. Both reference hosts implement ECMA-402, so
+    that delegation is direct native observation rather than a
+    reference-host comparison. Annex B's `getYear`, `setYear`, and
+    `toGMTString` stay outside the claim under ADR 0013 and are not
+    installed."
+  - "The only allocation these paths perform is the Date record and the
+    intrinsic cluster. A failed record allocation reports the owned
+    non-catchable OSEO2001 diagnostic without publishing a partly built
+    Date, which is Oseo's own resource boundary rather than a specified
+    one, so its evidence is direct native observation."
+  - "Realm creation beyond the initial realm, the primitive wrapper
+    prototype methods, and the `Boolean` intrinsic stay unadmitted, so
+    reviewed cases that require one of them retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/date-family.ts
+      - tests/property/m5-date-family.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/date-family.ts
+      - tests/native/scenarios/shard-0.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/date-family.ts
+      - tests/property/m5-date-family.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-date-family.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/date-family.ts
+      - tests/property/m5-date-family.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/date-family.ts
+      - tests/property/m5-date-family.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_date.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
