@@ -6262,12 +6262,19 @@ specialization enabled and disabled; collection forced at every safepoint; a
 false numeric hint; and an intentional shape-guard miss that reaches the
 generic fallback. The reference hosts run with the realm's own UTC local time
 zone, which makes those local-time observations differential rather than
-machine-dependent. Four observations stay native-only because the reference
+machine-dependent. Five observations stay native-only because the reference
 hosts cannot answer them for this profile: the locale delegation ECMA-402
 would replace, the negative-year `toString` round trip both hosts decline,
-the setter time-value snapshot Node.js rereads, and the clock reads no fixed
-expectation can name. A failed Date-record allocation reports the owned
-`OSEO2001` diagnostic without publishing a partly built Date.
+the setter time-value snapshot Node.js rereads, the clock reads no fixed
+expectation can name, and the `MakeTime` and `MakeDate` evaluation order,
+which has been observed to differ by machine: both hosts report the
+specified 34447360 on the x86\_64 host checked here, while the Node.js host
+on the macOS AArch64 continuous-integration machine reported 34448384, the
+answer a skipped rounding step produces. A reviewed Test262 path fixes the
+specified answer, so that case is a written expectation rather than a
+comparison that would demand Oseo reproduce a host divergence. A failed
+Date-record allocation reports the owned `OSEO2001` diagnostic without
+publishing a partly built Date.
 
 The inventory contains 586 included paths under *test/built-ins/Date/*. All
 586 are reviewed: 581 pass and five retain explicit realm-creation,

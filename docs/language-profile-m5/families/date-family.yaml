@@ -50,7 +50,14 @@ scope:
     the sum that follows it. The component pins C11 floating-point
     contraction off, which keeps that true on a target whose baseline
     has a fused multiply-add and would otherwise be free to skip a
-    rounding step."
+    rounding step. Which answer a reference host gives has been observed
+    to differ by machine: both report the specified 34447360 on the
+    `x86_64` host checked here, while the Node.js host on the macOS
+    AArch64 continuous-integration machine reported 34448384, the answer
+    a skipped rounding step produces. A reviewed Test262 path fixes the
+    specified answer, so the evidence is a written native expectation
+    rather than a host comparison, alongside a cross-target check that
+    the emitted arithmetic stays unfused."
   - "`Date.parse` over the Date Time String Format of 21.4.1.32,
     including the date-only, date-time, and expanded-year forms, the `Z`
     and offset representations, and the rejections that format requires:
