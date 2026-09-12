@@ -889,7 +889,7 @@ setTimeout(task, delay);
   );
 
   /*
-   * Four Date observations the reference hosts cannot answer for this
+   * Five Date observations the reference hosts cannot answer for this
    * profile, so they are native-only rather than differential fixtures.
    *
    * The three locale methods report the text of the operation they
@@ -907,6 +907,22 @@ setTimeout(task, delay);
    * host clock, whose value no fixed expectation can name; what is
    * checked is that all three agree to the second and report a time
    * value in the reviewed range.
+   *
+   * The fifth is the MakeTime and MakeDate evaluation order that
+   * test/built-ins/Date/UTC/fp-evaluation-order.js pins. 21.4.1.11 and
+   * 21.4.1.13 specify that arithmetic as IEEE 754-2019 operations in a
+   * fixed order, so each product rounds to a double before it reaches
+   * the sum that follows it, and the second call reports 34447360.
+   * Which answer a reference host gives has been observed to differ by
+   * machine: both hosts agree with that value on the x86_64 host
+   * checked here, while the Node.js host on the macOS AArch64
+   * continuous-integration machine reported 34448384, which is what
+   * contracting the day product into the sum of MakeDate would produce.
+   * A reviewed Test262 path fixes the specified answer for Oseo, so a
+   * differential fixture here would demand that Oseo reproduce a host
+   * divergence the standard forbids. The expectation is therefore
+   * written out, and the cross-target check above keeps the emitted
+   * arithmetic unfused on every configured target.
    */
   const dateHostBoundaries = await runNativeCli(
     {
@@ -960,6 +976,11 @@ console.log(
   Math.abs(called - now) < 60000,
   new Date(now).toISOString().length >= 24,
 );
+console.log(
+  "fp evaluation order",
+  Date.UTC(1970, 0, 1, 80063993375, 29, 1, -288230376151711740),
+  Date.UTC(1970, 0, 213503982336, 0, 0, 0, -18446744073709552000),
+);
 `,
       sourceId: "date-host-boundaries.ts",
       version: "0.1.0",
@@ -973,7 +994,8 @@ console.log(
       "negative year Fri Jan 01 -0001 00:00:00 GMT+0000 " +
       "(Coordinated Universal Time) true true true\n" +
       "snapshot 345600000 345600000 NaN 0\n" +
-      "clock true true true true true\n",
+      "clock true true true true true\n" +
+      "fp evaluation order 29312 34447360\n",
   );
   assert.equal(dateHostBoundaries.stderr, "");
 }
