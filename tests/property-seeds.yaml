@@ -416,3 +416,7 @@ families:
     owner: tests/property/m5-iterator-helpers-eager.property.test.ts
     start: 0x60006700
     end: 0x600067ff
+  - family: m5-date-family
+    owner: tests/property/m5-date-family.property.test.ts
+    start: 0x60006800
+    end: 0x600068ff

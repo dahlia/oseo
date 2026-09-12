@@ -195,6 +195,7 @@ static const char *object_builtin_tag(OseoValue receiver) {
         if (is_symbol(primitive)) return "Symbol";
         if (tag_of(primitive) == OSEO_TAG_BOOLEAN) return "Boolean";
     }
+    if (is_date(receiver)) return "Date";
     if (is_string(receiver)) return "String";
     if (is_symbol(receiver)) return "Symbol";
     if (is_number(receiver)) return "Number";

@@ -36,6 +36,7 @@ import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
+import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
@@ -118,6 +119,16 @@ if (nativeArguments.help) {
   process.exit(0);
 }
 
+/*
+ * Oseo's realm reports UTC as its local time zone until the PLAN-NIO clock
+ * and wakeup checkpoint supplies a host one. Both reference commands
+ * inherit this process's environment, so pinning it here makes every
+ * local-time observation a real differential comparison rather than one
+ * that depends on the developer machine's zone; the compiled program
+ * ignores the variable.
+ */
+process.env.TZ = "UTC";
+
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -169,6 +180,7 @@ const fixtures: readonly Fixture[] = [
   ...bigintFixtures,
   ...bigintIntrinsicFixtures,
   ...dataViewFixtures,
+  ...dateFamilyFixtures,
   ...expressionFixtures,
   ...genericStringCoercionFixtures,
   ...receiverFixtures,
@@ -668,6 +680,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "date-family" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
@@ -920,6 +933,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "data-view" ||
+    fixture.name === "date-family" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
@@ -1002,6 +1016,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
+            fixture.name === "date-family" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||
@@ -1251,10 +1266,12 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the eleven standard-object
-            // and value-property allocations plus twenty-eight admitted
+            // and value-property allocations plus twenty-nine admitted
             // standard global property names shared by every Script, with
-            // Proxy adding one allocation in each group.
-            assert.equal(native.counters.allocations, 45);
+            // Proxy adding one allocation in each group and Date adding
+            // only the property name, because the observation excludes
+            // the allocations of its intrinsic cluster build.
+            assert.equal(native.counters.allocations, 46);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

@@ -72,6 +72,7 @@ static void trace_object(
                object->kind == OSEO_HEAP_MAP ||
                object->kind == OSEO_HEAP_MAP_ITERATOR ||
                object->kind == OSEO_HEAP_DATA_VIEW ||
+               object->kind == OSEO_HEAP_DATE ||
                object->kind == OSEO_HEAP_REGEXP ||
                object->kind == OSEO_HEAP_ITERATOR_HELPER ||
                object->kind == OSEO_HEAP_PROXY) {
@@ -227,6 +228,7 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_MAP ||
         object->kind == OSEO_HEAP_MAP_ITERATOR ||
         object->kind == OSEO_HEAP_DATA_VIEW ||
+        object->kind == OSEO_HEAP_DATE ||
         object->kind == OSEO_HEAP_REGEXP ||
         object->kind == OSEO_HEAP_ITERATOR_HELPER ||
         object->kind == OSEO_HEAP_PROXY) {

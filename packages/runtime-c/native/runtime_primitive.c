@@ -919,13 +919,12 @@ static OseoResult default_array_text(
  * conversion, which honors a user `join` and shares this call's cycle
  * stack.
  */
-static OseoResult to_primitive_value(
+static OseoResult ordinary_to_primitive_value(
     OseoContext *context,
     OseoValue value,
     OseoToPrimitiveHint hint,
     const ConversionAncestor *previous
 ) {
-    if (!is_object(value)) return normal(value);
     static const uint16_t to_string_units[] = {
         't', 'o', 'S', 't', 'r', 'i', 'n', 'g'
     };
@@ -944,65 +943,6 @@ static OseoResult to_primitive_value(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = value;
     bool converted = false;
-    /*
-     * A Symbol.toPrimitive method can exist only after the program has
-     * touched the Symbol intrinsic, so an untouched intrinsic skips
-     * the dispatch without creating it.
-     */
-    OseoValue exotic_key =
-        context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
-    if (tag_of(exotic_key) != OSEO_TAG_UNDEFINED) {
-        result = oseo_object_get(context, frame.slots[0], exotic_key);
-        frame.slots[2] = result.value;
-        if (result.status != OSEO_STATUS_NORMAL) {
-            oseo_roots_release(context, &frame);
-            return result;
-        }
-        if (!is_nullish(frame.slots[2])) {
-            if (!is_callable(frame.slots[2])) {
-                result = oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "The Symbol.toPrimitive method is not callable."
-                );
-                oseo_roots_release(context, &frame);
-                return result;
-            }
-            const char *hint_name =
-                hint == OSEO_TO_PRIMITIVE_STRING
-                    ? "string"
-                    : hint == OSEO_TO_PRIMITIVE_DEFAULT
-                        ? "default"
-                        : "number";
-            size_t hint_length = strlen(hint_name);
-            uint16_t hint_units[8];
-            for (size_t unit = 0u; unit < hint_length; unit += 1u) {
-                hint_units[unit] = (uint16_t)(unsigned char)hint_name[unit];
-            }
-            result = oseo_string_from_units(context, hint_units, hint_length);
-            frame.slots[1] = result.value;
-            if (result.status == OSEO_STATUS_NORMAL) {
-                result = oseo_call_function(
-                    context,
-                    frame.slots[2],
-                    frame.slots[0],
-                    1u,
-                    &frame.slots[1],
-                    oseo_undefined()
-                );
-            }
-            if (result.status == OSEO_STATUS_NORMAL &&
-                is_object(result.value)) {
-                result = oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "Cannot convert an object to a primitive value."
-                );
-            }
-            oseo_roots_release(context, &frame);
-            return result;
-        }
-    }
     for (size_t index = 0u; index < 2u; index += 1u) {
         bool trying_to_string = names[index] == to_string_units;
         result = oseo_string_from_units(
@@ -1058,6 +998,90 @@ static OseoResult to_primitive_value(
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+/*
+ * ToPrimitive (7.1.1) over OrdinaryToPrimitive: @@toPrimitive is
+ * dispatched first, and everything else is the ordinary conversion.
+ */
+static OseoResult to_primitive_value(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint,
+    const ConversionAncestor *previous
+) {
+    if (!is_object(value)) return normal(value);
+    /*
+     * A Symbol.toPrimitive method can exist only after the program has
+     * touched the Symbol intrinsic, so an untouched intrinsic skips
+     * the dispatch without creating it.
+     */
+    OseoValue exotic_key =
+        context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
+    if (tag_of(exotic_key) == OSEO_TAG_UNDEFINED) {
+        return ordinary_to_primitive_value(context, value, hint, previous);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    result = oseo_object_get(context, frame.slots[0], exotic_key);
+    frame.slots[2] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (is_nullish(frame.slots[2])) {
+        oseo_roots_release(context, &frame);
+        return ordinary_to_primitive_value(context, value, hint, previous);
+    }
+    if (!is_callable(frame.slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The Symbol.toPrimitive method is not callable."
+        );
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    const char *hint_name = hint == OSEO_TO_PRIMITIVE_STRING
+        ? "string"
+        : hint == OSEO_TO_PRIMITIVE_DEFAULT ? "default" : "number";
+    size_t hint_length = strlen(hint_name);
+    uint16_t hint_units[8];
+    for (size_t unit = 0u; unit < hint_length; unit += 1u) {
+        hint_units[unit] = (uint16_t)(unsigned char)hint_name[unit];
+    }
+    result = oseo_string_from_units(context, hint_units, hint_length);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            1u,
+            &frame.slots[1],
+            oseo_undefined()
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_object(result.value)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert an object to a primitive value."
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_ordinary_to_primitive(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint
+) {
+    if (!is_object(value)) return normal(value);
+    return ordinary_to_primitive_value(context, value, hint, NULL);
 }
 
 OseoResult oseo_internal_to_primitive(

@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-seven reviewed assets in this order:
+The runtime input now lists thirty-eight reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -30,6 +30,7 @@ The runtime input now lists thirty-seven reviewed assets in this order:
 *runtime\_primitive.c*, *runtime\_promise.c*,
 *runtime\_event\_loop.c*, *runtime\_map.c*,
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
+*runtime\_date.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
 *runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*, and
@@ -40,8 +41,8 @@ component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
-RegExp-symbol-methods, URI-handling-functions, and
-Reflect-namespace and Proxy-exotic-object units each
+RegExp-symbol-methods, URI-handling-functions,
+Reflect-namespace, Proxy-exotic-object, and Date-family units each
 added one
 component the same
 way. The M5b
@@ -233,7 +234,16 @@ Ownership follows the plan's target layout:
     `RawBytesToNumeric` conversions and byte-order handling. It owns no
     Data Block: it holds only its buffer's value, rereads that buffer's
     pointer, byte length, and detached state on every access, and never
-    allocates, resizes, or releases a block.
+    allocates, resizes, or releases a block;
+ -  *runtime\_date.c*: the `%Date%` intrinsic with its call and
+    construct behavior, the `now`, `parse`, and `UTC` statics,
+    `%Date.prototype%` with its forty-four own methods, and the
+    time-value arithmetic of 21.4.1, including the Date Time String
+    Format parser and the `ToDateString`, `toUTCString`, and
+    `toISOString` writers. It is the one component that reads the host
+    clock, through a single `timespec_get` call with a `time` fallback,
+    and its `LocalTZA` is the constant +0 that the later host time-zone
+    adapter replaces.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
@@ -309,8 +319,8 @@ one.
 
 ### Internal helpers
 
-One hundred and seventy helpers cross a translation-unit
-boundary. Each uses
+One hundred and seventy-eight helpers cross a
+translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -382,6 +392,10 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_data_view_builtin_dispatch`          | *runtime\_data\_view.c*       |
 | `oseo_internal_data_view_intrinsic`                 | *runtime\_data\_view.c*       |
 | `oseo_internal_install_data_view_global`            | *runtime\_data\_view.c*       |
+| `oseo_internal_date_builtin_dispatch`               | *runtime\_date.c*             |
+| `oseo_internal_date_intrinsic`                      | *runtime\_date.c*             |
+| `oseo_internal_install_date_global`                 | *runtime\_date.c*             |
+| `oseo_internal_ordinary_to_primitive`               | *runtime\_primitive.c*        |
 | `oseo_internal_is_regexp`                           | *runtime\_regexp.c*           |
 | `oseo_internal_regexp_builtin_dispatch`             | *runtime\_regexp.c*           |
 | `oseo_internal_regexp_intrinsic`                    | *runtime\_regexp.c*           |

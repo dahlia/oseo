@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 116
+M5a is complete. The normative family records described below inventory 117
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 17,743 reviewed cases: 14,019 passes, 1,556
-expected negatives, and 2,168 unsupported profile features. It records no
+The current manifest contains 18,329 reviewed cases: 14,743 passes, 1,556
+expected negatives, and 2,030 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6163,6 +6163,121 @@ existing iterator range without adding a heap kind, a generated-code entry
 point, or a change to the graph's orchestration state.
 
 
+Date family
+-----------
+
+M5b node `date-family` admits the `Date` constructor, its `now`, `parse`,
+and `UTC` statics, `%Date.prototype%` with its forty-four own methods, and
+the time-value arithmetic of 21.4.1. `Date` is a constructible built-in the
+global object binds as a writable, non-enumerable, configurable property.
+Called without `new` it ignores every argument and returns the current time
+as a String. Constructed with no argument it reads the current time; with
+one argument it copies an existing Date's `[[DateValue]]` without converting
+it, parses a String, and otherwise runs `ToPrimitive` then `ToNumber`; with
+two or more it converts every supplied component in specification order.
+Every conversion precedes the `OrdinaryCreateFromConstructor` read of the new
+target's `prototype`, and `MakeFullYear` maps a year from 0 through 99 into
+the twentieth century. `%Date.prototype%` is an ordinary object with no
+`[[DateValue]]`, so every slot-reading method rejects it.
+
+The eighteen getters report NaN for an invalid time value and otherwise
+decompose the time value. Each of the fifteen setters reads the receiver's
+`[[DateValue]]` first, then converts its first parameter whether or not the
+call supplied it and each supplied trailing parameter in order; a year-first
+setter starts from +0 when that snapshot is NaN, and every other window
+leaves the slot untouched and reports NaN.
+
+Clause 21.4.4 binds `t` to the receiver's `[[DateValue]]` before the argument
+conversions and uses that binding for the NaN test and for every component
+the call does not supply, so a conversion that stores a new time value into
+the same Date does not change the result. Test262 pins that ordering in the
+`date-value-read-before-tonumber-when-date-is-valid` and
+`date-value-read-before-tonumber-when-date-is-invalid` files, which pass.
+Deno agrees; the pinned Node.js host rereads the slot after the conversions
+and answers differently, so the reviewed differential corpus cannot compare
+the case and a direct native observation records it instead. `Day`,
+`TimeWithinDay`, `YearFromTime`, `MonthFromTime`, `DateFromTime`, `WeekDay`,
+`HourFromTime`, `MinFromTime`, `SecFromTime`, `msFromTime`, `MakeTime`,
+`MakeDay`, `MakeDate`, `TimeClip`, and `MakeFullYear` are exact integer era
+arithmetic over the proleptic Gregorian year, so no intermediate leaves the
+exact range of the representation, `TimeClip` reports NaN outside 100,000,000
+days either way from the epoch, and `TimeClip` of a negative fraction is
+positive zero.
+
+`Date.parse` accepts the Date Time String Format of 21.4.1.32, including the
+date-only, date-time, and expanded-year forms and the `Z` and offset
+representations, and rejects `-000000` as an extended year, an hour of 24
+with a nonzero minute, second, or millisecond, an out-of-range component, and
+any trailing text. It additionally recovers this realm's own `toString` and
+`toUTCString` texts, including for a negative year, which is the
+non-normative recommendation of 21.4.3.2; no other implementation-defined
+text is accepted. `toISOString` throws a `RangeError` for an invalid time
+value, `toJSON` is generic over an arbitrary object and invokes that object's
+own `toISOString`, and `[Symbol.toPrimitive]` selects the hint and reaches
+`OrdinaryToPrimitive` rather than re-entering `ToPrimitive`.
+`Object.prototype.toString` reports the `Date` builtin tag.
+
+The realm's local time zone is UTC. `LocalTZA` is the constant +0, so
+`LocalTime` and `UTC` are identities on a finite time value,
+`getTimezoneOffset` reports +0, `TimeZoneString` is
+`+0000 (Coordinated Universal Time)`, and every local getter agrees with its
+UTC counterpart. ECMA-262 leaves the local time zone to the host, so this is a
+host choice rather than a gap inside the claim. It is the deliberate boundary
+[*PLAN-M5.md*](../PLAN-M5.md) gives this landing: the clock and wakeup
+checkpoint in [*PLAN-NIO.md*](../PLAN-NIO.md) owns the host time-zone and
+real-time adapter, and a later integration unit replaces both boundaries at
+once. The host clock is read in exactly one place, through C11's `timespec_get`
+with a `time` fallback, and a host that answers neither reports the owned
+non-catchable `OSEO2001` diagnostic. ECMA-402 is outside the claim, so
+`toLocaleString`, `toLocaleDateString`, and `toLocaleTimeString` report the
+text of the operation each localizes, and Annex B's `getYear`, `setYear`, and
+`toGMTString` stay outside the claim under
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md) and are not installed.
+
+The runtime represents a Date as a collector-traced ordinary object carrying
+one time value and no heap reference of its own. *runtime\_date.c* owns the
+constructor, the statics, every prototype method, the calendar arithmetic,
+the parser, and the three text writers, and it has its own fixed built-in
+code range. `ToPrimitive` on a Date reaches `OrdinaryToPrimitive` through the
+shared conversion *runtime\_primitive.c* now exports. The runtime ABI
+advances to `oseo-runtime-m5-101`; no dynamic-source entry point or
+generated-code ABI is added.
+
+Fixed native and generated differential evidence at property seed
+`0x60006800` covers every component of a time value at the epoch, at both
+ends of the reviewed range, and around the day, year, and leap-day edges; the
+ISO, `toString`, and `toUTCString` texts and their round trips; the
+seven-argument constructor and `Date.UTC` including the two-digit year
+window, carrying components, and the first value past each end of the range;
+every setter over a valid and an invalid receiver with its conversion order
+preserved; the format's acceptances and rejections; `@@toPrimitive` and every
+ordinary coercion; the receiver rejections; subclass construction;
+specialization enabled and disabled; collection forced at every safepoint; a
+false numeric hint; and an intentional shape-guard miss that reaches the
+generic fallback. The reference hosts run with the realm's own UTC local time
+zone, which makes those local-time observations differential rather than
+machine-dependent. Four observations stay native-only because the reference
+hosts cannot answer them for this profile: the locale delegation ECMA-402
+would replace, the negative-year `toString` round trip both hosts decline,
+the setter time-value snapshot Node.js rereads, and the clock reads no fixed
+expectation can name. A failed Date-record allocation reports the owned
+`OSEO2001` diagnostic without publishing a partly built Date.
+
+The inventory contains 586 included paths under *test/built-ins/Date/*. All
+586 are reviewed: 581 pass and five retain explicit realm-creation,
+primitive-wrapper-prototype, and `Boolean` boundaries. The reviewed Test262
+manifest grows from 17,743 to 18,329 paths and additionally promotes 143
+dependent paths outside that root, every one of them a case that reached an
+admitted contract only through a `Date` value, so the manifest moves from
+14,019 to 14,743 passes and from 2,168 to 2,030 unsupported profile features
+while keeping 1,556 expected negatives and zero semantic, harness, or
+infrastructure failures. The property ratchet moves from 135 to 136 domains
+and seeds and from 5,518 to 5,530 ordinary cases. The normative family index
+moves from 116 to 117 records. The suite revision, 41,091-path inventory,
+manifest schema, classification vocabulary, and zero-override policy remain
+unchanged.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6252,9 +6367,10 @@ complete. The remaining gaps retain their existing owners.
     does not admit the separate language surface. Owner: the intrinsics and
     built-in objects stream.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
-    and constructible `Object` value, primitive wrappers, and the
-    `ArrayBuffer` constructor with its Data Block, and `DataView` over that
-    block. The remaining standard
+    and constructible `Object` value, primitive wrappers, the
+    `ArrayBuffer` constructor with its Data Block, `DataView` over that
+    block, and the `Date` constructor with its statics and prototype. The
+    remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
     `ArrayBuffer.isView` reports `true` for a `DataView` and `false` for
     every other value this profile can produce; the node that admits a
