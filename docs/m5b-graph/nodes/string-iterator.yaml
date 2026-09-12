@@ -12,5 +12,5 @@ inventory:
 dependencies:
   - string-intrinsic
   - well-known-symbols
-landed: false
+landed: true
 status: ready
