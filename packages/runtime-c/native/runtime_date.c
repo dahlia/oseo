@@ -20,6 +20,20 @@
  * `date_current_time_value` alone.
  */
 
+/*
+ * 21.4.1.11 and 21.4.1.13 specify MakeTime and MakeDate as IEEE 754-2019
+ * arithmetic in a fixed order, so every product must round to a double
+ * before it reaches the sum that follows it. A contracted multiply-add
+ * skips that rounding, which changes the answer: on a target whose
+ * baseline has a fused multiply-add, C11 leaves the compiler free to
+ * contract `day * msPerDay + time`, and
+ * `Date.UTC(1970, 0, 213503982336, 0, 0, 0, -18446744073709552000)` then
+ * reports 34448384 rather than the specified 34447360. Pinning
+ * contraction off for this component makes every step round where the
+ * specification says it rounds, on every target.
+ */
+#pragma STDC FP_CONTRACT OFF
+
 #define OSEO_MS_PER_SECOND 1000.0
 #define OSEO_MS_PER_MINUTE 60000.0
 #define OSEO_MS_PER_HOUR 3600000.0
