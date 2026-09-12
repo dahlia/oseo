@@ -6195,14 +6195,20 @@ the same Date does not change the result. Test262 pins that ordering in the
 `date-value-read-before-tonumber-when-date-is-invalid` files, which pass.
 Deno agrees; the pinned Node.js host rereads the slot after the conversions
 and answers differently, so the reviewed differential corpus cannot compare
-the case and a direct native observation records it instead. `Day`,
-`TimeWithinDay`, `YearFromTime`, `MonthFromTime`, `DateFromTime`, `WeekDay`,
-`HourFromTime`, `MinFromTime`, `SecFromTime`, `msFromTime`, `MakeTime`,
-`MakeDay`, `MakeDate`, `TimeClip`, and `MakeFullYear` are exact integer era
-arithmetic over the proleptic Gregorian year, so no intermediate leaves the
-exact range of the representation, `TimeClip` reports NaN outside 100,000,000
-days either way from the epoch, and `TimeClip` of a negative fraction is
-positive zero.
+the case and a direct native observation records it instead. The time-value
+arithmetic covers `Day`, `TimeWithinDay`, `YearFromTime`, `MonthFromTime`,
+`DateFromTime`, `WeekDay`, `HourFromTime`, `MinFromTime`, `SecFromTime`,
+`msFromTime`, `MakeTime`, `MakeDay`, `MakeDate`, `TimeClip`, and
+`MakeFullYear`. The calendar is exact integer era arithmetic over the
+proleptic Gregorian year, so no intermediate leaves the exact range of the
+representation, `TimeClip` reports NaN outside 100,000,000 days either way
+from the epoch, and `TimeClip` of a negative fraction is positive zero.
+`MakeTime` and `MakeDate` are by contrast the IEEE 754-2019 operations
+21.4.1.11 and 21.4.1.13 name, in the order they name them, so each product
+rounds to a double before it reaches the sum that follows it. The
+component pins C11 floating-point contraction off, which keeps that true on a
+target whose baseline has a fused multiply-add and would otherwise be free to
+skip a rounding step.
 
 `Date.parse` accepts the Date Time String Format of 21.4.1.32, including the
 date-only, date-time, and expanded-year forms and the `Z` and offset

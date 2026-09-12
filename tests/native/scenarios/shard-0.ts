@@ -189,6 +189,71 @@ export async function runNativeScenario0(
     }
   }
 
+  // 21.4.1.11 and 21.4.1.13 specify MakeTime and MakeDate as IEEE 754-2019
+  // arithmetic in a fixed order, so each product rounds to a double before
+  // it reaches the sum that follows it. C11 otherwise lets a compiler
+  // contract a multiply-add and skip that rounding, which on an AArch64
+  // baseline changes
+  // `Date.UTC(1970, 0, 213503982336, 0, 0, 0, -18446744073709552000)` from
+  // the specified 34447360 to 34448384. The component pins contraction
+  // off, so no target may emit a fused multiply-add for it.
+  {
+    const dateSource = cRuntimeProvider
+      .getRuntimeInput()
+      .assets.find((asset) => asset.name === "runtime_date.c");
+    assert(dateSource != null, "Date runtime component");
+    const internalHeader = cRuntimeProvider
+      .getRuntimeInput()
+      .assets.find((asset) => asset.name === "runtime_internal.h");
+    assert(internalHeader != null, "internal runtime header");
+    const publicHeader = cRuntimeProvider
+      .getRuntimeInput()
+      .assets.find((asset) => asset.name === "oseo_runtime.h");
+    assert(publicHeader != null, "public runtime header");
+    for (const [target, zigTarget] of [
+      ["linux-x86_64-gnu", "x86_64-linux-gnu"],
+      ["macos-aarch64", "aarch64-macos"],
+      ["linux-aarch64-musl", "aarch64-linux-musl"],
+    ] as const) {
+      const directory = await host.makeTemporaryDirectory("oseo-date-fp-");
+      try {
+        for (const asset of [publicHeader, internalHeader, dateSource]) {
+          await host.writeTextFile(
+            `${directory}/${asset.name}`,
+            await host.readTextFile(asset.url),
+          );
+        }
+        const assemblyPath = `${directory}/runtime_date.s`;
+        const assembly = await host.run({
+          args: [
+            "cc",
+            "-target",
+            zigTarget,
+            "-std=c11",
+            "-O2",
+            "-S",
+            "-I",
+            directory,
+            `${directory}/runtime_date.c`,
+            "-o",
+            assemblyPath,
+          ],
+          command: "zig",
+          cwd: directory,
+        });
+        assert.equal(assembly.exitStatus, 0, assembly.stderr);
+        const text = await host.readTextFile(assemblyPath);
+        assert.doesNotMatch(
+          text,
+          /\b(?:f(?:n?madd|n?msub|mla|mls)|vf(?:n?madd|n?msub))[a-z0-9.]*\s/u,
+          `${target}: Date arithmetic keeps every rounding step`,
+        );
+      } finally {
+        await host.remove(directory);
+      }
+    }
+  }
+
   const recursiveCompilation = compileSource(babelFrontend, {
     source: "function recurse() { return recurse(); } recurse();",
     sourceId: "recursive-compile-only.ts",

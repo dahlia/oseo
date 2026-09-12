@@ -203,6 +203,18 @@ for (let index = 0; index < componentCases.length; index = index + 1) {
   );
 }
 console.log("utc defaults", Date.UTC(1970), Date.UTC(NaN));
+
+// MakeTime and MakeDate are IEEE 754-2019 arithmetic in a fixed order, so
+// each product rounds to a double before it reaches the sum that follows
+// it. A target whose baseline has a fused multiply-add may contract the
+// day product into the sum of MakeDate and skip that rounding, which
+// changes the second answer to 34448384. These are the two observations
+// test/built-ins/Date/UTC/fp-evaluation-order.js pins.
+console.log(
+  "fp evaluation order",
+  Date.UTC(1970, 0, 1, 80063993375, 29, 1, -288230376151711740),
+  Date.UTC(1970, 0, 213503982336, 0, 0, 0, -18446744073709552000),
+);
 console.log(
   "nonfinite",
   new Date(NaN).getTime(),
