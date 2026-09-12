@@ -92,6 +92,8 @@ const { numberPrototypeFixtures } =
   await import("./native/fixtures/number-prototype.ts");
 const { stringPrototypeReplaceFixtures } =
   await import("./native/fixtures/string-prototype-replace.ts");
+const { stringIteratorFixtures } =
+  await import("./native/fixtures/string-iterator.ts");
 const { genericStringCoercionFixtures } =
   await import("./native/fixtures/generic-string-coercion.ts");
 const { mathNamespaceFixtures } =
@@ -204,6 +206,7 @@ const fixtures: readonly Fixture[] = [
   ...stringPrototypeCaseFixtures,
   ...stringPrototypeMatchAndSplitFixtures,
   ...stringPrototypeReplaceFixtures,
+  ...stringIteratorFixtures,
   ...numberPrototypeFixtures,
   ...mathNamespaceFixtures,
   ...uriHandlingFunctionFixtures,
@@ -715,6 +718,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
+    fixture.name === "string-iterator" ||
     fixture.name === "generic-string-coercion" ||
     fixture.name === "function-intrinsic-chains" ||
     fixture.name === "number-prototype"
@@ -916,6 +920,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
+    fixture.name === "string-iterator" ||
     fixture.name === "generic-string-coercion" ||
     fixture.name === "number-prototype" ||
     fixture.name === "array-prototype-species-mapping" ||
@@ -1043,6 +1048,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-prototype-search-and-slice" ||
             fixture.name === "string-prototype-match-and-split" ||
             fixture.name === "string-prototype-replace" ||
+            fixture.name === "string-iterator" ||
             fixture.name === "generic-string-coercion" ||
             fixture.name === "number-prototype"
           ) {
@@ -1058,6 +1064,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||
+                fixture.name === "string-iterator" ||
                 fixture.name === "iterator-helpers-eager" ||
                 fixture.name === "iterator-helpers-lazy" ||
                 fixture.name === "map-intrinsic" ||

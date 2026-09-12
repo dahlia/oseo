@@ -92,8 +92,8 @@ static void initialize_ordinary(
     object->virtual_string_iterator_configurable = false;
     object->virtual_string_iterator_enumerable = false;
     object->virtual_string_iterator_writable = false;
-    object->array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    object->iterator_array = oseo_undefined();
+    object->iterator_kind = OSEO_ITERATOR_NONE;
+    object->iterator_target = oseo_undefined();
     object->iterator_index = 0u;
     object->regexp_string_iterator = false;
     object->regexp_iterator_regexp = oseo_undefined();

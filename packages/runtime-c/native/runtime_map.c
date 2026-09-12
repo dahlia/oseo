@@ -134,8 +134,8 @@ static OseoResult map_allocate(
     map->ordinary.virtual_string_iterator_configurable = false;
     map->ordinary.virtual_string_iterator_enumerable = false;
     map->ordinary.virtual_string_iterator_writable = false;
-    map->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    map->ordinary.iterator_array = oseo_undefined();
+    map->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    map->ordinary.iterator_target = oseo_undefined();
     map->ordinary.iterator_index = 0u;
     map->ordinary.regexp_string_iterator = false;
     map->ordinary.regexp_iterator_regexp = oseo_undefined();
@@ -751,8 +751,8 @@ static OseoResult map_create_iterator(
     iterator->ordinary.virtual_string_iterator_configurable = false;
     iterator->ordinary.virtual_string_iterator_enumerable = false;
     iterator->ordinary.virtual_string_iterator_writable = false;
-    iterator->ordinary.array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    iterator->ordinary.iterator_array = oseo_undefined();
+    iterator->ordinary.iterator_kind = OSEO_ITERATOR_NONE;
+    iterator->ordinary.iterator_target = oseo_undefined();
     iterator->ordinary.iterator_index = 0u;
     iterator->ordinary.regexp_string_iterator = false;
     iterator->ordinary.regexp_iterator_regexp = oseo_undefined();

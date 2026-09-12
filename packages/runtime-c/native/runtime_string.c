@@ -2020,6 +2020,29 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_method(
+            context,
+            OSEO_STRING_PROTOTYPE_ITERATOR_CODE_ID
+        );
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = create_string_function(
             context,
             OSEO_STRING_CONSTRUCTOR_CODE_ID,
@@ -2086,6 +2109,8 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
              index += 1u) {
             context->intrinsics[index] = oseo_undefined();
         }
+        context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE_ITERATOR] =
+            oseo_undefined();
     } else if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }

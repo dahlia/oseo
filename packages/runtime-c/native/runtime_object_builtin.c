@@ -2734,9 +2734,11 @@ static bool object_string_value(OseoValue source, OseoValue *string_value) {
 
 /*
  * Decide whether a value iterates as a String through the realm's
- * untouched virtual %String.prototype%[Symbol.iterator]. A primitive
- * String or a [[StringData]] wrapper that still reaches that default has
- * no iterator object to acquire, so the caller walks code points itself.
+ * untouched virtual %String.prototype%[Symbol.iterator] bootstrap slot. A
+ * primitive String or a [[StringData]] wrapper that still reaches that
+ * slot has no iterator object to acquire, so the caller walks code points
+ * itself. Once the String iterator intrinsic materializes the property,
+ * the ordinary own slot makes this branch dormant.
  * Anything else, including an own, inherited, replaced, or deleted
  * iterator, reports false and goes through observable iterator
  * acquisition. Both intrinsic lookups can allocate, so the frame roots
@@ -2878,9 +2880,9 @@ static OseoResult object_from_entries(
     }
     if (result.status == OSEO_STATUS_NORMAL && direct_string) {
         /*
-         * The separate String iterator node has not materialized an
-         * iterator object yet, so walk the default code-point sequence
-         * here as Object.groupBy and Array.from do. An empty String
+         * The bootstrap virtual default has no iterator object, so walk
+         * the default code-point sequence here as Object.groupBy and
+         * Array.from do. An empty String
          * yields nothing and produces an empty object; every element a
          * non-empty String yields is a primitive, so the first one
          * reaches the entry-object TypeError below. There is no iterator
@@ -3015,10 +3017,9 @@ static OseoResult object_group_by(
     double index = 0.0;
     if (result.status == OSEO_STATUS_NORMAL && direct_string) {
         /*
-         * The separate String iterator node has not materialized an
-         * iterator object yet. Preserve its default code-point iteration
-         * here, just as Array.from does, without changing indexed String
-         * properties or exposing that later node's public surface.
+         * The bootstrap virtual default has no iterator object. Preserve
+         * its default code-point iteration here, just as Array.from does.
+         * The materialized String iterator makes this branch dormant.
          */
         size_t offset = 0u;
         while (result.status == OSEO_STATUS_NORMAL) {

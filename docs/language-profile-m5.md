@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,329 reviewed cases: 14,743 passes, 1,556
-expected negatives, and 2,030 unsupported profile features. It records no
+The current manifest contains 18,342 reviewed cases: 14,762 passes, 1,556
+expected negatives, and 2,024 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -5451,18 +5451,18 @@ rather than a pass and the fixed and generated evidence above owns the
 admitted behavior in the meantime. This paragraph originally named the
 separately owned `iterator-helpers-eager` node as the one that completes that
 feature. The eager helper landing measured the remaining blockers and
-disproved that: the tag also needs String iteration, which the unlanded
-`string-iterator` node owns, and the `temporalHelpers.js` harness include the
-reviewed harness set does not supply. The eager section below names the six
-paths that measurement identified. No previously reviewed path moves. The
-manifest reaches 16,645 cases: 12,779 passes, 1,556 expected negatives, and
-2,310 unsupported profile features with no semantic, harness, or
-infrastructure failures. The property inventory moves from 122 to 123 domains
-and seeds and from 5,356 to 5,366 ordinary cases. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, target-parity policy,
-and zero-override policy are unchanged. The new heap kind and the expanded
-intrinsic table move the runtime ABI to `oseo-runtime-m5-91` and allocate
-seven code IDs inside the existing iterator range without adding a
+disproved that: the tag also needs String iteration and the
+`temporalHelpers.js` harness include the reviewed harness set does not supply.
+The `string-iterator` node now supplies the former prerequisite. The eager
+section below names the six paths that measurement identified. No previously
+reviewed path moves. The manifest reaches 16,645 cases: 12,779 passes, 1,556
+expected negatives, and 2,310 unsupported profile features with no semantic,
+harness, or infrastructure failures. The property inventory moves from 122 to
+123 domains and seeds and from 5,356 to 5,366 ordinary cases. The suite
+revision, 41,091-path inventory, manifest schema and vocabulary, target-parity
+policy, and zero-override policy are unchanged. The new heap kind and the
+expanded intrinsic table move the runtime ABI to `oseo-runtime-m5-91` and
+allocate seven code IDs inside the existing iterator range without adding a
 generated-code entry point or changing the graph's orchestration state.
 
 
@@ -5569,41 +5569,24 @@ configurable attributes and closes the iterator after abrupt entry processing.
 `hasOwn` preserves ToObject-before-ToPropertyKey order. `groupBy` converts
 callback results through ToPropertyKey, appends values to arrays on a
 null-prototype result, and closes an acquired iterator after callback or key
-failure. `fromEntries` and `groupBy` share one default primitive String path
-that consumes Unicode code points while the separate String iterator node
-remains unmaterialized. An empty String or empty String wrapper is a valid
-empty iterable, so `Object.fromEntries` builds an empty object from it rather
-than reporting the unmaterialized default as a missing iterator, and a
-non-empty String is consumed until its first primitive element fails the
-entry-object check. Both statics take that path only while the realm's
-virtual %String.prototype%[`Symbol.iterator`] is still the nearest one a
-value reaches, so an own, inherited, replaced, or deleted iterator goes
-through observable iterator acquisition instead.
+failure. At this checkpoint, `fromEntries` and `groupBy` shared one bootstrap
+path for the still-virtual default String iterator. The `string-iterator` node
+now materializes that method, so both statics acquire an ordinary iterator and
+consume the same Unicode code-point sequence. An empty String or empty String
+wrapper remains a valid empty iterable, while a non-empty String is consumed
+until its first primitive element fails the `fromEntries` entry-object check.
+An own, inherited, replaced, or deleted iterator follows the same observable
+acquisition path.
 
-One own-property primitive answers every reflective query, so the virtual
-%String.prototype%[`Symbol.iterator`] the String iterator node has not
-materialized cannot be visible to one query and absent from another.
-`Object.hasOwn`, inherited `hasOwnProperty`, `propertyIsEnumerable`, the `in`
-operator, `getOwnPropertyDescriptor`, `getOwnPropertyDescriptors`,
-redefinition rechecks, own-key spread, `Object.assign`, and ordinary
-assignment now report the same existence, attributes, and configurability,
-and an ordinary read of the untouched default stops at %String.prototype%
-instead of reaching a property inherited from %Object.prototype%. The
-descriptor reports the same unmaterialized `undefined` value that a read
-returns, so a program comparing the two agrees with Node.js and Deno.
-
-An ordinary assignment to the virtual property replaces it in place, keeping
-its attributes and its position among the object's symbol keys, while an
-assignment through a String wrapper creates a nearer own property and leaves
-the prototype's virtual property alone. A read-only virtual property refuses
-an assignment the way an ordinary read-only data property does, silently in
-sloppy code and with a `TypeError` in strict code. A non-configurable,
-non-writable virtual property accepts a redefinition whose value is SameValue
-to the `undefined` it models and rejects any other value, so reapplying the
-descriptor a frozen %String.prototype% reports succeeds as it does on Node.js
-and Deno. That redefinition changes nothing, so it leaves the property
-virtual rather than materializing an `undefined`, and default String
-iteration keeps working afterward.
+One own-property primitive still answers every reflective query about
+%String.prototype%[`Symbol.iterator`]. `Object.hasOwn`, inherited
+`hasOwnProperty`, `propertyIsEnumerable`, the `in` operator,
+`getOwnPropertyDescriptor`, `getOwnPropertyDescriptors`, redefinition
+rechecks, own-key spread, `Object.assign`, and ordinary assignment report the
+same existence, function value, attributes, and configurability. An ordinary
+assignment replaces the property in place and keeps its symbol-key position,
+while an assignment through a String wrapper creates a nearer own property.
+Read-only and non-configurable states follow the ordinary data-property rules.
 
 Fixed native and generated differential evidence at seed `0x60006100` covers
 integer, string, and symbol key ordering, mutation during enumeration,
@@ -6141,8 +6124,10 @@ reviewed manifest admits no semantic or harness failure, so the tag stays
 unsupported. *test/built-ins/Iterator/from/primitives.js*,
 *test/built-ins/Iterator/from/supports-iterable.js*, and
 *test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js* fail
-semantically because each iterates a String or a String wrapper, which the
-unlanded `string-iterator` node owns.
+semantically because each iterates a String or a String wrapper. The
+`string-iterator` node now supplies that prerequisite, and each still declares
+the unsupported `iterator-helpers` feature, so its reviewed classification
+is unchanged.
 *test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
 *test/built-ins/Iterator/from/return-method-calls-base-return-method.js*, and
 *test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail
@@ -6291,6 +6276,53 @@ manifest schema, classification vocabulary, and zero-override policy remain
 unchanged.
 
 
+String iteration
+----------------
+
+M5b node `string-iterator` materializes
+%String.prototype%[`Symbol.iterator`] as the ordinary `[Symbol.iterator]`
+method and adds `%StringIteratorPrototype%`. The iterator prototype inherits
+from `%IteratorPrototype%`, owns a non-constructible `next` method, and owns
+the configurable, non-writable, non-enumerable `"String Iterator"`
+`Symbol.toStringTag`. Each iterator is branded, returns itself from the
+inherited iterator method, and stays permanently exhausted after its source
+is cleared.
+
+The iterator method first rejects a nullish receiver and otherwise snapshots
+`ToString(this)`. `next` traverses the resulting UTF-16 sequence by Unicode
+code point: a leading surrogate followed by a trailing surrogate is returned
+as one two-unit String, while every BMP unit and lone surrogate is returned
+alone. The cursor advances before allocating the result String, and the
+iterator target remains collector-traced across every safepoint. The same
+ordinary iterator protocol now lets array binding and assignment patterns in
+a `for-in` head destructure each enumerated String key.
+
+Fixed native and generated differential evidence at property seed
+`0x60006900` covers method and prototype metadata, descriptors,
+non-construction, branding, receiver conversion and abrupt conversion,
+primitive and wrapped Strings, BMP and astral code points, lone surrogates,
+permanent exhaustion, the `for-in` array-pattern connection, both
+specialization policies, false hints, deliberate shape-guard hits and misses,
+generic fallback, and collection forced at every safepoint. The generated
+oracle advances an independent UTF-16 cursor, and its native host guard checks
+the result of `targetForExecutionHost` for `null` before execution.
+
+The inventory contains 13 applicable paths under the two String iterator
+roots, and this landing promotes every one of them into the reviewed manifest
+as a pass. Six reviewed *test/language/statements/for-in/* paths outside
+those roots also move from `unsupported-profile-feature` to `pass`, because
+each destructures its enumerated key through an array pattern the head now
+admits. The reviewed manifest moves from 18,329 to 18,342 paths, from 14,743
+to 14,762 passes, and from 2,030 to 2,024 unsupported profile features while
+keeping 1,556 expected negatives and zero semantic, harness, or
+infrastructure failures. The property ratchet moves from 136 to 137 domains
+and seeds and from 5,530 to 5,542 ordinary cases. The normative family index
+moves from 117 to 118 records. The runtime ABI moves to
+`oseo-runtime-m5-102`, allocates two code IDs inside the existing iterator
+range, and adds three realm intrinsics without adding a heap kind, a
+generated-code entry point, or a graph-state change.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6358,22 +6390,6 @@ complete. The remaining gaps retain their existing owners.
     `export-star-as-namespace-from-module` classify
     `unsupported-profile-feature`. Owner: the modules and asynchronous
     execution stream.
- -  Array destructuring of a `for-in` key remains rejected. Every enumerated
-    key is a string, and the realm does not yet expose the string iterator the
-    array pattern must consume. Owner: the intrinsics and built-in objects
-    stream.
- -  The untouched %String.prototype%[`Symbol.iterator`] exists as an own
-    property with the specified attributes and own-key position, but its
-    value is not materialized: an ordinary read returns `undefined`, and the
-    descriptor reports the same value. Every operation that only compares
-    the read against the descriptor, including `Object.assign` and own-key
-    spread, therefore agrees with the reference hosts. An operation that
-    requires the value itself to be an object does not: after a program makes
-    the property enumerable, `Object.defineProperties` over
-    %String.prototype% throws a catchable `TypeError` where the reference
-    hosts convert the function into an empty descriptor. The
-    `string-iterator` graph node materializes the value and closes the gap.
-    Owner: the intrinsics and built-in objects stream.
  -  A `super` property reference in a class body without `extends` and in an
     object literal method stays rejected until the `super-without-extends`
     graph node lands. The object prototype root is now populated, but that

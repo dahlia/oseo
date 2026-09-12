@@ -274,9 +274,22 @@ test("converts classic for binding patterns to owned syntax", () => {
   assert.match(hir, /for \(var \[/u);
 });
 
+test("converts for-in array pattern heads to owned syntax", () => {
+  // The String iterator lets an enumerated key destructure through the
+  // same recursive array binding and assignment lowering a for-of head
+  // uses, so neither head form is a profile boundary any longer.
+  const result = compileSource(babelFrontend, {
+    source:
+      "for (const [key] in {}) break;\n" +
+      "let assigned; for ([assigned] in {}) break;\n",
+    sourceId: "for-in-array-pattern-heads.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+});
+
 const unsupportedForForms = [
-  ["for-in declaration array pattern", "for (const [key] in {}) break;"],
-  ["for-in assignment array pattern", "let key; for ([key] in {}) break;"],
   ["for-in head initializer", "for (var key = 1 in {}) break;"],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;

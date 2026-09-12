@@ -512,8 +512,8 @@ static OseoResult array_create_with_prototype(
     array->virtual_string_iterator_configurable = false;
     array->virtual_string_iterator_enumerable = false;
     array->virtual_string_iterator_writable = false;
-    array->array_iterator_kind = OSEO_ARRAY_ITERATOR_NONE;
-    array->iterator_array = oseo_undefined();
+    array->iterator_kind = OSEO_ITERATOR_NONE;
+    array->iterator_target = oseo_undefined();
     array->iterator_index = 0u;
     array->regexp_string_iterator = false;
     array->regexp_iterator_regexp = oseo_undefined();
@@ -2078,9 +2078,11 @@ static bool array_from_string_value(
 }
 
 /*
- * The virtual default participates in the wrapper's ordinary prototype walk.
- * A nearer actual property wins, while the untouched default on
- * %String.prototype% shadows any property inherited from Object.prototype.
+ * The bootstrap virtual default participates in the wrapper's ordinary
+ * prototype walk. A nearer actual property wins, while the untouched default
+ * on %String.prototype% shadows any property inherited from Object.prototype.
+ * The materialized String iterator installs an actual own property and makes
+ * this compatibility path dormant.
  */
 bool oseo_internal_uses_virtual_string_iterator(
     OseoValue source,

@@ -127,20 +127,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - dynamic-source
       - lexical-bindings
       - property-enumeration
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-in/scope-body-lex-close.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-in/scope-body-lex-close.js:107:9:
-        error[OSEO1001]: A for-in array pattern target is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

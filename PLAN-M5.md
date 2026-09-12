@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-17,743 reviewed cases: 14,019 passes, 1,556 expected negatives, and 2,168
+18,342 reviewed cases: 14,762 passes, 1,556 expected negatives, and 2,024
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 116 indexed records in the normative
+M5a is complete. The 118 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-14,019 passes across 17,743 paths, and the property inventory records 135
-domains, 135 seeds, and an ordinary case budget of 5,518.
+14,762 passes across 18,342 paths, and the property inventory records 137
+domains, 137 seeds, and an ordinary case budget of 5,542.
 
 
 M5a implementation history
@@ -5921,7 +5921,8 @@ pass, and a reviewed manifest admits no semantic or harness failure.
 *test/built-ins/Iterator/from/supports-iterable.js*, and
 *test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js* fail
 semantically because each iterates a String or a String wrapper, which the
-unlanded `string-iterator` node owns.
+`string-iterator` node now supports. Each still declares the unsupported
+`iterator-helpers` feature, so its reviewed classification is unchanged.
 *test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
 *test/built-ins/Iterator/from/return-method-calls-base-return-method.js*, and
 *test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail
@@ -5942,6 +5943,41 @@ IDs inside the existing iterator range, adds six realm intrinsics, and adds no
 heap kind, generated-code entry point, or graph-state change. The reviewed
 test262 revision, 41,091-path applicable inventory, ADR 0013 schema and
 vocabulary, inventory policy, and zero-override policy are unchanged.
+
+M5b node `string-iterator` materializes
+%String.prototype%[`Symbol.iterator`] and `%StringIteratorPrototype%`. The
+prototype inherits from `%IteratorPrototype%`, owns the non-constructible
+`next` method and the `"String Iterator"` `Symbol.toStringTag`, and brands each
+iterator it creates. The iterator method rejects a nullish receiver and
+otherwise snapshots `ToString(this)`. Each `next` pairs a leading surrogate
+with a following trailing surrogate, preserves a lone surrogate as one code
+unit, advances before allocation, and clears its collector-traced target at
+permanent exhaustion.
+
+The frontend and HIR now admit recursive array binding and assignment patterns
+in a `for-in` head, so each enumerated String key destructures through the same
+ordinary iterator protocol. Fixed native and generated differential evidence
+at seed `0x60006900` covers metadata, descriptors, non-construction, receiver
+conversion, branding, prototype ancestry, BMP and astral code points, lone
+surrogates, exhaustion, the `for-in` connection, both specialization policies,
+false hints, deliberate guard hits and misses, generic fallback, and collection
+forced at every safepoint. The generated native test checks
+`targetForExecutionHost` for `null` before execution.
+
+The node inventory contains 13 applicable paths under the two owned String
+iterator roots, and this landing promotes every one of them into the reviewed
+manifest as a pass. Six reviewed *test/language/statements/for-in/* paths
+outside those roots also move from `unsupported-profile-feature` to `pass`,
+because each destructures its enumerated key through an array pattern that
+the head now admits. The manifest moves from 18,329 to 18,342 paths, from
+14,743 to 14,762 passes, and from 2,030 to 2,024 unsupported profile
+features while keeping 1,556 expected negatives and zero semantic, harness,
+or infrastructure failures. The property ratchet moves from 136 to 137
+domains and seeds and from 5,530 to 5,542 ordinary cases. The normative
+family index moves from 117 to 118 records.
+The runtime ABI moves to `oseo-runtime-m5-102`, allocates two code IDs in the
+existing iterator range, and adds three realm intrinsics without adding a heap
+kind, a generated-code entry point, or a graph-state change.
 
 
 Ahead-of-time challenge boundary

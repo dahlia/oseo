@@ -1108,13 +1108,9 @@ test("rejects assignment members in owned for-of declarations", () => {
   );
 });
 
-test("rejects nested array patterns in owned for-in heads", () => {
-  // Owned syntax narrows a for-in head to an object pattern, but a
-  // nested array pattern stays representable as an ordinary recursive
-  // leaf. The enumerated key is always a String and this realm creates
-  // no string iterator, so HIR repeats the frontend's rejection for any
-  // frontend rather than lowering an iterator acquisition that could
-  // only throw.
+test("resolves nested array patterns in owned for-in heads", () => {
+  // The enumerated key is a String, so the String iterator lets a nested
+  // array leaf use the same recursive binding shape as a for-of head.
   const nested = {
     elements: [
       {
@@ -1165,16 +1161,12 @@ test("rejects nested array patterns in owned for-in heads", () => {
       range,
       sourceId: "invalid-for-in-array-pattern.ts",
     });
-    assert.equal(result.program, undefined, head.kind);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /for-in array pattern target is unsupported/u,
-      head.kind,
-    );
+    assert.ok(result.program != null, head.kind);
+    assert.deepEqual(result.diagnostics, [], head.kind);
   }
 });
 
-test("rejects a non-object owned for-in head pattern", () => {
+test("resolves an array owned for-in head pattern", () => {
   const result = buildInvalidHir({
     body: [
       {
@@ -1198,11 +1190,8 @@ test("rejects a non-object owned for-in head pattern", () => {
     range,
     sourceId: "invalid-for-in-head-pattern.ts",
   });
-  assert.equal(result.program, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /for-in head pattern must be an object pattern/u,
-  );
+  assert.ok(result.program != null);
+  assert.deepEqual(result.diagnostics, []);
 });
 
 test("retains lexical reads for runtime temporal-dead-zone checks", () => {

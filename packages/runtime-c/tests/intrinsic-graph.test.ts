@@ -320,6 +320,32 @@ test("materializes all three Array iterator result kinds", () => {
   assert.match(arraySource, /OSEO_WELL_KNOWN_ITERATOR/u);
 });
 
+test("materializes the String iterator over shared iterator state", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const stringSource = sources.get("runtime_string.c") ?? "";
+
+  for (const intrinsic of [
+    "STRING_ITERATOR_PROTOTYPE",
+    "STRING_ITERATOR_NEXT",
+    "STRING_PROTOTYPE_ITERATOR",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  assert.match(internalHeader, /OSEO_STRING_ITERATOR_VALUE/u);
+  assert.match(internalHeader, /is_string_iterator/u);
+  assert.match(iteratorSource, /oseo_internal_string_iterator_create/u);
+  assert.match(iteratorSource, /oseo_internal_string_iterator_next/u);
+  assert.match(iteratorSource, /"String Iterator"/u);
+  assert.match(iteratorSource, /UINT16_C\(0xd800\)/u);
+  assert.match(iteratorSource, /UINT16_C\(0xdc00\)/u);
+  assert.match(memorySource, /mark_value\(ordinary->iterator_target/u);
+  assert.match(stringSource, /OSEO_STRING_PROTOTYPE_ITERATOR_CODE_ID/u);
+  assert.match(stringSource, /OSEO_WELL_KNOWN_ITERATOR/u);
+});
+
 test("populates Array predicate search methods over one loop", () => {
   const arraySource = sources.get("runtime_array.c") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
