@@ -1085,6 +1085,31 @@ observation is a fixed native assertion in *tests/native.ts* rather than a
 differential fixture, because the two reference hosts disagree about it and
 this runtime follows the specified behavior.
 
+### Eager iterator helper evidence
+
+M5b node `iterator-helpers-eager` adds `reduce`, `toArray`, `forEach`, `some`,
+`every`, and `find` to *runtime\_iterator.c*, which already owns the
+synchronous iterator protocol, `%IteratorPrototype%`, and the lazy helpers
+these six complete. They stay in that component for the same reason: each one
+is the protocol applied to an already-captured iterator record. They add no
+translation unit and no generated-code entry point.
+
+An eager helper needs no heap kind, because it never suspends. One root frame
+holds the receiver, the callback, the captured `next` method, the `toArray`
+result array, and the contiguous callback argument list for the length of the
+drain, so the accumulator and every in-flight value survive a collection at
+any safepoint inside user code.
+
+The node allocates six code IDs inside the existing iterator range, adds six
+realm intrinsics, adds no internal helper, and moves `abiVersion` to `m5-100`.
+Fixed and generated native differential evidence covers all six methods,
+receiver and callback validation with the close it performs before `next` is
+read, the reduce accumulator with and without an initial value, the
+empty-iterator `TypeError`, the early stop `some`, `every`, and `find`
+perform, close failures in both the abrupt and the normal-completion
+position, both specialization policies, deliberate guard hits and misses,
+generic fallback, and collection at every safepoint.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

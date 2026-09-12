@@ -13278,6 +13278,105 @@ tests:
   - path: test/built-ins/Iterator/prototype/drop/underlying-iterator-closed.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/argument-effect-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/argument-validation-failure-closes-underlying.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/get-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/iterator-already-exhausted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/iterator-has-no-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/iterator-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/non-callable-predicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-returns-falsey.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-returns-non-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-returns-truthy-then-falsey.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-returns-truthy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-throws-then-closing-iterator-also-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/predicate-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/result-is-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/every/this-plain-iterator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/filter/argument-effect-order.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
@@ -13387,6 +13486,102 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/filter/underlying-iterator-closed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/argument-effect-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/argument-validation-failure-closes-underlying.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/get-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/iterator-already-exhausted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/iterator-has-no-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/iterator-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/non-callable-predicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-returns-falsey-then-truthy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-returns-falsey.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-returns-non-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-returns-truthy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-throws-then-closing-iterator-also-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/predicate-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/find/this-plain-iterator.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/flatMap/argument-effect-order.js
@@ -13521,6 +13716,87 @@ tests:
   - path: test/built-ins/Iterator/prototype/flatMap/underlying-iterator-closed.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/argument-effect-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/argument-validation-failure-closes-underlying.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/fn-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/fn-called-for-each-yielded-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/fn-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/fn-throws-then-closing-iterator-also-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/fn-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/iterator-already-exhausted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/non-callable-predicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/result-is-undefined.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/forEach/this-plain-iterator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/initial-value.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
@@ -13632,6 +13908,195 @@ tests:
   - path: test/built-ins/Iterator/prototype/map/underlying-iterator-closed.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/argument-effect-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/argument-validation-failure-closes-underlying.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/iterator-already-exhausted-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/iterator-already-exhausted-no-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/iterator-yields-once-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/iterator-yields-once-no-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/non-callable-reducer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-args-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-args-no-initial-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-memo-can-be-any-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-throws-then-closing-iterator-also-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/reducer-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/reduce/this-plain-iterator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/argument-effect-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/argument-validation-failure-closes-underlying.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/get-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/iterator-already-exhausted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/iterator-has-no-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/iterator-return-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/non-callable-predicate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-returns-falsey-then-truthy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-returns-falsey.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-returns-non-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-returns-truthy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-throws-then-closing-iterator-also-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/predicate-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/result-is-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/some/this-plain-iterator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/take/argument-effect-order.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
@@ -13729,6 +14194,60 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/take/underlying-iterator-closed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/get-next-method-only-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/get-next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/is-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/iterator-already-exhausted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/next-method-returns-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/next-method-returns-throwing-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/next-method-returns-throwing-value-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/next-method-returns-throwing-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/next-method-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/non-constructible.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/this-non-callable-next.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/this-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/toArray/this-plain-iterator.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/subclassable.js

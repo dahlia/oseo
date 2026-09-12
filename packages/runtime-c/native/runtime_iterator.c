@@ -30,6 +30,13 @@ static OseoResult iterator_helper_method(
     size_t argument_count,
     const OseoValue *arguments
 );
+static OseoResult iterator_eager_method(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
 static OseoResult iterator_helper_resume(
     OseoContext *context,
     OseoValue receiver
@@ -109,6 +116,16 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     if (code_id <= OSEO_ITERATOR_MAP_CODE_ID &&
         code_id >= OSEO_ITERATOR_FLAT_MAP_CODE_ID) {
         return iterator_helper_method(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id <= OSEO_ITERATOR_REDUCE_CODE_ID &&
+        code_id >= OSEO_ITERATOR_FIND_CODE_ID) {
+        return iterator_eager_method(
             context,
             code_id,
             receiver,
@@ -435,6 +452,12 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_INTRINSIC_ITERATOR_TAKE,
         OSEO_INTRINSIC_ITERATOR_DROP,
         OSEO_INTRINSIC_ITERATOR_FLAT_MAP,
+        OSEO_INTRINSIC_ITERATOR_REDUCE,
+        OSEO_INTRINSIC_ITERATOR_TO_ARRAY,
+        OSEO_INTRINSIC_ITERATOR_FOR_EACH,
+        OSEO_INTRINSIC_ITERATOR_SOME,
+        OSEO_INTRINSIC_ITERATOR_EVERY,
+        OSEO_INTRINSIC_ITERATOR_FIND,
     };
     static const size_t codes[] = {
         OSEO_ITERATOR_FROM_CODE_ID,
@@ -449,6 +472,12 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_ITERATOR_TAKE_CODE_ID,
         OSEO_ITERATOR_DROP_CODE_ID,
         OSEO_ITERATOR_FLAT_MAP_CODE_ID,
+        OSEO_ITERATOR_REDUCE_CODE_ID,
+        OSEO_ITERATOR_TO_ARRAY_CODE_ID,
+        OSEO_ITERATOR_FOR_EACH_CODE_ID,
+        OSEO_ITERATOR_SOME_CODE_ID,
+        OSEO_ITERATOR_EVERY_CODE_ID,
+        OSEO_ITERATOR_FIND_CODE_ID,
     };
     static const char *const names[] = {
         "from",
@@ -463,9 +492,16 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         "take",
         "drop",
         "flatMap",
+        "reduce",
+        "toArray",
+        "forEach",
+        "some",
+        "every",
+        "find",
     };
     static const size_t lengths[] = {
         1u, 0u, 0u, 0u, 1u, 0u, 1u, 1u, 1u, 1u, 1u, 1u,
+        1u, 0u, 1u, 1u, 1u, 1u,
     };
     static const OseoFunctionNamePrefix prefixes[] = {
         OSEO_FUNCTION_NAME_PREFIX_NONE,
@@ -480,9 +516,15 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         OSEO_FUNCTION_NAME_PREFIX_NONE,
         OSEO_FUNCTION_NAME_PREFIX_NONE,
         OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
+        OSEO_FUNCTION_NAME_PREFIX_NONE,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 12u;
+         result.status == OSEO_STATUS_NORMAL && index < 18u;
          index += 1u) {
         result = create_iterator_builtin(
             context,
@@ -559,12 +601,12 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER]
         );
     }
-    /* The five lazy helper methods are ordinary writable,
+    /* The five lazy and six eager helper methods are ordinary writable,
      * non-enumerable, configurable data properties of
      * %IteratorPrototype%, so replacing one on the prototype changes
      * what every iterator that inherits it resolves. */
     for (size_t index = 7u;
-         result.status == OSEO_STATUS_NORMAL && index < 12u;
+         result.status == OSEO_STATUS_NORMAL && index < 18u;
          index += 1u) {
         result = ascii_iterator_string(context, names[index]);
         frame.slots[3] = result.value;
@@ -665,6 +707,11 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         }
         for (size_t index = OSEO_INTRINSIC_ITERATOR_MAP;
              index <= OSEO_INTRINSIC_ITERATOR_FLAT_MAP;
+             index += 1u) {
+            context->intrinsics[index] = oseo_undefined();
+        }
+        for (size_t index = OSEO_INTRINSIC_ITERATOR_REDUCE;
+             index <= OSEO_INTRINSIC_ITERATOR_FIND;
              index += 1u) {
             context->intrinsics[index] = oseo_undefined();
         }
@@ -1753,6 +1800,213 @@ static OseoResult iterator_helper_method(
         );
     }
     oseo_roots_pop(context, &frame);
+    return result;
+}
+
+
+/*
+ * The six eager helper kinds, in the order their code IDs count down
+ * from OSEO_ITERATOR_REDUCE_CODE_ID.
+ */
+typedef enum {
+    OSEO_ITERATOR_EAGER_REDUCE = 0,
+    OSEO_ITERATOR_EAGER_TO_ARRAY = 1,
+    OSEO_ITERATOR_EAGER_FOR_EACH = 2,
+    OSEO_ITERATOR_EAGER_SOME = 3,
+    OSEO_ITERATOR_EAGER_EVERY = 4,
+    OSEO_ITERATOR_EAGER_FIND = 5
+} OseoIteratorEagerKind;
+
+static const char *const eager_receiver_errors[] = {
+    "Iterator reduce requires an object receiver.",
+    "Iterator toArray requires an object receiver.",
+    "Iterator forEach requires an object receiver.",
+    "Iterator some requires an object receiver.",
+    "Iterator every requires an object receiver.",
+    "Iterator find requires an object receiver.",
+};
+
+/* toArray takes no callback, so its entry is never read. */
+static const char *const eager_callback_errors[] = {
+    "Iterator reduce requires a callable reducer.",
+    "Iterator toArray takes no callback.",
+    "Iterator forEach requires a callable procedure.",
+    "Iterator some requires a callable predicate.",
+    "Iterator every requires a callable predicate.",
+    "Iterator find requires a callable predicate.",
+};
+
+/*
+ * Iterator.prototype reduce, toArray, forEach, some, every, and find.
+ *
+ * Each validates its receiver first, so a primitive receiver throws
+ * before any argument is read. Each callback-taking method then
+ * validates its callback against the record it would capture and closes
+ * that record when the validation fails, which is the specified
+ * IteratorClose over a record whose next method is still undefined, and
+ * only then reads `next` once.
+ *
+ * The loop drains the record. A step that throws propagates without a
+ * close, because IteratorStepValue marks the record done before
+ * propagating, while a callback that throws closes the record and keeps
+ * the original completion. some, every, and find stop early and close
+ * the record with a normal completion, so a `return` that throws there
+ * replaces the answer they would have produced.
+ */
+static OseoResult iterator_eager_method(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoIteratorEagerKind kind =
+        (OseoIteratorEagerKind)(OSEO_ITERATOR_REDUCE_CODE_ID - code_id);
+    if (!is_object(receiver)) {
+        return iterator_type_error(context, eager_receiver_errors[kind]);
+    }
+    bool reduce = kind == OSEO_ITERATOR_EAGER_REDUCE;
+    bool collects = kind == OSEO_ITERATOR_EAGER_TO_ARRAY;
+    /*
+     * 0 receiver, 1 callback, 2 the captured next method, 3 the toArray
+     * result, 4 to 6 the callback argument list, 7 the stepped value.
+     * The argument list is contiguous because reduce passes the
+     * accumulator, the value, and the counter as one vector while the
+     * three predicates and forEach pass the value and the counter.
+     */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = argument_count > 0u ? arguments[0] : oseo_undefined();
+    bool accumulated = reduce && argument_count > 1u;
+    if (accumulated) frame.slots[4] = arguments[1];
+    if (!collects && !is_callable(frame.slots[1])) {
+        result = iterator_type_error(context, eager_callback_errors[kind]);
+        result = helper_close_after_abrupt(context, frame.slots[0], result);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = helper_get_iterator_direct(
+        context,
+        frame.slots[0],
+        &frame.slots[2]
+    );
+    if (result.status == OSEO_STATUS_NORMAL && collects) {
+        result = oseo_array_create(context, 0u);
+        frame.slots[3] = result.value;
+    }
+    double counter = 0.0;
+    bool done = false;
+    /*
+     * A reduce without an initial value takes the first value as the
+     * accumulator and starts its counter at one. An iterator that is
+     * already exhausted there is a TypeError, and the record needs no
+     * close because the step that reported done already ended it.
+     */
+    if (result.status == OSEO_STATUS_NORMAL && reduce && !accumulated) {
+        OseoValue first = oseo_undefined();
+        result = helper_iterator_step(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            true,
+            &first,
+            &done
+        );
+        frame.slots[4] = first;
+        if (result.status == OSEO_STATUS_NORMAL && done) {
+            result = iterator_type_error(
+                context,
+                "Iterator reduce of an empty iterator needs an initial "
+                "value."
+            );
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            counter = 1.0;
+        }
+    }
+    bool stopped = false;
+    while (result.status == OSEO_STATUS_NORMAL && !stopped) {
+        OseoValue stepped = oseo_undefined();
+        result = helper_iterator_step(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            true,
+            &stepped,
+            &done
+        );
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        frame.slots[7] = stepped;
+        if (collects) {
+            result = oseo_array_append(
+                context,
+                frame.slots[3],
+                frame.slots[7]
+            );
+            continue;
+        }
+        if (reduce) {
+            frame.slots[5] = frame.slots[7];
+            frame.slots[6] = oseo_number(counter);
+        } else {
+            frame.slots[4] = frame.slots[7];
+            frame.slots[5] = oseo_number(counter);
+        }
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            oseo_undefined(),
+            reduce ? 3u : 2u,
+            &frame.slots[4],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
+            result = helper_close_after_abrupt(
+                context,
+                frame.slots[0],
+                result
+            );
+            break;
+        }
+        counter += 1.0;
+        if (reduce) {
+            frame.slots[4] = result.value;
+            continue;
+        }
+        bool truthy = oseo_to_boolean(result.value);
+        if (kind == OSEO_ITERATOR_EAGER_SOME && truthy) stopped = true;
+        if (kind == OSEO_ITERATOR_EAGER_EVERY && !truthy) stopped = true;
+        if (kind == OSEO_ITERATOR_EAGER_FIND && truthy) stopped = true;
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (stopped) {
+        /* IteratorClose over a normal completion carrying the answer. */
+        frame.slots[6] = kind == OSEO_ITERATOR_EAGER_FIND
+            ? frame.slots[4]
+            : oseo_boolean(kind == OSEO_ITERATOR_EAGER_SOME);
+        result = oseo_iterator_close(context, frame.slots[0], false);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = normal(frame.slots[6]);
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (reduce) {
+        result = normal(frame.slots[4]);
+    } else if (collects) {
+        result = normal(frame.slots[3]);
+    } else if (kind == OSEO_ITERATOR_EAGER_SOME) {
+        result = normal(oseo_boolean(false));
+    } else if (kind == OSEO_ITERATOR_EAGER_EVERY) {
+        result = normal(oseo_boolean(true));
+    } else {
+        result = normal(oseo_undefined());
+    }
+    oseo_roots_release(context, &frame);
     return result;
 }
 

@@ -40,6 +40,7 @@ import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
+import * as eagerHelpers from "./native/fixtures/iterator-helpers-eager.ts";
 import * as lazyHelpers from "./native/fixtures/iterator-helpers-lazy.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
@@ -180,6 +181,7 @@ const fixtures: readonly Fixture[] = [
   ...functionIntrinsicChainFixtures,
   ...functionIntrinsicKeyOrderFixtures,
   ...iteratorFixtures.iteratorIntrinsicFixtures,
+  ...eagerHelpers.iteratorHelpersEagerFixtures,
   ...lazyHelpers.iteratorHelpersLazyFixtures,
   ...mapFixtures.mapIntrinsicFixtures,
   ...numberFixtures.numberIntrinsicFixtures,
@@ -681,6 +683,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
+    fixture.name === "iterator-helpers-eager" ||
     fixture.name === "iterator-helpers-lazy" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
@@ -773,6 +776,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
+    fixture.name === "iterator-helpers-eager" ||
     fixture.name === "iterator-helpers-lazy" ||
     fixture.name === "iterator-intrinsic" ||
     fixture.name === "map-intrinsic" ||
@@ -1011,6 +1015,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "global-object-record" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
+            fixture.name === "iterator-helpers-eager" ||
             fixture.name === "iterator-helpers-lazy" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "map-intrinsic" ||
@@ -1038,6 +1043,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
                 fixture.name === "generic-string-coercion" ||
+                fixture.name === "iterator-helpers-eager" ||
                 fixture.name === "iterator-helpers-lazy" ||
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||

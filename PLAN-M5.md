@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-17,570 reviewed cases: 13,929 passes, 1,556 expected negatives, and 2,085
+17,743 reviewed cases: 14,019 passes, 1,556 expected negatives, and 2,168
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 113 indexed records in the normative
+M5a is complete. The 116 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-13,929 passes across 17,570 paths, and the property inventory records 131
-domains, 131 seeds, and an ordinary case budget of 5,478.
+14,019 passes across 17,743 paths, and the property inventory records 135
+domains, 135 seeds, and an ordinary case budget of 5,518.
 
 
 M5a implementation history
@@ -3681,9 +3681,11 @@ collector-traced wrapper. Fixed native and generated differential evidence at
 seed `0x60003400` covers both specialization policies, forced collection,
 direct and iterable inputs, late `return` lookup, and deliberate shape-guard
 misses. All 37 paths under the node's six inventory roots are reviewed. They
-retain the honest `iterator-helpers` feature boundary until the later helper
-method nodes complete that upstream feature tag, so the manifest moves to
-5,459 paths with 3,141 passes and 963 unsupported profile features. The
+retain the honest `iterator-helpers` feature boundary, so the manifest moves
+to 5,459 paths with 3,141 passes and 963 unsupported profile features. This
+paragraph originally expected the later helper method nodes to complete that
+upstream feature tag; the eager helper entry below records the measurement
+that disproved it. The
 runtime ABI moves to `oseo-runtime-m5-49` without changing the graph's
 orchestration state.
 
@@ -5374,9 +5376,11 @@ forced at every safepoint, false hints, deliberate shape-guard hits and
 misses, and generic fallback.
 
 All 184 of the node's inventory paths are reviewed and every one declares the
-upstream `iterator-helpers` feature, which stays unsupported until the
-separately owned `iterator-helpers-eager` node completes that feature, so
-each enters as an explicit prerequisite boundary rather than a pass. No
+upstream `iterator-helpers` feature, which stays unsupported, so each enters
+as an explicit prerequisite boundary rather than a pass. This paragraph
+originally named the separately owned `iterator-helpers-eager` node as the
+one that completes that feature; the eager helper landing measured the
+remaining blockers and disproved it, as the eager entry below records. No
 previously reviewed path moves. The manifest moves from 16,461 to 16,645
 paths, keeps 12,779 passes and 1,556 expected negatives, and moves from 2,126
 to 2,310 unsupported profile features, with no failures. The property ratchet
@@ -5866,6 +5870,78 @@ external-component fact that needs a vendored source build. The report names
 each one as an open limit, and
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) keeps the item open until they are
 measured.
+
+Implemented M5b node `iterator-helpers-eager` completes the
+`%IteratorPrototype%` helper methods with `reduce`, `toArray`, `forEach`,
+`some`, `every`, and `find`. Each is a writable, non-enumerable, configurable
+data property whose function has its own name, `%Function.prototype%` as its
+`[[Prototype]]`, and no `[[Construct]]`; `toArray` has `length` 0 and the
+other five `length` 1. All six are eager: each drains the record it captures
+rather than returning a helper object, so the node adds no heap kind and no
+observable object kind.
+
+Each validates its receiver first, so a primitive receiver throws a
+`TypeError` before any argument is read. The five that take a callback then
+validate it against the record they would capture and close that record when
+the validation fails, which is `IteratorClose` over a record whose `next`
+method is still `undefined`, and only then read `next` once. The counter each
+callback receives counts callback invocations. `reduce` without an initial
+value takes the first value as the accumulator and starts its counter at one,
+and an already-exhausted iterator there is a `TypeError` with no close. A
+step that throws propagates without a close, while a callback that throws
+closes the record and keeps its own completion. `some`, `every`, and `find`
+stop early and close with a normal completion, so a `return` that throws or
+answers a non-object there replaces the answer.
+
+The implementation stays in *runtime\_iterator.c*, which already owns the
+synchronous iterator protocol and the lazy helpers these six complete. One
+root frame holds the receiver, the callback, the captured `next`, the
+`toArray` result, and the contiguous callback argument list for the length of
+the drain, so a collection at any safepoint inside user code keeps the
+accumulator and every in-flight value alive.
+
+Fixed native and generated differential evidence at seed `0x60006700` covers
+all six methods, metadata and descriptors, non-construction, receiver and
+callback validation with its close, counter sequences, the reduce accumulator
+with and without an initial value, the empty-iterator `TypeError`, early stop
+and exhaustion for all three predicates, close failures in both the abrupt
+and the normal-completion position, throwing `next`, `done`, and `value`,
+chained lazy-to-eager pipelines, both specialization policies, deliberate
+shape-guard hits and misses, generic fallback, and collection forced at every
+safepoint.
+
+All 173 of the node's inventory paths are reviewed and every one declares the
+upstream `iterator-helpers` feature, which stays unsupported, so each enters
+as an explicit prerequisite boundary rather than a pass. The lazy helper entry
+above expected this node to complete that feature tag. A scoped classification
+run over all 394 reviewed and inventoried `test/built-ins/Iterator/` paths
+with the tag enabled disproved it: six paths outside this node's roots do not
+pass, and a reviewed manifest admits no semantic or harness failure.
+*test/built-ins/Iterator/from/primitives.js*,
+*test/built-ins/Iterator/from/supports-iterable.js*, and
+*test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js* fail
+semantically because each iterates a String or a String wrapper, which the
+unlanded `string-iterator` node owns.
+*test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
+*test/built-ins/Iterator/from/return-method-calls-base-return-method.js*, and
+*test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail
+in the harness because each includes *temporalHelpers.js*, which the reviewed
+harness set does not supply. The tag therefore needs `string-iterator` and
+that harness include before any node can enable it, and the profile and the
+lazy family record are corrected in this change. Thirteen further paths keep
+an honest boundary for the separate `globalThis` feature, and one for
+`cross-realm`.
+
+No previously reviewed path moves. The manifest moves from 17,570 to 17,743
+paths, keeps 14,019 passes and 1,556 expected negatives, and moves from 1,995
+to 2,168 unsupported profile features, with no failures. The property ratchet
+moves from 134 to 135 domains and seeds and from 5,508 to 5,518 ordinary
+cases, and the normative family index from 115 to 116 records. The admitted
+runtime checkpoint moves the ABI to `oseo-runtime-m5-100`, allocates six code
+IDs inside the existing iterator range, adds six realm intrinsics, and adds no
+heap kind, generated-code entry point, or graph-state change. The reviewed
+test262 revision, 41,091-path applicable inventory, ADR 0013 schema and
+vocabulary, inventory policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

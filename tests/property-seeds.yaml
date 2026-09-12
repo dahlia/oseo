@@ -412,3 +412,7 @@ families:
     owner: tests/property/m5-runtime-error-observation.property.test.ts
     start: 0x60006600
     end: 0x600066ff
+  - family: m5-iterator-helpers-eager
+    owner: tests/property/m5-iterator-helpers-eager.property.test.ts
+    start: 0x60006700
+    end: 0x600067ff
