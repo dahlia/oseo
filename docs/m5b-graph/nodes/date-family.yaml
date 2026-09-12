@@ -11,5 +11,5 @@ dependencies:
   - number-prototype
   - object-prototype
   - string-prototype-search-and-slice
-landed: false
+landed: true
 status: ready

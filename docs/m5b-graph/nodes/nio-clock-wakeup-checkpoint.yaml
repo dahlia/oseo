@@ -7,4 +7,4 @@ delivers: "Implements the PLAN-NIO epoch-real-time, monotonic-deadline, and
 dependencies:
   - date-family
 landed: false
-status: blocked
+status: ready
