@@ -163,17 +163,19 @@ static OseoResult set_prototype_from_target(
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = new_target;
-    result = oseo_internal_ascii_string(context, "prototype");
+    result = oseo_internal_constructor_prototype(context, frame.slots[0]);
     frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
-        frame.slots[1] = result.value;
-    }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_intrinsic(
+        result = oseo_internal_validate_function_realm(
             context,
-            OSEO_INTRINSIC_SET_PROTOTYPE
+            frame.slots[0]
         );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_intrinsic(
+                context,
+                OSEO_INTRINSIC_SET_PROTOTYPE
+            );
+        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];

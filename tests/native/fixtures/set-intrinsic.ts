@@ -182,6 +182,29 @@ console.log(
   Object.getPrototypeOf(derived) === DerivedSet.prototype,
   derived.has(7),
 );
+function RevokedNewTarget() {}
+const revokedNewTarget = Proxy.revocable(RevokedNewTarget, {
+  get() {
+    revokedNewTarget.revoke();
+    return 0;
+  },
+});
+try {
+  Reflect.construct(Set, [], revokedNewTarget.proxy);
+} catch (error) {
+  console.log("revoked new target realm", error instanceof TypeError);
+}
+function PrimitivePrototypeNewTarget() {}
+PrimitivePrototypeNewTarget.prototype = 0;
+const fallbackSet = Reflect.construct(
+  Set,
+  [],
+  new Proxy(PrimitivePrototypeNewTarget, {}),
+);
+console.log(
+  "primitive prototype fallback",
+  Object.getPrototypeOf(fallbackSet) === Set.prototype,
+);
 for (const method of ["add", "clear", "delete", "entries", "forEach", "has"]) {
   try {
     Set.prototype[method].call({}, 1);
