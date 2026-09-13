@@ -344,6 +344,25 @@ interpretation and reviver traversal. The 72 reviewed rows under the node's
 inventory root carry it. Reviewed rows outside that root that use the `JSON`
 namespace as an ordinary object retain their existing tags.
 
+The M5b `set-intrinsic` node extends the vocabulary with `set-intrinsic`. The
+tag identifies the `Set` constructor, its insertion-ordered element storage
+with SameValueZero lookup, the `add`, `clear`, `delete`, `entries`,
+`forEach`, `has`, `keys`, `size`, and `values` members of `%Set.prototype%`,
+the `Symbol.species` accessor, and `%SetIteratorPrototype%` with its live
+forward cursor. One tag covers the cluster because every member reads or
+writes the same element vector and the iterator observes that vector rather
+than a snapshot, which is the contract the node adds. The tag is distinct
+from `iterator-protocol`, which names the generic protocol a Set iterator
+implements without naming the collection it walks, and from
+`object-properties`, which names property definition and descriptor
+semantics rather than element membership. The 201 reviewed rows under the
+node's sixteen inventory roots carry it, and the one reviewed
+*test/built-ins/Object/seal/* row whose only unmet prerequisite was `Set`
+gains it alongside the tag it already carried. Admitting the tag moves no
+classification by itself; the landing moves that row and eleven further
+reviewed `Map` and `Symbol` rows that construct a Set to `pass`, and those
+eleven retain their existing tags.
+
 
 Alternatives considered
 -----------------------

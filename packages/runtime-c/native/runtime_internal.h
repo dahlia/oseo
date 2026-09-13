@@ -487,7 +487,6 @@
 #define OSEO_ARRAY_BUFFER_TRANSFER_TO_FIXED_LENGTH_CODE_ID \
     (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 10u)
 
-
 #define OSEO_STRING_CODE_ID_RANGE_INDEX ((size_t)12u)
 #define OSEO_STRING_CODE_ID_RANGE_FIRST \
     OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_STRING_CODE_ID_RANGE_INDEX)
@@ -738,6 +737,24 @@
 #define OSEO_JSON_PARSE_CODE_ID OSEO_JSON_CODE_ID_RANGE_LAST
 #define OSEO_JSON_STRINGIFY_CODE_ID (OSEO_JSON_CODE_ID_RANGE_LAST - 1u)
 
+#define OSEO_SET_CODE_ID_RANGE_INDEX ((size_t)23u)
+#define OSEO_SET_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_SET_CODE_ID_RANGE_INDEX)
+#define OSEO_SET_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_SET_CODE_ID_RANGE_INDEX)
+#define OSEO_SET_CONSTRUCTOR_CODE_ID OSEO_SET_CODE_ID_RANGE_LAST
+#define OSEO_SET_ADD_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_SET_CLEAR_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_SET_DELETE_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_SET_ENTRIES_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_SET_FOR_EACH_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_SET_HAS_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_SET_SIZE_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_SET_VALUES_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_SET_ITERATOR_NEXT_CODE_ID \
+    (OSEO_SET_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_SET_SPECIES_CODE_ID (OSEO_SET_CODE_ID_RANGE_LAST - 10u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -792,6 +809,8 @@ typedef enum {
     OSEO_HEAP_ITERATOR_HELPER = 24,
     OSEO_HEAP_PROXY = 25,
     OSEO_HEAP_DATE = 26,
+    OSEO_HEAP_SET = 27,
+    OSEO_HEAP_SET_ITERATOR = 28,
 } OseoHeapKind;
 
 typedef struct {
@@ -1484,6 +1503,35 @@ typedef struct {
     OseoValue matcher;
 } OseoRegExp;
 
+/* One insertion-ordered Set element slot. A deleted slot remains in the
+ * sequence so iterators already past it keep their cursor, while a re-added
+ * value receives a fresh slot at the end. */
+typedef struct {
+    OseoValue value;
+    bool present;
+} OseoSetElement;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoSetElement *elements;
+    size_t element_capacity;
+    size_t element_count;
+    size_t size;
+} OseoSet;
+
+typedef enum {
+    OSEO_SET_ITERATOR_VALUE = 0,
+    OSEO_SET_ITERATOR_ENTRY = 1,
+} OseoSetIteratorKind;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue set;
+    size_t index;
+    OseoSetIteratorKind kind;
+    bool done;
+} OseoSetIterator;
+
 typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
@@ -1906,6 +1954,20 @@ static inline bool is_iterator_helper(OseoValue value) {
 static inline OseoIteratorHelper *iterator_helper_object(OseoValue value) {
     return (OseoIteratorHelper *)heap_object(value);
 }
+static inline bool is_set(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_SET;
+}
+static inline OseoSet *set_object(OseoValue value) {
+    return (OseoSet *)heap_object(value);
+}
+static inline bool is_set_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_SET_ITERATOR;
+}
+static inline OseoSetIterator *set_iterator_object(OseoValue value) {
+    return (OseoSetIterator *)heap_object(value);
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
@@ -1914,7 +1976,8 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_ARRAY_BUFFER || kind == OSEO_HEAP_MAP ||
         kind == OSEO_HEAP_MAP_ITERATOR || kind == OSEO_HEAP_DATA_VIEW ||
         kind == OSEO_HEAP_DATE || kind == OSEO_HEAP_REGEXP ||
-        kind == OSEO_HEAP_ITERATOR_HELPER || kind == OSEO_HEAP_PROXY;
+        kind == OSEO_HEAP_ITERATOR_HELPER || kind == OSEO_HEAP_PROXY ||
+        kind == OSEO_HEAP_SET || kind == OSEO_HEAP_SET_ITERATOR;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2179,6 +2242,15 @@ OseoResult oseo_internal_array_buffer_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_set_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 /*
  * Releases one ArrayBuffer's Data Block. The collector calls it for a
  * buffer it is about to destroy, and DetachArrayBuffer calls it while
@@ -2190,6 +2262,12 @@ void oseo_internal_array_buffer_release(OseoHeapObject *object);
  * methods, `isView`, and species accessor, and returns the constructor. */
 OseoResult oseo_internal_array_buffer_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_array_buffer_global(
+    OseoContext *context,
+    OseoValue global
+);
+/* Materializes %Set%, %Set.prototype%, and %SetIteratorPrototype%. */
+OseoResult oseo_internal_set_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_set_global(
     OseoContext *context,
     OseoValue global
 );

@@ -75,7 +75,9 @@ static void trace_object(
                object->kind == OSEO_HEAP_DATE ||
                object->kind == OSEO_HEAP_REGEXP ||
                object->kind == OSEO_HEAP_ITERATOR_HELPER ||
-               object->kind == OSEO_HEAP_PROXY) {
+               object->kind == OSEO_HEAP_PROXY ||
+               object->kind == OSEO_HEAP_SET ||
+               object->kind == OSEO_HEAP_SET_ITERATOR) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -187,6 +189,17 @@ static void trace_object(
             OseoProxy *proxy = (OseoProxy *)object;
             mark_value(proxy->target, worklist);
             mark_value(proxy->handler, worklist);
+        } else if (object->kind == OSEO_HEAP_SET) {
+            OseoSet *set = (OseoSet *)object;
+            for (size_t index = 0u;
+                 index < set->element_count;
+                 index += 1u) {
+                if (set->elements[index].present) {
+                    mark_value(set->elements[index].value, worklist);
+                }
+            }
+        } else if (object->kind == OSEO_HEAP_SET_ITERATOR) {
+            mark_value(((OseoSetIterator *)object)->set, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -231,7 +244,9 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_DATE ||
         object->kind == OSEO_HEAP_REGEXP ||
         object->kind == OSEO_HEAP_ITERATOR_HELPER ||
-        object->kind == OSEO_HEAP_PROXY) {
+        object->kind == OSEO_HEAP_PROXY ||
+        object->kind == OSEO_HEAP_SET ||
+        object->kind == OSEO_HEAP_SET_ITERATOR) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);
@@ -245,6 +260,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
             oseo_internal_array_buffer_release(object);
         } else if (object->kind == OSEO_HEAP_MAP) {
             free(((OseoMap *)object)->entries);
+        } else if (object->kind == OSEO_HEAP_SET) {
+            free(((OseoSet *)object)->elements);
         }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);

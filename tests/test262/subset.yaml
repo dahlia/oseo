@@ -38,6 +38,7 @@ supportedFeatures:
   - String.prototype.replaceAll
   - String.prototype.trimEnd
   - String.prototype.trimStart
+  - Set
   - align-detached-buffer-semantics-with-web-reality
   - array-find-from-last
   - array-grouping
@@ -16384,7 +16385,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/clear/context-is-set-object-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/clear/context-is-weakmap-object-throws.js
     expectedClassification: unsupported-profile-feature
@@ -16414,7 +16415,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/delete/context-is-set-object-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/delete/context-is-weakmap-object-throws.js
     expectedClassification: unsupported-profile-feature
@@ -16444,7 +16445,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16489,7 +16490,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16531,7 +16532,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16564,7 +16565,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16597,7 +16598,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16636,7 +16637,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16669,7 +16670,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -16702,7 +16703,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-weakmap.js
     expectedClassification: unsupported-profile-feature
@@ -28645,8 +28646,8 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-set.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [object-properties]
+    expectedClassification: pass
+    dependencies: [object-properties, set-intrinsic]
   - path: test/built-ins/Object/seal/seal-sharedarraybuffer.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
@@ -36801,6 +36802,609 @@ tests:
   - path: test/built-ins/RegExpStringIteratorPrototype/next/this-is-not-object-throws.js
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, regular-expressions]
+  - path: test/built-ins/Set/Symbol.species/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/Symbol.species/return-value.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/Symbol.species/symbol-species-name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/Symbol.species/symbol-species.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/bigint-number-same-value.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/properties-of-the-set-prototype-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype-of-set.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/Symbol.iterator/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/Symbol.toStringTag/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/add.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/returns-this-when-ignoring-duplicate.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/returns-this.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/will-not-add-duplicate-entry-initial-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/will-not-add-duplicate-entry-normalizes-zero.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/will-not-add-duplicate-entry.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/clear.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/clears-all-contents-from-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/clears-all-contents.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/clears-an-empty-set.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-set.prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/clear/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/constructor/set-prototype-constructor-intrinsic.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/constructor/set-prototype-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/delete-entry-initial-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/delete-entry-normalizes-zero.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/delete-entry.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/delete.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/returns-false-when-delete-is-noop.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/returns-true-when-delete-operation-occurs.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/delete/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/entries.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/returns-iterator-empty.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/entries/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/callback-not-callable-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/forEach.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-arg-explicit-cannot-override-lexical-this-arrow.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-arg-explicit.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-non-strict.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/this-strict.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/throws-when-callback-throws.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/has.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-undefined-added-deleted-not-present-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-nan.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-false-when-value-not-present-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-nan.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/returns-true-when-value-present-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/has/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/keys/keys.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/returns-count-of-present-values-before-after-add-delete.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/returns-count-of-present-values-by-insertion.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/returns-count-of-present-values-by-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/size/size.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-set-prototype.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-weakset.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/returns-iterator-empty.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/returns-iterator.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/values-iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/values/values.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-does-not-throw-when-add-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-get-add-method-failure.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterable-calls-add.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterable-empty-does-not-call-add.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterable-throws-when-add-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterator-close-after-add-failure.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterator-next-failure.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-iterator-value-failure.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-newtarget.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-no-iterable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set-undefined-newtarget.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/set.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/valid-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/does-not-have-mapiterator-internal-slots-set.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/does-not-have-mapiterator-internal-slots.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/iteration-mutable.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/iteration.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/length.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/name.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/this-not-object-throw-entries.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/this-not-object-throw-keys.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/this-not-object-throw-prototype-iterator.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
+  - path: test/built-ins/SetIteratorPrototype/next/this-not-object-throw-values.js
+    expectedClassification: pass
+    dependencies: [set-intrinsic]
   - path: test/built-ins/String/15.5.5.5.2-1-1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -40372,7 +40976,7 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/species/builtin-getter-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties, symbols]
   - path: test/built-ins/Symbol/species/cross-realm.js
     expectedClassification: unsupported-profile-feature

@@ -428,3 +428,7 @@ families:
     owner: tests/property/m5-json-parse.property.test.ts
     start: 0x60006a00
     end: 0x60006aff
+  - family: m5-set-intrinsic
+    owner: tests/property/m5-set-intrinsic.property.test.ts
+    start: 0x60006b00
+    end: 0x60006bff

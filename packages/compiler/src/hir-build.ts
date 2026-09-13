@@ -228,6 +228,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "isNaN" ||
     name === "parseFloat" ||
     name === "parseInt" ||
+    name === "Set" ||
     name === "undefined"
   );
 }
@@ -591,6 +592,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "Proxy" ||
     name === "RegExp" ||
     name === "String" ||
+    name === "Set" ||
     name === "Symbol" ||
     name === "setTimeout" ||
     name === "clearTimeout" ||

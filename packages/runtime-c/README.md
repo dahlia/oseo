@@ -831,6 +831,16 @@ is collector-traced and cleared at permanent exhaustion. Two code IDs are
 allocated inside the existing iterator range and three intrinsic slots are
 added; the generated-code ABI gains no entry point.
 
+The `m5-104` ABI materializes `%Set%`, `%Set.prototype%`, and
+`%SetIteratorPrototype%`. A Set owns an insertion-ordered element vector whose
+deleted slots remain as iterator tombstones and whose lookup uses
+SameValueZero. Its constructor calls the instance's observable `add` method,
+closes the input iterator after an abrupt add, and selects a derived
+constructor's prototype through the generic property path. Live iterators and
+`forEach` observe deletion, append, clear, and re-insertion without losing
+their forward cursor. Public runtime layout is unchanged; the runtime adds
+internal Set and Set iterator heap kinds.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
