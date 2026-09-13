@@ -434,6 +434,12 @@ struct OseoContext {
     /* Private stack of active array stringification receivers. */
     void *array_string_stack;
     OseoValue timer_head;
+    /* Collector-owned FIFO of finalization cells ready for a later runtime
+     * checkpoint. Collection queues records but never invokes user code. */
+    OseoValue finalization_head;
+    OseoValue finalization_tail;
+    uint64_t next_finalization_order;
+    size_t finalization_pending_count;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;

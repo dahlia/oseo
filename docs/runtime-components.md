@@ -68,10 +68,10 @@ Ownership follows the plan's target layout:
     constructors;
  -  *runtime\_memory.c*: GC-managed heap allocation, the unmanaged
     work-area allocator that shares its deterministic allocation-attempt
-    counter without collecting, publication,
-    tracing, collection, and destruction; [*PLAN-GC.md*](../PLAN-GC.md)
-    owns the planned policy, accounting, slot, descriptor, and collector
-    evolution boundaries;
+    counter without collecting, publication, strong and ephemeron tracing,
+    weak-edge clearing, finalization-record scheduling, collection, and
+    destruction; [*PLAN-GC.md*](../PLAN-GC.md) owns the planned policy,
+    accounting, slot, descriptor, and collector evolution boundaries;
  -  *runtime\_binding.c*: environments, binding cells, module
     namespaces, and the realm's global this value;
  -  *runtime\_string.c*: string values and the string half of a property
@@ -335,7 +335,7 @@ one.
 
 ### Internal helpers
 
-One hundred and eighty-four helpers cross a
+One hundred and ninety-three helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -371,6 +371,15 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_json_global`                 | *runtime\_json.c*             |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
+| `oseo_internal_ephemeron_table_create`              | *runtime\_memory.c*           |
+| `oseo_internal_ephemeron_set`                       | *runtime\_memory.c*           |
+| `oseo_internal_ephemeron_get`                       | *runtime\_memory.c*           |
+| `oseo_internal_ephemeron_live_count`                | *runtime\_memory.c*           |
+| `oseo_internal_weak_reference_create`               | *runtime\_memory.c*           |
+| `oseo_internal_weak_reference_target`               | *runtime\_memory.c*           |
+| `oseo_internal_finalization_registry_create`        | *runtime\_memory.c*           |
+| `oseo_internal_finalization_register`               | *runtime\_memory.c*           |
+| `oseo_internal_finalization_take_cleanup`           | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
 | `oseo_internal_error_to_string`                     | *runtime\_error.c*            |
@@ -596,6 +605,36 @@ The structural runtime tests reject a return of `default_intrinsics` or
 identity, prototype replacement, both specialization policies, and forced
 collection. The node owns no test262 inventory roots and changes no reviewed
 compatibility count.
+
+### Ephemeron tracing checkpoint evidence
+
+M5b node `ephemeron-tracing-checkpoint` adds five collector-only heap kinds to
+*runtime\_memory.c*: tables and their entry records, weak references,
+finalization registries, and finalization cells. Tables strongly trace only
+their entry chain. Collection parks an entry on its unmarked key and activates
+the value when that key becomes reachable, clears dead weak targets,
+unlinks dead ephemeron entries and consumed finalization cells so the sweep
+reclaims them, then publishes eligible finalization cells to the context's
+rooted FIFO in registration order. The collector performs neither allocation
+nor callback invocation in these phases.
+
+Nine private helpers create and inspect those records for the later weak
+collections component. The public context layout gains the cleanup queue and
+its ordering state, moving `abiVersion` to `m5-107`, but no global, intrinsic,
+built-in code ID, or generated-code operation is added. Fixed sanitized native
+evidence covers ephemeron chains and cycles, clearing timing, delayed cleanup,
+collection forced at every safepoint, and the AArch64 Linux cross-link. The
+generated native domain at seed `0x60006f00` compares bounded cyclic graphs and
+cleanup permutations with an independent fixed-point model under both
+specialization policy settings. The node owns no test262 paths and admits no
+language-profile family.
+
+The entry chain is collector traversal state, not the indexed representation
+for future JavaScript lookup. The later weak-collections component owns that
+index and its synchronization with dead-entry unlinking. It also owns the
+job-scoped strong root and later ABI increment required by
+`WeakRef.prototype.deref`; private target inspection at this checkpoint does
+not implement `KeepDuringJob`.
 
 ### Object prototype evidence
 

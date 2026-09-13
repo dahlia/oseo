@@ -142,6 +142,48 @@ features such as future weak references or finalization. Test counters and
 diagnostic records are removed before differential output comparison.
 
 
+Ephemeron and finalization checkpoint
+-------------------------------------
+
+The M5b `ephemeron-tracing-checkpoint` extends the non-moving collector with
+the weak-edge phase order that later JavaScript weak collections consume. It
+does not install `WeakMap`, `WeakSet`, `WeakRef`, or `FinalizationRegistry`
+intrinsics or expose their source-level operations.
+
+One marked ephemeron table strongly reaches its entry records but not their
+keys or values. An entry discovered before its key parks on a collector-only
+list owned by the key object. When the key becomes reachable, the collector
+activates every waiting value on the ordinary worklist. This computes the
+fixed point without repeated full passes. A key-value cycle with no independent
+strong path therefore dies, while an activated value may reveal a key that
+activates another table.
+
+The table's entry chain exists for collector traversal and clearing, not as a
+source-level lookup index. The later weak-collections component must add an
+address-keyed index for JavaScript operations and keep it synchronized when
+the collector unlinks dead entries. The private weak-target inspection helper
+does not implement `WeakRef.prototype.deref` or retain a target for the rest of
+the current job. That component also owns the `KeepDuringJob` root, its clear
+checkpoint, and the resulting runtime ABI increment before exposing `WeakRef`.
+
+Only after that fixed point does the collector clear an unmarked weak target
+and unlink an ephemeron entry whose key stayed unmarked, so the same sweep
+reclaims the entry record and a churning table does not grow. Marked
+finalization registries then publish dead-target cells to one collector-owned
+FIFO. The FIFO orders newly eligible cells by their realm-wide registration
+ordinal, retains the registry and holdings as strong edges, and is itself a
+context root until the scheduler consumes each record. A record the scheduler
+has consumed is unlinked from its registry at the next collection so a
+long-lived registry does not retain one dead cell per registration.
+
+Collection performs no allocation and invokes no callback during those phases.
+The private cleanup dequeue writes the registry and holdings into caller-owned
+root slots without collecting; the later JavaScript-facing component must turn
+those records into scheduled cleanup jobs at an explicit runtime checkpoint.
+This separates reachability and clearing from callback execution and keeps
+collection forced at every safepoint sound.
+
+
 Tracing and object metadata
 ---------------------------
 
