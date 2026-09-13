@@ -1304,6 +1304,71 @@ test("owns each ArrayBuffer data block through exactly one buffer", () => {
   assert.doesNotMatch(bufferSource, /realloc/u);
 });
 
+test("populates the realm-owned Set intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const setSource = sources.get("runtime_set.c") ?? "";
+
+  for (const intrinsic of [
+    "SET_PROTOTYPE",
+    "SET",
+    "SET_ADD",
+    "SET_CLEAR",
+    "SET_DELETE",
+    "SET_ENTRIES",
+    "SET_FOR_EACH",
+    "SET_HAS",
+    "SET_SIZE",
+    "SET_VALUES",
+    "SET_ITERATOR_PROTOTYPE",
+    "SET_ITERATOR_NEXT",
+    "SET_SPECIES",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "Set",
+    "add",
+    "clear",
+    "constructor",
+    "delete",
+    "entries",
+    "forEach",
+    "has",
+    "keys",
+    "next",
+    "size",
+    "values",
+  ]) {
+    assert.match(setSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(setSource, /OSEO_SET_CONSTRUCTOR_CODE_ID/u);
+  assert.match(setSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(setSource, /OSEO_WELL_KNOWN_ITERATOR/u);
+  assert.match(setSource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(setSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(setSource, /oseo_object_define_accessor/u);
+  assert.match(internalHeader, /oseo_internal_install_set_global/u);
+  assert.match(bindingSource, /oseo_internal_install_set_global/u);
+});
+
+test("traces ordered Set elements and live iterator state", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const setSource = sources.get("runtime_set.c") ?? "";
+
+  assert.match(internalHeader, /OSEO_HEAP_SET = 27/u);
+  assert.match(internalHeader, /OSEO_HEAP_SET_ITERATOR = 28/u);
+  assert.match(internalHeader, /OseoSetElement \*elements;/u);
+  assert.match(memorySource, /set->elements\[index\]\.value/u);
+  assert.match(memorySource, /OseoSetIterator \*\)object\)->set/u);
+  assert.match(memorySource, /free\(\(\(OseoSet \*\)object\)->elements\)/u);
+  assert.match(setSource, /oseo_internal_same_value_zero/u);
+  assert.match(setSource, /set->elements\[index\]\.present = false/u);
+  assert.match(setSource, /iterator->index \+= 1u/u);
+});
+
 test("populates the realm-owned Promise intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

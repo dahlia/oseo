@@ -117,6 +117,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "reflect-namespace",
   "regular-expressions",
   "rest-parameters",
+  "set-intrinsic",
   "symbols",
   "timers",
   "top-level-await",

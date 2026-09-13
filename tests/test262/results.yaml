@@ -9116,6 +9116,435 @@ partitions:
   - group: built-ins/RegExpStringIteratorPrototype
     key: f9
     path: results/built-ins/RegExpStringIteratorPrototype/f9.yaml
+  - group: built-ins/Set
+    key: "01"
+    path: results/built-ins/Set/01.yaml
+  - group: built-ins/Set
+    key: "04"
+    path: results/built-ins/Set/04.yaml
+  - group: built-ins/Set
+    key: "06"
+    path: results/built-ins/Set/06.yaml
+  - group: built-ins/Set
+    key: "07"
+    path: results/built-ins/Set/07.yaml
+  - group: built-ins/Set
+    key: "09"
+    path: results/built-ins/Set/09.yaml
+  - group: built-ins/Set
+    key: 0d
+    path: results/built-ins/Set/0d.yaml
+  - group: built-ins/Set
+    key: "12"
+    path: results/built-ins/Set/12.yaml
+  - group: built-ins/Set
+    key: "14"
+    path: results/built-ins/Set/14.yaml
+  - group: built-ins/Set
+    key: "15"
+    path: results/built-ins/Set/15.yaml
+  - group: built-ins/Set
+    key: "18"
+    path: results/built-ins/Set/18.yaml
+  - group: built-ins/Set
+    key: "19"
+    path: results/built-ins/Set/19.yaml
+  - group: built-ins/Set
+    key: 1b
+    path: results/built-ins/Set/1b.yaml
+  - group: built-ins/Set
+    key: 1d
+    path: results/built-ins/Set/1d.yaml
+  - group: built-ins/Set
+    key: 1e
+    path: results/built-ins/Set/1e.yaml
+  - group: built-ins/Set
+    key: 1f
+    path: results/built-ins/Set/1f.yaml
+  - group: built-ins/Set
+    key: "22"
+    path: results/built-ins/Set/22.yaml
+  - group: built-ins/Set
+    key: "25"
+    path: results/built-ins/Set/25.yaml
+  - group: built-ins/Set
+    key: "27"
+    path: results/built-ins/Set/27.yaml
+  - group: built-ins/Set
+    key: "28"
+    path: results/built-ins/Set/28.yaml
+  - group: built-ins/Set
+    key: 2a
+    path: results/built-ins/Set/2a.yaml
+  - group: built-ins/Set
+    key: 2b
+    path: results/built-ins/Set/2b.yaml
+  - group: built-ins/Set
+    key: 2c
+    path: results/built-ins/Set/2c.yaml
+  - group: built-ins/Set
+    key: 2d
+    path: results/built-ins/Set/2d.yaml
+  - group: built-ins/Set
+    key: 2f
+    path: results/built-ins/Set/2f.yaml
+  - group: built-ins/Set
+    key: "30"
+    path: results/built-ins/Set/30.yaml
+  - group: built-ins/Set
+    key: "32"
+    path: results/built-ins/Set/32.yaml
+  - group: built-ins/Set
+    key: "34"
+    path: results/built-ins/Set/34.yaml
+  - group: built-ins/Set
+    key: "35"
+    path: results/built-ins/Set/35.yaml
+  - group: built-ins/Set
+    key: "37"
+    path: results/built-ins/Set/37.yaml
+  - group: built-ins/Set
+    key: "39"
+    path: results/built-ins/Set/39.yaml
+  - group: built-ins/Set
+    key: 3b
+    path: results/built-ins/Set/3b.yaml
+  - group: built-ins/Set
+    key: 3d
+    path: results/built-ins/Set/3d.yaml
+  - group: built-ins/Set
+    key: 3e
+    path: results/built-ins/Set/3e.yaml
+  - group: built-ins/Set
+    key: 3f
+    path: results/built-ins/Set/3f.yaml
+  - group: built-ins/Set
+    key: "40"
+    path: results/built-ins/Set/40.yaml
+  - group: built-ins/Set
+    key: "42"
+    path: results/built-ins/Set/42.yaml
+  - group: built-ins/Set
+    key: "46"
+    path: results/built-ins/Set/46.yaml
+  - group: built-ins/Set
+    key: "49"
+    path: results/built-ins/Set/49.yaml
+  - group: built-ins/Set
+    key: 4b
+    path: results/built-ins/Set/4b.yaml
+  - group: built-ins/Set
+    key: 4d
+    path: results/built-ins/Set/4d.yaml
+  - group: built-ins/Set
+    key: 4e
+    path: results/built-ins/Set/4e.yaml
+  - group: built-ins/Set
+    key: "50"
+    path: results/built-ins/Set/50.yaml
+  - group: built-ins/Set
+    key: "53"
+    path: results/built-ins/Set/53.yaml
+  - group: built-ins/Set
+    key: "55"
+    path: results/built-ins/Set/55.yaml
+  - group: built-ins/Set
+    key: "56"
+    path: results/built-ins/Set/56.yaml
+  - group: built-ins/Set
+    key: "57"
+    path: results/built-ins/Set/57.yaml
+  - group: built-ins/Set
+    key: "58"
+    path: results/built-ins/Set/58.yaml
+  - group: built-ins/Set
+    key: "59"
+    path: results/built-ins/Set/59.yaml
+  - group: built-ins/Set
+    key: "60"
+    path: results/built-ins/Set/60.yaml
+  - group: built-ins/Set
+    key: "61"
+    path: results/built-ins/Set/61.yaml
+  - group: built-ins/Set
+    key: "62"
+    path: results/built-ins/Set/62.yaml
+  - group: built-ins/Set
+    key: "65"
+    path: results/built-ins/Set/65.yaml
+  - group: built-ins/Set
+    key: "66"
+    path: results/built-ins/Set/66.yaml
+  - group: built-ins/Set
+    key: "67"
+    path: results/built-ins/Set/67.yaml
+  - group: built-ins/Set
+    key: 6b
+    path: results/built-ins/Set/6b.yaml
+  - group: built-ins/Set
+    key: 6c
+    path: results/built-ins/Set/6c.yaml
+  - group: built-ins/Set
+    key: 6f
+    path: results/built-ins/Set/6f.yaml
+  - group: built-ins/Set
+    key: "70"
+    path: results/built-ins/Set/70.yaml
+  - group: built-ins/Set
+    key: "72"
+    path: results/built-ins/Set/72.yaml
+  - group: built-ins/Set
+    key: "73"
+    path: results/built-ins/Set/73.yaml
+  - group: built-ins/Set
+    key: "74"
+    path: results/built-ins/Set/74.yaml
+  - group: built-ins/Set
+    key: "77"
+    path: results/built-ins/Set/77.yaml
+  - group: built-ins/Set
+    key: "78"
+    path: results/built-ins/Set/78.yaml
+  - group: built-ins/Set
+    key: 7a
+    path: results/built-ins/Set/7a.yaml
+  - group: built-ins/Set
+    key: 7c
+    path: results/built-ins/Set/7c.yaml
+  - group: built-ins/Set
+    key: 7d
+    path: results/built-ins/Set/7d.yaml
+  - group: built-ins/Set
+    key: 7e
+    path: results/built-ins/Set/7e.yaml
+  - group: built-ins/Set
+    key: "82"
+    path: results/built-ins/Set/82.yaml
+  - group: built-ins/Set
+    key: "83"
+    path: results/built-ins/Set/83.yaml
+  - group: built-ins/Set
+    key: "84"
+    path: results/built-ins/Set/84.yaml
+  - group: built-ins/Set
+    key: "85"
+    path: results/built-ins/Set/85.yaml
+  - group: built-ins/Set
+    key: "87"
+    path: results/built-ins/Set/87.yaml
+  - group: built-ins/Set
+    key: "89"
+    path: results/built-ins/Set/89.yaml
+  - group: built-ins/Set
+    key: 8c
+    path: results/built-ins/Set/8c.yaml
+  - group: built-ins/Set
+    key: 8d
+    path: results/built-ins/Set/8d.yaml
+  - group: built-ins/Set
+    key: 8e
+    path: results/built-ins/Set/8e.yaml
+  - group: built-ins/Set
+    key: 8f
+    path: results/built-ins/Set/8f.yaml
+  - group: built-ins/Set
+    key: "91"
+    path: results/built-ins/Set/91.yaml
+  - group: built-ins/Set
+    key: "92"
+    path: results/built-ins/Set/92.yaml
+  - group: built-ins/Set
+    key: "93"
+    path: results/built-ins/Set/93.yaml
+  - group: built-ins/Set
+    key: "95"
+    path: results/built-ins/Set/95.yaml
+  - group: built-ins/Set
+    key: "99"
+    path: results/built-ins/Set/99.yaml
+  - group: built-ins/Set
+    key: 9c
+    path: results/built-ins/Set/9c.yaml
+  - group: built-ins/Set
+    key: 9e
+    path: results/built-ins/Set/9e.yaml
+  - group: built-ins/Set
+    key: 9f
+    path: results/built-ins/Set/9f.yaml
+  - group: built-ins/Set
+    key: a0
+    path: results/built-ins/Set/a0.yaml
+  - group: built-ins/Set
+    key: a3
+    path: results/built-ins/Set/a3.yaml
+  - group: built-ins/Set
+    key: a4
+    path: results/built-ins/Set/a4.yaml
+  - group: built-ins/Set
+    key: a5
+    path: results/built-ins/Set/a5.yaml
+  - group: built-ins/Set
+    key: a7
+    path: results/built-ins/Set/a7.yaml
+  - group: built-ins/Set
+    key: a9
+    path: results/built-ins/Set/a9.yaml
+  - group: built-ins/Set
+    key: aa
+    path: results/built-ins/Set/aa.yaml
+  - group: built-ins/Set
+    key: ac
+    path: results/built-ins/Set/ac.yaml
+  - group: built-ins/Set
+    key: ad
+    path: results/built-ins/Set/ad.yaml
+  - group: built-ins/Set
+    key: ae
+    path: results/built-ins/Set/ae.yaml
+  - group: built-ins/Set
+    key: b2
+    path: results/built-ins/Set/b2.yaml
+  - group: built-ins/Set
+    key: b3
+    path: results/built-ins/Set/b3.yaml
+  - group: built-ins/Set
+    key: b4
+    path: results/built-ins/Set/b4.yaml
+  - group: built-ins/Set
+    key: b7
+    path: results/built-ins/Set/b7.yaml
+  - group: built-ins/Set
+    key: b8
+    path: results/built-ins/Set/b8.yaml
+  - group: built-ins/Set
+    key: ba
+    path: results/built-ins/Set/ba.yaml
+  - group: built-ins/Set
+    key: bb
+    path: results/built-ins/Set/bb.yaml
+  - group: built-ins/Set
+    key: be
+    path: results/built-ins/Set/be.yaml
+  - group: built-ins/Set
+    key: c1
+    path: results/built-ins/Set/c1.yaml
+  - group: built-ins/Set
+    key: c2
+    path: results/built-ins/Set/c2.yaml
+  - group: built-ins/Set
+    key: c5
+    path: results/built-ins/Set/c5.yaml
+  - group: built-ins/Set
+    key: c6
+    path: results/built-ins/Set/c6.yaml
+  - group: built-ins/Set
+    key: c7
+    path: results/built-ins/Set/c7.yaml
+  - group: built-ins/Set
+    key: c8
+    path: results/built-ins/Set/c8.yaml
+  - group: built-ins/Set
+    key: c9
+    path: results/built-ins/Set/c9.yaml
+  - group: built-ins/Set
+    key: ca
+    path: results/built-ins/Set/ca.yaml
+  - group: built-ins/Set
+    key: cf
+    path: results/built-ins/Set/cf.yaml
+  - group: built-ins/Set
+    key: d1
+    path: results/built-ins/Set/d1.yaml
+  - group: built-ins/Set
+    key: d2
+    path: results/built-ins/Set/d2.yaml
+  - group: built-ins/Set
+    key: d3
+    path: results/built-ins/Set/d3.yaml
+  - group: built-ins/Set
+    key: d7
+    path: results/built-ins/Set/d7.yaml
+  - group: built-ins/Set
+    key: d9
+    path: results/built-ins/Set/d9.yaml
+  - group: built-ins/Set
+    key: db
+    path: results/built-ins/Set/db.yaml
+  - group: built-ins/Set
+    key: df
+    path: results/built-ins/Set/df.yaml
+  - group: built-ins/Set
+    key: e2
+    path: results/built-ins/Set/e2.yaml
+  - group: built-ins/Set
+    key: e5
+    path: results/built-ins/Set/e5.yaml
+  - group: built-ins/Set
+    key: e6
+    path: results/built-ins/Set/e6.yaml
+  - group: built-ins/Set
+    key: e8
+    path: results/built-ins/Set/e8.yaml
+  - group: built-ins/Set
+    key: eb
+    path: results/built-ins/Set/eb.yaml
+  - group: built-ins/Set
+    key: ed
+    path: results/built-ins/Set/ed.yaml
+  - group: built-ins/Set
+    key: ef
+    path: results/built-ins/Set/ef.yaml
+  - group: built-ins/Set
+    key: f4
+    path: results/built-ins/Set/f4.yaml
+  - group: built-ins/Set
+    key: f6
+    path: results/built-ins/Set/f6.yaml
+  - group: built-ins/Set
+    key: fa
+    path: results/built-ins/Set/fa.yaml
+  - group: built-ins/Set
+    key: fb
+    path: results/built-ins/Set/fb.yaml
+  - group: built-ins/Set
+    key: fc
+    path: results/built-ins/Set/fc.yaml
+  - group: built-ins/Set
+    key: ff
+    path: results/built-ins/Set/ff.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: "29"
+    path: results/built-ins/SetIteratorPrototype/29.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: 2f
+    path: results/built-ins/SetIteratorPrototype/2f.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: "34"
+    path: results/built-ins/SetIteratorPrototype/34.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: 3b
+    path: results/built-ins/SetIteratorPrototype/3b.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: 4c
+    path: results/built-ins/SetIteratorPrototype/4c.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: 6c
+    path: results/built-ins/SetIteratorPrototype/6c.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: 9c
+    path: results/built-ins/SetIteratorPrototype/9c.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: b4
+    path: results/built-ins/SetIteratorPrototype/b4.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: c1
+    path: results/built-ins/SetIteratorPrototype/c1.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: ce
+    path: results/built-ins/SetIteratorPrototype/ce.yaml
+  - group: built-ins/SetIteratorPrototype
+    key: db
+    path: results/built-ins/SetIteratorPrototype/db.yaml
   - group: built-ins/String
     key: "00"
     path: results/built-ins/String/00.yaml
@@ -13813,9 +14242,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 14905
+  passes: 15109
   semanticFailures: 0
-  unsupportedProfileFeatures: 1953
+  unsupportedProfileFeatures: 1950
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -13933,9 +14362,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1119
+      passes: 1129
       semanticFailures: 0
-      unsupportedProfileFeatures: 437
+      unsupportedProfileFeatures: 427
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -13975,9 +14404,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9632
+      passes: 9634
       semanticFailures: 0
-      unsupportedProfileFeatures: 445
+      unsupportedProfileFeatures: 443
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -14020,13 +14449,20 @@ summary:
       passes: 7
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - dependency: set-intrinsic
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 193
+      semanticFailures: 0
+      unsupportedProfileFeatures: 9
     - dependency: symbols
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 653
+      passes: 654
       semanticFailures: 0
-      unsupportedProfileFeatures: 84
+      unsupportedProfileFeatures: 83
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -14179,9 +14615,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 148
+      passes: 158
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 12
     - group: built-ins/MapIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -14221,9 +14657,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3197
+      passes: 3198
       semanticFailures: 0
-      unsupportedProfileFeatures: 126
+      unsupportedProfileFeatures: 125
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -14252,6 +14688,20 @@ summary:
       passes: 17
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/Set
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 181
+      semanticFailures: 0
+      unsupportedProfileFeatures: 9
+    - group: built-ins/SetIteratorPrototype
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 11
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
@@ -14270,9 +14720,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 21
+      passes: 22
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 13
     - group: built-ins/ThrowTypeError
       expectedNegatives: 0
       harnessFailures: 0

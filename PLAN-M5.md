@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,414 reviewed cases: 14,905 passes, 1,556 expected negatives, and 1,953
+18,615 reviewed cases: 15,109 passes, 1,556 expected negatives, and 1,950
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 119 indexed records in the normative
+M5a is complete. The 120 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-14,905 passes across 18,414 paths, and the property inventory records 138
-domains, 138 seeds, and an ordinary case budget of 5,554.
+15,109 passes across 18,615 paths, and the property inventory records 139
+domains, 139 seeds, and an ordinary case budget of 5,566.
 
 
 M5a implementation history
@@ -6025,6 +6025,39 @@ runtime component, one built-in code ID range, and two intrinsic slots, adds no
 generated-code entry point, and does not change the graph's orchestration
 state. The property ratchet moves from 137 to 138 domains and seeds and from
 5,542 to 5,554 ordinary cases.
+
+Implemented M5b node `set-intrinsic` materializes `%Set%`,
+`%Set.prototype%`, and `%SetIteratorPrototype%`. Each Set owns an
+insertion-ordered element vector. SameValueZero lookup unifies both zero signs
+and every `NaN`; deletion leaves a tombstone, and re-insertion appends a fresh
+live slot. Iterators and `forEach` advance one forward cursor over that live
+vector, so deletion skips an unvisited value, append remains visible, clear
+does not rewind the cursor, and a deleted then re-added value is visited at its
+new position. The constructor selects a derived prototype through the generic
+property path, obtains the instance's observable `add` before the iterable,
+and closes the iterator after an abrupt `add` without closing an abrupt
+iterator step.
+
+Fixed native and generated differential evidence at seed `0x60006b00` covers
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate shape-guard hits and misses, generic fallback, SameValueZero
+values, mutation during iteration and `forEach`, constructor order, and
+iterator closing. Of the 208 paths under the node's sixteen inventory roots,
+201 are reviewed: 192 pass and 9 retain explicit prerequisites for a second
+realm, `WeakSet`, TypedArrays, and `WeakRef`. The other seven use the
+unadmitted `Array.prototype.shift` while
+asserting Set order, so they remain outside the reviewed subset until the Array
+node owns that observable prerequisite. Twelve previously reviewed paths
+outside the roots also move from `unsupported-profile-feature` to `pass`
+because each constructs a Set as an ordinary operand: the Object sealing case,
+ten `Map` brand-check cases, and the `Symbol.species` built-in getter name
+case. No reviewed path moves away from `pass`. The manifest moves from 18,414
+to 18,615 paths, from 14,905 to 15,109 passes, and from 1,953 to 1,950
+unsupported profile features while keeping 1,556 expected negatives and zero
+semantic, harness, or infrastructure failures. The runtime ABI moves to
+`oseo-runtime-m5-104`. The property ratchet moves from 138 to 139 domains and
+seeds and from 5,554 to 5,566 ordinary cases, and the evidence inventory moves
+from 119 to 120 families. The graph's orchestration state is unchanged.
 
 
 Ahead-of-time challenge boundary

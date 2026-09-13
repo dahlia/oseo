@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 117
+M5a is complete. The normative family records described below inventory 118
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,414 reviewed cases: 14,905 passes, 1,556
-expected negatives, and 1,953 unsupported profile features. It records no
+The current manifest contains 18,615 reviewed cases: 15,109 passes, 1,556
+expected negatives, and 1,950 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6379,6 +6379,66 @@ adds one runtime component, one built-in code ID range, and two intrinsic
 slots, and adds no generated-code entry point.
 
 
+Set intrinsic
+-------------
+
+M5b node `set-intrinsic` materializes `%Set%`, `%Set.prototype%`, and
+`%SetIteratorPrototype%`. Calling `Set` without `new` throws a `TypeError`,
+while ordinary and derived construction obtain the instance prototype through
+the new target's observable `prototype` property. A nullish iterable returns
+the empty instance without reading `add`; otherwise the constructor reads the
+instance's observable `add` before acquiring the iterator. An abrupt call to
+that adder closes the iterator and preserves the original completion, while
+an abrupt iterator step propagates without a close.
+
+Each Set owns one insertion-ordered vector of element slots. Lookup uses
+SameValueZero, so the two zero signs denote one canonical positive-zero entry,
+every `NaN` denotes one entry, and objects retain identity. Deletion leaves a
+tombstone, clear tombstones every existing slot, and re-insertion appends a
+fresh live slot. The `add`, `clear`, `delete`, `has`, and `size` operations
+therefore preserve both membership and insertion order without moving a live
+entry that is added twice. Nothing compacts that vector, so its length and
+each membership scan follow the lifetime insertion count rather than `size`;
+the known gaps below record that limit and its owner.
+
+`values`, `keys`, and `Symbol.iterator` share one function identity and create
+a live value iterator; `entries` creates the same live cursor with
+`[value, value]` results. `%SetIteratorPrototype%` inherits from
+`%IteratorPrototype%`, so its iterators are iterable and carry the
+`Set Iterator` tag. A cursor reads the vector's current length on every step.
+It skips entries deleted before their turn, observes later appends, does not
+rewind after clear, and visits a deleted then re-added value at its new
+position. `forEach` uses the same live forward traversal and calls its callback
+with `(value, value, set)` and the supplied `thisArg`.
+
+Fixed native and generated differential evidence at property seed
+`0x60006b00` covers both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard hits and misses, generic
+fallback, primitive and object identity classes, SameValueZero, deletion and
+re-insertion, mutation during iteration and `forEach`, derived construction,
+observable adder order, and iterator closing. The generated model retains
+ordered tombstones independently of either reference engine and then compares
+its observations with Node.js, Deno, and both native policies.
+
+Of the 208 paths under the node's sixteen inventory roots, 201 are reviewed:
+192 pass and 9 retain explicit prerequisites for a second realm, `WeakSet`,
+TypedArrays, and `WeakRef`. The other seven use
+the unadmitted `Array.prototype.shift` to observe an otherwise applicable Set
+order and stay outside the reviewed subset until that Array method lands.
+Twelve previously reviewed paths outside the roots, the Object sealing case,
+ten `Map` brand-check cases, and the `Symbol.species` built-in getter name
+case, also become passes because each constructs a Set as an ordinary operand;
+no reviewed path moves away from `pass`. The reviewed feature list gains
+`Set`, and the reviewed dependency vocabulary gains `set-intrinsic`. The
+manifest moves from 18,414 to 18,615 cases and from 14,905 to 15,109 passes,
+keeps 1,556 expected negatives, and moves from 1,953 to 1,950 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are otherwise unchanged. The new component and two heap
+kinds move the runtime ABI to `oseo-runtime-m5-104` without a public layout
+change and without changing the graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6390,6 +6450,16 @@ already admits and assigned every genuine remaining rejection an explicit
 owner. Unit 8.5o closes the sole M5a evidence gap from that audit, so M5a is
 complete. The remaining gaps retain their existing owners.
 
+ -  `Set` element storage, admitted by the M5b `set-intrinsic` node as recorded
+    above, is one insertion-ordered vector whose deleted slots stay as
+    tombstones so that live iterators keep their forward cursor. Nothing
+    compacts or reuses a tombstone, so the vector and every membership scan
+    grow with the lifetime insertion count rather than with `size`, and a
+    long add-and-delete cycle over one Set holds memory and time that other
+    engines bound by the live count. `Map` storage shares the same shape.
+    Compaction that preserves open cursors is a measured storage checkpoint
+    that [*PLAN-M5.md*](../PLAN-M5.md) owns; the observable semantics are
+    complete without it.
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
     assignment, and update are admitted by M5a Unit 8.1a, and the callable
     `BigInt` intrinsic, `BigInt.prototype`, branded wrappers, `toString`,
@@ -6454,8 +6524,8 @@ complete. The remaining gaps retain their existing owners.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that
-    block, and the `Date` constructor with its statics and prototype. The
-    remaining standard
+    block, the `Date` constructor with its statics and prototype, and
+    `Set` with its insertion-ordered element vector. The remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
     `ArrayBuffer.isView` reports `true` for a `DataView` and `false` for
     every other value this profile can produce; the node that admits a
@@ -6472,7 +6542,7 @@ complete. The remaining gaps retain their existing owners.
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
     admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
-    `Promise`, and `String` identities. The
+    `Promise`, `Set`, and `String` identities. The
     `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
     `encodeURI`, and `encodeURIComponent` as four more replaceable
     properties of the same object, the `global-numeric-functions` node

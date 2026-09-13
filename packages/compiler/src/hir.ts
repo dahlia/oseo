@@ -362,6 +362,7 @@ export function intrinsicGlobalKind(
     name === "Reflect" ||
     name === "RegExp" ||
     name === "String" ||
+    name === "Set" ||
     name === "Symbol" ||
     name === "decodeURI" ||
     name === "decodeURIComponent" ||

@@ -1,0 +1,3 @@
+version: 1
+id: set-intrinsic
+record: docs/language-profile-m5/families/set-intrinsic.yaml

@@ -50,6 +50,7 @@ import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
+import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 
 const { regexpLiteralAotFixtures } =
@@ -215,6 +216,7 @@ const fixtures: readonly Fixture[] = [
   ...reflectNamespaceFixtures,
   ...proxyExoticObjectFixtures,
   ...jsonParseFixtures,
+  ...setIntrinsicFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -717,6 +719,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "set-intrinsic" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -827,6 +830,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
+    fixture.name === "set-intrinsic" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1071,7 +1075,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-prototype-replace" ||
             fixture.name === "string-iterator" ||
             fixture.name === "generic-string-coercion" ||
-            fixture.name === "number-prototype"
+            fixture.name === "number-prototype" ||
+            fixture.name === "set-intrinsic"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1090,7 +1095,8 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "iterator-helpers-lazy" ||
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||
-                fixture.name === "number-prototype"
+                fixture.name === "number-prototype" ||
+                fixture.name === "set-intrinsic"
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }
@@ -1294,12 +1300,13 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the eleven standard-object
-            // and value-property allocations plus thirty admitted
+            // and value-property allocations plus thirty-one admitted
             // standard global property names shared by every Script, with
-            // Proxy adding one allocation in each group and Date and JSON
-            // adding only their property names, because the observation
-            // excludes the allocations of their intrinsic builds.
-            assert.equal(native.counters.allocations, 47);
+            // Proxy adding one allocation in each group and Date, JSON,
+            // and Set adding only their property names, because the
+            // observation excludes the allocations of their intrinsic
+            // builds.
+            assert.equal(native.counters.allocations, 48);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

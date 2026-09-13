@@ -17,13 +17,14 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-nine reviewed assets in this order:
+The runtime input now lists forty reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
 *runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
-*runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_arguments.c*,
+*runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_set.c*,
+*runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
@@ -42,7 +43,8 @@ asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions,
-Reflect-namespace, Proxy-exotic-object, Date-family, and JSON-parse units each
+Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse, and
+Set-intrinsic units each
 added one
 component the same
 way. The M5b
@@ -187,6 +189,9 @@ Ownership follows the plan's target layout:
     string keys. It owns no dynamic-source entry point: ToString remains in
     *runtime\_primitive.c*, ordinary property operations remain in the object
     components, and the parsed text is data rather than JavaScript source;
+ -  *runtime\_set.c*: the `Set` constructor, insertion-ordered element
+    storage, SameValueZero lookup, the core prototype methods, and the live
+    `%SetIteratorPrototype%` cursor;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -1194,6 +1199,30 @@ prototype metadata, receiver conversion, branding, BMP and astral code points,
 lone surrogates, permanent exhaustion, `for-in` array-pattern destructuring of
 each String key, both specialization policies, deliberate guard hits and
 misses, generic fallback, and collection at every safepoint.
+
+### Set evidence
+
+M5b node `set-intrinsic` adds *runtime\_set.c* and two collector-traced heap
+kinds. A Set embeds the ordinary object layout and owns an insertion-ordered
+element vector. Deletion leaves a tombstone, so an iterator cursor never moves
+backward, and re-insertion appends a new live slot. SameValueZero lookup folds
+both zero signs together and treats every `NaN` as one value. The vector is
+never compacted, so storage and each linear membership scan grow with the
+lifetime insertion count rather than with `size`; the language profile records
+that limit under its known gaps.
+
+Set iterators trace the Set whose live element vector they traverse. The
+constructor obtains the instance's observable `add` method before it acquires
+the input iterator, and it closes that iterator exactly when a completed step
+is followed by an abrupt `add`. Fixed and generated native differential
+evidence covers both specialization policies, false hints, deliberate guard
+hits and misses, generic fallback, live mutation during iteration and
+`forEach`, and collection forced at every safepoint.
+
+The new component moves `abiVersion` to `m5-104` without a public layout
+change. The node reviews its sixteen declared test262 inventory roots and
+promotes the twelve already-reviewed Object, Map, and Symbol cases whose only
+unmet prerequisite was a constructible `Set`.
 
 ### Function prototype evidence
 
