@@ -4650,6 +4650,9 @@ partitions:
     key: "06"
     path: results/built-ins/JSON/06.yaml
   - group: built-ins/JSON
+    key: "08"
+    path: results/built-ins/JSON/08.yaml
+  - group: built-ins/JSON
     key: 0a
     path: results/built-ins/JSON/0a.yaml
   - group: built-ins/JSON
@@ -4662,6 +4665,9 @@ partitions:
     key: "15"
     path: results/built-ins/JSON/15.yaml
   - group: built-ins/JSON
+    key: "19"
+    path: results/built-ins/JSON/19.yaml
+  - group: built-ins/JSON
     key: 1a
     path: results/built-ins/JSON/1a.yaml
   - group: built-ins/JSON
@@ -4671,11 +4677,20 @@ partitions:
     key: 1e
     path: results/built-ins/JSON/1e.yaml
   - group: built-ins/JSON
+    key: "21"
+    path: results/built-ins/JSON/21.yaml
+  - group: built-ins/JSON
     key: "23"
     path: results/built-ins/JSON/23.yaml
   - group: built-ins/JSON
     key: "25"
     path: results/built-ins/JSON/25.yaml
+  - group: built-ins/JSON
+    key: "27"
+    path: results/built-ins/JSON/27.yaml
+  - group: built-ins/JSON
+    key: "28"
+    path: results/built-ins/JSON/28.yaml
   - group: built-ins/JSON
     key: 2b
     path: results/built-ins/JSON/2b.yaml
@@ -4683,8 +4698,17 @@ partitions:
     key: 2c
     path: results/built-ins/JSON/2c.yaml
   - group: built-ins/JSON
+    key: 2d
+    path: results/built-ins/JSON/2d.yaml
+  - group: built-ins/JSON
     key: "32"
     path: results/built-ins/JSON/32.yaml
+  - group: built-ins/JSON
+    key: "37"
+    path: results/built-ins/JSON/37.yaml
+  - group: built-ins/JSON
+    key: 3a
+    path: results/built-ins/JSON/3a.yaml
   - group: built-ins/JSON
     key: 3b
     path: results/built-ins/JSON/3b.yaml
@@ -4698,8 +4722,17 @@ partitions:
     key: "42"
     path: results/built-ins/JSON/42.yaml
   - group: built-ins/JSON
+    key: "44"
+    path: results/built-ins/JSON/44.yaml
+  - group: built-ins/JSON
     key: "45"
     path: results/built-ins/JSON/45.yaml
+  - group: built-ins/JSON
+    key: "49"
+    path: results/built-ins/JSON/49.yaml
+  - group: built-ins/JSON
+    key: 4c
+    path: results/built-ins/JSON/4c.yaml
   - group: built-ins/JSON
     key: 4f
     path: results/built-ins/JSON/4f.yaml
@@ -4707,11 +4740,32 @@ partitions:
     key: "51"
     path: results/built-ins/JSON/51.yaml
   - group: built-ins/JSON
+    key: "52"
+    path: results/built-ins/JSON/52.yaml
+  - group: built-ins/JSON
     key: "53"
     path: results/built-ins/JSON/53.yaml
   - group: built-ins/JSON
+    key: "54"
+    path: results/built-ins/JSON/54.yaml
+  - group: built-ins/JSON
+    key: "56"
+    path: results/built-ins/JSON/56.yaml
+  - group: built-ins/JSON
+    key: "57"
+    path: results/built-ins/JSON/57.yaml
+  - group: built-ins/JSON
     key: "58"
     path: results/built-ins/JSON/58.yaml
+  - group: built-ins/JSON
+    key: "59"
+    path: results/built-ins/JSON/59.yaml
+  - group: built-ins/JSON
+    key: 5a
+    path: results/built-ins/JSON/5a.yaml
+  - group: built-ins/JSON
+    key: 5d
+    path: results/built-ins/JSON/5d.yaml
   - group: built-ins/JSON
     key: "62"
     path: results/built-ins/JSON/62.yaml
@@ -4719,8 +4773,20 @@ partitions:
     key: "64"
     path: results/built-ins/JSON/64.yaml
   - group: built-ins/JSON
+    key: "65"
+    path: results/built-ins/JSON/65.yaml
+  - group: built-ins/JSON
     key: "66"
     path: results/built-ins/JSON/66.yaml
+  - group: built-ins/JSON
+    key: "68"
+    path: results/built-ins/JSON/68.yaml
+  - group: built-ins/JSON
+    key: "69"
+    path: results/built-ins/JSON/69.yaml
+  - group: built-ins/JSON
+    key: 6a
+    path: results/built-ins/JSON/6a.yaml
   - group: built-ins/JSON
     key: 6c
     path: results/built-ins/JSON/6c.yaml
@@ -4731,8 +4797,14 @@ partitions:
     key: 6f
     path: results/built-ins/JSON/6f.yaml
   - group: built-ins/JSON
+    key: "70"
+    path: results/built-ins/JSON/70.yaml
+  - group: built-ins/JSON
     key: "71"
     path: results/built-ins/JSON/71.yaml
+  - group: built-ins/JSON
+    key: "72"
+    path: results/built-ins/JSON/72.yaml
   - group: built-ins/JSON
     key: "73"
     path: results/built-ins/JSON/73.yaml
@@ -4746,11 +4818,23 @@ partitions:
     key: 7a
     path: results/built-ins/JSON/7a.yaml
   - group: built-ins/JSON
+    key: 7c
+    path: results/built-ins/JSON/7c.yaml
+  - group: built-ins/JSON
     key: 7d
     path: results/built-ins/JSON/7d.yaml
   - group: built-ins/JSON
+    key: 7e
+    path: results/built-ins/JSON/7e.yaml
+  - group: built-ins/JSON
+    key: 7f
+    path: results/built-ins/JSON/7f.yaml
+  - group: built-ins/JSON
     key: "83"
     path: results/built-ins/JSON/83.yaml
+  - group: built-ins/JSON
+    key: "84"
+    path: results/built-ins/JSON/84.yaml
   - group: built-ins/JSON
     key: "86"
     path: results/built-ins/JSON/86.yaml
@@ -4758,11 +4842,26 @@ partitions:
     key: 8a
     path: results/built-ins/JSON/8a.yaml
   - group: built-ins/JSON
+    key: 8b
+    path: results/built-ins/JSON/8b.yaml
+  - group: built-ins/JSON
+    key: 8d
+    path: results/built-ins/JSON/8d.yaml
+  - group: built-ins/JSON
+    key: "90"
+    path: results/built-ins/JSON/90.yaml
+  - group: built-ins/JSON
+    key: "92"
+    path: results/built-ins/JSON/92.yaml
+  - group: built-ins/JSON
     key: "97"
     path: results/built-ins/JSON/97.yaml
   - group: built-ins/JSON
     key: "99"
     path: results/built-ins/JSON/99.yaml
+  - group: built-ins/JSON
+    key: 9b
+    path: results/built-ins/JSON/9b.yaml
   - group: built-ins/JSON
     key: 9d
     path: results/built-ins/JSON/9d.yaml
@@ -4776,6 +4875,12 @@ partitions:
     key: a1
     path: results/built-ins/JSON/a1.yaml
   - group: built-ins/JSON
+    key: a4
+    path: results/built-ins/JSON/a4.yaml
+  - group: built-ins/JSON
+    key: a5
+    path: results/built-ins/JSON/a5.yaml
+  - group: built-ins/JSON
     key: a6
     path: results/built-ins/JSON/a6.yaml
   - group: built-ins/JSON
@@ -4784,6 +4889,9 @@ partitions:
   - group: built-ins/JSON
     key: aa
     path: results/built-ins/JSON/aa.yaml
+  - group: built-ins/JSON
+    key: ab
+    path: results/built-ins/JSON/ab.yaml
   - group: built-ins/JSON
     key: af
     path: results/built-ins/JSON/af.yaml
@@ -4803,11 +4911,29 @@ partitions:
     key: b9
     path: results/built-ins/JSON/b9.yaml
   - group: built-ins/JSON
+    key: bb
+    path: results/built-ins/JSON/bb.yaml
+  - group: built-ins/JSON
+    key: bc
+    path: results/built-ins/JSON/bc.yaml
+  - group: built-ins/JSON
     key: bf
     path: results/built-ins/JSON/bf.yaml
   - group: built-ins/JSON
+    key: c1
+    path: results/built-ins/JSON/c1.yaml
+  - group: built-ins/JSON
+    key: c4
+    path: results/built-ins/JSON/c4.yaml
+  - group: built-ins/JSON
+    key: c5
+    path: results/built-ins/JSON/c5.yaml
+  - group: built-ins/JSON
     key: c7
     path: results/built-ins/JSON/c7.yaml
+  - group: built-ins/JSON
+    key: c8
+    path: results/built-ins/JSON/c8.yaml
   - group: built-ins/JSON
     key: ca
     path: results/built-ins/JSON/ca.yaml
@@ -4815,8 +4941,14 @@ partitions:
     key: cc
     path: results/built-ins/JSON/cc.yaml
   - group: built-ins/JSON
+    key: ce
+    path: results/built-ins/JSON/ce.yaml
+  - group: built-ins/JSON
     key: d1
     path: results/built-ins/JSON/d1.yaml
+  - group: built-ins/JSON
+    key: d6
+    path: results/built-ins/JSON/d6.yaml
   - group: built-ins/JSON
     key: d7
     path: results/built-ins/JSON/d7.yaml
@@ -4827,8 +4959,26 @@ partitions:
     key: d9
     path: results/built-ins/JSON/d9.yaml
   - group: built-ins/JSON
+    key: dc
+    path: results/built-ins/JSON/dc.yaml
+  - group: built-ins/JSON
     key: e0
     path: results/built-ins/JSON/e0.yaml
+  - group: built-ins/JSON
+    key: e1
+    path: results/built-ins/JSON/e1.yaml
+  - group: built-ins/JSON
+    key: e4
+    path: results/built-ins/JSON/e4.yaml
+  - group: built-ins/JSON
+    key: e5
+    path: results/built-ins/JSON/e5.yaml
+  - group: built-ins/JSON
+    key: e6
+    path: results/built-ins/JSON/e6.yaml
+  - group: built-ins/JSON
+    key: eb
+    path: results/built-ins/JSON/eb.yaml
   - group: built-ins/JSON
     key: f1
     path: results/built-ins/JSON/f1.yaml
@@ -14242,9 +14392,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 15109
+  passes: 15176
   semanticFailures: 0
-  unsupportedProfileFeatures: 1950
+  unsupportedProfileFeatures: 1955
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -14278,9 +14428,9 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 247
+      passes: 251
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 31
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
@@ -14348,7 +14498,7 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4079
+      passes: 4080
       semanticFailures: 0
       unsupportedProfileFeatures: 868
     - dependency: generators
@@ -14372,6 +14522,13 @@ summary:
       passes: 72
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - dependency: json-stringify
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 67
+      semanticFailures: 0
+      unsupportedProfileFeatures: 5
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -14397,7 +14554,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 292
+      passes: 293
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: object-properties
@@ -14425,14 +14582,14 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9
+      passes: 18
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 154
+      passes: 156
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: regular-expressions
@@ -14460,9 +14617,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 654
+      passes: 658
       semanticFailures: 0
-      unsupportedProfileFeatures: 83
+      unsupportedProfileFeatures: 84
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -14608,9 +14765,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 72
+      passes: 139
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 5
     - group: built-ins/Map
       expectedNegatives: 0
       harnessFailures: 0

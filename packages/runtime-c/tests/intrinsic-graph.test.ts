@@ -1189,7 +1189,7 @@ test("populates Proxy and routes every essential internal method", () => {
   assert.match(proxySource, /OSEO_FUNCTION_INTERNAL/u);
 });
 
-test("populates the realm-owned JSON parser", () => {
+test("populates the realm-owned JSON algorithms", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
   const jsonSource = sources.get("runtime_json.c") ?? "";
@@ -1202,10 +1202,13 @@ test("populates the realm-owned JSON parser", () => {
   assert.match(internalHeader, /OSEO_JSON_STRINGIFY_CODE_ID/u);
   assert.match(jsonSource, /json_parse_value/u);
   assert.match(jsonSource, /json_internalize/u);
-  assert.match(
-    jsonSource,
-    /JSON\.stringify is not admitted in this M5b node\./u,
-  );
+  assert.match(jsonSource, /json_serialize_property/u);
+  assert.match(jsonSource, /json_serialize_array/u);
+  assert.match(jsonSource, /json_serialize_object/u);
+  assert.match(jsonSource, /json_quote_string/u);
+  assert.match(jsonSource, /json_replacer_property_list/u);
+  assert.match(jsonSource, /json_has_ancestor/u);
+  assert.doesNotMatch(jsonSource, /JSON\.stringify is not admitted/u);
   assert.match(jsonSource, /oseo_to_string[\s\S]*json_parse_text/u);
   assert.match(jsonSource, /is_callable\(frame\.slots\[1\]\)/u);
   assert.match(jsonSource, /oseo_internal_is_array/u);

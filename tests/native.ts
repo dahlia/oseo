@@ -108,6 +108,8 @@ const { reflectNamespaceFixtures } =
 const { proxyExoticObjectFixtures, proxyMissingDescriptorExtensibilitySource } =
   await import("./native/fixtures/proxy-exotic-object.ts");
 const { jsonParseFixtures } = await import("./native/fixtures/json-parse.ts");
+const { jsonStringifyFixtures } =
+  await import("./native/fixtures/json-stringify.ts");
 const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
   await import("./native/fixtures/function-intrinsic-chains.ts");
 const { regexpSymbolMethodsFixtures } =
@@ -217,6 +219,7 @@ const fixtures: readonly Fixture[] = [
   ...proxyExoticObjectFixtures,
   ...jsonParseFixtures,
   ...setIntrinsicFixtures,
+  ...jsonStringifyFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
   ...asyncGeneratorFixtures,
@@ -544,24 +547,6 @@ assert.equal(
   "true\ntrue BigInt exceeds the 65,536-bit implementation limit.\n",
 );
 
-for (const specializationArgs of [[], ["--no-specialization"]] as const) {
-  const jsonStringifyBoundary = await runNativeCli(
-    {
-      args: [...specializationArgs, "json-stringify-boundary.ts"],
-      source: "JSON.stringify(1);",
-      sourceId: "json-stringify-boundary.ts",
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(jsonStringifyBoundary.exitStatus, 1);
-  assert.equal(jsonStringifyBoundary.stdout, "");
-  assert.match(
-    jsonStringifyBoundary.stderr,
-    /error\[OSEO2001\]: JSON\.stringify is not admitted in this M5b node\./u,
-  );
-}
-
 async function requireSuccess(
   command: string,
   args: readonly string[],
@@ -733,6 +718,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "proxy-exotic-object" ||
     fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "json-parse" ||
+    fixture.name === "json-stringify" ||
     fixture.name === "number-intrinsic" ||
     fixture.name === "promise-all-and-race" ||
     fixture.name === "promise-intrinsic" ||
@@ -973,6 +959,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
     fixture.name === "proxy-object-rest-collection" ||
+    fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {
@@ -1064,6 +1051,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "iterator-helpers-lazy" ||
             fixture.name === "iterator-intrinsic" ||
             fixture.name === "map-intrinsic" ||
+            fixture.name === "json-stringify" ||
             fixture.name === "number-intrinsic" ||
             fixture.name === "promise-all-and-race" ||
             fixture.name === "promise-intrinsic" ||

@@ -1099,8 +1099,7 @@ literal prototype semantics. Malformed syntax and trailing input complete with
 Both parser and reviver recursion stop at the shared runtime call-depth bound
 with a deterministic `RangeError` instead of exhausting the native stack.
 The namespace also exposes the sibling `stringify` function's standard
-descriptor, while calls retain an explicit unsupported-profile boundary until
-the separate `json-stringify` node owns SerializeJSONProperty.
+descriptor. The separate `json-stringify` node below completes that function.
 Defining the namespace's own `Symbol.toStringTag` also exposed that
 `Symbol.prototype` lacked its standard tag property: the symbol component
 now defines it, and the `Object.prototype.toString` fallback for Symbol
@@ -1126,6 +1125,26 @@ policies, false hints, deliberate guard hits and misses, generic fallback, and
 collection at every safepoint. The node adds one runtime component, one
 built-in code ID range, and two realm intrinsic slots, adds no generated-code
 entry point, and moves `abiVersion` to `m5-103`.
+
+M5b node `json-stringify` extends *runtime\_json.c* with
+SerializeJSONProperty, SerializeJSONArray, and SerializeJSONObject. The
+component owns `toJSON` lookup, function and Array replacers, wrapper
+conversion, string quoting, gap construction, pretty-print indentation, and
+active-ancestor cycle detection. It snapshots Array lengths and object key
+lists before recursive values, routes Proxy observations through the existing
+internal methods, and holds partial output in the shared host-memory UTF-16
+builder so collection during user code cannot invalidate it.
+
+Fixed and generated native differential evidence covers primitive and wrapper
+values, well-formed lone-surrogate output, sparse Arrays, ordinary and Proxy
+objects, key order, both replacer forms, numeric and string gaps, BigInt,
+cycles, abrupt completion, both specialization policies, false hints,
+deliberate guard misses with generic fallback, and collection at every
+safepoint. The completed algorithm reuses the JSON range's reserved stringify
+code ID and the existing JSON namespace, adds no intrinsic, heap kind,
+component, internal helper, generated header asset, or generated-code entry
+point, leaves the fixed specialization allocation count at 47, and moves
+`abiVersion` to `m5-105`.
 
 ### Lazy iterator helper evidence
 

@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,615 reviewed cases: 15,109 passes, 1,556 expected negatives, and 1,950
+18,687 reviewed cases: 15,176 passes, 1,556 expected negatives, and 1,955
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 120 indexed records in the normative
+M5a is complete. The 121 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,109 passes across 18,615 paths, and the property inventory records 139
-domains, 139 seeds, and an ordinary case budget of 5,566.
+15,176 passes across 18,687 paths, and the property inventory records 140
+domains, 140 seeds, and an ordinary case budget of 5,578.
 
 
 M5a implementation history
@@ -5989,9 +5989,8 @@ data rather than JavaScript source, so this node does not cross the dynamic
 source boundary.
 
 The sibling `stringify` property has its standard callable descriptor so the
-new namespace remains coherent under reflection. Calling it reaches an
-explicit unsupported-profile boundary; SerializeJSONProperty and the
-`json-stringify` node remain unimplemented here.
+new namespace remains coherent under reflection. Its semantics are admitted
+by the separate `json-stringify` unit below.
 
 A callable second argument enables the post-order reviver walk. Arrays
 snapshot their length and visit ascending indices; objects snapshot enumerable
@@ -6058,6 +6057,50 @@ semantic, harness, or infrastructure failures. The runtime ABI moves to
 `oseo-runtime-m5-104`. The property ratchet moves from 138 to 139 domains and
 seeds and from 5,554 to 5,566 ordinary cases, and the evidence inventory moves
 from 119 to 120 families. The graph's orchestration state is unchanged.
+
+Implemented M5b node `json-stringify` completes the existing JSON component's
+`SerializeJSONProperty` path. It applies an object's or BigInt's callable
+`toJSON` before a replacer function, supplies the specified receivers and key
+arguments, converts primitive wrapper results, quotes UTF-16 strings with
+well-formed lone-surrogate escapes, maps non-finite numbers to `null`, and
+rejects an otherwise unhandled BigInt with `TypeError`. Arrays snapshot their
+length and substitute `null` for values with no JSON representation. Objects
+either snapshot enumerable own string keys in `OrdinaryOwnPropertyKeys` order
+or consume the deduplicated string-and-number property list supplied by a
+replacer Array.
+
+The serializer clamps a numeric gap to ten spaces, truncates a string gap to
+ten UTF-16 code units, preserves pretty-print indentation through recursive
+containers, and detects only identities on the active ancestor chain so a
+repeated sibling remains valid while a cycle throws `TypeError`. Proxy
+`IsArray`, length, own-key, descriptor, and Get operations stay observable and
+propagate abrupt completion. Recursion stops at the shared runtime depth bound
+with a deterministic `RangeError` before the native stack can overflow.
+
+Fixed Node.js, Deno, and native differential evidence covers descriptors,
+non-construction, primitives and wrappers, escaping, sparse Arrays, key
+ordering, `toJSON`, both replacer forms, gaps, Proxies, BigInt, cycles, and
+repeated identities. Generated differential evidence at seed `0x60006c00`
+adds bounded UTF-16 strings, both gap forms, function and Array replacers,
+specialization enabled and disabled, a false number hint, a deliberate JSON
+namespace shape-guard miss with generic fallback, and collection forced at
+every safepoint. The node reuses the existing JSON built-in code range,
+intrinsics, runtime component, and fixed specialization allocation count; it
+adds no generated-code entry point and moves the runtime ABI to
+`oseo-runtime-m5-105`. The property ratchet moves from 139 to 140 domains and
+seeds and from 5,566 to 5,578 ordinary cases. The normative family index moves
+from 120 to 121 records.
+
+All 72 edition paths under the node's inventory roots are reviewed. Sixty-seven
+pass under both specialization policies, including the well-formed
+JSON-stringification case after admitting its implemented frontmatter feature.
+The remaining five retain `unsupported-profile-feature`: two need the deferred
+cross-realm harness, two name the not-yet-admitted `Boolean` binding, and one
+depends on general BigInt primitive-wrapper method access. The reviewed
+manifest therefore moves from 18,615 to 18,687 paths, from 15,109 to 15,176
+passes, and from 1,950 to 1,955 unsupported profile features while keeping
+1,556 expected negatives and zero semantic, harness, or infrastructure
+failures. No reviewed path outside the node roots changes classification.
 
 
 Ahead-of-time challenge boundary

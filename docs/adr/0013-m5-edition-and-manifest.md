@@ -363,6 +363,19 @@ classification by itself; the landing moves that row and eleven further
 reviewed `Map` and `Symbol` rows that construct a Set to `pass`, and those
 eleven retain their existing tags.
 
+The reviewed dependency vocabulary includes `json-stringify` for the M5b
+`json-stringify` node. The tag identifies the remaining reviewed `JSON`
+namespace surface and the `stringify` function, including `toJSON` dispatch,
+function and property-list replacers, gap normalization, recursive Array and
+object serialization, and cycle detection. One tag covers these operations
+because they form the single serialization semantic unit admitted by the
+node. The tag is distinct from `json-parse`, which names text interpretation
+and reviver traversal, and from `object-own-keys`, which names the general
+own-key primitives rather than JSON's serialization order. The 72 reviewed
+rows under the node's inventory roots carry it. Reviewed rows outside those
+roots that call `JSON.stringify` retain their existing tags until a separate
+reviewed dependency change assigns this tag alongside them.
+
 
 Alternatives considered
 -----------------------

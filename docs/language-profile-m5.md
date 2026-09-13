@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,615 reviewed cases: 15,109 passes, 1,556
-expected negatives, and 1,950 unsupported profile features. It records no
+The current manifest contains 18,687 reviewed cases: 15,176 passes, 1,556
+expected negatives, and 1,955 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6337,9 +6337,8 @@ trailing input complete with `SyntaxError`. JSON text is data and is never
 compiled or executed as JavaScript source.
 
 The sibling `stringify` property has its standard callable descriptor so
-reflection remains coherent after the namespace is admitted. Calling it
-retains an explicit unsupported-profile boundary; this node does not implement
-SerializeJSONProperty or any `json-stringify` semantics.
+reflection remains coherent after the namespace is admitted. Its admitted
+semantics are recorded in the following family.
 Admitting the namespace's `Symbol.toStringTag` also gives `Symbol.prototype`
 its standard own tag property, so `Object.prototype.toString` observes the
 inherited tag and reports `Object` for a Symbol once the property is removed.
@@ -6439,6 +6438,76 @@ kinds move the runtime ABI to `oseo-runtime-m5-104` without a public layout
 change and without changing the graph's orchestration state.
 
 
+JSON stringify
+--------------
+
+M5b node `json-stringify` admits the ordinary, non-constructible
+`JSON.stringify` function and completes SerializeJSONProperty. For each value,
+an object or BigInt first reads and, when callable, invokes `toJSON` with the
+value as receiver and the property key as its sole argument. A callable
+replacer runs next with the holder as receiver and the key and transformed
+value as arguments. Number and String wrapper results use their observable
+numeric and string conversions, while Boolean and BigInt wrappers expose their
+internal primitive values. An unhandled BigInt throws `TypeError`; undefined,
+Symbols, and callable values have no object-member representation and become
+`null` in Arrays.
+
+Strings are quoted from their UTF-16 code units. JSON control characters,
+quotes, and reverse solidus use escapes, lone surrogates use lowercase
+four-digit Unicode escapes, and valid surrogate pairs remain unchanged.
+Finite numbers use the runtime's shortest decimal conversion, including `0`
+for negative zero, while non-finite numbers become `null`.
+
+A replacer Array is recognized through `IsArray`, including Proxy Arrays. Its
+array-like length and indexed values are read once in ascending order; String
+and Number primitives or wrappers are converted to strings and deduplicated
+without reordering. The resulting property list filters every serialized
+object and performs ordinary Get even for inherited names. Without that list,
+an object snapshots its enumerable own string keys in
+`OrdinaryOwnPropertyKeys` order before reading the first value. Arrays snapshot
+their array-like length and then read each index in order. All Proxy length,
+own-key, descriptor, and Get operations remain observable and propagate abrupt
+completion.
+
+A numeric space value is converted, truncated, and clamped to zero through ten
+spaces. A string space value contributes at most its first ten UTF-16 code
+units. Number and String wrapper space values perform the corresponding
+observable conversion. Nonempty gaps produce the specified line breaks,
+indentation, and colon spacing. The active ancestor chain, rather than a global
+visited set, rejects circular Arrays and objects with `TypeError` while
+allowing the same identity in sibling positions. The shared runtime depth
+bound completes excessively nested serialization with deterministic
+`RangeError`.
+
+Fixed Node.js, Deno, and native differential evidence covers descriptors,
+non-construction, primitive and wrapper values, escaping, sparse Arrays,
+ordinary and inherited key order, `toJSON`, both replacer forms, gaps, Proxies,
+BigInt, abrupt completion, cycles, and repeated identities. Generated evidence
+at seed `0x60006c00` supplies a 12-case ordinary budget over bounded integers,
+Booleans, two zero-through-twelve-code-unit UTF-16 strings, one nested Array,
+both gap forms, and function and Array replacers. It executes specialization
+enabled and disabled, collection forced at every safepoint, a false number
+hint, and a deliberate JSON namespace shape-guard miss that reaches compiled
+generic fallback. The node reuses the existing JSON component, code-ID range,
+intrinsics, and fixed allocation count, adds no generated-code entry point,
+and moves the runtime ABI to `oseo-runtime-m5-105`.
+The property ratchet moves from 139 to 140 domains and seeds and from 5,566 to
+5,578 ordinary cases. The normative family index moves from 120 to 121
+records.
+
+The node reviews all 72 edition paths under its inventory roots. Sixty-seven
+pass under both specialization policies, including the well-formed
+JSON-stringification case whose frontmatter feature enters the supported set.
+Five remain `unsupported-profile-feature`: the two cross-realm cases need the
+deferred realm harness, the two Boolean-wrapper cases name the deferred
+`Boolean` binding, and the BigInt `toJSON` case depends on general primitive
+wrapper method access. The manifest moves from 18,615 to 18,687 paths, from
+15,109 to 15,176 passes, and from 1,950 to 1,955 unsupported profile features
+while keeping 1,556 expected negatives and zero semantic, harness, or
+infrastructure failures. No reviewed path outside the node roots changes
+classification.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6468,8 +6537,10 @@ complete. The remaining gaps retain their existing owners.
     collector-traced BigInt wrappers whose ordinary `ToPrimitive` now reaches
     the real prototype methods. What remains is the dependent-family
     connection: the M5b `data-view` node now consumes `ToBigInt` for its two
-    64-bit element types, while typed arrays, `Atomics`, and JSON serialization
-    keep their own object and concurrency prerequisites. `BigInt` now has the
+    64-bit element types, and `json-stringify` now performs the specified
+    `toJSON`, replacer, wrapper, and rejection steps. Typed arrays and
+    `Atomics` keep their own object and concurrency prerequisites. `BigInt` has
+    the
     throwing `[[Construct]]`, and the reviewed cases that detect it through
     `Reflect.construct` execute now that the `reflect-namespace` node admits
     that namespace. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
