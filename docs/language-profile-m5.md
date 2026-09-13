@@ -6508,6 +6508,46 @@ infrastructure failures. No reviewed path outside the node roots changes
 classification.
 
 
+Promise harness helper
+----------------------
+
+M5b node `harness-promise-helper` completes the reviewed
+*promiseHelper.js* include as ordinary JavaScript assembled before each
+upstream test body. `checkSequence` accepts an empty or one-based numeric
+sequence and reports the first mismatch with the upstream truthy-message
+fallback and joined-array text. `checkSettledPromises` requires an Array of
+the expected length, checks each result record's own `status` and matching own
+`value` or `reason` property, rejects the opposite payload property, compares
+the expected payload, and preserves the upstream optional message prefix and
+failure text. The include adds no native shortcut, intrinsic, or runtime
+surface.
+
+Fixed native and generated differential evidence at property seed
+`0x60006d00` covers zero through six valid or mismatching sequence entries,
+one through four fulfilled or rejected settlement records, valid settlement
+Arrays, and one Array, length, status, property-presence, or payload fault.
+Omitted, empty, and custom messages reach both message branches. Node.js,
+Deno, and both native specialization policies agree with collection forced at
+every safepoint; a false numeric hint deliberately misses its guard and
+reaches the compiled generic fallback. The generated domain has a 12-case
+ordinary budget and direct record and Array shrinking.
+
+Focused execution also observes ten passing upstream users of the include:
+one AggregateError argument-order case, seven Promise reaction-order cases,
+and two Promise.resolve thenable-order cases. They remain outside the reviewed
+subset because this node has no inventory root and their paths belong to other
+graph nodes. The 44 reviewed include users keep their classifications: 39
+pass, and five Promise.prototype.finally cases retain that separate feature
+boundary. No reviewed row moves. The manifest keeps 18,687 cases: 15,176
+passes, 1,556 expected negatives, and 1,955 unsupported profile features,
+with no semantic, harness, or infrastructure failures. The property inventory
+reaches 141 domains and seeds with a 5,590-case ordinary budget, and the
+evidence inventory reaches 122 families. The runtime ABI remains
+`oseo-runtime-m5-105`, and the suite revision, applicable inventory,
+classification vocabulary, target-parity policy, forced-collection policy,
+and zero-override policy are unchanged.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6721,8 +6761,7 @@ complete. The remaining gaps retain their existing owners.
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
-    *nans.js*, *propertyHelper.js*,
-    and the `checkSequence` portion of *promiseHelper.js*. *nans.js*
+    *nans.js*, *promiseHelper.js*, and *propertyHelper.js*. *nans.js*
     joined that list with the `math-namespace` node, whose `Math.pow`
     intrinsic was its only unadmitted dependency, and
     *decimalToHexString.js* with the `uri-handling-functions` node that

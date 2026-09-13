@@ -1,0 +1,3 @@
+version: 1
+id: harness-promise-helper
+record: docs/language-profile-m5/families/harness-promise-helper.yaml

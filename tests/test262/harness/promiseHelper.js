@@ -6,7 +6,7 @@ function checkSequence(array, message) {
   array.forEach(function (element, index) {
     if (element !== index + 1) {
       throw new Test262Error(
-        (message === undefined ? "Steps in unexpected sequence:" : message) +
+        (message ? message : "Steps in unexpected sequence:") +
           " '" +
           array.join(",") +
           "'",
@@ -56,6 +56,9 @@ function checkSettledPromises(settleds, expected, message) {
         prefix + "value for item " + index,
       );
     } else {
+      // The upstream rejected branch names "the fulfilled promise" and
+      // capitalizes "Reason value" at the pinned revision. The text is kept
+      // verbatim so reviewed failure output matches upstream exactly.
       assert.sameValue(
         settled.status,
         "rejected",
@@ -64,17 +67,17 @@ function checkSettledPromises(settleds, expected, message) {
       assert.sameValue(
         Object.prototype.hasOwnProperty.call(settled, "value"),
         false,
-        prefix + "The rejected promise has no property named value",
+        prefix + "The fulfilled promise has no property named value",
       );
       assert.sameValue(
         Object.prototype.hasOwnProperty.call(settled, "reason"),
         true,
-        prefix + "The rejected promise has a property named reason",
+        prefix + "The fulfilled promise has a property named reason",
       );
       assert.sameValue(
         settled.reason,
         expected[index].reason,
-        prefix + "reason for item " + index,
+        prefix + "Reason value for item " + index,
       );
     }
   });
