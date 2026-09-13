@@ -730,6 +730,14 @@
 #define OSEO_DATE_METHOD_CODE_ID_FIRST \
     (OSEO_DATE_METHOD_CODE_ID_LAST - (OSEO_DATE_METHOD_COUNT - 1u))
 
+#define OSEO_JSON_CODE_ID_RANGE_INDEX ((size_t)22u)
+#define OSEO_JSON_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_JSON_CODE_ID_RANGE_INDEX)
+#define OSEO_JSON_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_JSON_CODE_ID_RANGE_INDEX)
+#define OSEO_JSON_PARSE_CODE_ID OSEO_JSON_CODE_ID_RANGE_LAST
+#define OSEO_JSON_STRINGIFY_CODE_ID (OSEO_JSON_CODE_ID_RANGE_LAST - 1u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -2153,6 +2161,15 @@ OseoResult oseo_internal_proxy_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_json_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_internal_array_buffer_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -3118,6 +3135,15 @@ OseoResult oseo_internal_install_reflect_global(
 );
 OseoResult oseo_internal_proxy_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_proxy_global(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * The realm's lazily created JSON namespace, its JSON.parse function,
+ * and the replaceable global property that exposes the namespace.
+ */
+OseoResult oseo_internal_json_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_json_global(
     OseoContext *context,
     OseoValue global
 );

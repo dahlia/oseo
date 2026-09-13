@@ -1,0 +1,68 @@
+version: 1
+id: json-parse
+title: "JSON parse"
+scope:
+  - "The replaceable JSON namespace and its parse function, including the
+    JSON lexical grammar over UTF-16 source text, primitive, object, and Array
+    construction, duplicate data-property replacement without prototype
+    mutation, number conversion, trailing-input rejection, SyntaxError
+    completion for malformed texts, and deterministic bounded recursion."
+  - "The optional callable reviver walk, including ToString before parsing,
+    post-order Array index traversal, snapshot OwnPropertyKeys ordering for
+    enumerable object properties, ordinary Get before every visit, delete on
+    undefined results, CreateDataProperty replacement otherwise, and the
+    final empty-name wrapper call."
+  - "Reviewed standards coverage is the 72 edition paths under
+    test/built-ins/JSON/parse/, all of which pass. Source-context records
+    introduced after the pinned edition stay outside the inventory, and the
+    nine Proxy-dependent paths also carry the proxy-exotic-object tag."
+  - "The sibling stringify property has its standard callable descriptor so
+    reflection remains coherent once JSON exists, but calls retain an
+    explicit unsupported-profile boundary; this node does not implement the
+    stringify algorithm owned by json-stringify."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/json-parse.ts
+      - tests/property/m5-json-parse.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/json-parse.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-parse.ts
+      - tests/property/m5-json-parse.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-json-parse.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-parse.ts
+      - tests/property/m5-json-parse.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-parse.ts
+      - tests/property/m5-json-parse.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_json.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

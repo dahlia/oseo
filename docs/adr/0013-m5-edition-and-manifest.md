@@ -332,6 +332,18 @@ tag to reviewed rows that observe a proxy is a separate reviewed change; when
 they gain it, they gain it alongside the tags they already carry. Admitting
 the tag moves no classification.
 
+The reviewed dependency vocabulary includes `json-parse` for the M5b
+`json-parse` node. The tag identifies the replaceable `JSON` namespace and its
+`parse` function, including input conversion, the JSON lexical grammar,
+ordinary Array and object construction, and the optional post-order reviver
+walk. One tag covers these operations because they form the single parsing
+semantic unit admitted by the node. The tag is distinct from `functions`,
+which names general call behavior, and `object-properties`, which names
+property definition and descriptor semantics rather than JSON text
+interpretation and reviver traversal. The 72 reviewed rows under the node's
+inventory root carry it. Reviewed rows outside that root that use the `JSON`
+namespace as an ordinary object retain their existing tags.
+
 
 Alternatives considered
 -----------------------

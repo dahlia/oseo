@@ -845,10 +845,10 @@ test("rejects typeof of an unimplemented standard global name", () => {
   // misreport them; each stays a source-located rejection until the
   // profile admits it as a value, inside and outside `with` alike.
   for (const source of [
-    "console.log(typeof JSON);",
+    "console.log(typeof WeakMap);",
     "console.log(typeof eval);",
     "console.log(typeof globalThis);",
-    "with ({}) { console.log(typeof JSON); }",
+    "with ({}) { console.log(typeof WeakMap); }",
   ]) {
     const result = compileSource(babelFrontend, {
       source,

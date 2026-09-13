@@ -203,6 +203,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "Function" ||
     name === "Infinity" ||
     name === "Iterator" ||
+    name === "JSON" ||
     name === "Map" ||
     name === "Math" ||
     name === "NaN" ||

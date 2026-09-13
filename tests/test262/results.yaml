@@ -4643,6 +4643,207 @@ partitions:
   - group: built-ins/Iterator
     key: ff
     path: results/built-ins/Iterator/ff.yaml
+  - group: built-ins/JSON
+    key: "05"
+    path: results/built-ins/JSON/05.yaml
+  - group: built-ins/JSON
+    key: "06"
+    path: results/built-ins/JSON/06.yaml
+  - group: built-ins/JSON
+    key: 0a
+    path: results/built-ins/JSON/0a.yaml
+  - group: built-ins/JSON
+    key: 0c
+    path: results/built-ins/JSON/0c.yaml
+  - group: built-ins/JSON
+    key: "13"
+    path: results/built-ins/JSON/13.yaml
+  - group: built-ins/JSON
+    key: "15"
+    path: results/built-ins/JSON/15.yaml
+  - group: built-ins/JSON
+    key: 1a
+    path: results/built-ins/JSON/1a.yaml
+  - group: built-ins/JSON
+    key: 1b
+    path: results/built-ins/JSON/1b.yaml
+  - group: built-ins/JSON
+    key: 1e
+    path: results/built-ins/JSON/1e.yaml
+  - group: built-ins/JSON
+    key: "23"
+    path: results/built-ins/JSON/23.yaml
+  - group: built-ins/JSON
+    key: "25"
+    path: results/built-ins/JSON/25.yaml
+  - group: built-ins/JSON
+    key: 2b
+    path: results/built-ins/JSON/2b.yaml
+  - group: built-ins/JSON
+    key: 2c
+    path: results/built-ins/JSON/2c.yaml
+  - group: built-ins/JSON
+    key: "32"
+    path: results/built-ins/JSON/32.yaml
+  - group: built-ins/JSON
+    key: 3b
+    path: results/built-ins/JSON/3b.yaml
+  - group: built-ins/JSON
+    key: 3d
+    path: results/built-ins/JSON/3d.yaml
+  - group: built-ins/JSON
+    key: 3e
+    path: results/built-ins/JSON/3e.yaml
+  - group: built-ins/JSON
+    key: "42"
+    path: results/built-ins/JSON/42.yaml
+  - group: built-ins/JSON
+    key: "45"
+    path: results/built-ins/JSON/45.yaml
+  - group: built-ins/JSON
+    key: 4f
+    path: results/built-ins/JSON/4f.yaml
+  - group: built-ins/JSON
+    key: "51"
+    path: results/built-ins/JSON/51.yaml
+  - group: built-ins/JSON
+    key: "53"
+    path: results/built-ins/JSON/53.yaml
+  - group: built-ins/JSON
+    key: "58"
+    path: results/built-ins/JSON/58.yaml
+  - group: built-ins/JSON
+    key: "62"
+    path: results/built-ins/JSON/62.yaml
+  - group: built-ins/JSON
+    key: "64"
+    path: results/built-ins/JSON/64.yaml
+  - group: built-ins/JSON
+    key: "66"
+    path: results/built-ins/JSON/66.yaml
+  - group: built-ins/JSON
+    key: 6c
+    path: results/built-ins/JSON/6c.yaml
+  - group: built-ins/JSON
+    key: 6e
+    path: results/built-ins/JSON/6e.yaml
+  - group: built-ins/JSON
+    key: 6f
+    path: results/built-ins/JSON/6f.yaml
+  - group: built-ins/JSON
+    key: "71"
+    path: results/built-ins/JSON/71.yaml
+  - group: built-ins/JSON
+    key: "73"
+    path: results/built-ins/JSON/73.yaml
+  - group: built-ins/JSON
+    key: "77"
+    path: results/built-ins/JSON/77.yaml
+  - group: built-ins/JSON
+    key: "79"
+    path: results/built-ins/JSON/79.yaml
+  - group: built-ins/JSON
+    key: 7a
+    path: results/built-ins/JSON/7a.yaml
+  - group: built-ins/JSON
+    key: 7d
+    path: results/built-ins/JSON/7d.yaml
+  - group: built-ins/JSON
+    key: "83"
+    path: results/built-ins/JSON/83.yaml
+  - group: built-ins/JSON
+    key: "86"
+    path: results/built-ins/JSON/86.yaml
+  - group: built-ins/JSON
+    key: 8a
+    path: results/built-ins/JSON/8a.yaml
+  - group: built-ins/JSON
+    key: "97"
+    path: results/built-ins/JSON/97.yaml
+  - group: built-ins/JSON
+    key: "99"
+    path: results/built-ins/JSON/99.yaml
+  - group: built-ins/JSON
+    key: 9d
+    path: results/built-ins/JSON/9d.yaml
+  - group: built-ins/JSON
+    key: 9f
+    path: results/built-ins/JSON/9f.yaml
+  - group: built-ins/JSON
+    key: a0
+    path: results/built-ins/JSON/a0.yaml
+  - group: built-ins/JSON
+    key: a1
+    path: results/built-ins/JSON/a1.yaml
+  - group: built-ins/JSON
+    key: a6
+    path: results/built-ins/JSON/a6.yaml
+  - group: built-ins/JSON
+    key: a7
+    path: results/built-ins/JSON/a7.yaml
+  - group: built-ins/JSON
+    key: aa
+    path: results/built-ins/JSON/aa.yaml
+  - group: built-ins/JSON
+    key: af
+    path: results/built-ins/JSON/af.yaml
+  - group: built-ins/JSON
+    key: b0
+    path: results/built-ins/JSON/b0.yaml
+  - group: built-ins/JSON
+    key: b2
+    path: results/built-ins/JSON/b2.yaml
+  - group: built-ins/JSON
+    key: b3
+    path: results/built-ins/JSON/b3.yaml
+  - group: built-ins/JSON
+    key: b7
+    path: results/built-ins/JSON/b7.yaml
+  - group: built-ins/JSON
+    key: b9
+    path: results/built-ins/JSON/b9.yaml
+  - group: built-ins/JSON
+    key: bf
+    path: results/built-ins/JSON/bf.yaml
+  - group: built-ins/JSON
+    key: c7
+    path: results/built-ins/JSON/c7.yaml
+  - group: built-ins/JSON
+    key: ca
+    path: results/built-ins/JSON/ca.yaml
+  - group: built-ins/JSON
+    key: cc
+    path: results/built-ins/JSON/cc.yaml
+  - group: built-ins/JSON
+    key: d1
+    path: results/built-ins/JSON/d1.yaml
+  - group: built-ins/JSON
+    key: d7
+    path: results/built-ins/JSON/d7.yaml
+  - group: built-ins/JSON
+    key: d8
+    path: results/built-ins/JSON/d8.yaml
+  - group: built-ins/JSON
+    key: d9
+    path: results/built-ins/JSON/d9.yaml
+  - group: built-ins/JSON
+    key: e0
+    path: results/built-ins/JSON/e0.yaml
+  - group: built-ins/JSON
+    key: f1
+    path: results/built-ins/JSON/f1.yaml
+  - group: built-ins/JSON
+    key: f5
+    path: results/built-ins/JSON/f5.yaml
+  - group: built-ins/JSON
+    key: f7
+    path: results/built-ins/JSON/f7.yaml
+  - group: built-ins/JSON
+    key: f9
+    path: results/built-ins/JSON/f9.yaml
+  - group: built-ins/JSON
+    key: ff
+    path: results/built-ins/JSON/ff.yaml
   - group: built-ins/Map
     key: "00"
     path: results/built-ins/Map/00.yaml
@@ -13612,9 +13813,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 14762
+  passes: 14905
   semanticFailures: 0
-  unsupportedProfileFeatures: 2024
+  unsupportedProfileFeatures: 1953
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -13718,9 +13919,9 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4057
+      passes: 4079
       semanticFailures: 0
-      unsupportedProfileFeatures: 889
+      unsupportedProfileFeatures: 868
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -13735,6 +13936,13 @@ summary:
       passes: 1119
       semanticFailures: 0
       unsupportedProfileFeatures: 437
+    - dependency: json-parse
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 72
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
       expectedNegatives: 148
       harnessFailures: 0
@@ -13760,16 +13968,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 291
+      passes: 292
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: object-properties
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9562
+      passes: 9632
       semanticFailures: 0
-      unsupportedProfileFeatures: 515
+      unsupportedProfileFeatures: 445
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -13784,11 +13992,18 @@ summary:
       passes: 46
       semanticFailures: 0
       unsupportedProfileFeatures: 19
+    - dependency: proxy-exotic-object
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 9
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 152
+      passes: 154
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: regular-expressions
@@ -13809,7 +14024,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 652
+      passes: 653
       semanticFailures: 0
       unsupportedProfileFeatures: 84
     - dependency: top-level-await
@@ -13838,9 +14053,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2703
+      passes: 2723
       semanticFailures: 0
-      unsupportedProfileFeatures: 197
+      unsupportedProfileFeatures: 177
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -13922,9 +14137,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 163
+      passes: 164
       semanticFailures: 0
-      unsupportedProfileFeatures: 167
+      unsupportedProfileFeatures: 166
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -13953,6 +14168,13 @@ summary:
       passes: 5
       semanticFailures: 0
       unsupportedProfileFeatures: 389
+    - group: built-ins/JSON
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 72
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/Map
       expectedNegatives: 0
       harnessFailures: 0
@@ -13999,9 +14221,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3147
+      passes: 3197
       semanticFailures: 0
-      unsupportedProfileFeatures: 176
+      unsupportedProfileFeatures: 126
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0

@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,342 reviewed cases: 14,762 passes, 1,556
-expected negatives, and 2,024 unsupported profile features. It records no
+The current manifest contains 18,414 reviewed cases: 14,905 passes, 1,556
+expected negatives, and 1,953 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6323,6 +6323,62 @@ range, and adds three realm intrinsics without adding a heap kind, a
 generated-code entry point, or a graph-state change.
 
 
+JSON parse
+----------
+
+M5b node `json-parse` admits the replaceable `JSON` namespace and its
+ordinary, non-constructible `parse` function. Parsing begins after ToString
+and consumes the JSON lexical grammar directly from the resulting UTF-16 code
+units. Strings retain code units including lone surrogates, numbers include
+the JSON decimal forms and preserve `-0`, Arrays and objects use the ordinary
+realm prototypes, and duplicate names including `__proto__` replace an
+ordinary data property without changing the prototype. Invalid grammar and
+trailing input complete with `SyntaxError`. JSON text is data and is never
+compiled or executed as JavaScript source.
+
+The sibling `stringify` property has its standard callable descriptor so
+reflection remains coherent after the namespace is admitted. Calling it
+retains an explicit unsupported-profile boundary; this node does not implement
+SerializeJSONProperty or any `json-stringify` semantics.
+Admitting the namespace's `Symbol.toStringTag` also gives `Symbol.prototype`
+its standard own tag property, so `Object.prototype.toString` observes the
+inherited tag and reports `Object` for a Symbol once the property is removed.
+
+When the second argument is callable, the result is walked in post-order.
+Arrays snapshot length and visit ascending index names, while objects snapshot
+their enumerable own string keys in OrdinaryOwnPropertyKeys order before the
+first child call. Each property is read immediately before recursion, an
+`undefined` callback result deletes it, and every other result is installed
+with CreateDataProperty semantics. A fresh ordinary wrapper owns the root
+under the empty name and receives the final call. Input conversion finishes
+before parsing and before the reviver is examined, preserving source-text
+ordering.
+
+Fixed native and generated differential evidence at seed `0x60006a00` covers
+the grammar, malformed texts, escaped and lone-surrogate strings, number
+forms, duplicate names, namespace and function descriptors, reviver order,
+bounded nesting near the runtime limit, deletion, replacement, the final
+wrapper, input conversion order, both specialization policies, collection
+forced at every safepoint, false hints, deliberate shape-guard misses, and
+generic fallback. The generated family has
+a 12-case ordinary budget over bounded numbers, Booleans, zero through twelve
+UTF-16 code units, one nested Array, and optional deletion. All 72 paths under
+the node's edition inventory root are reviewed and pass, including the nine
+Proxy-dependent paths that also carry the `proxy-exotic-object` tag; the
+later source-context records stay outside that inventory. The reviewed manifest
+moves from 18,342 to 18,414 paths, from 14,762 to 14,905 passes, and from 2,024
+to 1,953 unsupported profile features while keeping 1,556 expected negatives
+and zero semantic, harness, or infrastructure failures. The 72 root paths enter
+as passes, and 71 reviewed paths outside the roots, 50 under Object, 20 under
+Array, and one under Function, move from `unsupported-profile-feature` to
+`pass` because each uses the `JSON` namespace as an ordinary object operand
+that the realm now provides. The normative family index moves from 118 to 119
+records. The property ratchet moves from 137 to 138 domains and seeds and from
+5,542 to 5,554 ordinary cases. The runtime ABI moves to `oseo-runtime-m5-103`,
+adds one runtime component, one built-in code ID range, and two intrinsic
+slots, and adds no generated-code entry point.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6342,8 +6398,8 @@ complete. The remaining gaps retain their existing owners.
     collector-traced BigInt wrappers whose ordinary `ToPrimitive` now reaches
     the real prototype methods. What remains is the dependent-family
     connection: the M5b `data-view` node now consumes `ToBigInt` for its two
-    64-bit element types, while typed arrays, `Atomics`, and `JSON` keep their
-    own object and concurrency prerequisites. `BigInt` now has the specified
+    64-bit element types, while typed arrays, `Atomics`, and JSON serialization
+    keep their own object and concurrency prerequisites. `BigInt` now has the
     throwing `[[Construct]]`, and the reviewed cases that detect it through
     `Reflect.construct` execute now that the `reflect-namespace` node admits
     that namespace. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
