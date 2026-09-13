@@ -105,6 +105,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "functions",
   "generators",
   "iterator-protocol",
+  "json-parse",
   "lexical-bindings",
   "module-linking",
   "object-literals",

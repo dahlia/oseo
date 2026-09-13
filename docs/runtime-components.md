@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirty-eight reviewed assets in this order:
+The runtime input now lists thirty-nine reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -33,8 +33,8 @@ The runtime input now lists thirty-eight reviewed assets in this order:
 *runtime\_date.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
-*runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*, and
-*runtime\_proxy.c*. The M5
+*runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
+*runtime\_proxy.c*, and *runtime\_json.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
@@ -42,7 +42,7 @@ asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions,
-Reflect-namespace, Proxy-exotic-object, and Date-family units each
+Reflect-namespace, Proxy-exotic-object, Date-family, and JSON-parse units each
 added one
 component the same
 way. The M5b
@@ -180,6 +180,13 @@ Ownership follows the plan's target layout:
     calls the handler's trap when present, delegates to the target otherwise,
     and enforces the target invariants for prototypes, extensibility,
     descriptors, property results, own keys, calls, and construction;
+ -  *runtime\_json.c*: the `JSON` namespace object and `JSON.parse`, including
+    the JSON lexical grammar over UTF-16 input, number conversion, ordinary
+    Array and object construction, malformed-text `SyntaxError`, and the
+    post-order reviver walk over Array indices and snapshot enumerable own
+    string keys. It owns no dynamic-source entry point: ToString remains in
+    *runtime\_primitive.c*, ordinary property operations remain in the object
+    components, and the parsed text is data rather than JavaScript source;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -319,7 +326,7 @@ one.
 
 ### Internal helpers
 
-One hundred and eighty-one helpers cross a
+One hundred and eighty-four helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -350,6 +357,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_reflect_builtin_dispatch`            | *runtime\_reflect.c*          |
 | `oseo_internal_reflect_intrinsic`                   | *runtime\_reflect.c*          |
 | `oseo_internal_install_reflect_global`              | *runtime\_reflect.c*          |
+| `oseo_internal_json_builtin_dispatch`               | *runtime\_json.c*             |
+| `oseo_internal_json_intrinsic`                      | *runtime\_json.c*             |
+| `oseo_internal_install_json_global`                 | *runtime\_json.c*             |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
@@ -1073,6 +1083,44 @@ both specialization policies, deliberate guard hits and misses, generic
 fallback, and collection at every safepoint. The node adds no component or
 generated-code entry point, allocates two IDs inside the existing iterator
 range and two realm intrinsic slots, and moves `abiVersion` to `m5-97`.
+
+M5b node `json-parse` adds *runtime\_json.c* as the owner of the replaceable
+`JSON` namespace and its ordinary, non-constructible `parse` function. The
+component parses the JSON lexical grammar directly from the ToString result's
+UTF-16 code units, creates ordinary Arrays and objects, preserves `-0`, and
+defines duplicate `__proto__` names as ordinary data without invoking object
+literal prototype semantics. Malformed syntax and trailing input complete with
+`SyntaxError`; parsing never compiles or executes the text as JavaScript.
+Both parser and reviver recursion stop at the shared runtime call-depth bound
+with a deterministic `RangeError` instead of exhausting the native stack.
+The namespace also exposes the sibling `stringify` function's standard
+descriptor, while calls retain an explicit unsupported-profile boundary until
+the separate `json-stringify` node owns SerializeJSONProperty.
+Defining the namespace's own `Symbol.toStringTag` also exposed that
+`Symbol.prototype` lacked its standard tag property: the symbol component
+now defines it, and the `Object.prototype.toString` fallback for Symbol
+values reports `Object` once that property is removed instead of a private
+built-in tag.
+
+When the second argument is callable, the component walks the parsed graph in
+post-order. Arrays snapshot length and visit ascending indices, while objects
+snapshot enumerable own string keys in OrdinaryOwnPropertyKeys order before
+the first recursive callback. Every callback receives the current holder,
+name, and value; an `undefined` result deletes the property and every other
+result is installed with CreateDataProperty semantics. A fresh wrapper owns
+the parsed result under the empty name so the final callback follows the same
+operation. The input conversion completes before parsing or reviver
+classification, preserving source-text ordering.
+
+Fixed and generated native differential evidence covers valid and malformed
+grammar, escaped and lone-surrogate strings, number forms, duplicate names,
+bounded nesting near the runtime limit, namespace and function descriptors,
+post-order traversal, deletion,
+replacement, the final wrapper, input conversion ordering, both specialization
+policies, false hints, deliberate guard hits and misses, generic fallback, and
+collection at every safepoint. The node adds one runtime component, one
+built-in code ID range, and two realm intrinsic slots, adds no generated-code
+entry point, and moves `abiVersion` to `m5-103`.
 
 ### Lazy iterator helper evidence
 

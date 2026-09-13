@@ -110,6 +110,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_uri.c"],
       ["source", "runtime_reflect.c"],
       ["source", "runtime_proxy.c"],
+      ["source", "runtime_json.c"],
     ],
   );
 });

@@ -1189,6 +1189,35 @@ test("populates Proxy and routes every essential internal method", () => {
   assert.match(proxySource, /OSEO_FUNCTION_INTERNAL/u);
 });
 
+test("populates the realm-owned JSON parser", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const jsonSource = sources.get("runtime_json.c") ?? "";
+  const symbolSource = sources.get("runtime_symbol.c") ?? "";
+
+  for (const intrinsic of ["JSON", "JSON_PARSE"]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  assert.match(internalHeader, /OSEO_JSON_PARSE_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_JSON_STRINGIFY_CODE_ID/u);
+  assert.match(jsonSource, /json_parse_value/u);
+  assert.match(jsonSource, /json_internalize/u);
+  assert.match(
+    jsonSource,
+    /JSON\.stringify is not admitted in this M5b node\./u,
+  );
+  assert.match(jsonSource, /oseo_to_string[\s\S]*json_parse_text/u);
+  assert.match(jsonSource, /is_callable\(frame\.slots\[1\]\)/u);
+  assert.match(jsonSource, /oseo_internal_is_array/u);
+  assert.match(jsonSource, /oseo_internal_own_key_array/u);
+  assert.match(jsonSource, /oseo_internal_proxy_get_own_property/u);
+  assert.match(jsonSource, /oseo_call_function/u);
+  assert.match(
+    symbolSource,
+    /OSEO_WELL_KNOWN_TO_STRING_TAG[\s\S]*frame\.slots\[2\][\s\S]*tag/u,
+  );
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

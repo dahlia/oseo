@@ -192,12 +192,12 @@ static const char *object_builtin_tag(OseoValue receiver) {
     if (is_object(receiver) && ordinary_object(receiver)->primitive_data) {
         OseoValue primitive = ordinary_object(receiver)->primitive_value;
         if (is_string(primitive)) return "String";
-        if (is_symbol(primitive)) return "Symbol";
+        if (is_symbol(primitive)) return "Object";
         if (tag_of(primitive) == OSEO_TAG_BOOLEAN) return "Boolean";
     }
     if (is_date(receiver)) return "Date";
     if (is_string(receiver)) return "String";
-    if (is_symbol(receiver)) return "Symbol";
+    if (is_symbol(receiver)) return "Object";
     if (is_number(receiver)) return "Number";
     if (tag_of(receiver) == OSEO_TAG_BOOLEAN) return "Boolean";
     return "Object";

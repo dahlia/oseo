@@ -424,3 +424,7 @@ families:
     owner: tests/property/m5-string-iterator.property.test.ts
     start: 0x60006900
     end: 0x600069ff
+  - family: m5-json-parse
+    owner: tests/property/m5-json-parse.property.test.ts
+    start: 0x60006a00
+    end: 0x60006aff

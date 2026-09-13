@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,342 reviewed cases: 14,762 passes, 1,556 expected negatives, and 2,024
+18,414 reviewed cases: 14,905 passes, 1,556 expected negatives, and 1,953
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 118 indexed records in the normative
+M5a is complete. The 119 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-14,762 passes across 18,342 paths, and the property inventory records 137
-domains, 137 seeds, and an ordinary case budget of 5,542.
+14,905 passes across 18,414 paths, and the property inventory records 138
+domains, 138 seeds, and an ordinary case budget of 5,554.
 
 
 M5a implementation history
@@ -5978,6 +5978,53 @@ family index moves from 117 to 118 records.
 The runtime ABI moves to `oseo-runtime-m5-102`, allocates two code IDs in the
 existing iterator range, and adds three realm intrinsics without adding a heap
 kind, a generated-code entry point, or a graph-state change.
+
+Implemented M5b node `json-parse` adds the replaceable `JSON` namespace and
+its ordinary, non-constructible `parse` function. The new runtime component
+parses the JSON lexical grammar directly from the ToString result's UTF-16
+code units, builds ordinary Arrays and objects, preserves `-0`, replaces
+duplicate names including `__proto__` with ordinary data-property semantics,
+and rejects malformed syntax or trailing input with `SyntaxError`. The text is
+data rather than JavaScript source, so this node does not cross the dynamic
+source boundary.
+
+The sibling `stringify` property has its standard callable descriptor so the
+new namespace remains coherent under reflection. Calling it reaches an
+explicit unsupported-profile boundary; SerializeJSONProperty and the
+`json-stringify` node remain unimplemented here.
+
+A callable second argument enables the post-order reviver walk. Arrays
+snapshot their length and visit ascending indices; objects snapshot enumerable
+own string keys in OrdinaryOwnPropertyKeys order before recursion. Each result
+is deleted when it is `undefined` and otherwise installed with
+CreateDataProperty semantics. A fresh wrapper holds the parsed result under
+the empty name for the final call, and input ToString completes before either
+parsing or reviver classification.
+
+Fixed native and generated differential evidence at seed `0x60006a00` covers
+valid and malformed grammar, escaped and lone-surrogate strings, number forms,
+duplicate names, bounded nesting near the runtime limit, descriptors,
+post-order ordering, deletion, replacement, the final wrapper, input
+conversion ordering, both specialization policies,
+forced collection at every safepoint, false hints, deliberate shape-guard
+misses, and generic fallback. The generated family has a 12-case ordinary
+budget over bounded numbers, Booleans, zero through twelve UTF-16 code units,
+one nested Array, and an optional reviver deletion. All 72 edition paths under
+the node's inventory root are reviewed and pass, including the nine
+Proxy-dependent cases that also carry the `proxy-exotic-object` tag; the
+later source-context cases remain outside the inventory. The reviewed manifest
+moves from 18,342 to 18,414 paths, from 14,762 to 14,905 passes, and from 2,024
+to 1,953 unsupported profile features while keeping 1,556 expected negatives
+and zero semantic, harness, or infrastructure failures. The 72 root paths enter
+as passes, and 71 reviewed paths outside the roots, 50 under Object, 20 under
+Array, and one under Function, move from `unsupported-profile-feature` to
+`pass` because each uses the `JSON` namespace as an ordinary object operand
+that the realm now provides. The normative family index moves from 118 to 119
+records. The node moves the runtime ABI to `oseo-runtime-m5-103`, adds one
+runtime component, one built-in code ID range, and two intrinsic slots, adds no
+generated-code entry point, and does not change the graph's orchestration
+state. The property ratchet moves from 137 to 138 domains and seeds and from
+5,542 to 5,554 ordinary cases.
 
 
 Ahead-of-time challenge boundary

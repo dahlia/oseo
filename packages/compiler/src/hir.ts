@@ -352,6 +352,7 @@ export function intrinsicGlobalKind(
     name === "Date" ||
     name === "Function" ||
     name === "Iterator" ||
+    name === "JSON" ||
     name === "Map" ||
     name === "Math" ||
     name === "Number" ||

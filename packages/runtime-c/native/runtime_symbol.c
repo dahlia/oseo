@@ -294,6 +294,30 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        /*
+         * Object.prototype.toString observes the inherited standard tag.
+         * Removing it must expose the Symbol primitive's ordinary Object
+         * fallback instead of a private builtin tag.
+         */
+        result = oseo_internal_ascii_string(context, "Symbol");
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            const OseoPropertyAttributes tag = {
+                true,
+                false,
+                false,
+                false,
+            };
+            result = oseo_object_define(
+                context,
+                context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE],
+                context->well_known_symbols[OSEO_WELL_KNOWN_TO_STRING_TAG],
+                frame.slots[2],
+                tag
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result.value = frame.slots[1];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;

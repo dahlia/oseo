@@ -234,6 +234,20 @@ test("reads the Reflect namespace through its global property", () => {
   );
 });
 
+test("reads the JSON namespace through its global property", () => {
+  const compiled = compileSource(babelFrontend, {
+    source: "console.log(typeof JSON, JSON.parse('{\"value\": 1}').value);",
+    sourceId: "json-global.ts",
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  assert.ok(compiled.mir != null);
+  const hir = printHir(compiled.hir);
+  assert.match(hir, /"JSON" in %b\d+\(\*intrinsic global object\*\)/u);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["JSON"\]/u);
+  assert.match(printMir(compiled.mir), /read \*missing intrinsic:JSON\*/u);
+});
+
 test("reads the four URI handling functions as global properties", () => {
   const result = compileSource(babelFrontend, {
     source:
