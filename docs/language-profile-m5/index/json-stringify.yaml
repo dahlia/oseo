@@ -1,0 +1,3 @@
+version: 1
+id: json-stringify
+record: docs/language-profile-m5/families/json-stringify.yaml

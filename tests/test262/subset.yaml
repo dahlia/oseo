@@ -106,6 +106,7 @@ supportedFeatures:
   - template
   - top-level-await
   - u180e
+  - well-formed-json-stringify
   - well-known-symbols
 tests:
   - path: test/built-ins/AggregateError/cause-property.js
@@ -16012,6 +16013,21 @@ tests:
   - path: test/built-ins/Iterator/subclassable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
+  - path: test/built-ins/JSON/15.12-0-1.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/15.12-0-2.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/15.12-0-3.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/15.12-0-4.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [json-stringify, symbols]
   - path: test/built-ins/JSON/parse/15.12.1.1-0-1.js
     expectedClassification: pass
     dependencies: [json-parse]
@@ -16228,6 +16244,207 @@ tests:
   - path: test/built-ins/JSON/parse/text-object.js
     expectedClassification: pass
     dependencies: [json-parse]
+  - path: test/built-ins/JSON/prop-desc.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/builtin.js
+    expectedClassification: pass
+    dependencies: [json-stringify, reflect-namespace]
+  - path: test/built-ins/JSON/stringify/length.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/name.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, json-stringify, reflect-namespace]
+  - path: test/built-ins/JSON/stringify/prop-desc.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/property-order.js
+    expectedClassification: pass
+    dependencies: [json-stringify, object-own-keys]
+  - path: test/built-ins/JSON/stringify/replacer-array-abrupt.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/replacer-array-duplicates.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-empty.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-number-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-number.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-order.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-proxy-revoked-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/replacer-array-proxy-revoked.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/replacer-array-proxy.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/replacer-array-string-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-undefined.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-array-wrong-type.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object, symbols]
+  - path: test/built-ins/JSON/stringify/replacer-function-abrupt.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-arguments.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-array-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-object-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-object-deleted-property.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-result-undefined.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-result.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-tojson.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-function-wrapper.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/replacer-wrong-type.js
+    expectedClassification: pass
+    dependencies: [json-stringify, symbols]
+  - path: test/built-ins/JSON/stringify/space-number-float.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-number-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-number-range.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-number.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-string-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-string-range.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-string.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/space-wrong-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [json-stringify, symbols]
+  - path: test/built-ins/JSON/stringify/value-array-abrupt.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/value-array-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-array-proxy-revoked.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/value-array-proxy.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/value-bigint-cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-bigint-order.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-bigint-replacer.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-bigint-tojson-receiver.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-bigint-tojson.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, json-stringify]
+  - path: test/built-ins/JSON/stringify/value-boolean-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-function.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-number-negative-zero.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-number-non-finite.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-number-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-object-abrupt.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-object-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-object-proxy-revoked.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/value-object-proxy.js
+    expectedClassification: pass
+    dependencies: [json-stringify, proxy-exotic-object]
+  - path: test/built-ins/JSON/stringify/value-primitive-top-level.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-string-escape-ascii.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-string-escape-unicode.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-string-object.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-symbol.js
+    expectedClassification: pass
+    dependencies: [json-stringify, symbols]
+  - path: test/built-ins/JSON/stringify/value-tojson-abrupt.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-tojson-arguments.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-tojson-array-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-tojson-not-function.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-tojson-object-circular.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
+  - path: test/built-ins/JSON/stringify/value-tojson-result.js
+    expectedClassification: pass
+    dependencies: [json-stringify]
   - path: test/built-ins/Map/Symbol.species/length.js
     expectedClassification: pass
     dependencies: [iterator-protocol]

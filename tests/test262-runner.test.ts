@@ -1510,25 +1510,6 @@ null.item;
     "unsupported-profile-feature",
   );
 
-  const deferredJsonStringify = await executeTest262Case(
-    source,
-    parsed,
-    new Set<string>(),
-    harnesses,
-    respondStderr(
-      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
-        "JSON.stringify is not admitted in this M5b node.\n",
-    ),
-  );
-  assert.equal(
-    deferredJsonStringify.observation.unsupportedCapability,
-    "json-stringify",
-  );
-  assert.equal(
-    deferredJsonStringify.classification,
-    "unsupported-profile-feature",
-  );
-
   const deferredStringPrototype = await executeTest262Case(
     source,
     parsed,

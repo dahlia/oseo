@@ -17,9 +17,8 @@ scope:
     introduced after the pinned edition stay outside the inventory, and the
     nine Proxy-dependent paths also carry the proxy-exotic-object tag."
   - "The sibling stringify property has its standard callable descriptor so
-    reflection remains coherent once JSON exists, but calls retain an
-    explicit unsupported-profile boundary; this node does not implement the
-    stringify algorithm owned by json-stringify."
+    reflection remains coherent once JSON exists. Its algorithm is admitted
+    and evidenced by the separate json-stringify family."
 owners:
   - PLAN-M5.md
 evidence:

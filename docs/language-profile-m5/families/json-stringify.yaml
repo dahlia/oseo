@@ -1,0 +1,68 @@
+version: 1
+id: json-stringify
+title: "JSON stringify"
+scope:
+  - "The ordinary non-constructible JSON.stringify function and
+    SerializeJSONProperty, including toJSON before a callable replacer,
+    specified receivers and key arguments, primitive-wrapper conversion,
+    finite and non-finite Number handling, BigInt rejection, UTF-16 string
+    quoting, and omission or Array null substitution for values without a JSON
+    representation."
+  - "Replacer Arrays, including Proxy Arrays, array-like length and indexed
+    Get, String and Number primitive or wrapper conversion, stable
+    deduplication, inherited property selection, and property-list reuse at
+    every object depth."
+  - "Array length snapshots, object enumerable-own-string-key snapshots,
+    OrdinaryOwnPropertyKeys ordering, observable Proxy operations, numeric and
+    string gap handling, pretty-print indentation, abrupt completion,
+    active-ancestor cycle detection, and deterministic bounded recursion."
+  - "Reviewed standards coverage is the 72 edition paths under
+    test/built-ins/JSON/*.js and test/built-ins/JSON/stringify/: 67 pass and
+    five remain unsupported for cross-realm, Boolean-binding, or general
+    BigInt primitive-wrapper prerequisites outside this node."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/json-stringify.ts
+      - tests/property/m5-json-stringify.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/json-stringify.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-stringify.ts
+      - tests/property/m5-json-stringify.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-json-stringify.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-stringify.ts
+      - tests/property/m5-json-stringify.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/json-stringify.ts
+      - tests/property/m5-json-stringify.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_json.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -617,9 +617,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "primitive-wrapper-prototype";
   }
-  if (diagnostic === "JSON.stringify is not admitted in this M5b node.") {
-    return "json-stringify";
-  }
   if (diagnostic === "Object static method is not admitted in this M5b node.") {
     return "object-static-method";
   }

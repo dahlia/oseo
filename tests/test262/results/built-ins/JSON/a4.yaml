@@ -1,0 +1,26 @@
+group: built-ins/JSON
+key: a4
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/JSON/stringify/value-boolean-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - json-stringify
+    observation:
+      detail: "test/built-ins/JSON/stringify/value-boolean-object.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/JSON/stringify/value-boolean-object.js:\
+        100:37: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

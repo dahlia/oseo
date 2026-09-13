@@ -1,0 +1,36 @@
+group: built-ins/JSON
+key: e5
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/JSON/stringify/value-bigint-tojson.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - bigint-primitive
+      - json-stringify
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/JSON/stringify/value-bigint-tojson.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/JSON/stringify/value-bigint-tojson.js:92:48:
+        error[OSEO2001]: Primitive wrapper objects are not admitted
+        yet.\n"'
+      unsupportedCapability: primitive-wrapper
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
