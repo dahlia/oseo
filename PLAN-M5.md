@@ -1248,15 +1248,23 @@ lower pass count, a path leaving `pass`, or a removed subset path unless a
 separate, exact, reasoned override records the deliberate reversal.
 
 `mise run check:m5b-node-scope` adds the separate authorship axis. When
-`OSEO_M5B_NODE` names a node, additions, removals, and demotions outside that
-node's inventory roots fail, while promotions to `pass` remain allowed because
-inventory roots partition test paths, not the causes that make them pass. A
-node without an inventory block cannot change reviewed evidence. The check also
-rejects newly added ratchet overrides, since a worker reports a required
-reversal and the coordinator decides whether to record it. Removing a stale
-override remains allowed. The ratchet stays global and monotonic; node scope
-answers who may author a directional change, so neither axis replaces the
-other.
+`OSEO_M5B_NODE` names a node, additions, removals, and classification changes
+outside that node's inventory roots fail except for two directional
+improvements. A reviewed path may move to `pass`, or it may move from
+`unsupported-profile-feature` to `expected-negative` when the node removes
+the named unsupported boundary and makes the negative expectation observable.
+Inventory roots partition test paths, not the implementation causes that make
+them succeed. No other move between non-pass classifications is directional:
+it belongs to the path's owning node or needs a separately reviewed policy
+change. A node without an inventory block cannot change reviewed evidence.
+
+The check also rejects newly added ratchet overrides, since a worker reports a
+required reversal and the coordinator decides whether to record it. Removing a
+stale override remains allowed. This direction policy does not change the ADR
+0013 schema or classification vocabulary. The compatibility ratchet stays
+global and monotonic: it still rejects a lower pass count, a path leaving
+`pass`, or a removed reviewed path, and node scope answers who may author the
+remaining directional changes. Neither axis replaces the other.
 
 A run that does not name a node enforces nothing. The coordinator merges
 nodes, regenerates the manifest, and records reversals, and CI runs the gate

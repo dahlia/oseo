@@ -133,8 +133,13 @@ function reviewedChanges(
   );
 }
 
-function isPromotion(change: ReviewedChange): boolean {
-  return change.kind === "expected-classification" && change.to === "pass";
+function isOutOfRootImprovement(change: ReviewedChange): boolean {
+  if (change.kind !== "expected-classification") return false;
+  if (change.to === "pass") return true;
+  return (
+    change.from === "unsupported-profile-feature" &&
+    change.to === "expected-negative"
+  );
 }
 
 function describeChange(change: ReviewedChange): string {
@@ -174,7 +179,7 @@ function namedNodeFailures(
   return changes
     .filter((change) => {
       if (paths == null) return true;
-      return !paths.has(change.path) && !isPromotion(change);
+      return !paths.has(change.path) && !isOutOfRootImprovement(change);
     })
     .map((change) => {
       const scope =
@@ -198,8 +203,10 @@ function namedNodeFailures(
  * nodes, regenerating the manifest, or recording a reversal legitimately
  * changes reviewed rows that no single node owns.
  *
- * Promotions remain allowed outside the node because inventory roots assign
- * test paths, not the implementation causes that can make those tests pass.
+ * A move to `pass` remains allowed outside the node. A move from
+ * `unsupported-profile-feature` to `expected-negative` is also allowed when
+ * the node makes an already reviewed negative test executable. Inventory
+ * roots assign test paths, not the implementation causes that improve them.
  */
 export function checkM5bNodeScope(inputs: M5bNodeScopeInputs): void {
   const nodeId = inputs.nodeId;

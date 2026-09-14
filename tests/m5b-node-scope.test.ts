@@ -104,6 +104,42 @@ test("allows an out-of-root expected-classification promotion", () => {
   assert.doesNotThrow(() => checkM5bNodeScope(inputs(baseline, current)));
 });
 
+test("allows an out-of-root unsupported negative to become observed", () => {
+  const baseline = snapshot([
+    { classification: "unsupported-profile-feature", path: otherPath },
+  ]);
+  const current = snapshot([
+    { classification: "expected-negative", path: otherPath },
+  ]);
+  assert.doesNotThrow(() => checkM5bNodeScope(inputs(baseline, current)));
+});
+
+test("rejects reversing an out-of-root observed negative", () => {
+  const baseline = snapshot([
+    { classification: "expected-negative", path: otherPath },
+  ]);
+  const current = snapshot([
+    { classification: "unsupported-profile-feature", path: otherPath },
+  ]);
+  assert.throws(
+    () => checkM5bNodeScope(inputs(baseline, current)),
+    /"expected-negative" -> "unsupported-profile-feature"/u,
+  );
+});
+
+test("rejects other out-of-root moves to expected-negative", () => {
+  const baseline = snapshot([
+    { classification: "semantic-failure", path: otherPath },
+  ]);
+  const current = snapshot([
+    { classification: "expected-negative", path: otherPath },
+  ]);
+  assert.throws(
+    () => checkM5bNodeScope(inputs(baseline, current)),
+    /expectedClassification "semantic-failure" -> "expected-negative"/u,
+  );
+});
+
 test("allows every reviewed change inside the named node's roots", () => {
   const baseline = snapshot([
     { classification: "pass", path: ownPath },
