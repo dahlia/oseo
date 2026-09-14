@@ -436,3 +436,7 @@ families:
     owner: tests/property/m5-json-stringify.property.test.ts
     start: 0x60006c00
     end: 0x60006cff
+  - family: m5-harness-promise-helper
+    owner: tests/property/m5-harness-promise-helper.property.test.ts
+    start: 0x60006d00
+    end: 0x60006dff

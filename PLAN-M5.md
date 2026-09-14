@@ -6102,6 +6102,42 @@ passes, and from 1,950 to 1,955 unsupported profile features while keeping
 1,556 expected negatives and zero semantic, harness, or infrastructure
 failures. No reviewed path outside the node roots changes classification.
 
+Implemented M5b node `harness-promise-helper` completes the reviewed
+*promiseHelper.js* include. Its ordinary JavaScript adaptation preserves the
+upstream `checkSequence` truthy-message fallback and exact joined-array
+failure text. It also preserves every `checkSettledPromises` assertion over
+the result Array, its length, each record's own `status`, `value`, or `reason`
+property, the expected values, optional message prefix, and upstream failure
+text. The test262 adapter still assembles that source before the test body;
+the include adds no native shortcut or runtime surface.
+
+Fixed native and generated differential evidence at property seed
+`0x60006d00` covers zero through six sequence entries, one valid sequence or
+one directly generated mismatch, and one through four fulfilled or rejected
+settlement records. Each settlement case is either valid or carries one Array,
+length, status, property-presence, or payload mismatch. Omitted, empty, and
+custom messages cover both fallback branches. Node.js, Deno, and both native
+specialization policies agree under collection forced at every safepoint, and
+a false numeric hint deliberately misses its guard and reaches the compiled
+generic fallback. The generated domain has a 12-case ordinary budget and
+direct record and Array shrinking.
+
+Focused execution also observes ten passing upstream users of the include:
+one AggregateError argument-order case, seven Promise reaction-order cases,
+and two Promise.resolve thenable-order cases. They remain outside the reviewed
+subset because this node has no inventory root and their paths belong to other
+graph nodes. The 44 reviewed users of the include keep their classifications:
+39 pass, and five Promise.prototype.finally cases retain that separate feature
+boundary. No reviewed row moves. The manifest keeps 18,687 paths, 15,176
+passes, 1,556 expected negatives, and 1,955 unsupported profile features with
+no semantic, harness, or infrastructure failures. The property ratchet moves
+from 140 to 141 domains and seeds and from 5,578 to 5,590 ordinary cases, and
+the evidence inventory moves from 121 to 122 families. The runtime ABI remains
+`oseo-runtime-m5-105`; the node adds no component, code ID, realm intrinsic,
+generated-code entry point, or graph-state change. The suite revision,
+applicable inventory, classification vocabulary, target-parity policy,
+forced-collection policy, and zero-override policy are unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

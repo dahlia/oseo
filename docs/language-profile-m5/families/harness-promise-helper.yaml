@@ -1,0 +1,53 @@
+version: 1
+id: harness-promise-helper
+title: "promiseHelper.js harness include"
+scope:
+  - "The reviewed checkSequence helper, including an empty sequence, a
+    one-based numeric sequence, the first mismatch, falsey default messages,
+    custom messages, and the exact joined-array failure text."
+  - "The reviewed checkSettledPromises helper over fulfilled and rejected
+    result records, including Array and length checks, own status and payload
+    properties, status and payload values, optional message prefixes, and
+    the upstream failure text."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/property/m5-harness-promise-helper.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/promiseHelper.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: omitted
+    reason: "The include is ordinary JavaScript assembled ahead of each
+      reviewed test body and adds no IR construct, generated-C contract,
+      realm intrinsic, runtime helper, or ABI surface of its own."
+    replacements:
+      - tools/test262.ts
+      - tests/test262/harness/promiseHelper.js
