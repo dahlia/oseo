@@ -6,6 +6,4 @@ delivers: "Adds agent clusters, cross-agent shared-memory execution, and the
 dependencies:
   - atomics-single-agent
 landed: false
-status: parked
-reason: "Its atomics-single-agent dependency is parked behind the exhausted
-  typed-array-constructors coordinator review allowance."
+status: blocked

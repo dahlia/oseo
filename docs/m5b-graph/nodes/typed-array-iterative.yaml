@@ -17,6 +17,4 @@ dependencies:
   - array-prototype-species-mapping
   - typed-array-core
 landed: false
-status: parked
-reason: "Its typed-array-constructors dependency awaits authorization for one
-  clean coordinator confirmation review."
+status: blocked
