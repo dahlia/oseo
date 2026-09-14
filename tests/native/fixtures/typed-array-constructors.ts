@@ -236,6 +236,21 @@ Object.defineProperty(ownIterator, Symbol.iterator, {
   value: function () { return [5, 7][Symbol.iterator](); },
 });
 observeIterator("own iterator", ownIterator);
+const proxyStepIterator = [21, 23][Symbol.iterator]();
+const proxyIterable = {
+  [Symbol.iterator]: new Proxy(function () {
+    return {
+      next: new Proxy(function () { return proxyStepIterator.next(); }, {}),
+    };
+  }, {}),
+};
+const proxyIterated = new Uint8Array(proxyIterable);
+console.log(
+  "callable proxy iterator",
+  proxyIterated[0],
+  proxyIterated[1],
+  proxyIterated[2],
+);
 const nullPrototypeIterator = new Uint8Array(0);
 Object.setPrototypeOf(nullPrototypeIterator, null);
 for (const consume of [
@@ -333,6 +348,26 @@ console.log(
   "indexed has own",
   Object.hasOwn(indexedHasOwn, "0"),
   Object.hasOwn(indexedHasOwn, "1"),
+);
+const proxiedIndexes = new Proxy(new Uint8Array([31, 37]), {});
+const proxiedDescriptor = Object.getOwnPropertyDescriptor(proxiedIndexes, "0");
+console.log(
+  "proxy index descriptor",
+  Object.hasOwn(proxiedIndexes, "0"),
+  Object.hasOwn(proxiedIndexes, "2"),
+  propertyIsEnumerable.call(proxiedIndexes, "1"),
+  propertyIsEnumerable.call(proxiedIndexes, "2"),
+  proxiedDescriptor.value,
+  proxiedDescriptor.writable,
+  proxiedDescriptor.enumerable,
+  proxiedDescriptor.configurable,
+  Object.getOwnPropertyDescriptor(proxiedIndexes, "2") === undefined,
+);
+const proxiedBigIndexes = new Proxy(new BigInt64Array([41n]), {});
+console.log(
+  "proxy bigint index descriptor",
+  Object.getOwnPropertyDescriptor(proxiedBigIndexes, "0").value,
+  Object.hasOwn(proxiedBigIndexes, "0"),
 );
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);

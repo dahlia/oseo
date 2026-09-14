@@ -912,7 +912,7 @@ static OseoResult typed_array_from_iterable(
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_function(frame.slots[4])) {
+        !is_callable(frame.slots[4])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -996,7 +996,7 @@ static OseoResult typed_array_from_object(
             slots[1]
         );
     } else if (result.status == OSEO_STATUS_NORMAL &&
-               !is_function(slots[3])) {
+               !is_callable(slots[3])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,

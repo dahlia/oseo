@@ -17,6 +17,11 @@ export async function runNativeScenario2(
       'Object.defineProperty(new Uint8Array(1), "0", { value: 1 });',
     ],
     ["typed-array-in-index.ts", 'console.log("1.5" in new Uint8Array(1));'],
+    [
+      "typed-array-proxy-canonical-index.ts",
+      "console.log(Object.hasOwn(" +
+        'new Proxy(new Uint8Array(1), {}), "1.5"));',
+    ],
     ["typed-array-own-keys.ts", "Object.keys(new Uint8Array(1));"],
     ["typed-array-spread.ts", "console.log({...new Uint8Array(1)});"],
   ] as const) {

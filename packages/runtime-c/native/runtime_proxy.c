@@ -165,6 +165,40 @@ static OseoResult target_own_property(
         return oseo_internal_proxy_get_own_property(
             context, target, key, found, value, attributes, getter, setter);
     }
+    if (is_typed_array(target)) {
+        uint32_t index = 0u;
+        if (oseo_internal_array_index(key, &index)) {
+            *found = false;
+            *getter = oseo_undefined();
+            *setter = oseo_undefined();
+            bool present = false;
+            OseoResult loaded = oseo_internal_typed_array_get_index(
+                context, target, index, &present);
+            if (loaded.status != OSEO_STATUS_NORMAL) return loaded;
+            if (present) {
+                *found = true;
+                *value = loaded.value;
+                /* Always configurable and writable, so no trap-invariant
+                 * check ever compares this value after a later safepoint
+                 * could have collected a freshly loaded BigInt element. */
+                *attributes =
+                    (OseoPropertyAttributes){true, true, true, false};
+            }
+            return normal(oseo_undefined());
+        }
+        bool numeric_index = false;
+        OseoResult classified = oseo_internal_canonical_numeric_index(
+            context, key, &numeric_index);
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) {
+            return failure(
+                context,
+                "OSEO2001",
+                "TypedArray integer-indexed exotic operations are not "
+                "admitted yet."
+            );
+        }
+    }
     *found = oseo_internal_own_property_descriptor(
         context, target, key, value, attributes, getter, setter);
     return normal(oseo_undefined());
