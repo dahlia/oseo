@@ -17,16 +17,6 @@ static OseoResult typed_array_exotic_error(OseoContext *context) {
     );
 }
 
-static OseoResult typed_array_deferred_accessor_error(
-    OseoContext *context
-) {
-    return failure(
-        context,
-        "OSEO2001",
-        "TypedArray prototype accessors are not admitted yet."
-    );
-}
-
 OseoResult oseo_internal_require_property_key(
     OseoContext *context,
     OseoValue key
@@ -142,9 +132,11 @@ static OseoResult object_get(
             }
             return normal(value);
         }
-        if (oseo_internal_typed_array_deferred_accessor(
-                context, current, key)) {
-            return typed_array_deferred_accessor_error(context);
+        const char *deferred =
+            oseo_internal_typed_array_deferred_diagnostic(
+                context, current, key);
+        if (deferred != NULL) {
+            return failure(context, "OSEO2001", deferred);
         }
         current = object->prototype;
     }
@@ -188,6 +180,22 @@ OseoResult oseo_object_has_own(
             NULL
         )));
     }
+    if (is_typed_array(object_value)) {
+        uint32_t index = 0u;
+        if (oseo_internal_array_index(key, &index)) {
+            return normal(oseo_boolean(
+                oseo_internal_typed_array_has_index(object_value, index)
+            ));
+        }
+        bool numeric_index = false;
+        OseoResult classified = oseo_internal_canonical_numeric_index(
+            context,
+            key,
+            &numeric_index
+        );
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) return typed_array_exotic_error(context);
+    }
     /* The shared descriptor primitive already reports a function's
      * `prototype`, an array's `length`, and the virtual String iterator,
      * so the ownership answer never needs a separate synthetic case. */
@@ -210,7 +218,7 @@ OseoResult oseo_object_has_own(
         if (result.status != OSEO_STATUS_NORMAL) return result;
         return normal(oseo_boolean(found));
     }
-    return normal(oseo_boolean(oseo_internal_own_property_descriptor(
+    bool exists = oseo_internal_own_property_descriptor(
         context,
         object_value,
         key,
@@ -218,7 +226,13 @@ OseoResult oseo_object_has_own(
         &attributes,
         &getter,
         &setter
-    )));
+    );
+    if (exists) return normal(oseo_boolean(true));
+    const char *deferred =
+        oseo_internal_typed_array_deferred_diagnostic(
+            context, object_value, key);
+    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
+    return normal(oseo_boolean(false));
 }
 
 OseoResult oseo_object_set(
@@ -430,9 +444,12 @@ OseoResult oseo_object_set(
             }
             break;
         }
-        if (oseo_internal_typed_array_deferred_accessor(
+        if (oseo_internal_typed_array_deferred_assignment(
                 context, current, key)) {
-            return typed_array_deferred_accessor_error(context);
+            const char *deferred =
+                oseo_internal_typed_array_deferred_diagnostic(
+                    context, current, key);
+            return failure(context, "OSEO2001", deferred);
         }
         current = owner->prototype;
     }
@@ -535,9 +552,12 @@ OseoResult oseo_internal_set_with_receiver(
             }
             break;
         }
-        if (oseo_internal_typed_array_deferred_accessor(
+        if (oseo_internal_typed_array_deferred_assignment(
                 context, current, key)) {
-            return typed_array_deferred_accessor_error(context);
+            const char *deferred =
+                oseo_internal_typed_array_deferred_diagnostic(
+                    context, current, key);
+            return failure(context, "OSEO2001", deferred);
         }
         current = ordinary_object(current)->prototype;
     }

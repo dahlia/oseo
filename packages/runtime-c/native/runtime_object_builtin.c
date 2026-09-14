@@ -2208,6 +2208,14 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
             }
         }
     }
+    if (result.status == OSEO_STATUS_NORMAL && !exists) {
+        const char *deferred =
+            oseo_internal_typed_array_deferred_diagnostic(
+                context, object_value, frame.slots[1]);
+        if (deferred != NULL) {
+            result = failure(context, "OSEO2001", deferred);
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && exists &&
         oseo_internal_cell_backed_property(object_value, value)) {
         result = oseo_cell_get(context, value);
@@ -2382,6 +2390,10 @@ OseoResult oseo_internal_own_key_array(
     if (is_proxy(object_value)) {
         return oseo_internal_proxy_own_keys(context, object_value, filter);
     }
+    const char *deferred =
+        oseo_internal_typed_array_deferred_own_keys_diagnostic(
+            context, object_value);
+    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
     OseoValue rooted = object_value;
     OseoRootFrame root = {NULL, &rooted, 1u};
     oseo_roots_push(context, &root);
@@ -3137,6 +3149,10 @@ static OseoResult object_get_own_property_descriptors(
     }
     OseoResult converted = oseo_internal_to_object(context, value);
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    const char *deferred =
+        oseo_internal_typed_array_deferred_own_keys_diagnostic(
+            context, converted.value);
+    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
     size_t key_count = 0u;
     /* The key frame roots the conversion result, the reported object,
      * the one synthesized key string, and the whole key snapshot. The

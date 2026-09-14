@@ -11097,7 +11097,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, functions]
   - path: test/built-ins/DataView/prototype/setBigInt64/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view]
   - path: test/built-ins/DataView/prototype/setBigInt64/this-is-not-object.js
     expectedClassification: pass
@@ -28782,10 +28782,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-bigint64array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-biguint64array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-boolean-literal.js
     expectedClassification: pass
@@ -28809,10 +28809,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-float32array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-float64array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-function.js
     expectedClassification: unsupported-profile-feature
@@ -28824,13 +28824,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-int16array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-int32array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-int8array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-map.js
     expectedClassification: pass
@@ -28881,16 +28881,16 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-uint16array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-uint32array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-uint8array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-uint8clampedarray.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-undefined.js
     expectedClassification: pass

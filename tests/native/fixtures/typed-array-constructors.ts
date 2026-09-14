@@ -320,6 +320,20 @@ for (const name of ["length", "byteLength", "byteOffset", "buffer"]) {
     Object.prototype.hasOwnProperty.call(detachedAccessors, name),
   );
 }
+const shadowedMethod = new Uint8Array(0);
+Object.defineProperty(shadowedMethod, "map", { value: "own map" });
+console.log("own method shadow", shadowedMethod.map);
+const customMethod = new Uint8Array(0);
+Object.setPrototypeOf(customMethod, { map: "custom map" });
+console.log("custom method shadow", customMethod.map);
+Object.defineProperty(Uint8Array, "from", { value: "own from" });
+console.log("own static shadow", Uint8Array.from);
+const indexedHasOwn = new Uint8Array(1);
+console.log(
+  "indexed has own",
+  Object.hasOwn(indexedHasOwn, "0"),
+  Object.hasOwn(indexedHasOwn, "1"),
+);
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);
 console.log(

@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 118
+M5a is complete. The normative family records described below inventory 123
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -6000,10 +6000,13 @@ content types cannot mix. Integer conversions use modulo arithmetic,
 specified precision, and the BigInt arrays apply signed or unsigned modulo
 `2^64`. `ArrayBuffer.isView` recognizes every resulting view. The complete
 integer-indexed descriptor surface and the standard TypedArray prototype and
-static methods retain their later M5b graph owners.
+static methods retain their later M5b graph owners. Lookups that reach those
+deferred prototype or static properties report the owning boundary instead of
+silently observing an absent property, and deletion aimed at a deferred
+property stops at the same boundary before any mutation.
 
 Fixed native and generated differential evidence at property seed
-`0x60006700` covers all eleven element kinds, length, buffer, iterable,
+`0x60006e00` covers all eleven element kinds, length, buffer, iterable,
 array-like, and typed-array construction, shared-buffer observation, cloning,
 content-type rejection, both specialization policies, false hints, deliberate
 shape and small-integer guard misses, generic fallback, and collection forced
@@ -6022,18 +6025,24 @@ metadata cases, and two BigInt conversion cases carry test262's broad
 later core node. The remaining 655 paths stay outside the reviewed subset.
 Cases for prototype accessors and methods, static `from` and `of`, species,
 and the complete integer-indexed exotic object have explicit later graph
-owners. Constructor cases that include the upstream
+owners and runtime lookup boundaries. Constructor cases that include the
+upstream
 *testTypedArray.js* harness also require Array statics and TypedArray prototype
 accessors that this node does not admit; the fixed fixture and the independent
 generated oracle replace that harness for every construction path and element
 conversion this node owns. Twenty-four already reviewed ArrayBuffer transfer
 cases also promote because their typed-view inspection dependency is now
-available. The manifest reaches 17,651 cases: 14,057 passes, 1,556 expected
-negatives, and 2,038 unsupported profile features with no semantic, harness,
-or infrastructure failures. The reviewed feature list retains the broader
-`TypedArray` gate for the later core node, and the dependency vocabulary gains
+available. One DataView receiver case and eleven `Object.seal` cases also
+promote after their concrete TypedArray inputs become available. The manifest
+reaches 18,768 cases: 15,226 passes, 1,556 expected negatives, and 1,986
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The reviewed feature list retains the broader `TypedArray` gate for
+the later core node, and the dependency vocabulary gains
 `typed-array-constructors`. The component and heap kind move the runtime ABI
-to `oseo-runtime-m5-100` without a public layout change or a graph state edit.
+to `oseo-runtime-m5-106`, and the public intrinsic table grows by 24 slots
+for the new constructor and prototype pairs. The value representation and
+the generated-code entry points are unchanged, and no graph state moves.
+
 
 Proxy exotic objects
 --------------------

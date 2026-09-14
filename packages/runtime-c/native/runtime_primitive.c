@@ -552,7 +552,7 @@ OseoResult oseo_internal_canonical_numeric_index(
     OseoResult converted = string_number(context, string);
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
     char text[64];
-    size_t length = number_text(
+    size_t length = oseo_internal_number_text(
         number_value(converted.value),
         text,
         sizeof(text)
@@ -1843,13 +1843,11 @@ OseoResult oseo_has_property(
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
-        if (oseo_internal_typed_array_deferred_accessor(
-                context, current, property)) {
-            return failure(
-                context,
-                "OSEO2001",
-                "TypedArray prototype accessors are not admitted yet."
-            );
+        const char *deferred =
+            oseo_internal_typed_array_deferred_diagnostic(
+                context, current, property);
+        if (deferred != NULL) {
+            return failure(context, "OSEO2001", deferred);
         }
         OseoResult prototype = oseo_internal_get_prototype(context, current);
         if (prototype.status != OSEO_STATUS_NORMAL) return prototype;

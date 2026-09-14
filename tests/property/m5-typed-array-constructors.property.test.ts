@@ -131,8 +131,12 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 
+function isBigInt(value: bigint | number): value is bigint {
+  return typeof value === "bigint";
+}
+
 function printValue(value: bigint | number): string {
-  if (typeof value === "bigint") return `${value}n`;
+  if (isBigInt(value)) return `${value}n`;
   if (Number.isNaN(value)) return "NaN";
   if (value === Infinity) return "Infinity";
   if (value === -Infinity) return "-Infinity";
@@ -353,7 +357,7 @@ function convert(
   constructorName: ConstructorName,
   value: bigint | number,
 ): bigint | number {
-  if (typeof value === "bigint") {
+  if (isBigInt(value)) {
     const modulus = 1n << 64n;
     const unsigned = ((value % modulus) + modulus) % modulus;
     if (constructorName === "BigInt64Array" && unsigned >= 1n << 63n) {
@@ -529,7 +533,7 @@ test(
           "and restore",
         numRuns: 12,
         profile: "M5 TypedArray constructors",
-        seed: 0x6000_6500,
+        seed: 0x6000_6e00,
         sizeLimit:
           "one constructor, one construction path, at most eight values, " +
           "one typed-array clone, one out-of-bounds set and clone, one " +

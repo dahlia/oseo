@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,768 reviewed cases: 15,304 passes, 1,556 expected negatives, and 1,908
+18,768 reviewed cases: 15,226 passes, 1,556 expected negatives, and 1,986
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -31,8 +31,8 @@ M5a is complete. The 123 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,304 passes across 18,768 paths, and the property inventory records 142
-domains, 142 seeds, and an ordinary case budget of 5,632.
+15,226 passes across 18,768 paths, and the property inventory records 142
+domains, 142 seeds, and an ordinary case budget of 5,602.
 
 
 M5a implementation history
@@ -6155,17 +6155,20 @@ kinds and construction paths under both specialization policies, forced
 collection at every safepoint, false hints, deliberate guard misses, generic
 fallback, cloning, shared-buffer observation, and an independent arithmetic
 conversion oracle. The reviewed subset adds 81 paths from the node's
-736-path inventory. Later graph nodes still own prototype methods
-and accessors, statics, species, and the complete integer-indexed exotic
-surface; the fixed and generated suites replace the upstream harness for
+736-path inventory. Runtime lookups reject deferred prototype methods and
+accessors, statics, and species at explicit boundaries owned by later graph
+nodes. Those nodes also own the complete integer-indexed exotic surface; the
+fixed and generated suites replace the upstream harness for
 constructor paths whose harness itself needs those later facilities. Fourteen
 BigInt metadata cases pass and 67 newly reviewed paths retain the broad
 upstream `TypedArray` boundary. Twenty-four existing ArrayBuffer transfer
-cases also promote after their typed-view inspection dependency lands. The
-manifest moves to 18,768 paths with 15,304 passes, 1,556 expected negatives,
-and 1,908 unsupported profile features. The new component and heap kind move
-the runtime ABI to `oseo-runtime-m5-106` without changing the graph's
-orchestration state.
+cases also promote after their typed-view inspection dependency lands. One
+DataView receiver case and eleven `Object.seal` cases promote after their
+concrete TypedArray inputs become available. The manifest moves to 18,768
+paths with 15,226 passes, 1,556 expected negatives, and 1,986 unsupported
+profile features. The new component and heap kind move the runtime ABI to
+`oseo-runtime-m5-106` without changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

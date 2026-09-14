@@ -2360,7 +2360,16 @@ OseoResult oseo_internal_install_typed_array_globals(
     OseoContext *context,
     OseoValue global
 );
-bool oseo_internal_typed_array_deferred_accessor(
+const char *oseo_internal_typed_array_deferred_diagnostic(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
+    OseoContext *context,
+    OseoValue object
+);
+bool oseo_internal_typed_array_deferred_assignment(
     OseoContext *context,
     OseoValue object,
     OseoValue key

@@ -1293,13 +1293,14 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the eleven standard-object
-            // and value-property allocations plus thirty-one admitted
+            // and value-property allocations plus forty-two admitted
             // standard global property names shared by every Script, with
             // Proxy adding one allocation in each group and Date, JSON,
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
-            // builds.
-            assert.equal(native.counters.allocations, 48);
+            // builds. The eleven concrete TypedArray constructors add
+            // eleven property-name allocations.
+            assert.equal(native.counters.allocations, 59);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

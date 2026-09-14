@@ -760,15 +760,19 @@ allocate a fresh two-element Array. The iterator target and pending result stay
 collector-rooted throughout. Two code IDs and two intrinsic slots are added;
 the generated-code ABI gains no entry point.
 
-The `m5-100` ABI materializes `%TypedArray%` and all eleven concrete
+The `m5-106` ABI materializes `%TypedArray%` and all eleven concrete
 element-type constructors. Views retain a collector-traced `ArrayBuffer`
 reference plus their element kind, byte offset, and fixed or length-tracking
 element length. Construction accepts an element length, a buffer, an iterable,
 an array-like object, or another typed array; Number and BigInt content types
 remain distinct. Indexed element conversion and access are internal runtime
 operations, and every byte access reacquires the backing buffer after a
-possible safepoint. Public runtime layout is unchanged; the runtime adds one
-internal heap kind for the view record.
+possible safepoint. The public intrinsic table grows by 24 slots and the
+runtime adds one internal heap kind for the view record; the value
+representation and the generated-code entry points are unchanged. Deferred
+prototype and static API lookups report their later M5b owner instead of
+returning `undefined`, while own and intermediate prototype properties continue
+to shadow those defaults.
 
 The `m5-99` ABI extends `oseo_context_print_thrown` to a thrown value with
 no intrinsic error identity. The identity is the `name` of the value's

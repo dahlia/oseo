@@ -100,6 +100,7 @@ static void initialize_ordinary(
     object->length_writable = false;
     object->extensible = true;
     object->module_namespace = false;
+    object->immutable_prototype = false;
     object->global_object = false;
     object->error_data = false;
     object->number_data = false;
@@ -107,9 +108,19 @@ static void initialize_ordinary(
     object->primitive_data = false;
     object->primitive_value = oseo_undefined();
     object->primitive_wrapper_methods_initialized = false;
-    object->array_iterator = false;
-    object->iterator_array = oseo_undefined();
+    object->virtual_string_iterator = false;
+    object->virtual_string_iterator_configurable = false;
+    object->virtual_string_iterator_enumerable = false;
+    object->virtual_string_iterator_writable = false;
+    object->iterator_kind = OSEO_ITERATOR_NONE;
+    object->iterator_target = oseo_undefined();
     object->iterator_index = 0u;
+    object->regexp_string_iterator = false;
+    object->regexp_iterator_regexp = oseo_undefined();
+    object->regexp_iterator_subject = oseo_undefined();
+    object->regexp_iterator_global = false;
+    object->regexp_iterator_unicode = false;
+    object->regexp_iterator_complete = false;
     object->async_from_sync = false;
     object->async_sync_iterator = oseo_undefined();
     object->wrap_for_valid_iterator = false;
@@ -1268,14 +1279,24 @@ OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context) {
     return typed_array_intrinsic_build(context);
 }
 
-bool oseo_internal_typed_array_deferred_accessor(
+static bool typed_array_key_matches(
+    OseoValue key,
+    const char *const *names,
+    size_t name_count
+) {
+    for (size_t index = 0u; index < name_count; index += 1u) {
+        if (oseo_internal_string_is_ascii(key, names[index])) return true;
+    }
+    return false;
+}
+
+static bool typed_array_deferred_accessor(
     OseoContext *context,
     OseoValue object,
     OseoValue key
 ) {
     /* This constructor node defers every standard accessor and symbol-keyed
-     * entry on %TypedArray.prototype%. String-named methods stay with their
-     * later prototype-method nodes. */
+     * entry on %TypedArray.prototype%. */
     return object ==
             context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] &&
         (oseo_internal_string_is_ascii(key, "length") ||
@@ -1286,6 +1307,112 @@ bool oseo_internal_typed_array_deferred_accessor(
          key == context->well_known_symbols[
              OSEO_WELL_KNOWN_TO_STRING_TAG
          ]);
+}
+
+const char *oseo_internal_typed_array_deferred_diagnostic(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+) {
+    if (typed_array_deferred_accessor(context, object, key)) {
+        return "TypedArray prototype accessors are not admitted yet.";
+    }
+    if (object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]) {
+        if (oseo_internal_string_is_ascii(key, "from") ||
+            oseo_internal_string_is_ascii(key, "of") ||
+            key == context->well_known_symbols[OSEO_WELL_KNOWN_SPECIES]) {
+            return "TypedArray static APIs are not admitted yet.";
+        }
+        return NULL;
+    }
+    if (object !=
+        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
+        return NULL;
+    }
+    static const char *const core[] = {
+        "at",
+        "entries",
+        "keys",
+        "set",
+        "subarray",
+        "values",
+    };
+    if (typed_array_key_matches(
+            key, core, sizeof(core) / sizeof(*core))) {
+        return "TypedArray core prototype methods are not admitted yet.";
+    }
+    static const char *const iterative[] = {
+        "every",
+        "filter",
+        "forEach",
+        "map",
+        "reduce",
+        "reduceRight",
+        "some",
+    };
+    if (typed_array_key_matches(
+            key, iterative, sizeof(iterative) / sizeof(*iterative))) {
+        return "TypedArray iterative methods are not admitted yet.";
+    }
+    static const char *const mutation[] = {
+        "copyWithin",
+        "fill",
+        "reverse",
+        "slice",
+        "toReversed",
+        "with",
+    };
+    if (typed_array_key_matches(
+            key, mutation, sizeof(mutation) / sizeof(*mutation))) {
+        return "TypedArray mutation methods are not admitted yet.";
+    }
+    static const char *const search_and_join[] = {
+        "find",
+        "findIndex",
+        "findLast",
+        "findLastIndex",
+        "includes",
+        "indexOf",
+        "join",
+        "lastIndexOf",
+        "toLocaleString",
+        "toString",
+    };
+    if (typed_array_key_matches(
+            key,
+            search_and_join,
+            sizeof(search_and_join) / sizeof(*search_and_join))) {
+        return "TypedArray search and join methods are not admitted yet.";
+    }
+    static const char *const sorting[] = {"sort", "toSorted"};
+    if (typed_array_key_matches(
+            key, sorting, sizeof(sorting) / sizeof(*sorting))) {
+        return "TypedArray sorting methods are not admitted yet.";
+    }
+    return NULL;
+}
+
+const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
+    OseoContext *context,
+    OseoValue object
+) {
+    if (object ==
+        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
+        return "TypedArray prototype own-key reflection is not admitted yet.";
+    }
+    return object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]
+        ? "TypedArray static APIs are not admitted yet."
+        : NULL;
+}
+
+bool oseo_internal_typed_array_deferred_assignment(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+) {
+    return typed_array_deferred_accessor(context, object, key) ||
+        (object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY] &&
+         key == context->well_known_symbols[OSEO_WELL_KNOWN_SPECIES]);
 }
 
 OseoResult oseo_internal_install_typed_array_globals(

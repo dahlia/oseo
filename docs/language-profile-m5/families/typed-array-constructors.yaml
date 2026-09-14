@@ -13,7 +13,8 @@ scope:
     target prototype selection, and Number-versus-BigInt content rejection."
   - "The remaining integer-indexed exotic descriptor surface, prototype
     accessors and methods, static from and of methods, and species behavior
-    are omitted here and retain their later M5b graph owners."
+    are omitted here, retain their later M5b graph owners, and have explicit
+    runtime lookup boundaries."
 owners:
   - PLAN-M5.md
 evidence:
@@ -27,6 +28,7 @@ evidence:
     references:
       - tests/native/fixtures/typed-array-constructors.ts
       - tests/native.ts
+      - tests/native/scenarios/shard-2.ts
   forced-collection:
     status: covered
     references:

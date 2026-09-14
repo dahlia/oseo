@@ -193,6 +193,167 @@ export async function runNativeScenario2(
     );
   }
 
+  for (const [name, source, message] of [
+    [
+      "typed-array-core-method.ts",
+      "console.log(new Uint8Array(1).values);",
+      "TypedArray core prototype methods are not admitted yet.",
+    ],
+    [
+      "typed-array-iterative-method.ts",
+      "console.log(new Uint8Array(1).map);",
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+    [
+      "typed-array-search-method.ts",
+      "console.log(new Uint8Array(1).includes);",
+      "TypedArray search and join methods are not admitted yet.",
+    ],
+    [
+      "typed-array-mutation-method.ts",
+      "console.log(new Uint8Array(1).fill);",
+      "TypedArray mutation methods are not admitted yet.",
+    ],
+    [
+      "typed-array-sort-method.ts",
+      "console.log(new Uint8Array(1).sort);",
+      "TypedArray sorting methods are not admitted yet.",
+    ],
+    [
+      "typed-array-method-in.ts",
+      'console.log("map" in new Uint8Array(1));',
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          message.replace(".", "\\."),
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source, message] of [
+    [
+      "typed-array-has-own-method.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        'console.log(Object.hasOwn(p, "sort"));',
+      "TypedArray sorting methods are not admitted yet.",
+    ],
+    [
+      "typed-array-has-own-static.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        'console.log(Object.hasOwn(C, "from"));',
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-method-descriptor.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        'console.log(Object.getOwnPropertyDescriptor(p, "map"));',
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+    [
+      "typed-array-prototype-own-names.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(Object.getOwnPropertyNames(p));",
+      "TypedArray prototype own-key reflection is not admitted yet.",
+    ],
+    [
+      "typed-array-static-own-symbols.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        "console.log(Object.getOwnPropertySymbols(C));",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-static.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        "console.log(delete C.from);",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-core-method.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(delete p.at);",
+      "TypedArray core prototype methods are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-accessor.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(delete p.length);",
+      "TypedArray prototype accessors are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-own-replacement.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        'Object.defineProperty(C, "of", ' +
+        "{ value: 1, configurable: true }); " +
+        "console.log(delete C.of);",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          message.replace(".", "\\."),
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source] of [
+    ["typed-array-static-from.ts", "console.log(Uint8Array.from);"],
+    ["typed-array-static-of-in.ts", 'console.log("of" in Uint8Array);'],
+    [
+      "typed-array-static-species.ts",
+      "console.log(Uint8Array[Symbol.species]);",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray static APIs are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
   // The switch-tdz fixture explains why this check bypasses the Deno
   // reference: Deno's TypeScript transpile loses the case-level TDZ.
   const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;

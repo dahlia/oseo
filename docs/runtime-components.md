@@ -1267,12 +1267,23 @@ unsigned modular arithmetic before bytes are copied, which avoids signed C
 overflow. Loads and stores use `memcpy`, so unaligned host accesses and aliasing
 do not introduce undefined behavior.
 
-The component moves `abiVersion` to `m5-106` without a public layout change.
+Prototype method and accessor lookups and `%TypedArray%` static API lookups
+stop at source-located boundaries owned by their later M5b nodes, and
+deletion aimed at a deferred property stops at the same boundary before any
+mutation. An own or intermediate prototype property still shadows each
+deferred default property.
+
+The component moves `abiVersion` to `m5-106` and grows the public intrinsic
+table by 24 slots; the value representation and the generated-code entry
+points are unchanged.
 Fixed and generated native differential evidence covers every element kind,
 all five construction sources, both specialization policies, false hints,
 deliberate guard misses, generic fallback, shared-buffer observation, and
-collection forced at every safepoint. The node promotes reviewed cases only
-from its declared test262 inventory root.
+collection forced at every safepoint. The node reviews new cases only from
+its declared test262 inventory root; thirty-six already-reviewed cases
+outside that root, twenty-four ArrayBuffer transfer cases, one DataView
+receiver case, and eleven `Object.seal` cases, move to pass because the
+constructors they need now exist.
 
 ### Function prototype evidence
 
