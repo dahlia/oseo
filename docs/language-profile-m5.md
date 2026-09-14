@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,687 reviewed cases: 15,176 passes, 1,556
-expected negatives, and 1,955 unsupported profile features. It records no
+The current manifest contains 18,768 reviewed cases: 15,226 passes, 1,556
+expected negatives, and 1,986 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -60,6 +60,15 @@ The complete language profile is the union of the frozen
 every indexed M5 family record. M3 and M4 remain the normative owners of their
 admitted behavior; M5 does not duplicate those families or claim new ownership
 of them.
+
+The M4 event-loop profile's timer conversion, ordering, microtask checkpoint,
+and shutdown rules stay normative. Its logical clock now describes the
+deterministic test adapter of
+[ADR 0025](./adr/0025-native-clock-and-wakeup.md): production executables wait
+monotonic elapsed time for a timer deadline through the native clock adapter.
+That checkpoint is host scheduling infrastructure rather than a language
+family, so it adds no record below; its fixed, generated, and differential
+evidence is named in the decision.
 
 The files under *language-profile-m5/index/* are the normative index. Each
 index file names one record under *language-profile-m5/families/* with the same
@@ -4581,7 +4590,8 @@ initialization ordinal, meaning the number of realms the process had
 already initialized. ECMA-262 leaves the strategy to the implementation but
 requires the `Math.random` of one realm to produce a sequence distinct from
 every other realm's, and this runtime keeps every other observable schedule
-reproducible, including its logical timer clock, so realm N of a run seeds
+reproducible, including its timer order for known deadlines, so realm N of a
+run seeds
 from ordinal N: a host that initializes its realms in one order draws the
 same pairwise distinct sequences on every run and every supported target
 rather than seeding from host entropy. The ordinal counter is atomic, so a

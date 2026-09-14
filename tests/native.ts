@@ -845,6 +845,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
+    fixture.name === "monotonic-timer-wakeups" ||
     fixture.name === "arrays" ||
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
@@ -1038,6 +1039,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "data-view" ||
             fixture.name === "date-family" ||
+            fixture.name === "monotonic-timer-wakeups" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||

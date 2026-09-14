@@ -189,6 +189,11 @@ printf '%s\\n' \\
 chmod +x "$hooks/commit-msg"
 """
 
+[tasks."probe:native-io:clock"]
+description = "Measure the native clock and wakeup adapter facilities"
+raw_args = true
+run = "node tools/native-io-probe.ts"
+
 [tasks."probe:regexp"]
 description = "Measure the regular expression matcher backend candidates"
 depends = ["build"]

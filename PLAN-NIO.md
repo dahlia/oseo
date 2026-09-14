@@ -4,11 +4,27 @@ Native I/O plan
 Status
 ------
 
-Implementation status: planned, probe work not started. This plan defines the
-cross-milestone native I/O boundary that connects Oseo's deterministic scheduler
-to operating-system clocks, wakeups, sockets, and files. It does not reserve a
-numbered milestone or select a platform backend before measured prototypes
-exist.
+Implementation status: active. The clock and wakeup checkpoint is
+implemented; socket, name-resolution, and file work has not started. This plan
+defines the cross-milestone native I/O boundary that connects Oseo's
+deterministic scheduler to operating-system clocks, wakeups, sockets, and
+files. It does not reserve a numbered milestone or select a platform backend
+before measured prototypes exist.
+
+M5b node `nio-clock-wakeup-checkpoint` delivered the first backend decision,
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md). The runtime owns a
+platform-neutral clock adapter with separate monotonic and epoch real-time
+readings, a deadline wait, and a coalescing cross-thread wakeup. Linux selects
+`CLOCK_MONOTONIC` with `ppoll` on an eventfd, macOS selects `CLOCK_UPTIME_RAW`
+with `kevent` on `EVFILT_USER`, both read `CLOCK_REALTIME`, and both fall back
+to a self-pipe, then to a sleep without wakeup, and to `time` for real time.
+Production timer waits now take monotonic elapsed time, while the
+deterministic adapter under *tests/native-io/* reproduces the logical clock as
+the test oracle. `mise run probe:native-io:clock` reproduces the measurements.
+The Linux AMD64 measurements are recorded; macOS AArch64 execution evidence
+comes from that host's native test gate rather than from the recorded run.
+`Date` still reads its own clock until `date-nio-clock-integration` consumes
+the real-time capability.
 
 The initial production consumers are M5's `Date` family and M6's standardized
 clock work. `fetch()` is the first network consumer. Later consumers include
@@ -241,10 +257,11 @@ Probe and measurement plan
 --------------------------
 
 Checked-in I/O probes live under *tests/native-io/probes/*. They run through
-named `mise` tasks once those tasks exist and retain source, compiler
-invocation, target, operating-system version, capability results, and
-observations. A benchmark number without those inputs is not architecture
-evidence.
+named `mise` tasks and retain source, compiler invocation, target,
+operating-system version, capability results, and observations. A benchmark
+number without those inputs is not architecture evidence. The clock and wakeup
+probe runs through `mise run probe:native-io:clock`; socket and resolver probes
+have no task yet.
 
 The M5 and M6 native probe corpus covers:
 
@@ -375,17 +392,23 @@ Delivery order
 --------------
 
 1.  Freeze the platform-neutral operation, completion, cancellation, buffer,
-    clock, wakeup, and liveness model with a deterministic test adapter.
+    clock, wakeup, and liveness model with a deterministic test adapter. The
+    clock, wakeup, and timer liveness part is frozen by ADR 0025 with the
+    deterministic adapter in *tests/native-io/deterministic-clock.c*; the
+    operation, completion, cancellation, buffer, and referenced-operation
+    liveness parts remain open.
 2.  Add the checked-in native probe harness and retain reproducible build,
-    target, capability, safety, and measurement records.
+    target, capability, safety, and measurement records. The clock probe
+    harness is implemented; socket and resolver probes extend it.
 3.  Probe monotonic time, epoch real time, and wakeup candidates and fallbacks
     on Linux AMD64 and macOS AArch64, preserving AArch64 musl compile-link
-    evidence.
+    evidence. Implemented; ADR 0025 records the Linux AMD64 run.
 4.  Accept the clock and wakeup backend decision, then integrate those
     capabilities and switch existing production timer waits and deadlines from
     instant logical-clock advancement to monotonic elapsed time. Deterministic
     tests keep the injected logical scheduler oracle, and promise-job semantics
-    do not change.
+    do not change. Implemented by ADR 0025; the `Date` consumer follows in
+    `date-nio-clock-integration`.
 5.  Before native completion properties enter a gate, add the explicit
     versioned-trace loader required by [*PLAN-PT.md*](./PLAN-PT.md) and retain
     merged-scheduler-trace and deterministic trace-replay records.

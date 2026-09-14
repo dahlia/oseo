@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-107",
+  abiVersion: "m5-108",
   assets: [
     {
       kind: "header",
@@ -147,6 +147,16 @@ const runtimeInput: RuntimeInput = {
       kind: "source",
       name: "runtime_event_loop.c",
       url: new URL("../native/runtime_event_loop.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_clock.c",
+      url: new URL("../native/runtime_clock.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_clock_posix.c",
+      url: new URL("../native/runtime_clock_posix.c", import.meta.url),
     },
     {
       kind: "source",

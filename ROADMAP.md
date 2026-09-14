@@ -166,15 +166,18 @@ lifetimes the collector must preserve.
 Native I/O track
 ----------------
 
-Oseo's deterministic M4 scheduler deliberately has no real clock, socket, or
+Oseo's deterministic M4 scheduler deliberately had no real clock, socket, or
 file readiness backend. [*PLAN-NIO.md*](./PLAN-NIO.md) defines the separate
 track that measures platform facilities, freezes a completion-driven runtime
 adapter, preserves a deterministic test implementation, and records a fallback
 for every selected operation.
 
-This track is planned and its probe work is not started. Linux `io_uring`, the
-Linux readiness and worker fallbacks, the available macOS system interfaces,
-and maintained portable libraries remain candidates rather than commitments.
+This track is active. Its clock and wakeup checkpoint is implemented under
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md), so production timer
+waits take monotonic elapsed time. Socket, name-resolution, and file probes
+have not started, and for them Linux `io_uring`, the Linux readiness and worker
+fallbacks, the available macOS system interfaces, and maintained portable
+libraries remain candidates rather than commitments.
 Windows IOCP and I/O Ring are future-target candidates; this track does not add
 Windows to the supported target set by itself.
 

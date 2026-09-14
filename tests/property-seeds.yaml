@@ -448,3 +448,7 @@ families:
     owner: tests/property/m5-ephemeron-tracing.property.test.ts
     start: 0x60006f00
     end: 0x60006fff
+  - family: nio-clock-wakeup
+    owner: tests/property/nio-clock-wakeup.property.test.ts
+    start: 0x60007000
+    end: 0x600070ff

@@ -17,19 +17,20 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists forty reviewed assets in this order:
+The runtime input now lists forty-three reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
 *runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
 *runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_set.c*,
-*runtime\_arguments.c*,
+*runtime\_typed\_array.c*, *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
 *runtime\_primitive.c*, *runtime\_promise.c*,
-*runtime\_event\_loop.c*, *runtime\_map.c*,
+*runtime\_event\_loop.c*, *runtime\_clock.c*,
+*runtime\_clock\_posix.c*, *runtime\_map.c*,
 *runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
 *runtime\_date.c*,
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
@@ -232,7 +233,17 @@ Ownership follows the plan's target layout:
     rejection tracking, and job draining;
  -  *runtime\_event\_loop.c*: timer queues, task
     checkpoints, top-level await progress, and shutdown; timer delay
-    coercion goes through the shared primitive conversions;
+    coercion goes through the shared primitive conversions, and every timer
+    wait goes through the clock component;
+ -  *runtime\_clock.c*: the platform-neutral clock and wakeup boundary of
+    [ADR 0025](./adr/0025-native-clock-and-wakeup.md), meaning adapter
+    installation and selection, the realm's monotonic origin and cached
+    scheduler time, millisecond deadline waits, epoch real-time reads, and
+    cross-thread wakeup. It names no operating-system facility;
+ -  *runtime\_clock\_posix.c*: the Linux and macOS clock adapter and its
+    fallbacks, the one runtime translation unit that includes
+    operating-system headers. It selects its facilities when a realm first
+    needs a clock, links only the C library, and starts no thread;
  -  *runtime\_map.c*: the `%Map%` intrinsic and its statics, keyed
     collection storage with SameValueZero identity, insertion order, and
     in-place tombstone deletion, its realm-owned prototype methods, and
@@ -256,10 +267,11 @@ Ownership follows the plan's target layout:
     `%Date.prototype%` with its forty-four own methods, and the
     time-value arithmetic of 21.4.1, including the Date Time String
     Format parser and the `ToDateString`, `toUTCString`, and
-    `toISOString` writers. It is the one component that reads the host
-    clock, through a single `timespec_get` call with a `time` fallback,
-    and its `LocalTZA` is the constant +0 that the later host time-zone
-    adapter replaces.
+    `toISOString` writers. It still reads the host's current time
+    directly, through a single `timespec_get` call with a `time` fallback,
+    until `date-nio-clock-integration` moves that read to the clock
+    component, and its `LocalTZA` is the constant +0 that the later host
+    time-zone adapter replaces.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
@@ -335,7 +347,7 @@ one.
 
 ### Internal helpers
 
-One hundred and ninety-three helpers cross a
+One hundred and ninety-eight helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -504,6 +516,11 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_jobs_drain_until`                    | *runtime\_promise.c*          |
 | `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*          |
 | `oseo_internal_await_step`                          | *runtime\_event\_loop.c*      |
+| `oseo_internal_clock_start`                         | *runtime\_clock.c*            |
+| `oseo_internal_clock_destroy`                       | *runtime\_clock.c*            |
+| `oseo_internal_clock_now`                           | *runtime\_clock.c*            |
+| `oseo_internal_clock_wait_until`                    | *runtime\_clock.c*            |
+| `oseo_internal_platform_clock_open`                 | *runtime\_clock\_posix.c*     |
 | `oseo_internal_async_iterator_key_matches`          | *runtime\_iterator.c*         |
 | `oseo_internal_validate_string_length`              | *runtime\_string.c*           |
 | `oseo_internal_string_protocol_dispatch`            | *runtime\_string\_match.c*    |
@@ -586,6 +603,14 @@ through `oseo_internal_jobs_drain_until` and
 `oseo_internal_jobs_reached_promise`, and `await` and timers construct
 promises through promise-owned entry points, while no promise code calls
 into the event loop.
+
+The clock components form a one-way chain below the event loop: timer
+registration and turns call `oseo_internal_clock_start`,
+`oseo_internal_clock_now`, and `oseo_internal_clock_wait_until`, context
+destruction calls `oseo_internal_clock_destroy`, and *runtime\_clock.c*
+reaches the platform only through `oseo_internal_platform_clock_open` and the
+adapter table it returns. Neither clock component calls back into the event
+loop, promises, or generated code.
 
 ### Intrinsic graph root evidence
 
@@ -1323,6 +1348,34 @@ its declared test262 inventory root; thirty-six already-reviewed cases
 outside that root, twenty-four ArrayBuffer transfer cases, one DataView
 receiver case, and eleven `Object.seal` cases, move to pass because the
 constructors they need now exist.
+
+### Clock and wakeup evidence
+
+M5b node `nio-clock-wakeup-checkpoint` adds *runtime\_clock.c* and
+*runtime\_clock\_posix.c* under
+[ADR 0025](./adr/0025-native-clock-and-wakeup.md). `OseoClockAdapter` in
+*oseo\_runtime.h* is the replaceable boundary: monotonic nanoseconds, epoch
+real-time milliseconds, a deadline wait that may return early, a coalescing
+wakeup that another thread may request, a capability record, and close. No
+platform handle crosses it, and the deterministic test adapter under
+*tests/native-io/* is not a runtime asset. `OseoContext` gains the adapter,
+its state, the monotonic origin, the facility restriction bits, and a started
+flag, and six generated-code boundary declarations install, restrict, open,
+wake, read, and describe the realm's clock.
+
+The Linux adapter waits in `ppoll` on an eventfd and the macOS adapter in
+`kevent` on `EVFILT_USER`; both fall back to a nonblocking self-pipe and then
+to a sleep with no wakeup, and real time falls back from `CLOCK_REALTIME` to
+`time`. A missing monotonic clock is an owned `OSEO2001` diagnostic rather
+than a real-time substitute. The event loop now drops canceled head timers
+before it waits, waits through the adapter until the earliest live deadline
+has elapsed, and caches that elapsed time for the task it runs. Fixed probe,
+scheduler-harness, and differential fixture evidence and generated schedules
+against an independent model cover every facility configuration, idle CPU
+use, descriptor and thread lifetime, wakeups, wall-clock jumps, failures, both
+specialization policies, a guard miss, and collection forced at every
+safepoint. The node adds no code ID, intrinsic, or heap kind and moves
+`abiVersion` to `m5-108`.
 
 ### Function prototype evidence
 

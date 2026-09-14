@@ -31,8 +31,8 @@ M5a is complete. The 123 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,226 passes across 18,768 paths, and the property inventory records 143
-domains, 143 seeds, and an ordinary case budget of 5,614.
+15,226 passes across 18,768 paths, and the property inventory records 145
+domains, 145 seeds, and an ordinary case budget of 5,659.
 
 
 M5a implementation history
@@ -3505,6 +3505,9 @@ production timer waits to a monotonic clock. A final Date integration unit
 replaces the initial boundary with that adapter. `Date.now()` and Date
 operations that obtain the current time then read real time, while elapsed
 scheduling uses monotonic time. Tests inject both clock domains explicitly.
+The clock and wakeup checkpoint is implemented by
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md); the Date integration
+unit remains.
 
 The global object enters through this stream in dependency order:
 standard constructors become real intrinsic values first, the global
@@ -6201,6 +6204,50 @@ The entry chain is collector traversal state, not a future JavaScript lookup
 index. The weak-collections node owns an address-keyed index, dead-entry
 synchronization, `KeepDuringJob`, and its next ABI increment before it exposes
 those intrinsics.
+
+Implemented M5b node `nio-clock-wakeup-checkpoint` delivers the clock and
+wakeup checkpoint of [*PLAN-NIO.md*](./PLAN-NIO.md) under
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md). The runtime gains the
+platform-neutral `OseoClockAdapter` boundary in *runtime\_clock.c* and its
+Linux and macOS adapter in *runtime\_clock\_posix.c*: separate monotonic and
+epoch real-time readings, a deadline wait, a coalescing cross-thread wakeup,
+and a capability record, with a self-pipe, sleep, and `time` fallback chain
+and an owned `OSEO2001` diagnostic for an absent monotonic clock or a failed
+wait. Production timer turns now wait monotonic elapsed time from a
+per-task cached scheduler time and never wait for a canceled deadline; the
+deterministic adapter under *tests/native-io/* keeps the logical clock as the
+test oracle, and `mise run probe:native-io:clock` reproduces the recorded
+Linux AMD64 measurements.
+
+The node admits no language-profile family. `setTimeout` and `clearTimeout`
+are host scheduling surface whose conversion, order, and shutdown stay those
+of the frozen M4 event-loop profile; only the elapsed time a production wait
+takes changes, so no M5 family record or index entry is added. Fixed native
+evidence covers every facility configuration, idle CPU use, descriptor and
+thread lifetime, cross-thread and pending wakeups, platform and deterministic
+scheduler traces, and the AArch64 Linux link. The `monotonic-timer-wakeups`
+differential fixture covers equal deadlines, nested zero delays, microtask
+order, a late cancellation of a far timer, both specialization policies, and a
+deliberate guard miss under collection forced at every safepoint. Generated
+evidence at seeds `0x60007000` and `0x60007001`, in the reserved block
+`0x60007000` through `0x600070ff`, compares 30 and 15 ordinary cases of
+generated timer and microtask trees, late and spurious waits, wall-clock
+jumps, failed waits, and absent capabilities with an independent model, with
+and without collection at every safepoint.
+
+The node adds two runtime components, five internal helpers, six
+generated-code boundary declarations, and five `OseoContext` fields, and moves
+the runtime ABI to `oseo-runtime-m5-108`. It adds no code ID, realm
+intrinsic, heap kind, or graph-state change. The property ratchet moves from
+143 to 145 domains and seeds and from 5,614 to 5,659 ordinary cases, and the
+evidence inventory stays at 123 families. The node has no inventory roots, and
+no reviewed row moves: the manifest keeps 18,768 paths, 15,226 passes, 1,556
+expected negatives, and 1,986 unsupported profile features with no semantic,
+harness, or infrastructure failures. No reviewed test262 case or harness
+include schedules a timer, so the manifest's `deterministic-logical-clock`
+scheduler value stays exact, and a native test keeps it so. The suite
+revision, applicable inventory, classification vocabulary, target-parity
+policy, forced-collection policy, and zero-override policy are unchanged.
 
 
 Ahead-of-time challenge boundary

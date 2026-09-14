@@ -4,7 +4,10 @@ ADR 0012: Replaceable native event loop
 Status
 ------
 
-Accepted and implemented for M4.
+Accepted and implemented for M4. [ADR 0025](./0025-native-clock-and-wakeup.md)
+keeps its ordering, checkpoint, and liveness rules and moves production timer
+waits to monotonic elapsed time; the logical clock below now describes the
+deterministic test adapter.
 
 
 Context
