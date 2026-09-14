@@ -11,4 +11,7 @@ dependencies:
   - array-buffer
   - iterator-intrinsic
 landed: false
-status: ready
+status: parked
+reason: "Coordinator review used all five additionally authorized rounds. The
+  round-five finding is fixed on m5b-typed-array, but one clean confirmation
+  review still requires maintainer authorization."

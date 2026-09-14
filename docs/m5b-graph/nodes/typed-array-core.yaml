@@ -22,4 +22,6 @@ inventory:
 dependencies:
   - typed-array-constructors
 landed: false
-status: blocked
+status: parked
+reason: "Its typed-array-constructors dependency awaits authorization for one
+  clean coordinator confirmation review."

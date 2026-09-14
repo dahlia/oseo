@@ -13,4 +13,6 @@ dependencies:
   - array-buffer
   - typed-array-core
 landed: false
-status: blocked
+status: parked
+reason: "Its typed-array-core dependency is parked behind the exhausted
+  typed-array-constructors coordinator review allowance."

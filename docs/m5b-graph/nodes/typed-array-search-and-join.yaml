@@ -20,4 +20,6 @@ dependencies:
   - string-prototype-access
   - typed-array-core
 landed: false
-status: blocked
+status: parked
+reason: "Its typed-array-constructors dependency awaits authorization for one
+  clean coordinator confirmation review."
