@@ -655,6 +655,37 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "regexp-string-dispatch";
   }
+  if (diagnostic === "TypedArray prototype accessors are not admitted yet.") {
+    return "typed-array-core";
+  }
+  if (
+    diagnostic === "TypedArray core prototype methods are not admitted yet."
+  ) {
+    return "typed-array-core";
+  }
+  if (
+    diagnostic ===
+    "TypedArray prototype own-key reflection is not admitted yet."
+  ) {
+    return "typed-array-core";
+  }
+  if (diagnostic === "TypedArray iterative methods are not admitted yet.") {
+    return "typed-array-iterative";
+  }
+  if (diagnostic === "TypedArray mutation methods are not admitted yet.") {
+    return "typed-array-mutation";
+  }
+  if (
+    diagnostic === "TypedArray search and join methods are not admitted yet."
+  ) {
+    return "typed-array-search-and-join";
+  }
+  if (diagnostic === "TypedArray sorting methods are not admitted yet.") {
+    return "typed-array-sort";
+  }
+  if (diagnostic === "TypedArray static APIs are not admitted yet.") {
+    return "typed-array-statics";
+  }
   // The runtime ends a program at the first rejection checkpoint that
   // still holds an unhandled rejection. A case that needs the opposite
   // host policy names that boundary instead of reporting a semantic

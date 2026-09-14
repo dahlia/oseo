@@ -10,6 +10,360 @@ export async function runNativeScenario2(
 ): Promise<void> {
   const { host, root } = context;
 
+  for (const [name, source] of [
+    ["typed-array-canonical-index.ts", "console.log(new Uint8Array(1)[-1]);"],
+    [
+      "typed-array-define-index.ts",
+      'Object.defineProperty(new Uint8Array(1), "0", { value: 1 });',
+    ],
+    ["typed-array-in-index.ts", 'console.log("1.5" in new Uint8Array(1));'],
+    [
+      "typed-array-proxy-canonical-index.ts",
+      "console.log(Object.hasOwn(" +
+        'new Proxy(new Uint8Array(1), {}), "1.5"));',
+    ],
+    [
+      "typed-array-proxy-define-index.ts",
+      "Object.defineProperty(" +
+        'new Proxy(new Uint8Array(1), {}), "0", { value: 1 });',
+    ],
+    ["typed-array-own-keys.ts", "Object.keys(new Uint8Array(1));"],
+    ["typed-array-spread.ts", "console.log({...new Uint8Array(1)});"],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray integer-indexed exotic operations are not " +
+          "admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source] of [
+    [
+      "typed-array-default-for-of.ts",
+      "try { for (const value of new Uint8Array([1])) " +
+        "console.log(value); } catch (error) { console.log(error); }",
+    ],
+    [
+      "typed-array-default-array-spread.ts",
+      "try { console.log(...new Uint8Array([1])); } " +
+        "catch (error) { console.log(error); }",
+    ],
+    [
+      "typed-array-default-destructuring.ts",
+      "try { const [value] = new Uint8Array([1]); console.log(value); } " +
+        "catch (error) { console.log(error); }",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  for (const property of [
+    "length",
+    "byteLength",
+    "byteOffset",
+    "buffer",
+  ] as const) {
+    const name = `typed-array-in-${property}.ts`;
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source: `console.log("${property}" in new Uint8Array(1));`,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  const inheritedEnumerationName = "typed-array-inherited-enumeration.ts";
+  const inheritedEnumeration = await runNativeCli(
+    {
+      args: [inheritedEnumerationName],
+      source:
+        "const object = {}; " +
+        "Object.setPrototypeOf(object, new Uint8Array([1])); " +
+        "for (const key in object) console.log(key);",
+      sourceId: inheritedEnumerationName,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedEnumeration.exitStatus, 1);
+  assert.equal(inheritedEnumeration.stdout, "");
+  assert.match(
+    inheritedEnumeration.stderr,
+    new RegExp(
+      `^${inheritedEnumerationName.replace(".", "\\.")}:1:\\d+: ` +
+        "error\\[OSEO2001\\]: TypedArray integer-indexed exotic " +
+        "operations are not admitted yet\\.",
+      "u",
+    ),
+  );
+
+  for (const [name, source] of [
+    ["typed-array-accessor-set.ts", "new Uint8Array(1).length = 2;"],
+    [
+      "typed-array-accessor-super-set.ts",
+      "class V extends Uint8Array { set() { super.length = 2; } } " +
+        "new V(1).set();",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source] of [
+    [
+      "typed-array-to-string-tag.ts",
+      "console.log(new Uint8Array(1)[Symbol.toStringTag]);",
+    ],
+    [
+      "typed-array-object-to-string.ts",
+      "console.log(Object.prototype.toString.call(new Uint8Array(1)));",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray prototype accessors are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source, message] of [
+    [
+      "typed-array-core-method.ts",
+      "console.log(new Uint8Array(1).values);",
+      "TypedArray core prototype methods are not admitted yet.",
+    ],
+    [
+      "typed-array-iterative-method.ts",
+      "console.log(new Uint8Array(1).map);",
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+    [
+      "typed-array-search-method.ts",
+      "console.log(new Uint8Array(1).includes);",
+      "TypedArray search and join methods are not admitted yet.",
+    ],
+    [
+      "typed-array-mutation-method.ts",
+      "console.log(new Uint8Array(1).fill);",
+      "TypedArray mutation methods are not admitted yet.",
+    ],
+    [
+      "typed-array-sort-method.ts",
+      "console.log(new Uint8Array(1).sort);",
+      "TypedArray sorting methods are not admitted yet.",
+    ],
+    [
+      "typed-array-method-in.ts",
+      'console.log("map" in new Uint8Array(1));',
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          message.replace(".", "\\."),
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source, message] of [
+    [
+      "typed-array-has-own-method.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        'console.log(Object.hasOwn(p, "sort"));',
+      "TypedArray sorting methods are not admitted yet.",
+    ],
+    [
+      "typed-array-has-own-static.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        'console.log(Object.hasOwn(C, "from"));',
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-method-descriptor.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        'console.log(Object.getOwnPropertyDescriptor(p, "map"));',
+      "TypedArray iterative methods are not admitted yet.",
+    ],
+    [
+      "typed-array-prototype-own-names.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(Object.getOwnPropertyNames(p));",
+      "TypedArray prototype own-key reflection is not admitted yet.",
+    ],
+    [
+      "typed-array-static-own-symbols.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        "console.log(Object.getOwnPropertySymbols(C));",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-static.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        "console.log(delete C.from);",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-core-method.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(delete p.at);",
+      "TypedArray core prototype methods are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-accessor.ts",
+      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
+        "console.log(delete p.length);",
+      "TypedArray prototype accessors are not admitted yet.",
+    ],
+    [
+      "typed-array-delete-own-replacement.ts",
+      "const C = Object.getPrototypeOf(Uint8Array); " +
+        'Object.defineProperty(C, "of", ' +
+        "{ value: 1, configurable: true }); " +
+        "console.log(delete C.of);",
+      "TypedArray static APIs are not admitted yet.",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          message.replace(".", "\\."),
+        "u",
+      ),
+    );
+  }
+
+  for (const [name, source] of [
+    ["typed-array-static-from.ts", "console.log(Uint8Array.from);"],
+    ["typed-array-static-of-in.ts", 'console.log("of" in Uint8Array);'],
+    [
+      "typed-array-static-species.ts",
+      "console.log(Uint8Array[Symbol.species]);",
+    ],
+  ] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [name],
+        source,
+        sourceId: name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(
+      observed.stderr,
+      new RegExp(
+        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
+          "TypedArray static APIs are not admitted yet\\.",
+        "u",
+      ),
+    );
+  }
+
   // The switch-tdz fixture explains why this check bypasses the Deno
   // reference: Deno's TypeScript transpile loses the case-level TDZ.
   const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;

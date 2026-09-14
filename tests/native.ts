@@ -52,6 +52,7 @@ import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
 import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
+import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -181,6 +182,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeReductionFixtures,
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
+  ...typedArrays.typedArrayConstructorFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -696,6 +698,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-symbol-methods" ||
+    fixture.name === "typed-array-constructors" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -801,6 +804,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "array-buffer" ||
+    fixture.name === "typed-array-constructors" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -1038,6 +1042,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
+            fixture.name === "typed-array-constructors" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -1288,13 +1293,14 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the eleven standard-object
-            // and value-property allocations plus thirty-one admitted
+            // and value-property allocations plus forty-two admitted
             // standard global property names shared by every Script, with
             // Proxy adding one allocation in each group and Date, JSON,
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
-            // builds.
-            assert.equal(native.counters.allocations, 48);
+            // builds. The eleven concrete TypedArray constructors add
+            // eleven property-name allocations.
+            assert.equal(native.counters.allocations, 59);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

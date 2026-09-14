@@ -376,6 +376,23 @@ rows under the node's inventory roots carry it. Reviewed rows outside those
 roots that call `JSON.stringify` retain their existing tags until a separate
 reviewed dependency change assigns this tag alongside them.
 
+The M5b `typed-array-constructors` node extends the vocabulary with
+`typed-array-constructors`. The tag identifies the abstract `%TypedArray%`
+constructor, the eleven concrete Number and BigInt element-type constructors
+with their prototype pairs, and construction from a length, a buffer with a
+byte offset and an optional length, an iterable, an array-like object, or
+another typed array, including the element-kind conversion those paths
+perform over the viewed `ArrayBuffer`. One tag covers the cluster because
+every constructor produces the same view record and shares the same
+construction and conversion semantics, which is the contract the node adds.
+The tag is distinct from `array-buffer`, which names the buffer intrinsic
+and its byte storage without naming the views that interpret it, and from
+`data-view`, which names explicit method-based element access rather than
+constructor-driven view creation. The reviewed rows under the node's
+inventory root carry it. The twelve reviewed rows outside that root whose
+only unmet prerequisite was a concrete TypedArray constructor move to `pass`
+and retain their existing tags.
+
 
 Alternatives considered
 -----------------------

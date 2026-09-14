@@ -77,7 +77,8 @@ static void trace_object(
                object->kind == OSEO_HEAP_ITERATOR_HELPER ||
                object->kind == OSEO_HEAP_PROXY ||
                object->kind == OSEO_HEAP_SET ||
-               object->kind == OSEO_HEAP_SET_ITERATOR) {
+               object->kind == OSEO_HEAP_SET_ITERATOR ||
+               object->kind == OSEO_HEAP_TYPED_ARRAY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -172,6 +173,11 @@ static void trace_object(
             /* A view holds no Data Block of its own; tracing its buffer
              * is what keeps that buffer's block alive. */
             mark_value(((OseoDataView *)object)->buffer, worklist);
+        } else if (object->kind == OSEO_HEAP_TYPED_ARRAY) {
+            mark_value(
+                ((OseoTypedArray *)object)->viewed_buffer,
+                worklist
+            );
         } else if (object->kind == OSEO_HEAP_REGEXP) {
             mark_value(((OseoRegExp *)object)->matcher, worklist);
         } else if (object->kind == OSEO_HEAP_ITERATOR_HELPER) {
@@ -246,7 +252,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_ITERATOR_HELPER ||
         object->kind == OSEO_HEAP_PROXY ||
         object->kind == OSEO_HEAP_SET ||
-        object->kind == OSEO_HEAP_SET_ITERATOR) {
+        object->kind == OSEO_HEAP_SET_ITERATOR ||
+        object->kind == OSEO_HEAP_TYPED_ARRAY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);

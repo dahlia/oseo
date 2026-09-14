@@ -1,0 +1,58 @@
+group: built-ins/TypedArrayConstructors
+key: 3e
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/BigInt64Array/prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-constructors
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/BYTES_PER_ELEMENT.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-constructors
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - TypedArray
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

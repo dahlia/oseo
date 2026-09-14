@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,687 reviewed cases: 15,176 passes, 1,556 expected negatives, and 1,955
+18,768 reviewed cases: 15,226 passes, 1,556 expected negatives, and 1,986
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 121 indexed records in the normative
+M5a is complete. The 123 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,176 passes across 18,687 paths, and the property inventory records 140
-domains, 140 seeds, and an ordinary case budget of 5,578.
+15,226 passes across 18,768 paths, and the property inventory records 142
+domains, 142 seeds, and an ordinary case budget of 5,602.
 
 
 M5a implementation history
@@ -3811,9 +3811,10 @@ buffers and a failed allocation leaves the source intact; the single release
 path leaves a record detached, so the collector cannot free a block a transfer
 already gave up. `slice` clamps its bounds, allocates through
 SpeciesConstructor, and re-checks the source after the species ran. The four
-state accessors report the detached state rather than throwing, `isView` is
-`false` for every value this profile can produce, and the constructor carries
-the `Symbol.species` accessor. Fixed native and generated differential
+state accessors report the detached state rather than throwing. At that node's
+checkpoint `isView` was `false` for every admitted value, and the later
+TypedArray constructor node extends it with the view brand. The constructor
+carries the `Symbol.species` accessor. Fixed native and generated differential
 evidence at seed `0x60003a00` covers both specialization policies, forced
 collection at every safepoint, false hints, deliberate shape-guard misses,
 generic fallback, every ToIndex conversion class, the option bag's abrupt
@@ -6137,6 +6138,36 @@ the evidence inventory moves from 121 to 122 families. The runtime ABI remains
 generated-code entry point, or graph-state change. The suite revision,
 applicable inventory, classification vocabulary, target-parity policy,
 forced-collection policy, and zero-override policy are unchanged.
+
+Implemented M5b node `typed-array-constructors` materializes the abstract
+`%TypedArray%` constructor and all eleven concrete Number and BigInt
+element-type constructor and prototype pairs. A view records its element kind,
+backing `ArrayBuffer`, byte offset, and fixed or length-tracking element length.
+Construction accepts a length, a buffer with offset and optional length, an
+iterable, an array-like object, or another TypedArray. Fresh construction owns
+a new zeroed buffer, while the buffer path traces the supplied buffer without
+owning or caching its Data Block. Number and BigInt content types cannot mix;
+integer conversion uses defined unsigned modular arithmetic, clamping uses
+ties-to-even, and loads and stores use `memcpy` rather than unaligned typed
+pointers. `ArrayBuffer.isView` recognizes the resulting objects. Fixed native
+and generated differential evidence at seed `0x60006e00` covers all element
+kinds and construction paths under both specialization policies, forced
+collection at every safepoint, false hints, deliberate guard misses, generic
+fallback, cloning, shared-buffer observation, and an independent arithmetic
+conversion oracle. The reviewed subset adds 81 paths from the node's
+736-path inventory. Runtime lookups reject deferred prototype methods and
+accessors, statics, and species at explicit boundaries owned by later graph
+nodes. Those nodes also own the complete integer-indexed exotic surface; the
+fixed and generated suites replace the upstream harness for
+constructor paths whose harness itself needs those later facilities. Fourteen
+BigInt metadata cases pass and 67 newly reviewed paths retain the broad
+upstream `TypedArray` boundary. Twenty-four existing ArrayBuffer transfer
+cases also promote after their typed-view inspection dependency lands. One
+DataView receiver case and eleven `Object.seal` cases promote after their
+concrete TypedArray inputs become available. The manifest moves to 18,768
+paths with 15,226 passes, 1,556 expected negatives, and 1,986 unsupported
+profile features. The new component and heap kind move the runtime ABI to
+`oseo-runtime-m5-106` without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

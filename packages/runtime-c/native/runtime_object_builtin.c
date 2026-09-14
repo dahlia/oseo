@@ -121,6 +121,22 @@ static OseoResult object_prototype_property_is_enumerable(
         return normal(oseo_boolean(enumerable));
     }
     if (!is_object(receiver)) return normal(oseo_boolean(false));
+    if (is_typed_array(receiver)) {
+        uint32_t index = 0u;
+        if (oseo_internal_array_index(key.value, &index)) {
+            return normal(oseo_boolean(
+                oseo_internal_typed_array_has_index(receiver, index)
+            ));
+        }
+        bool numeric_index = false;
+        OseoResult classified = oseo_internal_canonical_numeric_index(
+            context,
+            key.value,
+            &numeric_index
+        );
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) return normal(oseo_boolean(false));
+    }
     OseoValue ignored = oseo_undefined();
     OseoValue ignored_getter = oseo_undefined();
     OseoValue ignored_setter = oseo_undefined();
@@ -686,7 +702,7 @@ static OseoResult object_set_integrity_level(
             proxy_result = oseo_internal_proxy_define_own_property(
                 context, slots[0], keys[index], &descriptor,
                 oseo_undefined(), oseo_undefined(), oseo_undefined(),
-                &refusal);
+                false, &refusal);
             if (proxy_result.status == OSEO_STATUS_NORMAL && refusal != NULL) {
                 proxy_result = type_error(context, refusal);
             }
@@ -1593,6 +1609,14 @@ static OseoResult copy_data_properties(
     size_t excluded_count,
     const OseoValue *excluded_keys
 ) {
+    if (is_typed_array(source)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     size_t key_count = 0u;
     OseoResult result = normal(oseo_undefined());
@@ -1886,6 +1910,7 @@ OseoResult oseo_internal_define_converted_property(
             value,
             getter,
             setter,
+            false,
             refusal
         );
     }
@@ -1955,6 +1980,7 @@ OseoResult oseo_internal_define_converted_property(
         attributes,
         descriptor->has_value,
         !descriptor->has_writable,
+        false,
         refusal
     );
 }
@@ -2119,6 +2145,23 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         builtin_argument(argument_count, arguments, 1u)
     );
     frame.slots[1] = result.value;
+    bool numeric_index = false;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_typed_array(object_value)) {
+        result = oseo_internal_canonical_numeric_index(
+            context,
+            frame.slots[1],
+            &numeric_index
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && numeric_index) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     OseoValue value = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
     OseoValue getter = oseo_undefined();
@@ -2167,6 +2210,14 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
             }
         }
     }
+    if (result.status == OSEO_STATUS_NORMAL && !exists) {
+        const char *deferred =
+            oseo_internal_typed_array_deferred_diagnostic(
+                context, object_value, frame.slots[1]);
+        if (deferred != NULL) {
+            result = failure(context, "OSEO2001", deferred);
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && exists &&
         oseo_internal_cell_backed_property(object_value, value)) {
         result = oseo_cell_get(context, value);
@@ -2207,6 +2258,14 @@ static OseoResult snapshot_own_keys(
     OseoRootFrame *frame,
     size_t key_count
 ) {
+    if (is_typed_array(frame->slots[0])) {
+        return failure(
+            context,
+            "OSEO2001",
+            "TypedArray integer-indexed exotic operations are not "
+            "admitted yet."
+        );
+    }
     bool virtual_length = is_array(frame->slots[0]);
     bool virtual_prototype =
         function_has_prototype_property(frame->slots[0]);
@@ -2333,6 +2392,10 @@ OseoResult oseo_internal_own_key_array(
     if (is_proxy(object_value)) {
         return oseo_internal_proxy_own_keys(context, object_value, filter);
     }
+    const char *deferred =
+        oseo_internal_typed_array_deferred_own_keys_diagnostic(
+            context, object_value);
+    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
     OseoValue rooted = object_value;
     OseoRootFrame root = {NULL, &rooted, 1u};
     oseo_roots_push(context, &root);
@@ -3088,6 +3151,10 @@ static OseoResult object_get_own_property_descriptors(
     }
     OseoResult converted = oseo_internal_to_object(context, value);
     if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    const char *deferred =
+        oseo_internal_typed_array_deferred_own_keys_diagnostic(
+            context, converted.value);
+    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
     size_t key_count = 0u;
     /* The key frame roots the conversion result, the reported object,
      * the one synthesized key string, and the whole key snapshot. The

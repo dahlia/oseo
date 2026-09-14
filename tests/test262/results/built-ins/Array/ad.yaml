@@ -18,13 +18,21 @@ results:
     dependencies:
       - functions
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Array/prototype/concat/Array.prototype.concat_l\
-        arge-typed-array.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Array/prototype/concat/Array.prototype.\
-        concat_large-typed-array.js:126:3: error[OSEO1001]: Unknown
-        binding 'Uint8Array'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/built-ins/Array/prototype/concat/Array.prototype.concat_large-typed-array.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Array/prototype/concat/Array.prototype.concat_large-typed-array.js:104:23:
+        error[OSEO2001]: TypedArray prototype accessors are not admitted
+        yet.\n"'
+      unsupportedCapability: typed-array-core
       passed: false
     unsupportedFeatures: []
   - case:

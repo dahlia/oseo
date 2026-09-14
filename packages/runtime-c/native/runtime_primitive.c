@@ -537,6 +537,39 @@ void oseo_internal_number_shortest_digits(
     memcpy(digits, parsed_digits, count);
 }
 
+OseoResult oseo_internal_canonical_numeric_index(
+    OseoContext *context,
+    OseoValue key,
+    bool *result
+) {
+    *result = false;
+    if (!is_string(key)) return normal(oseo_undefined());
+    if (oseo_internal_string_is_ascii(key, "-0")) {
+        *result = true;
+        return normal(oseo_undefined());
+    }
+    OseoString *string = string_object(key);
+    OseoResult converted = string_number(context, string);
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    char text[64];
+    size_t length = oseo_internal_number_text(
+        number_value(converted.value),
+        text,
+        sizeof(text)
+    );
+    if (length != string->length || length >= sizeof(text)) {
+        return normal(oseo_undefined());
+    }
+    for (size_t index = 0u; index < length; index += 1u) {
+        if (string->units[index] !=
+            (uint16_t)(unsigned char)text[index]) {
+            return normal(oseo_undefined());
+        }
+    }
+    *result = true;
+    return normal(oseo_undefined());
+}
+
 static OseoResult value_text(
     OseoContext *context,
     OseoValue value,
@@ -1776,6 +1809,31 @@ OseoResult oseo_has_property(
         if (is_proxy(current)) {
             return oseo_internal_proxy_has(context, current, property);
         }
+        uint32_t typed_index = 0u;
+        if (is_typed_array(current) &&
+            oseo_internal_array_index(property, &typed_index)) {
+            return normal(oseo_boolean(
+                oseo_internal_typed_array_has_index(current, typed_index)
+            ));
+        }
+        bool numeric_index = false;
+        OseoResult classified = normal(oseo_undefined());
+        if (is_typed_array(current)) {
+            classified = oseo_internal_canonical_numeric_index(
+                context,
+                property,
+                &numeric_index
+            );
+        }
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric_index) {
+            return failure(
+                context,
+                "OSEO2001",
+                "TypedArray integer-indexed exotic operations are not "
+                "admitted yet."
+            );
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue ignored_getter = oseo_undefined();
@@ -1784,6 +1842,12 @@ OseoResult oseo_has_property(
             context, current, property, &value, &attributes,
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
+        }
+        const char *deferred =
+            oseo_internal_typed_array_deferred_diagnostic(
+                context, current, property);
+        if (deferred != NULL) {
+            return failure(context, "OSEO2001", deferred);
         }
         OseoResult prototype = oseo_internal_get_prototype(context, current);
         if (prototype.status != OSEO_STATUS_NORMAL) return prototype;

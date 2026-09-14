@@ -315,6 +315,25 @@ export function isStandardGlobalName(name: string): boolean {
   return standardGlobalNames.has(name);
 }
 
+const typedArrayIntrinsicNames: ReadonlySet<string> = new Set([
+  "BigInt64Array",
+  "BigUint64Array",
+  "Float32Array",
+  "Float64Array",
+  "Int16Array",
+  "Int32Array",
+  "Int8Array",
+  "Uint16Array",
+  "Uint32Array",
+  "Uint8Array",
+  "Uint8ClampedArray",
+]);
+
+/** Whether `name` identifies one concrete TypedArray constructor. */
+export function isTypedArrayIntrinsicName(name: string): boolean {
+  return typedArrayIntrinsicNames.has(name);
+}
+
 /**
  * How ECMA-262's global object already binds one intrinsic global name,
  * which is what decides whether a Script's own top-level declaration of
@@ -372,6 +391,7 @@ export function intrinsicGlobalKind(
     name === "isNaN" ||
     name === "parseFloat" ||
     name === "parseInt" ||
+    isTypedArrayIntrinsicName(name) ||
     errorIntrinsicName(name) != null
   ) {
     return "replaceable";

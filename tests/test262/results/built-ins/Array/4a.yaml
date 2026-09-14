@@ -22,8 +22,9 @@ results:
       detail: "test/built-ins/Array/prototype/concat/Array.prototype.concat_s\
         mall-typed-array.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/concat/Array.prototype.\
-        concat_small-typed-array.js:124:3: error[OSEO1001]: Unknown
-        binding 'Uint8Array'.\\n\""
+        concat_small-typed-array.js:130:12: error[OSEO1001]: typeof
+        standard global binding 'Float16Array' is outside the admitted
+        global-object profile.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

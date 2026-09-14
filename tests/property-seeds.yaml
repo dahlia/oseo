@@ -440,3 +440,7 @@ families:
     owner: tests/property/m5-harness-promise-helper.property.test.ts
     start: 0x60006d00
     end: 0x60006dff
+  - family: m5-typed-array-constructors
+    owner: tests/property/m5-typed-array-constructors.property.test.ts
+    start: 0x60006e00
+    end: 0x60006eff

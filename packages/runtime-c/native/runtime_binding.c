@@ -315,6 +315,12 @@ static OseoResult global_this_object(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_typed_array_globals(
+            context,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_install_map_global(
             context,
             frame.slots[0]

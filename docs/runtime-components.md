@@ -192,6 +192,10 @@ Ownership follows the plan's target layout:
  -  *runtime\_set.c*: the `Set` constructor, insertion-ordered element
     storage, SameValueZero lookup, the core prototype methods, and the live
     `%SetIteratorPrototype%` cursor;
+ -  *runtime\_typed\_array.c*: `%TypedArray%`, the eleven concrete
+    constructor and prototype pairs, construction from lengths, buffers,
+    iterables, array-like objects, and typed arrays, element conversion,
+    and the backing-buffer view record;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -1242,6 +1246,44 @@ The new component moves `abiVersion` to `m5-104` without a public layout
 change. The node reviews its sixteen declared test262 inventory roots and
 promotes the twelve already-reviewed Object, Map, and Symbol cases whose only
 unmet prerequisite was a constructible `Set`.
+
+### TypedArray constructor evidence
+
+M5b node `typed-array-constructors` adds *runtime\_typed\_array.c* as the
+runtime's forty-first reviewed asset and `OSEO_HEAP_TYPED_ARRAY` as its
+twenty-ninth heap kind. Each view embeds the ordinary object layout and owns a
+traced reference to exactly one `ArrayBuffer`; it never owns or caches the
+buffer's Data Block. Element access therefore reacquires the buffer after
+every converting safepoint and validates the current view bounds before it
+touches bytes.
+
+The constructor cluster materializes `%TypedArray%` and one constructor and
+prototype pair for every Number and BigInt element kind. A view records its
+element kind, byte offset, and fixed or length-tracking element length.
+Construction allocates a fresh buffer for a length, iterable, array-like, or
+typed-array source, while the buffer path retains the supplied backing store.
+Number and BigInt content types cannot mix, and integer conversion uses
+unsigned modular arithmetic before bytes are copied, which avoids signed C
+overflow. Loads and stores use `memcpy`, so unaligned host accesses and aliasing
+do not introduce undefined behavior.
+
+Prototype method and accessor lookups and `%TypedArray%` static API lookups
+stop at source-located boundaries owned by their later M5b nodes, and
+deletion aimed at a deferred property stops at the same boundary before any
+mutation. An own or intermediate prototype property still shadows each
+deferred default property.
+
+The component moves `abiVersion` to `m5-106` and grows the public intrinsic
+table by 24 slots; the value representation and the generated-code entry
+points are unchanged.
+Fixed and generated native differential evidence covers every element kind,
+all five construction sources, both specialization policies, false hints,
+deliberate guard misses, generic fallback, shared-buffer observation, and
+collection forced at every safepoint. The node reviews new cases only from
+its declared test262 inventory root; thirty-six already-reviewed cases
+outside that root, twenty-four ArrayBuffer transfer cases, one DataView
+receiver case, and eleven `Object.seal` cases, move to pass because the
+constructors they need now exist.
 
 ### Function prototype evidence
 

@@ -10625,6 +10625,222 @@ partitions:
   - group: built-ins/ThrowTypeError
     key: f9
     path: results/built-ins/ThrowTypeError/f9.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "05"
+    path: results/built-ins/TypedArrayConstructors/05.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "09"
+    path: results/built-ins/TypedArrayConstructors/09.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "26"
+    path: results/built-ins/TypedArrayConstructors/26.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "34"
+    path: results/built-ins/TypedArrayConstructors/34.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "35"
+    path: results/built-ins/TypedArrayConstructors/35.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "39"
+    path: results/built-ins/TypedArrayConstructors/39.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 3c
+    path: results/built-ins/TypedArrayConstructors/3c.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 3d
+    path: results/built-ins/TypedArrayConstructors/3d.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 3e
+    path: results/built-ins/TypedArrayConstructors/3e.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "41"
+    path: results/built-ins/TypedArrayConstructors/41.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "45"
+    path: results/built-ins/TypedArrayConstructors/45.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "54"
+    path: results/built-ins/TypedArrayConstructors/54.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 5a
+    path: results/built-ins/TypedArrayConstructors/5a.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 5b
+    path: results/built-ins/TypedArrayConstructors/5b.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 5d
+    path: results/built-ins/TypedArrayConstructors/5d.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 5f
+    path: results/built-ins/TypedArrayConstructors/5f.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "60"
+    path: results/built-ins/TypedArrayConstructors/60.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "61"
+    path: results/built-ins/TypedArrayConstructors/61.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "63"
+    path: results/built-ins/TypedArrayConstructors/63.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "65"
+    path: results/built-ins/TypedArrayConstructors/65.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "68"
+    path: results/built-ins/TypedArrayConstructors/68.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 6c
+    path: results/built-ins/TypedArrayConstructors/6c.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "76"
+    path: results/built-ins/TypedArrayConstructors/76.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 7e
+    path: results/built-ins/TypedArrayConstructors/7e.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "81"
+    path: results/built-ins/TypedArrayConstructors/81.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "84"
+    path: results/built-ins/TypedArrayConstructors/84.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "85"
+    path: results/built-ins/TypedArrayConstructors/85.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "87"
+    path: results/built-ins/TypedArrayConstructors/87.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 8d
+    path: results/built-ins/TypedArrayConstructors/8d.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "90"
+    path: results/built-ins/TypedArrayConstructors/90.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "93"
+    path: results/built-ins/TypedArrayConstructors/93.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "94"
+    path: results/built-ins/TypedArrayConstructors/94.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: "98"
+    path: results/built-ins/TypedArrayConstructors/98.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 9b
+    path: results/built-ins/TypedArrayConstructors/9b.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 9c
+    path: results/built-ins/TypedArrayConstructors/9c.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 9e
+    path: results/built-ins/TypedArrayConstructors/9e.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: 9f
+    path: results/built-ins/TypedArrayConstructors/9f.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: a0
+    path: results/built-ins/TypedArrayConstructors/a0.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: a1
+    path: results/built-ins/TypedArrayConstructors/a1.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: a4
+    path: results/built-ins/TypedArrayConstructors/a4.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: a8
+    path: results/built-ins/TypedArrayConstructors/a8.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: ac
+    path: results/built-ins/TypedArrayConstructors/ac.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: ae
+    path: results/built-ins/TypedArrayConstructors/ae.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: af
+    path: results/built-ins/TypedArrayConstructors/af.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: b0
+    path: results/built-ins/TypedArrayConstructors/b0.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: b1
+    path: results/built-ins/TypedArrayConstructors/b1.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: b3
+    path: results/built-ins/TypedArrayConstructors/b3.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: b8
+    path: results/built-ins/TypedArrayConstructors/b8.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: be
+    path: results/built-ins/TypedArrayConstructors/be.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: bf
+    path: results/built-ins/TypedArrayConstructors/bf.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: c0
+    path: results/built-ins/TypedArrayConstructors/c0.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: c2
+    path: results/built-ins/TypedArrayConstructors/c2.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: c5
+    path: results/built-ins/TypedArrayConstructors/c5.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: c6
+    path: results/built-ins/TypedArrayConstructors/c6.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: c8
+    path: results/built-ins/TypedArrayConstructors/c8.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: cb
+    path: results/built-ins/TypedArrayConstructors/cb.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: cc
+    path: results/built-ins/TypedArrayConstructors/cc.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: ce
+    path: results/built-ins/TypedArrayConstructors/ce.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: d2
+    path: results/built-ins/TypedArrayConstructors/d2.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: d7
+    path: results/built-ins/TypedArrayConstructors/d7.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: dd
+    path: results/built-ins/TypedArrayConstructors/dd.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: e0
+    path: results/built-ins/TypedArrayConstructors/e0.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: e1
+    path: results/built-ins/TypedArrayConstructors/e1.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: e7
+    path: results/built-ins/TypedArrayConstructors/e7.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: e9
+    path: results/built-ins/TypedArrayConstructors/e9.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: ef
+    path: results/built-ins/TypedArrayConstructors/ef.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: f2
+    path: results/built-ins/TypedArrayConstructors/f2.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: f3
+    path: results/built-ins/TypedArrayConstructors/f3.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: f5
+    path: results/built-ins/TypedArrayConstructors/f5.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: fa
+    path: results/built-ins/TypedArrayConstructors/fa.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: fc
+    path: results/built-ins/TypedArrayConstructors/fc.yaml
+  - group: built-ins/TypedArrayConstructors
+    key: fd
+    path: results/built-ins/TypedArrayConstructors/fd.yaml
   - group: built-ins/decodeURI
     key: "03"
     path: results/built-ins/decodeURI/03.yaml
@@ -14392,9 +14608,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 15176
+  passes: 15226
   semanticFailures: 0
-  unsupportedProfileFeatures: 1955
+  unsupportedProfileFeatures: 1986
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -14407,9 +14623,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 624
+      passes: 649
       semanticFailures: 0
-      unsupportedProfileFeatures: 118
+      unsupportedProfileFeatures: 93
     - dependency: async-functions
       expectedNegatives: 161
       harnessFailures: 0
@@ -14428,9 +14644,9 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 251
+      passes: 252
       semanticFailures: 0
-      unsupportedProfileFeatures: 31
+      unsupportedProfileFeatures: 30
     - dependency: classes
       expectedNegatives: 579
       harnessFailures: 0
@@ -14449,9 +14665,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 475
+      passes: 476
       semanticFailures: 0
-      unsupportedProfileFeatures: 75
+      unsupportedProfileFeatures: 74
     - dependency: date
       expectedNegatives: 0
       harnessFailures: 0
@@ -14561,9 +14777,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9634
+      passes: 9645
       semanticFailures: 0
-      unsupportedProfileFeatures: 443
+      unsupportedProfileFeatures: 432
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -14627,6 +14843,13 @@ summary:
       passes: 15
       semanticFailures: 0
       unsupportedProfileFeatures: 4
+    - dependency: typed-array-constructors
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 14
+      semanticFailures: 0
+      unsupportedProfileFeatures: 67
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -14653,9 +14876,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 149
+      passes: 173
       semanticFailures: 0
-      unsupportedProfileFeatures: 43
+      unsupportedProfileFeatures: 19
     - group: built-ins/ArrayIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -14709,9 +14932,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 475
+      passes: 476
       semanticFailures: 0
-      unsupportedProfileFeatures: 75
+      unsupportedProfileFeatures: 74
     - group: built-ins/Date
       expectedNegatives: 0
       harnessFailures: 0
@@ -14814,9 +15037,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3198
+      passes: 3209
       semanticFailures: 0
-      unsupportedProfileFeatures: 125
+      unsupportedProfileFeatures: 114
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -14887,6 +15110,13 @@ summary:
       passes: 13
       semanticFailures: 0
       unsupportedProfileFeatures: 1
+    - group: built-ins/TypedArrayConstructors
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 14
+      semanticFailures: 0
+      unsupportedProfileFeatures: 67
     - group: built-ins/decodeURI
       expectedNegatives: 0
       harnessFailures: 0

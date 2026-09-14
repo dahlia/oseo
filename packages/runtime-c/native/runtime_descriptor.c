@@ -12,6 +12,30 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+static OseoResult typed_array_exotic_error(OseoContext *context) {
+    return failure(
+        context,
+        "OSEO2001",
+        "TypedArray integer-indexed exotic operations are not admitted yet."
+    );
+}
+
+static OseoResult reject_typed_array_numeric_key(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    if (!is_typed_array(object_value)) return normal(oseo_undefined());
+    bool numeric_index = false;
+    OseoResult result = oseo_internal_canonical_numeric_index(
+        context,
+        key,
+        &numeric_index
+    );
+    if (result.status != OSEO_STATUS_NORMAL || !numeric_index) return result;
+    return typed_array_exotic_error(context);
+}
+
 /* A concrete descriptor replacing the virtual String iterator keeps the
  * virtual property's original position before every user-created symbol.
  * The property vector already owns creation order, so inserting the
@@ -40,7 +64,6 @@ static OseoProperty *append_property_slot(
     object->property_count += 1u;
     return &object->properties[insertion];
 }
-
 bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -196,6 +219,12 @@ static OseoResult define_data_property(
             "Object.defineProperty requires an object."
         );
     }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
@@ -497,6 +526,7 @@ OseoResult oseo_internal_object_define_data(
         attributes,
         has_value,
         false,
+        false,
         &refusal
     );
     if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
@@ -511,6 +541,7 @@ OseoResult oseo_internal_define_data_reported(
     OseoPropertyAttributes attributes,
     bool has_value,
     bool absent_writable,
+    bool set_continuation,
     const char **refusal
 ) {
     if (is_proxy(object_value)) {
@@ -533,8 +564,36 @@ OseoResult oseo_internal_define_data_reported(
             value,
             oseo_undefined(),
             oseo_undefined(),
+            set_continuation,
             refusal
         );
+    }
+    uint32_t typed_index = 0u;
+    if (set_continuation &&
+        is_typed_array(object_value) &&
+        oseo_internal_array_index(key, &typed_index)) {
+        /* The receiver step of OrdinarySetWithOwnDescriptor on a
+         * TypedArray receiver is its [[DefineOwnProperty]] (10.4.5.3):
+         * a valid index performs the exotic element write and an
+         * invalid one reports false before converting the value. A
+         * definition without that provenance keeps the deferred
+         * indexed boundary below. */
+        *refusal = NULL;
+        if (!oseo_internal_typed_array_has_index(object_value, typed_index)) {
+            *refusal = "Cannot define an out-of-bounds TypedArray index.";
+            return normal(object_value);
+        }
+        bool present = false;
+        OseoResult stored = oseo_internal_typed_array_set_index(
+            context,
+            object_value,
+            typed_index,
+            value,
+            &present
+        );
+        (void)present;
+        if (stored.status != OSEO_STATUS_NORMAL) return stored;
+        return normal(object_value);
     }
     return define_data_property(
         context,
@@ -568,6 +627,12 @@ static OseoResult define_accessor_property(
             "Cannot define an accessor property on a non-object."
         );
     }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
     if (ordinary_object(object_value)->module_namespace) {
         *refusal =
             "Cannot define a module namespace property.";
@@ -721,6 +786,7 @@ OseoResult oseo_internal_define_accessor_reported(
             oseo_undefined(),
             getter,
             setter,
+            false,
             refusal
         );
     }
@@ -762,6 +828,22 @@ OseoResult oseo_object_delete(
     if (is_proxy(object_value)) {
         return oseo_internal_proxy_delete(
             context, object_value, key, strict);
+    }
+    OseoResult typed_array_key = reject_typed_array_numeric_key(
+        context,
+        object_value,
+        key
+    );
+    if (typed_array_key.status != OSEO_STATUS_NORMAL) return typed_array_key;
+    /* Deletion observes the deferred TypedArray surface exactly as a
+     * lookup does, so it stops at the same owning boundary before any
+     * mutation. Without this, deleting an absent deferred property would
+     * report success while the next lookup still reports the boundary. */
+    const char *typed_array_deferred =
+        oseo_internal_typed_array_deferred_diagnostic(
+            context, object_value, key);
+    if (typed_array_deferred != NULL) {
+        return failure(context, "OSEO2001", typed_array_deferred);
     }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {

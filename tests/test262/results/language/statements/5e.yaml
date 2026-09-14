@@ -39,12 +39,20 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/subclass/builtins.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/subclass/builtins.js:83\
-        :34: error[OSEO1001]: Unknown binding 'Uint8Array'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: 'test/language/statements/class/subclass/builtins.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/class/subclass/builtins.js:92:18:
+        error[OSEO2001]: TypedArray prototype accessors are not admitted
+        yet.\n"'
+      unsupportedCapability: typed-array-core
       passed: false
     unsupportedFeatures: []
   - case:
