@@ -526,6 +526,7 @@ OseoResult oseo_internal_object_define_data(
         attributes,
         has_value,
         false,
+        false,
         &refusal
     );
     if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
@@ -540,6 +541,7 @@ OseoResult oseo_internal_define_data_reported(
     OseoPropertyAttributes attributes,
     bool has_value,
     bool absent_writable,
+    bool set_continuation,
     const char **refusal
 ) {
     if (is_proxy(object_value)) {
@@ -562,8 +564,36 @@ OseoResult oseo_internal_define_data_reported(
             value,
             oseo_undefined(),
             oseo_undefined(),
+            set_continuation,
             refusal
         );
+    }
+    uint32_t typed_index = 0u;
+    if (set_continuation &&
+        is_typed_array(object_value) &&
+        oseo_internal_array_index(key, &typed_index)) {
+        /* The receiver step of OrdinarySetWithOwnDescriptor on a
+         * TypedArray receiver is its [[DefineOwnProperty]] (10.4.5.3):
+         * a valid index performs the exotic element write and an
+         * invalid one reports false before converting the value. A
+         * definition without that provenance keeps the deferred
+         * indexed boundary below. */
+        *refusal = NULL;
+        if (!oseo_internal_typed_array_has_index(object_value, typed_index)) {
+            *refusal = "Cannot define an out-of-bounds TypedArray index.";
+            return normal(object_value);
+        }
+        bool present = false;
+        OseoResult stored = oseo_internal_typed_array_set_index(
+            context,
+            object_value,
+            typed_index,
+            value,
+            &present
+        );
+        (void)present;
+        if (stored.status != OSEO_STATUS_NORMAL) return stored;
+        return normal(object_value);
     }
     return define_data_property(
         context,
@@ -756,6 +786,7 @@ OseoResult oseo_internal_define_accessor_reported(
             oseo_undefined(),
             getter,
             setter,
+            false,
             refusal
         );
     }

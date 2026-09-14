@@ -369,6 +369,78 @@ console.log(
   Object.getOwnPropertyDescriptor(proxiedBigIndexes, "0").value,
   Object.hasOwn(proxiedBigIndexes, "0"),
 );
+const reflectSetView = new Uint8Array(2);
+console.log(
+  "reflect indexed set",
+  Reflect.set(reflectSetView, "0", 7),
+  reflectSetView[0],
+  Reflect.set(reflectSetView, "1", 9, reflectSetView),
+  reflectSetView[1],
+  Reflect.set(reflectSetView, "5", 3),
+  Object.hasOwn(reflectSetView, "5"),
+);
+const reflectSetBigView = new BigInt64Array(1);
+console.log(
+  "reflect bigint indexed set",
+  Reflect.set(reflectSetBigView, "0", 5n),
+  reflectSetBigView[0],
+);
+const proxiedWriteView = new Uint8Array(2);
+const transparentWrites = new Proxy(proxiedWriteView, {});
+transparentWrites[0] = 11;
+transparentWrites["1"] = 13;
+transparentWrites[5] = 17;
+console.log(
+  "transparent proxy indexed set",
+  proxiedWriteView[0],
+  proxiedWriteView[1],
+  Reflect.set(transparentWrites, "0", 19),
+  proxiedWriteView[0],
+  Object.hasOwn(proxiedWriteView, "5"),
+  transparentWrites[5],
+);
+const foreignBase = new Uint8Array([3, 4]);
+const foreignReceiver = new Uint8Array(2);
+const shortForeignReceiver = new Uint8Array(1);
+const plainBaseReceiver = new Uint8Array(1);
+console.log(
+  "foreign typed receiver set",
+  Reflect.set(foreignBase, "0", 9, foreignReceiver),
+  foreignReceiver[0],
+  foreignBase[0],
+  Reflect.set(foreignBase, "1", 9, shortForeignReceiver),
+  shortForeignReceiver[0],
+  Reflect.set({}, "0", 7, plainBaseReceiver),
+  plainBaseReceiver[0],
+);
+const nestedWriteView = new Uint8Array(1);
+const nestedWrites = new Proxy(new Proxy(nestedWriteView, {}), {});
+nestedWrites[0] = 21;
+console.log(
+  "nested proxy indexed set",
+  nestedWriteView[0],
+  Reflect.set(nestedWrites, "0", 23),
+  nestedWriteView[0],
+);
+const shrinkingBuffer = new ArrayBuffer(1, { maxByteLength: 1 });
+const shrinkingView = new Uint8Array(shrinkingBuffer);
+let shrinkObserved = 0;
+const shrinkingProxy = new Proxy(shrinkingView, {
+  getOwnPropertyDescriptor(target, key) {
+    if (key === "0") {
+      shrinkObserved = shrinkObserved + 1;
+      shrinkingBuffer.resize(0);
+      return undefined;
+    }
+    return Reflect.getOwnPropertyDescriptor(target, key);
+  },
+});
+console.log(
+  "shrunk during receiver lookup",
+  Reflect.set(shrinkingProxy, "0", 7),
+  shrinkObserved,
+  shrinkingView[0],
+);
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);
 console.log(
@@ -379,6 +451,28 @@ console.log(
   derived[0],
   derived[1],
 );
+const numberPrototypeTarget = function () {};
+numberPrototypeTarget.prototype = 7;
+console.log(
+  "non-object prototype fallback",
+  Object.getPrototypeOf(
+    Reflect.construct(Uint8Array, [1], numberPrototypeTarget),
+  ) === Uint8Array.prototype,
+);
+const revocable = Proxy.revocable(function () {}, {
+  get(target, key, receiver) {
+    if (key === "prototype") {
+      revocable.revoke();
+      return null;
+    }
+    return Reflect.get(target, key, receiver);
+  },
+});
+try {
+  Reflect.construct(Uint8Array, [1], revocable.proxy);
+} catch (error) {
+  console.log("revoked realm fallback", error instanceof TypeError);
+}
 try {
   new Uint8Array(-1);
 } catch (error) {

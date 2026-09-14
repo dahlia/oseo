@@ -517,6 +517,43 @@ OseoResult oseo_internal_set_with_receiver(
             *refusal = "Cannot assign to a module namespace property.";
             return normal(value);
         }
+        uint32_t typed_index = 0u;
+        if (is_typed_array(current) &&
+            oseo_internal_array_index(key, &typed_index)) {
+            /* The TypedArray [[Set]] (10.4.5.5) answers a canonical
+             * numeric index itself when the view is the receiver, and an
+             * invalid index with a foreign receiver reports true without
+             * writing anywhere. Only a valid index with a foreign
+             * receiver continues into the ordinary walk, whose element
+             * descriptor is always a writable data property. */
+            if (current == receiver) {
+                bool present = false;
+                OseoResult stored = oseo_internal_typed_array_set_index(
+                    context,
+                    current,
+                    typed_index,
+                    value,
+                    &present
+                );
+                if (stored.status != OSEO_STATUS_NORMAL) return stored;
+                (void)present;
+                return normal(value);
+            }
+            if (!oseo_internal_typed_array_has_index(current, typed_index)) {
+                return normal(value);
+            }
+            break;
+        }
+        if (is_typed_array(current)) {
+            bool numeric_index = false;
+            OseoResult classified = oseo_internal_canonical_numeric_index(
+                context,
+                key,
+                &numeric_index
+            );
+            if (classified.status != OSEO_STATUS_NORMAL) return classified;
+            if (numeric_index) return typed_array_exotic_error(context);
+        }
         OseoValue own_value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -619,6 +656,7 @@ OseoResult oseo_internal_set_with_receiver(
             attributes,
             true,
             true,
+            true,
             refusal
         );
         if (assigned.status != OSEO_STATUS_NORMAL) return assigned;
@@ -634,6 +672,7 @@ OseoResult oseo_internal_set_with_receiver(
         (OseoPropertyAttributes){true, true, true, false},
         true,
         false,
+        true,
         refusal
     );
     if (created.status != OSEO_STATUS_NORMAL) return created;

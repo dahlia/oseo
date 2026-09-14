@@ -2876,6 +2876,13 @@ OseoResult oseo_internal_proxy_get_own_property(
     OseoValue *getter,
     OseoValue *setter
 );
+/*
+ * `set_continuation` marks the receiver-definition step of
+ * OrdinarySetWithOwnDescriptor (10.1.9.2). Only that provenance lets a
+ * trap-free Proxy over a TypedArray route an admitted generic indexed
+ * write through the exotic element write; a direct definition with the
+ * same descriptor shape keeps the deferred indexed boundary.
+ */
 OseoResult oseo_internal_proxy_define_own_property(
     OseoContext *context,
     OseoValue proxy,
@@ -2884,6 +2891,7 @@ OseoResult oseo_internal_proxy_define_own_property(
     OseoValue value,
     OseoValue getter,
     OseoValue setter,
+    bool set_continuation,
     const char **refusal
 );
 OseoResult oseo_internal_proxy_delete(
@@ -2936,6 +2944,11 @@ OseoResult oseo_internal_define_converted_property(
  * array `length` definition coerces its value, which is the one step of
  * a definition that runs user code, so it reads that field again after
  * the coercion instead of trusting the caller's copy.
+ *
+ * `set_continuation` says the definition is the receiver step of
+ * OrdinarySetWithOwnDescriptor, which a trap-free Proxy receiver needs
+ * to route an admitted TypedArray indexed write through the exotic
+ * element write instead of the deferred indexed boundary.
  */
 OseoResult oseo_internal_define_data_reported(
     OseoContext *context,
@@ -2945,6 +2958,7 @@ OseoResult oseo_internal_define_data_reported(
     OseoPropertyAttributes attributes,
     bool has_value,
     bool absent_writable,
+    bool set_continuation,
     const char **refusal
 );
 OseoResult oseo_internal_define_accessor_reported(

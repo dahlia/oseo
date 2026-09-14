@@ -702,7 +702,7 @@ static OseoResult object_set_integrity_level(
             proxy_result = oseo_internal_proxy_define_own_property(
                 context, slots[0], keys[index], &descriptor,
                 oseo_undefined(), oseo_undefined(), oseo_undefined(),
-                &refusal);
+                false, &refusal);
             if (proxy_result.status == OSEO_STATUS_NORMAL && refusal != NULL) {
                 proxy_result = type_error(context, refusal);
             }
@@ -1910,6 +1910,7 @@ OseoResult oseo_internal_define_converted_property(
             value,
             getter,
             setter,
+            false,
             refusal
         );
     }
@@ -1979,6 +1980,7 @@ OseoResult oseo_internal_define_converted_property(
         attributes,
         descriptor->has_value,
         !descriptor->has_writable,
+        false,
         refusal
     );
 }

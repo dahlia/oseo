@@ -409,6 +409,7 @@ static OseoResult json_define_revived(
         (OseoPropertyAttributes){true, true, true, false},
         true,
         false,
+        false,
         &refusal
     );
 }

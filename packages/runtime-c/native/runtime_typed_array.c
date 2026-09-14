@@ -216,7 +216,16 @@ static OseoResult typed_array_allocate_object(
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         !is_object(frame.slots[2])) {
-        result = typed_array_default_prototype(context, kind);
+        /* GetPrototypeFromConstructor reads the fallback realm through
+         * GetFunctionRealm, so a revoked Proxy new target throws here
+         * instead of silently borrowing this realm's default. */
+        result = oseo_internal_validate_function_realm(
+            context,
+            frame.slots[0]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_default_prototype(context, kind);
+        }
         frame.slots[2] = result.value;
     }
     if (result.status != OSEO_STATUS_NORMAL) {
