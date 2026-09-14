@@ -771,6 +771,41 @@ static OseoResult typed_array_copy_values(
     return result;
 }
 
+/*
+ * The same-kind branch of InitializeTypedArrayFromTypedArray clones the
+ * source byte range verbatim, as CloneArrayBuffer does. Loading and
+ * storing each element instead would canonicalize Float32 and Float64
+ * NaN payloads through the number representation and allocate one
+ * temporary BigInt per BigInt64 or BigUint64 element. The clamp keeps the
+ * copy inside both blocks even if either view no longer covers `length`
+ * elements, and memmove tolerates a source range that overlaps the target.
+ */
+static void typed_array_clone_bytes(
+    const OseoTypedArray *target_view,
+    const OseoTypedArray *source_view,
+    size_t length
+) {
+    size_t byte_length = length * typed_array_bytes[source_view->element_kind];
+    const OseoArrayBuffer *from =
+        array_buffer_object(source_view->viewed_buffer);
+    OseoArrayBuffer *to = array_buffer_object(target_view->viewed_buffer);
+    size_t available = from->byte_length > source_view->byte_offset
+        ? from->byte_length - source_view->byte_offset
+        : 0u;
+    size_t room = to->byte_length > target_view->byte_offset
+        ? to->byte_length - target_view->byte_offset
+        : 0u;
+    if (byte_length > available) byte_length = available;
+    if (byte_length > room) byte_length = room;
+    if (byte_length > 0u && from->data != NULL && to->data != NULL) {
+        memmove(
+            to->data + target_view->byte_offset,
+            from->data + source_view->byte_offset,
+            byte_length
+        );
+    }
+}
+
 static OseoResult typed_array_from_typed_array(
     OseoContext *context,
     OseoValue target,
@@ -808,13 +843,19 @@ static OseoResult typed_array_from_typed_array(
         typed_array_allocate_buffer(context, slots[0], length);
     slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = typed_array_copy_values(
-            context,
-            slots[0],
-            slots[1],
-            length,
-            true
-        );
+        target_view = typed_array_object(slots[0]);
+        source_view = typed_array_object(slots[1]);
+        if (target_view->element_kind == source_view->element_kind) {
+            typed_array_clone_bytes(target_view, source_view, length);
+        } else {
+            result = typed_array_copy_values(
+                context,
+                slots[0],
+                slots[1],
+                length,
+                true
+            );
+        }
     }
     oseo_roots_pop(context, &frame);
     return result;

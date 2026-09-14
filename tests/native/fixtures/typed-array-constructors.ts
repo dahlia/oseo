@@ -278,6 +278,55 @@ try {
 } catch (error) {
   console.log("typed content mismatch", error instanceof TypeError);
 }
+const bigClone = new BigInt64Array(
+  new BigInt64Array([-1n, 9223372036854775807n, -9223372036854775808n]),
+);
+const bigUnsignedClone = new BigUint64Array(
+  new BigUint64Array([18446744073709551615n, 9223372036854775808n]),
+);
+const bigConverted = new BigUint64Array(bigClone);
+console.log(
+  "same kind bigint clone",
+  bigClone[0],
+  bigClone[1],
+  bigClone[2],
+  bigClone[3],
+  bigUnsignedClone[0],
+  bigUnsignedClone[1],
+  bigConverted[0],
+  bigConverted[1],
+  bigConverted[2],
+);
+const floatSource = new Float64Array([NaN, -0, 1.5, Infinity]);
+const floatClone = new Float64Array(floatSource);
+floatSource[2] = 7;
+const floatConverted = new Float32Array(floatSource);
+console.log(
+  "same kind float clone",
+  Number.isNaN(floatClone[0]),
+  1 / floatClone[1],
+  floatClone[2],
+  floatClone[3],
+  Number.isNaN(floatConverted[0]),
+  1 / floatConverted[1],
+  floatConverted[2],
+  floatConverted[3],
+);
+const offsetCloneBuffer = new ArrayBuffer(24, { maxByteLength: 32 });
+const offsetCloneSource = new Float64Array(offsetCloneBuffer, 8);
+offsetCloneSource[0] = 2.5;
+offsetCloneSource[1] = -3.25;
+offsetCloneBuffer.resize(32);
+offsetCloneSource[2] = 4.75;
+const offsetClone = new Float64Array(offsetCloneSource);
+offsetCloneSource[0] = 0;
+console.log(
+  "offset clone",
+  offsetClone[0],
+  offsetClone[1],
+  offsetClone[2],
+  offsetClone[3],
+);
 let outOfBoundsConversions = 0;
 const outOfBoundsNumber = new Uint8Array(0);
 outOfBoundsNumber[1] = {
