@@ -6,12 +6,16 @@ Status
 
 Implementation status: delivery items 1 through 3 and 7, the Unicode
 property escape checkpoint, the RegExp intrinsic checkpoint, and the
-prototype and built-in execution checkpoint landed. Delivery item 8 is
-under way rather than complete: its five probes exist, and one run of
-them is recorded in
+prototype and built-in execution checkpoint landed. Delivery item 8 remains
+under way rather than complete: its five probes exist, and one run of them is
+recorded in
 [*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md),
-while measurements that item requires remain unperformed. No backend is
-selected, which is delivery item 9.
+while measurements that item requires remain unperformed. Delivery item 9 is
+complete: [ADR 0024](./docs/adr/0024-regexp-matcher-backend-selection.md)
+selects a composed owned backend for M5b, with the ordered matcher as semantic
+authority and fallback and an owned automaton path for proven regular work.
+The decision adds no matcher implementation. After M5b, direct generated C as
+the primary static backend is the preferred direction, not a current backend.
 This plan defines the M5 semantic and compilation boundary for ECMAScript
 regular expressions. The active language profile admits the callable and
 constructible `RegExp` intrinsic, initialization, `lastIndex` state,
@@ -83,10 +87,10 @@ automaton. Backreferences, captures, assertions, and ECMAScript choice order
 need representations that a plain DFA does not preserve. The probes may select
 different strategies for different pattern regions.
 
-It does not require one generated C function per literal. Direct C lowering,
-serialized matcher instructions, static transition tables, and mixtures of
-those forms remain candidates until compile-time, code-size, and run-time
-measurements compare them.
+It does not require one generated C function per literal. ADR 0024 selects
+serialized matcher instructions composed with an owned automaton path for
+proven regular work during M5b. It prefers direct generated C as the primary
+static backend after M5b, subject to a future implementation and measurements.
 
 It does not admit only a convenient regular subset under the `RegExp` name.
 Unsupported syntax remains a source-located diagnostic until the complete
@@ -301,8 +305,10 @@ direct C, which is the form the runtime's executor already consumes, so
 both compilation paths run one executor and no measurement is needed to
 justify a second one yet. Deduplication is still limited to what one
 descriptor reaches: two source occurrences of one pattern emit two
-descriptors. Direct C lowering and cross-occurrence deduplication remain
-delivery items 8 and 9.
+descriptors. Cross-occurrence deduplication and specialized lowering remain
+later work. ADR 0024 selects an owned automaton path for M5b and records direct
+generated C as the preferred primary direction after M5b; neither path is
+implemented by the decision.
 
 ### Dynamic pattern path
 
@@ -442,6 +448,14 @@ generated C stays unmeasured because no lowering exists to measure, so the
 report records the size budget one would have to fit, 1,149 bytes of executable
 for each literal, rather than a number for it.
 
+ADR 0024 selects the composed owned shape for M5b. The ordered matcher remains
+the complete semantic authority and fallback, and a later implementation may
+select an owned automaton only for a pattern or region whose regularity and
+bounded state space are proved before execution. At the decision checkpoint,
+the ordered executor remains the only executable matcher path. Direct
+generated C is preferred as the primary static backend after M5b, once a
+reviewed implementation and measurements exist.
+
 ### Owned implementation or external component
 
 An external engine probe must cover the complete candidate grammar and match
@@ -452,8 +466,8 @@ binary size.
 
 Missing observable behavior is not filled with unreviewed wrappers around the
 library. The probe lists each mismatch and measures the owned code needed to
-close it. An architecture decision then selects an owned implementation, an
-external component behind an Oseo adapter, or a composed design.
+close it. ADR 0024 selects a composed owned design for M5b rather than an
+external component behind an Oseo adapter.
 
 The probe compared PCRE2 in its 16-bit form over the reviewed corpus. It
 agreed on 38 of 52 cases, refused unbounded-length lookbehind, class set
@@ -472,6 +486,10 @@ rather than the exponential case. Static linking, both execution targets, the
 AArch64 Linux cross-link, sanitizer behavior, Unicode pinning, thread and
 locale assumptions, and a license review of the exact source tree stay
 unmeasured: they need a source build the probe did not perform.
+
+ADR 0024 therefore does not select an external component for M5b. The missing
+source-build and mismatch-closing evidence remains required before that
+alternative could be reconsidered.
 
 ### Matcher artifact and backend boundary
 
@@ -593,10 +611,13 @@ Optimization proceeds in measured layers:
 1.  Compile literal patterns into a validated immutable artifact during the
     build.
 2.  Deduplicate equal static artifacts without sharing object state.
-3.  Lower a proven matcher-IR subset directly to C when it improves the
-    reviewed workloads within the code-size budget.
-4.  Add input or representation fast paths only with explicit guards and a
-    generic matcher edge.
+3.  Add the selected owned automaton path for patterns or regions with a
+    structural regularity proof and bounded state space, retaining the ordered
+    matcher edge.
+4.  After M5b, prefer direct generated C as the primary static backend when a
+    reviewed lowering improves the measured workloads within the code-size
+    budget. Other input or representation fast paths still need explicit
+    guards and the ordered matcher edge.
 
 The build may select a compact representation when direct C would exceed a
 reviewed size limit. That selection is a compile-time backend choice and does
@@ -831,10 +852,17 @@ Delivery order
     closes when they are measured and recorded beside that run.
 9.  After maintainer review of that report, record the selected backend and
     runtime split in an architecture decision before it becomes a later family
-    dependency.
-10. Add measured direct-C, automaton, string-search, or representation fast
-    paths one at a time. Each lands with a structural guard or applicability
-    proof and generic comparison.
+    dependency. Landed. ADR 0024 selects the composed owned backend for M5b:
+    the ordered matcher remains the semantic authority and fallback, and an
+    owned automaton path is selected for proven regular patterns or regions.
+    The record implements no new path. It prefers direct generated C as the
+    primary static backend after M5b, subject to a future implementation and
+    measurements.
+10. Implement the selected M5b automaton path, then add other measured
+    string-search or representation fast paths one at a time. Each lands with
+    a structural guard or applicability proof and comparison with the ordered
+    matcher. Direct generated C remains the preferred post-M5b primary path
+    rather than work admitted by item 9.
 11. Expand the reviewed and generated corpus to the complete
     candidate-edition boundary, update the M5 profile and compatibility
     manifest, and remove the regular expression gap only when no applicable
