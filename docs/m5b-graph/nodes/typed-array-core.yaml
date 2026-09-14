@@ -22,4 +22,4 @@ inventory:
 dependencies:
   - typed-array-constructors
 landed: false
-status: blocked
+status: ready

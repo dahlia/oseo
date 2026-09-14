@@ -10,5 +10,5 @@ inventory:
 dependencies:
   - array-buffer
   - iterator-intrinsic
-landed: false
+landed: true
 status: ready
