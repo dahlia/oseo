@@ -13,5 +13,5 @@ dependencies:
   - number-intrinsic
   - object-own-keys
   - string-prototype-access
-landed: false
+landed: true
 status: ready
