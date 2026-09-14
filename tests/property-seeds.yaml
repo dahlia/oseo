@@ -444,3 +444,7 @@ families:
     owner: tests/property/m5-typed-array-constructors.property.test.ts
     start: 0x60006e00
     end: 0x60006eff
+  - family: m5-ephemeron-tracing
+    owner: tests/property/m5-ephemeron-tracing.property.test.ts
+    start: 0x60006f00
+    end: 0x60006fff

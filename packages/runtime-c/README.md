@@ -855,6 +855,22 @@ constructor's prototype through the generic property path. Live iterators and
 their forward cursor. Public runtime layout is unchanged; the runtime adds
 internal Set and Set iterator heap kinds.
 
+The `m5-107` ABI adds the collector-only weak-edge checkpoint. Ephemeron entries
+park on unmarked key objects and activate through the ordinary worklist to a
+fixed point. Dead weak targets then clear and dead ephemeron entries unlink
+before sweep, so the sweep reclaims each dead entry record. Marked finalization
+registries publish eligible cells to a rooted context FIFO in deterministic
+registration order without allocating or invoking callbacks during collection,
+and a consumed cell unlinks from its registry at the next collection. Nine
+private runtime helpers let the later weak-collections component create these
+records and consume cleanup records into rooted slots. No JavaScript global,
+intrinsic, built-in code ID, or generated-code operation is added at this
+checkpoint.
+
+The entry chain serves collector traversal rather than JavaScript lookup. The
+later component owns an address-keyed index and the job-scoped strong root
+required by `WeakRef.prototype.deref`, together with its next ABI increment.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

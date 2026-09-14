@@ -10,16 +10,17 @@
  * destruction for every runtime heap kind.
  */
 
-static void mark_value(
+static bool mark_value(
     OseoValue value,
     OseoHeapObject **worklist
 ) {
-    if (tag_of(value) != OSEO_TAG_HEAP) return;
+    if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapObject *object = heap_object(value);
-    if (object->marked) return;
+    if (object->marked) return false;
     object->marked = true;
     object->trace_next = *worklist;
     *worklist = object;
+    return true;
 }
 
 static void trace_object(
@@ -56,6 +57,29 @@ static void trace_object(
         for (size_t index = 0u; index < list->length; index += 1u) {
             mark_value(list->values[index], worklist);
         }
+    } else if (object->kind == OSEO_HEAP_EPHEMERON_TABLE) {
+        OseoEphemeronTable *table = (OseoEphemeronTable *)object;
+        mark_value(table->head, worklist);
+        mark_value(table->tail, worklist);
+    } else if (object->kind == OSEO_HEAP_EPHEMERON_ENTRY) {
+        /* `key` and `value` are processed by the fixed-point phase. */
+        mark_value(((OseoEphemeronEntry *)object)->next, worklist);
+    } else if (object->kind == OSEO_HEAP_WEAK_REFERENCE) {
+        /* `target` is cleared after the ephemeron fixed point. */
+        return;
+    } else if (object->kind == OSEO_HEAP_FINALIZATION_REGISTRY) {
+        OseoFinalizationRegistry *registry =
+            (OseoFinalizationRegistry *)object;
+        mark_value(registry->callback, worklist);
+        mark_value(registry->cell_head, worklist);
+        mark_value(registry->cell_tail, worklist);
+    } else if (object->kind == OSEO_HEAP_FINALIZATION_CELL) {
+        OseoFinalizationCell *cell = (OseoFinalizationCell *)object;
+        mark_value(cell->next, worklist);
+        mark_value(cell->queue_next, worklist);
+        mark_value(cell->registry, worklist);
+        if (!cell->processed) mark_value(cell->holdings, worklist);
+        /* `target` is weak and never enters ordinary tracing. */
     } else if (object->kind == OSEO_HEAP_ENUMERATION) {
         /* The receiver, candidates, and visited keys are reachable only
          * through the record a for-in head roots, so a suspended body keeps
@@ -238,6 +262,181 @@ static void trace_object(
     }
 }
 
+static bool value_is_marked(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP && heap_object(value)->marked;
+}
+
+static OseoValue heap_value(OseoHeapObject *object) {
+    return tagged(OSEO_TAG_HEAP, (uint64_t)(uintptr_t)object);
+}
+
+/* Activate entries that waited for this key to finish marking. */
+static void activate_ephemeron_values(
+    OseoHeapObject *key,
+    OseoHeapObject **worklist
+) {
+    OseoHeapObject *pending = key->ephemeron_pending;
+    key->ephemeron_pending = NULL;
+    while (pending != NULL) {
+        OseoEphemeronEntry *entry = (OseoEphemeronEntry *)pending;
+        pending = entry->header.trace_next;
+        entry->header.trace_next = NULL;
+        mark_value(entry->value, worklist);
+    }
+}
+
+/*
+ * Drain strong edges and activate ephemeron values as their keys become
+ * reachable. An entry discovered before its key parks on the key object's
+ * collector-only pending list. Processing that key activates every waiting
+ * value, so the worklist computes the fixed point without repeated scans.
+ */
+static void trace_ephemeron_fixed_point(OseoHeapObject **worklist) {
+    while (*worklist != NULL) {
+        OseoHeapObject *object = *worklist;
+        *worklist = object->trace_next;
+        object->trace_next = NULL;
+        trace_object(object, worklist);
+        if (object->kind == OSEO_HEAP_EPHEMERON_ENTRY) {
+            OseoEphemeronEntry *entry = (OseoEphemeronEntry *)object;
+            OseoHeapObject *key = heap_object(entry->key);
+            if (key->marked) {
+                mark_value(entry->value, worklist);
+            } else {
+                entry->header.trace_next = key->ephemeron_pending;
+                key->ephemeron_pending = &entry->header;
+            }
+        }
+        activate_ephemeron_values(object, worklist);
+    }
+}
+
+/*
+ * An entry is reachable only through its table's chain, so walking every
+ * marked table visits every marked entry exactly once. A dead-key entry is
+ * unlinked and unmarked here, which lets the same sweep reclaim it: weak
+ * tables must not retain per-entry records after their keys die.
+ */
+static void clear_dead_weak_edges(OseoContext *context) {
+    for (OseoHeapObject *object = context->objects;
+         object != NULL;
+         object = object->next) {
+        if (!object->marked) continue;
+        if (object->kind == OSEO_HEAP_WEAK_REFERENCE) {
+            OseoWeakReference *reference = (OseoWeakReference *)object;
+            if (tag_of(reference->target) == OSEO_TAG_HEAP &&
+                !value_is_marked(reference->target)) {
+                reference->target = oseo_undefined();
+            }
+        } else if (object->kind == OSEO_HEAP_EPHEMERON_TABLE) {
+            OseoEphemeronTable *table = (OseoEphemeronTable *)object;
+            OseoValue *link = &table->head;
+            OseoHeapObject *last = NULL;
+            while (tag_of(*link) == OSEO_TAG_HEAP) {
+                OseoEphemeronEntry *entry = ephemeron_entry_object(*link);
+                if (value_is_marked(entry->key)) {
+                    last = &entry->header;
+                    link = &entry->next;
+                    continue;
+                }
+                *link = entry->next;
+                entry->next = oseo_undefined();
+                entry->key = oseo_undefined();
+                entry->value = oseo_undefined();
+                entry->header.marked = false;
+                if (table->live_count > 0u) table->live_count -= 1u;
+            }
+            table->tail =
+                last == NULL ? oseo_undefined() : heap_value(last);
+        }
+    }
+}
+
+/*
+ * A consumed cleanup cell has no further observable state, so unlinking
+ * it from its registry's chain and dropping its mark lets the sweep free
+ * it. Without this, a long-lived registry would retain one dead record
+ * per registration forever.
+ */
+static void compact_finalization_registries(OseoContext *context) {
+    for (OseoHeapObject *object = context->objects;
+         object != NULL;
+         object = object->next) {
+        if (object->kind != OSEO_HEAP_FINALIZATION_REGISTRY ||
+            !object->marked) {
+            continue;
+        }
+        OseoFinalizationRegistry *registry =
+            (OseoFinalizationRegistry *)object;
+        OseoValue *link = &registry->cell_head;
+        OseoHeapObject *last = NULL;
+        while (tag_of(*link) == OSEO_TAG_HEAP) {
+            OseoFinalizationCell *cell = finalization_cell_object(*link);
+            if (cell->processed) {
+                *link = cell->next;
+                cell->next = oseo_undefined();
+                cell->header.marked = false;
+            } else {
+                last = &cell->header;
+                link = &cell->next;
+            }
+        }
+        registry->cell_tail =
+            last == NULL ? oseo_undefined() : heap_value(last);
+    }
+}
+
+/*
+ * Scheduling is allocation-free and globally stable by registration order.
+ * The collector only publishes cleanup records; a later checkpoint decides
+ * when to invoke the JavaScript callback that will consume them. One pass
+ * gathers the newly eligible cells onto an ordinal-sorted list threaded
+ * through their free `trace_next` links, so the heap is scanned once
+ * rather than once per queued cell.
+ */
+static void schedule_finalization(OseoContext *context) {
+    OseoHeapObject *candidates = NULL;
+    for (OseoHeapObject *object = context->objects;
+         object != NULL;
+         object = object->next) {
+        if (object->kind != OSEO_HEAP_FINALIZATION_CELL ||
+            !object->marked) {
+            continue;
+        }
+        OseoFinalizationCell *cell = (OseoFinalizationCell *)object;
+        if (cell->processed || cell->queued ||
+            tag_of(cell->target) != OSEO_TAG_HEAP ||
+            value_is_marked(cell->target)) {
+            continue;
+        }
+        OseoHeapObject **link = &candidates;
+        while (*link != NULL &&
+               ((OseoFinalizationCell *)*link)->registration_order <
+                   cell->registration_order) {
+            link = &(*link)->trace_next;
+        }
+        cell->header.trace_next = *link;
+        *link = &cell->header;
+    }
+    while (candidates != NULL) {
+        OseoFinalizationCell *cell = (OseoFinalizationCell *)candidates;
+        candidates = cell->header.trace_next;
+        cell->header.trace_next = NULL;
+        OseoValue cell_value = heap_value(&cell->header);
+        cell->target = oseo_undefined();
+        cell->queue_next = oseo_undefined();
+        cell->queued = true;
+        if (tag_of(context->finalization_tail) == OSEO_TAG_HEAP) {
+            finalization_cell_object(context->finalization_tail)->queue_next =
+                cell_value;
+        } else {
+            context->finalization_head = cell_value;
+        }
+        context->finalization_tail = cell_value;
+        context->finalization_pending_count += 1u;
+    }
+}
+
 static void destroy_heap_object(OseoHeapObject *object) {
     if (object->kind == OSEO_HEAP_OBJECT ||
         object->kind == OSEO_HEAP_ARRAY ||
@@ -323,12 +522,12 @@ void oseo_collect(OseoContext *context) {
         mark_value(regexp_cache[index].matcher, &worklist);
     }
     mark_value(context->timer_head, &worklist);
-    while (worklist != NULL) {
-        OseoHeapObject *object = worklist;
-        worklist = object->trace_next;
-        object->trace_next = NULL;
-        trace_object(object, &worklist);
-    }
+    mark_value(context->finalization_head, &worklist);
+    mark_value(context->finalization_tail, &worklist);
+    trace_ephemeron_fixed_point(&worklist);
+    clear_dead_weak_edges(context);
+    schedule_finalization(context);
+    compact_finalization_registries(context);
     OseoHeapObject **link = &context->objects;
     while (*link != NULL) {
         OseoHeapObject *object = *link;
@@ -390,6 +589,7 @@ OseoResult oseo_internal_publish_heap(
     }
     object->next = context->objects;
     object->trace_next = NULL;
+    object->ephemeron_pending = NULL;
     object->kind = kind;
     object->marked = false;
     context->objects = object;
@@ -399,4 +599,278 @@ OseoResult oseo_internal_publish_heap(
         context->allocations += 1u;
     }
     return normal(tagged(OSEO_TAG_HEAP, (uint64_t)address));
+}
+
+static bool has_heap_kind(OseoValue value, OseoHeapKind kind) {
+    return tag_of(value) == OSEO_TAG_HEAP && heap_object(value)->kind == kind;
+}
+
+OseoResult oseo_internal_ephemeron_table_create(OseoContext *context) {
+    OseoEphemeronTable *table =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*table));
+    if (table == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Ephemeron table allocation failed."
+        );
+    }
+    table->head = oseo_undefined();
+    table->tail = oseo_undefined();
+    table->live_count = 0u;
+    return oseo_internal_publish_heap(
+        context,
+        &table->header,
+        OSEO_HEAP_EPHEMERON_TABLE
+    );
+}
+
+OseoResult oseo_internal_ephemeron_set(
+    OseoContext *context,
+    OseoValue table_value,
+    OseoValue key,
+    OseoValue value
+) {
+    if (!has_heap_kind(table_value, OSEO_HEAP_EPHEMERON_TABLE)) {
+        return failure(context, "OSEO2001", "Value is not an ephemeron table.");
+    }
+    if (tag_of(key) != OSEO_TAG_HEAP) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Ephemeron key is not a heap value."
+        );
+    }
+    OseoEphemeronTable *table = ephemeron_table_object(table_value);
+    OseoValue cursor = table->head;
+    while (has_heap_kind(cursor, OSEO_HEAP_EPHEMERON_ENTRY)) {
+        OseoEphemeronEntry *entry = ephemeron_entry_object(cursor);
+        if (entry->key == key) {
+            entry->value = value;
+            return normal(table_value);
+        }
+        cursor = entry->next;
+    }
+
+    OseoValue roots[] = {table_value, key, value};
+    OseoRootFrame frame = {NULL, roots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoEphemeronEntry *entry =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*entry));
+    if (entry == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Ephemeron entry allocation failed."
+        );
+    }
+    entry->next = oseo_undefined();
+    entry->key = roots[1];
+    entry->value = roots[2];
+    OseoResult published = oseo_internal_publish_heap(
+        context,
+        &entry->header,
+        OSEO_HEAP_EPHEMERON_ENTRY
+    );
+    if (published.status == OSEO_STATUS_NORMAL) {
+        table = ephemeron_table_object(roots[0]);
+        if (has_heap_kind(table->tail, OSEO_HEAP_EPHEMERON_ENTRY)) {
+            ephemeron_entry_object(table->tail)->next = published.value;
+        } else {
+            table->head = published.value;
+        }
+        table->tail = published.value;
+        table->live_count += 1u;
+    }
+    oseo_roots_pop(context, &frame);
+    return published.status == OSEO_STATUS_NORMAL
+        ? normal(roots[0])
+        : published;
+}
+
+bool oseo_internal_ephemeron_get(
+    OseoValue table_value,
+    OseoValue key,
+    OseoValue *value
+) {
+    if (!has_heap_kind(table_value, OSEO_HEAP_EPHEMERON_TABLE)) return false;
+    OseoValue cursor = ephemeron_table_object(table_value)->head;
+    while (has_heap_kind(cursor, OSEO_HEAP_EPHEMERON_ENTRY)) {
+        OseoEphemeronEntry *entry = ephemeron_entry_object(cursor);
+        if (entry->key == key) {
+            *value = entry->value;
+            return true;
+        }
+        cursor = entry->next;
+    }
+    return false;
+}
+
+size_t oseo_internal_ephemeron_live_count(OseoValue table_value) {
+    if (!has_heap_kind(table_value, OSEO_HEAP_EPHEMERON_TABLE)) return 0u;
+    return ephemeron_table_object(table_value)->live_count;
+}
+
+OseoResult oseo_internal_weak_reference_create(
+    OseoContext *context,
+    OseoValue target
+) {
+    if (tag_of(target) != OSEO_TAG_HEAP) {
+        return failure(context, "OSEO2001", "Weak target is not a heap value.");
+    }
+    OseoRootFrame frame = {NULL, &target, 1u};
+    oseo_roots_push(context, &frame);
+    OseoWeakReference *reference =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*reference));
+    if (reference == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Weak reference allocation failed."
+        );
+    }
+    reference->target = target;
+    OseoResult published = oseo_internal_publish_heap(
+        context,
+        &reference->header,
+        OSEO_HEAP_WEAK_REFERENCE
+    );
+    oseo_roots_pop(context, &frame);
+    return published;
+}
+
+OseoValue oseo_internal_weak_reference_target(OseoValue reference) {
+    if (!has_heap_kind(reference, OSEO_HEAP_WEAK_REFERENCE)) {
+        return oseo_undefined();
+    }
+    return weak_reference_object(reference)->target;
+}
+
+OseoResult oseo_internal_finalization_registry_create(
+    OseoContext *context,
+    OseoValue callback
+) {
+    OseoRootFrame frame = {NULL, &callback, 1u};
+    oseo_roots_push(context, &frame);
+    OseoFinalizationRegistry *registry =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*registry));
+    if (registry == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Finalization registry allocation failed."
+        );
+    }
+    registry->callback = callback;
+    registry->cell_head = oseo_undefined();
+    registry->cell_tail = oseo_undefined();
+    OseoResult published = oseo_internal_publish_heap(
+        context,
+        &registry->header,
+        OSEO_HEAP_FINALIZATION_REGISTRY
+    );
+    oseo_roots_pop(context, &frame);
+    return published;
+}
+
+OseoResult oseo_internal_finalization_register(
+    OseoContext *context,
+    OseoValue registry_value,
+    OseoValue target,
+    OseoValue holdings
+) {
+    if (!has_heap_kind(registry_value, OSEO_HEAP_FINALIZATION_REGISTRY)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Value is not a finalization registry."
+        );
+    }
+    if (tag_of(target) != OSEO_TAG_HEAP || target == holdings) {
+        return failure(context, "OSEO2001", "Finalization target is invalid.");
+    }
+    if (context->next_finalization_order == UINT64_MAX) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Finalization registration limit exceeded."
+        );
+    }
+    OseoValue roots[] = {registry_value, target, holdings};
+    OseoRootFrame frame = {NULL, roots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoFinalizationCell *cell =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*cell));
+    if (cell == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Finalization cell allocation failed."
+        );
+    }
+    cell->next = oseo_undefined();
+    cell->queue_next = oseo_undefined();
+    cell->registry = roots[0];
+    cell->target = roots[1];
+    cell->holdings = roots[2];
+    cell->registration_order = context->next_finalization_order;
+    cell->queued = false;
+    cell->processed = false;
+    OseoResult published = oseo_internal_publish_heap(
+        context,
+        &cell->header,
+        OSEO_HEAP_FINALIZATION_CELL
+    );
+    if (published.status == OSEO_STATUS_NORMAL) {
+        OseoFinalizationRegistry *registry =
+            finalization_registry_object(roots[0]);
+        if (has_heap_kind(
+            registry->cell_tail,
+            OSEO_HEAP_FINALIZATION_CELL
+        )) {
+            finalization_cell_object(registry->cell_tail)->next =
+                published.value;
+        } else {
+            registry->cell_head = published.value;
+        }
+        registry->cell_tail = published.value;
+        context->next_finalization_order += 1u;
+    }
+    oseo_roots_pop(context, &frame);
+    return published.status == OSEO_STATUS_NORMAL
+        ? normal(roots[0])
+        : published;
+}
+
+bool oseo_internal_finalization_take_cleanup(
+    OseoContext *context,
+    OseoValue *registry,
+    OseoValue *holdings
+) {
+    if (!has_heap_kind(
+        context->finalization_head,
+        OSEO_HEAP_FINALIZATION_CELL
+    )) {
+        return false;
+    }
+    OseoFinalizationCell *cell =
+        finalization_cell_object(context->finalization_head);
+    context->finalization_head = cell->queue_next;
+    if (tag_of(context->finalization_head) != OSEO_TAG_HEAP) {
+        context->finalization_tail = oseo_undefined();
+    }
+    cell->queue_next = oseo_undefined();
+    cell->queued = false;
+    cell->processed = true;
+    *registry = cell->registry;
+    *holdings = cell->holdings;
+    cell->holdings = oseo_undefined();
+    if (context->finalization_pending_count > 0u) {
+        context->finalization_pending_count -= 1u;
+    }
+    return true;
 }

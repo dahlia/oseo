@@ -842,6 +842,11 @@ typedef enum {
     OSEO_HEAP_SET = 27,
     OSEO_HEAP_SET_ITERATOR = 28,
     OSEO_HEAP_TYPED_ARRAY = 29,
+    OSEO_HEAP_EPHEMERON_TABLE = 30,
+    OSEO_HEAP_EPHEMERON_ENTRY = 31,
+    OSEO_HEAP_WEAK_REFERENCE = 32,
+    OSEO_HEAP_FINALIZATION_REGISTRY = 33,
+    OSEO_HEAP_FINALIZATION_CELL = 34,
 } OseoHeapKind;
 
 typedef struct {
@@ -859,6 +864,7 @@ typedef struct {
 struct OseoHeapObject {
     OseoHeapObject *next;
     OseoHeapObject *trace_next;
+    OseoHeapObject *ephemeron_pending;
     OseoHeapKind kind;
     bool marked;
 };
@@ -933,6 +939,57 @@ typedef struct {
     size_t length;
     size_t capacity;
 } OseoArgumentList;
+
+/*
+ * Collector-only ephemeron storage. The table strongly owns its entry
+ * records, but an entry's key and value are not ordinary tracing edges.
+ * A marked key activates its value during the collector's fixed point;
+ * an unmarked key unlinks the entry before sweep, so a linked entry is
+ * always live.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue head;
+    OseoValue tail;
+    size_t live_count;
+} OseoEphemeronTable;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue key;
+    OseoValue value;
+} OseoEphemeronEntry;
+
+/* A weak target is inspected only after the ephemeron fixed point. */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue target;
+} OseoWeakReference;
+
+/*
+ * Finalization cells stay in registration order under their registry.
+ * The target is weak. The holdings and registry are strong while the cell
+ * is live or queued, and queue_next links the collector-owned cleanup FIFO.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue queue_next;
+    OseoValue registry;
+    OseoValue target;
+    OseoValue holdings;
+    uint64_t registration_order;
+    bool queued;
+    bool processed;
+} OseoFinalizationCell;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue callback;
+    OseoValue cell_head;
+    OseoValue cell_tail;
+} OseoFinalizationRegistry;
 
 /*
  * One EnumerateObjectProperties (14.7.5.9) record. It is never reachable
@@ -1819,6 +1876,23 @@ static inline OseoMap *map_object(OseoValue value) {
 static inline OseoMapIterator *map_iterator_object(OseoValue value) {
     return (OseoMapIterator *)heap_object(value);
 }
+static inline OseoEphemeronTable *ephemeron_table_object(OseoValue value) {
+    return (OseoEphemeronTable *)heap_object(value);
+}
+static inline OseoEphemeronEntry *ephemeron_entry_object(OseoValue value) {
+    return (OseoEphemeronEntry *)heap_object(value);
+}
+static inline OseoWeakReference *weak_reference_object(OseoValue value) {
+    return (OseoWeakReference *)heap_object(value);
+}
+static inline OseoFinalizationRegistry *finalization_registry_object(
+    OseoValue value
+) {
+    return (OseoFinalizationRegistry *)heap_object(value);
+}
+static inline OseoFinalizationCell *finalization_cell_object(OseoValue value) {
+    return (OseoFinalizationCell *)heap_object(value);
+}
 static inline OseoResult normal(OseoValue value) {
     OseoResult result = {OSEO_STATUS_NORMAL, value};
     return result;
@@ -2414,6 +2488,49 @@ OseoResult oseo_internal_publish_heap(
     OseoContext *context,
     OseoHeapObject *object,
     OseoHeapKind kind
+);
+/*
+ * Collector-level weak-edge contract. These helpers are private runtime
+ * operations for the later JavaScript weak-collection component. They do
+ * not install globals, intrinsics, prototypes, or source-visible methods.
+ */
+OseoResult oseo_internal_ephemeron_table_create(OseoContext *context);
+OseoResult oseo_internal_ephemeron_set(
+    OseoContext *context,
+    OseoValue table,
+    OseoValue key,
+    OseoValue value
+);
+bool oseo_internal_ephemeron_get(
+    OseoValue table,
+    OseoValue key,
+    OseoValue *value
+);
+size_t oseo_internal_ephemeron_live_count(OseoValue table);
+OseoResult oseo_internal_weak_reference_create(
+    OseoContext *context,
+    OseoValue target
+);
+OseoValue oseo_internal_weak_reference_target(OseoValue reference);
+OseoResult oseo_internal_finalization_registry_create(
+    OseoContext *context,
+    OseoValue callback
+);
+OseoResult oseo_internal_finalization_register(
+    OseoContext *context,
+    OseoValue registry,
+    OseoValue target,
+    OseoValue holdings
+);
+/*
+ * Pops one cleanup record without allocating or invoking user code. The
+ * caller supplies rooted output slots and schedules callback execution at
+ * its explicit host checkpoint.
+ */
+bool oseo_internal_finalization_take_cleanup(
+    OseoContext *context,
+    OseoValue *registry,
+    OseoValue *holdings
 );
 /*
  * Unmanaged allocation for a component's own work area, routed through the

@@ -31,8 +31,8 @@ M5a is complete. The 123 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,226 passes across 18,768 paths, and the property inventory records 142
-domains, 142 seeds, and an ordinary case budget of 5,602.
+15,226 passes across 18,768 paths, and the property inventory records 143
+domains, 143 seeds, and an ordinary case budget of 5,614.
 
 
 M5a implementation history
@@ -6168,6 +6168,31 @@ concrete TypedArray inputs become available. The manifest moves to 18,768
 paths with 15,226 passes, 1,556 expected negatives, and 1,986 unsupported
 profile features. The new component and heap kind move the runtime ABI to
 `oseo-runtime-m5-106` without changing the graph's orchestration state.
+
+Implemented M5b node `ephemeron-tracing-checkpoint` gives the collector its
+pre-sweep weak-edge phases. An entry parks on its unmarked key and activates
+its value through the ordinary worklist when that key becomes reachable; after
+that fixed-point closure,
+dead weak targets clear and dead ephemeron entries unlink so the sweep
+reclaims them. Marked finalization registries queue
+eligible holdings in deterministic registration order without allocating or
+invoking user code, and a later scheduler checkpoint consumes the rooted FIFO.
+Fixed C evidence covers activated chains, dead reachability cycles, clearing
+boundaries, and cross-collection finalization timing. The generated domain at
+seed `0x60006f00` covers cyclic strong and ephemeron graphs, arbitrary roots,
+both specialization policy settings, collection forced at every safepoint, and
+replayable cleanup permutations under native execution; the fixed evidence
+also retains the AArch64 Linux cross-link. The node owns no test262 inventory
+root and admits no JavaScript family, so the reviewed manifest, profile family
+index, edition pin, and classification vocabulary do not move. The runtime ABI
+moves to `oseo-runtime-m5-107` without installing `WeakMap`, `WeakSet`,
+`WeakRef`, or `FinalizationRegistry`. The property ratchet moves from 142 to
+143 domains and seeds and from 5,602 to 5,614 ordinary cases.
+
+The entry chain is collector traversal state, not a future JavaScript lookup
+index. The weak-collections node owns an address-keyed index, dead-entry
+synchronization, `KeepDuringJob`, and its next ABI increment before it exposes
+those intrinsics.
 
 
 Ahead-of-time challenge boundary

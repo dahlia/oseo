@@ -389,6 +389,19 @@ safepoint facts and the runtime owns tracing and collection policy. A future
 WebAssembly strategy with an incompatible memory model requires its own
 representation decision under [*PLAN-WASM.md*](./PLAN-WASM.md).
 
+Weak edges use a collector-owned phase boundary rather than ordinary object
+tracing. The collector parks an ephemeron entry on its unmarked key, then
+activates the value when that key becomes reachable. The ordinary worklist
+therefore reaches the fixed point without repeated full passes. It then
+unlinks dead ephemeron entries, clears dead weak targets, queues
+finalization records in deterministic registration order, and only then
+sweeps, which also reclaims the unlinked entry records. Collection neither
+allocates nor invokes user code while publishing cleanup work; the runtime
+scheduler consumes rooted records at an explicit later checkpoint. The M5b
+checkpoint exposes this only to runtime components. JavaScript weak collections
+and finalization remain a separate semantic unit. That unit owns an indexed
+lookup representation and the job-scoped strong roots required by `WeakRef`.
+
 
 Calls, exceptions, and abrupt completion
 ----------------------------------------
