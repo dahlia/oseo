@@ -2175,7 +2175,19 @@ OseoResult oseo_internal_array_iterator_next(
     OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
     double length = 0.0;
-    OseoResult result = array_like_length(context, slots[2], &length);
+    OseoResult result = normal(oseo_undefined());
+    if (is_typed_array(slots[2])) {
+        /* A view reads its internal length, and a detached or
+         * out-of-bounds view throws without exhausting the iterator, so
+         * a later step checks the view again. */
+        result = oseo_internal_typed_array_iteration_length(
+            context,
+            slots[2],
+            &length
+        );
+    } else {
+        result = array_like_length(context, slots[2], &length);
+    }
     if (result.status != OSEO_STATUS_NORMAL) {
         oseo_roots_pop(context, &frame);
         return result;

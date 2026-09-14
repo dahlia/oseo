@@ -1,0 +1,64 @@
+group: built-ins/TypedArray
+key: "26"
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - SharedArrayBuffer
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-same-type-sab.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-core
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - SharedArrayBuffer
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/values/BigInt/detached-buffer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

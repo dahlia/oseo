@@ -784,6 +784,30 @@
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 10u)
 #define OSEO_BIGUINT64_ARRAY_CONSTRUCTOR_CODE_ID \
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_TYPED_ARRAY_BUFFER_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_TYPED_ARRAY_BYTE_LENGTH_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_TYPED_ARRAY_BYTE_OFFSET_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_TYPED_ARRAY_LENGTH_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_TYPED_ARRAY_TO_STRING_TAG_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_TYPED_ARRAY_AT_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_TYPED_ARRAY_ENTRIES_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 18u)
+#define OSEO_TYPED_ARRAY_KEYS_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 19u)
+#define OSEO_TYPED_ARRAY_SET_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 20u)
+#define OSEO_TYPED_ARRAY_SUBARRAY_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 21u)
+#define OSEO_TYPED_ARRAY_VALUES_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 22u)
+#define OSEO_TYPED_ARRAY_SPECIES_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 23u)
 
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
@@ -2443,24 +2467,89 @@ const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
     OseoContext *context,
     OseoValue object
 );
-bool oseo_internal_typed_array_deferred_assignment(
+/*
+ * CanonicalNumericIndexString for a TypedArray property key.
+ * `*numeric` reports that the key is one, so a view's integer-indexed
+ * exotic methods answer it and ordinary lookup never runs.
+ * `*index` is then the element index the key names, or SIZE_MAX when the
+ * number is not a non-negative integral value other than -0 that fits
+ * size_t. No view is that long, so SIZE_MAX is never a valid integer
+ * index, yet a write through it still converts its value.
+ */
+OseoResult oseo_internal_typed_array_numeric_key(
     OseoContext *context,
-    OseoValue object,
-    OseoValue key
+    OseoValue key,
+    bool *numeric,
+    size_t *index
 );
+/* TypedArrayGetElement; undefined for an invalid index. */
 OseoResult oseo_internal_typed_array_get_index(
     OseoContext *context,
     OseoValue view,
-    uint32_t index,
+    size_t index,
     bool *present
 );
-bool oseo_internal_typed_array_has_index(OseoValue view, uint32_t index);
+/* IsValidIntegerIndex for an already classified index. */
+bool oseo_internal_typed_array_has_index(OseoValue view, size_t index);
+/* TypedArraySetElement: converts, then writes if valid. */
 OseoResult oseo_internal_typed_array_set_index(
     OseoContext *context,
     OseoValue view,
-    uint32_t index,
+    size_t index,
     OseoValue value,
     bool *present
+);
+/*
+ * The integer-indexed branch of a view's [[GetOwnProperty]].
+ * `*handled` is true exactly when `object` is a TypedArray and `key` is a
+ * canonical numeric string, and the caller must then skip ordinary
+ * lookup. `*found` reports a valid index, whose element is always a
+ * writable, enumerable, and configurable data property holding
+ * `result.value`. Loading a BigInt element allocates, so a caller that
+ * keeps the value across a safepoint roots it.
+ */
+OseoResult oseo_internal_typed_array_own_property(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    bool *handled,
+    bool *found
+);
+/*
+ * A view's [[DefineOwnProperty]] for a classified numeric key.
+ * `*refusal` names why the definition returned false; otherwise a
+ * descriptor with a value writes the element through
+ * TypedArraySetElement.
+ */
+OseoResult oseo_internal_typed_array_define_index(
+    OseoContext *context,
+    OseoValue view,
+    size_t index,
+    const OseoConvertedDescriptor *descriptor,
+    OseoValue value,
+    const char **refusal
+);
+/*
+ * The leading integer-index keys of a view's [[OwnPropertyKeys]]: its
+ * current length, zero when out of bounds, and zero for every other
+ * object. A view's property vector never holds a canonical
+ * numeric key, so these never duplicate a stored key.
+ */
+size_t oseo_internal_typed_array_index_key_count(OseoValue object);
+OseoResult oseo_internal_typed_array_index_key(
+    OseoContext *context,
+    size_t index
+);
+/* IsTypedArrayFixedLength, which [[PreventExtensions]] reads. */
+bool oseo_internal_typed_array_fixed_length(OseoValue view);
+/*
+ * The TypedArray step of %ArrayIteratorPrototype%.next: throws
+ * a TypeError for a detached or out-of-bounds view.
+ */
+OseoResult oseo_internal_typed_array_iteration_length(
+    OseoContext *context,
+    OseoValue view,
+    double *length
 );
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
@@ -2993,13 +3082,6 @@ OseoResult oseo_internal_proxy_get_own_property(
     OseoValue *getter,
     OseoValue *setter
 );
-/*
- * `set_continuation` marks the receiver-definition step of
- * OrdinarySetWithOwnDescriptor (10.1.9.2). Only that provenance lets a
- * trap-free Proxy over a TypedArray route an admitted generic indexed
- * write through the exotic element write; a direct definition with the
- * same descriptor shape keeps the deferred indexed boundary.
- */
 OseoResult oseo_internal_proxy_define_own_property(
     OseoContext *context,
     OseoValue proxy,
@@ -3008,7 +3090,6 @@ OseoResult oseo_internal_proxy_define_own_property(
     OseoValue value,
     OseoValue getter,
     OseoValue setter,
-    bool set_continuation,
     const char **refusal
 );
 OseoResult oseo_internal_proxy_delete(
@@ -3062,10 +3143,9 @@ OseoResult oseo_internal_define_converted_property(
  * a definition that runs user code, so it reads that field again after
  * the coercion instead of trusting the caller's copy.
  *
- * `set_continuation` says the definition is the receiver step of
- * OrdinarySetWithOwnDescriptor, which a trap-free Proxy receiver needs
- * to route an admitted TypedArray indexed write through the exotic
- * element write instead of the deferred indexed boundary.
+ * A canonical numeric key of a TypedArray goes to the view's own
+ * [[DefineOwnProperty]] instead, reading `attributes` as present fields
+ * except for [[Writable]] when `absent_writable` is set.
  */
 OseoResult oseo_internal_define_data_reported(
     OseoContext *context,
@@ -3075,7 +3155,6 @@ OseoResult oseo_internal_define_data_reported(
     OseoPropertyAttributes attributes,
     bool has_value,
     bool absent_writable,
-    bool set_continuation,
     const char **refusal
 );
 OseoResult oseo_internal_define_accessor_reported(

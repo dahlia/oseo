@@ -196,7 +196,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_typed\_array.c*: `%TypedArray%`, the eleven concrete
     constructor and prototype pairs, construction from lengths, buffers,
     iterables, array-like objects, and typed arrays, element conversion,
-    and the backing-buffer view record;
+    the backing-buffer view record, the integer-indexed element operations
+    the generic property components delegate to, and the core prototype
+    accessors and methods;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -1376,6 +1378,32 @@ use, descriptor and thread lifetime, wakeups, wall-clock jumps, failures, both
 specialization policies, a guard miss, and collection forced at every
 safepoint. The node adds no code ID, intrinsic, or heap kind and moves
 `abiVersion` to `m5-108`.
+
+### TypedArray core evidence
+
+M5b node `typed-array-core` keeps the view record unchanged and adds the
+integer-indexed exotic operations to *runtime\_typed\_array.c*. One helper
+classifies a canonical numeric key into an element index, with `SIZE_MAX`
+standing for a key that can never be valid, and the descriptor, property,
+primitive, enumeration, JSON, Proxy, and Object built-in components call the
+component's element get, set, define, own-property, and index-key helpers
+instead of their former boundary. The own-key snapshots place the current
+indices ahead of the stored keys, and a view's property vector never holds a
+canonical numeric key. The receiver-provenance flag that let only a `[[Set]]`
+continuation reach a TypedArray element through a trap-free Proxy is removed,
+because the view's `[[DefineOwnProperty]]` now answers every definition.
+
+The prototype accessors, `at`, `set`, `subarray`, and the three iterator
+methods take twelve code IDs from the TypedArray range. `set` writes Number
+elements through the same conversion as indexed stores, copies a same-kind
+typed source with `memmove`, and snapshots a cross-kind source that shares
+the target's buffer before converting it, so no step reads bytes it already
+overwrote. The Array component records the original `Array.prototype.toString`
+in the new `OSEO_INTRINSIC_ARRAY_TO_STRING` slot, so the TypedArray cluster can
+share that identity even when a program replaced the Array method first; the
+TypedArray cluster's failure path now clears only its own slots. The component
+moves `abiVersion` to `m5-109`; the value representation and the
+generated-code entry points are unchanged.
 
 ### Function prototype evidence
 

@@ -166,37 +166,21 @@ static OseoResult target_own_property(
             context, target, key, found, value, attributes, getter, setter);
     }
     if (is_typed_array(target)) {
-        uint32_t index = 0u;
-        if (oseo_internal_array_index(key, &index)) {
-            *found = false;
+        bool numeric = false;
+        bool present = false;
+        OseoResult loaded = oseo_internal_typed_array_own_property(
+            context, target, key, &numeric, &present);
+        if (loaded.status != OSEO_STATUS_NORMAL) return loaded;
+        if (numeric) {
+            *found = present;
+            *value = loaded.value;
             *getter = oseo_undefined();
             *setter = oseo_undefined();
-            bool present = false;
-            OseoResult loaded = oseo_internal_typed_array_get_index(
-                context, target, index, &present);
-            if (loaded.status != OSEO_STATUS_NORMAL) return loaded;
-            if (present) {
-                *found = true;
-                *value = loaded.value;
-                /* Always configurable and writable, so no trap-invariant
-                 * check ever compares this value after a later safepoint
-                 * could have collected a freshly loaded BigInt element. */
-                *attributes =
-                    (OseoPropertyAttributes){true, true, true, false};
-            }
+            /* Always configurable and writable, so no trap-invariant
+             * check ever compares this value after a later safepoint
+             * could have collected a freshly loaded BigInt element. */
+            *attributes = (OseoPropertyAttributes){true, true, true, false};
             return normal(oseo_undefined());
-        }
-        bool numeric_index = false;
-        OseoResult classified = oseo_internal_canonical_numeric_index(
-            context, key, &numeric_index);
-        if (classified.status != OSEO_STATUS_NORMAL) return classified;
-        if (numeric_index) {
-            return failure(
-                context,
-                "OSEO2001",
-                "TypedArray integer-indexed exotic operations are not "
-                "admitted yet."
-            );
         }
     }
     *found = oseo_internal_own_property_descriptor(
@@ -558,6 +542,16 @@ OseoResult oseo_internal_prevent_extensions_reported(
     const char **refusal
 ) {
     *refusal = NULL;
+    if (is_typed_array(object_value) &&
+        !oseo_internal_typed_array_fixed_length(object_value)) {
+        /* TypedArray [[PreventExtensions]]: a view whose
+         * integer indices can appear as its buffer grows stays
+         * extensible. */
+        *refusal =
+            "Cannot prevent extensions of a TypedArray whose length can "
+            "change.";
+        return normal(object_value);
+    }
     if (!is_proxy(object_value)) {
         ordinary_object(object_value)->extensible = false;
         return normal(object_value);
@@ -869,7 +863,6 @@ OseoResult oseo_internal_proxy_define_own_property(
     OseoValue value,
     OseoValue getter,
     OseoValue setter,
-    bool set_continuation,
     const char **refusal
 ) {
     *refusal = NULL;
@@ -884,54 +877,6 @@ OseoResult oseo_internal_proxy_define_own_property(
     slots[5] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[5])) {
         OseoValue target = proxy_object(slots[0])->target;
-        if (set_continuation && is_proxy(target)) {
-            /* A trap-free Proxy hands its receiver-definition step to
-             * the target's own [[DefineOwnProperty]], so the provenance
-             * survives a nested Proxy chain. */
-            result = oseo_internal_proxy_define_own_property(
-                context,
-                target,
-                slots[1],
-                descriptor,
-                slots[2],
-                slots[3],
-                slots[4],
-                true,
-                refusal
-            );
-            return proxy_complete(context, &frame, result);
-        }
-        uint32_t typed_index = 0u;
-        if (set_continuation &&
-            is_typed_array(target) &&
-            oseo_internal_array_index(slots[1], &typed_index)) {
-            /* The transparent [[Set]] continuation finishes with the
-             * receiver's [[DefineOwnProperty]], which for a valid
-             * TypedArray index and the continuation's plain data write
-             * is the exotic element write, and for an index a trap made
-             * invalid since the walk checked it reports false before
-             * converting the value (10.4.5.3). Descriptor shape alone
-             * cannot prove that provenance, so a direct indexed
-             * definition through the same trap-free Proxy falls through
-             * to the deferred boundary the direct receiver reports. */
-            if (!oseo_internal_typed_array_has_index(target, typed_index)) {
-                *refusal =
-                    "Cannot define an out-of-bounds TypedArray index.";
-                result = normal(slots[0]);
-                return proxy_complete(context, &frame, result);
-            }
-            bool present = false;
-            result = oseo_internal_typed_array_set_index(
-                context,
-                target,
-                typed_index,
-                slots[2],
-                &present
-            );
-            (void)present;
-            if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
-            return proxy_complete(context, &frame, result);
-        }
         result = oseo_internal_define_converted_property(
             context,
             target,

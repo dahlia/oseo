@@ -1051,6 +1051,7 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         }
     } else if (
         intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_ARRAY_TO_STRING ||
         (intrinsic >= OSEO_INTRINSIC_ARRAY &&
          intrinsic <= OSEO_INTRINSIC_ARRAY_SPECIES_GETTER)
     ) {

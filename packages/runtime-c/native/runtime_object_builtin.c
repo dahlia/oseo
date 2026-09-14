@@ -18,6 +18,51 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
+/*
+ * [[GetOwnProperty]] for a non-Proxy object. A TypedArray answers its
+ * canonical numeric keys from the view, whose elements live outside the
+ * property vector; every other key reads the stored descriptor. A BigInt
+ * element is freshly allocated, so a caller that keeps `*value` across a
+ * safepoint roots it.
+ */
+static OseoResult own_property_query(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    bool *found,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
+) {
+    bool numeric = false;
+    OseoResult result = oseo_internal_typed_array_own_property(
+        context,
+        object_value,
+        key,
+        &numeric,
+        found
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (numeric) {
+        *value = result.value;
+        *attributes = (OseoPropertyAttributes){true, true, true, false};
+        *getter = oseo_undefined();
+        *setter = oseo_undefined();
+        return normal(oseo_undefined());
+    }
+    *found = oseo_internal_own_property_descriptor(
+        context,
+        object_value,
+        key,
+        value,
+        attributes,
+        getter,
+        setter
+    );
+    return normal(oseo_undefined());
+}
+
 static OseoValue builtin_argument(
     size_t argument_count,
     const OseoValue *arguments,
@@ -121,22 +166,6 @@ static OseoResult object_prototype_property_is_enumerable(
         return normal(oseo_boolean(enumerable));
     }
     if (!is_object(receiver)) return normal(oseo_boolean(false));
-    if (is_typed_array(receiver)) {
-        uint32_t index = 0u;
-        if (oseo_internal_array_index(key.value, &index)) {
-            return normal(oseo_boolean(
-                oseo_internal_typed_array_has_index(receiver, index)
-            ));
-        }
-        bool numeric_index = false;
-        OseoResult classified = oseo_internal_canonical_numeric_index(
-            context,
-            key.value,
-            &numeric_index
-        );
-        if (classified.status != OSEO_STATUS_NORMAL) return classified;
-        if (numeric_index) return normal(oseo_boolean(false));
-    }
     OseoValue ignored = oseo_undefined();
     OseoValue ignored_getter = oseo_undefined();
     OseoValue ignored_setter = oseo_undefined();
@@ -153,17 +182,16 @@ static OseoResult object_prototype_property_is_enumerable(
             &ignored_getter,
             &ignored_setter
         )
-        : normal(oseo_boolean(
-            (own = oseo_internal_own_property_descriptor(
-                context,
-                receiver,
-                key.value,
-                &ignored,
-                &attributes,
-                &ignored_getter,
-                &ignored_setter
-            ))
-        ));
+        : own_property_query(
+            context,
+            receiver,
+            key.value,
+            &own,
+            &ignored,
+            &attributes,
+            &ignored_getter,
+            &ignored_setter
+        );
     if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(oseo_boolean(own && attributes.enumerable));
 }
@@ -702,7 +730,7 @@ static OseoResult object_set_integrity_level(
             proxy_result = oseo_internal_proxy_define_own_property(
                 context, slots[0], keys[index], &descriptor,
                 oseo_undefined(), oseo_undefined(), oseo_undefined(),
-                false, &refusal);
+                &refusal);
             if (proxy_result.status == OSEO_STATUS_NORMAL && refusal != NULL) {
                 proxy_result = type_error(context, refusal);
             }
@@ -712,6 +740,24 @@ static OseoResult object_set_integrity_level(
         }
         oseo_roots_pop(context, &proxy_frame);
         return proxy_result;
+    }
+    if (is_typed_array(object_value)) {
+        /* A view's [[PreventExtensions]] refuses a length that can still
+         * change, and each valid index then refuses the non-configurable
+         * redefinition DefinePropertyOrThrow asks for. The
+         * indices lead the own keys, so no ordinary property changes. */
+        const char *refusal = NULL;
+        OseoResult prevented = oseo_internal_prevent_extensions_reported(
+            context, object_value, &refusal);
+        if (prevented.status != OSEO_STATUS_NORMAL) return prevented;
+        if (refusal != NULL) return type_error(context, refusal);
+        if (oseo_internal_typed_array_index_key_count(object_value) > 0u) {
+            return type_error(
+                context,
+                "A TypedArray element must stay a writable, enumerable, "
+                "and configurable data property."
+            );
+        }
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     object->extensible = false;
@@ -834,6 +880,10 @@ static OseoResult object_test_integrity_level(
     }
     OseoOrdinaryObject *object = ordinary_object(value);
     if (object->extensible) return normal(oseo_boolean(false));
+    /* Every valid TypedArray element is configurable and writable. */
+    if (oseo_internal_typed_array_index_key_count(value) > 0u) {
+        return normal(oseo_boolean(false));
+    }
     if (frozen && is_array(value) && object->length_writable) {
         return normal(oseo_boolean(false));
     }
@@ -1519,7 +1569,8 @@ static OseoResult proxy_own_key_frame(
  * %String.prototype%[@@iterator] can become enumerable, so it is the one
  * synthetic key this snapshot has to place; an array's `length` and a
  * function's `prototype` are permanently non-enumerable and the copy
- * would skip them anyway.
+ * would skip them anyway. A TypedArray's valid integer indices lead its
+ * keys, as they do in the ordinary snapshot.
  */
 static OseoResult snapshot_rest_keys(
     OseoContext *context,
@@ -1540,6 +1591,12 @@ static OseoResult snapshot_rest_keys(
         return normal(oseo_undefined());
     }
     if (!is_object(source)) return normal(oseo_undefined());
+    size_t index_count = oseo_internal_typed_array_index_key_count(source);
+    for (; output < index_count && output < key_count; output += 1u) {
+        OseoResult key = oseo_internal_typed_array_index_key(context, output);
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        frame->slots[3u + output] = key.value;
+    }
     uint64_t previous = UINT64_MAX;
     while (output < key_count) {
         OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
@@ -1609,14 +1666,6 @@ static OseoResult copy_data_properties(
     size_t excluded_count,
     const OseoValue *excluded_keys
 ) {
-    if (is_typed_array(source)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "TypedArray integer-indexed exotic operations are not "
-            "admitted yet."
-        );
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     size_t key_count = 0u;
     OseoResult result = normal(oseo_undefined());
@@ -1629,7 +1678,8 @@ static OseoResult copy_data_properties(
                 ? ordinary_object(source)->property_count +
                     (ordinary_object(source)->virtual_string_iterator
                         ? 1u
-                        : 0u)
+                        : 0u) +
+                    oseo_internal_typed_array_index_key_count(source)
                 : 0u;
         if (key_count > SIZE_MAX - 3u) {
             return failure(
@@ -1671,15 +1721,17 @@ static OseoResult copy_data_properties(
             );
             if (result.status != OSEO_STATUS_NORMAL) break;
         } else {
-            exists = oseo_internal_own_property_descriptor(
+            result = own_property_query(
                 context,
                 frame.slots[0],
                 key,
+                &exists,
                 &ignored,
                 &attributes,
                 &ignored_getter,
                 &ignored_setter
             );
+            if (result.status != OSEO_STATUS_NORMAL) break;
         }
         bool enumerable = is_string(frame.slots[0])
             ? exists && !oseo_internal_string_is_ascii(key, "length")
@@ -1910,7 +1962,27 @@ OseoResult oseo_internal_define_converted_property(
             value,
             getter,
             setter,
-            false,
+            refusal
+        );
+    }
+    bool typed_array_key = false;
+    size_t typed_index = SIZE_MAX;
+    if (is_typed_array(object_value)) {
+        OseoResult classified = oseo_internal_typed_array_numeric_key(
+            context,
+            key,
+            &typed_array_key,
+            &typed_index
+        );
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+    }
+    if (typed_array_key) {
+        return oseo_internal_typed_array_define_index(
+            context,
+            object_value,
+            typed_index,
+            descriptor,
+            value,
             refusal
         );
     }
@@ -1980,7 +2052,6 @@ OseoResult oseo_internal_define_converted_property(
         attributes,
         descriptor->has_value,
         !descriptor->has_writable,
-        false,
         refusal
     );
 }
@@ -2145,23 +2216,6 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         builtin_argument(argument_count, arguments, 1u)
     );
     frame.slots[1] = result.value;
-    bool numeric_index = false;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        is_typed_array(object_value)) {
-        result = oseo_internal_canonical_numeric_index(
-            context,
-            frame.slots[1],
-            &numeric_index
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL && numeric_index) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "TypedArray integer-indexed exotic operations are not "
-            "admitted yet."
-        );
-    }
     OseoValue value = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
     OseoValue getter = oseo_undefined();
@@ -2179,17 +2233,16 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
                 &getter,
                 &setter
             )
-            : normal(oseo_boolean(
-                (exists = oseo_internal_own_property_descriptor(
-                    context,
-                    object_value,
-                    frame.slots[1],
-                    &value,
-                    &attributes,
-                    &getter,
-                    &setter
-                ))
-            ));
+            : own_property_query(
+                context,
+                object_value,
+                frame.slots[1],
+                &exists,
+                &value,
+                &attributes,
+                &getter,
+                &setter
+            );
         /* The normal value is ignored; only the abrupt completion and
          * the descriptor outputs are observable here. */
         (void)result.value;
@@ -2258,20 +2311,20 @@ static OseoResult snapshot_own_keys(
     OseoRootFrame *frame,
     size_t key_count
 ) {
-    if (is_typed_array(frame->slots[0])) {
-        return failure(
-            context,
-            "OSEO2001",
-            "TypedArray integer-indexed exotic operations are not "
-            "admitted yet."
-        );
+    /* A TypedArray's valid integer indices lead its keys. */
+    size_t output = 0u;
+    size_t index_count =
+        oseo_internal_typed_array_index_key_count(frame->slots[0]);
+    for (; output < index_count && output < key_count; output += 1u) {
+        OseoResult key = oseo_internal_typed_array_index_key(context, output);
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        frame->slots[3u + output] = key.value;
     }
     bool virtual_length = is_array(frame->slots[0]);
     bool virtual_prototype =
         function_has_prototype_property(frame->slots[0]);
     bool virtual_string_iterator =
         ordinary_object(frame->slots[0])->virtual_string_iterator;
-    size_t output = 0u;
     uint64_t previous = UINT64_MAX;
     while (output < key_count) {
         OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
@@ -2361,7 +2414,10 @@ static size_t own_key_count(OseoValue object_value) {
     if (ordinary_object(object_value)->virtual_string_iterator) {
         virtual_count += 1u;
     }
-    return ordinary_object(object_value)->property_count + virtual_count;
+    /* A view's length is bounded by its buffer's byte length, so adding
+     * it to the property count cannot overflow. */
+    return ordinary_object(object_value)->property_count + virtual_count +
+        oseo_internal_typed_array_index_key_count(object_value);
 }
 
 static OseoResult object_close_after_abrupt(
@@ -2577,18 +2633,19 @@ static OseoResult object_enumerable_own_properties(
         OseoValue ignored_getter = oseo_undefined();
         OseoValue ignored_setter = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
-        if (!oseo_internal_own_property_descriptor(
-                context,
-                frame.slots[0],
-                key,
-                &ignored,
-                &attributes,
-                &ignored_getter,
-                &ignored_setter
-            ) ||
-            !attributes.enumerable) {
-            continue;
-        }
+        bool exists = false;
+        result = own_property_query(
+            context,
+            frame.slots[0],
+            key,
+            &exists,
+            &ignored,
+            &attributes,
+            &ignored_getter,
+            &ignored_setter
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!exists || !attributes.enumerable) continue;
         if (kind == OSEO_ENUMERABLE_KEYS) {
             result = oseo_array_append(context, frame.slots[1], key);
             continue;
@@ -2692,15 +2749,17 @@ static OseoResult object_assign(
                 );
                 if (result.status != OSEO_STATUS_NORMAL) break;
             } else {
-                exists = oseo_internal_own_property_descriptor(
+                result = own_property_query(
                     context,
                     frame.slots[0],
                     key,
+                    &exists,
                     &ignored,
                     &attributes,
                     &ignored_getter,
                     &ignored_setter
                 );
+                if (result.status != OSEO_STATUS_NORMAL) break;
             }
             if (!exists || !attributes.enumerable) {
                 continue;
@@ -3210,15 +3269,17 @@ static OseoResult object_get_own_property_descriptors(
             );
             if (result.status != OSEO_STATUS_NORMAL) break;
         } else {
-            exists = oseo_internal_own_property_descriptor(
+            result = own_property_query(
                 context,
                 frame.slots[0],
                 key,
+                &exists,
                 &own,
                 &attributes,
                 &getter,
                 &setter
             );
+            if (result.status != OSEO_STATUS_NORMAL) break;
         }
         if (!exists) continue;
         descriptor.slots[2] = attributes.accessor ? getter : own;
@@ -3351,15 +3412,17 @@ static OseoResult object_define_properties(
             );
             if (result.status != OSEO_STATUS_NORMAL) break;
         } else {
-            exists = oseo_internal_own_property_descriptor(
+            result = own_property_query(
                 context,
                 frame.slots[0],
                 key,
+                &exists,
                 &ignored,
                 &attributes,
                 &ignored_getter,
                 &ignored_setter
             );
+            if (result.status != OSEO_STATUS_NORMAL) break;
         }
         if (!exists || !attributes.enumerable) {
             continue;

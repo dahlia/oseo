@@ -1,0 +1,76 @@
+version: 1
+id: typed-array-core
+title: "TypedArray core prototype"
+scope:
+  - "The complete integer-indexed exotic object: [[GetOwnProperty]],
+    [[HasProperty]], [[DefineOwnProperty]], [[Get]], [[Set]], [[Delete]],
+    [[OwnPropertyKeys]], and [[PreventExtensions]] for every canonical
+    numeric string key, including -0, non-integral, out-of-range,
+    detached, and out-of-bounds views, and the generic Object, Reflect,
+    Proxy, JSON, spread, rest, for-in, and integrity-level operations that
+    reach them."
+  - "The %TypedArray.prototype% buffer, byteLength, byteOffset, length, and
+    Symbol.toStringTag getters over fixed and length-tracking views, and
+    the at, set, subarray, entries, keys, values, and Symbol.iterator
+    methods, including array-like and typed-array set sources, overlapping
+    same-buffer copies, species construction, content-type checks, and the
+    TypedArray step of %ArrayIteratorPrototype%.next."
+  - "The %TypedArray.prototype%.toString identity with Array.prototype.toString
+    and the %TypedArray%[Symbol.species] getter subarray needs. The
+    iterative, mutation, search and join, and sorting prototype methods, the
+    from and of statics, and prototype own-key reflection keep explicit
+    runtime boundaries owned by later M5b nodes."
+  - "Reviewed standards coverage is all 337 upstream paths under the node's
+    thirteen inventory roots, through the reviewed testTypedArray.js
+    harness. Paths that need resizableArrayBufferUtils.js, SharedArrayBuffer,
+    or a TypedArray search and join method retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-core.ts
+      - tests/property/m5-typed-array-core.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-core.ts
+      - tests/native.ts
+      - tests/native/scenarios/shard-2.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-core.ts
+      - tests/property/m5-typed-array-core.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-core.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-core.ts
+      - tests/property/m5-typed-array-core.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-core.ts
+      - tests/property/m5-typed-array-core.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/testTypedArray.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c
+      - packages/runtime-c/native/runtime_descriptor.c
+      - packages/runtime-c/native/runtime_iterator.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

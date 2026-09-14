@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-18,768 reviewed cases: 15,226 passes, 1,556 expected negatives, and 1,986
+19,105 reviewed cases: 15,606 passes, 1,556 expected negatives, and 1,943
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 123 indexed records in the normative
+M5a is complete. The 124 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,226 passes across 18,768 paths, and the property inventory records 145
-domains, 145 seeds, and an ordinary case budget of 5,659.
+15,606 passes across 19,105 paths, and the property inventory records 146
+domains, 146 seeds, and an ordinary case budget of 5,671.
 
 
 M5a implementation history
@@ -6248,6 +6248,51 @@ include schedules a timer, so the manifest's `deterministic-logical-clock`
 scheduler value stays exact, and a native test keeps it so. The suite
 revision, applicable inventory, classification vocabulary, target-parity
 policy, forced-collection policy, and zero-override policy are unchanged.
+
+Implemented M5b node `typed-array-core` completes the integer-indexed exotic
+object and the core `%TypedArray.prototype%` surface. Every canonical numeric
+key of a view is answered by the view's own `[[GetOwnProperty]]`,
+`[[HasProperty]]`, `[[DefineOwnProperty]]`, `[[Get]]`, `[[Set]]`,
+`[[Delete]]`, and `[[OwnPropertyKeys]]`, and the generic Object, Reflect,
+Proxy, JSON, spread, rest, `for-in`, and integrity-level paths now reach those
+methods instead of stopping at the constructor node's boundary.
+`[[PreventExtensions]]` refuses a view whose length can change. The
+`buffer`, `byteLength`, `byteOffset`, `length`, and `Symbol.toStringTag`
+getters read internal slots; `at`, `set`, `subarray`, `entries`, `keys`,
+`values`, and `Symbol.iterator` follow the specification's validation,
+conversion, and species order, and the Array iterator's `next` reads a view's
+internal length. With coordinator approval the node also materializes the
+`%TypedArray%[Symbol.species]` getter, which `subarray` needs for its default
+result and `typed-array-statics` reuses, and links
+`%TypedArray.prototype%.toString` to the original `Array.prototype.toString`,
+which the root *toString.js* case observes; `from`, `of`, `join`,
+`toLocaleString`, and the *toString/* root stay with their owners. Fixed and
+generated native differential evidence at property seed `0x60007100` uses an
+independent element-level buffer model over fixed and length-tracking views,
+resizes, and detachment, under both specialization policies, collection
+forced at every safepoint, a false hint that reaches the generic fallback,
+and Node.js and Deno references. Two native-only checks record the reference
+engines' divergence from ECMA-262 for sealing a non-empty view and for the
+`subarray` species content-type check.
+
+The reviewed harness gains *testTypedArray.js*, and the reviewed feature list
+gains `TypedArray` and `TypedArray.prototype.at`. All 337 paths under the
+node's thirteen inventory roots are reviewed: 288 pass, 28 need the
+unreviewed *resizableArrayBufferUtils.js* include, seven need
+`SharedArrayBuffer`, and fourteen reach a TypedArray search and join method.
+Ninety-two already reviewed paths outside the roots move to pass: the 67
+constructor-node metadata and conversion cases that carried the `TypedArray`
+feature gate, ten Array iterator detachment and resize cases, nine Array
+prototype cases over TypedArray inputs, five `ArrayBuffer.isView` cases, and
+one built-in subclassing case. The manifest moves from 18,768 to 19,105 paths
+and from 15,226 to 15,606 passes, keeps 1,556 expected negatives, and moves
+from 1,986 to 1,943 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property ratchet moves from 145 to 146 domains and
+seeds and from 5,659 to 5,671 ordinary cases, and the evidence inventory moves
+from 123 to 124 families. The runtime ABI moves to `oseo-runtime-m5-109` with
+twelve new TypedArray code IDs and one realm intrinsic slot for the shared
+`Array.prototype.toString` identity; the generated-code entry points are
+unchanged.
 
 
 Ahead-of-time challenge boundary

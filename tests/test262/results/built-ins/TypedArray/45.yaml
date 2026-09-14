@@ -1,0 +1,108 @@
+group: built-ins/TypedArray
+key: "45"
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Symbol
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-length-symbol.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type.js:627:48:
+        error[OSEO2001]: TypedArray search and join methods are not
+        admitted yet.\n"'
+      unsupportedCapability: typed-array-search-and-join
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.species
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-returns-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

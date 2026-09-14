@@ -81,6 +81,23 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
         }
     } else if (result.status == OSEO_STATUS_NORMAL &&
                is_object(frame.slots[0])) {
+        /* A TypedArray's valid integer indices lead its own keys, and its
+         * property vector never stores a canonical numeric key. */
+        size_t index_count =
+            oseo_internal_typed_array_index_key_count(frame.slots[0]);
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < index_count;
+             index += 1u) {
+            result = oseo_internal_typed_array_index_key(context, index);
+            frame.slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_argument_list_append(
+                    context,
+                    frame.slots[1],
+                    frame.slots[2]
+                );
+            }
+        }
         uint64_t previous = UINT64_MAX;
         while (result.status == OSEO_STATUS_NORMAL) {
             OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
@@ -239,6 +256,18 @@ static OseoResult enumeration_own_key(
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
+    if (is_typed_array(level)) {
+        bool numeric = false;
+        size_t index = SIZE_MAX;
+        OseoResult result = oseo_internal_typed_array_numeric_key(
+            context, key, &numeric, &index);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        if (numeric) {
+            *found = oseo_internal_typed_array_has_index(level, index);
+            *enumerable = true;
+            return normal(oseo_undefined());
+        }
+    }
     if (is_proxy(level)) {
         OseoResult result = oseo_internal_proxy_get_own_property(
             context, level, key, found, &value, &attributes, &getter, &setter);
@@ -327,15 +356,6 @@ static OseoResult enumeration_collect(
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            (is_object(frame.slots[0]) || is_string(frame.slots[0]))) {
-        if (is_typed_array(frame.slots[0])) {
-            result = failure(
-                context,
-                "OSEO2001",
-                "TypedArray integer-indexed exotic operations are not "
-                "admitted yet."
-            );
-            break;
-        }
         result = enumeration_keys(context, frame.slots[0]);
         frame.slots[2] = result.value;
         for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {

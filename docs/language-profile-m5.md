@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 123
+M5a is complete. The normative family records described below inventory 124
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 18,768 reviewed cases: 15,226 passes, 1,556
-expected negatives, and 1,986 unsupported profile features. It records no
+The current manifest contains 19,105 reviewed cases: 15,606 passes, 1,556
+expected negatives, and 1,943 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6008,12 +6008,13 @@ allocates an independent backing buffer before conversion. Number and BigInt
 content types cannot mix. Integer conversions use modulo arithmetic,
 `Uint8ClampedArray` uses ties-to-even rounding, floating arrays retain their
 specified precision, and the BigInt arrays apply signed or unsigned modulo
-`2^64`. `ArrayBuffer.isView` recognizes every resulting view. The complete
-integer-indexed descriptor surface and the standard TypedArray prototype and
-static methods retain their later M5b graph owners. Lookups that reach those
-deferred prototype or static properties report the owning boundary instead of
-silently observing an absent property, and deletion aimed at a deferred
-property stops at the same boundary before any mutation.
+`2^64`. `ArrayBuffer.isView` recognizes every resulting view. The
+`typed-array-core` section below admits the integer-indexed descriptor surface
+and the core prototype; the remaining TypedArray prototype and static methods
+retain their later M5b graph owners. Lookups that reach those deferred
+prototype or static properties report the owning boundary instead of silently
+observing an absent property, and deletion aimed at a deferred property stops
+at the same boundary before any mutation.
 
 Fixed native and generated differential evidence at property seed
 `0x60006e00` covers all eleven element kinds, length, buffer, iterable,
@@ -6046,12 +6047,13 @@ available. One DataView receiver case and eleven `Object.seal` cases also
 promote after their concrete TypedArray inputs become available. The manifest
 reaches 18,768 cases: 15,226 passes, 1,556 expected negatives, and 1,986
 unsupported profile features with no semantic, harness, or infrastructure
-failures. The reviewed feature list retains the broader `TypedArray` gate for
-the later core node, and the dependency vocabulary gains
-`typed-array-constructors`. The component and heap kind move the runtime ABI
-to `oseo-runtime-m5-106`, and the public intrinsic table grows by 24 slots
-for the new constructor and prototype pairs. The value representation and
-the generated-code entry points are unchanged, and no graph state moves.
+failures. The reviewed feature list retained the broader `TypedArray` gate for
+the later core node, which has since admitted it and moved those 67 cases to
+`pass`, and the dependency vocabulary gains `typed-array-constructors`. The
+component and heap kind move the runtime ABI to `oseo-runtime-m5-106`, and the
+public intrinsic table grows by 24 slots for the new constructor and prototype
+pairs. The value representation and the generated-code entry points are
+unchanged, and no graph state moves.
 
 
 Proxy exotic objects
@@ -6623,6 +6625,94 @@ evidence inventory reaches 122 families. The runtime ABI remains
 `oseo-runtime-m5-105`, and the suite revision, applicable inventory,
 classification vocabulary, target-parity policy, forced-collection policy,
 and zero-override policy are unchanged.
+
+
+TypedArray core prototype
+-------------------------
+
+M5b node `typed-array-core` completes the integer-indexed exotic object for
+every TypedArray view. A canonical numeric string key never reaches ordinary
+lookup: `[[Get]]` reads the element or `undefined`, `[[HasProperty]]` and
+`[[GetOwnProperty]]` report only a valid integer index, and neither consults
+the prototype chain. A key such as `"-0"`, `"1.5"`, or an index beyond the
+current length is never valid. `[[DefineOwnProperty]]` accepts a valid index
+only with a writable, enumerable, configurable data descriptor and writes its
+value through the element conversion; `[[Delete]]` refuses exactly the valid
+indices. `[[Set]]` on the view converts the value before it checks the index,
+so an invalid index still observes the conversion. An ordinary object that
+inherits from a view creates its own property for a valid index and silently
+ignores an invalid one. `[[OwnPropertyKeys]]` lists the current indices ahead
+of the string and symbol keys, so `Object.keys`, `Object.entries`,
+`Object.assign`, object spread and rest, `for-in`, `JSON.stringify`,
+`Reflect.ownKeys`, and a trap-free `Proxy` observe the elements.
+`[[PreventExtensions]]` refuses a length-tracking view or a view over a
+resizable buffer, and sealing or freezing a view with elements throws because
+no element can become non-configurable.
+
+The `buffer`, `byteLength`, `byteOffset`, and `length` getters read the view's
+internal slots, so an own shadowing property or a replaced prototype does not
+change their answer, and a detached or out-of-bounds view reports zero
+lengths and offset. The `Symbol.toStringTag` getter returns the element-type
+name for a view and `undefined` for any other value. `at` validates the view
+before converting its index. `set` converts its offset first, then copies from
+an array-like source through per-element conversion that skips writes a
+detach or shrink invalidated, or from a TypedArray source whose bytes are
+snapshotted when both views share a buffer. `subarray` clamps against the
+length observed before its argument conversions, keeps a length-tracking
+result when the receiver tracks and the end is omitted, and constructs the
+result through the observable `constructor` and `Symbol.species` lookups with
+a content-type check. `entries`, `keys`, `values`, and the identical
+`Symbol.iterator` return Array iterators whose `next` reads the view's
+internal length and throws for a detached or out-of-bounds view without
+exhausting the iterator.
+
+`%TypedArray.prototype%.toString` is the original `Array.prototype.toString`
+function object, recorded when `%Array.prototype%` materializes. This node
+also materializes the `%TypedArray%[Symbol.species]` getter, because
+`subarray` cannot construct its default result without that lookup; the
+`typed-array-statics` node reuses it and still owns `from` and `of`. The
+iterative, mutation, search and join, and sorting prototype methods keep their
+explicit lookup boundaries, and so does own-key reflection over
+`%TypedArray.prototype%`, whose key list completes only after those nodes
+land.
+
+Fixed native and generated differential evidence at property seed
+`0x60007100` covers all eleven element kinds over fixed and length-tracking
+views with and without an element offset, grown, shrunk, and detached
+buffers, accessor reads, `at`, all three iterator methods, canonical key
+probes and definitions, array-like, cross-kind, and overlapping self `set`,
+and `subarray` with negative, clamped, and omitted bounds. Node.js, Deno, and
+both native specialization policies agree with collection forced at every
+safepoint, a false numeric hint deliberately misses its guard and reaches the
+compiled generic fallback, and an independent element-level model of the
+buffer computes every expected observation. Two native-only checks record
+where both reference engines diverge from ECMA-262: V8 seals a non-empty view
+and skips the `subarray` species content-type check.
+
+The reviewed test262 harness gains *testTypedArray.js*, unchanged in behavior
+except that it defines the `isPrimitive` predicate the reviewed base harness
+omits and drops the two `typeof Float16Array` probes, whose outcome is fixed
+on an ECMAScript 2025 host. The reviewed feature list gains `TypedArray` and
+`TypedArray.prototype.at`, and the dependency vocabulary gains
+`typed-array-core`. All 337 paths under the node's thirteen inventory roots
+are reviewed: 288 pass, 28 need the unreviewed
+*resizableArrayBufferUtils.js* include, whose subclass factory uses the
+`Function` constructor, seven need `SharedArrayBuffer`, and fourteen reach a
+TypedArray search and join method. Ninety-two already reviewed paths outside
+the roots move to pass now that the prototype surface and harness exist: the
+67 constructor cases held at the `TypedArray` feature gate, ten Array iterator
+detachment and resize cases, nine Array prototype cases over TypedArray
+inputs, five `ArrayBuffer.isView` cases, and one built-in subclassing case. No
+reviewed path moves away from `pass`. The manifest moves from 18,768 to
+19,105 cases and from 15,226 to 15,606 passes, keeps 1,556 expected
+negatives, and moves from 1,986 to 1,943 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property inventory
+reaches 146 domains and seeds with a 5,671-case ordinary budget, and the
+evidence inventory reaches 124 families. The runtime ABI moves to
+`oseo-runtime-m5-109`: the TypedArray code range gains twelve built-in code
+IDs and the public intrinsic table gains one slot for the shared
+`Array.prototype.toString` identity, while the value representation and the
+generated-code entry points are unchanged.
 
 
 Known gaps inside the claim

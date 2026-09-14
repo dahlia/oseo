@@ -491,7 +491,7 @@ test("reports descriptors through one FromPropertyDescriptor body", () => {
     new RegExp(
       String.raw`oseo_internal_to_object\(context, value\)[\s\S]*` +
         String.raw`snapshot_own_keys\(context, &frame, key_count\)[\s\S]*` +
-        String.raw`oseo_internal_own_property_descriptor\([\s\S]*` +
+        String.raw`own_property_query\([\s\S]*` +
         String.raw`from_property_descriptor\(context, &descriptor`,
       "u",
     ),
@@ -1250,8 +1250,43 @@ test("populates the realm-owned TypedArray constructor cluster", () => {
   assert.match(typedArrays, /typed_array_from_length/u);
   assert.match(memory, /OSEO_HEAP_TYPED_ARRAY/u);
   assert.match(memory, /viewed_buffer/u);
-  assert.match(properties, /oseo_internal_typed_array_get_index/u);
+  assert.match(properties, /oseo_internal_typed_array_own_property/u);
+  assert.match(properties, /oseo_internal_typed_array_numeric_key/u);
   assert.match(properties, /oseo_internal_typed_array_set_index/u);
+});
+
+test("installs the core TypedArray prototype surface", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const arrays = sources.get("runtime_array.c") ?? "";
+  const descriptors = sources.get("runtime_descriptor.c") ?? "";
+  const iterators = sources.get("runtime_iterator.c") ?? "";
+  const typedArrays = sources.get("runtime_typed_array.c") ?? "";
+
+  // toString shares the Array method's realm-slot identity, so replacing
+  // Array.prototype.toString before the cluster materializes cannot
+  // change what %TypedArray.prototype%.toString is.
+  assert.match(header, /OSEO_INTRINSIC_ARRAY_TO_STRING = 238/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 239/u);
+  assert.match(
+    arrays,
+    /OSEO_ARRAY_TO_STRING_CODE_ID[\s\S]*OSEO_INTRINSIC_ARRAY_TO_STRING\] =/u,
+  );
+  assert.match(
+    typedArrays,
+    new RegExp(
+      String.raw`static OseoResult typed_array_install_core\([\s\S]*` +
+        '"byteOffset"[\\s\\S]*"subarray"[\\s\\S]*' +
+        "OSEO_WELL_KNOWN_ITERATOR[\\s\\S]*OSEO_INTRINSIC_ARRAY_TO_STRING" +
+        "[\\s\\S]*OSEO_WELL_KNOWN_TO_STRING_TAG[\\s\\S]*" +
+        "OSEO_WELL_KNOWN_SPECIES",
+      "u",
+    ),
+  );
+  // The failure path of the cluster clears only its own slots.
+  assert.match(typedArrays, /index <= OSEO_INTRINSIC_BIGUINT64_ARRAY;/u);
+  assert.match(descriptors, /oseo_internal_typed_array_define_index\(/u);
+  assert.match(iterators, /oseo_internal_typed_array_iteration_length\(/u);
+  assert.doesNotMatch(typedArrays, /typed_array_deferred_accessor/u);
 });
 
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {

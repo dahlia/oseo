@@ -10625,6 +10625,564 @@ partitions:
   - group: built-ins/ThrowTypeError
     key: f9
     path: results/built-ins/ThrowTypeError/f9.yaml
+  - group: built-ins/TypedArray
+    key: "00"
+    path: results/built-ins/TypedArray/00.yaml
+  - group: built-ins/TypedArray
+    key: "02"
+    path: results/built-ins/TypedArray/02.yaml
+  - group: built-ins/TypedArray
+    key: "04"
+    path: results/built-ins/TypedArray/04.yaml
+  - group: built-ins/TypedArray
+    key: "05"
+    path: results/built-ins/TypedArray/05.yaml
+  - group: built-ins/TypedArray
+    key: "08"
+    path: results/built-ins/TypedArray/08.yaml
+  - group: built-ins/TypedArray
+    key: "09"
+    path: results/built-ins/TypedArray/09.yaml
+  - group: built-ins/TypedArray
+    key: 0a
+    path: results/built-ins/TypedArray/0a.yaml
+  - group: built-ins/TypedArray
+    key: 0c
+    path: results/built-ins/TypedArray/0c.yaml
+  - group: built-ins/TypedArray
+    key: 0d
+    path: results/built-ins/TypedArray/0d.yaml
+  - group: built-ins/TypedArray
+    key: 0e
+    path: results/built-ins/TypedArray/0e.yaml
+  - group: built-ins/TypedArray
+    key: "10"
+    path: results/built-ins/TypedArray/10.yaml
+  - group: built-ins/TypedArray
+    key: "11"
+    path: results/built-ins/TypedArray/11.yaml
+  - group: built-ins/TypedArray
+    key: "12"
+    path: results/built-ins/TypedArray/12.yaml
+  - group: built-ins/TypedArray
+    key: "13"
+    path: results/built-ins/TypedArray/13.yaml
+  - group: built-ins/TypedArray
+    key: "14"
+    path: results/built-ins/TypedArray/14.yaml
+  - group: built-ins/TypedArray
+    key: "16"
+    path: results/built-ins/TypedArray/16.yaml
+  - group: built-ins/TypedArray
+    key: "17"
+    path: results/built-ins/TypedArray/17.yaml
+  - group: built-ins/TypedArray
+    key: "18"
+    path: results/built-ins/TypedArray/18.yaml
+  - group: built-ins/TypedArray
+    key: "19"
+    path: results/built-ins/TypedArray/19.yaml
+  - group: built-ins/TypedArray
+    key: 1b
+    path: results/built-ins/TypedArray/1b.yaml
+  - group: built-ins/TypedArray
+    key: 1c
+    path: results/built-ins/TypedArray/1c.yaml
+  - group: built-ins/TypedArray
+    key: 1d
+    path: results/built-ins/TypedArray/1d.yaml
+  - group: built-ins/TypedArray
+    key: 1f
+    path: results/built-ins/TypedArray/1f.yaml
+  - group: built-ins/TypedArray
+    key: "20"
+    path: results/built-ins/TypedArray/20.yaml
+  - group: built-ins/TypedArray
+    key: "21"
+    path: results/built-ins/TypedArray/21.yaml
+  - group: built-ins/TypedArray
+    key: "23"
+    path: results/built-ins/TypedArray/23.yaml
+  - group: built-ins/TypedArray
+    key: "25"
+    path: results/built-ins/TypedArray/25.yaml
+  - group: built-ins/TypedArray
+    key: "26"
+    path: results/built-ins/TypedArray/26.yaml
+  - group: built-ins/TypedArray
+    key: "27"
+    path: results/built-ins/TypedArray/27.yaml
+  - group: built-ins/TypedArray
+    key: "28"
+    path: results/built-ins/TypedArray/28.yaml
+  - group: built-ins/TypedArray
+    key: "29"
+    path: results/built-ins/TypedArray/29.yaml
+  - group: built-ins/TypedArray
+    key: 2b
+    path: results/built-ins/TypedArray/2b.yaml
+  - group: built-ins/TypedArray
+    key: 2c
+    path: results/built-ins/TypedArray/2c.yaml
+  - group: built-ins/TypedArray
+    key: 2d
+    path: results/built-ins/TypedArray/2d.yaml
+  - group: built-ins/TypedArray
+    key: 2e
+    path: results/built-ins/TypedArray/2e.yaml
+  - group: built-ins/TypedArray
+    key: 2f
+    path: results/built-ins/TypedArray/2f.yaml
+  - group: built-ins/TypedArray
+    key: "30"
+    path: results/built-ins/TypedArray/30.yaml
+  - group: built-ins/TypedArray
+    key: "31"
+    path: results/built-ins/TypedArray/31.yaml
+  - group: built-ins/TypedArray
+    key: "32"
+    path: results/built-ins/TypedArray/32.yaml
+  - group: built-ins/TypedArray
+    key: "33"
+    path: results/built-ins/TypedArray/33.yaml
+  - group: built-ins/TypedArray
+    key: "34"
+    path: results/built-ins/TypedArray/34.yaml
+  - group: built-ins/TypedArray
+    key: "35"
+    path: results/built-ins/TypedArray/35.yaml
+  - group: built-ins/TypedArray
+    key: "37"
+    path: results/built-ins/TypedArray/37.yaml
+  - group: built-ins/TypedArray
+    key: "39"
+    path: results/built-ins/TypedArray/39.yaml
+  - group: built-ins/TypedArray
+    key: 3a
+    path: results/built-ins/TypedArray/3a.yaml
+  - group: built-ins/TypedArray
+    key: 3b
+    path: results/built-ins/TypedArray/3b.yaml
+  - group: built-ins/TypedArray
+    key: 3c
+    path: results/built-ins/TypedArray/3c.yaml
+  - group: built-ins/TypedArray
+    key: 3d
+    path: results/built-ins/TypedArray/3d.yaml
+  - group: built-ins/TypedArray
+    key: 3e
+    path: results/built-ins/TypedArray/3e.yaml
+  - group: built-ins/TypedArray
+    key: "40"
+    path: results/built-ins/TypedArray/40.yaml
+  - group: built-ins/TypedArray
+    key: "44"
+    path: results/built-ins/TypedArray/44.yaml
+  - group: built-ins/TypedArray
+    key: "45"
+    path: results/built-ins/TypedArray/45.yaml
+  - group: built-ins/TypedArray
+    key: "49"
+    path: results/built-ins/TypedArray/49.yaml
+  - group: built-ins/TypedArray
+    key: 4a
+    path: results/built-ins/TypedArray/4a.yaml
+  - group: built-ins/TypedArray
+    key: 4b
+    path: results/built-ins/TypedArray/4b.yaml
+  - group: built-ins/TypedArray
+    key: 4e
+    path: results/built-ins/TypedArray/4e.yaml
+  - group: built-ins/TypedArray
+    key: 4f
+    path: results/built-ins/TypedArray/4f.yaml
+  - group: built-ins/TypedArray
+    key: "50"
+    path: results/built-ins/TypedArray/50.yaml
+  - group: built-ins/TypedArray
+    key: "51"
+    path: results/built-ins/TypedArray/51.yaml
+  - group: built-ins/TypedArray
+    key: "52"
+    path: results/built-ins/TypedArray/52.yaml
+  - group: built-ins/TypedArray
+    key: "53"
+    path: results/built-ins/TypedArray/53.yaml
+  - group: built-ins/TypedArray
+    key: "54"
+    path: results/built-ins/TypedArray/54.yaml
+  - group: built-ins/TypedArray
+    key: "55"
+    path: results/built-ins/TypedArray/55.yaml
+  - group: built-ins/TypedArray
+    key: "56"
+    path: results/built-ins/TypedArray/56.yaml
+  - group: built-ins/TypedArray
+    key: "57"
+    path: results/built-ins/TypedArray/57.yaml
+  - group: built-ins/TypedArray
+    key: "58"
+    path: results/built-ins/TypedArray/58.yaml
+  - group: built-ins/TypedArray
+    key: "59"
+    path: results/built-ins/TypedArray/59.yaml
+  - group: built-ins/TypedArray
+    key: 5d
+    path: results/built-ins/TypedArray/5d.yaml
+  - group: built-ins/TypedArray
+    key: 5e
+    path: results/built-ins/TypedArray/5e.yaml
+  - group: built-ins/TypedArray
+    key: 5f
+    path: results/built-ins/TypedArray/5f.yaml
+  - group: built-ins/TypedArray
+    key: "60"
+    path: results/built-ins/TypedArray/60.yaml
+  - group: built-ins/TypedArray
+    key: "62"
+    path: results/built-ins/TypedArray/62.yaml
+  - group: built-ins/TypedArray
+    key: "64"
+    path: results/built-ins/TypedArray/64.yaml
+  - group: built-ins/TypedArray
+    key: "65"
+    path: results/built-ins/TypedArray/65.yaml
+  - group: built-ins/TypedArray
+    key: "67"
+    path: results/built-ins/TypedArray/67.yaml
+  - group: built-ins/TypedArray
+    key: "69"
+    path: results/built-ins/TypedArray/69.yaml
+  - group: built-ins/TypedArray
+    key: 6a
+    path: results/built-ins/TypedArray/6a.yaml
+  - group: built-ins/TypedArray
+    key: 6b
+    path: results/built-ins/TypedArray/6b.yaml
+  - group: built-ins/TypedArray
+    key: 6c
+    path: results/built-ins/TypedArray/6c.yaml
+  - group: built-ins/TypedArray
+    key: 6d
+    path: results/built-ins/TypedArray/6d.yaml
+  - group: built-ins/TypedArray
+    key: 6e
+    path: results/built-ins/TypedArray/6e.yaml
+  - group: built-ins/TypedArray
+    key: 6f
+    path: results/built-ins/TypedArray/6f.yaml
+  - group: built-ins/TypedArray
+    key: "70"
+    path: results/built-ins/TypedArray/70.yaml
+  - group: built-ins/TypedArray
+    key: "71"
+    path: results/built-ins/TypedArray/71.yaml
+  - group: built-ins/TypedArray
+    key: "72"
+    path: results/built-ins/TypedArray/72.yaml
+  - group: built-ins/TypedArray
+    key: "74"
+    path: results/built-ins/TypedArray/74.yaml
+  - group: built-ins/TypedArray
+    key: "75"
+    path: results/built-ins/TypedArray/75.yaml
+  - group: built-ins/TypedArray
+    key: "76"
+    path: results/built-ins/TypedArray/76.yaml
+  - group: built-ins/TypedArray
+    key: "77"
+    path: results/built-ins/TypedArray/77.yaml
+  - group: built-ins/TypedArray
+    key: "78"
+    path: results/built-ins/TypedArray/78.yaml
+  - group: built-ins/TypedArray
+    key: "79"
+    path: results/built-ins/TypedArray/79.yaml
+  - group: built-ins/TypedArray
+    key: 7a
+    path: results/built-ins/TypedArray/7a.yaml
+  - group: built-ins/TypedArray
+    key: 7b
+    path: results/built-ins/TypedArray/7b.yaml
+  - group: built-ins/TypedArray
+    key: 7c
+    path: results/built-ins/TypedArray/7c.yaml
+  - group: built-ins/TypedArray
+    key: 7d
+    path: results/built-ins/TypedArray/7d.yaml
+  - group: built-ins/TypedArray
+    key: 7f
+    path: results/built-ins/TypedArray/7f.yaml
+  - group: built-ins/TypedArray
+    key: "80"
+    path: results/built-ins/TypedArray/80.yaml
+  - group: built-ins/TypedArray
+    key: "81"
+    path: results/built-ins/TypedArray/81.yaml
+  - group: built-ins/TypedArray
+    key: "82"
+    path: results/built-ins/TypedArray/82.yaml
+  - group: built-ins/TypedArray
+    key: "83"
+    path: results/built-ins/TypedArray/83.yaml
+  - group: built-ins/TypedArray
+    key: "84"
+    path: results/built-ins/TypedArray/84.yaml
+  - group: built-ins/TypedArray
+    key: "85"
+    path: results/built-ins/TypedArray/85.yaml
+  - group: built-ins/TypedArray
+    key: "86"
+    path: results/built-ins/TypedArray/86.yaml
+  - group: built-ins/TypedArray
+    key: "87"
+    path: results/built-ins/TypedArray/87.yaml
+  - group: built-ins/TypedArray
+    key: "89"
+    path: results/built-ins/TypedArray/89.yaml
+  - group: built-ins/TypedArray
+    key: 8b
+    path: results/built-ins/TypedArray/8b.yaml
+  - group: built-ins/TypedArray
+    key: 8d
+    path: results/built-ins/TypedArray/8d.yaml
+  - group: built-ins/TypedArray
+    key: 8e
+    path: results/built-ins/TypedArray/8e.yaml
+  - group: built-ins/TypedArray
+    key: 8f
+    path: results/built-ins/TypedArray/8f.yaml
+  - group: built-ins/TypedArray
+    key: "91"
+    path: results/built-ins/TypedArray/91.yaml
+  - group: built-ins/TypedArray
+    key: "92"
+    path: results/built-ins/TypedArray/92.yaml
+  - group: built-ins/TypedArray
+    key: "96"
+    path: results/built-ins/TypedArray/96.yaml
+  - group: built-ins/TypedArray
+    key: "98"
+    path: results/built-ins/TypedArray/98.yaml
+  - group: built-ins/TypedArray
+    key: "99"
+    path: results/built-ins/TypedArray/99.yaml
+  - group: built-ins/TypedArray
+    key: 9b
+    path: results/built-ins/TypedArray/9b.yaml
+  - group: built-ins/TypedArray
+    key: 9c
+    path: results/built-ins/TypedArray/9c.yaml
+  - group: built-ins/TypedArray
+    key: 9e
+    path: results/built-ins/TypedArray/9e.yaml
+  - group: built-ins/TypedArray
+    key: 9f
+    path: results/built-ins/TypedArray/9f.yaml
+  - group: built-ins/TypedArray
+    key: a0
+    path: results/built-ins/TypedArray/a0.yaml
+  - group: built-ins/TypedArray
+    key: a1
+    path: results/built-ins/TypedArray/a1.yaml
+  - group: built-ins/TypedArray
+    key: a2
+    path: results/built-ins/TypedArray/a2.yaml
+  - group: built-ins/TypedArray
+    key: a4
+    path: results/built-ins/TypedArray/a4.yaml
+  - group: built-ins/TypedArray
+    key: a6
+    path: results/built-ins/TypedArray/a6.yaml
+  - group: built-ins/TypedArray
+    key: a7
+    path: results/built-ins/TypedArray/a7.yaml
+  - group: built-ins/TypedArray
+    key: a8
+    path: results/built-ins/TypedArray/a8.yaml
+  - group: built-ins/TypedArray
+    key: aa
+    path: results/built-ins/TypedArray/aa.yaml
+  - group: built-ins/TypedArray
+    key: ab
+    path: results/built-ins/TypedArray/ab.yaml
+  - group: built-ins/TypedArray
+    key: ad
+    path: results/built-ins/TypedArray/ad.yaml
+  - group: built-ins/TypedArray
+    key: ae
+    path: results/built-ins/TypedArray/ae.yaml
+  - group: built-ins/TypedArray
+    key: af
+    path: results/built-ins/TypedArray/af.yaml
+  - group: built-ins/TypedArray
+    key: b1
+    path: results/built-ins/TypedArray/b1.yaml
+  - group: built-ins/TypedArray
+    key: b2
+    path: results/built-ins/TypedArray/b2.yaml
+  - group: built-ins/TypedArray
+    key: b3
+    path: results/built-ins/TypedArray/b3.yaml
+  - group: built-ins/TypedArray
+    key: b6
+    path: results/built-ins/TypedArray/b6.yaml
+  - group: built-ins/TypedArray
+    key: b7
+    path: results/built-ins/TypedArray/b7.yaml
+  - group: built-ins/TypedArray
+    key: b8
+    path: results/built-ins/TypedArray/b8.yaml
+  - group: built-ins/TypedArray
+    key: b9
+    path: results/built-ins/TypedArray/b9.yaml
+  - group: built-ins/TypedArray
+    key: ba
+    path: results/built-ins/TypedArray/ba.yaml
+  - group: built-ins/TypedArray
+    key: bb
+    path: results/built-ins/TypedArray/bb.yaml
+  - group: built-ins/TypedArray
+    key: bc
+    path: results/built-ins/TypedArray/bc.yaml
+  - group: built-ins/TypedArray
+    key: bd
+    path: results/built-ins/TypedArray/bd.yaml
+  - group: built-ins/TypedArray
+    key: be
+    path: results/built-ins/TypedArray/be.yaml
+  - group: built-ins/TypedArray
+    key: bf
+    path: results/built-ins/TypedArray/bf.yaml
+  - group: built-ins/TypedArray
+    key: c1
+    path: results/built-ins/TypedArray/c1.yaml
+  - group: built-ins/TypedArray
+    key: c2
+    path: results/built-ins/TypedArray/c2.yaml
+  - group: built-ins/TypedArray
+    key: c3
+    path: results/built-ins/TypedArray/c3.yaml
+  - group: built-ins/TypedArray
+    key: c4
+    path: results/built-ins/TypedArray/c4.yaml
+  - group: built-ins/TypedArray
+    key: c5
+    path: results/built-ins/TypedArray/c5.yaml
+  - group: built-ins/TypedArray
+    key: c6
+    path: results/built-ins/TypedArray/c6.yaml
+  - group: built-ins/TypedArray
+    key: c7
+    path: results/built-ins/TypedArray/c7.yaml
+  - group: built-ins/TypedArray
+    key: c8
+    path: results/built-ins/TypedArray/c8.yaml
+  - group: built-ins/TypedArray
+    key: cb
+    path: results/built-ins/TypedArray/cb.yaml
+  - group: built-ins/TypedArray
+    key: cc
+    path: results/built-ins/TypedArray/cc.yaml
+  - group: built-ins/TypedArray
+    key: cd
+    path: results/built-ins/TypedArray/cd.yaml
+  - group: built-ins/TypedArray
+    key: ce
+    path: results/built-ins/TypedArray/ce.yaml
+  - group: built-ins/TypedArray
+    key: cf
+    path: results/built-ins/TypedArray/cf.yaml
+  - group: built-ins/TypedArray
+    key: d0
+    path: results/built-ins/TypedArray/d0.yaml
+  - group: built-ins/TypedArray
+    key: d1
+    path: results/built-ins/TypedArray/d1.yaml
+  - group: built-ins/TypedArray
+    key: d3
+    path: results/built-ins/TypedArray/d3.yaml
+  - group: built-ins/TypedArray
+    key: d5
+    path: results/built-ins/TypedArray/d5.yaml
+  - group: built-ins/TypedArray
+    key: d6
+    path: results/built-ins/TypedArray/d6.yaml
+  - group: built-ins/TypedArray
+    key: d7
+    path: results/built-ins/TypedArray/d7.yaml
+  - group: built-ins/TypedArray
+    key: d8
+    path: results/built-ins/TypedArray/d8.yaml
+  - group: built-ins/TypedArray
+    key: da
+    path: results/built-ins/TypedArray/da.yaml
+  - group: built-ins/TypedArray
+    key: db
+    path: results/built-ins/TypedArray/db.yaml
+  - group: built-ins/TypedArray
+    key: e1
+    path: results/built-ins/TypedArray/e1.yaml
+  - group: built-ins/TypedArray
+    key: e2
+    path: results/built-ins/TypedArray/e2.yaml
+  - group: built-ins/TypedArray
+    key: e3
+    path: results/built-ins/TypedArray/e3.yaml
+  - group: built-ins/TypedArray
+    key: e6
+    path: results/built-ins/TypedArray/e6.yaml
+  - group: built-ins/TypedArray
+    key: e8
+    path: results/built-ins/TypedArray/e8.yaml
+  - group: built-ins/TypedArray
+    key: ea
+    path: results/built-ins/TypedArray/ea.yaml
+  - group: built-ins/TypedArray
+    key: eb
+    path: results/built-ins/TypedArray/eb.yaml
+  - group: built-ins/TypedArray
+    key: ec
+    path: results/built-ins/TypedArray/ec.yaml
+  - group: built-ins/TypedArray
+    key: ed
+    path: results/built-ins/TypedArray/ed.yaml
+  - group: built-ins/TypedArray
+    key: ee
+    path: results/built-ins/TypedArray/ee.yaml
+  - group: built-ins/TypedArray
+    key: ef
+    path: results/built-ins/TypedArray/ef.yaml
+  - group: built-ins/TypedArray
+    key: f0
+    path: results/built-ins/TypedArray/f0.yaml
+  - group: built-ins/TypedArray
+    key: f1
+    path: results/built-ins/TypedArray/f1.yaml
+  - group: built-ins/TypedArray
+    key: f4
+    path: results/built-ins/TypedArray/f4.yaml
+  - group: built-ins/TypedArray
+    key: f6
+    path: results/built-ins/TypedArray/f6.yaml
+  - group: built-ins/TypedArray
+    key: f8
+    path: results/built-ins/TypedArray/f8.yaml
+  - group: built-ins/TypedArray
+    key: f9
+    path: results/built-ins/TypedArray/f9.yaml
+  - group: built-ins/TypedArray
+    key: fa
+    path: results/built-ins/TypedArray/fa.yaml
+  - group: built-ins/TypedArray
+    key: fd
+    path: results/built-ins/TypedArray/fd.yaml
+  - group: built-ins/TypedArray
+    key: fe
+    path: results/built-ins/TypedArray/fe.yaml
+  - group: built-ins/TypedArray
+    key: ff
+    path: results/built-ins/TypedArray/ff.yaml
   - group: built-ins/TypedArrayConstructors
     key: "05"
     path: results/built-ins/TypedArrayConstructors/05.yaml
@@ -14608,9 +15166,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 15226
+  passes: 15606
   semanticFailures: 0
-  unsupportedProfileFeatures: 1986
+  unsupportedProfileFeatures: 1943
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -14623,9 +15181,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 649
+      passes: 654
       semanticFailures: 0
-      unsupportedProfileFeatures: 93
+      unsupportedProfileFeatures: 88
     - dependency: async-functions
       expectedNegatives: 161
       harnessFailures: 0
@@ -14651,9 +15209,9 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 868
+      passes: 869
       semanticFailures: 0
-      unsupportedProfileFeatures: 61
+      unsupportedProfileFeatures: 60
     - dependency: control-flow
       expectedNegatives: 225
       harnessFailures: 0
@@ -14714,9 +15272,9 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4080
+      passes: 4099
       semanticFailures: 0
-      unsupportedProfileFeatures: 868
+      unsupportedProfileFeatures: 849
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -14728,9 +15286,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1129
+      passes: 1139
       semanticFailures: 0
-      unsupportedProfileFeatures: 427
+      unsupportedProfileFeatures: 417
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -14777,9 +15335,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9645
+      passes: 9664
       semanticFailures: 0
-      unsupportedProfileFeatures: 432
+      unsupportedProfileFeatures: 413
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -14833,9 +15391,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 658
+      passes: 668
       semanticFailures: 0
-      unsupportedProfileFeatures: 84
+      unsupportedProfileFeatures: 74
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -14847,9 +15405,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 81
       semanticFailures: 0
-      unsupportedProfileFeatures: 67
+      unsupportedProfileFeatures: 0
+    - dependency: typed-array-core
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 288
+      semanticFailures: 0
+      unsupportedProfileFeatures: 49
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -14869,23 +15434,23 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2723
+      passes: 2732
       semanticFailures: 0
-      unsupportedProfileFeatures: 177
+      unsupportedProfileFeatures: 168
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 173
+      passes: 178
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 14
     - group: built-ins/ArrayIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17
+      passes: 27
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 0
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -15110,13 +15675,20 @@ summary:
       passes: 13
       semanticFailures: 0
       unsupportedProfileFeatures: 1
+    - group: built-ins/TypedArray
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 288
+      semanticFailures: 0
+      unsupportedProfileFeatures: 49
     - group: built-ins/TypedArrayConstructors
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 81
       semanticFailures: 0
-      unsupportedProfileFeatures: 67
+      unsupportedProfileFeatures: 0
     - group: built-ins/decodeURI
       expectedNegatives: 0
       harnessFailures: 0
@@ -15289,6 +15861,6 @@ summary:
       expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1224
+      passes: 1225
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 71

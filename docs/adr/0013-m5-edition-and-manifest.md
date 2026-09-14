@@ -393,6 +393,21 @@ inventory root carry it. The twelve reviewed rows outside that root whose
 only unmet prerequisite was a concrete TypedArray constructor move to `pass`
 and retain their existing tags.
 
+The M5b `typed-array-core` node extends the vocabulary with
+`typed-array-core`. The tag identifies the integer-indexed exotic object's
+internal methods over canonical numeric keys, the `%TypedArray.prototype%`
+`buffer`, `byteLength`, `byteOffset`, `length`, and `Symbol.toStringTag`
+getters, and the `at`, `set`, `subarray`, `entries`, `keys`, `values`, and
+`Symbol.iterator` methods with the species construction and Array iterator
+steps they perform. One tag covers the surface because every member reads the
+same view record through the same bounds and conversion rules. The tag is
+distinct from `typed-array-constructors`, which names view creation, and from
+the later TypedArray method nodes, which add algorithms over this surface. The
+reviewed rows under the node's thirteen inventory roots carry it. The
+reviewed rows outside those roots whose only unmet prerequisites were this
+surface, the reviewed *testTypedArray.js* harness, or the `TypedArray`
+feature gate move to `pass` and retain their existing tags.
+
 
 Alternatives considered
 -----------------------

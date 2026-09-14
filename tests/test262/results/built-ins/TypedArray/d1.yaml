@@ -1,0 +1,204 @@
+group: built-ins/TypedArray
+key: d1
+results:
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+        - Symbol
+        - Symbol.iterator
+        - arrow-function
+        - TypedArray
+      flags: []
+      includes:
+        - isConstructor.js
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/Symbol.iterator/not-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - isConstructor.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-offset-tointeger.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-src-byteoffset-internal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/typedarray-arg-return-abrupt-from-tointeger-offset.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - SharedArrayBuffer
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type-sab.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-core
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - SharedArrayBuffer
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/subarray/result-is-new-instance-with-shared-buffer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
