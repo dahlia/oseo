@@ -5,5 +5,5 @@ delivers: "Designs and implements the collector's ephemeron tracing,
   weak-reference clearing, and finalization scheduling contract before the
   JavaScript weak collections expose it."
 dependencies: []
-landed: false
+landed: true
 status: ready
