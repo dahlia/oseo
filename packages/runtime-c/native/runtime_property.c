@@ -17,6 +17,63 @@ static OseoResult typed_array_exotic_error(OseoContext *context) {
     );
 }
 
+/*
+ * The TypedArray [[Set]] prelude (10.4.5.5 steps 1.a and 1.b) for a view
+ * reached on a set walk, whether the view is the receiver itself or a
+ * prototype of an ordinary receiver. `*answered` reports that the view
+ * settled the write: an admitted index writes the element when the view
+ * is the receiver, and an invalid index with a foreign receiver reports
+ * true without writing anywhere. `*element` reports a valid index with a
+ * foreign receiver, whose ordinary descriptor is always a writable data
+ * property, so the caller stops the walk and writes to the receiver. A
+ * non-index canonical numeric key stays at the deferred boundary. Any
+ * other key leaves both flags clear and the walk continues ordinarily.
+ */
+static OseoResult typed_array_set_step(
+    OseoContext *context,
+    OseoValue view,
+    OseoValue key,
+    OseoValue value,
+    OseoValue receiver,
+    bool *answered,
+    bool *element
+) {
+    *answered = false;
+    *element = false;
+    uint32_t typed_index = 0u;
+    if (oseo_internal_array_index(key, &typed_index)) {
+        if (view == receiver) {
+            bool present = false;
+            OseoResult stored = oseo_internal_typed_array_set_index(
+                context,
+                view,
+                typed_index,
+                value,
+                &present
+            );
+            if (stored.status != OSEO_STATUS_NORMAL) return stored;
+            (void)present;
+            *answered = true;
+            return normal(value);
+        }
+        if (!oseo_internal_typed_array_has_index(view, typed_index)) {
+            *answered = true;
+            return normal(value);
+        }
+        *element = true;
+        return normal(value);
+    }
+    bool numeric_index = false;
+    OseoResult classified = oseo_internal_canonical_numeric_index(
+        context,
+        key,
+        &numeric_index
+    );
+    if (classified.status != OSEO_STATUS_NORMAL) return classified;
+    if (numeric_index) return typed_array_exotic_error(context);
+    return normal(value);
+}
+
 OseoResult oseo_internal_require_property_key(
     OseoContext *context,
     OseoValue key
@@ -298,32 +355,6 @@ OseoResult oseo_object_set(
             NULL
         );
     }
-    uint32_t typed_index = 0u;
-    if (is_typed_array(object_value) &&
-        oseo_internal_array_index(key, &typed_index)) {
-        bool present = false;
-        OseoResult result = oseo_internal_typed_array_set_index(
-            context,
-            object_value,
-            typed_index,
-            value,
-            &present
-        );
-        if (result.status != OSEO_STATUS_NORMAL) return result;
-        (void)present;
-        return normal(value);
-    }
-    bool numeric_index = false;
-    OseoResult classified = normal(oseo_undefined());
-    if (is_typed_array(object_value)) {
-        classified = oseo_internal_canonical_numeric_index(
-            context,
-            key,
-            &numeric_index
-        );
-    }
-    if (classified.status != OSEO_STATUS_NORMAL) return classified;
-    if (numeric_index) return typed_array_exotic_error(context);
     uint32_t receiver_index = 0u;
     bool extends_array = is_array(object_value) &&
         oseo_internal_array_index(key, &receiver_index) &&
@@ -357,6 +388,27 @@ OseoResult oseo_object_set(
                 );
             }
             return normal(value);
+        }
+        if (is_typed_array(current)) {
+            /* A view anywhere on the walk owns the [[Set]] for a
+             * canonical numeric key, so an ordinary receiver inheriting
+             * from a TypedArray never materializes an invalid index as
+             * its own property. */
+            bool answered = false;
+            bool element = false;
+            OseoResult stepped = typed_array_set_step(
+                context,
+                current,
+                key,
+                value,
+                object_value,
+                &answered,
+                &element
+            );
+            if (stepped.status != OSEO_STATUS_NORMAL || answered) {
+                return stepped;
+            }
+            if (element) break;
         }
         OseoValue own_value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
@@ -517,42 +569,22 @@ OseoResult oseo_internal_set_with_receiver(
             *refusal = "Cannot assign to a module namespace property.";
             return normal(value);
         }
-        uint32_t typed_index = 0u;
-        if (is_typed_array(current) &&
-            oseo_internal_array_index(key, &typed_index)) {
-            /* The TypedArray [[Set]] (10.4.5.5) answers a canonical
-             * numeric index itself when the view is the receiver, and an
-             * invalid index with a foreign receiver reports true without
-             * writing anywhere. Only a valid index with a foreign
-             * receiver continues into the ordinary walk, whose element
-             * descriptor is always a writable data property. */
-            if (current == receiver) {
-                bool present = false;
-                OseoResult stored = oseo_internal_typed_array_set_index(
-                    context,
-                    current,
-                    typed_index,
-                    value,
-                    &present
-                );
-                if (stored.status != OSEO_STATUS_NORMAL) return stored;
-                (void)present;
-                return normal(value);
-            }
-            if (!oseo_internal_typed_array_has_index(current, typed_index)) {
-                return normal(value);
-            }
-            break;
-        }
         if (is_typed_array(current)) {
-            bool numeric_index = false;
-            OseoResult classified = oseo_internal_canonical_numeric_index(
+            bool answered = false;
+            bool element = false;
+            OseoResult stepped = typed_array_set_step(
                 context,
+                current,
                 key,
-                &numeric_index
+                value,
+                receiver,
+                &answered,
+                &element
             );
-            if (classified.status != OSEO_STATUS_NORMAL) return classified;
-            if (numeric_index) return typed_array_exotic_error(context);
+            if (stepped.status != OSEO_STATUS_NORMAL || answered) {
+                return stepped;
+            }
+            if (element) break;
         }
         OseoValue own_value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};

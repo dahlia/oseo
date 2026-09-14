@@ -490,6 +490,44 @@ console.log(
   shrinkObserved,
   shrinkingView[0],
 );
+const inheritedBase = new Uint8Array(1);
+const inheritedReceiver = Object.create(inheritedBase);
+inheritedReceiver[5] = 7;
+inheritedReceiver["1"] = 3;
+inheritedReceiver[0] = 9;
+inheritedReceiver.label = "own";
+console.log(
+  "inherited typed index set",
+  Object.hasOwn(inheritedReceiver, "5"),
+  inheritedReceiver[5],
+  Object.hasOwn(inheritedReceiver, "1"),
+  Object.hasOwn(inheritedReceiver, "0"),
+  inheritedReceiver[0],
+  inheritedBase[0],
+  Reflect.set(inheritedReceiver, "5", 7),
+  Object.hasOwn(inheritedReceiver, "5"),
+  Object.hasOwn(inheritedReceiver, "label"),
+  inheritedReceiver.label,
+);
+const inheritedStrict = Object.create(new Uint8Array(1));
+console.log(
+  "inherited strict invalid index",
+  (function () {
+    "use strict";
+    inheritedStrict[5] = 7;
+    return Object.hasOwn(inheritedStrict, "5");
+  })(),
+);
+const detachedInheritedBuffer = new ArrayBuffer(1);
+const detachedInheritedBase = new Uint8Array(detachedInheritedBuffer);
+detachedInheritedBuffer.transfer();
+const detachedInheritedReceiver = Object.create(detachedInheritedBase);
+detachedInheritedReceiver[0] = 7;
+console.log(
+  "inherited detached index",
+  Object.hasOwn(detachedInheritedReceiver, "0"),
+  detachedInheritedReceiver[0],
+);
 class Derived extends Uint8Array {}
 const derived = new Derived([4, 6]);
 console.log(
