@@ -6,5 +6,5 @@ delivers: "Implements the reviewed promiseHelper.js include so its sequence
 dependencies:
   - array-prototype-iterative
   - promise-intrinsic
-landed: false
+landed: true
 status: ready
