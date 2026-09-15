@@ -15,4 +15,4 @@ inventory:
 dependencies:
   - typed-array-core
 landed: false
-status: blocked
+status: ready

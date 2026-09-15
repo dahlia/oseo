@@ -17,4 +17,4 @@ dependencies:
   - array-prototype-species-mapping
   - typed-array-core
 landed: false
-status: blocked
+status: ready

@@ -13,4 +13,4 @@ dependencies:
   - array-buffer
   - typed-array-core
 landed: false
-status: blocked
+status: ready

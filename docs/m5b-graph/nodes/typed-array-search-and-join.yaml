@@ -20,4 +20,4 @@ dependencies:
   - string-prototype-access
   - typed-array-core
 landed: false
-status: blocked
+status: ready
