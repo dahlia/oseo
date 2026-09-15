@@ -3666,6 +3666,38 @@ OseoResult oseo_internal_jobs_drain_until(
 );
 bool oseo_internal_jobs_reached_promise(OseoValue promise);
 /*
+ * The scheduler side of the clock boundary, owned by runtime_clock.c.
+ * `clock_start` takes the monotonic origin at the realm's first scheduler
+ * clock use and is idempotent. `clock_now` reports whole milliseconds
+ * elapsed since that origin, never less than the cached scheduler time.
+ * `clock_wait_until` performs one adapter wait toward a deadline in that
+ * millisecond domain; it may return before the deadline, so the caller
+ * rereads `clock_now`. A missing monotonic clock or a failed wait is an
+ * owned host diagnostic, never a substituted real-time reading.
+ */
+OseoResult oseo_internal_clock_start(OseoContext *context);
+/* Closes the realm's adapter during context destruction. */
+void oseo_internal_clock_destroy(OseoContext *context);
+OseoResult oseo_internal_clock_now(
+    OseoContext *context,
+    uint64_t *milliseconds
+);
+OseoResult oseo_internal_clock_wait_until(
+    OseoContext *context,
+    uint64_t deadline
+);
+/*
+ * The platform clock adapter, owned by runtime_clock_posix.c, the one
+ * translation unit that includes operating-system headers. It selects its
+ * facilities once, honoring OSEO_CLOCK_RESTRICT_* bits, stores its state
+ * through `state`, and always returns an adapter: an unavailable
+ * facility is a recorded fallback or an absent capability, not a NULL.
+ */
+const OseoClockAdapter *oseo_internal_platform_clock_open(
+    unsigned restrictions,
+    void **state
+);
+/*
  * Await one value from a position the frontend did not split into
  * continuations, which is one step of a `for await` head. It runs the
  * scheduler until the awaited promise settles and reports a stalled

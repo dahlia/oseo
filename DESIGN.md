@@ -656,16 +656,24 @@ frame before a queued reaction resumes it. Each timer task drains microtasks
 before the next timer, and pending promises alone do not keep the executable
 alive.
 
-The runtime ABI is the replacement boundary for a future platform event
-adapter. Streams, `fetch()`, I/O readiness, wakeups, and wall-clock observation
-remain outside M4 and must extend the same documented scheduling and liveness
-model. [*PLAN-NIO.md*](./PLAN-NIO.md) owns the measured probes, deterministic
-test adapter, platform capability model, and decision that will turn this
-replacement boundary into a native I/O interface. Platform completions become
-runtime tasks; they do not call generated functions directly or take ownership
-of the ECMAScript job queue. Monotonic time drives waits and timer deadlines;
-epoch-based real time supplies `Date` and other civil-time observations.
-Adjustment of the real-time clock must not accelerate or delay scheduled work.
+The runtime ABI is the replacement boundary for a platform event adapter.
+Streams, `fetch()`, and I/O readiness remain outside M4 and must extend the
+same documented scheduling and liveness model. [*PLAN-NIO.md*](./PLAN-NIO.md)
+owns the measured probes, deterministic test adapter, platform capability
+model, and decisions that turn this replacement boundary into a native I/O
+interface. Platform completions become runtime tasks; they do not call
+generated functions directly or take ownership of the ECMAScript job queue.
+Monotonic time drives waits and timer deadlines; epoch-based real time supplies
+`Date` and other civil-time observations. Adjustment of the real-time clock
+must not accelerate or delay scheduled work.
+
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md) implements the first
+part of that interface. The runtime reads monotonic and real time and waits
+through a platform-neutral clock adapter with a coalescing cross-thread
+wakeup, so production timer turns take monotonic elapsed time while the M4
+ordering rules stay unchanged. The Linux and macOS adapter links only the C
+library and starts no thread, and a deterministic adapter outside the runtime
+assets keeps the logical clock as the test oracle.
 
 
 Native backend

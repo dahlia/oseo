@@ -108,6 +108,11 @@ void oseo_context_init(
     );
     context->random_state[0] = seed_word(&seed);
     context->random_state[1] = seed_word(&seed) | UINT64_C(1);
+    context->clock_adapter = NULL;
+    context->clock_state = NULL;
+    context->clock_origin = 0u;
+    context->clock_restrictions = 0u;
+    context->clock_started = false;
     context->clock_milliseconds = 0u;
     context->next_timer_id = 1u;
     context->next_timer_order = 0u;
@@ -172,6 +177,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->finalization_tail = oseo_undefined();
     context->finalization_pending_count = 0u;
     oseo_collect(context);
+    oseo_internal_clock_destroy(context);
 }
 
 void oseo_context_location(

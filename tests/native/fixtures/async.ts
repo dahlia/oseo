@@ -370,6 +370,47 @@ console.log("scheduled");
 `,
   },
   {
+    // Every host derives these deadlines from monotonic elapsed time, so
+    // this program really waits. Timers are spaced at least 30 ms apart
+    // so a stalled reference host cannot reorder distinct deadlines, while
+    // equal deadlines must keep registration order everywhere.
+    name: "monotonic-timer-wakeups",
+    source: `
+function log(label) { console.log(label); }
+function delayAfter(base: number, step: number) {
+  return base + step;
+}
+const far = setTimeout(log, 60000, "canceled far timer");
+setTimeout(function first() {
+  log("first task");
+  Promise.resolve("first microtask").then(log);
+  setTimeout(log, 0, "nested zero delay");
+  Promise.resolve("second microtask").then(function chained(label) {
+    log(label);
+    Promise.resolve("chained microtask").then(log);
+  });
+}, 10);
+setTimeout(log, delayAfter(30, 10), "equal first");
+setTimeout(log, delayAfter(0.5, 39.5), "equal second");
+setTimeout(log, delayAfter(30, 10), "equal third");
+setTimeout(function late() {
+  log("late task");
+  setTimeout(function later() {
+    log("later task");
+    clearTimeout(far);
+  }, 40);
+}, 80);
+log("scheduled");
+`,
+    specialization: {
+      genericCallsDisabled: 3,
+      genericCallsEnabled: 1,
+      hits: 2,
+      misses: 4,
+      overflowMisses: 0,
+    },
+  },
+  {
     name: "async-pattern-await-positions",
     source: `
 function trace(label, value) {

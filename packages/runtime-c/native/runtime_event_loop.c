@@ -8,6 +8,16 @@
 /*
  * Timer conversion, timer queues, task checkpoints, top-level
  * await progress, and shutdown.
+ *
+ * Deadlines are whole milliseconds in the realm's monotonic domain. A
+ * task computes every deadline from the scheduler time cached when it
+ * started, and a timer turn waits through the clock adapter until the
+ * earliest live deadline has elapsed before it caches the new time. The
+ * deterministic test adapter's wait advances straight to the deadline,
+ * which reproduces the logical clock of ADR 0012 exactly; a platform
+ * adapter's wait blocks for the elapsed time instead. Neither changes
+ * the order of timers with known deadlines or the microtask checkpoint
+ * after each task.
  */
 
 static uint64_t timer_delay(OseoValue value) {
@@ -35,6 +45,8 @@ OseoResult oseo_set_timeout(
     OseoResult result = oseo_internal_to_number(context, delay_value);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     uint64_t delay = timer_delay(result.value);
+    result = oseo_internal_clock_start(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     size_t callback_argument_count = argument_count > 2u
         ? argument_count - 2u
         : 0u;
@@ -120,12 +132,43 @@ OseoResult oseo_clear_timeout(
     return normal(oseo_undefined());
 }
 
+/*
+ * Waits until the earliest live timer is due and caches that monotonic
+ * observation as the scheduler time of the turn that runs it. Canceled
+ * timers at the head are unlinked first, so a canceled deadline never
+ * extends a wait and a queue of canceled timers alone ends without one.
+ * An early wakeup only rereads the clock. The wait is not a safepoint:
+ * no allocation happens between reading the head and running it.
+ */
+static OseoResult wait_for_due_timer(OseoContext *context) {
+    while (tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
+        OseoTimer *timer = timer_object(context->timer_head);
+        if (timer->canceled) {
+            context->timer_head = timer->next;
+            timer->next = oseo_undefined();
+            continue;
+        }
+        uint64_t now = 0u;
+        OseoResult result = oseo_internal_clock_now(context, &now);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        if (timer->deadline <= now) {
+            context->clock_milliseconds = now;
+            break;
+        }
+        result = oseo_internal_clock_wait_until(context, timer->deadline);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+    }
+    return normal(oseo_undefined());
+}
+
 static OseoResult run_timer_turn(
     OseoContext *context,
     OseoValue awaited_promise
 ) {
+    OseoResult result = wait_for_due_timer(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     while (tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
         frame.slots[0] = context->timer_head;
@@ -136,7 +179,6 @@ static OseoResult run_timer_turn(
             frame.slots[0] = oseo_undefined();
             continue;
         }
-        context->clock_milliseconds = timer->deadline;
         frame.slots[1] = timer->arguments;
         result = oseo_call_function(
             context,

@@ -394,6 +394,74 @@ struct OseoRootFrame {
     size_t slot_count;
 };
 
+/*
+ * The clock and wakeup adapter boundary that ADR 0025 accepts from
+ * PLAN-NIO.md.
+ *
+ * The scheduler reads two independent clock domains through this table
+ * and waits through it. `monotonic` reports nanoseconds from an
+ * adapter-chosen origin that never decrease, and only that domain drives
+ * timer deadlines. `real_time` reports milliseconds from the Unix epoch,
+ * which may move in either direction and never drives a deadline.
+ * `wait` blocks until the monotonic `deadline` passes, or indefinitely
+ * when `has_deadline` is false, unless a wakeup arrives first; it may
+ * also return early, so a caller rereads the monotonic clock instead of
+ * trusting the reason. `wake` is the one operation another thread may
+ * call, and wakeups that arrive while nobody waits coalesce into one
+ * early return. `describe` names the selected facilities, with NULL for
+ * an absent capability, and `close` releases the adapter state once the
+ * last waker has stopped.
+ *
+ * The table carries behavior only. No operation runs JavaScript, owns a
+ * job queue, or keeps an executable alive: liveness stays a scheduler
+ * query over its own referenced work, and no platform handle crosses
+ * this boundary. Synthetic clock and completion commands belong to a
+ * deterministic test adapter's own interface, never to this table.
+ */
+typedef enum {
+    OSEO_CLOCK_WAIT_DEADLINE = 0,
+    OSEO_CLOCK_WAIT_WAKEUP = 1,
+    OSEO_CLOCK_WAIT_FAILED = 2,
+} OseoClockWaitResult;
+
+/*
+ * The capability record of one clock adapter. `fallback` is true when
+ * the adapter selected a recorded fallback for waiting or real time
+ * instead of the target's primary facility.
+ */
+typedef struct {
+    const char *backend;
+    const char *monotonic;
+    const char *real_time;
+    const char *wait;
+    const char *wakeup;
+    bool fallback;
+} OseoClockCapabilities;
+
+typedef struct {
+    bool (*monotonic)(void *state, uint64_t *nanoseconds);
+    bool (*real_time)(void *state, double *milliseconds);
+    OseoClockWaitResult (*wait)(
+        void *state,
+        bool has_deadline,
+        uint64_t deadline
+    );
+    bool (*wake)(void *state);
+    void (*describe)(void *state, OseoClockCapabilities *capabilities);
+    void (*close)(void *state);
+} OseoClockAdapter;
+
+/*
+ * Facilities the platform clock adapter treats as unavailable when it
+ * opens, as a restricted sandbox or an older kernel would. They exercise
+ * the recorded fallback and owned-failure paths at the same selection
+ * point a real setup failure reaches; they are not adapter operations.
+ */
+#define OSEO_CLOCK_RESTRICT_MONOTONIC ((unsigned)1u << 0u)
+#define OSEO_CLOCK_RESTRICT_REAL_TIME ((unsigned)1u << 1u)
+#define OSEO_CLOCK_RESTRICT_PRIMARY_WAKEUP ((unsigned)1u << 2u)
+#define OSEO_CLOCK_RESTRICT_PIPE_WAKEUP ((unsigned)1u << 3u)
+
 struct OseoContext {
     OseoRootFrame *roots;
     OseoHeapObject *objects;
@@ -467,6 +535,20 @@ struct OseoContext {
      * the realm's own initialization ordinal rather than host entropy.
      */
     uint64_t random_state[2];
+    /*
+     * The realm's clock adapter and its state, NULL until the first
+     * clock use opens the platform adapter or an embedder installs one.
+     * `clock_origin` is the monotonic reading at the first scheduler
+     * clock use, and `clock_milliseconds` is the scheduler time cached
+     * for the current task: whole milliseconds elapsed since that origin,
+     * read once when a timer turn starts so that every deadline one task
+     * computes shares one base.
+     */
+    const OseoClockAdapter *clock_adapter;
+    void *clock_state;
+    uint64_t clock_origin;
+    unsigned clock_restrictions;
+    bool clock_started;
     uint64_t clock_milliseconds;
     uint64_t next_timer_id;
     uint64_t next_timer_order;
@@ -669,6 +751,33 @@ void oseo_context_init(
 OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic);
 void oseo_context_destroy(OseoContext *context);
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt);
+/*
+ * Clock boundary operations. `oseo_context_set_clock` installs an adapter
+ * before the realm's first clock use and hands its state to the realm,
+ * which closes it when the context is destroyed.
+ * `oseo_context_restrict_clock` applies OSEO_CLOCK_RESTRICT_* bits to the
+ * platform adapter before it opens. `oseo_clock_open` opens the adapter
+ * on the realm's own thread and reports whether cross-thread wakeup is
+ * available; after it returns, `oseo_clock_wake` may be called from any
+ * thread until destruction. `oseo_clock_real_time` reads epoch
+ * milliseconds and never touches the scheduler clock.
+ */
+void oseo_context_set_clock(
+    OseoContext *context,
+    const OseoClockAdapter *adapter,
+    void *state
+);
+void oseo_context_restrict_clock(
+    OseoContext *context,
+    unsigned restrictions
+);
+bool oseo_clock_open(OseoContext *context);
+bool oseo_clock_wake(OseoContext *context);
+bool oseo_clock_real_time(OseoContext *context, double *milliseconds);
+void oseo_clock_capabilities(
+    OseoContext *context,
+    OseoClockCapabilities *capabilities
+);
 void oseo_context_clear_language_error(OseoContext *context);
 void oseo_context_location(
     OseoContext *context,
