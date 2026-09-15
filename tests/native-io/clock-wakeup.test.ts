@@ -474,16 +474,13 @@ test("no reviewed test262 execution schedules a timer", async () => {
   assert.ok(paths.length > 0);
   const harness = join(repository, "tests/test262/harness");
   const includes = (await readdir(harness)).map((name) => join(harness, name));
-  const sources = await Promise.all(
-    [...paths, ...includes].map(async (path) => ({
-      path,
-      text: await readFile(path, "utf8"),
-    })),
-  );
-  assert.deepEqual(
-    sources
-      .filter(({ text }) => /\b(?:setTimeout|clearTimeout)\b/u.test(text))
-      .map(({ path }) => path),
-    [],
-  );
+  // The corpus holds thousands of files, so they are read one at a time:
+  // opening them all at once exhausts the descriptor limit on Windows.
+  const timers: string[] = [];
+  for (const path of [...paths, ...includes]) {
+    // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
+    const text = await readFile(path, "utf8");
+    if (/\b(?:setTimeout|clearTimeout)\b/u.test(text)) timers.push(path);
+  }
+  assert.deepEqual(timers, []);
 });
