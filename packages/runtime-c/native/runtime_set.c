@@ -1,5 +1,6 @@
 #include "runtime_internal.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -183,24 +184,19 @@ static OseoResult set_prototype_from_target(
     return result;
 }
 
-static OseoResult set_add(
+/* Appends a value the caller has already found absent. Growing the vector
+ * is a safepoint, so both values are rooted across it. */
+static OseoResult set_append(
     OseoContext *context,
-    OseoValue receiver,
+    OseoValue set_value,
     OseoValue value
 ) {
-    OseoResult checked = set_receiver(context, receiver);
-    if (checked.status != OSEO_STATUS_NORMAL) return checked;
-    OseoValue slots[2] = {receiver, normalize_set_value(value)};
+    OseoValue slots[2] = {set_value, value};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
-    OseoSet *set = set_object(slots[0]);
-    if (set_find(set, slots[1]) != SIZE_MAX) {
-        oseo_roots_pop(context, &frame);
-        return normal(slots[0]);
-    }
     OseoResult result = grow_set(context, slots[0]);
     if (result.status == OSEO_STATUS_NORMAL) {
-        set = set_object(slots[0]);
+        OseoSet *set = set_object(slots[0]);
         OseoSetElement *element = &set->elements[set->element_count];
         element->value = slots[1];
         element->present = true;
@@ -210,6 +206,27 @@ static OseoResult set_add(
     }
     oseo_roots_pop(context, &frame);
     return result;
+}
+
+/* Replaces one live slot with a tombstone. */
+static void set_remove_at(OseoSet *set, size_t index) {
+    set->elements[index].present = false;
+    set->elements[index].value = oseo_undefined();
+    set->size -= 1u;
+}
+
+static OseoResult set_add(
+    OseoContext *context,
+    OseoValue receiver,
+    OseoValue value
+) {
+    OseoResult checked = set_receiver(context, receiver);
+    if (checked.status != OSEO_STATUS_NORMAL) return checked;
+    value = normalize_set_value(value);
+    if (set_find(set_object(receiver), value) != SIZE_MAX) {
+        return normal(receiver);
+    }
+    return set_append(context, receiver, value);
 }
 
 static OseoResult set_clear(OseoContext *context, OseoValue receiver) {
@@ -234,9 +251,7 @@ static OseoResult set_delete(
     OseoSet *set = set_object(receiver);
     size_t index = set_find(set, value);
     if (index == SIZE_MAX) return normal(oseo_boolean(false));
-    set->elements[index].present = false;
-    set->elements[index].value = oseo_undefined();
-    set->size -= 1u;
+    set_remove_at(set, index);
     return normal(oseo_boolean(true));
 }
 
@@ -517,6 +532,683 @@ static OseoResult set_constructor(
     return result;
 }
 
+/*
+ * Root frame layout shared by the seven methods that combine or compare a
+ * Set with a set-like argument. Every value one of them reads back after
+ * calling user code lives in one of these slots.
+ */
+enum {
+    SET_OPERATION_RECEIVER = 0,
+    SET_OPERATION_OTHER = 1,
+    SET_OPERATION_HAS = 2,
+    SET_OPERATION_KEYS = 3,
+    SET_OPERATION_RESULT = 4,
+    SET_OPERATION_ITERATOR = 5,
+    SET_OPERATION_NEXT = 6,
+    SET_OPERATION_VALUE = 7,
+    SET_OPERATION_SCRATCH = 8,
+    SET_OPERATION_SLOT_COUNT = 9,
+};
+
+/* Reads one named property of the set-like argument into a rooted slot. */
+static OseoResult set_record_property(
+    OseoContext *context,
+    OseoValue *slots,
+    const char *name,
+    size_t slot
+) {
+    OseoResult result = oseo_internal_ascii_string(context, name);
+    slots[slot] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            slots[SET_OPERATION_OTHER],
+            slots[slot]
+        );
+        slots[slot] = result.value;
+    }
+    return result;
+}
+
+/*
+ * GetSetRecord(other). The size is read and converted before `has` and
+ * `keys` are read, and ToIntegerOrInfinity keeps an infinite size, so the
+ * record's size is a non-negative integral double rather than a count.
+ */
+static OseoResult set_record_get(
+    OseoContext *context,
+    OseoValue *slots,
+    double *size
+) {
+    if (!is_object(slots[SET_OPERATION_OTHER])) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The Set method argument is not an object."
+        );
+    }
+    OseoResult result = set_record_property(
+        context,
+        slots,
+        "size",
+        SET_OPERATION_SCRATCH
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_number(
+            context,
+            slots[SET_OPERATION_SCRATCH]
+        );
+    }
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    if (isnan(number)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The set-like size is not a number."
+        );
+    }
+    if (isfinite(number)) number = trunc(number);
+    if (number < 0.0) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "The set-like size is negative."
+        );
+    }
+    *size = number == 0.0 ? 0.0 : number;
+    result = set_record_property(context, slots, "has", SET_OPERATION_HAS);
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_callable(slots[SET_OPERATION_HAS])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The set-like has property is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_record_property(
+            context,
+            slots,
+            "keys",
+            SET_OPERATION_KEYS
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_callable(slots[SET_OPERATION_KEYS])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The set-like keys property is not callable."
+        );
+    }
+    return result;
+}
+
+/*
+ * RequireInternalSlot(O, [[SetData]]) followed by GetSetRecord(other). On
+ * a normal completion the caller owns the allocated frame and releases it.
+ */
+static OseoResult set_operation_begin(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoRootFrame *frame,
+    double *other_size
+) {
+    OseoResult result = set_receiver(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_roots_allocate(context, frame, SET_OPERATION_SLOT_COUNT);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame->slots[SET_OPERATION_RECEIVER] = receiver;
+    frame->slots[SET_OPERATION_OTHER] = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    result = set_record_get(context, frame->slots, other_size);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, frame);
+    }
+    return result;
+}
+
+/*
+ * GetIteratorFromMethod(other, keys). The next method is read once and
+ * reused by every step; a non-callable one throws when the first step
+ * calls it.
+ */
+static OseoResult set_keys_iterator(OseoContext *context, OseoValue *slots) {
+    OseoResult result = oseo_call_function(
+        context,
+        slots[SET_OPERATION_KEYS],
+        slots[SET_OPERATION_OTHER],
+        0u,
+        NULL,
+        oseo_undefined()
+    );
+    slots[SET_OPERATION_ITERATOR] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_object(slots[SET_OPERATION_ITERATOR])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The set-like keys iterator is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "next");
+        slots[SET_OPERATION_SCRATCH] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            slots[SET_OPERATION_ITERATOR],
+            slots[SET_OPERATION_SCRATCH]
+        );
+        slots[SET_OPERATION_NEXT] = result.value;
+    }
+    return result;
+}
+
+/* IteratorStepValue over the captured keys iterator. */
+static OseoResult set_keys_step(
+    OseoContext *context,
+    OseoValue *slots,
+    bool *done
+) {
+    return oseo_iterator_next(
+        context,
+        slots[SET_OPERATION_ITERATOR],
+        slots[SET_OPERATION_NEXT],
+        &slots[SET_OPERATION_VALUE],
+        done
+    );
+}
+
+/* Call(otherRec.[[Has]], otherRec.[[SetObject]], « value »), as a Boolean. */
+static OseoResult set_other_has(
+    OseoContext *context,
+    OseoValue *slots,
+    bool *present
+) {
+    OseoResult result = oseo_call_function(
+        context,
+        slots[SET_OPERATION_HAS],
+        slots[SET_OPERATION_OTHER],
+        1u,
+        &slots[SET_OPERATION_VALUE],
+        oseo_undefined()
+    );
+    *present = result.status == OSEO_STATUS_NORMAL &&
+        oseo_to_boolean(result.value);
+    return result;
+}
+
+/* OrdinaryObjectCreate(%Set.prototype%) with an empty element vector. The
+ * result never consults the receiver's constructor or Symbol.species. */
+static OseoResult set_result_create(OseoContext *context, OseoValue *slots) {
+    OseoResult result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_SET_PROTOTYPE
+    );
+    slots[SET_OPERATION_RESULT] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_allocate(context, slots[SET_OPERATION_RESULT]);
+        slots[SET_OPERATION_RESULT] = result.value;
+    }
+    return result;
+}
+
+/* Copies the receiver's live elements into the fresh result in order.
+ * Tombstones are not copied: the result is unobservable until returned,
+ * so its slot positions carry no meaning. */
+static OseoResult set_result_copy(OseoContext *context, OseoValue *slots) {
+    OseoResult result = normal(slots[SET_OPERATION_RESULT]);
+    size_t count = set_object(slots[SET_OPERATION_RECEIVER])->element_count;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count;
+         index += 1u) {
+        OseoSet *source = set_object(slots[SET_OPERATION_RECEIVER]);
+        if (!source->elements[index].present) continue;
+        slots[SET_OPERATION_VALUE] = source->elements[index].value;
+        result = set_append(
+            context,
+            slots[SET_OPERATION_RESULT],
+            slots[SET_OPERATION_VALUE]
+        );
+    }
+    return result;
+}
+
+/* Releases an operation frame and reports either its abrupt completion or
+ * the given normal value. */
+static OseoResult set_operation_end(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    OseoResult result,
+    OseoValue value
+) {
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(value);
+    oseo_roots_release(context, frame);
+    return result;
+}
+
+static OseoResult set_union(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue *slots = frame.slots;
+    result = set_keys_iterator(context, slots);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_result_create(context, slots);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_result_copy(context, slots);
+    }
+    bool done = false;
+    while (result.status == OSEO_STATUS_NORMAL && !done) {
+        result = set_keys_step(context, slots, &done);
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        slots[SET_OPERATION_VALUE] =
+            normalize_set_value(slots[SET_OPERATION_VALUE]);
+        if (set_find(
+                set_object(slots[SET_OPERATION_RESULT]),
+                slots[SET_OPERATION_VALUE]
+            ) == SIZE_MAX) {
+            result = set_append(
+                context,
+                slots[SET_OPERATION_RESULT],
+                slots[SET_OPERATION_VALUE]
+            );
+        }
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        slots[SET_OPERATION_RESULT]
+    );
+}
+
+/* What a receiver-driven visit does with each `has` answer. */
+typedef enum {
+    SET_VISIT_INTERSECT = 0,
+    SET_VISIT_SUBSET = 1,
+    SET_VISIT_DISJOINT = 2,
+} OseoSetVisitKind;
+
+/*
+ * Visits the receiver's live elements by index while `has` may mutate it.
+ * The loop rereads the vector length after every call, as the
+ * specification's thisSize does, so an element appended during a call is
+ * visited and a deleted then re-added one can be visited twice.
+ */
+static OseoResult set_visit_receiver(
+    OseoContext *context,
+    OseoValue *slots,
+    OseoSetVisitKind kind,
+    bool *answer
+) {
+    OseoResult result = normal(oseo_undefined());
+    *answer = true;
+    size_t index = 0u;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        OseoSet *set = set_object(slots[SET_OPERATION_RECEIVER]);
+        if (index >= set->element_count) break;
+        bool live = set->elements[index].present;
+        slots[SET_OPERATION_VALUE] = set->elements[index].value;
+        index += 1u;
+        if (!live) continue;
+        bool in_other = false;
+        result = set_other_has(context, slots, &in_other);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (kind == SET_VISIT_SUBSET && !in_other) {
+            *answer = false;
+            break;
+        }
+        if (kind == SET_VISIT_DISJOINT && in_other) {
+            *answer = false;
+            break;
+        }
+        if (kind == SET_VISIT_INTERSECT && in_other &&
+            set_find(
+                set_object(slots[SET_OPERATION_RESULT]),
+                slots[SET_OPERATION_VALUE]
+            ) == SIZE_MAX) {
+            result = set_append(
+                context,
+                slots[SET_OPERATION_RESULT],
+                slots[SET_OPERATION_VALUE]
+            );
+        }
+    }
+    return result;
+}
+
+static OseoResult set_intersection(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue *slots = frame.slots;
+    result = set_result_create(context, slots);
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (double)set_object(slots[SET_OPERATION_RECEIVER])->size <=
+            other_size) {
+        bool unused = true;
+        result = set_visit_receiver(
+            context,
+            slots,
+            SET_VISIT_INTERSECT,
+            &unused
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_keys_iterator(context, slots);
+        bool done = false;
+        while (result.status == OSEO_STATUS_NORMAL && !done) {
+            result = set_keys_step(context, slots, &done);
+            if (result.status != OSEO_STATUS_NORMAL || done) break;
+            slots[SET_OPERATION_VALUE] =
+                normalize_set_value(slots[SET_OPERATION_VALUE]);
+            if (set_find(
+                    set_object(slots[SET_OPERATION_RECEIVER]),
+                    slots[SET_OPERATION_VALUE]
+                ) != SIZE_MAX &&
+                set_find(
+                    set_object(slots[SET_OPERATION_RESULT]),
+                    slots[SET_OPERATION_VALUE]
+                ) == SIZE_MAX) {
+                result = set_append(
+                    context,
+                    slots[SET_OPERATION_RESULT],
+                    slots[SET_OPERATION_VALUE]
+                );
+            }
+        }
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        slots[SET_OPERATION_RESULT]
+    );
+}
+
+static OseoResult set_difference(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue *slots = frame.slots;
+    result = set_result_create(context, slots);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_result_copy(context, slots);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (double)set_object(slots[SET_OPERATION_RECEIVER])->size <=
+            other_size) {
+        /* The copy fixes the visited elements, so a call that mutates the
+         * receiver changes neither the count nor the values visited. */
+        size_t count = set_object(slots[SET_OPERATION_RESULT])->element_count;
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < count;
+             index += 1u) {
+            slots[SET_OPERATION_VALUE] =
+                set_object(slots[SET_OPERATION_RESULT])->elements[index].value;
+            bool in_other = false;
+            result = set_other_has(context, slots, &in_other);
+            if (result.status == OSEO_STATUS_NORMAL && in_other) {
+                set_remove_at(set_object(slots[SET_OPERATION_RESULT]), index);
+            }
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_keys_iterator(context, slots);
+        bool done = false;
+        while (result.status == OSEO_STATUS_NORMAL && !done) {
+            result = set_keys_step(context, slots, &done);
+            if (result.status != OSEO_STATUS_NORMAL || done) break;
+            OseoSet *copy = set_object(slots[SET_OPERATION_RESULT]);
+            size_t index = set_find(copy, slots[SET_OPERATION_VALUE]);
+            if (index != SIZE_MAX) set_remove_at(copy, index);
+        }
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        slots[SET_OPERATION_RESULT]
+    );
+}
+
+static OseoResult set_symmetric_difference(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue *slots = frame.slots;
+    result = set_keys_iterator(context, slots);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_result_create(context, slots);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = set_result_copy(context, slots);
+    }
+    bool done = false;
+    while (result.status == OSEO_STATUS_NORMAL && !done) {
+        result = set_keys_step(context, slots, &done);
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        slots[SET_OPERATION_VALUE] =
+            normalize_set_value(slots[SET_OPERATION_VALUE]);
+        OseoSet *copy = set_object(slots[SET_OPERATION_RESULT]);
+        size_t index = set_find(copy, slots[SET_OPERATION_VALUE]);
+        bool in_receiver = set_find(
+            set_object(slots[SET_OPERATION_RECEIVER]),
+            slots[SET_OPERATION_VALUE]
+        ) != SIZE_MAX;
+        if (in_receiver) {
+            if (index != SIZE_MAX) set_remove_at(copy, index);
+        } else if (index == SIZE_MAX) {
+            result = set_append(
+                context,
+                slots[SET_OPERATION_RESULT],
+                slots[SET_OPERATION_VALUE]
+            );
+        }
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        slots[SET_OPERATION_RESULT]
+    );
+}
+
+/*
+ * The keys-iterator half of isSupersetOf and isDisjointFrom. The walk
+ * stops at the first value whose receiver membership equals `stop_when`
+ * and closes the iterator with a normal completion, so an abrupt return
+ * method replaces the Boolean answer.
+ */
+static OseoResult set_scan_keys(
+    OseoContext *context,
+    OseoValue *slots,
+    bool stop_when,
+    bool *answer
+) {
+    *answer = true;
+    OseoResult result = set_keys_iterator(context, slots);
+    bool done = false;
+    while (result.status == OSEO_STATUS_NORMAL && !done) {
+        result = set_keys_step(context, slots, &done);
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        bool in_receiver = set_find(
+            set_object(slots[SET_OPERATION_RECEIVER]),
+            slots[SET_OPERATION_VALUE]
+        ) != SIZE_MAX;
+        if (in_receiver == stop_when) {
+            *answer = false;
+            result = oseo_iterator_close(
+                context,
+                slots[SET_OPERATION_ITERATOR],
+                false
+            );
+            break;
+        }
+    }
+    return result;
+}
+
+static OseoResult set_is_subset_of(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    bool answer = false;
+    if ((double)set_object(frame.slots[SET_OPERATION_RECEIVER])->size <=
+        other_size) {
+        result = set_visit_receiver(
+            context,
+            frame.slots,
+            SET_VISIT_SUBSET,
+            &answer
+        );
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        oseo_boolean(answer)
+    );
+}
+
+static OseoResult set_is_superset_of(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    bool answer = false;
+    if ((double)set_object(frame.slots[SET_OPERATION_RECEIVER])->size >=
+        other_size) {
+        result = set_scan_keys(context, frame.slots, false, &answer);
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        oseo_boolean(answer)
+    );
+}
+
+static OseoResult set_is_disjoint_from(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    double other_size = 0.0;
+    OseoResult result = set_operation_begin(
+        context,
+        receiver,
+        argument_count,
+        arguments,
+        &frame,
+        &other_size
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    bool answer = true;
+    if ((double)set_object(frame.slots[SET_OPERATION_RECEIVER])->size <=
+        other_size) {
+        result = set_visit_receiver(
+            context,
+            frame.slots,
+            SET_VISIT_DISJOINT,
+            &answer
+        );
+    } else {
+        result = set_scan_keys(context, frame.slots, true, &answer);
+    }
+    return set_operation_end(
+        context,
+        &frame,
+        result,
+        oseo_boolean(answer)
+    );
+}
+
 OseoResult oseo_internal_set_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -566,6 +1258,42 @@ OseoResult oseo_internal_set_builtin_dispatch(
         return set_iterator_next(context, receiver);
     }
     if (code_id == OSEO_SET_SPECIES_CODE_ID) return normal(receiver);
+    if (code_id == OSEO_SET_UNION_CODE_ID) {
+        return set_union(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_SET_INTERSECTION_CODE_ID) {
+        return set_intersection(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_SET_DIFFERENCE_CODE_ID) {
+        return set_difference(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_SET_SYMMETRIC_DIFFERENCE_CODE_ID) {
+        return set_symmetric_difference(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_SET_IS_SUBSET_OF_CODE_ID) {
+        return set_is_subset_of(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_SET_IS_SUPERSET_OF_CODE_ID) {
+        return set_is_superset_of(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_SET_IS_DISJOINT_FROM_CODE_ID) {
+        return set_is_disjoint_from(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     return oseo_unknown_function(context, code_id);
 }
 
@@ -755,6 +1483,47 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
             context,
             frame.slots[1],
             method_names[index],
+            frame.slots[4],
+            method
+        );
+    }
+    /* The composition methods own no realm intrinsic slot: nothing in the
+     * runtime refers to them except their prototype properties. */
+    static const size_t composition_codes[] = {
+        OSEO_SET_UNION_CODE_ID,
+        OSEO_SET_INTERSECTION_CODE_ID,
+        OSEO_SET_DIFFERENCE_CODE_ID,
+        OSEO_SET_SYMMETRIC_DIFFERENCE_CODE_ID,
+        OSEO_SET_IS_SUBSET_OF_CODE_ID,
+        OSEO_SET_IS_SUPERSET_OF_CODE_ID,
+        OSEO_SET_IS_DISJOINT_FROM_CODE_ID,
+    };
+    static const char *const composition_names[] = {
+        "union",
+        "intersection",
+        "difference",
+        "symmetricDifference",
+        "isSubsetOf",
+        "isSupersetOf",
+        "isDisjointFrom",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 7u;
+         index += 1u) {
+        result = create_set_builtin(
+            context,
+            composition_codes[index],
+            composition_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[4] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_set_ascii_property(
+            context,
+            frame.slots[1],
+            composition_names[index],
             frame.slots[4],
             method
         );

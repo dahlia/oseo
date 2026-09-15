@@ -50,6 +50,7 @@ import { objectFixtures } from "./native/fixtures/objects.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
+import * as setComposition from "./native/fixtures/set-composition-methods.ts";
 import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
@@ -223,6 +224,7 @@ const fixtures: readonly Fixture[] = [
   ...proxyExoticObjectFixtures,
   ...jsonParseFixtures,
   ...setIntrinsicFixtures,
+  ...setComposition.setCompositionMethodFixtures,
   ...jsonStringifyFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
@@ -711,6 +713,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
     fixture.name === "set-intrinsic" ||
+    fixture.name === "set-composition-methods" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -825,6 +828,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "promise-intrinsic" ||
     fixture.name === "string-intrinsic" ||
     fixture.name === "set-intrinsic" ||
+    fixture.name === "set-composition-methods" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1076,7 +1080,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-iterator" ||
             fixture.name === "generic-string-coercion" ||
             fixture.name === "number-prototype" ||
-            fixture.name === "set-intrinsic"
+            fixture.name === "set-intrinsic" ||
+            fixture.name === "set-composition-methods"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1096,7 +1101,8 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "map-intrinsic" ||
                 fixture.name === "object-constructor" ||
                 fixture.name === "number-prototype" ||
-                fixture.name === "set-intrinsic"
+                fixture.name === "set-intrinsic" ||
+                fixture.name === "set-composition-methods"
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }

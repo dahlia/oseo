@@ -456,3 +456,7 @@ families:
     owner: tests/property/m5-typed-array-core.property.test.ts
     start: 0x60007100
     end: 0x600071ff
+  - family: m5-set-composition-methods
+    owner: tests/property/m5-set-composition-methods.property.test.ts
+    start: 0x60007200
+    end: 0x600072ff

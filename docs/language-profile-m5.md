@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 124
+M5a is complete. The normative family records described below inventory 125
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,7 +47,7 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 19,105 reviewed cases: 15,606 passes, 1,556
+The current manifest contains 19,291 reviewed cases: 15,792 passes, 1,556
 expected negatives, and 1,943 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
@@ -6719,6 +6719,88 @@ IDs and the public intrinsic table gains one slot for the shared
 generated-code entry points are unchanged.
 
 
+Set composition methods
+-----------------------
+
+M5b node `set-composition-methods` adds `union`, `intersection`,
+`difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
+`isDisjointFrom` to `%Set.prototype%`. Each is an ordinary non-constructible
+method of length 1 with the standard writable, non-enumerable, configurable
+descriptor. Each first requires a Set receiver, so a non-Set receiver throws
+`TypeError` before the argument is touched.
+
+The argument then passes through GetSetRecord. A non-object throws
+`TypeError`. `size` is read and converted with ToNumber, so a `valueOf` method
+runs and a BigInt or Symbol size throws `TypeError`; `NaN`, including an
+absent size, throws `TypeError`, and ToIntegerOrInfinity keeps an infinite
+size while a negative integer size throws `RangeError`. `has` and then `keys`
+are read and must be callable. A Set, a Map, and any other object with those
+three properties are therefore equally valid operands, and an Array is not.
+
+When an algorithm walks the argument's keys, it calls `keys` on the argument,
+requires an object result, reads that iterator's `next` once, and reuses it
+for every step. Values from the iterator are canonicalized so that `-0` joins
+the result as `+0`, and membership uses the Set's SameValueZero lookup.
+`union` and `symmetricDifference` always walk the keys. Each acquires the
+iterator, including its `next` read, then copies the receiver, and only then
+calls `next`, so the copy observes mutations made by `keys` or the `next`
+getter but not those made by a `next` call. The other
+five compare the receiver's live size with the record's size. `intersection`,
+`difference`, and `isDisjointFrom` call `has` for each receiver element when
+the receiver is not larger, and walk the keys otherwise. `isSubsetOf` answers
+`false` without calls when the receiver is larger, and `isSupersetOf` answers
+`false` when it is smaller.
+
+A receiver-driven walk rereads the receiver's element vector after every
+`has` call, as the specification's `thisSize` does. An element appended during
+a call is visited. An element deleted and re-added before its turn is visited
+once at its new position, while one deleted and re-added after its visit is
+visited again. `difference` instead walks its private copy, so receiver
+mutation during `has` changes neither the values it visits nor the result.
+`isSupersetOf` and `isDisjointFrom` close the keys iterator with a normal
+completion when they stop early: an absent `return` is skipped, an abrupt
+`return` replaces the Boolean answer, and a non-object result throws
+`TypeError`. An exhausted walk does not close the iterator, and an abrupt
+`has` call or iterator step propagates without a close.
+
+The four constructive methods return a fresh Set whose prototype is always the
+realm's `%Set.prototype%`, whatever the receiver's class, `constructor`, or
+`Symbol.species`. Results are built directly in the new element vector
+without calling any `add` method. The receiver's order comes first, followed
+by argument values in iteration order; `intersection` follows the order of
+the walked side.
+
+Fixed native and generated differential evidence at property seed
+`0x60007200` covers all seven methods under both specialization policies and
+collection forced at every safepoint, false hints, deliberate guard hits and
+misses, and generic fallback. The fixed fixture covers descriptors, Set, Map,
+and logging set-like operands; size conversion and every invalid record;
+branch selection and call order; iterator closing with normal, abrupt,
+primitive, and absent `return` methods; receiver mutation during `has` and
+`keys`; derived receivers with throwing species, `add`, `has`, and `size`; and
+object identity. The generated domain draws a receiver of up to six values and
+up to four calls whose operands are Sets, Maps, or logging set-like objects
+with up to six keys and a declared size of 0, 1, 2, 2.5, 3, 5, 8, or
+`Infinity`. An independent model of the specification algorithms predicts
+each result and the complete call log without using a JavaScript Set, and
+Node.js, Deno, and both native policies must match it.
+
+All 186 edition paths under the node's seven inventory roots are reviewed and
+pass. The reviewed feature list gains `set-methods`, and the reviewed
+dependency vocabulary gains `set-composition-methods`. No reviewed path outside
+the roots changes classification. The manifest moves from 19,105 to 19,291
+cases and from 15,606 to 15,792 passes while keeping 1,556 expected negatives
+and 1,943 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property ratchet moves from 146 to 147 domains
+and seeds and from 5,671 to 5,683 ordinary cases, and the evidence inventory
+moves from 124 to 125 families. The methods take seven code IDs inside the
+existing Set range and no realm intrinsic slot, heap kind, component, or
+generated-code entry point; the runtime ABI moves to `oseo-runtime-m5-110`.
+The suite revision, applicable inventory, classification vocabulary,
+target-parity policy, forced-collection policy, and zero-override policy are
+unchanged.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6736,7 +6818,11 @@ complete. The remaining gaps retain their existing owners.
     compacts or reuses a tombstone, so the vector and every membership scan
     grow with the lifetime insertion count rather than with `size`, and a
     long add-and-delete cycle over one Set holds memory and time that other
-    engines bound by the live count. `Map` storage shares the same shape.
+    engines bound by the live count. The `set-composition-methods` node
+    builds its results on that same linear lookup, so each composition
+    method takes time proportional to the product of the two operands'
+    element counts rather than to their sum. `Map` storage shares the same
+    shape.
     Compaction that preserves open cursors is a measured storage checkpoint
     that [*PLAN-M5.md*](../PLAN-M5.md) owns; the observable semantics are
     complete without it.
