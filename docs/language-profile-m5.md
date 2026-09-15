@@ -6685,9 +6685,13 @@ and `subarray` with negative, clamped, and omitted bounds. Node.js, Deno, and
 both native specialization policies agree with collection forced at every
 safepoint, a false numeric hint deliberately misses its guard and reaches the
 compiled generic fallback, and an independent element-level model of the
-buffer computes every expected observation. Two native-only checks record
-where both reference engines diverge from ECMA-262: V8 seals a non-empty view
-and skips the `subarray` species content-type check.
+buffer computes every expected observation. Native-only checks record where
+both reference engines diverge from ECMA-262: V8 answers integrity-level
+queries from a view's byte length rather than its element descriptors, so it
+reports a non-empty view sealed and a detached view that was non-empty not
+frozen, and it skips the `subarray` species content-type check. The same
+checks pin the empty, length-tracking, and fixed-length resizable
+boundaries, and JavaScriptCore matches every integrity-level row.
 
 The reviewed test262 harness gains *testTypedArray.js*, unchanged in behavior
 except that it defines the `isPrimitive` predicate the reviewed base harness

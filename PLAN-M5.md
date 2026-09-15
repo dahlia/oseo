@@ -6271,9 +6271,10 @@ generated native differential evidence at property seed `0x60007100` uses an
 independent element-level buffer model over fixed and length-tracking views,
 resizes, and detachment, under both specialization policies, collection
 forced at every safepoint, a false hint that reaches the generic fallback,
-and Node.js and Deno references. Two native-only checks record the reference
-engines' divergence from ECMA-262 for sealing a non-empty view and for the
-`subarray` species content-type check.
+and Node.js and Deno references. Native-only checks record the reference
+engines' divergence from ECMA-262 for the sealed and frozen state of
+non-empty and detached views and for the `subarray` species content-type
+check.
 
 The reviewed harness gains *testTypedArray.js*, and the reviewed feature list
 gains `TypedArray` and `TypedArray.prototype.at`. All 337 paths under the

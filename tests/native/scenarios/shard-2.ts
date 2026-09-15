@@ -151,9 +151,17 @@ export async function runNativeScenario2(
   }
 
   // Both references diverge from ECMA-262 on two TypedArray core steps,
-  // so these checks bypass them. V8 seals a non-empty view even though
-  // the view's [[DefineOwnProperty]] refuses a non-configurable element,
-  // and V8's subarray skips TypedArraySpeciesCreate's content-type check.
+  // so these checks bypass them. A view's [[GetOwnProperty]] reports every
+  // valid element as configurable and writable, and TestIntegrityLevel
+  // reads those descriptors, so a non-empty view that cannot be extended is
+  // neither sealed nor frozen. A detached view has no element keys, so it
+  // is both. V8 answers from the view's byte length and length-tracking
+  // state instead: it reports a non-empty view sealed and a detached view
+  // that was non-empty not frozen, even right after Object.freeze
+  // succeeds. JavaScriptCore agrees with ECMA-262 on every row. The empty,
+  // length-tracking, and fixed-length resizable rows are boundaries where
+  // all engines agree. V8's subarray also skips TypedArraySpeciesCreate's
+  // content-type check.
   const typedArrayDivergenceName = "typed-array-reference-divergence.ts";
   const typedArrayDivergence = await runNativeCli(
     {
@@ -164,6 +172,26 @@ export async function runNativeScenario2(
         'catch (error) { console.log("seal", error instanceof TypeError); } ' +
         'console.log("sealed", Object.isSealed(sealed), ' +
         "Object.isExtensible(sealed)); " +
+        "const integrity = (label, value) => console.log(" +
+        '"integrity", label, Reflect.preventExtensions(value), ' +
+        "Object.isExtensible(value), Object.isSealed(value), " +
+        "Object.isFrozen(value)); " +
+        'integrity("fixed", new Uint8Array(3)); ' +
+        'integrity("empty", new Uint8Array(0)); ' +
+        "const detached = new Uint8Array(4); " +
+        "detached.buffer.transfer(); " +
+        'integrity("detached", detached); ' +
+        "const prevented = new Uint8Array(2); " +
+        'integrity("prevented", prevented); ' +
+        "prevented.buffer.transfer(); " +
+        'integrity("prevented detached", prevented); ' +
+        "const frozen = new Uint8Array(2); " +
+        "frozen.buffer.transfer(); " +
+        'console.log("freeze detached", Object.freeze(frozen) === frozen, ' +
+        "Object.isSealed(frozen), Object.isFrozen(frozen)); " +
+        "const resizable = new ArrayBuffer(4, { maxByteLength: 8 }); " +
+        'integrity("tracking", new Uint8Array(resizable)); ' +
+        'integrity("resizable fixed", new Uint8Array(resizable, 0, 2)); ' +
         "const view = new Uint8Array(4); " +
         "view.constructor = { [Symbol.species]: function () { " +
         "return new BigInt64Array(4); } }; " +
@@ -177,7 +205,20 @@ export async function runNativeScenario2(
   assert.equal(typedArrayDivergence.exitStatus, 0, typedArrayDivergence.stderr);
   assert.equal(
     typedArrayDivergence.stdout,
-    "seal true\nsealed false false\ncontent true\n",
+    [
+      "seal true",
+      "sealed false false",
+      "integrity fixed true false false false",
+      "integrity empty true false true true",
+      "integrity detached true false true true",
+      "integrity prevented true false false false",
+      "integrity prevented detached true false true true",
+      "freeze detached true true true",
+      "integrity tracking false true false false",
+      "integrity resizable fixed false true false false",
+      "content true",
+      "",
+    ].join("\n"),
   );
 
   // The switch-tdz fixture explains why this check bypasses the Deno
