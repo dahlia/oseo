@@ -6,5 +6,5 @@ delivers: "Implements the PLAN-NIO epoch-real-time, monotonic-deadline, and
   decision."
 dependencies:
   - date-family
-landed: false
+landed: true
 status: ready
