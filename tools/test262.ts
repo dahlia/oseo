@@ -148,6 +148,10 @@ const regexpUtilsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/regExpUtils.js",
 );
+const testTypedArrayHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/testTypedArray.js",
+);
 
 const classifications = new Set<Test262Classification>([
   "expected-negative",
@@ -177,9 +181,9 @@ const reviewedExecutionPoolLimit = Math.min(
 );
 const reviewedExecutionRetryLimit = 1;
 const unavailableHarnessIncludes = new Set([
-  // The resizable-buffer utilities build every TypedArray constructor at
-  // load time, so no case that includes them can execute before a view
-  // kind is admitted.
+  // The resizable-buffer utilities create their TypedArray subclasses
+  // through the Function constructor, which this profile keeps outside
+  // the admitted dynamic source, so no unreviewed copy can execute them.
   "resizableArrayBufferUtils.js",
   "nativeFunctionMatcher.js",
   "wellKnownIntrinsicObjects.js",
@@ -655,19 +659,13 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "regexp-string-dispatch";
   }
-  if (diagnostic === "TypedArray prototype accessors are not admitted yet.") {
-    return "typed-array-core";
-  }
-  if (
-    diagnostic === "TypedArray core prototype methods are not admitted yet."
-  ) {
-    return "typed-array-core";
-  }
+  // The prototype's own-key list completes only after every remaining
+  // prototype method node lands, so no single graph node owns it.
   if (
     diagnostic ===
     "TypedArray prototype own-key reflection is not admitted yet."
   ) {
-    return "typed-array-core";
+    return "typed-array-prototype-methods";
   }
   if (diagnostic === "TypedArray iterative methods are not admitted yet.") {
     return "typed-array-iterative";
@@ -1726,6 +1724,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
       ["proxyTrapsHelper.js", await readFile(proxyTrapsHarnessPath, "utf8")],
       ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
+      ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
     ]),
   };
 }

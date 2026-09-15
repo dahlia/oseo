@@ -2731,6 +2731,12 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            copying_codes[index] == OSEO_ARRAY_TO_STRING_CODE_ID) {
+            /* %TypedArray.prototype%.toString shares this identity. */
+            context->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
+                frame.slots[2];
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_internal_ascii_string(
                 context,
@@ -3124,6 +3130,8 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE] =
             oseo_undefined();
         context->intrinsics[OSEO_INTRINSIC_ARRAY_PUSH] = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
+            oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_ARRAY;
              index <= OSEO_INTRINSIC_ARRAY_SPECIES_GETTER;
              index += 1u) {

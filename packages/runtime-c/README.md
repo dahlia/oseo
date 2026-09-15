@@ -760,6 +760,14 @@ allocate a fresh two-element Array. The iterator target and pending result stay
 collector-rooted throughout. Two code IDs and two intrinsic slots are added;
 the generated-code ABI gains no entry point.
 
+The `m5-109` ABI completes the TypedArray integer-indexed exotic object and
+adds the core `%TypedArray.prototype%` accessors, `at`, `set`, `subarray`,
+the three iterator methods, and the `%TypedArray%[Symbol.species]` getter.
+Twelve TypedArray code IDs and one public intrinsic slot, which holds the
+original `Array.prototype.toString` that `%TypedArray.prototype%.toString`
+shares, are added; the value representation and the generated-code entry
+points are unchanged.
+
 The `m5-106` ABI materializes `%TypedArray%` and all eleven concrete
 element-type constructors. Views retain a collector-traced `ArrayBuffer`
 reference plus their element kind, byte offset, and fixed or length-tracking

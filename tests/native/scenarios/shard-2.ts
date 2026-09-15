@@ -10,205 +10,7 @@ export async function runNativeScenario2(
 ): Promise<void> {
   const { host, root } = context;
 
-  for (const [name, source] of [
-    ["typed-array-canonical-index.ts", "console.log(new Uint8Array(1)[-1]);"],
-    [
-      "typed-array-define-index.ts",
-      'Object.defineProperty(new Uint8Array(1), "0", { value: 1 });',
-    ],
-    ["typed-array-in-index.ts", 'console.log("1.5" in new Uint8Array(1));'],
-    [
-      "typed-array-proxy-canonical-index.ts",
-      "console.log(Object.hasOwn(" +
-        'new Proxy(new Uint8Array(1), {}), "1.5"));',
-    ],
-    [
-      "typed-array-proxy-define-index.ts",
-      "Object.defineProperty(" +
-        'new Proxy(new Uint8Array(1), {}), "0", { value: 1 });',
-    ],
-    ["typed-array-own-keys.ts", "Object.keys(new Uint8Array(1));"],
-    ["typed-array-spread.ts", "console.log({...new Uint8Array(1)});"],
-  ] as const) {
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          "TypedArray integer-indexed exotic operations are not " +
-          "admitted yet\\.",
-        "u",
-      ),
-    );
-  }
-
-  for (const [name, source] of [
-    [
-      "typed-array-default-for-of.ts",
-      "try { for (const value of new Uint8Array([1])) " +
-        "console.log(value); } catch (error) { console.log(error); }",
-    ],
-    [
-      "typed-array-default-array-spread.ts",
-      "try { console.log(...new Uint8Array([1])); } " +
-        "catch (error) { console.log(error); }",
-    ],
-    [
-      "typed-array-default-destructuring.ts",
-      "try { const [value] = new Uint8Array([1]); console.log(value); } " +
-        "catch (error) { console.log(error); }",
-    ],
-  ] as const) {
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          "TypedArray prototype accessors are not admitted yet\\.",
-        "u",
-      ),
-    );
-  }
-
-  for (const property of [
-    "length",
-    "byteLength",
-    "byteOffset",
-    "buffer",
-  ] as const) {
-    const name = `typed-array-in-${property}.ts`;
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source: `console.log("${property}" in new Uint8Array(1));`,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          "TypedArray prototype accessors are not admitted yet\\.",
-        "u",
-      ),
-    );
-  }
-
-  const inheritedEnumerationName = "typed-array-inherited-enumeration.ts";
-  const inheritedEnumeration = await runNativeCli(
-    {
-      args: [inheritedEnumerationName],
-      source:
-        "const object = {}; " +
-        "Object.setPrototypeOf(object, new Uint8Array([1])); " +
-        "for (const key in object) console.log(key);",
-      sourceId: inheritedEnumerationName,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(inheritedEnumeration.exitStatus, 1);
-  assert.equal(inheritedEnumeration.stdout, "");
-  assert.match(
-    inheritedEnumeration.stderr,
-    new RegExp(
-      `^${inheritedEnumerationName.replace(".", "\\.")}:1:\\d+: ` +
-        "error\\[OSEO2001\\]: TypedArray integer-indexed exotic " +
-        "operations are not admitted yet\\.",
-      "u",
-    ),
-  );
-
-  for (const [name, source] of [
-    ["typed-array-accessor-set.ts", "new Uint8Array(1).length = 2;"],
-    [
-      "typed-array-accessor-super-set.ts",
-      "class V extends Uint8Array { set() { super.length = 2; } } " +
-        "new V(1).set();",
-    ],
-  ] as const) {
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          "TypedArray prototype accessors are not admitted yet\\.",
-        "u",
-      ),
-    );
-  }
-
-  for (const [name, source] of [
-    [
-      "typed-array-to-string-tag.ts",
-      "console.log(new Uint8Array(1)[Symbol.toStringTag]);",
-    ],
-    [
-      "typed-array-object-to-string.ts",
-      "console.log(Object.prototype.toString.call(new Uint8Array(1)));",
-    ],
-  ] as const) {
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          "TypedArray prototype accessors are not admitted yet\\.",
-        "u",
-      ),
-    );
-  }
-
   for (const [name, source, message] of [
-    [
-      "typed-array-core-method.ts",
-      "console.log(new Uint8Array(1).values);",
-      "TypedArray core prototype methods are not admitted yet.",
-    ],
     [
       "typed-array-iterative-method.ts",
       "console.log(new Uint8Array(1).map);",
@@ -294,18 +96,6 @@ export async function runNativeScenario2(
       "TypedArray static APIs are not admitted yet.",
     ],
     [
-      "typed-array-delete-core-method.ts",
-      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
-        "console.log(delete p.at);",
-      "TypedArray core prototype methods are not admitted yet.",
-    ],
-    [
-      "typed-array-delete-accessor.ts",
-      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
-        "console.log(delete p.length);",
-      "TypedArray prototype accessors are not admitted yet.",
-    ],
-    [
       "typed-array-delete-own-replacement.ts",
       "const C = Object.getPrototypeOf(Uint8Array); " +
         'Object.defineProperty(C, "of", ' +
@@ -338,10 +128,6 @@ export async function runNativeScenario2(
   for (const [name, source] of [
     ["typed-array-static-from.ts", "console.log(Uint8Array.from);"],
     ["typed-array-static-of-in.ts", 'console.log("of" in Uint8Array);'],
-    [
-      "typed-array-static-species.ts",
-      "console.log(Uint8Array[Symbol.species]);",
-    ],
   ] as const) {
     const observed = await runNativeCli(
       {
@@ -363,6 +149,77 @@ export async function runNativeScenario2(
       ),
     );
   }
+
+  // Both references diverge from ECMA-262 on two TypedArray core steps,
+  // so these checks bypass them. A view's [[GetOwnProperty]] reports every
+  // valid element as configurable and writable, and TestIntegrityLevel
+  // reads those descriptors, so a non-empty view that cannot be extended is
+  // neither sealed nor frozen. A detached view has no element keys, so it
+  // is both. V8 answers from the view's byte length and length-tracking
+  // state instead: it reports a non-empty view sealed and a detached view
+  // that was non-empty not frozen, even right after Object.freeze
+  // succeeds. JavaScriptCore agrees with ECMA-262 on every row. The empty,
+  // length-tracking, and fixed-length resizable rows are boundaries where
+  // all engines agree. V8's subarray also skips TypedArraySpeciesCreate's
+  // content-type check.
+  const typedArrayDivergenceName = "typed-array-reference-divergence.ts";
+  const typedArrayDivergence = await runNativeCli(
+    {
+      args: [typedArrayDivergenceName],
+      source:
+        "const sealed = new Uint8Array(1); " +
+        "try { Object.seal(sealed); } " +
+        'catch (error) { console.log("seal", error instanceof TypeError); } ' +
+        'console.log("sealed", Object.isSealed(sealed), ' +
+        "Object.isExtensible(sealed)); " +
+        "const integrity = (label, value) => console.log(" +
+        '"integrity", label, Reflect.preventExtensions(value), ' +
+        "Object.isExtensible(value), Object.isSealed(value), " +
+        "Object.isFrozen(value)); " +
+        'integrity("fixed", new Uint8Array(3)); ' +
+        'integrity("empty", new Uint8Array(0)); ' +
+        "const detached = new Uint8Array(4); " +
+        "detached.buffer.transfer(); " +
+        'integrity("detached", detached); ' +
+        "const prevented = new Uint8Array(2); " +
+        'integrity("prevented", prevented); ' +
+        "prevented.buffer.transfer(); " +
+        'integrity("prevented detached", prevented); ' +
+        "const frozen = new Uint8Array(2); " +
+        "frozen.buffer.transfer(); " +
+        'console.log("freeze detached", Object.freeze(frozen) === frozen, ' +
+        "Object.isSealed(frozen), Object.isFrozen(frozen)); " +
+        "const resizable = new ArrayBuffer(4, { maxByteLength: 8 }); " +
+        'integrity("tracking", new Uint8Array(resizable)); ' +
+        'integrity("resizable fixed", new Uint8Array(resizable, 0, 2)); ' +
+        "const view = new Uint8Array(4); " +
+        "view.constructor = { [Symbol.species]: function () { " +
+        "return new BigInt64Array(4); } }; " +
+        "try { view.subarray(0); } " +
+        'catch (error) { console.log("content", error instanceof TypeError); }',
+      sourceId: typedArrayDivergenceName,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(typedArrayDivergence.exitStatus, 0, typedArrayDivergence.stderr);
+  assert.equal(
+    typedArrayDivergence.stdout,
+    [
+      "seal true",
+      "sealed false false",
+      "integrity fixed true false false false",
+      "integrity empty true false true true",
+      "integrity detached true false true true",
+      "integrity prevented true false false false",
+      "integrity prevented detached true false true true",
+      "freeze detached true true true",
+      "integrity tracking false true false false",
+      "integrity resizable fixed false true false false",
+      "content true",
+      "",
+    ].join("\n"),
+  );
 
   // The switch-tdz fixture explains why this check bypasses the Deno
   // reference: Deno's TypeScript transpile loses the case-level TDZ.

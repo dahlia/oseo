@@ -409,7 +409,6 @@ static OseoResult json_define_revived(
         (OseoPropertyAttributes){true, true, true, false},
         true,
         false,
-        false,
         &refusal
     );
 }
@@ -462,6 +461,19 @@ static OseoResult json_own_enumerable(
     OseoValue setter = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
     bool found = false;
+    bool numeric = false;
+    OseoResult element = oseo_internal_typed_array_own_property(
+        context,
+        object,
+        key,
+        &numeric,
+        &found
+    );
+    if (element.status != OSEO_STATUS_NORMAL || numeric) {
+        /* A valid TypedArray element is always enumerable. */
+        *enumerable = element.status == OSEO_STATUS_NORMAL && found;
+        return element;
+    }
     OseoResult result = is_proxy(object)
         ? oseo_internal_proxy_get_own_property(
             context,

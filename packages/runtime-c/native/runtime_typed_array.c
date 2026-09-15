@@ -8,9 +8,12 @@
 #include <string.h>
 
 /*
- * %TypedArray% and the eleven concrete constructors. This component owns
- * construction and element conversion. The complete integer-indexed exotic
- * descriptor surface and prototype algorithms remain later graph nodes.
+ * %TypedArray%, the eleven concrete constructors, and the core prototype.
+ * This component owns construction, element conversion, the
+ * integer-indexed exotic element operations the generic property paths
+ * delegate to, the prototype accessors, at, set, subarray, and the
+ * iterator methods. The iterative, mutation, search and join, and sorting
+ * prototype methods and the from and of statics remain later graph nodes.
  */
 
 #define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
@@ -381,6 +384,120 @@ static OseoResult typed_array_to_bigint_bits(
     return result.status == OSEO_STATUS_NORMAL ? normal(slot) : result;
 }
 
+/*
+ * Writes one already converted element into its Data Block bytes. Number
+ * kinds take `number` and BigInt kinds take `bits`; no user code runs and
+ * nothing allocates, so a caller may hold a Data Block pointer across it.
+ */
+static void typed_array_write_raw(
+    OseoTypedArrayKind kind,
+    uint8_t *target,
+    double number,
+    uint64_t bits
+) {
+    switch (kind) {
+        case OSEO_TYPED_ARRAY_INT8:
+        case OSEO_TYPED_ARRAY_UINT8: {
+            uint8_t stored = (uint8_t)integer_bits(number, 8u);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
+        case OSEO_TYPED_ARRAY_UINT8_CLAMPED: {
+            uint8_t stored = clamped_uint8(number);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
+        case OSEO_TYPED_ARRAY_INT16:
+        case OSEO_TYPED_ARRAY_UINT16: {
+            uint16_t stored = (uint16_t)integer_bits(number, 16u);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
+        case OSEO_TYPED_ARRAY_INT32:
+        case OSEO_TYPED_ARRAY_UINT32: {
+            uint32_t stored = (uint32_t)integer_bits(number, 32u);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
+        case OSEO_TYPED_ARRAY_FLOAT32: {
+            float stored = float32_value(number);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
+        case OSEO_TYPED_ARRAY_FLOAT64:
+            memcpy(target, &number, sizeof(number));
+            break;
+        case OSEO_TYPED_ARRAY_BIGINT64:
+        case OSEO_TYPED_ARRAY_BIGUINT64:
+            memcpy(target, &bits, sizeof(bits));
+            break;
+    }
+}
+
+/* Reads one Number-kind element from its Data Block bytes. */
+static double typed_array_read_number(
+    OseoTypedArrayKind kind,
+    const uint8_t *source
+) {
+    switch (kind) {
+        case OSEO_TYPED_ARRAY_INT8: {
+            uint8_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return stored >= UINT8_C(128)
+                ? (double)stored - 256.0
+                : (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_UINT8:
+        case OSEO_TYPED_ARRAY_UINT8_CLAMPED: {
+            uint8_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_INT16: {
+            uint16_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return stored >= UINT16_C(32768)
+                ? (double)stored - 65536.0
+                : (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_UINT16: {
+            uint16_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_INT32: {
+            uint32_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return stored >= UINT32_C(2147483648)
+                ? (double)stored - 4294967296.0
+                : (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_UINT32: {
+            uint32_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_FLOAT32: {
+            float stored;
+            memcpy(&stored, source, sizeof(stored));
+            return (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_FLOAT64:
+        case OSEO_TYPED_ARRAY_BIGINT64:
+        case OSEO_TYPED_ARRAY_BIGUINT64:
+            break;
+    }
+    double stored;
+    memcpy(&stored, source, sizeof(stored));
+    return stored;
+}
+
+/*
+ * TypedArraySetElement: the value converts first, which can
+ * run user code that resizes or detaches the buffer, and only then does
+ * IsValidIntegerIndex decide whether any byte changes. An index that was
+ * never valid, such as SIZE_MAX for a non-integral key, still converts.
+ */
 static OseoResult typed_array_store(
     OseoContext *context,
     OseoValue view_value,
@@ -391,7 +508,6 @@ static OseoResult typed_array_store(
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
     OseoTypedArray *view = typed_array_object(slots[0]);
-    size_t bytes = typed_array_bytes[view->element_kind];
     OseoResult result = normal(slots[1]);
     uint64_t bits = UINT64_C(0);
     double number = 0.0;
@@ -405,54 +521,18 @@ static OseoResult typed_array_store(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         view = typed_array_object(slots[0]);
-        if (index >= typed_array_length(view)) {
-            oseo_roots_pop(context, &frame);
-            return normal(slots[1]);
+        if (index < typed_array_length(view)) {
+            size_t bytes = typed_array_bytes[view->element_kind];
+            OseoArrayBuffer *buffer =
+                array_buffer_object(view->viewed_buffer);
+            typed_array_write_raw(
+                view->element_kind,
+                buffer->data + view->byte_offset + index * bytes,
+                number,
+                bits
+            );
         }
-        OseoArrayBuffer *buffer = array_buffer_object(view->viewed_buffer);
-        size_t offset = view->byte_offset + index * bytes;
-        uint8_t *target = buffer->data + offset;
-        switch (view->element_kind) {
-            case OSEO_TYPED_ARRAY_INT8: {
-                uint8_t stored = (uint8_t)integer_bits(number, 8u);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_UINT8: {
-                uint8_t stored = (uint8_t)integer_bits(number, 8u);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_UINT8_CLAMPED: {
-                uint8_t stored = clamped_uint8(number);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_INT16:
-            case OSEO_TYPED_ARRAY_UINT16: {
-                uint16_t stored = (uint16_t)integer_bits(number, 16u);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_INT32:
-            case OSEO_TYPED_ARRAY_UINT32: {
-                uint32_t stored = (uint32_t)integer_bits(number, 32u);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_FLOAT32: {
-                float stored = float32_value(number);
-                memcpy(target, &stored, sizeof(stored));
-                break;
-            }
-            case OSEO_TYPED_ARRAY_FLOAT64:
-                memcpy(target, &number, sizeof(number));
-                break;
-            case OSEO_TYPED_ARRAY_BIGINT64:
-            case OSEO_TYPED_ARRAY_BIGUINT64:
-                memcpy(target, &bits, sizeof(bits));
-                break;
-        }
+        result = normal(slots[1]);
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -492,69 +572,18 @@ static OseoResult typed_array_load(
     const OseoArrayBuffer *buffer =
         array_buffer_object(view->viewed_buffer);
     const uint8_t *source = buffer->data + view->byte_offset + index * bytes;
-    switch (view->element_kind) {
-        case OSEO_TYPED_ARRAY_INT8: {
-            uint8_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            double number = stored >= UINT8_C(128)
-                ? (double)stored - 256.0
-                : (double)stored;
-            return normal(oseo_number(number));
-        }
-        case OSEO_TYPED_ARRAY_UINT8:
-        case OSEO_TYPED_ARRAY_UINT8_CLAMPED: {
-            uint8_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            return normal(oseo_number((double)stored));
-        }
-        case OSEO_TYPED_ARRAY_INT16: {
-            uint16_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            double number = stored >= UINT16_C(32768)
-                ? (double)stored - 65536.0
-                : (double)stored;
-            return normal(oseo_number(number));
-        }
-        case OSEO_TYPED_ARRAY_UINT16: {
-            uint16_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            return normal(oseo_number((double)stored));
-        }
-        case OSEO_TYPED_ARRAY_INT32: {
-            uint32_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            double number = stored >= UINT32_C(2147483648)
-                ? (double)stored - 4294967296.0
-                : (double)stored;
-            return normal(oseo_number(number));
-        }
-        case OSEO_TYPED_ARRAY_UINT32: {
-            uint32_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            return normal(oseo_number((double)stored));
-        }
-        case OSEO_TYPED_ARRAY_FLOAT32: {
-            float stored;
-            memcpy(&stored, source, sizeof(stored));
-            return normal(oseo_number((double)stored));
-        }
-        case OSEO_TYPED_ARRAY_FLOAT64: {
-            double stored;
-            memcpy(&stored, source, sizeof(stored));
-            return normal(oseo_number(stored));
-        }
-        case OSEO_TYPED_ARRAY_BIGINT64:
-        case OSEO_TYPED_ARRAY_BIGUINT64: {
-            uint64_t stored;
-            memcpy(&stored, source, sizeof(stored));
-            return bigint_from_bits(
-                context,
-                stored,
-                view->element_kind == OSEO_TYPED_ARRAY_BIGINT64
-            );
-        }
+    if (typed_array_bigint_kind(view->element_kind)) {
+        uint64_t stored;
+        memcpy(&stored, source, sizeof(stored));
+        return bigint_from_bits(
+            context,
+            stored,
+            view->element_kind == OSEO_TYPED_ARRAY_BIGINT64
+        );
     }
-    return failure(context, "OSEO2001", "Unknown TypedArray element kind.");
+    return normal(oseo_number(
+        typed_array_read_number(view->element_kind, source)
+    ));
 }
 
 static OseoResult typed_array_index_string(
@@ -569,10 +598,39 @@ static OseoResult typed_array_index_string(
     return oseo_internal_ascii_string(context, text);
 }
 
+OseoResult oseo_internal_typed_array_numeric_key(
+    OseoContext *context,
+    OseoValue key,
+    bool *numeric,
+    size_t *index
+) {
+    *numeric = false;
+    *index = SIZE_MAX;
+    uint32_t array_index = 0u;
+    if (oseo_internal_array_index(key, &array_index)) {
+        *numeric = true;
+        *index = (size_t)array_index;
+        return normal(oseo_undefined());
+    }
+    OseoResult result =
+        oseo_internal_canonical_numeric_index(context, key, numeric);
+    if (result.status != OSEO_STATUS_NORMAL || !*numeric) return result;
+    result = oseo_internal_to_number(context, key);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    /* "-0" is canonical but never an integer index, and no view can be
+     * long enough to reach an index that does not fit size_t. */
+    if (isfinite(number) && number >= 0.0 && !signbit(number) &&
+        trunc(number) == number && number < (double)SIZE_MAX) {
+        *index = (size_t)number;
+    }
+    return normal(oseo_undefined());
+}
+
 OseoResult oseo_internal_typed_array_get_index(
     OseoContext *context,
     OseoValue view,
-    uint32_t index,
+    size_t index,
     bool *present
 ) {
     *present = false;
@@ -580,20 +638,20 @@ OseoResult oseo_internal_typed_array_get_index(
         return failure(context, "OSEO2001", "Value is not a TypedArray.");
     }
     size_t length = typed_array_length(typed_array_object(view));
-    if ((size_t)index >= length) return normal(oseo_undefined());
+    if (index >= length) return normal(oseo_undefined());
     *present = true;
     return typed_array_load(context, view, index);
 }
 
-bool oseo_internal_typed_array_has_index(OseoValue view, uint32_t index) {
+bool oseo_internal_typed_array_has_index(OseoValue view, size_t index) {
     return is_typed_array(view) &&
-        (size_t)index < typed_array_length(typed_array_object(view));
+        index < typed_array_length(typed_array_object(view));
 }
 
 OseoResult oseo_internal_typed_array_set_index(
     OseoContext *context,
     OseoValue view,
-    uint32_t index,
+    size_t index,
     OseoValue value,
     bool *present
 ) {
@@ -603,10 +661,100 @@ OseoResult oseo_internal_typed_array_set_index(
     }
     OseoResult result = typed_array_store(context, view, index, value);
     if (result.status == OSEO_STATUS_NORMAL) {
-        *present = (size_t)index <
-            typed_array_length(typed_array_object(view));
+        *present = index < typed_array_length(typed_array_object(view));
     }
     return result.status == OSEO_STATUS_NORMAL ? normal(value) : result;
+}
+
+OseoResult oseo_internal_typed_array_own_property(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    bool *handled,
+    bool *found
+) {
+    *handled = false;
+    *found = false;
+    if (!is_typed_array(object)) return normal(oseo_undefined());
+    size_t index = SIZE_MAX;
+    OseoResult result = oseo_internal_typed_array_numeric_key(
+        context,
+        key,
+        handled,
+        &index
+    );
+    if (result.status != OSEO_STATUS_NORMAL || !*handled) return result;
+    return oseo_internal_typed_array_get_index(context, object, index, found);
+}
+
+OseoResult oseo_internal_typed_array_define_index(
+    OseoContext *context,
+    OseoValue view,
+    size_t index,
+    const OseoConvertedDescriptor *descriptor,
+    OseoValue value,
+    const char **refusal
+) {
+    *refusal = NULL;
+    if (!oseo_internal_typed_array_has_index(view, index)) {
+        *refusal = "Cannot define an out-of-bounds TypedArray index.";
+    } else if ((descriptor->has_configurable &&
+                !descriptor->configurable) ||
+               (descriptor->has_enumerable && !descriptor->enumerable) ||
+               descriptor->has_getter || descriptor->has_setter ||
+               (descriptor->has_writable && !descriptor->writable)) {
+        *refusal =
+            "A TypedArray element must stay a writable, enumerable, and "
+            "configurable data property.";
+    }
+    if (*refusal != NULL || !descriptor->has_value) return normal(view);
+    bool present = false;
+    OseoResult result = oseo_internal_typed_array_set_index(
+        context,
+        view,
+        index,
+        value,
+        &present
+    );
+    return result.status == OSEO_STATUS_NORMAL ? normal(view) : result;
+}
+
+size_t oseo_internal_typed_array_index_key_count(OseoValue object) {
+    return is_typed_array(object)
+        ? typed_array_length(typed_array_object(object))
+        : 0u;
+}
+
+OseoResult oseo_internal_typed_array_index_key(
+    OseoContext *context,
+    size_t index
+) {
+    return typed_array_index_string(context, index);
+}
+
+bool oseo_internal_typed_array_fixed_length(OseoValue view) {
+    const OseoTypedArray *typed = typed_array_object(view);
+    if (typed->array_length == SIZE_MAX) return false;
+    return !is_array_buffer(typed->viewed_buffer) ||
+        !array_buffer_object(typed->viewed_buffer)->resizable;
+}
+
+OseoResult oseo_internal_typed_array_iteration_length(
+    OseoContext *context,
+    OseoValue view,
+    double *length
+) {
+    const OseoTypedArray *typed = typed_array_object(view);
+    if (typed_array_out_of_bounds(typed)) {
+        *length = 0.0;
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot iterate a detached or out-of-bounds TypedArray."
+        );
+    }
+    *length = (double)typed_array_length(typed);
+    return normal(oseo_undefined());
 }
 
 static OseoResult typed_array_from_length(
@@ -1116,6 +1264,559 @@ static OseoResult typed_array_construct(
     return result;
 }
 
+static OseoValue typed_array_argument(
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t index
+) {
+    return index < argument_count ? arguments[index] : oseo_undefined();
+}
+
+/* ToIntegerOrInfinity, with -0 normalized to +0. */
+static OseoResult typed_array_integer_or_infinity(
+    OseoContext *context,
+    OseoValue value,
+    double *integer
+) {
+    OseoResult result = oseo_internal_to_number(context, value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    if (isnan(number) || number == 0.0) number = 0.0;
+    else if (isfinite(number)) number = trunc(number);
+    if (number == 0.0) number = 0.0;
+    *integer = number;
+    return normal(oseo_undefined());
+}
+
+/* The relative-index clamp subarray applies to its start and end. */
+static double typed_array_clamped_index(double relative, double length) {
+    if (relative == -INFINITY) return 0.0;
+    if (relative < 0.0) return fmax(length + relative, 0.0);
+    return fmin(relative, length);
+}
+
+/*
+ * ValidateTypedArray: the value must carry [[TypedArrayName]]
+ * and its buffer must be neither detached nor too short for the view.
+ */
+static OseoResult typed_array_validate(OseoContext *context, OseoValue value) {
+    if (!is_typed_array(value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The receiver is not a TypedArray."
+        );
+    }
+    if (typed_array_out_of_bounds(typed_array_object(value))) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The TypedArray is detached or out of bounds."
+        );
+    }
+    return normal(value);
+}
+
+/*
+ * The buffer, byteLength, byteOffset, and length getters and the
+ * [Symbol.toStringTag] getter. Each reads the view's internal slots, so
+ * a shadowing own property or a replaced prototype never changes the
+ * answer, and a detached or out-of-bounds view reports zero lengths.
+ */
+static OseoResult typed_array_accessor(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver
+) {
+    if (code_id == OSEO_TYPED_ARRAY_TO_STRING_TAG_CODE_ID) {
+        if (!is_typed_array(receiver)) return normal(oseo_undefined());
+        return oseo_internal_ascii_string(
+            context,
+            typed_array_names[typed_array_object(receiver)->element_kind]
+        );
+    }
+    if (!is_typed_array(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray accessor requires a TypedArray receiver."
+        );
+    }
+    const OseoTypedArray *view = typed_array_object(receiver);
+    if (code_id == OSEO_TYPED_ARRAY_BUFFER_CODE_ID) {
+        return normal(view->viewed_buffer);
+    }
+    bool out_of_bounds = typed_array_out_of_bounds(view);
+    size_t length = typed_array_length(view);
+    if (code_id == OSEO_TYPED_ARRAY_BYTE_OFFSET_CODE_ID) {
+        return normal(oseo_number(
+            out_of_bounds ? 0.0 : (double)view->byte_offset
+        ));
+    }
+    if (code_id == OSEO_TYPED_ARRAY_BYTE_LENGTH_CODE_ID) {
+        return normal(oseo_number(
+            (double)length * (double)typed_array_bytes[view->element_kind]
+        ));
+    }
+    return normal(oseo_number((double)length));
+}
+
+/* %TypedArray%.prototype.at. */
+static OseoResult typed_array_at(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slot = receiver;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    double length = (double)typed_array_length(typed_array_object(slot));
+    double relative = 0.0;
+    result = typed_array_integer_or_infinity(
+        context,
+        typed_array_argument(argument_count, arguments, 0u),
+        &relative
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        double index = relative >= 0.0 ? relative : length + relative;
+        bool present = false;
+        result = index < 0.0 || index >= length
+            ? normal(oseo_undefined())
+            : oseo_internal_typed_array_get_index(
+                context,
+                slot,
+                (size_t)index,
+                &present
+            );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * SetTypedArrayFromTypedArray. No user code runs after the
+ * offset conversion, so the Data Block pointers stay valid through the
+ * copy. A source sharing the target's buffer is snapshotted first, as
+ * CloneArrayBuffer does, unless a same-kind move can overlap safely.
+ */
+static OseoResult typed_array_set_from_typed_array(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source,
+    double offset
+) {
+    const OseoTypedArray *target_view = typed_array_object(target);
+    const OseoTypedArray *source_view = typed_array_object(source);
+    if (typed_array_out_of_bounds(target_view) ||
+        typed_array_out_of_bounds(source_view)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray set requires in-bounds views."
+        );
+    }
+    size_t target_length = typed_array_length(target_view);
+    size_t source_length = typed_array_length(source_view);
+    if (offset == INFINITY ||
+        (double)source_length + offset > (double)target_length) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "TypedArray set source does not fit the target."
+        );
+    }
+    OseoTypedArrayKind target_kind = target_view->element_kind;
+    OseoTypedArrayKind source_kind = source_view->element_kind;
+    if (typed_array_bigint_kind(target_kind) !=
+        typed_array_bigint_kind(source_kind)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot mix BigInt and Number TypedArrays."
+        );
+    }
+    size_t target_bytes = typed_array_bytes[target_kind];
+    size_t source_bytes = typed_array_bytes[source_kind];
+    size_t source_byte_length = source_length * source_bytes;
+    if (source_byte_length == 0u) return normal(oseo_undefined());
+    uint8_t *target_data =
+        array_buffer_object(target_view->viewed_buffer)->data +
+        target_view->byte_offset + (size_t)offset * target_bytes;
+    const uint8_t *source_data =
+        array_buffer_object(source_view->viewed_buffer)->data +
+        source_view->byte_offset;
+    if (target_kind == source_kind) {
+        memmove(target_data, source_data, source_byte_length);
+        return normal(oseo_undefined());
+    }
+    uint8_t *snapshot = NULL;
+    if (target_view->viewed_buffer == source_view->viewed_buffer) {
+        snapshot = malloc(source_byte_length);
+        if (snapshot == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "TypedArray set snapshot allocation failed."
+            );
+        }
+        memcpy(snapshot, source_data, source_byte_length);
+        source_data = snapshot;
+    }
+    for (size_t index = 0u; index < source_length; index += 1u) {
+        const uint8_t *from = source_data + index * source_bytes;
+        uint64_t bits = UINT64_C(0);
+        double number = 0.0;
+        if (typed_array_bigint_kind(source_kind)) {
+            memcpy(&bits, from, sizeof(bits));
+        } else {
+            number = typed_array_read_number(source_kind, from);
+        }
+        typed_array_write_raw(
+            target_kind,
+            target_data + index * target_bytes,
+            number,
+            bits
+        );
+    }
+    free(snapshot);
+    return normal(oseo_undefined());
+}
+
+/*
+ * SetTypedArrayFromArrayLike. Every element read and
+ * conversion can run user code that detaches or resizes the target, and
+ * TypedArraySetElement then skips the write rather than throwing.
+ */
+static OseoResult typed_array_set_from_array_like(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source,
+    double offset
+) {
+    if (typed_array_out_of_bounds(typed_array_object(target))) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray set requires an in-bounds target."
+        );
+    }
+    size_t target_length = typed_array_length(typed_array_object(target));
+    OseoValue slots[4] = {target, source, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_object(context, slots[1]);
+    slots[1] = result.value;
+    size_t source_length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_array_like_length(
+            context,
+            slots[1],
+            &source_length
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (offset == INFINITY ||
+         (double)source_length + offset > (double)target_length)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "TypedArray set source does not fit the target."
+        );
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < source_length;
+         index += 1u) {
+        result = typed_array_index_string(context, index);
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[1], slots[2]);
+            slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_store(
+                context,
+                slots[0],
+                (size_t)offset + index,
+                slots[3]
+            );
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_undefined())
+        : result;
+}
+
+/* %TypedArray%.prototype.set. */
+static OseoResult typed_array_set(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_typed_array(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The receiver is not a TypedArray."
+        );
+    }
+    OseoValue slots[2] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+    };
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    double offset = 0.0;
+    OseoResult result = typed_array_integer_or_infinity(
+        context,
+        typed_array_argument(argument_count, arguments, 1u),
+        &offset
+    );
+    if (result.status == OSEO_STATUS_NORMAL && offset < 0.0) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "TypedArray set offset must not be negative."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = is_typed_array(slots[1])
+            ? typed_array_set_from_typed_array(
+                context,
+                slots[0],
+                slots[1],
+                offset
+            )
+            : typed_array_set_from_array_like(
+                context,
+                slots[0],
+                slots[1],
+                offset
+            );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Construct for a species constructor that may be a class, a
+ * bound function, or a Proxy. `arguments` must already be rooted.
+ */
+static OseoResult typed_array_construct_with(
+    OseoContext *context,
+    OseoValue constructor,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[2] = {constructor, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        oseo_internal_construct_receiver(context, slots[0], slots[0]);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[0],
+            slots[1],
+            argument_count,
+            arguments,
+            slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_constructor_result(context, result.value, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * TypedArraySpeciesCreate with SpeciesConstructor and
+ * TypedArrayCreateFromConstructor. `arguments` must already
+ * be rooted by the caller.
+ */
+static OseoResult typed_array_species_create(
+    OseoContext *context,
+    OseoValue exemplar,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoTypedArrayKind kind = typed_array_object(exemplar)->element_kind;
+    OseoValue slots[3] = {exemplar, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "constructor");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[1]) != OSEO_TAG_UNDEFINED) {
+        if (!is_object(slots[1])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "TypedArray constructor property is not an object."
+            );
+        } else {
+            result = oseo_internal_well_known_symbol(
+                context,
+                OSEO_WELL_KNOWN_SPECIES
+            );
+            slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(context, slots[1], slots[2]);
+                slots[1] = is_nullish(result.value)
+                    ? oseo_undefined()
+                    : result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL &&
+                tag_of(slots[1]) != OSEO_TAG_UNDEFINED &&
+                !function_is_constructible(slots[1])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "TypedArray species is not a constructor."
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(slots[1]) == OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_intrinsic(
+            context,
+            typed_array_constructors[kind]
+        );
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_construct_with(
+            context,
+            slots[1],
+            argument_count,
+            arguments
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_validate(context, slots[2]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && argument_count == 1u &&
+        is_number(arguments[0]) &&
+        (double)typed_array_length(typed_array_object(slots[2])) <
+            number_value(arguments[0])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray species result is too short."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        typed_array_bigint_kind(typed_array_object(slots[2])->element_kind) !=
+            typed_array_bigint_kind(kind)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray species result has a different content type."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[2];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* %TypedArray%.prototype.subarray. */
+static OseoResult typed_array_subarray(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_typed_array(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The receiver is not a TypedArray."
+        );
+    }
+    const OseoTypedArray *view = typed_array_object(receiver);
+    double source_length = typed_array_out_of_bounds(view)
+        ? 0.0
+        : (double)typed_array_length(view);
+    OseoValue end = typed_array_argument(argument_count, arguments, 1u);
+    OseoValue slots[5] = {
+        receiver,
+        end,
+        view->viewed_buffer,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    double relative_start = 0.0;
+    OseoResult result = typed_array_integer_or_infinity(
+        context,
+        typed_array_argument(argument_count, arguments, 0u),
+        &relative_start
+    );
+    double start = typed_array_clamped_index(relative_start, source_length);
+    view = typed_array_object(slots[0]);
+    size_t bytes = typed_array_bytes[view->element_kind];
+    slots[3] = oseo_number(
+        (double)view->byte_offset + start * (double)bytes
+    );
+    size_t forwarded = 2u;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (view->array_length != SIZE_MAX ||
+         tag_of(slots[1]) != OSEO_TAG_UNDEFINED)) {
+        double relative_end = source_length;
+        if (tag_of(slots[1]) != OSEO_TAG_UNDEFINED) {
+            result = typed_array_integer_or_infinity(
+                context,
+                slots[1],
+                &relative_end
+            );
+        }
+        double end_index =
+            typed_array_clamped_index(relative_end, source_length);
+        slots[4] = oseo_number(fmax(end_index - start, 0.0));
+        forwarded = 3u;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_species_create(
+            context,
+            slots[0],
+            forwarded,
+            &slots[2]
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The entries, keys, and values methods. */
+static OseoResult typed_array_iterator_method(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoIteratorKind kind = OSEO_ARRAY_ITERATOR_VALUE;
+    if (code_id == OSEO_TYPED_ARRAY_ENTRIES_CODE_ID) {
+        kind = OSEO_ARRAY_ITERATOR_KEY_AND_VALUE;
+    } else if (code_id == OSEO_TYPED_ARRAY_KEYS_CODE_ID) {
+        kind = OSEO_ARRAY_ITERATOR_KEY;
+    }
+    return oseo_internal_array_iterator_create(context, receiver, kind);
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1126,7 +1827,33 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoValue new_target
 ) {
     (void)callee;
-    (void)receiver;
+    if (code_id == OSEO_TYPED_ARRAY_BUFFER_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_BYTE_LENGTH_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_BYTE_OFFSET_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_LENGTH_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_TO_STRING_TAG_CODE_ID) {
+        return typed_array_accessor(context, code_id, receiver);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_SPECIES_CODE_ID) return normal(receiver);
+    if (code_id == OSEO_TYPED_ARRAY_AT_CODE_ID) {
+        return typed_array_at(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_SET_CODE_ID) {
+        return typed_array_set(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_SUBARRAY_CODE_ID) {
+        return typed_array_subarray(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_ENTRIES_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_KEYS_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_VALUES_CODE_ID) {
+        return typed_array_iterator_method(context, code_id, receiver);
+    }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
         return oseo_internal_throw_error(
             context,
@@ -1147,7 +1874,9 @@ static OseoResult create_typed_array_builtin(
     OseoContext *context,
     size_t code_id,
     const char *name,
-    size_t length
+    size_t length,
+    OseoFunctionKind kind,
+    OseoFunctionNamePrefix prefix
 ) {
     size_t name_length = strlen(name);
     uint16_t units[32];
@@ -1170,10 +1899,10 @@ static OseoResult create_typed_array_builtin(
             units,
             name_length,
             length,
-            OSEO_FUNCTION_ORDINARY,
+            kind,
             oseo_undefined(),
             oseo_undefined(),
-            OSEO_FUNCTION_NAME_PREFIX_NONE
+            prefix
         );
     }
     oseo_roots_pop(context, &frame);
@@ -1199,6 +1928,211 @@ static OseoResult define_typed_array_property(
             slots[2],
             slots[1],
             attributes
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Installs the core %TypedArray.prototype% surface and the
+ * %TypedArray%[Symbol.species] getter subarray's species lookup needs.
+ * `toString` is the original %Array.prototype.toString% function object,
+ * read from its realm slot so a program that replaced the Array method
+ * before this cluster materialized cannot change the identity. The
+ * remaining prototype methods and the `from` and `of` statics stay with
+ * their later graph owners.
+ */
+static OseoResult typed_array_install_core(
+    OseoContext *context,
+    OseoValue prototype,
+    OseoValue constructor
+) {
+    OseoValue slots[4] = {
+        prototype,
+        constructor,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    const OseoPropertyAttributes method = {true, false, true, false};
+    const OseoPropertyAttributes accessor = {true, false, false, true};
+    static const size_t accessor_codes[] = {
+        OSEO_TYPED_ARRAY_BUFFER_CODE_ID,
+        OSEO_TYPED_ARRAY_BYTE_LENGTH_CODE_ID,
+        OSEO_TYPED_ARRAY_BYTE_OFFSET_CODE_ID,
+        OSEO_TYPED_ARRAY_LENGTH_CODE_ID,
+    };
+    static const char *const accessor_names[] = {
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length",
+    };
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 4u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            accessor_codes[index],
+            accessor_names[index],
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(
+                context,
+                accessor_names[index]
+            );
+            slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define_accessor(
+                context,
+                slots[0],
+                slots[3],
+                slots[2],
+                oseo_undefined(),
+                true,
+                false,
+                accessor
+            );
+        }
+    }
+    static const size_t method_codes[] = {
+        OSEO_TYPED_ARRAY_AT_CODE_ID,
+        OSEO_TYPED_ARRAY_ENTRIES_CODE_ID,
+        OSEO_TYPED_ARRAY_KEYS_CODE_ID,
+        OSEO_TYPED_ARRAY_SET_CODE_ID,
+        OSEO_TYPED_ARRAY_SUBARRAY_CODE_ID,
+        OSEO_TYPED_ARRAY_VALUES_CODE_ID,
+    };
+    static const char *const method_names[] = {
+        "at",
+        "entries",
+        "keys",
+        "set",
+        "subarray",
+        "values",
+    };
+    static const size_t method_lengths[] = {1u, 0u, 0u, 1u, 2u, 0u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 6u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            method_codes[index],
+            method_names[index],
+            method_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[0],
+                method_names[index],
+                slots[2],
+                method
+            );
+        }
+    }
+    /* `values` was created last, so slot 2 still holds it. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            slots[0],
+            slots[3],
+            slots[2],
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_ARRAY_TO_STRING
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_typed_array_property(
+            context,
+            slots[0],
+            "toString",
+            slots[2],
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_typed_array_builtin(
+            context,
+            OSEO_TYPED_ARRAY_TO_STRING_TAG_CODE_ID,
+            "[Symbol.toStringTag]",
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define_accessor(
+            context,
+            slots[0],
+            slots[3],
+            slots[2],
+            oseo_undefined(),
+            true,
+            false,
+            accessor
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_typed_array_builtin(
+            context,
+            OSEO_TYPED_ARRAY_SPECIES_CODE_ID,
+            "[Symbol.species]",
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_SPECIES
+        );
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define_accessor(
+            context,
+            slots[1],
+            slots[3],
+            slots[2],
+            oseo_undefined(),
+            true,
+            false,
+            accessor
         );
     }
     oseo_roots_pop(context, &frame);
@@ -1237,7 +2171,9 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
             context,
             OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID,
             "TypedArray",
-            0u
+            0u,
+            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[2] = result.value;
     }
@@ -1256,6 +2192,13 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
             method
         );
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_install_core(
+            context,
+            frame.slots[1],
+            frame.slots[2]
+        );
+    }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
              index < TYPED_ARRAY_KIND_COUNT;
@@ -1268,7 +2211,9 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
             context,
             typed_array_codes[index],
             typed_array_names[index],
-            3u
+            3u,
+            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[4] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
@@ -1309,7 +2254,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
     }
     if (result.status != OSEO_STATUS_NORMAL) {
         for (size_t index = OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE;
-             index < OSEO_INTRINSIC_COUNT;
+             index <= OSEO_INTRINSIC_BIGUINT64_ARRAY;
              index += 1u) {
             context->intrinsics[index] = oseo_undefined();
         }
@@ -1340,37 +2285,14 @@ static bool typed_array_key_matches(
     return false;
 }
 
-static bool typed_array_deferred_accessor(
-    OseoContext *context,
-    OseoValue object,
-    OseoValue key
-) {
-    /* This constructor node defers every standard accessor and symbol-keyed
-     * entry on %TypedArray.prototype%. */
-    return object ==
-            context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] &&
-        (oseo_internal_string_is_ascii(key, "length") ||
-         oseo_internal_string_is_ascii(key, "byteLength") ||
-         oseo_internal_string_is_ascii(key, "byteOffset") ||
-         oseo_internal_string_is_ascii(key, "buffer") ||
-         key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR] ||
-         key == context->well_known_symbols[
-             OSEO_WELL_KNOWN_TO_STRING_TAG
-         ]);
-}
-
 const char *oseo_internal_typed_array_deferred_diagnostic(
     OseoContext *context,
     OseoValue object,
     OseoValue key
 ) {
-    if (typed_array_deferred_accessor(context, object, key)) {
-        return "TypedArray prototype accessors are not admitted yet.";
-    }
     if (object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]) {
         if (oseo_internal_string_is_ascii(key, "from") ||
-            oseo_internal_string_is_ascii(key, "of") ||
-            key == context->well_known_symbols[OSEO_WELL_KNOWN_SPECIES]) {
+            oseo_internal_string_is_ascii(key, "of")) {
             return "TypedArray static APIs are not admitted yet.";
         }
         return NULL;
@@ -1378,18 +2300,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
     if (object !=
         context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
         return NULL;
-    }
-    static const char *const core[] = {
-        "at",
-        "entries",
-        "keys",
-        "set",
-        "subarray",
-        "values",
-    };
-    if (typed_array_key_matches(
-            key, core, sizeof(core) / sizeof(*core))) {
-        return "TypedArray core prototype methods are not admitted yet.";
     }
     static const char *const iterative[] = {
         "every",
@@ -1426,7 +2336,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
         "join",
         "lastIndexOf",
         "toLocaleString",
-        "toString",
     };
     if (typed_array_key_matches(
             key,
@@ -1446,6 +2355,9 @@ const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
     OseoContext *context,
     OseoValue object
 ) {
+    /* The prototype's own-key list stays incomplete until every later
+     * prototype method node lands, and the constructor's until the
+     * statics node lands. */
     if (object ==
         context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
         return "TypedArray prototype own-key reflection is not admitted yet.";
@@ -1453,16 +2365,6 @@ const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
     return object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]
         ? "TypedArray static APIs are not admitted yet."
         : NULL;
-}
-
-bool oseo_internal_typed_array_deferred_assignment(
-    OseoContext *context,
-    OseoValue object,
-    OseoValue key
-) {
-    return typed_array_deferred_accessor(context, object, key) ||
-        (object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY] &&
-         key == context->well_known_symbols[OSEO_WELL_KNOWN_SPECIES]);
 }
 
 OseoResult oseo_internal_install_typed_array_globals(

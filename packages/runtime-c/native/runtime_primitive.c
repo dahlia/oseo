@@ -1809,30 +1809,23 @@ OseoResult oseo_has_property(
         if (is_proxy(current)) {
             return oseo_internal_proxy_has(context, current, property);
         }
-        uint32_t typed_index = 0u;
-        if (is_typed_array(current) &&
-            oseo_internal_array_index(property, &typed_index)) {
-            return normal(oseo_boolean(
-                oseo_internal_typed_array_has_index(current, typed_index)
-            ));
-        }
-        bool numeric_index = false;
-        OseoResult classified = normal(oseo_undefined());
         if (is_typed_array(current)) {
-            classified = oseo_internal_canonical_numeric_index(
+            /* A view's [[HasProperty]] answers every canonical
+             * numeric key without consulting its prototype. */
+            bool numeric = false;
+            size_t typed_index = SIZE_MAX;
+            OseoResult classified = oseo_internal_typed_array_numeric_key(
                 context,
                 property,
-                &numeric_index
+                &numeric,
+                &typed_index
             );
-        }
-        if (classified.status != OSEO_STATUS_NORMAL) return classified;
-        if (numeric_index) {
-            return failure(
-                context,
-                "OSEO2001",
-                "TypedArray integer-indexed exotic operations are not "
-                "admitted yet."
-            );
+            if (classified.status != OSEO_STATUS_NORMAL) return classified;
+            if (numeric) {
+                return normal(oseo_boolean(
+                    oseo_internal_typed_array_has_index(current, typed_index)
+                ));
+            }
         }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};

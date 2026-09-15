@@ -9,25 +9,17 @@ static OseoResult type_error(OseoContext *context, const char *message) {
     return oseo_internal_throw_error(context, OSEO_ERROR_TYPE, message);
 }
 
-static OseoResult typed_array_exotic_error(OseoContext *context) {
-    return failure(
-        context,
-        "OSEO2001",
-        "TypedArray integer-indexed exotic operations are not admitted yet."
-    );
-}
-
 /*
- * The TypedArray [[Set]] prelude (10.4.5.5 steps 1.a and 1.b) for a view
- * reached on a set walk, whether the view is the receiver itself or a
- * prototype of an ordinary receiver. `*answered` reports that the view
- * settled the write: an admitted index writes the element when the view
- * is the receiver, and an invalid index with a foreign receiver reports
- * true without writing anywhere. `*element` reports a valid index with a
- * foreign receiver, whose ordinary descriptor is always a writable data
- * property, so the caller stops the walk and writes to the receiver. A
- * non-index canonical numeric key stays at the deferred boundary. Any
- * other key leaves both flags clear and the walk continues ordinarily.
+ * The TypedArray [[Set]] prelude for a view reached on
+ * a set walk, whether the view is the receiver itself or a prototype of
+ * an ordinary receiver. `*answered` reports that the view settled the
+ * write: a canonical numeric key performs TypedArraySetElement when the
+ * view is the receiver, and an invalid index with a foreign receiver
+ * reports true without writing anywhere. `*element` reports a valid
+ * index with a foreign receiver, whose ordinary descriptor is always a
+ * writable data property, so the caller stops the walk and writes to the
+ * receiver. Any other key leaves both flags clear and the walk continues
+ * ordinarily.
  */
 static OseoResult typed_array_set_step(
     OseoContext *context,
@@ -40,37 +32,37 @@ static OseoResult typed_array_set_step(
 ) {
     *answered = false;
     *element = false;
-    uint32_t typed_index = 0u;
-    if (oseo_internal_array_index(key, &typed_index)) {
-        if (view == receiver) {
-            bool present = false;
-            OseoResult stored = oseo_internal_typed_array_set_index(
-                context,
-                view,
-                typed_index,
-                value,
-                &present
-            );
-            if (stored.status != OSEO_STATUS_NORMAL) return stored;
-            (void)present;
-            *answered = true;
-            return normal(value);
-        }
-        if (!oseo_internal_typed_array_has_index(view, typed_index)) {
-            *answered = true;
-            return normal(value);
-        }
-        *element = true;
-        return normal(value);
-    }
-    bool numeric_index = false;
-    OseoResult classified = oseo_internal_canonical_numeric_index(
+    bool numeric = false;
+    size_t typed_index = SIZE_MAX;
+    OseoResult classified = oseo_internal_typed_array_numeric_key(
         context,
         key,
-        &numeric_index
+        &numeric,
+        &typed_index
     );
-    if (classified.status != OSEO_STATUS_NORMAL) return classified;
-    if (numeric_index) return typed_array_exotic_error(context);
+    if (classified.status != OSEO_STATUS_NORMAL || !numeric) {
+        return classified.status == OSEO_STATUS_NORMAL
+            ? normal(value)
+            : classified;
+    }
+    if (view == receiver) {
+        bool present = false;
+        OseoResult stored = oseo_internal_typed_array_set_index(
+            context,
+            view,
+            typed_index,
+            value,
+            &present
+        );
+        if (stored.status != OSEO_STATUS_NORMAL) return stored;
+        *answered = true;
+        return normal(value);
+    }
+    if (!oseo_internal_typed_array_has_index(view, typed_index)) {
+        *answered = true;
+        return normal(value);
+    }
+    *element = true;
     return normal(value);
 }
 
@@ -138,28 +130,22 @@ static OseoResult object_get(
             return oseo_internal_proxy_get(
                 context, current, key, receiver);
         }
-        uint32_t typed_index = 0u;
-        if (is_typed_array(current) &&
-            oseo_internal_array_index(key, &typed_index)) {
+        if (is_typed_array(current)) {
+            /* A view's [[Get]] answers every canonical numeric
+             * key itself, so an invalid index never reaches the prototype. */
+            bool numeric = false;
             bool present = false;
-            return oseo_internal_typed_array_get_index(
+            OseoResult element = oseo_internal_typed_array_own_property(
                 context,
                 current,
-                typed_index,
+                key,
+                &numeric,
                 &present
             );
+            if (element.status != OSEO_STATUS_NORMAL || numeric) {
+                return element;
+            }
         }
-        bool numeric_index = false;
-        OseoResult classified = normal(oseo_undefined());
-        if (is_typed_array(current)) {
-            classified = oseo_internal_canonical_numeric_index(
-                context,
-                key,
-                &numeric_index
-            );
-        }
-        if (classified.status != OSEO_STATUS_NORMAL) return classified;
-        if (numeric_index) return typed_array_exotic_error(context);
         OseoOrdinaryObject *object = ordinary_object(current);
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
@@ -238,20 +224,20 @@ OseoResult oseo_object_has_own(
         )));
     }
     if (is_typed_array(object_value)) {
-        uint32_t index = 0u;
-        if (oseo_internal_array_index(key, &index)) {
+        bool numeric = false;
+        size_t index = SIZE_MAX;
+        OseoResult classified = oseo_internal_typed_array_numeric_key(
+            context,
+            key,
+            &numeric,
+            &index
+        );
+        if (classified.status != OSEO_STATUS_NORMAL) return classified;
+        if (numeric) {
             return normal(oseo_boolean(
                 oseo_internal_typed_array_has_index(object_value, index)
             ));
         }
-        bool numeric_index = false;
-        OseoResult classified = oseo_internal_canonical_numeric_index(
-            context,
-            key,
-            &numeric_index
-        );
-        if (classified.status != OSEO_STATUS_NORMAL) return classified;
-        if (numeric_index) return typed_array_exotic_error(context);
     }
     /* The shared descriptor primitive already reports a function's
      * `prototype`, an array's `length`, and the virtual String iterator,
@@ -496,13 +482,6 @@ OseoResult oseo_object_set(
             }
             break;
         }
-        if (oseo_internal_typed_array_deferred_assignment(
-                context, current, key)) {
-            const char *deferred =
-                oseo_internal_typed_array_deferred_diagnostic(
-                    context, current, key);
-            return failure(context, "OSEO2001", deferred);
-        }
         current = owner->prototype;
     }
     if (!receiver->extensible) {
@@ -621,13 +600,6 @@ OseoResult oseo_internal_set_with_receiver(
             }
             break;
         }
-        if (oseo_internal_typed_array_deferred_assignment(
-                context, current, key)) {
-            const char *deferred =
-                oseo_internal_typed_array_deferred_diagnostic(
-                    context, current, key);
-            return failure(context, "OSEO2001", deferred);
-        }
         current = ordinary_object(current)->prototype;
     }
     if (!is_object(receiver)) {
@@ -688,7 +660,6 @@ OseoResult oseo_internal_set_with_receiver(
             attributes,
             true,
             true,
-            true,
             refusal
         );
         if (assigned.status != OSEO_STATUS_NORMAL) return assigned;
@@ -704,7 +675,6 @@ OseoResult oseo_internal_set_with_receiver(
         (OseoPropertyAttributes){true, true, true, false},
         true,
         false,
-        true,
         refusal
     );
     if (created.status != OSEO_STATUS_NORMAL) return created;

@@ -105,6 +105,8 @@ supportedFeatures:
   - Symbol.unscopables
   - template
   - top-level-await
+  - TypedArray
+  - TypedArray.prototype.at
   - u180e
   - well-formed-json-stringify
   - well-known-symbols
@@ -758,7 +760,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_large-typed-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_length-throws.js
     expectedClassification: pass
@@ -2456,7 +2458,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-ctor-non-object.js
     expectedClassification: pass
@@ -2534,7 +2536,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/length.js
     expectedClassification: pass
@@ -2603,7 +2605,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/length.js
     expectedClassification: pass
@@ -2672,7 +2674,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/length.js
     expectedClassification: pass
@@ -2744,7 +2746,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/length.js
     expectedClassification: pass
@@ -5462,7 +5464,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-ctor-non-object.js
     expectedClassification: pass
@@ -6446,7 +6448,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/length.js
     expectedClassification: pass
@@ -7223,7 +7225,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/callbackfn-resize-arraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/length-near-integer-limit.js
     expectedClassification: pass
@@ -8894,19 +8896,19 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray-subclass-instance.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/arg-is-typedarray.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/invoked-as-a-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/isView/length.js
     expectedClassification: pass
@@ -9434,31 +9436,31 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Float32Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Float64Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Int16Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Int32Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Int8Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Uint16Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Uint32Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Uint8Array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/Uint8ClampedArray.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/args-mapped-expansion-after-exhaustion.js
     expectedClassification: pass
@@ -9485,7 +9487,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/detach-typedarray-in-progress.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/ArrayIteratorPrototype/next/iteration-mutable.js
     expectedClassification: pass
@@ -41270,6 +41272,1017 @@ tests:
   - path: test/built-ins/ThrowTypeError/unique-per-realm-unmapped-args.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/built-ins/TypedArray/prototype/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.iterator/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/return-typedarrayname.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/BigInt/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/return-typedarrayname.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/Symbol.toStringTag/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/coerced-index-resize.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/index-argument-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/index-non-numeric-argument-tointeger-invalid.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/index-non-numeric-argument-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/returns-item-relative-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/returns-item.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/returns-undefined-for-holes-in-sparse-arrays.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/at/returns-undefined-for-out-of-range-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/BigInt/return-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/return-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/this-inherits-typedarray.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/buffer/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/BigInt/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/BigInt/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/BigInt/return-bytelength.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/resizable-buffer-assorted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/resized-out-of-bounds-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/resized-out-of-bounds-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/return-bytelength.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/BigInt/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/BigInt/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/BigInt/return-byteoffset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/resized-out-of-bounds.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/return-byteoffset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/byteOffset/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/BigInt/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/BigInt/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/entries/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/BigInt/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/BigInt/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/keys/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/BigInt/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/BigInt/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/BigInt/return-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/resizable-buffer-assorted.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/resized-out-of-bounds-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/resized-out-of-bounds-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/return-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/this-has-no-typedarrayname-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/length/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-negative-integer-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-offset-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-primitive-toobject.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-get-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-get-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-length-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-tonumber-value-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-src-tonumber-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-tointeger-offset-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-tointeger-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-return-abrupt-from-toobject-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-set-values-in-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-set-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-src-tonumber-value-type-conversions.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-src-values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-target-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-targetbuffer-detached-on-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-targetbuffer-detached-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/bigint-tobigint64.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/bigint-tobiguint64.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/boolean-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/null-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/number-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/src-typedarray-big.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/src-typedarray-not-big-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/string-nan-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/string-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/symbol-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-negative-integer-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-offset-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-return-abrupt-from-tointeger-offset-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-return-abrupt-from-tointeger-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-other-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-other-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-same-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-same-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type-resized.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-src-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-src-byteoffset-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-src-range-greather-than-target-throws-rangeerror.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-srcbuffer-detached-during-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-target-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-target-byteoffset-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-target-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-targetbuffer-detached-during-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/BigInt/undefined-tobigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-negative-integer-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-offset-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-primitive-toobject.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-get-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-get-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-length-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-tonumber-value-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-src-tonumber-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-tointeger-offset-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-tointeger-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-return-abrupt-from-toobject-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-set-values-in-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-set-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-src-tonumber-value-conversions.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-src-tonumber-value-type-conversions.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-src-values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-target-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-targetbuffer-detached-on-get-src-value-no-throw.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-targetbuffer-detached-on-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-targetbuffer-detached-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/array-arg-value-conversion-resizes-array-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/bit-precision.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/src-typedarray-big-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/target-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/target-grow-source-length-getter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/target-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/target-shrink-source-length-getter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/this-backed-by-resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-negative-integer-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-offset-tointeger.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-return-abrupt-from-tointeger-offset-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-return-abrupt-from-tointeger-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-other-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type-resized.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type-sab.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-backed-by-resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-byteoffset-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-range-greather-than-target-throws-rangeerror.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-srcbuffer-detached-during-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-target-arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-target-byteoffset-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-target-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-targetbuffer-detached-during-tointeger-offset-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/result-does-not-copy-ordinary-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/result-is-new-instance-from-same-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/result-is-new-instance-with-shared-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/results-with-different-length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/results-with-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/results-with-same-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/return-abrupt-from-begin-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/return-abrupt-from-begin.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/return-abrupt-from-end-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/tointeger-begin.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/BigInt/tointeger-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/byteoffset-with-detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/coerced-begin-end-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/coerced-begin-end-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/result-byteOffset-from-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/result-does-not-copy-ordinary-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/result-is-new-instance-from-same-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/result-is-new-instance-with-shared-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/results-with-different-length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/results-with-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/results-with-same-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/return-abrupt-from-begin-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/return-abrupt-from-begin.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/return-abrupt-from-end-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/tointeger-begin.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/subarray/tointeger-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/toString.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/BigInt/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/BigInt/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/iter-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/make-in-bounds-after-exhausted.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/make-out-of-bounds-after-exhausted.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/return-itor.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/values/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-core]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/BYTES_PER_ELEMENT.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]
@@ -41277,7 +42290,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/name.js
     expectedClassification: pass
@@ -41301,7 +42314,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/BigUint64Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/BigUint64Array/name.js
     expectedClassification: pass
@@ -41319,199 +42332,199 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float32Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Float64Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int16Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int32Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Int8Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint16Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint32Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8Array/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/prototype/BYTES_PER_ELEMENT.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/Uint8ClampedArray/prototype/constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/bigint-tobigint64.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/bigint-tobiguint64.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-constructors]
   - path: test/built-ins/decodeURI/S15.1.3.1_A1.10_T1.js
     expectedClassification: pass
@@ -54145,7 +55158,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes]
   - path: test/language/statements/class/subclass/builtins.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/subclass/class-definition-null-proto-super.js
     expectedClassification: pass

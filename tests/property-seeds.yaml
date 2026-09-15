@@ -452,3 +452,7 @@ families:
     owner: tests/property/nio-clock-wakeup.property.test.ts
     start: 0x60007000
     end: 0x600070ff
+  - family: m5-typed-array-core
+    owner: tests/property/m5-typed-array-core.property.test.ts
+    start: 0x60007100
+    end: 0x600071ff
