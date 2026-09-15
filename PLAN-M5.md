@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-19,105 reviewed cases: 15,606 passes, 1,556 expected negatives, and 1,943
+19,291 reviewed cases: 15,792 passes, 1,556 expected negatives, and 1,943
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 124 indexed records in the normative
+M5a is complete. The 125 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,606 passes across 19,105 paths, and the property inventory records 146
-domains, 146 seeds, and an ordinary case budget of 5,671.
+15,792 passes across 19,291 paths, and the property inventory records 147
+domains, 147 seeds, and an ordinary case budget of 5,683.
 
 
 M5a implementation history
@@ -6294,6 +6294,45 @@ from 123 to 124 families. The runtime ABI moves to `oseo-runtime-m5-109` with
 twelve new TypedArray code IDs and one realm intrinsic slot for the shared
 `Array.prototype.toString` identity; the generated-code entry points are
 unchanged.
+
+Implemented M5b node `set-composition-methods` adds `union`, `intersection`,
+`difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
+`isDisjointFrom` to `%Set.prototype%` over GetSetRecord. Each method checks its
+Set receiver before reading the argument's `size`, converting it with ToNumber
+and ToIntegerOrInfinity, and reading callable `has` and `keys`; `NaN` and
+non-object operands throw `TypeError`, and a negative size throws `RangeError`.
+`union` and `symmetricDifference` always walk the argument's keys;
+`intersection`, `difference`, and `isDisjointFrom` compare the receiver's live
+size with the record's size to choose a `has`-driven or `keys`-driven walk;
+and `isSubsetOf` and `isSupersetOf` answer `false` from sizes before their
+`has` or `keys` walk. A receiver-driven
+walk rereads the element vector after each `has` call, `difference` walks its
+private copy, and `isSupersetOf` and `isDisjointFrom` close the keys iterator
+with a normal completion when they stop early. Constructive results are fresh
+Sets on the realm's `%Set.prototype%` that never consult species or `add`.
+
+Fixed native and generated differential evidence at seed `0x60007200` covers
+all seven methods under both specialization policies, collection forced at
+every safepoint, false hints, deliberate guard hits and misses, and generic
+fallback. The fixed fixture covers descriptors, Set, Map, and logging set-like
+operands, every invalid record, call order, iterator closing, receiver
+mutation, and derived receivers. The generated domain compares Node.js, Deno,
+and both native policies with an independent model of the specification
+algorithms that predicts each result and call log over Sets, Maps, and
+set-like operands with declared sizes from zero through `Infinity`.
+
+All 186 edition paths under the node's seven inventory roots are reviewed and
+pass after the reviewed feature list admits `set-methods`; the dependency
+vocabulary gains `set-composition-methods`. No reviewed path outside the roots
+changes classification. The manifest moves from 19,105 to 19,291 paths and
+from 15,606 to 15,792 passes while keeping 1,556 expected negatives and 1,943
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 146 to 147 domains and seeds and
+from 5,671 to 5,683 ordinary cases, and the evidence inventory moves from 124
+to 125 families. The methods take seven code IDs in the existing Set range and
+add no realm intrinsic slot, heap kind, component, or generated-code entry
+point. The runtime ABI moves to `oseo-runtime-m5-110` without changing the
+graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

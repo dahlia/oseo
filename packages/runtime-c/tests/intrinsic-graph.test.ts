@@ -1440,6 +1440,35 @@ test("traces ordered Set elements and live iterator state", () => {
   assert.match(setSource, /iterator->index \+= 1u/u);
 });
 
+test("installs the Set composition methods over GetSetRecord", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const setSource = sources.get("runtime_set.c") ?? "";
+
+  for (const [name, code] of [
+    ["union", "UNION"],
+    ["intersection", "INTERSECTION"],
+    ["difference", "DIFFERENCE"],
+    ["symmetricDifference", "SYMMETRIC_DIFFERENCE"],
+    ["isSubsetOf", "IS_SUBSET_OF"],
+    ["isSupersetOf", "IS_SUPERSET_OF"],
+    ["isDisjointFrom", "IS_DISJOINT_FROM"],
+  ] as const) {
+    assert.match(setSource, new RegExp(`"${name}"`, "u"));
+    assert.match(
+      internalHeader,
+      new RegExp(`#define OSEO_SET_${code}_CODE_ID`, "u"),
+    );
+    assert.match(setSource, new RegExp(`OSEO_SET_${code}_CODE_ID`, "u"));
+  }
+  assert.doesNotMatch(internalHeader, /OSEO_INTRINSIC_SET_UNION/u);
+  for (const property of ["size", "has", "keys", "next"]) {
+    assert.match(setSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(setSource, /OSEO_ERROR_RANGE/u);
+  assert.match(setSource, /OSEO_INTRINSIC_SET_PROTOTYPE/u);
+  assert.match(setSource, /oseo_iterator_close\(/u);
+});
+
 test("populates the realm-owned Promise intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

@@ -191,7 +191,8 @@ Ownership follows the plan's target layout:
     *runtime\_primitive.c*, ordinary property operations remain in the object
     components, and the parsed text is data rather than JavaScript source;
  -  *runtime\_set.c*: the `Set` constructor, insertion-ordered element
-    storage, SameValueZero lookup, the core prototype methods, and the live
+    storage, SameValueZero lookup, the core prototype methods, the seven
+    composition methods over GetSetRecord, and the live
     `%SetIteratorPrototype%` cursor;
  -  *runtime\_typed\_array.c*: `%TypedArray%`, the eleven concrete
     constructor and prototype pairs, construction from lengths, buffers,
@@ -1312,6 +1313,25 @@ The new component moves `abiVersion` to `m5-104` without a public layout
 change. The node reviews its sixteen declared test262 inventory roots and
 promotes the twelve already-reviewed Object, Map, and Symbol cases whose only
 unmet prerequisite was a constructible `Set`.
+
+### Set composition evidence
+
+M5b node `set-composition-methods` extends *runtime\_set.c* in place with
+`union`, `intersection`, `difference`, `symmetricDifference`, `isSubsetOf`,
+`isSupersetOf`, and `isDisjointFrom`. The seven methods share one rooted frame
+layout for the receiver, the set-like operand, its `has` and `keys` methods,
+the result, and the keys iterator with its captured `next` method, so every
+value read back after user code runs is reachable from a root. A receiver
+walk reacquires the element vector after each `has` call, and results are
+appended to a fresh Set through the same growth safepoint the core `add` uses.
+Early termination closes the keys iterator through the existing
+`oseo_iterator_close`. The methods take seven code IDs inside the existing Set
+range and add no realm intrinsic slot, heap kind, component, internal helper,
+or generated-code entry point. Fixed and generated native differential
+evidence covers both specialization policies, false hints, deliberate guard
+hits and misses, generic fallback, receiver mutation during `has` and `keys`,
+and collection forced at every safepoint. The node moves `abiVersion` to
+`m5-110`.
 
 ### TypedArray constructor evidence
 

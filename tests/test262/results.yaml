@@ -9270,6 +9270,9 @@ partitions:
     key: "01"
     path: results/built-ins/Set/01.yaml
   - group: built-ins/Set
+    key: "02"
+    path: results/built-ins/Set/02.yaml
+  - group: built-ins/Set
     key: "04"
     path: results/built-ins/Set/04.yaml
   - group: built-ins/Set
@@ -9279,11 +9282,29 @@ partitions:
     key: "07"
     path: results/built-ins/Set/07.yaml
   - group: built-ins/Set
+    key: "08"
+    path: results/built-ins/Set/08.yaml
+  - group: built-ins/Set
     key: "09"
     path: results/built-ins/Set/09.yaml
   - group: built-ins/Set
+    key: 0b
+    path: results/built-ins/Set/0b.yaml
+  - group: built-ins/Set
+    key: 0c
+    path: results/built-ins/Set/0c.yaml
+  - group: built-ins/Set
     key: 0d
     path: results/built-ins/Set/0d.yaml
+  - group: built-ins/Set
+    key: 0e
+    path: results/built-ins/Set/0e.yaml
+  - group: built-ins/Set
+    key: 0f
+    path: results/built-ins/Set/0f.yaml
+  - group: built-ins/Set
+    key: "11"
+    path: results/built-ins/Set/11.yaml
   - group: built-ins/Set
     key: "12"
     path: results/built-ins/Set/12.yaml
@@ -9294,14 +9315,26 @@ partitions:
     key: "15"
     path: results/built-ins/Set/15.yaml
   - group: built-ins/Set
+    key: "16"
+    path: results/built-ins/Set/16.yaml
+  - group: built-ins/Set
+    key: "17"
+    path: results/built-ins/Set/17.yaml
+  - group: built-ins/Set
     key: "18"
     path: results/built-ins/Set/18.yaml
   - group: built-ins/Set
     key: "19"
     path: results/built-ins/Set/19.yaml
   - group: built-ins/Set
+    key: 1a
+    path: results/built-ins/Set/1a.yaml
+  - group: built-ins/Set
     key: 1b
     path: results/built-ins/Set/1b.yaml
+  - group: built-ins/Set
+    key: 1c
+    path: results/built-ins/Set/1c.yaml
   - group: built-ins/Set
     key: 1d
     path: results/built-ins/Set/1d.yaml
@@ -9312,8 +9345,17 @@ partitions:
     key: 1f
     path: results/built-ins/Set/1f.yaml
   - group: built-ins/Set
+    key: "20"
+    path: results/built-ins/Set/20.yaml
+  - group: built-ins/Set
+    key: "21"
+    path: results/built-ins/Set/21.yaml
+  - group: built-ins/Set
     key: "22"
     path: results/built-ins/Set/22.yaml
+  - group: built-ins/Set
+    key: "23"
+    path: results/built-ins/Set/23.yaml
   - group: built-ins/Set
     key: "25"
     path: results/built-ins/Set/25.yaml
@@ -9323,6 +9365,9 @@ partitions:
   - group: built-ins/Set
     key: "28"
     path: results/built-ins/Set/28.yaml
+  - group: built-ins/Set
+    key: "29"
+    path: results/built-ins/Set/29.yaml
   - group: built-ins/Set
     key: 2a
     path: results/built-ins/Set/2a.yaml
@@ -9342,8 +9387,14 @@ partitions:
     key: "30"
     path: results/built-ins/Set/30.yaml
   - group: built-ins/Set
+    key: "31"
+    path: results/built-ins/Set/31.yaml
+  - group: built-ins/Set
     key: "32"
     path: results/built-ins/Set/32.yaml
+  - group: built-ins/Set
+    key: "33"
+    path: results/built-ins/Set/33.yaml
   - group: built-ins/Set
     key: "34"
     path: results/built-ins/Set/34.yaml
@@ -9351,14 +9402,23 @@ partitions:
     key: "35"
     path: results/built-ins/Set/35.yaml
   - group: built-ins/Set
+    key: "36"
+    path: results/built-ins/Set/36.yaml
+  - group: built-ins/Set
     key: "37"
     path: results/built-ins/Set/37.yaml
+  - group: built-ins/Set
+    key: "38"
+    path: results/built-ins/Set/38.yaml
   - group: built-ins/Set
     key: "39"
     path: results/built-ins/Set/39.yaml
   - group: built-ins/Set
     key: 3b
     path: results/built-ins/Set/3b.yaml
+  - group: built-ins/Set
+    key: 3c
+    path: results/built-ins/Set/3c.yaml
   - group: built-ins/Set
     key: 3d
     path: results/built-ins/Set/3d.yaml
@@ -9372,11 +9432,17 @@ partitions:
     key: "40"
     path: results/built-ins/Set/40.yaml
   - group: built-ins/Set
+    key: "41"
+    path: results/built-ins/Set/41.yaml
+  - group: built-ins/Set
     key: "42"
     path: results/built-ins/Set/42.yaml
   - group: built-ins/Set
     key: "46"
     path: results/built-ins/Set/46.yaml
+  - group: built-ins/Set
+    key: "47"
+    path: results/built-ins/Set/47.yaml
   - group: built-ins/Set
     key: "49"
     path: results/built-ins/Set/49.yaml
@@ -9393,8 +9459,14 @@ partitions:
     key: "50"
     path: results/built-ins/Set/50.yaml
   - group: built-ins/Set
+    key: "52"
+    path: results/built-ins/Set/52.yaml
+  - group: built-ins/Set
     key: "53"
     path: results/built-ins/Set/53.yaml
+  - group: built-ins/Set
+    key: "54"
+    path: results/built-ins/Set/54.yaml
   - group: built-ins/Set
     key: "55"
     path: results/built-ins/Set/55.yaml
@@ -9410,6 +9482,12 @@ partitions:
   - group: built-ins/Set
     key: "59"
     path: results/built-ins/Set/59.yaml
+  - group: built-ins/Set
+    key: 5c
+    path: results/built-ins/Set/5c.yaml
+  - group: built-ins/Set
+    key: 5e
+    path: results/built-ins/Set/5e.yaml
   - group: built-ins/Set
     key: "60"
     path: results/built-ins/Set/60.yaml
@@ -9428,6 +9506,9 @@ partitions:
   - group: built-ins/Set
     key: "67"
     path: results/built-ins/Set/67.yaml
+  - group: built-ins/Set
+    key: "68"
+    path: results/built-ins/Set/68.yaml
   - group: built-ins/Set
     key: 6b
     path: results/built-ins/Set/6b.yaml
@@ -9450,14 +9531,26 @@ partitions:
     key: "74"
     path: results/built-ins/Set/74.yaml
   - group: built-ins/Set
+    key: "75"
+    path: results/built-ins/Set/75.yaml
+  - group: built-ins/Set
+    key: "76"
+    path: results/built-ins/Set/76.yaml
+  - group: built-ins/Set
     key: "77"
     path: results/built-ins/Set/77.yaml
   - group: built-ins/Set
     key: "78"
     path: results/built-ins/Set/78.yaml
   - group: built-ins/Set
+    key: "79"
+    path: results/built-ins/Set/79.yaml
+  - group: built-ins/Set
     key: 7a
     path: results/built-ins/Set/7a.yaml
+  - group: built-ins/Set
+    key: 7b
+    path: results/built-ins/Set/7b.yaml
   - group: built-ins/Set
     key: 7c
     path: results/built-ins/Set/7c.yaml
@@ -9467,6 +9560,9 @@ partitions:
   - group: built-ins/Set
     key: 7e
     path: results/built-ins/Set/7e.yaml
+  - group: built-ins/Set
+    key: "80"
+    path: results/built-ins/Set/80.yaml
   - group: built-ins/Set
     key: "82"
     path: results/built-ins/Set/82.yaml
@@ -9480,11 +9576,20 @@ partitions:
     key: "85"
     path: results/built-ins/Set/85.yaml
   - group: built-ins/Set
+    key: "86"
+    path: results/built-ins/Set/86.yaml
+  - group: built-ins/Set
     key: "87"
     path: results/built-ins/Set/87.yaml
   - group: built-ins/Set
     key: "89"
     path: results/built-ins/Set/89.yaml
+  - group: built-ins/Set
+    key: 8a
+    path: results/built-ins/Set/8a.yaml
+  - group: built-ins/Set
+    key: 8b
+    path: results/built-ins/Set/8b.yaml
   - group: built-ins/Set
     key: 8c
     path: results/built-ins/Set/8c.yaml
@@ -9507,14 +9612,23 @@ partitions:
     key: "93"
     path: results/built-ins/Set/93.yaml
   - group: built-ins/Set
+    key: "94"
+    path: results/built-ins/Set/94.yaml
+  - group: built-ins/Set
     key: "95"
     path: results/built-ins/Set/95.yaml
   - group: built-ins/Set
     key: "99"
     path: results/built-ins/Set/99.yaml
   - group: built-ins/Set
+    key: 9b
+    path: results/built-ins/Set/9b.yaml
+  - group: built-ins/Set
     key: 9c
     path: results/built-ins/Set/9c.yaml
+  - group: built-ins/Set
+    key: 9d
+    path: results/built-ins/Set/9d.yaml
   - group: built-ins/Set
     key: 9e
     path: results/built-ins/Set/9e.yaml
@@ -9524,6 +9638,9 @@ partitions:
   - group: built-ins/Set
     key: a0
     path: results/built-ins/Set/a0.yaml
+  - group: built-ins/Set
+    key: a2
+    path: results/built-ins/Set/a2.yaml
   - group: built-ins/Set
     key: a3
     path: results/built-ins/Set/a3.yaml
@@ -9536,6 +9653,9 @@ partitions:
   - group: built-ins/Set
     key: a7
     path: results/built-ins/Set/a7.yaml
+  - group: built-ins/Set
+    key: a8
+    path: results/built-ins/Set/a8.yaml
   - group: built-ins/Set
     key: a9
     path: results/built-ins/Set/a9.yaml
@@ -9552,6 +9672,9 @@ partitions:
     key: ae
     path: results/built-ins/Set/ae.yaml
   - group: built-ins/Set
+    key: b1
+    path: results/built-ins/Set/b1.yaml
+  - group: built-ins/Set
     key: b2
     path: results/built-ins/Set/b2.yaml
   - group: built-ins/Set
@@ -9560,6 +9683,9 @@ partitions:
   - group: built-ins/Set
     key: b4
     path: results/built-ins/Set/b4.yaml
+  - group: built-ins/Set
+    key: b6
+    path: results/built-ins/Set/b6.yaml
   - group: built-ins/Set
     key: b7
     path: results/built-ins/Set/b7.yaml
@@ -9573,14 +9699,32 @@ partitions:
     key: bb
     path: results/built-ins/Set/bb.yaml
   - group: built-ins/Set
+    key: bc
+    path: results/built-ins/Set/bc.yaml
+  - group: built-ins/Set
+    key: bd
+    path: results/built-ins/Set/bd.yaml
+  - group: built-ins/Set
     key: be
     path: results/built-ins/Set/be.yaml
+  - group: built-ins/Set
+    key: bf
+    path: results/built-ins/Set/bf.yaml
+  - group: built-ins/Set
+    key: c0
+    path: results/built-ins/Set/c0.yaml
   - group: built-ins/Set
     key: c1
     path: results/built-ins/Set/c1.yaml
   - group: built-ins/Set
     key: c2
     path: results/built-ins/Set/c2.yaml
+  - group: built-ins/Set
+    key: c3
+    path: results/built-ins/Set/c3.yaml
+  - group: built-ins/Set
+    key: c4
+    path: results/built-ins/Set/c4.yaml
   - group: built-ins/Set
     key: c5
     path: results/built-ins/Set/c5.yaml
@@ -9600,8 +9744,17 @@ partitions:
     key: ca
     path: results/built-ins/Set/ca.yaml
   - group: built-ins/Set
+    key: cb
+    path: results/built-ins/Set/cb.yaml
+  - group: built-ins/Set
+    key: ce
+    path: results/built-ins/Set/ce.yaml
+  - group: built-ins/Set
     key: cf
     path: results/built-ins/Set/cf.yaml
+  - group: built-ins/Set
+    key: d0
+    path: results/built-ins/Set/d0.yaml
   - group: built-ins/Set
     key: d1
     path: results/built-ins/Set/d1.yaml
@@ -9612,14 +9765,29 @@ partitions:
     key: d3
     path: results/built-ins/Set/d3.yaml
   - group: built-ins/Set
+    key: d5
+    path: results/built-ins/Set/d5.yaml
+  - group: built-ins/Set
+    key: d6
+    path: results/built-ins/Set/d6.yaml
+  - group: built-ins/Set
     key: d7
     path: results/built-ins/Set/d7.yaml
   - group: built-ins/Set
     key: d9
     path: results/built-ins/Set/d9.yaml
   - group: built-ins/Set
+    key: da
+    path: results/built-ins/Set/da.yaml
+  - group: built-ins/Set
     key: db
     path: results/built-ins/Set/db.yaml
+  - group: built-ins/Set
+    key: dc
+    path: results/built-ins/Set/dc.yaml
+  - group: built-ins/Set
+    key: dd
+    path: results/built-ins/Set/dd.yaml
   - group: built-ins/Set
     key: df
     path: results/built-ins/Set/df.yaml
@@ -9627,14 +9795,23 @@ partitions:
     key: e2
     path: results/built-ins/Set/e2.yaml
   - group: built-ins/Set
+    key: e3
+    path: results/built-ins/Set/e3.yaml
+  - group: built-ins/Set
     key: e5
     path: results/built-ins/Set/e5.yaml
   - group: built-ins/Set
     key: e6
     path: results/built-ins/Set/e6.yaml
   - group: built-ins/Set
+    key: e7
+    path: results/built-ins/Set/e7.yaml
+  - group: built-ins/Set
     key: e8
     path: results/built-ins/Set/e8.yaml
+  - group: built-ins/Set
+    key: e9
+    path: results/built-ins/Set/e9.yaml
   - group: built-ins/Set
     key: eb
     path: results/built-ins/Set/eb.yaml
@@ -9645,11 +9822,29 @@ partitions:
     key: ef
     path: results/built-ins/Set/ef.yaml
   - group: built-ins/Set
+    key: f1
+    path: results/built-ins/Set/f1.yaml
+  - group: built-ins/Set
+    key: f2
+    path: results/built-ins/Set/f2.yaml
+  - group: built-ins/Set
+    key: f3
+    path: results/built-ins/Set/f3.yaml
+  - group: built-ins/Set
     key: f4
     path: results/built-ins/Set/f4.yaml
   - group: built-ins/Set
+    key: f5
+    path: results/built-ins/Set/f5.yaml
+  - group: built-ins/Set
     key: f6
     path: results/built-ins/Set/f6.yaml
+  - group: built-ins/Set
+    key: f7
+    path: results/built-ins/Set/f7.yaml
+  - group: built-ins/Set
+    key: f9
+    path: results/built-ins/Set/f9.yaml
   - group: built-ins/Set
     key: fa
     path: results/built-ins/Set/fa.yaml
@@ -9659,6 +9854,9 @@ partitions:
   - group: built-ins/Set
     key: fc
     path: results/built-ins/Set/fc.yaml
+  - group: built-ins/Set
+    key: fe
+    path: results/built-ins/Set/fe.yaml
   - group: built-ins/Set
     key: ff
     path: results/built-ins/Set/ff.yaml
@@ -15166,7 +15364,7 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 15606
+  passes: 15792
   semanticFailures: 0
   unsupportedProfileFeatures: 1943
   dependencies:
@@ -15378,6 +15576,13 @@ summary:
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 7
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
+    - dependency: set-composition-methods
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 186
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: set-intrinsic
@@ -15637,7 +15842,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 181
+      passes: 367
       semanticFailures: 0
       unsupportedProfileFeatures: 9
     - group: built-ins/SetIteratorPrototype

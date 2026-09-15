@@ -879,6 +879,18 @@ The entry chain serves collector traversal rather than JavaScript lookup. The
 later component owns an address-keyed index and the job-scoped strong root
 required by `WeakRef.prototype.deref`, together with its next ABI increment.
 
+The `m5-110` ABI adds the Set composition methods `union`, `intersection`,
+`difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
+`isDisjointFrom` over GetSetRecord. Each validates its Set receiver, reads a
+set-like operand's `size`, `has`, and `keys`. `union` and
+`symmetricDifference` always walk `keys`; `intersection`, `difference`, and
+`isDisjointFrom` choose a `has` or `keys` walk by comparing sizes; and
+`isSubsetOf` and `isSupersetOf` answer `false` from sizes before a `has` or a
+`keys` walk respectively. Constructive results are fresh Sets on the realm's
+`%Set.prototype%`. Seven code IDs are allocated inside the existing Set range;
+no intrinsic slot, heap kind, public layout, or generated-code entry point is
+added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

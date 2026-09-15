@@ -408,6 +408,21 @@ reviewed rows outside those roots whose only unmet prerequisites were this
 surface, the reviewed *testTypedArray.js* harness, or the `TypedArray`
 feature gate move to `pass` and retain their existing tags.
 
+The M5b `set-composition-methods` node extends the vocabulary with
+`set-composition-methods`. The tag identifies the `union`, `intersection`,
+`difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
+`isDisjointFrom` members of `%Set.prototype%` together with the GetSetRecord
+operation they share, including the size-selected `has` or `keys` branch, the
+keys iterator they walk and close, and their fresh `%Set.prototype%` results.
+One tag covers the seven methods because each consumes the same Set Record
+contract over an arbitrary set-like operand, which is the contract the node
+adds. The tag is distinct from `set-intrinsic`, which names the constructor,
+element storage, and the core membership and iteration members without any
+foreign operand, and from `iterator-protocol`, which names the generic
+protocol the keys walk uses without naming the Set Record. The 186 reviewed
+rows under the node's seven inventory roots carry it, and no reviewed row
+outside those roots gains or loses a tag.
+
 
 Alternatives considered
 -----------------------
