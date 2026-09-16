@@ -6418,8 +6418,9 @@ slot immediately, and collector unlinking tombstones the slot of an entry
 whose key died without allocating. Finalization cells gain a weak unregister
 token; `unregister` removes live and already queued records, and the cleanup
 dequeue skips a removed record. The context gains the job-scoped KeptAlive
-set that `WeakRef` construction and `deref` fill and the event loop clears
-after the script or timer callback and its promise jobs. The event loop then
+set that `WeakRef` construction and `deref` fill. The job queue clears it
+before every promise job, and the event loop clears it before every timer
+turn and after the script or timer callback and its promise jobs. It then
 runs one cleanup job per registry with queued records, ordered by each
 registry's oldest record, before the next timer. A job calls the callback for
 all of that registry's records in queue order before promise jobs drain.
@@ -6429,15 +6430,19 @@ Objects and all symbols can be held weakly because the profile admits no
 Fixed differential evidence covers descriptors, brands, key validity, index
 churn, constructor adder and iterator-closing order, derived construction,
 and registry validation independently of collection timing. A native-only
-observation under forced collection covers KeptAlive lifetime, cleanup
+observation under forced collection covers KeptAlive lifetime across the
+script and consecutive promise jobs, cleanup
 grouping by registry with promise jobs deferred until each registry's job
 ends, a queued record removed by `unregister` before or during its job, and an
 abrupt callback. Sanitized fixed C evidence covers index synchronization, weak
-tokens, KeptAlive roots, and the KeptAlive set ending before a timer turn that
-an internal await drives, with the AArch64 Linux cross-link. The generated
+tokens, KeptAlive roots, and the KeptAlive set ending before each promise job
+of one drain and before each promise job or timer turn that an internal await
+drives, with the AArch64 Linux cross-link. The generated
 domain at seed `0x60007500` compares WeakMap, WeakSet, WeakRef, and
 FinalizationRegistry operation sequences, after two or three fresh
-registrations, with an independent identity and cleanup-job model under both
+registrations and followed by one to four sibling or chained promise jobs
+that dereference earlier references, with an independent identity,
+job-boundary, and cleanup-job model under both
 specialization policies and collection forced at every safepoint,
 including a deliberate guard miss that reaches generic fallback. Of the 262
 paths under the node's four roots, 249 are reviewed: 245 pass and four keep

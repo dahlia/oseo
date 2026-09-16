@@ -1543,11 +1543,12 @@ cleanup dequeue skips consumed cells, and registry compaction keeps a consumed
 cell that is still queued alive until that dequeue.
 
 The public context gains the KeptAlive set that `WeakRef` construction and
-`deref` fill and that the collector marks as roots. *runtime\_event\_loop.c*
-clears it after the script or a timer callback and the promise jobs it
-enabled, and then runs one cleanup job per registry with queued records
-before the next timer. The component, the four heap kinds, eighteen intrinsic
-slots, one built-in code ID range, and the context fields move `abiVersion` to
+`deref` fill and that the collector marks as roots. *runtime\_promise.c* clears
+it before every promise job, and *runtime\_event\_loop.c* clears it before every
+timer turn and after the script or a timer callback and the promise jobs it
+enabled, and then runs one cleanup job per registry with queued records before
+the next timer. The component, the four heap kinds, eighteen intrinsic slots,
+one built-in code ID range, and the context fields move `abiVersion` to
 `m5-113`; no generated-code entry point is added. Fixed and generated native
 differential evidence, a native-only cleanup observation, and sanitized fixed C
 evidence with the AArch64 Linux cross-link cover the node under both

@@ -7000,10 +7000,12 @@ constructor reads `add` before either acquires the iterator. A non-object
 the iterator, while an abrupt iterator step propagates without a close.
 
 `new WeakRef(target)` and `deref` add a live target to the current job's
-KeptAlive set, which the native event loop clears only after the script or
-timer callback and every promise job it enabled have run. A target therefore
-survives collection for the rest of the job that created or dereferenced its
-reference, and a later `deref` answers `undefined` once a collection has
+KeptAlive set. The set ends with that job: the runtime clears it before every
+promise job, before every timer turn, and before the cleanup checkpoint, so
+each promise reaction is a job of its own, including a reaction that an
+internal await drains. A target therefore survives collection for the rest of
+the job that created or dereferenced its reference, and a `deref` in a later
+job, including the next promise job, answers `undefined` once a collection has
 cleared it. `register` requires a target that can be held weakly and differs
 from the held value, and an unregister token that can be held weakly or is
 `undefined`. Targets and tokens are weak. `unregister` removes every
@@ -7029,20 +7031,25 @@ held weakly, index growth under deletion churn, constructor adder order and
 iterator closing, derived construction, prototype fallback, `WeakRef` and
 `FinalizationRegistry` validation, and unregistration. Every observation there
 is independent of collection timing. A native-only observation with
-collection forced at every safepoint checks KeptAlive lifetime, one cleanup job
+collection forced at every safepoint checks KeptAlive lifetime across the
+script and consecutive promise jobs, one cleanup job
 per registry with its promise jobs deferred until the job ends, skipping a
 queued record after `unregister` before or during its job, and an abrupt
 cleanup callback. Sanitized fixed C evidence checks index
 synchronization with deletion and collector unlinking, weak unregister tokens,
-KeptAlive roots, and a KeptAlive set that ends before a timer turn an internal
-await drives, and retains the AArch64 Linux cross-link. Generated
+KeptAlive roots, and a KeptAlive set that ends before each promise job of one
+drain and before each promise job or timer turn an internal await drives, and
+retains the AArch64 Linux cross-link. Generated
 evidence at property seed `0x60007500` starts with two or three fresh
 registrations, then compares one to sixteen `WeakMap`,
 `WeakSet`, `WeakRef`, and `FinalizationRegistry` operations over stable
 objects, unregistered symbols, fresh unreachable objects, and primitives with
 an independent identity model, Node.js, Deno, and both native specialization
 policies under forced collection, and checks the native cleanup report
-against a model where every callback precedes every promise job it enabled; a
+against a model where every callback precedes every promise job it enabled.
+One to four generated sibling or chained promise jobs then construct a
+`WeakRef` and dereference every earlier one, and the native report must show
+fresh targets from the script and earlier jobs already cleared; a
 false numeric hint deliberately misses its guard and reaches the compiled
 generic fallback.
 

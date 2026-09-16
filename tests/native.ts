@@ -649,15 +649,16 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
 }
 
 /*
- * Collection timing is host-defined, so reference engines cannot supply
- * this observation. With collection forced at every safepoint, the native
- * runtime clears a WeakRef only after the job that created or dereferenced
- * it ends, and runs one cleanup job per registry after the script's promise
- * jobs and before a timer. Jobs follow each registry's oldest queued record.
- * A job calls its callback for every record of that registry in queue order
- * before any promise job a callback enabled runs, and skips a record an
- * unregister removed after the collector had already queued it, including
- * one removed by an earlier callback of the same job.
+ * Collection timing is host-defined, so reference engines cannot supply this
+ * observation. With collection forced at every safepoint, the native runtime
+ * clears a WeakRef only after the job that created or dereferenced it ends,
+ * including a promise job followed by another promise job of the same drain,
+ * and runs one cleanup job per registry after the script's promise jobs and
+ * before a timer. Jobs follow each registry's oldest queued record. A job calls
+ * its callback for every record of that registry in queue order before any
+ * promise job a callback enabled runs, and skips a record an unregister removed
+ * after the collector had already queued it, including one removed by an
+ * earlier callback of the same job.
  */
 const weakCleanupSource = `
 const laterToken = {};
@@ -692,8 +693,14 @@ const pressure = [{}, {}];
 console.log("unregister queued", registry.unregister(token), pressure.length);
 const reference = new WeakRef({ label: "temporary" });
 console.log("same job", reference.deref().label);
+let jobReference;
 Promise.resolve().then(() => {
   console.log("promise job", typeof reference.deref());
+  jobReference = new WeakRef({ label: "job" });
+  console.log("promise job same", jobReference.deref().label);
+});
+Promise.resolve().then(() => {
+  console.log("next promise job", typeof jobReference.deref());
 });
 setTimeout(() => {
   console.log("timer", typeof reference.deref(), typeof kept);
@@ -702,7 +709,9 @@ setTimeout(() => {
 const weakCleanupExpected =
   "unregister queued true 2\n" +
   "same job temporary\n" +
-  "promise job object\n" +
+  "promise job undefined\n" +
+  "promise job same job\n" +
+  "next promise job undefined\n" +
   "cleanup dead0\n" +
   "unregister in job true\n" +
   "cleanup dead2\n" +

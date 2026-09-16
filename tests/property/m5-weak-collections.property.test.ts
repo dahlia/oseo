@@ -37,6 +37,12 @@ const { assertAsyncProperty } = await import(
  * the script ends, and the timer's report then records one registry
  * cleanup job: each callback in registration order, and only afterwards the
  * promise job each callback enabled.
+ *
+ * Generated promise jobs, queued by the script or chained on an earlier
+ * job, each create a WeakRef and dereference every reference so far. Each
+ * reaction is a job of its own, so natively a fresh target from the script
+ * or an earlier job is already cleared, while its own and stable targets
+ * survive. The timer reports those observations after the cleanup report.
  */
 type KeyToken =
   | "fresh-object"
@@ -118,8 +124,24 @@ const cleanupRegistrationArbitrary = fc.record({
   ),
 });
 
+/*
+ * A sibling job reacts to a promise the script resolved; a chained job
+ * reacts to the previous job's promise, so it is queued only when that job
+ * ends. The first job is always a sibling.
+ */
+interface JobStep {
+  readonly link: "chain" | "sibling";
+  readonly target: "fresh-object" | "object-a";
+}
+
+const jobStepArbitrary: fc.Arbitrary<JobStep> = fc.record({
+  link: fc.constantFrom("chain" as const, "sibling" as const),
+  target: fc.constantFrom("fresh-object" as const, "object-a" as const),
+});
+
 interface GeneratedCase {
   readonly cleanup: readonly Operation[];
+  readonly jobs: readonly JobStep[];
   readonly operations: readonly Operation[];
 }
 
@@ -128,6 +150,7 @@ const caseArbitrary: fc.Arbitrary<GeneratedCase> = fc.record({
     maxLength: 3,
     minLength: 2,
   }),
+  jobs: fc.array(jobStepArbitrary, { maxLength: 4, minLength: 1 }),
   operations: fc.array(operationArbitrary, {
     maxLength: 16,
     minLength: 1,
@@ -196,7 +219,23 @@ function printOperation(operation: Operation, index: number): string {
   }
 }
 
-function printCase(operations: readonly Operation[]): string {
+function printJobs(jobs: readonly JobStep[]): string {
+  return jobs
+    .map((job, index) => {
+      const link =
+        index === 0 || job.link === "sibling"
+          ? "Promise.resolve()"
+          : `job${index - 1}`;
+      const target = expression(job.target);
+      return `const job${index} = ${link}.then(() => jobStep(${target}));`;
+    })
+    .join("\n");
+}
+
+function printCase(
+  operations: readonly Operation[],
+  jobs: readonly JobStep[],
+): string {
   return `
 const objectA = {};
 const objectB = {};
@@ -217,10 +256,22 @@ function probe(index, operation) {
   }
 }
 ${operations.map(printOperation).join("\n")}
+const jobReferences = [new WeakRef({})];
+const jobReports = [];
+function jobStep(target) {
+  jobReferences.push(new WeakRef(target));
+  jobReports.push(
+    jobReferences.map((reference) => typeof reference.deref()).join(" "),
+  );
+}
+${printJobs(jobs)}
 /** @param {number} left @param {number} right */
 function hinted(left, right) { return left + right; }
 console.log("hint", hinted(2, 3), hinted("2", 3), objectA !== objectB);
-setTimeout(() => console.log("cleanup", cleanups.join(", ")), 0);
+setTimeout(() => {
+  console.log("cleanup", cleanups.join(", "));
+  console.log("jobs", jobReports.join(", "));
+}, 0);
 `;
 }
 
@@ -271,7 +322,39 @@ interface Expectation {
   readonly native: string;
 }
 
-function expected(operations: readonly Operation[]): Expectation {
+/*
+ * Replays the job queue: sibling jobs are queued in order by the script,
+ * and a chained job joins the queue when the job it follows ends. Each
+ * report lists the script's fresh reference and every job's reference in
+ * creation order; only this job's target and stable targets are live.
+ */
+function jobReports(jobs: readonly JobStep[]): string {
+  const queue = jobs.flatMap((job, index) =>
+    index === 0 || job.link === "sibling" ? [index] : [],
+  );
+  const created: boolean[] = [false];
+  const reports: string[] = [];
+  for (let position = 0; position < queue.length; position += 1) {
+    const index = queue[position] ?? 0;
+    const stableTarget = jobs[index]?.target === "object-a";
+    created.push(stableTarget);
+    const current = created.length - 1;
+    reports.push(
+      created
+        .map((live, reference) =>
+          live || reference === current ? "object" : "undefined",
+        )
+        .join(" "),
+    );
+    if (jobs[index + 1]?.link === "chain") queue.push(index + 1);
+  }
+  return reports.join(", ");
+}
+
+function expected(
+  operations: readonly Operation[],
+  jobs: readonly JobStep[],
+): Expectation {
   const map = new Map<KeyToken, number>();
   const set = new Set<KeyToken>();
   const tokens: KeyToken[] = [];
@@ -352,21 +435,33 @@ function expected(operations: readonly Operation[]): Expectation {
     ...dead.map((registration) => `job ${heldText(registration.held)}`),
   ];
   return {
-    native: [...lines, `cleanup ${cleanups.join(", ")}`, ""].join("\n"),
+    native: [
+      ...lines,
+      `cleanup ${cleanups.join(", ")}`,
+      `jobs ${jobReports(jobs)}`,
+      "",
+    ].join("\n"),
     synchronous: [...lines, ""].join("\n"),
   };
 }
 
 /*
  * A reference engine may or may not collect before its timer runs, so its
- * cleanup report is removed before comparison with the synchronous model.
+ * cleanup and job reports are removed before comparison with the
+ * synchronous model.
  */
 function withoutCleanupReport<T extends { readonly stdout: string }>(
   observation: T,
 ): T {
   const lines = observation.stdout.split("\n");
-  const report = lines.length - 2;
-  if (report < 0 || !lines[report]?.startsWith("cleanup ")) return observation;
+  const report = lines.length - 3;
+  if (
+    report < 0 ||
+    !lines[report]?.startsWith("cleanup ") ||
+    !lines[report + 1]?.startsWith("jobs ")
+  ) {
+    return observation;
+  }
   return {
     ...observation,
     stdout: [...lines.slice(0, report), ""].join("\n"),
@@ -422,8 +517,8 @@ test(
       "WeakMap, WeakSet, WeakRef, and FinalizationRegistry agree",
       fc.asyncProperty(caseArbitrary, async (generated) => {
         const operations = [...generated.cleanup, ...generated.operations];
-        const source = printCase(operations);
-        const expectation = expected(operations);
+        const source = printCase(operations, generated.jobs);
+        const expectation = expected(operations, generated.jobs);
         const expectedObservation = {
           exitStatus: 0,
           stderr: "",
@@ -493,14 +588,17 @@ test(
           "FinalizationRegistry register and unregister operations over " +
           "two stable objects, two unregistered symbols, a fresh " +
           "unreachable object, and three primitives that cannot be held " +
-          "weakly, plus truthful and false number hints and a native " +
-          "report of the one cleanup job for fresh registration targets",
+          "weakly, then one to four sibling or chained promise jobs " +
+          "that each construct a WeakRef to a fresh or stable target and " +
+          "dereference every earlier one, plus truthful and false number " +
+          "hints and a native report of the one cleanup job for fresh " +
+          "registration targets and of each job's dereferences",
         numRuns: 12,
         profile: "M5 weak collections",
         seed: 0x6000_7500,
         sizeLimit:
           "at most three fresh registrations and sixteen operations over " +
-          "eight reviewed key tokens, one " +
+          "eight reviewed key tokens, four promise jobs, one " +
           "WeakMap, one WeakSet, and one FinalizationRegistry",
         timeLimitMilliseconds: 180_000,
       },

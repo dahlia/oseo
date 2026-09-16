@@ -3061,11 +3061,18 @@ bool oseo_internal_jobs_reached_promise(OseoValue promise) {
         promise_object(promise)->state != OSEO_PROMISE_PENDING;
 }
 
+/*
+ * Runs the oldest promise job as a job of its own. The preceding job's
+ * KeptAlive set ends first, whether that job was the script, a timer
+ * callback, a cleanup job, an earlier promise job of the same drain, or the
+ * job suspended by an internal await that drains these jobs directly.
+ */
 static OseoResult jobs_run_next(OseoContext *context) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     if (tag_of(context->microtask_head) != OSEO_TAG_UNDEFINED) {
+        oseo_internal_clear_kept_objects(context);
         frame.slots[0] = context->microtask_head;
         OseoValue next = job_object(frame.slots[0])->next;
         context->microtask_head = next;

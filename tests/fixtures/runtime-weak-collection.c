@@ -9,8 +9,9 @@
  * with source-level deletion and collector unlinking, unregister tokens
  * are weak, an unregistered queued record is skipped, one registry's
  * records dequeue together past another registry's, KeptAlive roots
- * last exactly until they are cleared, and a timer turn that an internal
- * await drives starts without the awaiting job's KeptAlive set.
+ * last exactly until they are cleared, and every promise job and timer
+ * turn, including one that an internal await drives, starts without the
+ * KeptAlive set of the job before it.
  */
 
 #define KEY_COUNT ((size_t)48u)
@@ -529,6 +530,113 @@ static void test_internal_await_timer_ends_kept_objects(void) {
     oseo_context_destroy(&context);
 }
 
+static OseoValue kept_function(OseoContext *context) {
+    return require_normal(oseo_function_create(
+        context,
+        1u,
+        node(context),
+        NULL,
+        0u,
+        1u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+}
+
+static size_t reaction_step;
+static bool reaction_observed_cleared;
+
+/*
+ * The first reaction starts without the enqueuing job's KeptAlive set,
+ * then keeps a fresh target and fulfills with its reference. The second
+ * reaction runs in the same drain and must see neither set.
+ */
+static OseoResult dispatch_kept_reaction(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)new_target;
+    assert(argument_count == 1u);
+    assert(context->kept_object_count == 0u);
+    reaction_step += 1u;
+    oseo_collect(context);
+    if (reaction_step == 1u) {
+        assert(oseo_internal_weak_reference_target(arguments[0]) ==
+            oseo_undefined());
+        OseoValue target = node(context);
+        require_normal(oseo_internal_keep_during_job(context, target));
+        return oseo_internal_weak_reference_create(context, target);
+    }
+    reaction_observed_cleared =
+        oseo_internal_weak_reference_target(arguments[0]) == oseo_undefined();
+    return normal(oseo_undefined());
+}
+
+/* A job holds a target, then queues two chained reactions. */
+static void enqueue_kept_reactions(OseoContext *context, OseoValue *slots) {
+    slots[0] = node(context);
+    slots[1] = require_normal(oseo_internal_weak_reference_create(
+        context,
+        slots[0]
+    ));
+    require_normal(oseo_internal_keep_during_job(context, slots[0]));
+    slots[0] = oseo_undefined();
+    slots[2] = require_normal(oseo_promise_resolve(context, slots[1]));
+    slots[3] = kept_function(context);
+    slots[2] = require_normal(oseo_promise_then(
+        context,
+        slots[2],
+        slots[3],
+        oseo_undefined()
+    ));
+    slots[2] = require_normal(oseo_promise_then(
+        context,
+        slots[2],
+        slots[3],
+        oseo_undefined()
+    ));
+    oseo_collect(context);
+    assert(oseo_internal_weak_reference_target(slots[1]) != oseo_undefined());
+    reaction_step = 0u;
+    reaction_observed_cleared = false;
+}
+
+static void test_promise_jobs_end_kept_objects(void) {
+    OseoContext context;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    oseo_context_init(
+        &context,
+        "weak-promise-jobs",
+        sizeof("weak-promise-jobs") - 1u
+    );
+    oseo_context_set_function_dispatcher(&context, dispatch_kept_reaction);
+    require_normal(oseo_roots_allocate(&context, &frame, 4u));
+
+    /* One drain runs both reactions as separate jobs. */
+    enqueue_kept_reactions(&context, frame.slots);
+    require_normal(oseo_jobs_drain(&context));
+    assert(reaction_step == 2u);
+    assert(reaction_observed_cleared);
+
+    /* An internal await drains the same reactions until its promise
+     * settles, so they also end the awaiting job's set and each other's. */
+    enqueue_kept_reactions(&context, frame.slots);
+    require_normal(oseo_internal_await_step(&context, frame.slots[2]));
+    assert(reaction_step == 2u);
+    assert(reaction_observed_cleared);
+
+    oseo_roots_release(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 int main(void) {
     test_index_survives_delete_and_clearing();
     test_index_reuses_tombstones();
@@ -536,5 +644,6 @@ int main(void) {
     test_registry_cleanup_grouping();
     test_kept_objects();
     test_internal_await_timer_ends_kept_objects();
+    test_promise_jobs_end_kept_objects();
     return 0;
 }

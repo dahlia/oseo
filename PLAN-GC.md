@@ -204,18 +204,20 @@ live and queued cells consumed; the cleanup dequeue skips a consumed cell, and
 compaction keeps a consumed cell that is still queued alive until then.
 
 The context's KeptAlive set is a root set filled by `WeakRef` construction and
-`deref`. The native event loop clears it after the script or a timer callback
-and every promise job it enabled. The same checkpoint then runs one cleanup
-job per registry before the next timer. Every timer turn also clears the set
-before its callback, because an internal await can drive a timer turn
-directly. Jobs follow each registry's oldest
-record in the FIFO, and a job consumes every record of its registry, including
-one queued while it runs, before promise jobs drain; ordering by registration
+`deref`. The job queue clears it before every promise job, so each reaction ends
+the set of the script, timer callback, or earlier reaction before it, including
+the reactions an internal await drains. The native event loop clears it again
+after the script or a timer callback and every promise job it enabled, and the
+same checkpoint then runs one cleanup job per registry before the next timer.
+Every timer turn also clears the set before its callback, because an internal
+await can drive a timer turn directly. Jobs follow each registry's oldest record
+in the FIFO, and a job consumes every record of its registry, including one
+queued while it runs, before promise jobs drain; ordering by registration
 ordinal therefore holds among the records one collection publishes, not across
-collections. Collection currently
-runs only when forced at every safepoint or when a context is destroyed, so in
-an ordinary run no weak target clears and no cleanup job runs. A
-pressure-driven collection trigger remains the policy work this plan owns.
+collections. Collection currently runs only when forced at every safepoint or
+when a context is destroyed, so in an ordinary run no weak target clears and no
+cleanup job runs. A pressure-driven collection trigger remains the policy work
+this plan owns.
 
 
 Tracing and object metadata

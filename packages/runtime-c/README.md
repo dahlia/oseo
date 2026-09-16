@@ -921,9 +921,10 @@ The `m5-113` ABI materializes `WeakMap`, `WeakSet`, `WeakRef`, and
 object wraps one collector weak record. Ephemeron tables gain an address-keyed
 index that deletion and collector unlinking keep synchronized, and
 finalization cells gain weak unregister tokens. The public context gains the
-job-scoped KeptAlive set behind `WeakRef` construction and `deref`. The event
-loop clears that set after each script or timer turn and its promise jobs, then
-runs queued cleanup records as separate jobs in queue order. Every
+job-scoped KeptAlive set behind `WeakRef` construction and `deref`. The job
+queue clears that set before every promise job, and the event loop clears it
+before every timer turn and after each script or timer turn and its promise
+jobs, then runs queued cleanup records as separate jobs in queue order. Every
 object and every symbol can be held weakly because the profile admits no
 `Symbol.for` registry.
 
