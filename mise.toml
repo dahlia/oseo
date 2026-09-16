@@ -47,6 +47,7 @@ depends = [
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:native-host-guards",
+  "check:native-toolchains",
   "check:packages",
   "check:types",
   "check:unicode-tables",
@@ -320,3 +321,10 @@ depends = ["build"]
 raw_args = true
 run = "node tools/test262.ts"
 env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."check:native-toolchains"]
+description = "Reject native tests that bypass sanitizer toolchain selection"
+run = '''
+node --test tests/native-toolchains.test.ts
+node tools/check-native-toolchains.ts
+'''

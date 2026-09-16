@@ -1,3 +1,4 @@
+import { runNativeCli as run } from "../packages/cli/src/index.ts";
 /* eslint-disable no-await-in-loop -- Compiler probing is ordered. */
 import { spawnSync } from "node:child_process";
 import {
@@ -159,3 +160,7 @@ int main(int argc, char **argv) {
 
 /** Concrete adapter shared by native test composition sites. */
 export const nativeToolchain: NativeToolchain = select();
+
+/** Compose the selected test compiler without changing CLI defaults. */
+export const runNativeCli: typeof run = (request, host) =>
+  run(request, host, nativeToolchain);

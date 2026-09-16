@@ -276,6 +276,30 @@ fixtures, built-artifact validation, and workspace tooling. A package test may
 import only its public source entry point or an explicitly tested internal
 module from the same package.
 
+Native integration tests must import `nativeToolchain` from
+*tests/native-toolchain.ts*, using the relative path from the test file. For
+example, a file under *tests/property/* uses:
+
+~~~~ ts
+import { nativeToolchain } from "../native-toolchain.ts";
+~~~~
+
+Pass `nativeToolchain` as the `toolchain` option. Tests calling `runNativeCli`
+must import it from *tests/native-cli.ts*, which injects the selected
+toolchain. Direct adapter imports bypass the host compiler sanitizer lane even
+when the test runs through that lane’s mise task. Ordinary runs still select
+Zig.
+
+`mise run check:native-toolchains`, included in `mise run check`, checks all
+of *tests/*, *tools/test262.ts*, and *tools/native-io/*. Only
+*tests/native-toolchain.ts* may select concrete adapters: it owns composition.
+Unit tests and their helpers under *packages/toolchain-zig/tests/* and
+*packages/toolchain-host-cc/tests/* are exempt because they test those concrete
+adapters' contracts independently of the selected integration lane. Type-only
+imports select no compiler and are allowed. Do not obtain the compiler from
+`defaultComponents.toolchain` or spread `defaultComponents` into native build
+options; pass the selected `nativeToolchain` explicitly instead.
+
 ### Property-based tests
 
 Use property tests when a semantic unit has a useful generated domain or state
