@@ -6,7 +6,7 @@ import test from "node:test";
 
 import fc from "fast-check";
 
-import { runNativeCli } from "../../packages/cli/src/index.ts";
+import { runNativeCli } from "../native-cli.ts";
 import { targetForExecutionHost } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
 

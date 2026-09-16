@@ -70,11 +70,42 @@ as the default compiler and linker driver and `zig ar` as the archiver. Preserve
 the four boundaries above as compiler-owned interfaces. Runtime C is a separate
 translation unit and static archive.
 
+The sanitizer lane additionally uses the host Clang or GCC driver and `ar`.
+Clang is selected when available; GCC is selected only when Clang is absent.
+`OSEO_HOST_CC=clang` or `OSEO_HOST_CC=gcc` selects one explicitly. A selected
+compiler must compile, link, and execute a deliberate ASan fault before its
+runtime builds are accepted as sanitizer evidence. Missing instrumentation or
+sanitizer libraries fail the lane; they never select an unsanitized build or
+another compiler.
+
+The publishable `@oseo/toolchain-host-cc` adapter implements the compiler-owned
+interface. It owns compile flags, archive planning, rejection of cross-target
+requests, and archive keys. Test entry points own compiler discovery and the
+execution probe. The package follows the existing lockstep version, paired
+npm/JSR manifests, GPL license, and package-artifact checks. This boundary
+permits reuse without placing process discovery in the compiler core or
+changing the default CLI.
+
+Both runtime objects and generated C use ASan and UBSan, with recovery disabled.
+The archive key includes the resolved compiler path and complete version output.
+Native failure records and property replay diagnostics retain that identity.
+Compiler subprocesses inherit only PATH, HOME, and TMPDIR; ambient sanitizer
+options and injected libraries are rejected at lane startup.
+
+Linux CI schedules this lane and an explicit GCC self-check. The host adapter
+rejects cross-target build requests; the ordinary Zig gate still owns
+cross-link and assembly evidence. macOS ASan coverage remains unverified, and
+no macOS CI job is added. Measurements and the Apple Clang proposal live in
+[the activity audit](../sanitizer-activity.md).
+
 
 Consequences
 ------------
 
-Another C compiler replaces only the toolchain adapter and target mapping.
+Another C compiler supplies its toolchain adapter and target mapping. Runtime
+compilation controls may need equivalent compiler-specific spellings: the Date
+component uses GCC's no-contraction pragma for GCC and retains the standard
+pragma for Clang. Both preserve the same rounding contract.
 Another runtime implementation supplies the same private runtime ABI. Another
 native backend consumes the backend-neutral input without changing source
 semantics. M0 models these inputs as opaque data without merging their

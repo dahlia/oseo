@@ -8,6 +8,8 @@
  * compiler invocation and target.
  */
 
+import { hostCcLane } from "../../tests/native-toolchain.ts";
+import { buildHostCcFixture } from "../../tests/host-cc-runtime.ts";
 import { spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import process from "node:process";
@@ -122,6 +124,19 @@ export function buildClockProgram(options: ClockBuildOptions): ClockBuild {
     options.directory,
     `${options.program}-${options.target}`,
   );
+  if (hostCcLane) {
+    if (options.target !== hostClockTarget()) {
+      throw new Error(`Host C lane cannot cross-compile ${options.target}.`);
+    }
+    const sources = programSources(options.program);
+    const invocation = buildHostCcFixture(
+      sources[0]!,
+      runtimeDirectory,
+      [...runtimeSources(), ...sources.slice(1)],
+      executable,
+    );
+    return { executable, invocation, target: options.target };
+  }
   const args = [
     "cc",
     "-target",

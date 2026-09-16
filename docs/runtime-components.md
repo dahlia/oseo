@@ -1,11 +1,12 @@
 C runtime componentization evidence
 ===================================
 
-Sanitizer evidence correction (2026-09-17): the pinned Zig 0.16.0 accepts
-the requested flags but omits ASan from `address,undefined`. References to
-address sanitization below describe the requested policy, not verified ASan
-coverage. See the [activity audit](sanitizer-activity.md) for measurements and
-the unresolved runtime-linking requirement.
+Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
+provide ASan coverage. The separate Linux host C sanitizer lane now verifies
+instrumentation; its measured scope is recorded in the
+[activity audit](sanitizer-activity.md). This does not retroactively validate
+earlier gates or establish macOS ASan coverage. Zig address self-checks remain
+TODOs.
 
 
 Status

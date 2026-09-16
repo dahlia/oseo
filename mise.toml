@@ -47,6 +47,7 @@ depends = [
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:native-host-guards",
+  "check:native-toolchains",
   "check:packages",
   "check:types",
   "check:unicode-tables",
@@ -288,3 +289,42 @@ run = "node tools/test262-inventory.ts --update"
 [tasks."unicode:update"]
 description = "Regenerate the pinned Unicode tables from the reviewed inputs"
 run = "node tools/unicode-tables.ts --update"
+
+[tasks."test:sanitizer:self"]
+description = "Verify host C sanitizer instrumentation in both code locations"
+depends = ["build"]
+run = "node --test tests/host-cc-*.test.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."test:sanitizer:runtime"]
+description = "Run C runtime fixtures under host ASan and UBSan"
+depends = ["build"]
+run = "node --test --test-concurrency=1 tests/runtime-*.test.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."test:sanitizer:native"]
+description = "Run native fixtures under host ASan and UBSan"
+depends = ["build"]
+raw_args = true
+run = "node tests/native.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."test:sanitizer:property"]
+description = "Run ordinary native properties under host ASan and UBSan"
+depends = ["build"]
+run = "node --test --test-concurrency=4 tests/property/*.property.test.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."test:sanitizer:test262"]
+description = "Measure a bounded test262 shard under host ASan and UBSan"
+depends = ["build"]
+raw_args = true
+run = "node tools/test262.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+
+[tasks."check:native-toolchains"]
+description = "Reject native tests that bypass sanitizer toolchain selection"
+run = '''
+node --test tests/native-toolchains.test.ts
+node tools/check-native-toolchains.ts
+'''

@@ -138,6 +138,8 @@ export interface NativeBuildInput {
 
 /** Toolchain boundary that constructs commands without executing them. */
 export interface NativeToolchain {
+  /** Exact compiler identity retained in failure and replay metadata. */
+  readonly identity?: string;
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan;
   readonly environment?: ProcessEnvironmentPolicy;
   readonly runtimeArchiveReuse?: RuntimeArchiveReuse;

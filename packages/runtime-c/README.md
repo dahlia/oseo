@@ -1,11 +1,11 @@
 @oseo/runtime-c
 ===============
 
-Sanitizer evidence correction (2026-09-17): the pinned Zig 0.16.0 accepts
-the requested flags but omits ASan from `address,undefined`. References to
-address sanitization below describe the requested policy, not verified ASan
-coverage. See the [activity audit] for
-measurements and the unresolved runtime-linking requirement.
+Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
+provide ASan coverage. The separate Linux host C sanitizer lane now verifies
+instrumentation; its measured scope is recorded in the [activity audit]. This
+does not retroactively validate earlier gates or establish macOS ASan coverage.
+Zig address self-checks remain TODOs.
 
 This package provides versioned, reviewed C11 runtime source inputs. The runtime
 owns opaque NaN-boxed values, UTF-16 strings, primitive semantics, two-word call

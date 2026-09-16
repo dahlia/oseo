@@ -622,6 +622,7 @@ export async function withNativeFixture<T>(
     return result;
   } catch (error) {
     const metadata = {
+      toolchainIdentity: options.toolchain.identity,
       compilerInvocation,
       emittedC,
       error: errorMessage(error),

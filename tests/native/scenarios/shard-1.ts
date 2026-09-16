@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import process from "node:process";
 
-import { runNativeCli } from "../../../packages/cli/src/index.ts";
+import { runNativeCli } from "../../native-cli.ts";
 import type { NativeScenarioContext } from "../scenario.ts";
 
 /**

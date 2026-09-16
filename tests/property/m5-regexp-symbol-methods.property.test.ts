@@ -27,7 +27,7 @@ import {
   assertMatchingObservations,
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
-import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { nativeToolchain } from "../native-toolchain.ts";
 import { unicodeMatcherData } from "../regexp-matcher-data.ts";
 
 const { assertAsyncProperty } = await import(
@@ -484,7 +484,7 @@ async function assertNative(
           operation: "execute",
           runtime: cRuntimeProvider,
           target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
-          toolchain: zigToolchain,
+          toolchain: nativeToolchain,
         },
         (native) => {
           assertMatchingObservations([expected, native]);

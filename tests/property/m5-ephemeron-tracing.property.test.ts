@@ -1,3 +1,5 @@
+import { hostCcLane } from "../native-toolchain.ts";
+import { buildHostCcFixture } from "../host-cc-runtime.ts";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -142,22 +144,25 @@ test(
     const directory = await mkdtemp(join(tmpdir(), "oseo-ephemeron-property-"));
     try {
       const executable = join(directory, "runtime-ephemeron-property");
-      run("zig", [
-        "cc",
-        "-target",
-        zigNativeTarget ?? "x86_64-linux-gnu",
-        "-std=c11",
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-fsanitize=address,undefined",
-        "-I",
-        runtime,
-        fixture,
-        ...runtimeSources,
-        "-o",
-        executable,
-      ]);
+      if (hostCcLane) {
+        buildHostCcFixture(fixture, runtime, runtimeSources, executable);
+      } else
+        run("zig", [
+          "cc",
+          "-target",
+          zigNativeTarget ?? "x86_64-linux-gnu",
+          "-std=c11",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-fsanitize=address,undefined",
+          "-I",
+          runtime,
+          fixture,
+          ...runtimeSources,
+          "-o",
+          executable,
+        ]);
       assertProperty(
         "ephemeron fixed points, weak clearing, and cleanup order agree",
         fc.property(caseArbitrary, (testCase) => {

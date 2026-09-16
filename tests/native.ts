@@ -6,7 +6,8 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { cBackend } from "../packages/backend-c/src/index.ts";
-import { defaultComponents, runNativeCli } from "../packages/cli/src/index.ts";
+import { defaultComponents } from "../packages/cli/src/index.ts";
+import { runNativeCli } from "./native-cli.ts";
 import {
   compileSource,
   describeTarget,
@@ -19,7 +20,7 @@ import {
   assertMatchingObservations,
   withNativeFixture,
 } from "../packages/testkit/src/index.ts";
-import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
+import { nativeToolchain, hostCcLane } from "./native-toolchain.ts";
 import {
   isTestShardPosition,
   parseTestShardArguments,
@@ -998,7 +999,7 @@ for (const fixture of selectedFixtures) {
           operation: "execute",
           runtime: cRuntimeProvider,
           target: nativeTarget,
-          toolchain: zigToolchain,
+          toolchain: nativeToolchain,
         },
         (native) => {
           assertMatchingObservations([nodeReference, denoReference, native]);
@@ -1346,7 +1347,7 @@ for (const fixture of selectedFixtures) {
 
   const crossCompilations =
     fixture.specialization == null ? [enabledMir] : [disabledMir, enabledMir];
-  for (const compilation of crossCompilations) {
+  for (const compilation of hostCcLane ? [] : crossCompilations) {
     await withNativeFixture(
       {
         backend: cBackend,
@@ -1356,7 +1357,7 @@ for (const fixture of selectedFixtures) {
         operation: "compile",
         runtime: cRuntimeProvider,
         target: describeTarget("linux-aarch64-musl"),
-        toolchain: zigToolchain,
+        toolchain: nativeToolchain,
       },
       (cross) => {
         assert(
@@ -1402,12 +1403,13 @@ console.log(
     "Deno, and " +
     `${nativeTarget.name} outputs match`,
 );
-console.log(
-  `cross fixtures: ${
-    selectedFixtures.length +
-    (isTestShardPosition(0, nativeArguments.shard) ? 1 : 0)
-  } linux-aarch64-musl builds passed`,
-);
-if (isTestShardPosition(0, nativeArguments.shard)) {
+if (!hostCcLane)
+  console.log(
+    `cross fixtures: ${
+      selectedFixtures.length +
+      (isTestShardPosition(0, nativeArguments.shard) ? 1 : 0)
+    } linux-aarch64-musl builds passed`,
+  );
+if (!hostCcLane && isTestShardPosition(0, nativeArguments.shard)) {
   console.log("assembly fixtures: all configured target paths inspected");
 }

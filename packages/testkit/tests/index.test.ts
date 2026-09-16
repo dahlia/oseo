@@ -180,9 +180,17 @@ test("records complete failed build observations", async () => {
   const state = memoryHost([
     { exitStatus: 1, stderr: "compiler error", stdout: "compiler output" },
   ]);
+  const options = fixtureOptions(state.host, ["compile", "link"]);
   await assert.rejects(
-    withNativeFixture(fixtureOptions(state.host, ["compile", "link"]), () =>
-      assert.fail("A failed build must not reach inspection."),
+    withNativeFixture(
+      {
+        ...options,
+        toolchain: {
+          ...options.toolchain,
+          identity: "/usr/bin/clang\nclang 22",
+        },
+      },
+      () => assert.fail("A failed build must not reach inspection."),
     ),
     /Native artifacts retained/u,
   );
@@ -192,11 +200,13 @@ test("records complete failed build observations", async () => {
   assert.ok(bytes != null);
   // SAFETY: compileNativeTest writes this metadata using the asserted schema.
   const metadata = JSON.parse(bytes) as {
+    readonly toolchainIdentity: string;
     readonly compilerInvocation: readonly string[];
     readonly steps: readonly {
       readonly observation?: ProcessObservation;
     }[];
   };
+  assert.equal(metadata.toolchainIdentity, "/usr/bin/clang\nclang 22");
   assert.deepEqual(metadata.compilerInvocation, [
     "zig compile.c",
     "zig link.c",

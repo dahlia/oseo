@@ -19,7 +19,7 @@ import {
   assertMatchingObservations,
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
-import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+import { nativeToolchain } from "../native-toolchain.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -277,7 +277,7 @@ test(
                 operation: "execute",
                 runtime: cRuntimeProvider,
                 target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
-                toolchain: zigToolchain,
+                toolchain: nativeToolchain,
               },
               (native) =>
                 assertMatchingObservations([expectedObservation, native]),

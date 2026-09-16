@@ -584,6 +584,7 @@ async function executeNativeWorkflow(
   mir: MirProgram,
   target: TargetDescription,
   archiveReuse: CliInvocation["runtimeArchiveReuse"],
+  toolchain: NativeToolchain,
 ): Promise<CliResult> {
   const emitted = defaultComponents.backend.emit(mir);
   const generatedSourcePath = join(directory, emitted.sourceName);
@@ -626,9 +627,9 @@ async function executeNativeWorkflow(
       hostDiagnostic(sourceId, "The C runtime source is unavailable."),
     );
   }
-  const reuse = defaultComponents.toolchain.runtimeArchiveReuse;
+  const reuse = toolchain.runtimeArchiveReuse;
   let toolchainEnvironment: ProcessEnvironment | undefined;
-  const environmentPolicy = defaultComponents.toolchain.environment;
+  const environmentPolicy = toolchain.environment;
   if (environmentPolicy != null && host.captureEnvironment != null) {
     try {
       toolchainEnvironment = await host.captureEnvironment(environmentPolicy);
@@ -663,7 +664,7 @@ async function executeNativeWorkflow(
     try {
       const identity = await observeToolchainIdentity(
         host,
-        defaultComponents.toolchain,
+        toolchain,
         directory,
         toolchainEnvironment,
       );
@@ -734,7 +735,7 @@ async function executeNativeWorkflow(
   }
   let executablePath: string | undefined;
   try {
-    const plan = defaultComponents.toolchain.createBuildPlan({
+    const plan = toolchain.createBuildPlan({
       ...includePropertiesWhen(() => {
         if (toolchainEnvironment == null) return undefined;
         return {
@@ -856,6 +857,7 @@ function selectExecutionTarget(
 export async function runNativeCli(
   request: CliRequest,
   host?: CompilerHost,
+  toolchain: NativeToolchain = defaultComponents.toolchain,
 ): Promise<CliResult> {
   host ??= defaultNodeHost();
   const parsed = parseCliRequest(request);
@@ -964,6 +966,7 @@ export async function runNativeCli(
       mir,
       selected.target,
       parsed.value.runtimeArchiveReuse,
+      toolchain,
     );
   } catch {
     result = diagnosticResult(

@@ -104,6 +104,12 @@ importers:
         specifier: workspace:*
         version: 0.1.0
 
+  packages/toolchain-host-cc:
+    dependencies:
+      '@oseo/compiler':
+        specifier: workspace:*
+        version: 0.1.0
+
   packages/toolchain-zig:
     dependencies:
       '@oseo/compiler':
