@@ -1,6 +1,13 @@
 ADR 0025: Native clock and wakeup checkpoint
 ============================================
 
+Sanitizer evidence correction (2026-09-17): the pinned Zig 0.16.0 accepts
+the requested flags but omits ASan from `address,undefined`. References to
+address sanitization below describe the requested policy, not verified ASan
+coverage. See the [activity audit](../sanitizer-activity.md) for measurements
+and the unresolved runtime-linking requirement.
+
+
 Status
 ------
 

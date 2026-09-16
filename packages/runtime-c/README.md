@@ -1,6 +1,12 @@
 @oseo/runtime-c
 ===============
 
+Sanitizer evidence correction (2026-09-17): the pinned Zig 0.16.0 accepts
+the requested flags but omits ASan from `address,undefined`. References to
+address sanitization below describe the requested policy, not verified ASan
+coverage. See the [activity audit] for
+measurements and the unresolved runtime-linking requirement.
+
 This package provides versioned, reviewed C11 runtime source inputs. The runtime
 owns opaque NaN-boxed values, UTF-16 strings, primitive semantics, two-word call
 results, explicit root frames, mark-and-sweep collection, ordinary objects,
@@ -927,3 +933,5 @@ program output cannot observe them. The context also carries diagnostic source
 identifiers with explicit byte lengths, heap-backed root-frame ownership, and
 active frame-budget accounting. Embedded null bytes are preserved during native
 error output.
+
+[activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
