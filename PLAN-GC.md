@@ -205,10 +205,12 @@ compaction keeps a consumed cell that is still queued alive until then.
 
 The context's KeptAlive set is a root set filled by `WeakRef` construction and
 `deref`. The native event loop clears it after the script or a timer callback
-and every promise job it enabled. The same checkpoint then runs each queued
-record as its own cleanup job before the next timer, in FIFO order; ordering by
-registration ordinal therefore holds among the records one collection
-publishes, not across collections. Collection currently
+and every promise job it enabled. The same checkpoint then runs one cleanup
+job per registry before the next timer. Jobs follow each registry's oldest
+record in the FIFO, and a job consumes every record of its registry, including
+one queued while it runs, before promise jobs drain; ordering by registration
+ordinal therefore holds among the records one collection publishes, not across
+collections. Collection currently
 runs only when forced at every safepoint or when a context is destroyed, so in
 an ordinary run no weak target clears and no cleanup job runs. A
 pressure-driven collection trigger remains the policy work this plan owns.

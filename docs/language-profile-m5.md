@@ -7015,11 +7015,13 @@ queue decide what is eligible for cleanup. After the script's promise jobs
 drain, and again after each timer turn, the event loop consumes that queue in
 order. The queue appends the records each collection makes eligible in their
 registration order, so records from an earlier collection run before records
-from a later one. Each record runs as its own cleanup job: the registry's
-callback receives the held value with an `undefined` receiver, and promise jobs
-drain before the next record. An abrupt callback ends the program with that
-completion, exactly as an abrupt timer callback does. Collection itself still
-neither allocates nor invokes user code.
+from a later one. Each registry with queued records gets one cleanup job,
+ordered by its oldest record. The job calls the registry's callback with an
+`undefined` receiver and each record's held value in queue order, including a
+record queued while the job runs and excluding one an earlier callback
+unregistered, and promise jobs drain only after the job ends. An abrupt
+callback ends the program with that completion, exactly as an abrupt timer
+callback does. Collection itself still neither allocates nor invokes user code.
 
 Fixed Node.js, Deno, and native differential evidence covers descriptors,
 brands, object, function, Array, and symbol keys, primitives that cannot be
@@ -7027,17 +7029,21 @@ held weakly, index growth under deletion churn, constructor adder order and
 iterator closing, derived construction, prototype fallback, `WeakRef` and
 `FinalizationRegistry` validation, and unregistration. Every observation there
 is independent of collection timing. A native-only observation with
-collection forced at every safepoint checks KeptAlive lifetime, cleanup order,
-interleaved promise jobs, skipping a queued record after `unregister`, and an
-abrupt cleanup callback. Sanitized fixed C evidence checks index
+collection forced at every safepoint checks KeptAlive lifetime, one cleanup job
+per registry with its promise jobs deferred until the job ends, skipping a
+queued record after `unregister` before or during its job, and an abrupt
+cleanup callback. Sanitized fixed C evidence checks index
 synchronization with deletion and collector unlinking, weak unregister tokens,
 and KeptAlive roots, and retains the AArch64 Linux cross-link. Generated
-evidence at property seed `0x60007500` compares one to sixteen `WeakMap`,
+evidence at property seed `0x60007500` starts with two or three fresh
+registrations, then compares one to sixteen `WeakMap`,
 `WeakSet`, `WeakRef`, and `FinalizationRegistry` operations over stable
 objects, unregistered symbols, fresh unreachable objects, and primitives with
 an independent identity model, Node.js, Deno, and both native specialization
-policies under forced collection; a false numeric hint deliberately misses its
-guard and reaches the compiled generic fallback.
+policies under forced collection, and checks the native cleanup report
+against a model where every callback precedes every promise job it enabled; a
+false numeric hint deliberately misses its guard and reaches the compiled
+generic fallback.
 
 Of the 262 paths under the node's four inventory roots, 249 are reviewed: 245
 pass and four retain the explicit cross-realm prerequisite. The other 13 use

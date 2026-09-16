@@ -221,7 +221,7 @@ Ownership follows the plan's target layout:
  -  *runtime\_weak\_collection.c*: the `WeakMap`, `WeakSet`, `WeakRef`, and
     `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
     job-scoped KeptAlive set, and the cleanup job step that calls a
-    registry's callback for one queued record;
+    registry's callback for each of its queued records;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -417,6 +417,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_finalization_registry_create`        | *runtime\_memory.c*           |
 | `oseo_internal_finalization_register`               | *runtime\_memory.c*           |
 | `oseo_internal_finalization_take_cleanup`           | *runtime\_memory.c*           |
+| `oseo_internal_finalization_take_registry_cleanup`  | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_delete`                    | *runtime\_memory.c*           |
 | `oseo_internal_finalization_register_token`         | *runtime\_memory.c*           |
 | `oseo_internal_finalization_unregister`             | *runtime\_memory.c*           |
@@ -1544,17 +1545,17 @@ cell that is still queued alive until that dequeue.
 The public context gains the KeptAlive set that `WeakRef` construction and
 `deref` fill and that the collector marks as roots. *runtime\_event\_loop.c*
 clears it after the script or a timer callback and the promise jobs it
-enabled, and then runs each queued cleanup record as its own job before the
-next timer. The component, the four heap kinds, eighteen intrinsic slots, one
-built-in code ID range, and the context fields move `abiVersion` to `m5-113`;
-no generated-code entry point is added. Fixed and generated native
-differential evidence, a native-only cleanup observation, and sanitized fixed
-C evidence with the AArch64 Linux cross-link cover the node under both
+enabled, and then runs one cleanup job per registry with queued records
+before the next timer. The component, the four heap kinds, eighteen intrinsic
+slots, one built-in code ID range, and the context fields move `abiVersion` to
+`m5-113`; no generated-code entry point is added. Fixed and generated native
+differential evidence, a native-only cleanup observation, and sanitized fixed C
+evidence with the AArch64 Linux cross-link cover the node under both
 specialization policies and collection forced at every safepoint. The node
-reviews 249 paths from its four test262 inventory roots and promotes 25
-already reviewed `Map`, `Set`, and `Object` cases whose last unmet
-prerequisite was a weak collection; two of them, the `Map` and `Set`
-value-domain cases, also needed the landed `typed-array-core` node.
+reviews 249 paths from its four test262 inventory roots and promotes 25 already
+reviewed `Map`, `Set`, and `Object` cases whose last unmet prerequisite was a
+weak collection; two of them, the `Map` and `Set` value-domain cases, also
+needed the landed `typed-array-core` node.
 
 ### Function prototype evidence
 

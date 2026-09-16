@@ -6420,20 +6420,24 @@ token; `unregister` removes live and already queued records, and the cleanup
 dequeue skips a removed record. The context gains the job-scoped KeptAlive
 set that `WeakRef` construction and `deref` fill and the event loop clears
 after the script or timer callback and its promise jobs. The event loop then
-runs each queued cleanup record as its own job, in queue order, before
-the next timer. Objects and all symbols can be held weakly because the profile
-admits no `Symbol.for` registry.
+runs one cleanup job per registry with queued records, ordered by each
+registry's oldest record, before the next timer. A job calls the callback for
+all of that registry's records in queue order before promise jobs drain.
+Objects and all symbols can be held weakly because the profile admits no
+`Symbol.for` registry.
 
 Fixed differential evidence covers descriptors, brands, key validity, index
 churn, constructor adder and iterator-closing order, derived construction,
 and registry validation independently of collection timing. A native-only
-observation under forced collection covers KeptAlive lifetime, cleanup order
-and promise-job interleaving, a queued record removed by `unregister`, and an
+observation under forced collection covers KeptAlive lifetime, cleanup
+grouping by registry with promise jobs deferred until each registry's job
+ends, a queued record removed by `unregister` before or during its job, and an
 abrupt callback. Sanitized fixed C evidence covers index synchronization, weak
 tokens, and KeptAlive roots with the AArch64 Linux cross-link. The generated
 domain at seed `0x60007500` compares WeakMap, WeakSet, WeakRef, and
-FinalizationRegistry operation sequences with an independent identity model
-under both specialization policies and collection forced at every safepoint,
+FinalizationRegistry operation sequences, after two or three fresh
+registrations, with an independent identity and cleanup-job model under both
+specialization policies and collection forced at every safepoint,
 including a deliberate guard miss that reaches generic fallback. Of the 262
 paths under the node's four roots, 249 are reviewed: 245 pass and four keep
 the cross-realm boundary. The 13 paths that create a registered symbol through

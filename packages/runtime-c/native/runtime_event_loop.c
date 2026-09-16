@@ -403,9 +403,11 @@ OseoResult oseo_entry_task_checkpoint(
 
 /*
  * The finalization cleanup checkpoint. It first ends the current job's
- * KeptAlive set, then runs every record the collector has queued as its
- * own cleanup job, draining promise jobs after each callback exactly as a
- * timer turn does. An abrupt callback ends the loop with that completion.
+ * KeptAlive set, then runs one cleanup job per registry with queued
+ * records, ordered by each registry's oldest record. A job calls the
+ * callback for all of its registry's records before promise jobs drain,
+ * exactly as a timer turn drains them after its callback. An abrupt
+ * callback ends the loop with that completion.
  */
 static OseoResult run_finalization_turns(OseoContext *context) {
     OseoRootFrame frame = {NULL, NULL, 0u};

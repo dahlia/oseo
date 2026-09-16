@@ -652,21 +652,36 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
  * Collection timing is host-defined, so reference engines cannot supply
  * this observation. With collection forced at every safepoint, the native
  * runtime clears a WeakRef only after the job that created or dereferenced
- * it ends, runs one cleanup job per dead registration in queue order, which
- * is registration order among records one collection makes eligible, after
- * the script's promise jobs and before a timer, and skips a record an
- * unregister removed after the collector had already queued it.
+ * it ends, and runs one cleanup job per registry after the script's promise
+ * jobs and before a timer. Jobs follow each registry's oldest queued record.
+ * A job calls its callback for every record of that registry in queue order
+ * before any promise job a callback enabled runs, and skips a record an
+ * unregister removed after the collector had already queued it, including
+ * one removed by an earlier callback of the same job.
  */
 const weakCleanupSource = `
+const laterToken = {};
 const registry = new FinalizationRegistry((held) => {
   console.log("cleanup", held);
+  if (held === "dead0") {
+    console.log("unregister in job", registry.unregister(laterToken));
+  }
   Promise.resolve().then(() => console.log("cleanup job", held));
+});
+const other = new FinalizationRegistry((held) => {
+  console.log("other cleanup", held);
+  Promise.resolve().then(() => console.log("other cleanup job", held));
 });
 const kept = {};
 registry.register(kept, "kept");
 (function () {
   for (let index = 0; index < 3; index = index + 1) {
-    registry.register({ index }, "dead" + index);
+    registry.register(
+      { index },
+      "dead" + index,
+      index === 1 ? laterToken : undefined,
+    );
+    if (index === 0) other.register({}, "other0");
   }
 })();
 const token = {};
@@ -689,11 +704,12 @@ const weakCleanupExpected =
   "same job temporary\n" +
   "promise job object\n" +
   "cleanup dead0\n" +
-  "cleanup job dead0\n" +
-  "cleanup dead1\n" +
-  "cleanup job dead1\n" +
+  "unregister in job true\n" +
   "cleanup dead2\n" +
+  "cleanup job dead0\n" +
   "cleanup job dead2\n" +
+  "other cleanup other0\n" +
+  "other cleanup job other0\n" +
   "timer undefined object\n";
 const weakCleanupThrowSource = `
 const registry = new FinalizationRegistry(() => {

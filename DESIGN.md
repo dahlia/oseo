@@ -410,8 +410,9 @@ scheduler consumes rooted records at an explicit later checkpoint. The M5b
 checkpoint first exposed this only to runtime components. The later
 `weak-collections` unit exposes it to JavaScript through an address-keyed
 index over each ephemeron table and a job-scoped KeptAlive root set for
-`WeakRef`, and the native event loop runs each queued finalization record as
-its own cleanup job after the current job's promise jobs drain.
+`WeakRef`, and after the current job's promise jobs drain, the native event
+loop runs one cleanup job per registry that consumes all of its queued
+finalization records.
 
 
 Calls, exceptions, and abrupt completion

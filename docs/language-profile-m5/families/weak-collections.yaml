@@ -12,8 +12,8 @@ scope:
     stays synchronized with collector unlinking."
   - "WeakRef construction and deref with the job-scoped KeptAlive set, and
     FinalizationRegistry register and unregister with weak targets and
-    tokens, cleanup jobs scheduled by the event loop in collector queue order,
-    and removal of records that were already queued."
+    tokens, one cleanup job per registry scheduled by the event loop in
+    collector queue order, and removal of records that were already queued."
 owners:
   - PLAN-M5.md
   - PLAN-GC.md

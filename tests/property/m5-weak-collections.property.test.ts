@@ -29,8 +29,14 @@ const { assertAsyncProperty } = await import(
 /*
  * Stable identities can be held weakly and stay reachable for the whole
  * program. A fresh object is unreachable as soon as its operation ends, so
- * forced collection may clear it; the model only asks questions whose
- * answers every conforming collection schedule shares.
+ * forced collection may clear it; the synchronous model only asks
+ * questions whose answers every conforming collection schedule shares.
+ *
+ * Cleanup is host-defined, so only the native run reports it. Collection
+ * forced at every safepoint queues every fresh registration target before
+ * the script ends, and the timer's report then records one registry
+ * cleanup job: each callback in registration order, and only afterwards the
+ * promise job each callback enabled.
  */
 type KeyToken =
   | "fresh-object"
@@ -92,9 +98,40 @@ const operationArbitrary: fc.Arbitrary<Operation> = fc.oneof(
   fc.record({ key: keyArbitrary, kind: fc.constant("unregister" as const) }),
 );
 
-const caseArbitrary = fc.array(operationArbitrary, {
-  maxLength: 16,
-  minLength: 1,
+/*
+ * Every case starts with two or three registrations whose fresh targets die
+ * before the script ends, so the native cleanup report sees several records
+ * of one registry. Their held values and tokens stay generated, so later
+ * unregister operations can still remove them.
+ */
+const cleanupRegistrationArbitrary = fc.record({
+  held: keyArbitrary,
+  key: fc.constant<KeyToken>("fresh-object"),
+  kind: fc.constant("register" as const),
+  token: fc.constantFrom<KeyToken>(
+    "fresh-object",
+    "object-a",
+    "object-b",
+    "symbol-a",
+    "symbol-b",
+    "undefined",
+  ),
+});
+
+interface GeneratedCase {
+  readonly cleanup: readonly Operation[];
+  readonly operations: readonly Operation[];
+}
+
+const caseArbitrary: fc.Arbitrary<GeneratedCase> = fc.record({
+  cleanup: fc.array(cleanupRegistrationArbitrary, {
+    maxLength: 3,
+    minLength: 2,
+  }),
+  operations: fc.array(operationArbitrary, {
+    maxLength: 16,
+    minLength: 1,
+  }),
 });
 
 const host = createNodeHost();
@@ -167,7 +204,11 @@ const symbolA = Symbol("a");
 const symbolB = Symbol("b");
 const map = new WeakMap();
 const set = new WeakSet();
-const registry = new FinalizationRegistry(function () {});
+const cleanups = [];
+const registry = new FinalizationRegistry(function (held) {
+  cleanups.push("callback " + String(held));
+  Promise.resolve().then(() => cleanups.push("job " + String(held)));
+});
 function probe(index, operation) {
   try {
     console.log(index, String(operation()));
@@ -179,6 +220,7 @@ ${operations.map(printOperation).join("\n")}
 /** @param {number} left @param {number} right */
 function hinted(left, right) { return left + right; }
 console.log("hint", hinted(2, 3), hinted("2", 3), objectA !== objectB);
+setTimeout(() => console.log("cleanup", cleanups.join(", ")), 0);
 `;
 }
 
@@ -197,10 +239,43 @@ function stable(token: KeyToken): boolean {
   return weakly(token) && token !== "fresh-object";
 }
 
-function expected(operations: readonly Operation[]): string {
+/* The source text String(held) prints for each held value token. */
+function heldText(token: KeyToken): string {
+  switch (token) {
+    case "fresh-object":
+    case "object-a":
+    case "object-b":
+      return "[object Object]";
+    case "number":
+      return "1";
+    case "string":
+      return "a";
+    case "symbol-a":
+      return "Symbol(a)";
+    case "symbol-b":
+      return "Symbol(b)";
+    case "undefined":
+      return "undefined";
+  }
+}
+
+interface Registration {
+  readonly held: KeyToken;
+  readonly token: KeyToken;
+}
+
+interface Expectation {
+  /* The observation Node.js and Deno share, without the cleanup report. */
+  readonly synchronous: string;
+  /* The native observation, whose last line reports the cleanup job. */
+  readonly native: string;
+}
+
+function expected(operations: readonly Operation[]): Expectation {
   const map = new Map<KeyToken, number>();
   const set = new Set<KeyToken>();
   const tokens: KeyToken[] = [];
+  let dead: Registration[] = [];
   const lines = operations.map((operation, index) => {
     const key = operation.key;
     let result: string;
@@ -248,6 +323,9 @@ function expected(operations: readonly Operation[]): string {
           result = "TypeError";
         } else {
           if (stable(operation.token)) tokens.push(operation.token);
+          if (key === "fresh-object") {
+            dead.push({ held: operation.held, token: operation.token });
+          }
           result = "undefined";
         }
         break;
@@ -259,14 +337,40 @@ function expected(operations: readonly Operation[]): string {
           const kept = tokens.filter((token) => token !== key);
           tokens.length = 0;
           tokens.push(...kept);
+          dead = dead.filter(
+            (registration) => !stable(key) || registration.token !== key,
+          );
           result = String(kept.length !== before);
         }
         break;
     }
     return `${index} ${result}`;
   });
-  lines.push("hint 5 23 true", "");
-  return lines.join("\n");
+  lines.push("hint 5 23 true");
+  const cleanups = [
+    ...dead.map((registration) => `callback ${heldText(registration.held)}`),
+    ...dead.map((registration) => `job ${heldText(registration.held)}`),
+  ];
+  return {
+    native: [...lines, `cleanup ${cleanups.join(", ")}`, ""].join("\n"),
+    synchronous: [...lines, ""].join("\n"),
+  };
+}
+
+/*
+ * A reference engine may or may not collect before its timer runs, so its
+ * cleanup report is removed before comparison with the synchronous model.
+ */
+function withoutCleanupReport<T extends { readonly stdout: string }>(
+  observation: T,
+): T {
+  const lines = observation.stdout.split("\n");
+  const report = lines.length - 2;
+  if (report < 0 || !lines[report]?.startsWith("cleanup ")) return observation;
+  return {
+    ...observation,
+    stdout: [...lines.slice(0, report), ""].join("\n"),
+  };
 }
 
 async function references(source: string): Promise<
@@ -316,16 +420,18 @@ test(
   async () => {
     await assertAsyncProperty(
       "WeakMap, WeakSet, WeakRef, and FinalizationRegistry agree",
-      fc.asyncProperty(caseArbitrary, async (operations) => {
+      fc.asyncProperty(caseArbitrary, async (generated) => {
+        const operations = [...generated.cleanup, ...generated.operations];
         const source = printCase(operations);
+        const expectation = expected(operations);
         const expectedObservation = {
           exitStatus: 0,
           stderr: "",
-          stdout: expected(operations),
+          stdout: expectation.native,
         };
         assertMatchingObservations([
-          expectedObservation,
-          ...(await references(source)),
+          { ...expectedObservation, stdout: expectation.synchronous },
+          ...(await references(source)).map(withoutCleanupReport),
         ]);
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
@@ -380,17 +486,21 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
+          "two or three FinalizationRegistry registrations of fresh " +
+          "targets with generated held values and tokens, then " +
           "one to sixteen WeakMap set, get, has, and delete, WeakSet add, " +
           "has, and delete, WeakRef construction and deref, and " +
           "FinalizationRegistry register and unregister operations over " +
           "two stable objects, two unregistered symbols, a fresh " +
           "unreachable object, and three primitives that cannot be held " +
-          "weakly, plus truthful and false number hints",
+          "weakly, plus truthful and false number hints and a native " +
+          "report of the one cleanup job for fresh registration targets",
         numRuns: 12,
         profile: "M5 weak collections",
         seed: 0x6000_7500,
         sizeLimit:
-          "at most sixteen operations over eight reviewed key tokens, one " +
+          "at most three fresh registrations and sixteen operations over " +
+          "eight reviewed key tokens, one " +
           "WeakMap, one WeakSet, and one FinalizationRegistry",
         timeLimitMilliseconds: 180_000,
       },

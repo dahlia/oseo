@@ -1090,28 +1090,46 @@ bool oseo_internal_finalization_unregister(
     return removed;
 }
 
-bool oseo_internal_finalization_take_cleanup(
+/*
+ * Unlinks and consumes the oldest queued record, restricted to `registry`
+ * unless it is undefined. A record an unregister already consumed has
+ * given back its pending count, so the scan unlinks it without a callback.
+ */
+static bool take_queued_cleanup(
     OseoContext *context,
-    OseoValue *registry,
+    OseoValue registry,
+    OseoValue *registry_out,
     OseoValue *holdings
 ) {
-    while (has_heap_kind(
-        context->finalization_head,
-        OSEO_HEAP_FINALIZATION_CELL
-    )) {
-        OseoFinalizationCell *cell =
-            finalization_cell_object(context->finalization_head);
-        context->finalization_head = cell->queue_next;
-        if (tag_of(context->finalization_head) != OSEO_TAG_HEAP) {
-            context->finalization_tail = oseo_undefined();
+    OseoValue previous = oseo_undefined();
+    OseoValue cursor = context->finalization_head;
+    while (has_heap_kind(cursor, OSEO_HEAP_FINALIZATION_CELL)) {
+        OseoFinalizationCell *cell = finalization_cell_object(cursor);
+        OseoValue next = cell->queue_next;
+        bool matches = !cell->processed &&
+            (tag_of(registry) == OSEO_TAG_UNDEFINED ||
+             cell->registry == registry);
+        if (!cell->processed && !matches) {
+            previous = cursor;
+            cursor = next;
+            continue;
+        }
+        if (has_heap_kind(previous, OSEO_HEAP_FINALIZATION_CELL)) {
+            finalization_cell_object(previous)->queue_next = next;
+        } else {
+            context->finalization_head = next;
+        }
+        if (context->finalization_tail == cursor) {
+            context->finalization_tail = previous;
         }
         cell->queue_next = oseo_undefined();
         cell->queued = false;
-        /* An unregister already removed this record and its pending
-         * count, so the dequeue skips it. */
-        if (cell->processed) continue;
+        if (!matches) {
+            cursor = next;
+            continue;
+        }
         cell->processed = true;
-        *registry = cell->registry;
+        *registry_out = cell->registry;
         *holdings = cell->holdings;
         cell->holdings = oseo_undefined();
         if (context->finalization_pending_count > 0u) {
@@ -1120,4 +1138,27 @@ bool oseo_internal_finalization_take_cleanup(
         return true;
     }
     return false;
+}
+
+bool oseo_internal_finalization_take_cleanup(
+    OseoContext *context,
+    OseoValue *registry,
+    OseoValue *holdings
+) {
+    return take_queued_cleanup(
+        context,
+        oseo_undefined(),
+        registry,
+        holdings
+    );
+}
+
+bool oseo_internal_finalization_take_registry_cleanup(
+    OseoContext *context,
+    OseoValue registry,
+    OseoValue *holdings
+) {
+    OseoValue taken = oseo_undefined();
+    return has_heap_kind(registry, OSEO_HEAP_FINALIZATION_REGISTRY) &&
+        take_queued_cleanup(context, registry, &taken, holdings);
 }

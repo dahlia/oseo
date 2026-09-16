@@ -2757,10 +2757,12 @@ OseoResult oseo_internal_keep_during_job(
 /* ClearKeptObjects. It releases the roots without collecting. */
 void oseo_internal_clear_kept_objects(OseoContext *context);
 /*
- * Runs one HostEnqueueFinalizationRegistryCleanupJob step: it consumes the
- * oldest queued finalization record, if any, and calls its registry's
- * cleanup callback with the holdings. `ran` reports whether a record was
- * consumed; the caller owns the surrounding job checkpoint.
+ * Runs one cleanup job, CleanupFinalizationRegistry for the registry of the
+ * oldest queued finalization record, if any. The job calls that registry's
+ * callback for each of its queued records in queue order, including one
+ * queued while the job runs, and stops at the first abrupt callback. `ran`
+ * reports whether a job ran; the caller owns the surrounding job
+ * checkpoint, so no promise job runs between two of the job's callbacks.
  */
 OseoResult oseo_internal_finalization_cleanup_job(
     OseoContext *context,
@@ -2980,6 +2982,17 @@ bool oseo_internal_finalization_unregister(
 bool oseo_internal_finalization_take_cleanup(
     OseoContext *context,
     OseoValue *registry,
+    OseoValue *holdings
+);
+/*
+ * Pops the oldest unconsumed record that belongs to `registry`, leaving
+ * other registries' records queued in order. Like the unrestricted
+ * dequeue, it neither allocates nor invokes user code, and `holdings` is a
+ * caller-rooted output slot.
+ */
+bool oseo_internal_finalization_take_registry_cleanup(
+    OseoContext *context,
+    OseoValue registry,
     OseoValue *holdings
 );
 /*

@@ -7,7 +7,8 @@
  * Collector-facing contracts the weak-collections component adds on top of
  * the ephemeron checkpoint: the address-keyed index stays synchronized
  * with source-level deletion and collector unlinking, unregister tokens
- * are weak, an unregistered queued record is skipped, and KeptAlive roots
+ * are weak, an unregistered queued record is skipped, one registry's
+ * records dequeue together past another registry's, and KeptAlive roots
  * last exactly until they are cleared.
  */
 
@@ -295,6 +296,120 @@ static void test_unregister_tokens(void) {
     oseo_context_destroy(&context);
 }
 
+/* Registries 0 and 1 hold targets 2, 3, 4, and 5 in that order. */
+static void register_grouped(OseoContext *context, OseoValue *slots) {
+    for (size_t index = 0u; index < 4u; index += 1u) {
+        slots[2u + index] = node(context);
+        require_normal(oseo_internal_finalization_register_token(
+            context,
+            slots[index == 1u ? 1u : 0u],
+            slots[2u + index],
+            oseo_number((double)index),
+            index == 2u ? slots[6] : oseo_undefined()
+        ));
+    }
+}
+
+static void assert_registry_take(
+    OseoContext *context,
+    OseoValue registry,
+    OseoValue *holdings,
+    double expected
+) {
+    assert(oseo_internal_finalization_take_registry_cleanup(
+        context,
+        registry,
+        holdings
+    ));
+    assert(*holdings == oseo_number(expected));
+}
+
+static void test_registry_cleanup_grouping(void) {
+    OseoContext context;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    oseo_context_init(&context, "weak-group", sizeof("weak-group") - 1u);
+    require_normal(oseo_roots_allocate(&context, &frame, 9u));
+    for (size_t index = 0u; index < 2u; index += 1u) {
+        frame.slots[index] = require_normal(
+            oseo_internal_finalization_registry_create(
+                &context,
+                oseo_undefined()
+            )
+        );
+    }
+    frame.slots[6] = node(&context);
+    register_grouped(&context, frame.slots);
+    for (size_t index = 2u; index < 6u; index += 1u) {
+        frame.slots[index] = oseo_undefined();
+    }
+    oseo_collect(&context);
+    assert(context.finalization_pending_count == 4u);
+
+    /* Queue: 0/r0, 1/r1, 2/r0 (token), 3/r0. The first take picks the
+     * job's registry; its later records dequeue past registry 1's. */
+    assert(oseo_internal_finalization_take_cleanup(
+        &context,
+        &frame.slots[7],
+        &frame.slots[8]
+    ));
+    assert(frame.slots[7] == frame.slots[0]);
+    assert(frame.slots[8] == oseo_number(0.0));
+    /* An unregister during the job removes a record not yet called. */
+    assert(oseo_internal_finalization_unregister(
+        &context,
+        frame.slots[0],
+        frame.slots[6]
+    ));
+    assert_registry_take(&context, frame.slots[0], &frame.slots[8], 3.0);
+    assert(!oseo_internal_finalization_take_registry_cleanup(
+        &context,
+        frame.slots[0],
+        &frame.slots[8]
+    ));
+    assert(!oseo_internal_finalization_take_registry_cleanup(
+        &context,
+        oseo_number(1.0),
+        &frame.slots[8]
+    ));
+    assert(context.finalization_pending_count == 1u);
+    assert_registry_take(&context, frame.slots[1], &frame.slots[8], 1.0);
+    assert(context.finalization_pending_count == 0u);
+    assert(context.finalization_head == oseo_undefined());
+    assert(context.finalization_tail == oseo_undefined());
+
+    /* Removing the tail record past registry 1's keeps appends linked. */
+    register_grouped(&context, frame.slots);
+    for (size_t index = 2u; index < 6u; index += 1u) {
+        frame.slots[index] = oseo_undefined();
+    }
+    oseo_collect(&context);
+    assert_registry_take(&context, frame.slots[0], &frame.slots[8], 0.0);
+    assert_registry_take(&context, frame.slots[0], &frame.slots[8], 2.0);
+    assert_registry_take(&context, frame.slots[0], &frame.slots[8], 3.0);
+    assert(context.finalization_tail == context.finalization_head);
+    frame.slots[2] = node(&context);
+    require_normal(oseo_internal_finalization_register(
+        &context,
+        frame.slots[1],
+        frame.slots[2],
+        oseo_number(4.0)
+    ));
+    frame.slots[2] = oseo_undefined();
+    oseo_collect(&context);
+    assert_registry_take(&context, frame.slots[1], &frame.slots[8], 1.0);
+    assert(oseo_internal_finalization_take_cleanup(
+        &context,
+        &frame.slots[7],
+        &frame.slots[8]
+    ));
+    assert(frame.slots[7] == frame.slots[1]);
+    assert(frame.slots[8] == oseo_number(4.0));
+    assert(context.finalization_tail == oseo_undefined());
+
+    oseo_roots_release(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 static void test_kept_objects(void) {
     OseoContext context;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -342,6 +457,7 @@ int main(void) {
     test_index_survives_delete_and_clearing();
     test_index_reuses_tombstones();
     test_unregister_tokens();
+    test_registry_cleanup_grouping();
     test_kept_objects();
     return 0;
 }

@@ -732,25 +732,33 @@ OseoResult oseo_internal_finalization_cleanup_job(
     OseoContext *context,
     bool *ran
 ) {
-    OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
+    OseoValue slots[3] = {oseo_undefined(), oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
     *ran = oseo_internal_finalization_take_cleanup(
         context,
         &slots[0],
-        &slots[1]
+        &slots[2]
     );
     OseoResult result = normal(oseo_undefined());
     if (*ran) {
-        slots[0] = finalization_registry_object(slots[0])->callback;
-        result = oseo_call_function(
-            context,
-            slots[0],
-            oseo_undefined(),
-            1u,
-            &slots[1],
-            oseo_undefined()
-        );
+        slots[1] = finalization_registry_object(slots[0])->callback;
+        do {
+            result = oseo_call_function(
+                context,
+                slots[1],
+                oseo_undefined(),
+                1u,
+                &slots[2],
+                oseo_undefined()
+            );
+            slots[2] = oseo_undefined();
+        } while (result.status == OSEO_STATUS_NORMAL &&
+                 oseo_internal_finalization_take_registry_cleanup(
+                     context,
+                     slots[0],
+                     &slots[2]
+                 ));
     }
     oseo_roots_pop(context, &frame);
     return result;
