@@ -751,8 +751,17 @@ size_t oseo_internal_typed_array_element_size(OseoTypedArrayKind kind) {
 bool oseo_internal_typed_array_fixed_length(OseoValue view) {
     const OseoTypedArray *typed = typed_array_object(view);
     if (typed->array_length == SIZE_MAX) return false;
-    return !is_array_buffer(typed->viewed_buffer) ||
-        !array_buffer_object(typed->viewed_buffer)->resizable;
+    if (!is_array_buffer(typed->viewed_buffer)) return true;
+    const OseoArrayBuffer *buffer =
+        array_buffer_object(typed->viewed_buffer);
+    /*
+     * IsTypedArrayFixedLength step 3 excuses a shared buffer from the
+     * fixed-length requirement: `resizable` means growable on a
+     * SharedArrayBuffer, and a growable buffer only grows, so an
+     * explicitly sized view of one can never fall out of bounds and
+     * never gains an integer index.
+     */
+    return !buffer->resizable || buffer->shared;
 }
 
 OseoResult oseo_internal_typed_array_iteration_length(

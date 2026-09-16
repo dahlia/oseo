@@ -265,6 +265,43 @@ const trackingView = new DataView(growable);
 growable.grow(8);
 console.log("data view tracking", trackingView.byteLength, tracking.length);
 
+// IsTypedArrayFixedLength excuses a shared buffer from the fixed-length
+// requirement, so an explicitly sized view of a growable SharedArrayBuffer
+// may have its extensions prevented: the buffer only grows, and a sized
+// view never gains an index. A length-tracking view still does, and a
+// resizable ArrayBuffer can shrink a sized view out of bounds.
+const integritySharedGrowable = new SAB(4, { maxByteLength: 8 });
+const integrityResizable = new ArrayBuffer(4, { maxByteLength: 8 });
+for (const [label, value] of [
+  ["shared sized", new Int32Array(integritySharedGrowable, 0, 1)],
+  ["shared tracking", new Int32Array(integritySharedGrowable)],
+  ["shared empty sized", new Int32Array(integritySharedGrowable, 4, 0)],
+  ["shared fixed buffer", new Int32Array(new SAB(4))],
+  ["resizable sized", new Int32Array(integrityResizable, 0, 1)],
+  ["resizable tracking", new Int32Array(integrityResizable)],
+]) {
+  console.log(
+    "integrity",
+    label,
+    errorName(() => Object.preventExtensions(value) === value),
+    Object.isExtensible(value),
+    Reflect.preventExtensions(value),
+  );
+}
+const sizedOverGrowable = new Int32Array(integritySharedGrowable, 0, 1);
+Object.preventExtensions(sizedOverGrowable);
+integritySharedGrowable.grow(8);
+console.log(
+  "integrity after grow",
+  integritySharedGrowable.byteLength,
+  sizedOverGrowable.length,
+  Object.isExtensible(sizedOverGrowable),
+  Object.getOwnPropertyNames(sizedOverGrowable).join(),
+  Reflect.defineProperty(sizedOverGrowable, "extra", { value: 1 }),
+  Reflect.set(sizedOverGrowable, "extra", 1),
+  "extra" in sizedOverGrowable,
+);
+
 // A false Number hint on a SharedArrayBuffer length must not change
 // behavior, so the enabled policy misses its guard and reaches the
 // compiled generic fallback.

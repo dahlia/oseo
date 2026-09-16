@@ -6819,7 +6819,11 @@ current length, and throws a `RangeError` for a smaller or over-maximum
 length; the grown bytes read zero. A shared buffer never detaches. TypedArray
 and DataView construction, element access, and length-tracking views accept
 either buffer kind unchanged, so a length-tracking view over a growable
-buffer observes each grow.
+buffer observes each grow. A growable shared buffer is still fixed length
+for IsTypedArrayFixedLength, because it never shrinks, so
+`Object.preventExtensions` accepts an explicitly sized view over one while
+it keeps rejecting a length-tracking view and a sized view over a resizable
+`ArrayBuffer`.
 
 The thirteen `Atomics` functions validate an integer TypedArray first, then
 convert the index against the length read before that conversion, then
