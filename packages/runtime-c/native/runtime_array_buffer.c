@@ -5,9 +5,11 @@
 #include <string.h>
 
 /*
- * The ArrayBuffer constructor, the Data Block its instances own, the
- * prototype accessors, resize, transfer, transferToFixedLength, slice,
- * and the species accessor.
+ * The ArrayBuffer and SharedArrayBuffer constructors, the Data Blocks
+ * their instances own, the prototype accessors, resize, grow, transfer,
+ * transferToFixedLength, slice, and the species accessors. Both buffer
+ * kinds share one record and one allocation path; `shared` is the
+ * IsSharedArrayBuffer distinction every brand check below reads.
  */
 
 /*
@@ -48,15 +50,15 @@ static OseoResult array_buffer_to_index(
 }
 
 /*
- * RequireInternalSlot(this, [[ArrayBufferData]]). A SharedArrayBuffer
- * cannot exist in this realm, so the specification's separate
- * IsSharedArrayBuffer rejection is the same TypeError as this one.
+ * RequireInternalSlot(this, [[ArrayBufferData]]) followed by the
+ * IsSharedArrayBuffer rejection every ArrayBuffer.prototype member
+ * performs. Both are the same TypeError, so one check reports them.
  */
 static OseoResult array_buffer_receiver(
     OseoContext *context,
     OseoValue receiver
 ) {
-    if (!is_array_buffer(receiver)) {
+    if (!is_array_buffer(receiver) || array_buffer_object(receiver)->shared) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -86,7 +88,8 @@ static OseoResult array_buffer_allocate(
     OseoValue prototype,
     double byte_length,
     double max_byte_length,
-    bool resizable
+    bool resizable,
+    bool shared
 ) {
     if (resizable && byte_length > max_byte_length) {
         return oseo_internal_throw_error(
@@ -169,6 +172,7 @@ static OseoResult array_buffer_allocate(
     buffer->max_byte_length = maximum;
     buffer->resizable = resizable;
     buffer->detached = false;
+    buffer->shared = shared;
     OseoResult published = oseo_internal_publish_heap(
         context,
         &buffer->ordinary.header,
@@ -217,12 +221,14 @@ OseoResult oseo_internal_array_buffer_create(
         prototype.value,
         byte_length,
         max_byte_length,
-        resizable
+        resizable,
+        false
     );
 }
 
 /*
- * OrdinaryCreateFromConstructor(newTarget, "%ArrayBuffer.prototype%").
+ * OrdinaryCreateFromConstructor(newTarget, fallback), where the fallback
+ * is %ArrayBuffer.prototype% or %SharedArrayBuffer.prototype%.
  * The `prototype` read is the specified Get, so a new target whose
  * property is an accessor runs it, and a non-object result falls back to
  * the realm prototype.
@@ -230,6 +236,7 @@ OseoResult oseo_internal_array_buffer_create(
 static OseoResult array_buffer_prototype_from_target(
     OseoContext *context,
     OseoValue new_target,
+    OseoIntrinsic fallback,
     OseoValue *prototype
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -248,10 +255,7 @@ static OseoResult array_buffer_prototype_from_target(
             frame.slots[0]
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE
-            );
+            result = oseo_internal_intrinsic(context, fallback);
         }
         frame.slots[1] = result.value;
     }
@@ -288,17 +292,26 @@ static OseoResult array_buffer_max_option(
     return result;
 }
 
+/*
+ * The ArrayBuffer and SharedArrayBuffer constructors. They differ only in
+ * the fallback prototype and in the kind of Data Block they allocate, and
+ * AllocateArrayBuffer and AllocateSharedArrayBuffer order their length
+ * check, prototype read, and block creation identically.
+ */
 static OseoResult array_buffer_construct(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments,
-    OseoValue new_target
+    OseoValue new_target,
+    bool shared
 ) {
     if (tag_of(new_target) == OSEO_TAG_UNDEFINED) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "ArrayBuffer requires new."
+            shared
+                ? "SharedArrayBuffer requires new."
+                : "ArrayBuffer requires new."
         );
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -334,6 +347,9 @@ static OseoResult array_buffer_construct(
         result = array_buffer_prototype_from_target(
             context,
             frame.slots[0],
+            shared
+                ? OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE
+                : OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE,
             &frame.slots[1]
         );
     }
@@ -343,7 +359,8 @@ static OseoResult array_buffer_construct(
             frame.slots[1],
             byte_length,
             maximum,
-            resizable
+            resizable,
+            shared
         );
     }
     oseo_roots_release(context, &frame);
@@ -539,10 +556,140 @@ static OseoResult array_buffer_copy_and_detach(
     return result;
 }
 
-/* SpeciesConstructor(O, %ArrayBuffer%). */
+static OseoResult array_buffer_slice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool shared
+);
+
+/*
+ * RequireInternalSlot(this, [[ArrayBufferData]]) followed by the
+ * IsSharedArrayBuffer requirement of every SharedArrayBuffer.prototype
+ * member.
+ */
+static OseoResult shared_array_buffer_receiver(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (!is_array_buffer(receiver) ||
+        !array_buffer_object(receiver)->shared) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "SharedArrayBuffer method receiver is not a SharedArrayBuffer."
+        );
+    }
+    return normal(receiver);
+}
+
+/*
+ * SharedArrayBuffer.prototype.grow(newLength). Only a growable shared
+ * buffer carries [[ArrayBufferMaxByteLength]] together with a shared
+ * block, so both brand checks throw before the length converts. One agent
+ * is the whole cluster, so the compare-and-exchange loop the
+ * specification describes never observes a racing grow and reduces to one
+ * comparison against the current length. The block was reserved at its
+ * maximum and cleared at creation, so the grown bytes already read zero.
+ */
+static OseoResult shared_array_buffer_grow(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_array_buffer(receiver) ||
+        !array_buffer_object(receiver)->shared ||
+        !array_buffer_object(receiver)->resizable) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "SharedArrayBuffer.prototype.grow needs a growable "
+            "SharedArrayBuffer."
+        );
+    }
+    OseoValue slot = receiver;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    double requested = 0.0;
+    OseoResult result = oseo_internal_to_index(
+        context,
+        argument_count == 0u ? oseo_undefined() : arguments[0],
+        "SharedArrayBuffer length is outside the admitted index range.",
+        &requested
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoArrayBuffer *buffer = array_buffer_object(slot);
+        size_t length = 0u;
+        if (requested == (double)buffer->byte_length) {
+            result = normal(oseo_undefined());
+        } else if (requested < (double)buffer->byte_length ||
+                   !array_buffer_size(requested, &length) ||
+                   length > buffer->max_byte_length) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_RANGE,
+                "SharedArrayBuffer grow length is outside its current and "
+                "maximum byte lengths."
+            );
+        } else {
+            buffer->byte_length = length;
+            result = normal(oseo_undefined());
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The SharedArrayBuffer.prototype accessors and methods. */
+static OseoResult shared_array_buffer_member(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (code_id == OSEO_SHARED_ARRAY_BUFFER_GROW_CODE_ID) {
+        return shared_array_buffer_grow(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_SHARED_ARRAY_BUFFER_SLICE_CODE_ID) {
+        return array_buffer_slice(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            true
+        );
+    }
+    OseoResult checked = shared_array_buffer_receiver(context, receiver);
+    if (checked.status != OSEO_STATUS_NORMAL) return checked;
+    const OseoArrayBuffer *buffer = array_buffer_object(receiver);
+    if (code_id == OSEO_SHARED_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID) {
+        return normal(oseo_number((double)buffer->byte_length));
+    }
+    if (code_id == OSEO_SHARED_ARRAY_BUFFER_GROWABLE_CODE_ID) {
+        return normal(oseo_boolean(buffer->resizable));
+    }
+    if (code_id == OSEO_SHARED_ARRAY_BUFFER_MAX_BYTE_LENGTH_CODE_ID) {
+        return normal(oseo_number(
+            (double)(buffer->resizable ? buffer->max_byte_length
+                                       : buffer->byte_length)
+        ));
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
+/* SpeciesConstructor(O, defaultConstructor). */
 static OseoResult array_buffer_species_constructor(
     OseoContext *context,
-    OseoValue object
+    OseoValue object,
+    OseoIntrinsic default_constructor
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
@@ -556,10 +703,7 @@ static OseoResult array_buffer_species_constructor(
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         tag_of(frame.slots[2]) == OSEO_TAG_UNDEFINED) {
-        result = oseo_internal_intrinsic(
-            context,
-            OSEO_INTRINSIC_ARRAY_BUFFER
-        );
+        result = oseo_internal_intrinsic(context, default_constructor);
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -582,10 +726,7 @@ static OseoResult array_buffer_species_constructor(
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(frame.slots[2])) {
-        result = oseo_internal_intrinsic(
-            context,
-            OSEO_INTRINSIC_ARRAY_BUFFER
-        );
+        result = oseo_internal_intrinsic(context, default_constructor);
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -639,14 +780,23 @@ static OseoResult array_buffer_construct_species(
     return result;
 }
 
-/* ArrayBuffer.prototype.slice(start, end). */
+/*
+ * ArrayBuffer.prototype.slice(start, end) and, when `shared` is true,
+ * SharedArrayBuffer.prototype.slice(start, end). The two algorithms share
+ * their bounds, species construction, and copy; they differ in the brand
+ * each requires of the receiver and of the species result, and a shared
+ * buffer is never detached, so the detachment checks cannot fire for it.
+ */
 static OseoResult array_buffer_slice(
     OseoContext *context,
     OseoValue receiver,
     size_t argument_count,
-    const OseoValue *arguments
+    const OseoValue *arguments,
+    bool shared
 ) {
-    OseoResult checked = array_buffer_receiver(context, receiver);
+    OseoResult checked = shared
+        ? shared_array_buffer_receiver(context, receiver)
+        : array_buffer_receiver(context, receiver);
     if (checked.status != OSEO_STATUS_NORMAL) return checked;
     if (array_buffer_object(receiver)->detached) {
         return oseo_internal_throw_error(
@@ -690,7 +840,13 @@ static OseoResult array_buffer_slice(
     }
     double new_length = final - first > 0.0 ? final - first : 0.0;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = array_buffer_species_constructor(context, slots[0]);
+        result = array_buffer_species_constructor(
+            context,
+            slots[0],
+            shared
+                ? OSEO_INTRINSIC_SHARED_ARRAY_BUFFER
+                : OSEO_INTRINSIC_ARRAY_BUFFER
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -706,6 +862,17 @@ static OseoResult array_buffer_slice(
             context,
             OSEO_ERROR_TYPE,
             "The ArrayBuffer species did not return an ArrayBuffer."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        array_buffer_object(slots[2])->shared != shared) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            shared
+                ? "The SharedArrayBuffer species did not return a "
+                  "SharedArrayBuffer."
+                : "The ArrayBuffer species returned a SharedArrayBuffer."
         );
     }
     if (result.status == OSEO_STATUS_NORMAL &&
@@ -776,12 +943,14 @@ OseoResult oseo_internal_array_buffer_builtin_dispatch(
     OseoValue new_target
 ) {
     (void)callee;
-    if (code_id == OSEO_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID) {
+    if (code_id == OSEO_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID ||
+        code_id == OSEO_SHARED_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID) {
         return array_buffer_construct(
             context,
             argument_count,
             arguments,
-            new_target
+            new_target,
+            code_id == OSEO_SHARED_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID
         );
     }
     if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
@@ -794,8 +963,19 @@ OseoResult oseo_internal_array_buffer_builtin_dispatch(
     if (code_id == OSEO_ARRAY_BUFFER_IS_VIEW_CODE_ID) {
         return array_buffer_is_view(argument_count, arguments);
     }
-    if (code_id == OSEO_ARRAY_BUFFER_SPECIES_CODE_ID) {
+    if (code_id == OSEO_ARRAY_BUFFER_SPECIES_CODE_ID ||
+        code_id == OSEO_SHARED_ARRAY_BUFFER_SPECIES_CODE_ID) {
         return normal(receiver);
+    }
+    if (code_id >= OSEO_SHARED_ARRAY_BUFFER_SLICE_CODE_ID &&
+        code_id <= OSEO_SHARED_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID) {
+        return shared_array_buffer_member(
+            context,
+            code_id,
+            receiver,
+            argument_count,
+            arguments
+        );
     }
     if (code_id == OSEO_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID) {
         return array_buffer_byte_length(context, receiver);
@@ -822,7 +1002,8 @@ OseoResult oseo_internal_array_buffer_builtin_dispatch(
             context,
             receiver,
             argument_count,
-            arguments
+            arguments,
+            false
         );
     }
     if (code_id == OSEO_ARRAY_BUFFER_TRANSFER_CODE_ID) {
@@ -1190,6 +1371,220 @@ OseoResult oseo_internal_install_array_buffer_global(
             context,
             slots[0],
             "ArrayBuffer",
+            slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL ? normal(slots[0]) : result;
+}
+
+/*
+ * Materializes %SharedArrayBuffer%, %SharedArrayBuffer.prototype%, and
+ * every own property ECMA-262 gives them. The cluster follows the
+ * ArrayBuffer build: `OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES` is
+ * filled last and doubles as the completion marker, holds the
+ * uninitialized sentinel while the attempt runs, and a failed attempt
+ * clears every slot it filled.
+ */
+static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
+    OseoValue *marker =
+        &context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES];
+    if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The SharedArrayBuffer intrinsic cluster is already being built."
+        );
+    }
+    if (tag_of(*marker) != OSEO_TAG_UNDEFINED) return normal(*marker);
+    size_t entry_allocations = context->allocations;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    *marker = oseo_uninitialized();
+    result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_OBJECT_PROTOTYPE
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE] =
+            frame.slots[0];
+        result = create_array_buffer_builtin(
+            context,
+            OSEO_SHARED_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID,
+            "SharedArrayBuffer",
+            1u,
+            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[1] = result.value;
+    }
+    const OseoPropertyAttributes method = {true, false, true, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER] =
+            frame.slots[1];
+        OseoFunction *constructor = function_object(frame.slots[1]);
+        constructor->prototype_object = frame.slots[0];
+        constructor->prototype_writable = false;
+        result = define_array_buffer_property(
+            context,
+            frame.slots[0],
+            "constructor",
+            frame.slots[1],
+            method
+        );
+    }
+    static const size_t accessor_codes[] = {
+        OSEO_SHARED_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID,
+        OSEO_SHARED_ARRAY_BUFFER_GROWABLE_CODE_ID,
+        OSEO_SHARED_ARRAY_BUFFER_MAX_BYTE_LENGTH_CODE_ID,
+    };
+    static const char *const accessor_names[] = {
+        "byteLength",
+        "growable",
+        "maxByteLength",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         index += 1u) {
+        result = create_array_buffer_builtin(
+            context,
+            accessor_codes[index],
+            accessor_names[index],
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_array_buffer_accessor(
+            context,
+            frame.slots[0],
+            accessor_names[index],
+            frame.slots[2]
+        );
+    }
+    static const size_t method_codes[] = {
+        OSEO_SHARED_ARRAY_BUFFER_GROW_CODE_ID,
+        OSEO_SHARED_ARRAY_BUFFER_SLICE_CODE_ID,
+    };
+    static const char *const method_names[] = {"grow", "slice"};
+    static const size_t method_lengths[] = {1u, 2u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_array_buffer_builtin(
+            context,
+            method_codes[index],
+            method_names[index],
+            method_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_array_buffer_property(
+            context,
+            frame.slots[0],
+            method_names[index],
+            frame.slots[2],
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_TO_STRING_TAG
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "SharedArrayBuffer");
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[3],
+            frame.slots[4],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_array_buffer_builtin(
+            context,
+            OSEO_SHARED_ARRAY_BUFFER_SPECIES_CODE_ID,
+            "[Symbol.species]",
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_SPECIES
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define_accessor(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[2],
+            oseo_undefined(),
+            true,
+            false,
+            (OseoPropertyAttributes){true, false, false, true}
+        );
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        for (size_t index = OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE;
+             index <= OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES;
+             index += 1u) {
+            context->intrinsics[index] = oseo_undefined();
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    OseoValue species = frame.slots[2];
+    context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES] = species;
+    if (context->observe_specialization) {
+        context->allocations = entry_allocations;
+    }
+    oseo_roots_release(context, &frame);
+    return normal(species);
+}
+
+OseoResult oseo_internal_shared_array_buffer_intrinsic(OseoContext *context) {
+    OseoResult built = shared_array_buffer_intrinsic_build(context);
+    if (built.status != OSEO_STATUS_NORMAL) return built;
+    return normal(context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER]);
+}
+
+OseoResult oseo_internal_install_shared_array_buffer_global(
+    OseoContext *context,
+    OseoValue global
+) {
+    OseoValue slots[2] = {global, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_shared_array_buffer_intrinsic(context);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_array_buffer_property(
+            context,
+            slots[0],
+            "SharedArrayBuffer",
             slots[1],
             (OseoPropertyAttributes){true, false, true, false}
         );

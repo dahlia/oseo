@@ -423,6 +423,23 @@ protocol the keys walk uses without naming the Set Record. The 186 reviewed
 rows under the node's seven inventory roots carry it, and no reviewed row
 outside those roots gains or loses a tag.
 
+The M5b `atomics-single-agent` node extends the vocabulary with
+`atomics-single-agent`. The tag identifies the `SharedArrayBuffer`
+constructor, its prototype accessors, `grow`, `slice`, and species getter,
+and the `Atomics` namespace with its read-modify-write, `load`, `store`,
+`compareExchange`, `isLockFree`, `wait`, `waitAsync`, and `notify`
+functions, as far as one agent can observe them. One tag covers the surface
+because every member reads the same shared Data Block and the same
+single-agent WaiterList store. The tag is distinct from `array-buffer`,
+which names the unshared buffer and its detachment and resize semantics, and
+from the later agent and shared-memory node, which adds the `$262.agent`
+harness capability and cross-agent execution that the tagged rows still name
+as an unsupported capability. The reviewed rows under the node's two
+inventory roots carry it. The reviewed rows outside those roots whose only
+unmet prerequisite was the `SharedArrayBuffer` feature gate move to `pass`
+and retain their existing tags. Admitting the tag changes no classification
+value.
+
 
 Alternatives considered
 -----------------------

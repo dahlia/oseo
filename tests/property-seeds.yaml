@@ -460,3 +460,7 @@ families:
     owner: tests/property/m5-set-composition-methods.property.test.ts
     start: 0x60007200
     end: 0x600072ff
+  - family: m5-atomics-single-agent
+    owner: tests/property/m5-atomics-single-agent.property.test.ts
+    start: 0x60007300
+    end: 0x600073ff

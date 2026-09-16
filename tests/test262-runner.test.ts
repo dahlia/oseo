@@ -1749,6 +1749,78 @@ includes: [${include}]
   );
 });
 
+test("names the agent capabilities a single agent cannot provide", async () => {
+  const cases = [
+    ["/*---\nincludes: [atomicsHelper.js]\n---*/\n", "test262-agent"],
+    [
+      "/*---\nfeatures: [Atomics]\n---*/\n$262.agent.start('');\n",
+      "test262-agent",
+    ],
+    [
+      '/*---\nfeatures: [Atomics]\n---*/\n$262["agent"].sleep(1);\n',
+      "test262-agent",
+    ],
+    ["/*---\nfeatures: [Atomics]\n---*/\n$262.agent ??= 1;\n", "test262-agent"],
+    [
+      "/*---\nfeatures: [Atomics]\n---*/\n[x = $262.agent] = [];\n",
+      "test262-agent",
+    ],
+    [
+      "/*---\nflags: [CanBlockIsFalse]\n---*/\nAtomics.wait;\n",
+      "non-blocking-agent",
+    ],
+  ] as const;
+  await Promise.all(
+    cases.map(async ([source, capability]) => {
+      const parsed = parseTest262Case(source, "test/agent-gap.js", revision);
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(["Atomics"]),
+        harnesses,
+        {
+          async execute() {
+            return assert.fail("an agent capability case must not execute");
+          },
+        },
+        ["atomics-single-agent"],
+      );
+      assert.equal(result.classification, "unsupported-profile-feature");
+      assert.equal(result.observation.unsupportedCapability, capability);
+      assert.equal(result.observation.passed, false);
+    }),
+  );
+});
+
+test("executes a case that only mentions $262.agent in text", async () => {
+  const source =
+    "/*---\nfeatures: [Atomics]\n---*/\n" +
+    "// $262.agent is not read here.\n" +
+    'const label = "$262.agent";\n' +
+    "$262.agent = undefined;\n" +
+    "delete $262.agent;\n" +
+    "({ value: $262.agent } = { value: 1 });\n" +
+    "[$262.agent, ...$262.agent] = [1];\n" +
+    "for ($262.agent of []) {}\n";
+  const parsed = parseTest262Case(source, "test/agent-text.js", revision);
+  let executions = 0;
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set(["Atomics"]),
+    harnesses,
+    {
+      async execute() {
+        executions += 1;
+        return { exitStatus: 0, stderr: "", stdout: "" };
+      },
+    },
+    ["atomics-single-agent"],
+  );
+  assert.ok(executions > 0);
+  assert.equal(result.classification, "pass");
+});
+
 test("recognizes strict early errors as expected parse failures", async () => {
   const source = `/*---
 negative:

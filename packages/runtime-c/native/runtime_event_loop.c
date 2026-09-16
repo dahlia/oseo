@@ -27,6 +27,23 @@ static uint64_t timer_delay(OseoValue value) {
     return (uint64_t)delay;
 }
 
+/* Links one published timer into the deadline-ordered queue. */
+static void timer_link(OseoContext *context, OseoValue timer_value) {
+    OseoTimer *timer = timer_object(timer_value);
+    OseoValue *link = &context->timer_head;
+    while (tag_of(*link) != OSEO_TAG_UNDEFINED) {
+        OseoTimer *current = timer_object(*link);
+        if (current->deadline > timer->deadline ||
+            (current->deadline == timer->deadline &&
+             current->order > timer->order)) {
+            break;
+        }
+        link = &current->next;
+    }
+    timer->next = *link;
+    *link = timer_value;
+}
+
 OseoResult oseo_set_timeout(
     OseoContext *context,
     size_t argument_count,
@@ -82,6 +99,7 @@ OseoResult oseo_set_timeout(
         timer->next = oseo_undefined();
         timer->callback = frame.slots[0];
         timer->arguments = frame.slots[1];
+        timer->waiter = oseo_undefined();
         timer->deadline = UINT64_MAX - context->clock_milliseconds < delay
             ? UINT64_MAX
             : context->clock_milliseconds + delay;
@@ -96,21 +114,56 @@ OseoResult oseo_set_timeout(
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoValue *link = &context->timer_head;
-        while (tag_of(*link) != OSEO_TAG_UNDEFINED) {
-            OseoTimer *current = timer_object(*link);
-            if (current->deadline > timer->deadline ||
-                (current->deadline == timer->deadline &&
-                 current->order > timer->order)) {
-                break;
-            }
-            link = &current->next;
-        }
-        timer->next = *link;
-        *link = frame.slots[2];
+        timer_link(context, frame.slots[2]);
         result.value = oseo_number((double)timer->id);
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Enqueues the EnqueueAtomicsWaitAsyncTimeoutJob of one waiter at an
+ * absolute monotonic deadline, with the same FIFO tie order as
+ * `setTimeout`, so a waiter timeout and a timer due at the same time run
+ * in the order they were enqueued. The job is a host timeout job like any
+ * other and keeps the event loop running until it is due or canceled.
+ */
+OseoResult oseo_internal_atomics_timeout_enqueue(
+    OseoContext *context,
+    OseoValue waiter,
+    uint64_t deadline
+) {
+    OseoValue slots[2] = {waiter, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoTimer *timer = oseo_internal_allocate_heap_bytes(
+        context,
+        sizeof(*timer)
+    );
+    if (timer == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(context, "OSEO2001", "Timer allocation failed.");
+    }
+    timer->next = oseo_undefined();
+    timer->callback = oseo_undefined();
+    timer->arguments = oseo_undefined();
+    timer->waiter = frame.slots[0];
+    timer->deadline = deadline;
+    timer->id = 0u;
+    timer->order = context->next_timer_order;
+    context->next_timer_order += 1u;
+    timer->argument_count = 0u;
+    timer->canceled = false;
+    OseoResult result = oseo_internal_publish_heap(
+        context,
+        &timer->header,
+        OSEO_HEAP_TIMER
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        timer_link(context, frame.slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -123,7 +176,7 @@ OseoResult oseo_clear_timeout(
     OseoValue current = context->timer_head;
     while (tag_of(current) != OSEO_TAG_UNDEFINED) {
         OseoTimer *timer = timer_object(current);
-        if ((double)timer->id == requested) {
+        if (timer->id != 0u && (double)timer->id == requested) {
             timer->canceled = true;
             break;
         }
@@ -179,15 +232,25 @@ static OseoResult run_timer_turn(
             frame.slots[0] = oseo_undefined();
             continue;
         }
-        frame.slots[1] = timer->arguments;
-        result = oseo_call_function(
-            context,
-            timer->callback,
-            oseo_undefined(),
-            timer->argument_count,
-            environment_object(frame.slots[1])->slots,
-            oseo_undefined()
-        );
+        if (tag_of(timer->waiter) != OSEO_TAG_UNDEFINED) {
+            /* A waiter timeout job runs no user code itself, so it can
+             * only fail with a host diagnostic; its promise reactions
+             * run in the checkpoint below like a callback's. */
+            result = oseo_internal_atomics_waiter_timeout(
+                context,
+                timer->waiter
+            );
+        } else {
+            frame.slots[1] = timer->arguments;
+            result = oseo_call_function(
+                context,
+                timer->callback,
+                oseo_undefined(),
+                timer->argument_count,
+                environment_object(frame.slots[1])->slots,
+                oseo_undefined()
+            );
+        }
         OseoResult callback_result = result;
         const char *callback_error_code = context->error_code;
         const char *callback_error_message = context->error_message;

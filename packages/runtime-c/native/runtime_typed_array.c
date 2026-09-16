@@ -732,11 +732,36 @@ OseoResult oseo_internal_typed_array_index_key(
     return typed_array_index_string(context, index);
 }
 
+bool oseo_internal_typed_array_out_of_bounds(
+    OseoValue view,
+    size_t *buffer_byte_length
+) {
+    const OseoTypedArray *typed = typed_array_object(view);
+    bool out_of_bounds = typed_array_out_of_bounds(typed);
+    *buffer_byte_length = out_of_bounds
+        ? 0u
+        : array_buffer_object(typed->viewed_buffer)->byte_length;
+    return out_of_bounds;
+}
+
+size_t oseo_internal_typed_array_element_size(OseoTypedArrayKind kind) {
+    return typed_array_bytes[kind];
+}
+
 bool oseo_internal_typed_array_fixed_length(OseoValue view) {
     const OseoTypedArray *typed = typed_array_object(view);
     if (typed->array_length == SIZE_MAX) return false;
-    return !is_array_buffer(typed->viewed_buffer) ||
-        !array_buffer_object(typed->viewed_buffer)->resizable;
+    if (!is_array_buffer(typed->viewed_buffer)) return true;
+    const OseoArrayBuffer *buffer =
+        array_buffer_object(typed->viewed_buffer);
+    /*
+     * IsTypedArrayFixedLength step 3 excuses a shared buffer from the
+     * fixed-length requirement: `resizable` means growable on a
+     * SharedArrayBuffer, and a growable buffer only grows, so an
+     * explicitly sized view of one can never fall out of bounds and
+     * never gains an integer index.
+     */
+    return !buffer->resizable || buffer->shared;
 }
 
 OseoResult oseo_internal_typed_array_iteration_length(
@@ -1315,6 +1340,19 @@ static OseoResult typed_array_validate(OseoContext *context, OseoValue value) {
         );
     }
     return normal(value);
+}
+
+OseoResult oseo_internal_typed_array_validate(
+    OseoContext *context,
+    OseoValue value,
+    size_t *length
+) {
+    *length = 0u;
+    OseoResult result = typed_array_validate(context, value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *length = typed_array_length(typed_array_object(value));
+    }
+    return result;
 }
 
 /*

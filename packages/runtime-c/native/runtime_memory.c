@@ -259,6 +259,13 @@ static void trace_object(
         mark_value(timer->next, worklist);
         mark_value(timer->callback, worklist);
         mark_value(timer->arguments, worklist);
+        mark_value(timer->waiter, worklist);
+    } else if (object->kind == OSEO_HEAP_ATOMICS_WAITER) {
+        OseoAtomicsWaiter *waiter = (OseoAtomicsWaiter *)object;
+        mark_value(waiter->next, worklist);
+        mark_value(waiter->buffer, worklist);
+        mark_value(waiter->promise, worklist);
+        mark_value(waiter->timer, worklist);
     }
 }
 
@@ -522,6 +529,8 @@ void oseo_collect(OseoContext *context) {
         mark_value(regexp_cache[index].matcher, &worklist);
     }
     mark_value(context->timer_head, &worklist);
+    mark_value(context->atomics_waiter_head, &worklist);
+    mark_value(context->atomics_waiter_tail, &worklist);
     mark_value(context->finalization_head, &worklist);
     mark_value(context->finalization_tail, &worklist);
     trace_ephemeron_fixed_point(&worklist);

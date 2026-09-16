@@ -1,0 +1,33 @@
+group: built-ins/Atomics
+key: af
+results:
+  - case:
+      async: true
+      features:
+        - Atomics.waitAsync
+        - SharedArrayBuffer
+        - TypedArray
+        - Atomics
+        - BigInt
+        - arrow-function
+        - async-functions
+      flags:
+        - async
+      includes:
+        - atomicsHelper.js
+      mode: script
+      path: test/built-ins/Atomics/waitAsync/bigint/poisoned-object-for-timeout-throws-agent.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - atomics-single-agent
+    observation:
+      detail: "Not executed: the case needs the $262.agent multi-agent
+        capability."
+      passed: false
+      unsupportedCapability: test262-agent
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

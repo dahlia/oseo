@@ -1,0 +1,26 @@
+group: built-ins/Atomics
+key: "26"
+results:
+  - case:
+      async: false
+      features:
+        - Atomics
+      flags: []
+      includes:
+        - atomicsHelper.js
+      mode: script
+      path: test/built-ins/Atomics/wait/good-views.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - atomics-single-agent
+    observation:
+      detail: "Not executed: the case needs the $262.agent multi-agent
+        capability."
+      passed: false
+      unsupportedCapability: test262-agent
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

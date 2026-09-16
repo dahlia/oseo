@@ -7,6 +7,8 @@ import { performance } from "node:perf_hooks";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { parse as parseBabel } from "@babel/parser";
+
 import {
   defaultComponents,
   processResourceExhaustionDiagnosticSuffix,
@@ -27,6 +29,7 @@ import type {
 import {
   parsedObject as record,
   type StructuredDataInput,
+  type StructuredDataValue,
 } from "./structured-data.ts";
 import { isObject, isString } from "./value-kinds.ts";
 import {
@@ -151,6 +154,10 @@ const regexpUtilsHarnessPath = join(
 const testTypedArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/testTypedArray.js",
+);
+const testAtomicsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/testAtomics.js",
 );
 
 const classifications = new Set<Test262Classification>([
@@ -694,6 +701,157 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"
     : undefined;
+}
+
+/**
+ * A harness or agent capability that the single native agent cannot
+ * provide, decided before execution. `$262.agent` starts further agents
+ * that share memory with this one, and the atomicsHelper.js include
+ * builds on it at load time. A `CanBlockIsFalse` case needs an agent whose
+ * [[CanBlock]] is false, while every native agent of this profile can
+ * suspend. Each stays an explicit unsupported result naming the missing
+ * capability, never a pass and never a silently dropped path.
+ */
+function unsupportedHostCapability(
+  source: string,
+  parsed: ParsedTest262Case,
+): { readonly capability: string; readonly detail: string } | undefined {
+  if (needsTest262Agent(source, parsed)) {
+    return {
+      capability: "test262-agent",
+      detail: "the case needs the $262.agent multi-agent capability.",
+    };
+  }
+  if (parsed.flags.includes("CanBlockIsFalse")) {
+    return {
+      capability: "non-blocking-agent",
+      detail: "the case needs an agent whose [[CanBlock]] is false.",
+    };
+  }
+  return undefined;
+}
+
+/**
+ * Whether the case needs the `$262.agent` multi-agent capability, so the
+ * reviewed runner never executes it. A case reads that capability through
+ * the atomicsHelper.js include, which builds on it at load time, or as a
+ * `$262.agent` property of its own. The property is found in the parsed
+ * syntax rather than in the text, so the name inside a comment or a string
+ * never withholds execution, and a body that does not parse, such as a
+ * parse-negative case, reads nothing and executes as usual.
+ */
+export function needsTest262Agent(
+  source: string,
+  parsed: ParsedTest262Case,
+): boolean {
+  return (
+    parsed.case.includes.includes("atomicsHelper.js") ||
+    readsAgentCapability(source, parsed.case.mode)
+  );
+}
+
+function readsAgentCapability(
+  source: string,
+  mode: Test262Case["mode"],
+): boolean {
+  if (!source.includes("$262")) return false;
+  let program: unknown;
+  try {
+    program = parseBabel(source, {
+      sourceType: mode === "module" ? "module" : "script",
+    });
+  } catch {
+    return false;
+  }
+  const pending: {
+    readonly target: boolean;
+    readonly value: unknown;
+  }[] = [{ target: false, value: program }];
+  while (pending.length > 0) {
+    const entry = pending.pop();
+    if (entry == null) break;
+    if (Array.isArray(entry.value)) {
+      for (const value of entry.value) {
+        pending.push({ target: entry.target, value });
+      }
+      continue;
+    }
+    const node = agentSyntaxNode(entry.value);
+    if (node == null) continue;
+    if (!entry.target && agentMemberRead(node)) return true;
+    for (const [key, value] of Object.entries(node)) {
+      pending.push({
+        target: assignmentTarget(node, key, entry.target),
+        value,
+      });
+    }
+  }
+  return false;
+}
+
+/*
+ * Whether field `key` of `node` holds a reference that is only written or
+ * deleted, never read: the target of a plain assignment, the head of a
+ * `for-in` or `for-of` statement, the operand of `delete`, and every
+ * binding position of a destructuring pattern in such a target. A
+ * compound assignment reads its target first, and a computed key or a
+ * default value inside a pattern is evaluated as an ordinary read.
+ */
+function assignmentTarget(
+  node: AgentSyntaxNode,
+  key: string,
+  target: boolean,
+): boolean {
+  switch (node.type) {
+    case "AssignmentExpression":
+      return key === "left" && node.operator === "=";
+    case "ForInStatement":
+    case "ForOfStatement":
+      return key === "left";
+    case "UnaryExpression":
+      return key === "argument" && node.operator === "delete";
+    case "ObjectPattern":
+      return target && key === "properties";
+    case "ObjectProperty":
+      return target && key === "value";
+    case "ArrayPattern":
+      return target && key === "elements";
+    case "RestElement":
+      return target && key === "argument";
+    case "AssignmentPattern":
+      return target && key === "left";
+    default:
+      return false;
+  }
+}
+
+interface AgentSyntaxNode {
+  readonly [key: string]: StructuredDataValue | undefined;
+  readonly type?: StructuredDataValue;
+}
+
+function agentSyntaxNode<Candidate>(
+  value: Candidate,
+): AgentSyntaxNode | undefined {
+  if (!isObject(value) || Array.isArray(value)) return undefined;
+  // SAFETY: Babel syntax nodes are open records with structured values.
+  return value as AgentSyntaxNode;
+}
+
+/** Whether a parsed node is `$262.agent` or `$262["agent"]`. */
+function agentMemberRead(node: AgentSyntaxNode): boolean {
+  if (
+    node.type !== "MemberExpression" &&
+    node.type !== "OptionalMemberExpression"
+  ) {
+    return false;
+  }
+  const object = agentSyntaxNode(node.object);
+  const property = agentSyntaxNode(node.property);
+  if (object?.type !== "Identifier" || object.name !== "$262") return false;
+  return node.computed === true
+    ? property?.type === "StringLiteral" && property.value === "agent"
+    : property?.type === "Identifier" && property.name === "agent";
 }
 
 function unsupportedResult(
@@ -1531,6 +1689,19 @@ export async function executeTest262Case(
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
+  const hostCapability = unsupportedHostCapability(source, parsed);
+  if (hostCapability != null) {
+    return classifyTest262(
+      parsed.case,
+      {
+        detail: `Not executed: ${hostCapability.detail}`,
+        passed: false,
+        unsupportedCapability: hostCapability.capability,
+      },
+      supportedFeatures,
+      evidence,
+    );
+  }
   const unsupportedInclude = parsed.flags.includes("raw")
     ? undefined
     : parsed.case.includes.find(
@@ -1724,6 +1895,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
       ["proxyTrapsHelper.js", await readFile(proxyTrapsHarnessPath, "utf8")],
       ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
+      ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
     ]),
   };

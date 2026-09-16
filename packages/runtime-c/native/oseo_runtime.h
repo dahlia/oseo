@@ -351,7 +351,11 @@ typedef enum {
     OSEO_INTRINSIC_BIGUINT64_ARRAY_PROTOTYPE = 236,
     OSEO_INTRINSIC_BIGUINT64_ARRAY = 237,
     OSEO_INTRINSIC_ARRAY_TO_STRING = 238,
-    OSEO_INTRINSIC_COUNT = 239,
+    OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE = 239,
+    OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240,
+    OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241,
+    OSEO_INTRINSIC_ATOMICS = 242,
+    OSEO_INTRINSIC_COUNT = 243,
 } OseoIntrinsic;
 
 typedef struct {
@@ -503,6 +507,13 @@ struct OseoContext {
     /* Private stack of active array stringification receivers. */
     void *array_string_stack;
     OseoValue timer_head;
+    /*
+     * The realm's WaiterList store: every pending `Atomics.waitAsync`
+     * waiter in the FIFO order its call added it. The private record
+     * layout stays behind this public generated-code boundary.
+     */
+    OseoValue atomics_waiter_head;
+    OseoValue atomics_waiter_tail;
     /* Collector-owned FIFO of finalization cells ready for a later runtime
      * checkpoint. Collection queues records but never invokes user code. */
     OseoValue finalization_head;

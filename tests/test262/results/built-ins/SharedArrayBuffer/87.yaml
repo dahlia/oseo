@@ -1,0 +1,26 @@
+group: built-ins/SharedArrayBuffer
+key: "87"
+results:
+  - case:
+      async: false
+      features:
+        - SharedArrayBuffer
+        - DataView
+        - Int8Array
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - atomics-single-agent
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Int8Array
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

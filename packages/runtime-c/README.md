@@ -760,6 +760,14 @@ allocate a fresh two-element Array. The iterator target and pending result stay
 collector-rooted throughout. Two code IDs and two intrinsic slots are added;
 the generated-code ABI gains no entry point.
 
+The `m5-111` ABI adds `SharedArrayBuffer` and the single-agent `Atomics`
+namespace. A shared buffer is the ArrayBuffer record with a shared brand, so
+views accept it unchanged. Seven SharedArrayBuffer code IDs join the
+ArrayBuffer range, code range index 25 holds the thirteen Atomics functions,
+the public intrinsic table gains four slots, the heap gains the Atomics waiter
+kind, and the public context gains the rooted WaiterList head and tail; the
+value representation and the generated-code entry points are unchanged.
+
 The `m5-109` ABI completes the TypedArray integer-indexed exotic object and
 adds the core `%TypedArray.prototype%` accessors, `at`, `set`, `subarray`,
 the three iterator methods, and the `%TypedArray%[Symbol.species]` getter.

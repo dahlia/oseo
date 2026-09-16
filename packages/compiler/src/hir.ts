@@ -366,6 +366,7 @@ export function intrinsicGlobalKind(
   if (
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "Atomics" ||
     name === "BigInt" ||
     name === "DataView" ||
     name === "Date" ||
@@ -382,6 +383,7 @@ export function intrinsicGlobalKind(
     name === "RegExp" ||
     name === "String" ||
     name === "Set" ||
+    name === "SharedArrayBuffer" ||
     name === "Symbol" ||
     name === "decodeURI" ||
     name === "decodeURIComponent" ||

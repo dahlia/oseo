@@ -17,7 +17,7 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists forty-three reviewed assets in this order:
+The runtime input now lists forty-four reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
@@ -36,7 +36,7 @@ The runtime input now lists forty-three reviewed assets in this order:
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
 *runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
-*runtime\_proxy.c*, and *runtime\_json.c*. The M5
+*runtime\_proxy.c*, *runtime\_json.c*, and *runtime\_atomics.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
@@ -44,8 +44,8 @@ asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions,
-Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse, and
-Set-intrinsic units each
+Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
+Set-intrinsic, and single-agent Atomics units each
 added one
 component the same
 way. The M5b
@@ -125,10 +125,17 @@ Ownership follows the plan's target layout:
     `toExponential`, `toPrecision`, `toLocaleString`, and `valueOf`,
     including the exact bignum arithmetic their rounding and radix
     conversion share;
- -  *runtime\_array\_buffer.c*: the `ArrayBuffer` constructor, the Data
-    Block one buffer owns, `isView`, the `Symbol.species` accessor, the
-    `byteLength`, `detached`, `maxByteLength`, and `resizable` accessors,
-    and `resize`, `slice`, `transfer`, and `transferToFixedLength`;
+ -  *runtime\_array\_buffer.c*: the `ArrayBuffer` and `SharedArrayBuffer`
+    constructors, the Data Block or Shared Data Block one buffer owns,
+    `isView`, both `Symbol.species` accessors, the `byteLength`, `detached`,
+    `maxByteLength`, `resizable`, and `growable` accessors, the shared brand
+    every prototype member checks, and `resize`, `grow`, `slice`,
+    `transfer`, and `transferToFixedLength`;
+ -  *runtime\_atomics.c*: the `Atomics` namespace object, integer-view
+    validation and revalidation, the read-modify-write functions over raw
+    element bits, `compareExchange`, `isLockFree`, the suspending `wait`,
+    and the realm-owned WaiterList store that `waitAsync` fills and
+    `notify` and waiter timeout jobs drain;
  -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
     `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
     and flag validation, immutable matcher artifact, `Symbol.species`,
@@ -549,6 +556,16 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_array_buffer_intrinsic`              | *runtime\_array\_buffer.c*    |
 | `oseo_internal_array_buffer_release`                | *runtime\_array\_buffer.c*    |
 | `oseo_internal_install_array_buffer_global`         | *runtime\_array\_buffer.c*    |
+| `oseo_internal_shared_array_buffer_intrinsic`       | *runtime\_array\_buffer.c*    |
+| `oseo_internal_install_shared_array_buffer_global`  | *runtime\_array\_buffer.c*    |
+| `oseo_internal_atomics_builtin_dispatch`            | *runtime\_atomics.c*          |
+| `oseo_internal_atomics_intrinsic`                   | *runtime\_atomics.c*          |
+| `oseo_internal_install_atomics_global`              | *runtime\_atomics.c*          |
+| `oseo_internal_atomics_waiter_timeout`              | *runtime\_atomics.c*          |
+| `oseo_internal_atomics_timeout_enqueue`             | *runtime\_event\_loop.c*      |
+| `oseo_internal_typed_array_validate`                | *runtime\_typed\_array.c*     |
+| `oseo_internal_typed_array_out_of_bounds`           | *runtime\_typed\_array.c*     |
+| `oseo_internal_typed_array_element_size`            | *runtime\_typed\_array.c*     |
 | `oseo_internal_object_define_data`                  | *runtime\_descriptor.c*       |
 | `oseo_internal_define_data_reported`                | *runtime\_descriptor.c*       |
 | `oseo_internal_define_accessor_reported`            | *runtime\_descriptor.c*       |
@@ -599,7 +616,13 @@ and *runtime\_enumeration.c*.
     `oseo_internal_iterator_method`, while the iterator component reads
     elements, reads and calls `next` and `return`, and reads the
     well-known iterator symbol through public object, symbol, and
-    function operations.
+    function operations;
+ -  event loop and Atomics: a finite `Atomics.waitAsync` timeout enters the
+    timer queue through `oseo_internal_atomics_timeout_enqueue`, while a
+    timer turn that reaches that job calls
+    `oseo_internal_atomics_waiter_timeout`, because the timer queue owns the
+    host timeout job and the Atomics component owns the WaiterList whose
+    membership decides whether the job times the waiter out.
 
 The event-loop component is a one-way dependent: timer turns drain jobs
 through `oseo_internal_jobs_drain_until` and
@@ -1423,6 +1446,30 @@ in the new `OSEO_INTRINSIC_ARRAY_TO_STRING` slot, so the TypedArray cluster can
 share that identity even when a program replaced the Array method first; the
 TypedArray cluster's failure path now clears only its own slots. The component
 moves `abiVersion` to `m5-109`; the value representation and the
+generated-code entry points are unchanged.
+
+### Single-agent Atomics evidence
+
+M5b node `atomics-single-agent` adds `shared` to the ArrayBuffer record
+instead of a second buffer kind, so the TypedArray, DataView, and collector
+paths that already accept an ArrayBuffer value reach a SharedArrayBuffer
+unchanged and only the brand checks in *runtime\_array\_buffer.c* read it.
+The SharedArrayBuffer constructor, accessors, `grow`, `slice`, and species
+getter take seven code IDs from the ArrayBuffer range, and `slice` shares the
+ArrayBuffer bounds, species construction, and copy with a brand parameter.
+
+The new *runtime\_atomics.c* takes built-in code range index 25 and reads a
+view through three TypedArray component helpers: validation with the current
+length, the out-of-bounds state with the current buffer length, and the
+element size. It reads and writes element bytes through local copies, so no
+access assumes an aligned block. The `OSEO_HEAP_ATOMICS_WAITER` record roots
+one waiter's buffer, promise, and timeout job, the context gains the
+collector-rooted head and tail of the WaiterList FIFO, and a timer gains a
+`waiter` field so one queue holds both `setTimeout` callbacks and waiter
+timeout jobs. A waiter job takes id 0, which `clearTimeout` never matches.
+Four public intrinsic slots hold `%SharedArrayBuffer.prototype%`,
+`%SharedArrayBuffer%`, its species marker, and `%Atomics%`. The component
+moves `abiVersion` to `m5-111`; the value representation and the
 generated-code entry points are unchanged.
 
 ### Function prototype evidence

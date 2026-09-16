@@ -55,6 +55,7 @@ import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
+import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -186,6 +187,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeSpeciesMappingFixtures,
   ...typedArrays.typedArrayConstructorFixtures,
   ...typedArrayCore.typedArrayCoreFixtures,
+  ...atomics.atomicsSingleAgentFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -704,6 +706,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-core" ||
+    fixture.name === "shared-array-buffer" ||
+    fixture.name === "atomics-single-agent" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -812,6 +816,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-core" ||
+    fixture.name === "shared-array-buffer" ||
+    fixture.name === "atomics-single-agent" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -1054,6 +1060,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "typed-array-constructors" ||
             fixture.name === "typed-array-core" ||
+            fixture.name === "shared-array-buffer" ||
+            fixture.name === "atomics-single-agent" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
@@ -1312,8 +1320,9 @@ for (const fixture of selectedFixtures) {
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
             // builds. The eleven concrete TypedArray constructors add
-            // eleven property-name allocations.
-            assert.equal(native.counters.allocations, 59);
+            // eleven property-name allocations, and SharedArrayBuffer and
+            // Atomics add one each.
+            assert.equal(native.counters.allocations, 61);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {
