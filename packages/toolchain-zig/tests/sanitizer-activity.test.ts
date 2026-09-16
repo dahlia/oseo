@@ -39,7 +39,7 @@ int probe(int increment) {
   return 0;
 }
 `,
-    report: /signed integer overflow: 2147483647 \+ 1/u,
+    report: /signed integer overflow: (?:2147483647 \+ 1|1 \+ 2147483647)\b/u,
   },
 } as const;
 
