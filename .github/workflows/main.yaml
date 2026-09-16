@@ -233,27 +233,51 @@ jobs:
           - os: macos-15
             target: macos-aarch64
             shard: 1
-            total: 6
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 2
-            total: 6
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 3
-            total: 6
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 4
-            total: 6
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 5
-            total: 6
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 6
-            total: 6
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 7
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 8
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 9
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 10
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 11
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 12
+            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
