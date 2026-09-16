@@ -8,8 +8,9 @@
  * the ephemeron checkpoint: the address-keyed index stays synchronized
  * with source-level deletion and collector unlinking, unregister tokens
  * are weak, an unregistered queued record is skipped, one registry's
- * records dequeue together past another registry's, and KeptAlive roots
- * last exactly until they are cleared.
+ * records dequeue together past another registry's, KeptAlive roots
+ * last exactly until they are cleared, and a timer turn that an internal
+ * await drives starts without the awaiting job's KeptAlive set.
  */
 
 #define KEY_COUNT ((size_t)48u)
@@ -453,11 +454,87 @@ static void test_kept_objects(void) {
     oseo_context_destroy(&context);
 }
 
+static bool timer_observed_cleared;
+
+/* The timer callback collects, observes its reference, and settles the
+ * awaited promise so the internal await returns. */
+static OseoResult dispatch_kept_timer(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)new_target;
+    assert(argument_count == 2u);
+    assert(context->kept_object_count == 0u);
+    oseo_collect(context);
+    timer_observed_cleared =
+        oseo_internal_weak_reference_target(arguments[0]) == oseo_undefined();
+    return oseo_promise_resolve_into(context, arguments[1], oseo_undefined());
+}
+
+static void test_internal_await_timer_ends_kept_objects(void) {
+    OseoContext context;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    oseo_context_init(
+        &context,
+        "weak-await-timer",
+        sizeof("weak-await-timer") - 1u
+    );
+    oseo_context_set_function_dispatcher(&context, dispatch_kept_timer);
+    require_normal(oseo_roots_allocate(&context, &frame, 5u));
+    frame.slots[0] = node(&context);
+    frame.slots[1] = require_normal(oseo_internal_weak_reference_create(
+        &context,
+        frame.slots[0]
+    ));
+    require_normal(oseo_internal_keep_during_job(&context, frame.slots[0]));
+    frame.slots[0] = oseo_undefined();
+    frame.slots[2] = require_normal(oseo_internal_promise_create(&context));
+    frame.slots[3] = require_normal(oseo_function_create(
+        &context,
+        1u,
+        node(&context),
+        NULL,
+        0u,
+        0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+    frame.slots[4] = oseo_number(0.0);
+    OseoValue arguments[4] = {
+        frame.slots[3],
+        frame.slots[4],
+        frame.slots[1],
+        frame.slots[2],
+    };
+    require_normal(oseo_set_timeout(&context, 4u, arguments));
+
+    /* The awaiting job still holds the target, so only the timer turn
+     * that the await drives may end its KeptAlive set. */
+    oseo_collect(&context);
+    assert(oseo_internal_weak_reference_target(frame.slots[1]) !=
+        oseo_undefined());
+    timer_observed_cleared = false;
+    require_normal(oseo_internal_await_step(&context, frame.slots[2]));
+    assert(timer_observed_cleared);
+
+    oseo_roots_release(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 int main(void) {
     test_index_survives_delete_and_clearing();
     test_index_reuses_tombstones();
     test_unregister_tokens();
     test_registry_cleanup_grouping();
     test_kept_objects();
+    test_internal_await_timer_ends_kept_objects();
     return 0;
 }

@@ -2748,7 +2748,8 @@ OseoResult oseo_internal_install_weak_collection_globals(
 /*
  * AddToKeptObjects. The value stays a strong root until the next
  * oseo_internal_clear_kept_objects, which the event loop calls once the
- * current job and its promise jobs have drained.
+ * current job and its promise jobs have drained, and again before every
+ * timer turn, including one an internal await drives.
  */
 OseoResult oseo_internal_keep_during_job(
     OseoContext *context,

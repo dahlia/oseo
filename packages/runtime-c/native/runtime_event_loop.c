@@ -214,12 +214,21 @@ static OseoResult wait_for_due_timer(OseoContext *context) {
     return normal(oseo_undefined());
 }
 
+/*
+ * Runs the earliest due timer as a job of its own. The preceding job's
+ * KeptAlive set ends before the callback. The outer event loop has already
+ * cleared it in its finalization checkpoint, but an internal await drives
+ * this turn directly, and its timer callback must not observe a target
+ * kept alive only by the WeakRef construction or deref of the job that
+ * awaited.
+ */
 static OseoResult run_timer_turn(
     OseoContext *context,
     OseoValue awaited_promise
 ) {
     OseoResult result = wait_for_due_timer(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    oseo_internal_clear_kept_objects(context);
     OseoRootFrame frame = {NULL, NULL, 0u};
     result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;

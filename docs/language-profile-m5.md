@@ -7034,7 +7034,8 @@ per registry with its promise jobs deferred until the job ends, skipping a
 queued record after `unregister` before or during its job, and an abrupt
 cleanup callback. Sanitized fixed C evidence checks index
 synchronization with deletion and collector unlinking, weak unregister tokens,
-and KeptAlive roots, and retains the AArch64 Linux cross-link. Generated
+KeptAlive roots, and a KeptAlive set that ends before a timer turn an internal
+await drives, and retains the AArch64 Linux cross-link. Generated
 evidence at property seed `0x60007500` starts with two or three fresh
 registrations, then compares one to sixteen `WeakMap`,
 `WeakSet`, `WeakRef`, and `FinalizationRegistry` operations over stable

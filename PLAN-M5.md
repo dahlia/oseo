@@ -6433,7 +6433,8 @@ observation under forced collection covers KeptAlive lifetime, cleanup
 grouping by registry with promise jobs deferred until each registry's job
 ends, a queued record removed by `unregister` before or during its job, and an
 abrupt callback. Sanitized fixed C evidence covers index synchronization, weak
-tokens, and KeptAlive roots with the AArch64 Linux cross-link. The generated
+tokens, KeptAlive roots, and the KeptAlive set ending before a timer turn that
+an internal await drives, with the AArch64 Linux cross-link. The generated
 domain at seed `0x60007500` compares WeakMap, WeakSet, WeakRef, and
 FinalizationRegistry operation sequences, after two or three fresh
 registrations, with an independent identity and cleanup-job model under both
