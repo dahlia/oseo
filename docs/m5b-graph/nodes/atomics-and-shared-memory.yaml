@@ -6,4 +6,4 @@ delivers: "Adds agent clusters, cross-agent shared-memory execution, and the
 dependencies:
   - atomics-single-agent
 landed: false
-status: blocked
+status: ready

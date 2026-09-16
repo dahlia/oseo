@@ -12,5 +12,5 @@ inventory:
 dependencies:
   - array-buffer
   - typed-array-core
-landed: false
+landed: true
 status: ready
