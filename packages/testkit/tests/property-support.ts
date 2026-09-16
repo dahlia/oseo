@@ -75,13 +75,20 @@ export function propertyParameters(
     "OSEO_PROPERTY_RUN_SCALE",
     environment.OSEO_PROPERTY_RUN_SCALE,
   );
+  // Instrumented lanes run every case several times slower without changing
+  // what a case proves. This widens only the interrupt limit, so the reviewed
+  // case budget stays fixed and an interrupted run still fails.
+  const timeScale = positiveInteger(
+    "OSEO_PROPERTY_TIME_SCALE",
+    environment.OSEO_PROPERTY_TIME_SCALE,
+  );
   const path = environment.OSEO_PROPERTY_PATH;
   const replay = path == null || path === "" ? {} : { path };
   return {
     interruptAfterTimeLimit: scaledPositive(
       "time limit",
       options.timeLimitMilliseconds,
-      scale,
+      scale * timeScale,
     ),
     markInterruptAsFailure: true,
     numRuns: scaledPositive("run count", options.numRuns, scale),

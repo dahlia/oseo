@@ -335,8 +335,12 @@ replay quality.
 Failures report `fast-check` version, seed, replay path, profile, and domain.
 Replay an ordinary or extended suite by setting `OSEO_PROPERTY_SEED` and
 `OSEO_PROPERTY_PATH`; use `OSEO_PROPERTY_RUN_SCALE` and `OSEO_PROPERTY_SIZE`
-only to change the reviewed case budget and size. Minimize a failure and retain
-it as an ordinary regression fixture before fixing the implementation.
+only to change the reviewed case budget and size. `OSEO_PROPERTY_TIME_SCALE`
+multiplies only the interrupt time limit. It exists for lanes whose
+instrumentation slows every case, such as the host C compiler sanitizer lane,
+and never changes the case budget, so an interrupted run still fails. Minimize
+a failure and retain it as an ordinary regression fixture before fixing the
+implementation.
 
 `mise run test` owns the ordinary property gate. Run
 `mise run test:property:extended` before submitting changes to generators,

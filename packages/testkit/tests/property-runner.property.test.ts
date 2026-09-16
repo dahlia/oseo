@@ -59,6 +59,19 @@ test("records explicit replay inputs and incomplete-run failures", () => {
   );
 });
 
+test("scales only the time limit for instrumented lanes", () => {
+  const ordinary = propertyParameters(ordinarySuite, {});
+  const instrumented = propertyParameters(ordinarySuite, {
+    OSEO_PROPERTY_TIME_SCALE: "3",
+  });
+  assert.equal(instrumented.numRuns, ordinary.numRuns);
+  assert.equal(
+    instrumented.interruptAfterTimeLimit,
+    (ordinary.interruptAfterTimeLimit ?? 0) * 3,
+  );
+  assert.equal(instrumented.markInterruptAsFailure, true);
+});
+
 test("awaits asynchronous property predicates", async () => {
   let completed = false;
   await assertAsyncProperty(
@@ -86,6 +99,13 @@ test("rejects invalid replay configuration", () => {
         OSEO_PROPERTY_RUN_SCALE: "0",
       }),
     /OSEO_PROPERTY_RUN_SCALE must be positive/u,
+  );
+  assert.throws(
+    () =>
+      propertyParameters(ordinarySuite, {
+        OSEO_PROPERTY_TIME_SCALE: "0",
+      }),
+    /OSEO_PROPERTY_TIME_SCALE must be positive/u,
   );
   assert.throws(
     () =>
