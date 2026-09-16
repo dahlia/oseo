@@ -1,11 +1,12 @@
 ADR 0014: Native target and execution-host support
 ==================================================
 
-Sanitizer evidence correction (2026-09-17): the pinned Zig 0.16.0 accepts
-the requested flags but omits ASan from `address,undefined`. References to
-address sanitization below describe the requested policy, not verified ASan
-coverage. See the [activity audit](../sanitizer-activity.md) for measurements
-and the unresolved runtime-linking requirement.
+Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
+provide ASan coverage. The separate Linux host C sanitizer lane now verifies
+instrumentation; its measured scope is recorded in the
+[activity audit](../sanitizer-activity.md). This does not retroactively
+validate earlier gates or establish macOS ASan coverage. Zig address
+self-checks remain TODOs.
 
 
 Status
@@ -240,3 +241,15 @@ Links
     IDs and their toolchain mapping boundary.
  -  [ADR 0013](./0013-m5-edition-and-manifest.md) defines the compatibility
     counting and manifest contracts retained here.
+
+
+Host compiler sanitizer lane (2026-09-17)
+-----------------------------------------
+
+The host compiler lane introduced in ADR 0003 satisfies the sanitizer policy
+only for measured host executions. It accepts the matching execution target
+and rejects all cross-target requests before constructing build commands.
+Its Linux tests do not replace the Zig AArch64 cross-links or establish macOS
+ASan coverage. Zig's address self-checks remain TODOs; target sanitizer lists
+are unchanged. Native failure records and property replay diagnostics include
+the compiler identity.

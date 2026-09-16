@@ -1,3 +1,5 @@
+import { nativeToolchain } from "../tests/native-toolchain.ts";
+import { runNativeCli } from "../tests/native-cli.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
@@ -12,7 +14,6 @@ import { parse as parseBabel } from "@babel/parser";
 import {
   defaultComponents,
   processResourceExhaustionDiagnosticSuffix,
-  runNativeCli,
 } from "../packages/cli/src/index.ts";
 import type { CliResult } from "../packages/cli/src/index.ts";
 import {
@@ -226,6 +227,7 @@ export interface ReviewedTest262Subset {
 
 /** Host-varying facts reported outside the canonical manifest. */
 export interface ReviewedTest262RunMetadata {
+  readonly toolchainIdentity?: string;
   readonly durationMilliseconds: number;
   readonly poolLimit: number;
   readonly retries: number;
@@ -1944,6 +1946,10 @@ function runMetadata(
   retries: number,
 ): ReviewedTest262RunMetadata {
   return {
+    ...includePropertiesWhen(() => {
+      if (nativeToolchain.identity == null) return undefined;
+      return { toolchainIdentity: nativeToolchain.identity };
+    }),
     durationMilliseconds:
       Math.round((performance.now() - startedAt) * 100) / 100,
     poolLimit,

@@ -3,7 +3,7 @@
 import process from "node:process";
 import test from "node:test";
 
-import { runNativeCli } from "../../packages/cli/src/index.ts";
+import { runNativeCli } from "../native-cli.ts";
 import { targetForExecutionHost } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
 import * as testkit from "../../packages/testkit/src/index.ts";

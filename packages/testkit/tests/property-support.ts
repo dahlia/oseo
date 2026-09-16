@@ -106,6 +106,9 @@ export function assertProperty<T>(
     throw new Error(
       `${name} failed\n` +
         `profile=${options.profile} domain=${options.domain}\n` +
+        (process.env.OSEO_NATIVE_TOOLCHAIN === "host-cc"
+          ? `compiler=${process.env.OSEO_HOST_CC_IDENTITY ?? "unknown"}\n`
+          : "") +
         propertyContext(options) +
         `size-limit=${options.sizeLimit}\n` +
         `fast-check=${fastCheckVersion}\n${detail}`,
@@ -128,6 +131,9 @@ export async function assertAsyncProperty<T>(
     throw new Error(
       `${name} failed\n` +
         `profile=${options.profile} domain=${options.domain}\n` +
+        (process.env.OSEO_NATIVE_TOOLCHAIN === "host-cc"
+          ? `compiler=${process.env.OSEO_HOST_CC_IDENTITY ?? "unknown"}\n`
+          : "") +
         propertyContext(options) +
         `size-limit=${options.sizeLimit}\n` +
         `fast-check=${fastCheckVersion}\n${detail}`,

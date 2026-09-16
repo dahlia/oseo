@@ -1,3 +1,5 @@
+import { hostCcLane } from "./native-toolchain.ts";
+import { buildHostCcFixture } from "./host-cc-runtime.ts";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -55,37 +57,41 @@ test(
     try {
       const executable = join(directory, "runtime-ephemeron");
       const sources = [fixture, ...runtimeSources];
-      run("zig", [
-        "cc",
-        "-target",
-        zigNativeTarget ?? "x86_64-linux-gnu",
-        "-std=c11",
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-fsanitize=address,undefined",
-        "-I",
-        runtime,
-        ...sources,
-        "-o",
-        executable,
-      ]);
+      if (hostCcLane) {
+        buildHostCcFixture(fixture, runtime, runtimeSources, executable);
+      } else
+        run("zig", [
+          "cc",
+          "-target",
+          zigNativeTarget ?? "x86_64-linux-gnu",
+          "-std=c11",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-fsanitize=address,undefined",
+          "-I",
+          runtime,
+          ...sources,
+          "-o",
+          executable,
+        ]);
       run(executable, []);
       run(executable, [], { OSEO_GC_EVERY_SAFEPOINT: "1" });
-      run("zig", [
-        "cc",
-        "-target",
-        "aarch64-linux-musl",
-        "-std=c11",
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-I",
-        runtime,
-        ...sources,
-        "-o",
-        join(directory, "runtime-ephemeron-aarch64"),
-      ]);
+      if (!hostCcLane)
+        run("zig", [
+          "cc",
+          "-target",
+          "aarch64-linux-musl",
+          "-std=c11",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-I",
+          runtime,
+          ...sources,
+          "-o",
+          join(directory, "runtime-ephemeron-aarch64"),
+        ]);
     } finally {
       await rm(directory, { force: true, recursive: true });
     }

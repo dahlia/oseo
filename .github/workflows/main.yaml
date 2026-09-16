@@ -92,6 +92,30 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_sanitizer:
+    name: host C sanitizers (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - run: mise run test:sanitizer:self
+      - name: Verify GCC sanitizer instrumentation
+        run: mise run test:sanitizer:self
+        env:
+          OSEO_HOST_CC: gcc
+      - run: mise run test:sanitizer:runtime
+      - run: mise run test:sanitizer:native
+      - run: mise run test:sanitizer:property
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-failures
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
   test_test262:
     name: >-
       test262 (${{ matrix.target }},

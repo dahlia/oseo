@@ -32,7 +32,11 @@
  * contraction off for this component makes every step round where the
  * specification says it rounds, on every target.
  */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize ("fp-contract=off")
+#else
 #pragma STDC FP_CONTRACT OFF
+#endif
 
 #define OSEO_MS_PER_SECOND 1000.0
 #define OSEO_MS_PER_MINUTE 60000.0

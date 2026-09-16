@@ -1,12 +1,13 @@
-Sanitizer activity with Zig 0.16.0
-==================================
+Sanitizer activity and the host C lane
+======================================
 
 The native target descriptions request `address` and `undefined`, but the
 pinned Zig 0.16.0 build does not provide AddressSanitizer coverage. Passing the
 flags and completing a gate do not establish that ASan ran. This finding
 qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
-documentation, and gate-cost records. Their ASan requirements remain unmet;
-the declared target policy has not changed.
+documentation, and gate-cost records. The Linux host C lane below supplies
+separate verified instrumentation. Historical Zig runs and macOS execution
+still lack ASan evidence; the declared target policy has not changed.
 
 
 Cause and reproduction
@@ -100,30 +101,69 @@ passes after a compiler change, check whether both primary execution targets
 now meet the removal condition.
 
 
-Options requiring a maintainer decision
----------------------------------------
+Host C sanitizer lane
+---------------------
 
-A flag-only correction would preserve ADR 0003's compiler policy, but separating
-the flags is insufficient: it needs an ASan runtime as well. No self-contained
-Zig 0.16.0 flag fix was established. Adding a system sanitizer library brings
-another toolchain input that needs pinning and validation on each host.
+The sanitizer lane uses a separate host compiler; Zig remains the ordinary
+compiler. The new `@oseo/toolchain-host-cc` package plans builds;
+*tests/native-toolchain.ts* selects an absolute compiler path and verifies its
+runtime before composing the native test entry points. The adapter has paired
+npm and JSR manifests at the lockstep version and its own GPL license. Its only
+workspace dependency is the compiler interface package.
 
-Changing Zig releases requires a pin change and fresh cross-target evidence.
-An older release alone is not a proven solution: #24377 reports the runtime
-linking problem in 0.14.1 too. Candidate versions must pass these self-checks
-before being proposed as a replacement.
+The lane selects `clang` when available and otherwise selects `gcc`. Set
+`OSEO_HOST_CC=clang` or `OSEO_HOST_CC=gcc` to require one. Selection never
+falls back after a failed probe. The probe compiles and executes a known heap
+overflow and requires the ASan diagnostic. Build failures name missing runtime
+libraries through the compiler's linker output. Foreign targets are rejected;
+the existing Zig task retains cross-link and assembly checks.
 
-A separate, pinned Clang sanitizer CI lane can provide working ASan while
-preserving Zig as the default production compiler. It adds a supported compiler,
-headers, and sanitizer runtime to the evidence policy in ADR 0003; the
-maintainer must approve that policy extension. Both the runtime archive and
-generated C must be instrumented, and the lane must fail on sanitizer
-diagnostics.
+~~~~ sh
+mise run test:sanitizer:self
+mise run test:sanitizer:runtime
+mise run test:sanitizer:native
+mise run test:sanitizer:property
+mise run test:sanitizer:test262 --shard 3/200
+OSEO_HOST_CC=gcc mise run test:sanitizer:self
+~~~~
 
-Removing `address` would make the target descriptions match the existing
-coverage, but would weaken ADR 0014's target contract and leave memory errors
-undetected by ASan. That also needs a maintainer decision. None of these
-compiler, version, or declared-sanitizer changes accompanies this correction.
+The runtime task uses one test-file worker; the property task uses four and
+retains the ordinary seeds, sizes, and case counts. Generated native fixtures
+still exercise the suite's specialization and forced collection modes. The
+sanitizer native task omits only Zig-specific assembly and cross-link checks;
+all executable scenarios remain. The ordinary native gate still runs the
+assembly and cross-link checks.
+
+The archive reuse key includes the exact resolved compiler path, full version
+output, archiver path, compile flags, target, runtime contents, and captured
+build environment. Failure metadata and property replay diagnostics include the
+compiler identity. Compiler subprocesses inherit only PATH, HOME, and TMPDIR.
+The lane refuses ambient ASAN\_OPTIONS, LSAN\_OPTIONS, UBSAN\_OPTIONS,
+LD\_PRELOAD, and DYLD\_INSERT\_LIBRARIES so these cannot suppress a diagnostic.
+UBSan recovery is disabled in both runtime and generated code.
+
+On this Linux host, Clang 22.1.8 passed all four self-check assertions:
+address and undefined behavior in a runtime archive member and generated C.
+The host address probe calls malloc through a volatile function pointer, so
+GCC cannot terminate it with an object-size UBSan check before ASan reports the
+heap overflow. Both sanitizers stay enabled with recovery disabled. The
+unchanged Zig address cases remain TODOs. GCC 16.2.1 is installed and
+`gcc -print-file-name=libasan.so` returns a linker-script path, but its link
+fails because */usr/lib64/libasan.so.8.0.0* and
+*/usr/lib64/libubsan.so.1.0.0* are absent. The explicit GCC lane fails at
+preflight, naming those missing libraries. GCC execution coverage is not
+established on this host, and no system packages or sanitizer suppressions were
+added.
+
+Compiling the Date component with GCC also required its compiler-specific
+spelling of the existing no-contraction pragma. The guarded directive keeps the
+same rounding contract; Clang and Zig retain the original standard pragma. A
+compile-only regression checks strict warnings, ASan instrumentation, and the
+absence of fused multiply-add instructions with both installed compilers,
+without needing GCC's missing link runtime. All 41 runtime translation units
+also compiled to ASan/UBSan-instrumented GCC objects with the adapter flags in
+30.55 seconds (measured); no warning or compiler error occurred. This is
+compile evidence, not GCC execution evidence.
 
 
 Independent Clang runtime probe
@@ -156,3 +196,71 @@ above supply the required arguments. No sanitizer suppression options were
 used. The intentional Clang self-check separately produced the expected
 `AddressSanitizer: heap-buffer-overflow`, a four-byte write immediately after
 a four-byte allocation in `self.c`.
+
+
+Linux measurements (2026-09-17)
+-------------------------------
+
+These measurements use base `28d640daaae8e80162d784cb2727dff8af1e3d4f`
+plus this lane, on Linux x86-64, kernel 7.1.12-200.fc44, with an AMD Ryzen 7
+7700X (16 logical CPUs). The compiler is */usr/bin/clang-22*, Fedora Clang
+22.1.8-4.fc44. This is a shared host: other work continued, and observed load
+averages were around 11–13 during preparation. These are elapsed observations,
+not isolated benchmarks or GitHub runner predictions.
+
+Each command includes its mise package-build dependency. The host runtime
+archive cache was available; generated programs are compiled by the host driver
+on every invocation. Runtime C fixtures build their own archives. Two early
+native runs were stopped while test wiring was incomplete and are excluded.
+The successful native run includes all executable scenarios; a separate focused
+run also verified scenario 0 after its cross-link checks were separated.
+
+| Command                                         | Measured elapsed | Result                                                          |
+| ----------------------------------------------- | ---------------: | --------------------------------------------------------------- |
+| `mise run test:sanitizer:self`                  |           3.65 s | 4 sanitizer assertions and 3 selection assertions pass          |
+| `mise run test:sanitizer:runtime`               |          87.63 s | 4 C fixtures pass                                               |
+| `mise run test:sanitizer:native`                |       1,219.54 s | 245 fixtures and all executable scenarios pass                  |
+| `mise run test:sanitizer:property`              |         758.58 s | 200 tests across 114 files pass at ordinary budgets, 4 workers  |
+| `mise run test:sanitizer:test262 --shard 3/200` |          52.93 s | 99/19,770 paths: 76 pass, 10 expected negatives, 13 unsupported |
+
+No ASan, LeakSanitizer, or UBSan diagnostic occurred in Oseo's runtime or
+generated code in these successful runs. The intentional self-check faults are
+separate: ASan reports a heap overflow and UBSan reports signed overflow.
+The clock property also passed a focused host-lane run in 17.49 seconds.
+No sanitizer suppression was used and no runtime algorithm was changed.
+
+The test262 runner reported 42.71041 seconds internally, with eight workers and
+zero retries. Multiplying that execution time by `19,770 / 99` estimates
+8,529.14 seconds, about 142 minutes, for the corpus at the same effective
+throughput. The shard consumed 230.72 user plus 64.15 system CPU seconds;
+scaling those gives about 16.4 CPU-hours. These are estimates from one shard,
+not a full-corpus result. Case mix, cache state, host contention, and runner
+capacity can change the cost.
+
+That cost is too high for this change's additional per-PR gate: the measured
+self, runtime, native, and property tasks together take 34.49 minutes, while
+full test262 would add roughly 142 minutes at the sampled throughput. Linux CI
+therefore schedules those four tasks and an explicit GCC self-check, but not
+full sanitizer test262. Sharded periodic or on-demand corpus runs remain an
+option if their compute budget is accepted. No unsharded test262 run was made.
+
+
+Apple Clang proposal, not execution evidence
+--------------------------------------------
+
+No macOS job is added. This Linux host cannot measure Apple Clang or verify
+macOS ASan/UBSan execution, and Linux LeakSanitizer results do not establish
+macOS leak checking.
+
+For capacity planning only, consider Apple Clang taking one or two times the
+34.49-minute Linux lane measurement, excluding test262. Those assumptions give
+about 35 or 69 runner-minutes. Dividing by the maintainer's stated five macOS
+slots gives an added capacity floor of 6.90 or 13.80 minutes; a stated
+156-minute existing floor would become approximately 163 or 170 minutes. These
+are estimates, not measured compiler-speed ratios. They exclude extra setup,
+queueing, and cold-cache costs.
+
+The proposed next step is to run the self-check and a small native shard
+manually on an Apple Clang AArch64 host, record its full compiler identity, and
+then measure the complete lane before budgeting any CI job. Until that evidence
+exists, historical and current macOS ASan coverage remains unverified.
