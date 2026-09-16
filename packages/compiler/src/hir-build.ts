@@ -196,6 +196,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "AggregateError" ||
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "Atomics" ||
     name === "BigInt" ||
     name === "DataView" ||
     name === "Date" ||
@@ -230,6 +231,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "parseFloat" ||
     name === "parseInt" ||
     name === "Set" ||
+    name === "SharedArrayBuffer" ||
     name === "undefined" ||
     isTypedArrayIntrinsicName(name)
   );
@@ -595,6 +597,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "RegExp" ||
     name === "String" ||
     name === "Set" ||
+    name === "SharedArrayBuffer" ||
     name === "Symbol" ||
     isTypedArrayIntrinsicName(name) ||
     name === "setTimeout" ||

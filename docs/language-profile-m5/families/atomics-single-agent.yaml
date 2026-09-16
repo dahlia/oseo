@@ -1,0 +1,78 @@
+version: 1
+id: atomics-single-agent
+title: "Single-agent SharedArrayBuffer and Atomics"
+scope:
+  - "The SharedArrayBuffer constructor with its length conversion,
+    maxByteLength option, length check, new-target prototype read, and
+    fixed or growable Shared Data Block allocation; the byteLength,
+    growable, and maxByteLength getters, grow, slice, the species getter,
+    the shared brand every ArrayBuffer.prototype and
+    SharedArrayBuffer.prototype member checks, and TypedArray and DataView
+    views over shared buffers, including length-tracking views that observe
+    grow."
+  - "The Atomics namespace object and its add, and, compareExchange,
+    exchange, isLockFree, load, notify, or, store, sub, wait, waitAsync, and
+    xor functions over integer TypedArray views of shared and unshared
+    buffers, with integer-view validation, pre-conversion length, index and
+    value conversion, and revalidation after detachment or resize."
+  - "The single-agent WaiterList semantics: a suspending wait that returns
+    not-equal or times out, waitAsync results that settle synchronously or
+    through a realm-owned FIFO waiter store, count-limited FIFO notification
+    that resolves same-agent promises synchronously, and host timeout jobs
+    that time out a still-waiting promise."
+  - "Reviewed standards coverage is all 479 upstream paths under the node's
+    two inventory roots through the reviewed testAtomics.js harness. Cases
+    that need $262.agent or a non-blocking agent are never executed and name
+    the test262-agent or non-blocking-agent capability; agent clusters and
+    cross-agent execution belong to the atomics-and-shared-memory node."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-single-agent.ts
+      - tests/property/m5-atomics-single-agent.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-single-agent.ts
+      - tests/native.ts
+      - tests/native/scenarios/shard-0.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-single-agent.ts
+      - tests/property/m5-atomics-single-agent.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-atomics-single-agent.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-single-agent.ts
+      - tests/property/m5-atomics-single-agent.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-single-agent.ts
+      - tests/property/m5-atomics-single-agent.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/testAtomics.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tools/test262.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_atomics.c
+      - packages/runtime-c/native/runtime_array_buffer.c
+      - packages/runtime-c/native/runtime_event_loop.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

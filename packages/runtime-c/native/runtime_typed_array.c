@@ -732,6 +732,22 @@ OseoResult oseo_internal_typed_array_index_key(
     return typed_array_index_string(context, index);
 }
 
+bool oseo_internal_typed_array_out_of_bounds(
+    OseoValue view,
+    size_t *buffer_byte_length
+) {
+    const OseoTypedArray *typed = typed_array_object(view);
+    bool out_of_bounds = typed_array_out_of_bounds(typed);
+    *buffer_byte_length = out_of_bounds
+        ? 0u
+        : array_buffer_object(typed->viewed_buffer)->byte_length;
+    return out_of_bounds;
+}
+
+size_t oseo_internal_typed_array_element_size(OseoTypedArrayKind kind) {
+    return typed_array_bytes[kind];
+}
+
 bool oseo_internal_typed_array_fixed_length(OseoValue view) {
     const OseoTypedArray *typed = typed_array_object(view);
     if (typed->array_length == SIZE_MAX) return false;
@@ -1315,6 +1331,19 @@ static OseoResult typed_array_validate(OseoContext *context, OseoValue value) {
         );
     }
     return normal(value);
+}
+
+OseoResult oseo_internal_typed_array_validate(
+    OseoContext *context,
+    OseoValue value,
+    size_t *length
+) {
+    *length = 0u;
+    OseoResult result = typed_array_validate(context, value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *length = typed_array_length(typed_array_object(value));
+    }
+    return result;
 }
 
 /*

@@ -54,11 +54,24 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-sab.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-sab.js:615:48:
+        error[OSEO2001]: TypedArray search and join methods are not
+        admitted yet.\n"'
+      unsupportedCapability: typed-array-search-and-join
       passed: false
-    unsupportedFeatures:
-      - SharedArrayBuffer
+    unsupportedFeatures: []
   - case:
       async: false
       features:

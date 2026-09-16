@@ -1266,7 +1266,6 @@ test("installs the core TypedArray prototype surface", () => {
   // Array.prototype.toString before the cluster materializes cannot
   // change what %TypedArray.prototype%.toString is.
   assert.match(header, /OSEO_INTRINSIC_ARRAY_TO_STRING = 238/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 239/u);
   assert.match(
     arrays,
     /OSEO_ARRAY_TO_STRING_CODE_ID[\s\S]*OSEO_INTRINSIC_ARRAY_TO_STRING\] =/u,
@@ -2183,6 +2182,89 @@ test("routes generic string coercion through the realm-owned methods", () => {
     new RegExp(
       String.raw`object_prototype_to_string[\s\S]*` +
         String.raw`OSEO_WELL_KNOWN_TO_STRING_TAG[\s\S]*object_tag_text`,
+      "u",
+    ),
+  );
+});
+
+test("populates the single-agent shared memory clusters", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const bufferSource = sources.get("runtime_array_buffer.c") ?? "";
+  const atomicsSource = sources.get("runtime_atomics.c") ?? "";
+  const eventLoopSource = sources.get("runtime_event_loop.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+
+  assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE = 239/u);
+  assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
+  assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
+  assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 243/u);
+  assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
+  // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
+  // so views, DataView, and the collector reach both kinds through one
+  // representation while every prototype member checks the brand.
+  assert.match(internalHeader, /bool shared;\s*\} OseoArrayBuffer;/u);
+  assert.match(
+    bufferSource,
+    /array_buffer_receiver[\s\S]*array_buffer_object\(receiver\)->shared/u,
+  );
+  assert.match(bufferSource, /shared_array_buffer_receiver/u);
+  assert.match(bufferSource, /shared_array_buffer_grow/u);
+  for (const property of [
+    "SharedArrayBuffer",
+    "byteLength",
+    "growable",
+    "maxByteLength",
+    "grow",
+    "slice",
+  ]) {
+    assert.match(bufferSource, new RegExp(`"${property}"`, "u"));
+  }
+  for (const name of [
+    "add",
+    "and",
+    "compareExchange",
+    "exchange",
+    "isLockFree",
+    "load",
+    "notify",
+    "or",
+    "store",
+    "sub",
+    "wait",
+    "waitAsync",
+    "xor",
+  ]) {
+    assert.match(atomicsSource, new RegExp(`\\{"${name}", \\du\\}`, "u"));
+  }
+  assert.match(atomicsSource, /"Atomics"/u);
+  assert.match(atomicsSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  // Every access revalidates after the argument conversions, and a same
+  // agent notification resolves the promise synchronously instead of
+  // enqueueing a generic job.
+  assert.match(atomicsSource, /atomics_revalidate\(context/u);
+  assert.match(
+    atomicsSource,
+    /atomics_resolve_waiter[\s\S]*oseo_promise_resolve_into\(/u,
+  );
+  // The waiter store and the timeout job stay collector roots.
+  assert.match(memorySource, /mark_value\(context->atomics_waiter_head/u);
+  assert.match(memorySource, /mark_value\(timer->waiter, worklist\)/u);
+  assert.match(
+    memorySource,
+    /OSEO_HEAP_ATOMICS_WAITER[\s\S]*mark_value\(waiter->promise/u,
+  );
+  // A waiter timeout never shares an id with setTimeout, so clearTimeout
+  // can never cancel it.
+  assert.match(eventLoopSource, /timer->id = 0u;/u);
+  assert.match(eventLoopSource, /timer->id != 0u &&/u);
+  assert.match(
+    bindingSource,
+    new RegExp(
+      "oseo_internal_install_shared_array_buffer_global" +
+        String.raw`[\s\S]*oseo_internal_install_atomics_global`,
       "u",
     ),
   );

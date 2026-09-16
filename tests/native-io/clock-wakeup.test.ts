@@ -32,6 +32,7 @@ import {
   runClockProbe,
   runClockScheduler,
 } from "../../tools/native-io/clock.ts";
+import { needsTest262Agent, parseTest262Case } from "../../tools/test262.ts";
 import type {
   ClockBuild,
   ClockProbeConfiguration,
@@ -454,10 +455,13 @@ test(
 /*
  * The reviewed test262 manifest records its asynchronous executions under
  * the `deterministic-logical-clock` scheduler value of ADR 0013. That value
- * stays exact after ADR 0025 only because no reviewed case and no reviewed
- * harness include schedules a timer, so no reviewed execution ever opens
- * the clock adapter or waits. A reviewed timer case would need that record
- * revisited before it enters the subset.
+ * stays exact after ADR 0025 only because no reviewed execution schedules a
+ * timer, so none ever opens the clock adapter or waits. A reviewed case that
+ * would schedule one, and any reviewed harness include, needs that record
+ * revisited before it enters the subset. A case that needs the `$262.agent`
+ * capability is never executed, so the timers behind that capability cannot
+ * reach the scheduler; the reviewed Atomics rows that call
+ * `$262.agent.setTimeout` are exactly those.
  */
 test("no reviewed test262 execution schedules a timer", async () => {
   const repository = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -468,8 +472,10 @@ test("no reviewed test262 execution schedules a timer", async () => {
     join(repository, "tests/test262/subset.yaml"),
     "utf8",
   );
+  const revision = /^suiteRevision: (\S+)$/mu.exec(subset)?.[1] ?? "";
+  assert.notEqual(revision, "");
   const paths = [...subset.matchAll(/^\s*(?:-\s+)?path: (test\/\S+)$/gmu)].map(
-    (match) => join(upstream, match[1] ?? ""),
+    (match) => match[1] ?? "",
   );
   assert.ok(paths.length > 0);
   const harness = join(repository, "tests/test262/harness");
@@ -477,10 +483,19 @@ test("no reviewed test262 execution schedules a timer", async () => {
   // The corpus holds thousands of files, so they are read one at a time:
   // opening them all at once exhausts the descriptor limit on Windows.
   const timers: string[] = [];
-  for (const path of [...paths, ...includes]) {
+  for (const path of paths) {
     // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
-    const text = await readFile(path, "utf8");
-    if (/\b(?:setTimeout|clearTimeout)\b/u.test(text)) timers.push(path);
+    const text = await readFile(join(upstream, path), "utf8");
+    if (!/\b(?:setTimeout|clearTimeout)\b/u.test(text)) continue;
+    if (needsTest262Agent(text, parseTest262Case(text, path, revision))) {
+      continue;
+    }
+    timers.push(path);
+  }
+  for (const include of includes) {
+    // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
+    const text = await readFile(include, "utf8");
+    if (/\b(?:setTimeout|clearTimeout)\b/u.test(text)) timers.push(include);
   }
   assert.deepEqual(timers, []);
 });

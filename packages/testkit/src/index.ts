@@ -92,6 +92,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "array-buffer",
   "async-functions",
   "async-iteration",
+  "atomics-single-agent",
   "bigint-primitive",
   "classes",
   "control-flow",

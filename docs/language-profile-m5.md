@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 125
+M5a is complete. The normative family records described below inventory 126
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 19,291 reviewed cases: 15,792 passes, 1,556
-expected negatives, and 1,943 unsupported profile features. It records no
+The current manifest contains 19,770 reviewed cases: 16,144 passes, 1,556
+expected negatives, and 2,070 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6801,6 +6801,105 @@ target-parity policy, forced-collection policy, and zero-override policy are
 unchanged.
 
 
+Single-agent shared memory and Atomics
+--------------------------------------
+
+M5b node `atomics-single-agent` admits `SharedArrayBuffer` and the `Atomics`
+namespace for a realm that is the only agent of its agent cluster. A
+`SharedArrayBuffer` is the ArrayBuffer record with the shared brand: its
+constructor orders the length conversion, the `maxByteLength` option, the
+length comparison, the new target's `prototype` read, and the Shared Data
+Block allocation exactly as AllocateSharedArrayBuffer does, and a growable
+buffer reserves its maximum length at creation. The `byteLength`,
+`growable`, and `maxByteLength` getters, `grow`, and `slice` require the
+shared brand, while every `ArrayBuffer.prototype` member now rejects it, and
+`ArrayBuffer.prototype.slice` rejects a species result that is shared. `grow`
+checks both brands before its length converts, returns `undefined` for the
+current length, and throws a `RangeError` for a smaller or over-maximum
+length; the grown bytes read zero. A shared buffer never detaches. TypedArray
+and DataView construction, element access, and length-tracking views accept
+either buffer kind unchanged, so a length-tracking view over a growable
+buffer observes each grow.
+
+The thirteen `Atomics` functions validate an integer TypedArray first, then
+convert the index against the length read before that conversion, then
+convert their values, and then revalidate the view, so a conversion that
+detaches or shrinks an `ArrayBuffer` throws before any byte is read. The
+read-modify-write functions, `store`, and `compareExchange` operate on
+`ArrayBuffer` and `SharedArrayBuffer` views alike, compute over the element's
+two's-complement bits, and return the previous element, except that `store`
+returns the converted value. `compareExchange` compares raw element bytes, so
+an expected value that wraps to the stored bits matches. `isLockFree` reports
+`true` for one, two, four, and eight bytes after `ToIntegerOrInfinity`, which
+is this profile's implementation-defined agent record.
+
+The agent can suspend. `Atomics.wait` requires an `Int32Array` or
+`BigInt64Array` over a `SharedArrayBuffer` and returns `"not-equal"` or, for
+a matching element, suspends until its timeout and returns `"timed-out"`: no
+other agent exists to notify it, so an infinite timeout never returns. A
+fractional timeout rounds up to whole milliseconds, which is a permitted
+additional timeout. `Atomics.waitAsync` returns `{ async, value }` with
+`"not-equal"` or an immediate `"timed-out"` synchronously, and otherwise adds
+a waiter to the realm's FIFO WaiterList store and returns its pending
+`%Promise%`. `Atomics.notify` removes up to `count` waiters on the same buffer
+and byte index in FIFO order and resolves each promise to `"ok"`
+synchronously, as NotifyWaiter specifies for a waiter of the surrounding
+agent; a non-shared buffer reports zero after the same validation and
+conversions. A finite waitAsync timeout is a host timeout job whose deadline
+counts from the monotonic time of the call rather than from the start of the
+current task, and which keeps the event loop running until it resolves a
+still-waiting promise to `"timed-out"`. A notification cancels that job.
+Waiters, their promises, their buffers, and their timeout jobs stay collector
+roots while listed.
+
+Fixed native and generated differential evidence at property seed
+`0x60007300` covers the constructor, prototype, brand, grow, slice, species,
+DataView, and TypedArray surface over fixed and growable shared buffers, all
+eight integer and both BigInt element kinds over shared and unshared buffers,
+wrapping, fractional, non-finite, and mismatched operands, validation and
+conversion order, revalidation after resize and detachment, immediate and
+blocking waits, and waitAsync waiters settled by count-limited notification
+or by timeout. Node.js, Deno, and both native specialization policies agree
+with collection forced at every safepoint, a false numeric hint deliberately
+misses its guard and reaches the compiled generic fallback, and an
+independent element-level model computes every generated observation.
+Native-only checks record where both reference engines diverge from
+ECMA-262: V8 resolves a same-agent notification through a later host task
+rather than synchronously, lets a process exit with a waitAsync timeout still
+pending, answers `isLockFree` for an unconverted fractional size, and throws
+a `TypeError` instead of the specified `RangeError` when revalidation finds a
+byte index past a shrunk buffer under an in-bounds length-tracking view.
+
+Every case that needs a second agent keeps an explicit capability boundary.
+The reviewed runner classifies a case that includes *atomicsHelper.js* or
+names `$262.agent` as unsupported with the `test262-agent` capability without
+executing it, and a `CanBlockIsFalse` case as unsupported with the
+`non-blocking-agent` capability, because every native agent of this profile
+can suspend. The reviewed harness gains *testAtomics.js*, unchanged in
+behavior; its non-view value list constructs a Boolean wrapper, so the cases
+that include it keep the unadmitted `Boolean` binding boundary. The reviewed
+feature list gains `Atomics`, `Atomics.waitAsync`, and `SharedArrayBuffer`,
+and the dependency vocabulary gains `atomics-single-agent`. All 479 paths
+under the node's two inventory roots are reviewed: 304 pass, 112 need
+`$262.agent`, 52 need the `Boolean` binding through *testAtomics.js*, two
+need an agent that cannot block, three reference an unresolvable upstream
+identifier this profile rejects at compile time, five need concrete
+TypedArray feature gates, and one needs a second realm. Forty-eight already
+reviewed paths outside the roots move to pass: 38 DataView cases, nine
+ArrayBuffer brand-check cases, and one `Object.seal` case; the remaining
+eight shared-buffer paths keep their TypedArray method, `Float16Array`, or
+realm boundaries. No reviewed path moves away from `pass`. The manifest moves
+from 19,291 to 19,770 cases and from 15,792 to 16,144 passes, keeps 1,556
+expected negatives, and moves from 1,943 to 2,070 unsupported profile
+features with no semantic, harness, or infrastructure failures. The property
+inventory reaches 148 domains and seeds with a 5,695-case ordinary budget, and
+the evidence inventory reaches 126 families. The runtime ABI moves to
+`oseo-runtime-m5-111`: the ArrayBuffer range gains seven SharedArrayBuffer
+code IDs, code range index 25 holds the thirteen Atomics functions, the
+public intrinsic table gains four slots, the heap gains the Atomics waiter
+kind, and the context gains the WaiterList store roots.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -7013,9 +7112,12 @@ complete. The remaining gaps retain their existing owners.
     Reviewed cases that need them carry the `dynamic-source` dependency
     tag, and no release uses an unqualified conformance label while this
     boundary stands.
- -  Realm creation beyond the initial realm, agent clusters, and shared
-    memory need runtime and harness capabilities that do not exist yet;
-    affected tests name the missing `$262` capability.
+ -  Realm creation beyond the initial realm and agent clusters need runtime
+    and harness capabilities that do not exist yet; affected tests name the
+    missing `$262` capability. Shared memory as one agent observes it is
+    admitted by the `atomics-single-agent` node as recorded above, and the
+    `atomics-and-shared-memory` node owns agent clusters, cross-agent
+    shared-memory execution, and the `$262.agent` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *nans.js*, *promiseHelper.js*, and *propertyHelper.js*. *nans.js*

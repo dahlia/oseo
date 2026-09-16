@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-19,291 reviewed cases: 15,792 passes, 1,556 expected negatives, and 1,943
+19,770 reviewed cases: 16,144 passes, 1,556 expected negatives, and 2,070
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 125 indexed records in the normative
+M5a is complete. The 126 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-15,792 passes across 19,291 paths, and the property inventory records 147
-domains, 147 seeds, and an ordinary case budget of 5,683.
+16,144 passes across 19,770 paths, and the property inventory records 148
+domains, 148 seeds, and an ordinary case budget of 5,695.
 
 
 M5a implementation history
@@ -6333,6 +6333,48 @@ to 125 families. The methods take seven code IDs in the existing Set range and
 add no realm intrinsic slot, heap kind, component, or generated-code entry
 point. The runtime ABI moves to `oseo-runtime-m5-110` without changing the
 graph's orchestration state.
+
+Implemented M5b node `atomics-single-agent` admits `SharedArrayBuffer` and the
+`Atomics` namespace as one agent observes them. A shared buffer reuses the
+ArrayBuffer record with a shared brand that every `ArrayBuffer.prototype` and
+`SharedArrayBuffer.prototype` member checks, reserves a growable buffer's
+maximum at creation, and never detaches, so TypedArray and DataView views
+accept it unchanged. The new *runtime\_atomics.c* component validates,
+converts, and revalidates in specification order, computes the
+read-modify-write family over raw element bits for both buffer kinds, blocks
+`Atomics.wait` through the clock adapter until its timeout, and keeps
+`Atomics.waitAsync` waiters in a realm-owned FIFO store that `Atomics.notify`
+drains synchronously and host timeout jobs time out. The reviewed runner
+names the `test262-agent` capability for every case that needs `$262.agent`
+and the `non-blocking-agent` capability for a `CanBlockIsFalse` case, and it
+executes neither. Fixed and generated native differential evidence at
+property seed `0x60007300` uses an independent element and waiter model under
+both specialization policies, collection forced at every safepoint, a false
+hint that reaches the generic fallback, and Node.js and Deno references;
+native-only checks record V8's divergence from ECMA-262 for same-agent
+notification order, pending waitAsync timeouts at exit, fractional
+`isLockFree` sizes, and the revalidation error type.
+
+The reviewed harness gains *testAtomics.js*, and the reviewed feature list
+gains `Atomics`, `Atomics.waitAsync`, and `SharedArrayBuffer`. All 479 paths
+under the node's two inventory roots are reviewed: 304 pass, 112 need
+`$262.agent`, 52 need the unadmitted `Boolean` binding through
+*testAtomics.js*, two need an agent that cannot block, three reference an
+unresolvable upstream identifier, five need concrete TypedArray feature
+gates, and one needs a second realm. Forty-eight already reviewed paths
+outside the roots move to pass: 38 DataView, nine ArrayBuffer brand-check,
+and one `Object.seal` shared-buffer cases. The manifest moves from 19,291 to
+19,770 paths and from 15,792 to 16,144 passes, keeps 1,556 expected
+negatives, and moves from 1,943 to 2,070 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property ratchet moves
+from 147 to 148 domains and seeds and from 5,683 to 5,695 ordinary cases, and
+the evidence inventory moves from 125 to 126 families. The runtime ABI moves
+to `oseo-runtime-m5-111` with seven SharedArrayBuffer code IDs in the
+ArrayBuffer range, code range index 25 for the thirteen Atomics functions,
+four realm intrinsic slots, one heap kind, and the context's WaiterList store
+roots; the value representation and the generated-code entry points are
+unchanged. Agent clusters, cross-agent shared-memory execution, and the
+`$262.agent` capability remain with the `atomics-and-shared-memory` node.
 
 
 Ahead-of-time challenge boundary

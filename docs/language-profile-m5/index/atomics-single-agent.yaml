@@ -1,0 +1,3 @@
+version: 1
+id: atomics-single-agent
+record: docs/language-profile-m5/families/atomics-single-agent.yaml

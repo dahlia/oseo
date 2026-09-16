@@ -486,6 +486,25 @@
     (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 9u)
 #define OSEO_ARRAY_BUFFER_TRANSFER_TO_FIXED_LENGTH_CODE_ID \
     (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 10u)
+/*
+ * %SharedArrayBuffer% shares the component and its Data Block helpers, so
+ * its constructor, accessors, methods, and species getter count down from
+ * the ArrayBuffer entries inside the same range.
+ */
+#define OSEO_SHARED_ARRAY_BUFFER_CONSTRUCTOR_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_SHARED_ARRAY_BUFFER_SPECIES_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_SHARED_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_SHARED_ARRAY_BUFFER_GROWABLE_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_SHARED_ARRAY_BUFFER_MAX_BYTE_LENGTH_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 15u)
+#define OSEO_SHARED_ARRAY_BUFFER_GROW_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 16u)
+#define OSEO_SHARED_ARRAY_BUFFER_SLICE_CODE_ID \
+    (OSEO_ARRAY_BUFFER_CODE_ID_RANGE_LAST - 17u)
 
 #define OSEO_STRING_CODE_ID_RANGE_INDEX ((size_t)12u)
 #define OSEO_STRING_CODE_ID_RANGE_FIRST \
@@ -818,6 +837,20 @@
 #define OSEO_TYPED_ARRAY_SPECIES_CODE_ID \
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 23u)
 
+#define OSEO_ATOMICS_CODE_ID_RANGE_INDEX ((size_t)25u)
+#define OSEO_ATOMICS_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ATOMICS_CODE_ID_RANGE_INDEX)
+#define OSEO_ATOMICS_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ATOMICS_CODE_ID_RANGE_INDEX)
+/*
+ * The thirteen Atomics functions count down from the range end in
+ * `OseoAtomicsOperation` order, so an operation's index is the only
+ * identity the builder and the dispatcher share.
+ */
+#define OSEO_ATOMICS_FUNCTION_CODE_ID_LAST OSEO_ATOMICS_CODE_ID_RANGE_LAST
+#define OSEO_ATOMICS_FUNCTION_CODE_ID_FIRST \
+    (OSEO_ATOMICS_CODE_ID_RANGE_LAST - (OSEO_ATOMICS_OPERATION_COUNT - 1u))
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -880,6 +913,7 @@ typedef enum {
     OSEO_HEAP_WEAK_REFERENCE = 32,
     OSEO_HEAP_FINALIZATION_REGISTRY = 33,
     OSEO_HEAP_FINALIZATION_CELL = 34,
+    OSEO_HEAP_ATOMICS_WAITER = 35,
 } OseoHeapKind;
 
 typedef struct {
@@ -1454,6 +1488,14 @@ typedef struct {
     size_t max_byte_length;
     bool resizable;
     bool detached;
+    /*
+     * IsSharedArrayBuffer. A shared buffer is a SharedArrayBuffer: its
+     * block is a Shared Data Block, `resizable` means growable, it is
+     * never detached, and `byte_length` only grows. One agent owns the
+     * whole agent cluster, so no second agent can ever reach the block,
+     * and ownership follows the same single-owner rule as above.
+     */
+    bool shared;
 } OseoArrayBuffer;
 
 /*
@@ -1724,17 +1766,65 @@ typedef struct {
     bool fulfilled;
 } OseoJob;
 
+/*
+ * One host timeout job. A `setTimeout` timer calls `callback` with the
+ * values in `arguments`. A timer whose `waiter` is an Atomics waiter is
+ * the EnqueueAtomicsWaitAsyncTimeoutJob of that waiter instead: it has no
+ * callback, takes id 0 so `clearTimeout` can never name it, and times the
+ * waiter out only if the waiter is still in its list when the job runs.
+ */
 typedef struct {
     OseoHeapObject header;
     OseoValue next;
     OseoValue callback;
     OseoValue arguments;
+    OseoValue waiter;
     uint64_t deadline;
     uint64_t id;
     uint64_t order;
     size_t argument_count;
     bool canceled;
 } OseoTimer;
+
+/* The thirteen Atomics functions, in code-ID and creation order. */
+typedef enum {
+    OSEO_ATOMICS_ADD = 0,
+    OSEO_ATOMICS_AND = 1,
+    OSEO_ATOMICS_COMPARE_EXCHANGE = 2,
+    OSEO_ATOMICS_EXCHANGE = 3,
+    OSEO_ATOMICS_IS_LOCK_FREE = 4,
+    OSEO_ATOMICS_LOAD = 5,
+    OSEO_ATOMICS_NOTIFY = 6,
+    OSEO_ATOMICS_OR = 7,
+    OSEO_ATOMICS_STORE = 8,
+    OSEO_ATOMICS_SUB = 9,
+    OSEO_ATOMICS_WAIT = 10,
+    OSEO_ATOMICS_WAIT_ASYNC = 11,
+    OSEO_ATOMICS_XOR = 12,
+    OSEO_ATOMICS_OPERATION_COUNT = 13,
+} OseoAtomicsOperation;
+
+/*
+ * One Waiter Record of an `Atomics.waitAsync` call. The single agent owns
+ * the whole agent cluster, so the WaiterList store is one FIFO list on the
+ * context and a waiter's WaiterList is the pair of its `buffer` identity
+ * and `byte_index`: no second agent can alias a Shared Data Block, so the
+ * buffer object names its block exactly. The list roots every waiter it
+ * holds, and a waiter roots its buffer, its promise, and the timeout job
+ * in `timer`, which is undefined for an infinite timeout. `listed` is
+ * whether the waiter is still in its list, which the timeout job reads.
+ * `Atomics.wait` never creates one: a waiting agent is suspended, so no
+ * code in this agent can run to notify it.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue buffer;
+    OseoValue promise;
+    OseoValue timer;
+    size_t byte_index;
+    bool listed;
+} OseoAtomicsWaiter;
 
 /*
  * One [[MapData]] record. A deleted entry becomes a tombstone in place
@@ -1902,6 +1992,9 @@ static inline OseoAsyncGeneratorRequest *request_object(OseoValue value) {
 }
 static inline OseoTimer *timer_object(OseoValue value) {
     return (OseoTimer *)heap_object(value);
+}
+static inline OseoAtomicsWaiter *atomics_waiter_object(OseoValue value) {
+    return (OseoAtomicsWaiter *)heap_object(value);
 }
 static inline OseoMap *map_object(OseoValue value) {
     return (OseoMap *)heap_object(value);
@@ -2455,6 +2548,48 @@ OseoResult oseo_internal_install_array_buffer_global(
     OseoContext *context,
     OseoValue global
 );
+/* Materializes %SharedArrayBuffer% with its prototype, accessors, grow,
+ * slice, and species accessor, and returns the constructor. */
+OseoResult oseo_internal_shared_array_buffer_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_shared_array_buffer_global(
+    OseoContext *context,
+    OseoValue global
+);
+OseoResult oseo_internal_atomics_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/* Materializes the %Atomics% namespace object and its functions. */
+OseoResult oseo_internal_atomics_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_atomics_global(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * Runs one waiter's timeout job: a waiter still in its list leaves it and
+ * its promise resolves to "timed-out", and a waiter a notification already
+ * removed is left alone. Nothing here drains jobs; the timer turn that
+ * called it does.
+ */
+/*
+ * Owned by runtime_event_loop.c: enqueues one waiter's timeout job at
+ * `deadline`, whole milliseconds in the realm's monotonic domain. The
+ * caller has started the clock.
+ */
+OseoResult oseo_internal_atomics_timeout_enqueue(
+    OseoContext *context,
+    OseoValue waiter,
+    uint64_t deadline
+);
+OseoResult oseo_internal_atomics_waiter_timeout(
+    OseoContext *context,
+    OseoValue waiter
+);
 /* Materializes %Set%, %Set.prototype%, and %SetIteratorPrototype%. */
 OseoResult oseo_internal_set_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_set_global(
@@ -2549,6 +2684,27 @@ OseoResult oseo_internal_typed_array_index_key(
     OseoContext *context,
     size_t index
 );
+/*
+ * ValidateTypedArray for a caller outside this component: throws the
+ * TypeError for a value that is not a TypedArray or whose view is detached
+ * or out of bounds, and otherwise reports TypedArrayLength.
+ */
+OseoResult oseo_internal_typed_array_validate(
+    OseoContext *context,
+    OseoValue value,
+    size_t *length
+);
+/*
+ * IsTypedArrayOutOfBounds together with the current buffer byte length,
+ * which RevalidateAtomicAccess compares against. A detached buffer is out
+ * of bounds and reports zero.
+ */
+bool oseo_internal_typed_array_out_of_bounds(
+    OseoValue view,
+    size_t *buffer_byte_length
+);
+/* TypedArrayElementSize. */
+size_t oseo_internal_typed_array_element_size(OseoTypedArrayKind kind);
 /* IsTypedArrayFixedLength, which [[PreventExtensions]] reads. */
 bool oseo_internal_typed_array_fixed_length(OseoValue view);
 /*

@@ -998,4 +998,61 @@ console.log(
       "fp evaluation order 29312 34447360\n",
   );
   assert.equal(dateHostBoundaries.stderr, "");
+
+  // Both references diverge from ECMA-262 on four single-agent Atomics
+  // steps, so these checks bypass them. NotifyWaiter resolves a waiter of
+  // the surrounding agent synchronously, so its reaction runs before a
+  // reaction enqueued after the notify; V8 enqueues a host task instead.
+  // A waitAsync timeout is a host timeout job that runs once it is due,
+  // while V8 lets the process exit with the job still pending.
+  // isLockFree converts its size through ToIntegerOrInfinity, so 1.5 asks
+  // about one byte; V8 compares the unconverted number. RevalidateAtomicAccess
+  // throws a RangeError for a byte index past a shrunk buffer whose
+  // length-tracking view stays in bounds; V8 throws a TypeError.
+  const atomicsDivergenceName = "atomics-reference-divergence.ts";
+  const atomicsDivergence = await runNativeCli(
+    {
+      args: [atomicsDivergenceName],
+      source: `
+const view = new Int32Array(new SharedArrayBuffer(8));
+const order = [];
+Atomics.waitAsync(view, 0, 0).value.then((value) => order.push(value));
+console.log("notify", Atomics.notify(view, 0));
+Promise.resolve().then(() => order.push("later"));
+setTimeout(() => console.log("order", order.join()), 0);
+Atomics.waitAsync(view, 1, 0, 5).value.then((value) => {
+  console.log("timeout", value, Atomics.notify(view, 1));
+});
+console.log("isLockFree", Atomics.isLockFree(1.5), Atomics.isLockFree(-0.5));
+const resizable = new ArrayBuffer(8, { maxByteLength: 8 });
+const tracking = new Int16Array(resizable);
+try {
+  Atomics.store(tracking, 3, {
+    valueOf() {
+      resizable.resize(4);
+      return 1;
+    },
+  });
+} catch (error) {
+  console.log("revalidate", error instanceof RangeError, tracking.length);
+}
+`,
+      sourceId: atomicsDivergenceName,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(atomicsDivergence.exitStatus, 0, atomicsDivergence.stderr);
+  assert.equal(
+    atomicsDivergence.stdout,
+    [
+      "notify 1",
+      "isLockFree true false",
+      "revalidate true 2",
+      "order ok,later",
+      "timeout timed-out 0",
+      "",
+    ].join("\n"),
+  );
+  assert.equal(atomicsDivergence.stderr, "");
 }

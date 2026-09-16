@@ -7,6 +7,8 @@ supportedFeatures:
   - Array.prototype.includes
   - Array.prototype.values
   - ArrayBuffer
+  - Atomics
+  - Atomics.waitAsync
   - BigInt
   - DataView
   - DataView.prototype.getFloat32
@@ -39,6 +41,7 @@ supportedFeatures:
   - String.prototype.trimEnd
   - String.prototype.trimStart
   - Set
+  - SharedArrayBuffer
   - align-detached-buffer-semantics-with-web-reality
   - array-find-from-last
   - array-grouping
@@ -9014,7 +9017,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/constructor.js
     expectedClassification: pass
@@ -9047,10 +9050,10 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/detached-buffer.js
     expectedClassification: pass
@@ -9083,7 +9086,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resizable/detached-buffer.js
     expectedClassification: pass
@@ -9113,7 +9116,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resizable/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resize/coerced-new-length-detach.js
     expectedClassification: pass
@@ -9176,7 +9179,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resize/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/slice/context-is-not-arraybuffer-object.js
     expectedClassification: pass
@@ -9266,7 +9269,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/slice/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/slice/tointeger-conversion-end.js
     expectedClassification: pass
@@ -9341,7 +9344,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/transfer/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/descriptor.js
     expectedClassification: pass
@@ -9410,7 +9413,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/transferToFixedLength/this-is-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/return-abrupt-from-length-symbol.js
     expectedClassification: pass
@@ -9883,6 +9886,1131 @@ tests:
   - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncIterator/return-val.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/Atomics/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/add/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/and/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/validate-arraytype-before-expectedValue-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/compareExchange/validate-arraytype-before-replacementValue-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/exchange/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/bigint/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/corner-cases.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/isLockFree/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/load/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/non-bigint64-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/non-shared-bufferdata-count-evaluation-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/non-shared-bufferdata-index-evaluation-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/non-shared-bufferdata-non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/non-shared-bufferdata-returns-0.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/notify-all-on-loc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/bigint/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-boundary-cases.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-defaults-to-infinity-missing.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-defaults-to-infinity-undefined.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-from-nans.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-symbol-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/count-tointeger-throws-then-wake-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/negative-count.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/negative-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-int32-typedarray-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-shared-bufferdata-count-evaluation-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-shared-bufferdata-index-evaluation-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-shared-bufferdata-non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-shared-bufferdata-returns-0.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-shared-int-views.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/not-a-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/not-an-object-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-all-on-loc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-all.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-in-order-one-time.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-in-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-nan.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-one.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-renotify-noop.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-two.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-with-no-agents-waiting.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-with-no-matching-agents-waiting.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/notify-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/out-of-range-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/retrieve-length-before-index-coercion-non-shared-detached.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/retrieve-length-before-index-coercion-non-shared-resize-to-zero.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/retrieve-length-before-index-coercion-non-shared.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/retrieve-length-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/symbol-for-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/undefined-index-defaults-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/validate-arraytype-before-count-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/notify/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/or/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/prop-desc.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/proto.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/expected-return-value-negative-zero.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/store/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/sub/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/cannot-suspend-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/false-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/false-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/nan-for-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/negative-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/negative-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/negative-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-no-operation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-add.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-and.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-compareExchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-exchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-or.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-store.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-sub.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-xor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/non-bigint64-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/non-shared-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/out-of-range-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/value-not-equal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/waiterlist-block-indexedposition-wake.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/waiterlist-order-of-operations-is-fifo.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/bigint/was-woken-before-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/cannot-suspend-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/false-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/false-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/nan-for-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/negative-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/negative-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/negative-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-no-operation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-add.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-and.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-compareExchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-exchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-or.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-store.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-sub.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-xor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/non-int32-typedarray-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/non-shared-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/not-a-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/not-an-object-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/null-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/null-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/object-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/object-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/out-of-range-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/poisoned-object-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/poisoned-object-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/retrieve-length-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-index-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-value-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/symbol-for-value-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/true-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/true-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/undefined-for-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/undefined-index-defaults-to-zero.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/validate-arraytype-before-timeout-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/value-not-equal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/wait-index-value-not-equal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/waiterlist-block-indexedposition-wake.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/waiterlist-order-of-operations-is-fifo.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/wait/was-woken-before-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/false-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/false-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/nan-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/negative-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/negative-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/negative-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-no-operation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-add.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-and.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-compareExchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-exchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-or.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-store.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-sub.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-xor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/non-shared-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/not-a-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/not-an-object-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/null-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/null-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/object-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/object-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/out-of-range-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/poisoned-object-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/poisoned-object-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-index-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-value-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-value-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/true-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/true-for-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/undefined-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/undefined-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/undefined-index-defaults-to-zero-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/value-not-equal-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/value-not-equal.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/waiterlist-block-indexedposition-wake.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/bigint/was-woken-before-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/false-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/false-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/implicit-infinity-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/is-function.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/nan-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/negative-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/negative-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/negative-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-no-operation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-add.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-and.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-compareExchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-exchange.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-or.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-store.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-sub.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-xor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/non-int32-typedarray-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/non-shared-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/not-a-typedarray-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/not-an-object-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/null-bufferdata-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/null-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/null-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/object-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/object-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/out-of-range-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/poisoned-object-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/poisoned-object-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/retrieve-length-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-promise-resolves-to-ok.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-promise-resolves-to-timed-out.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-string-not-equal.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-string-timed-out.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-index-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-index-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-timeout-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-timeout-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-value-throws-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/symbol-for-value-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/true-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/true-for-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/undefined-for-timeout-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/undefined-for-timeout.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/undefined-index-defaults-to-zero-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/validate-arraytype-before-timeout-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/value-not-equal-agent.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/value-not-equal.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/waiterlist-block-indexedposition-wake.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/waitAsync/was-woken-before-timeout.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/bigint/bad-range.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/bigint/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/bigint/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/expected-return-value.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/good-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/non-shared-bufferdata.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/non-shared-int-views-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/non-views.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/validate-arraytype-before-index-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/xor/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
   - path: test/built-ins/BigInt/asIntN/arithmetic.js
     expectedClassification: pass
     dependencies: [bigint-primitive]
@@ -10115,7 +11243,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-properties]
   - path: test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws.js
     expectedClassification: unsupported-profile-feature
@@ -10124,7 +11252,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/buffer-reference-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/buffer-reference.js
     expectedClassification: pass
@@ -10133,7 +11261,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/byteoffset-is-negative-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/byteoffset-is-negative-throws.js
     expectedClassification: pass
@@ -10157,19 +11285,19 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-access-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-access-throws.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-if-not-object-fallbacks-to-default-prototype-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-if-not-object-fallbacks-to-default-prototype.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-if-object-is-used-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/custom-proto-if-object-is-used.js
     expectedClassification: pass
@@ -10178,16 +11306,16 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/defined-bytelength-and-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/defined-bytelength-and-byteoffset.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/defined-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/defined-byteoffset-undefined-bytelength-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/defined-byteoffset-undefined-bytelength.js
     expectedClassification: pass
@@ -10199,13 +11327,13 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/excessive-bytelength-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/excessive-bytelength-throws.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/excessive-byteoffset-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/excessive-byteoffset-throws.js
     expectedClassification: pass
@@ -10214,7 +11342,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/instance-extensibility-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/instance-extensibility.js
     expectedClassification: pass
@@ -10229,19 +11357,19 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/negative-bytelength-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/negative-bytelength-throws.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/negative-byteoffset-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/negative-byteoffset-throws.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/newtarget-undefined-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/newtarget-undefined-throws.js
     expectedClassification: pass
@@ -10280,13 +11408,13 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/return-buffer-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/return-buffer.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal.js
     expectedClassification: unsupported-profile-feature
@@ -10322,13 +11450,13 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/return-bytelength-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/return-bytelength.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal.js
     expectedClassification: unsupported-profile-feature
@@ -10361,13 +11489,13 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/return-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/return-byteoffset.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal.js
     expectedClassification: unsupported-profile-feature
@@ -10758,7 +11886,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/index-is-out-of-range-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/index-is-out-of-range.js
     expectedClassification: pass
@@ -10770,7 +11898,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/negative-byteoffset-throws-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/negative-byteoffset-throws.js
     expectedClassification: pass
@@ -10782,10 +11910,10 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-abrupt-from-tonumber-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-abrupt-from-tonumber-byteoffset-symbol-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getInt32/return-abrupt-from-tonumber-byteoffset-symbol.js
     expectedClassification: pass
@@ -10794,25 +11922,25 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-value-clean-arraybuffer-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-value-clean-arraybuffer.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-values-custom-offset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-values-custom-offset.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-values-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/return-values.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal.js
     expectedClassification: unsupported-profile-feature
@@ -10821,13 +11949,13 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getInt32/to-boolean-littleendian-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getInt32/to-boolean-littleendian.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getInt32/toindex-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/toindex-byteoffset.js
     expectedClassification: pass
@@ -11727,10 +12855,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-abrupt-tonumber-bytelength-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-abrupt-tonumber-bytelength-symbol-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/return-abrupt-tonumber-bytelength-symbol.js
     expectedClassification: pass
@@ -11739,10 +12867,10 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-abrupt-tonumber-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-abrupt-tonumber-byteoffset-symbol-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/return-abrupt-tonumber-byteoffset-symbol.js
     expectedClassification: pass
@@ -11751,19 +12879,19 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-instance-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-instance.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/toindex-bytelength-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/toindex-bytelength.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/toindex-byteoffset-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/toindex-byteoffset.js
     expectedClassification: pass
@@ -28869,7 +29997,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties, set-intrinsic]
   - path: test/built-ins/Object/seal/seal-sharedarraybuffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-string.js
     expectedClassification: pass
@@ -38183,6 +39311,318 @@ tests:
   - path: test/built-ins/SetIteratorPrototype/next/this-not-object-throw-values.js
     expectedClassification: pass
     dependencies: [set-intrinsic]
+  - path: test/built-ins/SharedArrayBuffer/allocation-limit.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/data-allocation-after-object-creation.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/init-zero.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/length-is-absent.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/length-is-too-large-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/negative-length-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/newtarget-prototype-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-allocation-limit.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-compared-before-object-creation.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-data-allocation-after-object-creation.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-diminuitive.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-excessive.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-negative.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-poisoned.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-maxbytelength-undefined.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/options-non-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype-from-newtarget.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/prop-desc.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/return-bytelength.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-is-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/extensible.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/grow-larger-size.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/grow-same-size.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/grow-smaller-size.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/new-length-excessive.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/new-length-negative.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/new-length-non-number.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/nonconstructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/this-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/this-is-not-resizable-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/grow/this-is-sharedarraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/prop-desc.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/return-growable.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/this-has-no-arraybufferdata-internal.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/this-is-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/growable/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/invoked-as-accessor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/prop-desc.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/return-maxbytelength-growable.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/return-maxbytelength-non-growable.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/this-has-no-arraybufferdata-internal.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/this-is-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/maxByteLength/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/context-is-not-arraybuffer-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/context-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/end-default-if-absent.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/end-default-if-undefined.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/end-exceeds-length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/extensible.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/negative-end.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/negative-start.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/nonconstructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/number-conversion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-constructor-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-constructor-is-undefined.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-is-not-constructor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-is-not-object.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-is-null.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-is-undefined.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-returns-larger-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-returns-not-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-returns-same-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species-returns-smaller-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/species.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/start-default-if-absent.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/start-default-if-undefined.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/start-exceeds-end.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/start-exceeds-length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/this-is-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/tointeger-conversion-end.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/prototype/slice/tointeger-conversion-start.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/return-abrupt-from-length-symbol.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/return-abrupt-from-length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/toindex-length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/SharedArrayBuffer/zero-length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
   - path: test/built-ins/String/15.5.5.5.2-1-1.js
     expectedClassification: pass
     dependencies: [object-properties]
