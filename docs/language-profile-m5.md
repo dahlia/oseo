@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 126
+M5a is complete. The normative family records described below inventory 127
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 19,770 reviewed cases: 16,144 passes, 1,556
-expected negatives, and 2,070 unsupported profile features. It records no
+The current manifest contains 20,168 reviewed cases: 16,519 passes, 1,556
+expected negatives, and 2,093 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6679,7 +6679,7 @@ function object, recorded when `%Array.prototype%` materializes. This node
 also materializes the `%TypedArray%[Symbol.species]` getter, because
 `subarray` cannot construct its default result without that lookup; the
 `typed-array-statics` node reuses it and still owns `from` and `of`. The
-iterative, mutation, search and join, and sorting prototype methods keep their
+mutation, search and join, and sorting prototype methods keep their
 explicit lookup boundaries, and so does own-key reflection over
 `%TypedArray.prototype%`, whose key list completes only after those nodes
 land.
@@ -6725,6 +6725,66 @@ evidence inventory reaches 124 families. The runtime ABI moves to
 IDs and the public intrinsic table gains one slot for the shared
 `Array.prototype.toString` identity, while the value representation and the
 generated-code entry points are unchanged.
+
+
+TypedArray iteration methods
+----------------------------
+
+M5b node `typed-array-iterative` adds `every`, `some`, `forEach`, `map`,
+`filter`, `reduce`, and `reduceRight` to `%TypedArray.prototype%`. Each is an
+ordinary non-constructible method of length one with the standard writable,
+non-enumerable, configurable descriptor. Each begins with ValidateTypedArray,
+so a receiver without a `[[TypedArrayName]]` slot, or one whose buffer is
+detached or too short for its view, throws a `TypeError` before the callback
+is inspected. The callable check follows the length snapshot, and the element
+length itself is read once at the start and never re-read, so a resize during
+a callback does not extend the traversal.
+
+A typed array has no holes, so the seven methods read every index below the
+snapshot through TypedArrayGetElement instead of testing HasProperty. A
+detach or shrink that a callback performs makes a later index invalid, and
+TypedArrayGetElement then reports `undefined` for that step rather than
+reading outside the Data Block; the callback still runs once per snapshot
+index. `every` stops at its first false result, `some` at its first true one,
+and `forEach` returns `undefined`.
+
+`map` performs TypedArraySpeciesCreate before the first callback and stores
+each mapped value with TypedArraySetElement, so the observable `constructor`
+and `Symbol.species` lookups and the species construction all precede user
+code, and a species result that is shorter than the snapshot throws the
+specified `TypeError`. `filter` instead collects the selected values first and
+only then performs TypedArraySpeciesCreate with the captured count, so its
+species constructor observes the final number of matches. Both check that the
+species result is a TypedArray of the same content type. `reduce` and
+`reduceRight` traverse the same snapshot in opposite directions without hole
+skipping; with no initial value the first element in that direction seeds the
+accumulator and no callback runs for it, an empty view with no initial value
+throws a `TypeError`, and each callback receives the accumulator, element,
+index, and receiver.
+
+Fixed native and generated differential evidence at property seed
+`0x60007400` covers the seven methods over Number and BigInt element kinds,
+default, null, and subclass species, present and absent reduction initial
+values, and no mutation, detach, and shrink during the first callback.
+Node.js, Deno, and both native specialization policies agree with collection
+forced at every safepoint, a false numeric hint deliberately misses its guard
+and reaches the compiled generic fallback, and an independent model computes
+every callback, element, accumulator, and result observation. The fixed
+fixture also pins method metadata, argument and receiver identity, the
+callback's `this`, species construction order, content-type and result-shape
+errors, non-typed-array and detached receivers, non-callable callbacks, empty
+reductions, and species reads that throw.
+
+The reviewed feature list already carries `TypedArray`, so no new feature tag
+is needed. All 398 paths under the node's seven inventory roots enter the
+reviewed subset: 375 pass and twenty-three keep the unreviewed
+*resizableArrayBufferUtils.js* include as an explicit prerequisite. No path
+outside the roots changes classification. The manifest moves from 19,770 to
+20,168 cases and from 16,144 to 16,519 passes while keeping 1,556 expected
+negatives and moving from 2,070 to 2,093 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property inventory reaches
+149 domains and seeds with a 5,707-case ordinary budget, the evidence
+inventory reaches 127 families, and the runtime ABI moves to `m5-112`.
 
 
 Set composition methods

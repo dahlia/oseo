@@ -43574,6 +43574,516 @@ tests:
   - path: test/built-ins/TypedArray/prototype/entries/this-is-not-typedarray-instance.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/returns-false-if-any-cb-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/returns-true-if-every-cb-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/returns-false-if-any-cb-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/returns-true-if-every-cb-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/every/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-called-before-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-called-before-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-no-iteration-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/result-does-not-share-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/result-empty-callbackfn-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/result-full-callbackfn-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/BigInt/values-are-set.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-called-before-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-called-before-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-no-iteration-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/result-does-not-share-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/result-empty-callbackfn-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/result-full-callbackfn-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/filter/values-are-set.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/forEach/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/keys/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -43685,6 +44195,558 @@ tests:
   - path: test/built-ins/TypedArray/prototype/length/this-is-not-object.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-no-interaction-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-return-affects-returned-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-return-does-not-copy-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/return-new-typedarray-from-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/return-new-typedarray-from-positive-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-no-interaction-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-return-affects-returned-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-return-does-not-copy-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/return-new-typedarray-conversion-operation-consistent-nan.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/return-new-typedarray-conversion-operation.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/return-new-typedarray-from-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/return-new-typedarray-from-positive-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-resizable-buffer-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/speciesctor-resizable-buffer-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/map/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-arguments-custom-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-arguments-default-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-no-iteration-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/empty-instance-return-initialvalue.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/empty-instance-with-no-initialvalue-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/result-is-last-callbackfn-return.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/result-of-any-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/return-first-value-without-callbackfn.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-arguments-custom-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-arguments-default-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-no-iteration-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/empty-instance-return-initialvalue.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/empty-instance-with-no-initialvalue-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/result-is-last-callbackfn-return.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/result-of-any-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/return-first-value-without-callbackfn.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduce/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-arguments-custom-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-arguments-default-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-no-iteration-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/empty-instance-return-initialvalue.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/empty-instance-with-no-initialvalue-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/result-is-last-callbackfn-return.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/result-of-any-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/return-first-value-without-callbackfn.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-arguments-custom-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-arguments-default-accumulator.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-no-iteration-over-non-integer-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-set-value-during-iteration.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/empty-instance-return-initialvalue.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/empty-instance-with-no-initialvalue-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/result-is-last-callbackfn-return.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/result-of-any-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/return-first-value-without-callbackfn.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/reduceRight/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [typed-array-core]
@@ -44015,6 +45077,138 @@ tests:
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-targetbuffer-detached-during-tointeger-offset-throws.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/returns-false-if-every-cb-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/returns-true-if-any-cb-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/BigInt/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-arguments-with-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-arguments-without-thisarg.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-detachbuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-no-interaction-over-non-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-not-called-on-empty.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-return-does-not-change-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-set-value-during-interaction.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/callbackfn-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/returns-false-if-every-cb-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/returns-true-if-any-cb-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/some/values-are-not-cached.js
+    expectedClassification: pass
+    dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/subarray/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -45488,7 +46682,6 @@ tests:
   - path: test/language/arguments-object/10.5-1gs.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
-
   - path: test/language/arguments-object/10.5-7-b-2-s.js
     expectedClassification: pass
     dependencies: [functions, object-properties]

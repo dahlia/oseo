@@ -213,8 +213,9 @@ Ownership follows the plan's target layout:
     constructor and prototype pairs, construction from lengths, buffers,
     iterables, array-like objects, and typed arrays, element conversion,
     the backing-buffer view record, the integer-indexed element operations
-    the generic property components delegate to, and the core prototype
-    accessors and methods;
+    the generic property components delegate to, the core prototype
+    accessors and methods, and the every, some, forEach, map, filter,
+    reduce, and reduceRight iteration methods;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -1479,6 +1480,29 @@ Four public intrinsic slots hold `%SharedArrayBuffer.prototype%`,
 `%SharedArrayBuffer%`, its species marker, and `%Atomics%`. The component
 moves `abiVersion` to `m5-111`; the value representation and the
 generated-code entry points are unchanged.
+
+### TypedArray iterative methods evidence
+
+M5b node `typed-array-iterative` adds the seven iteration methods to
+*runtime\_typed\_array.c* without changing the view record or the component's
+helper surface. Each method validates the receiver, snapshots the view length,
+checks the callback, and reads every snapshot index through the existing
+integer-indexed element getter, so a callback that detaches or shrinks the
+buffer only makes later reads `undefined`. `map` reuses the component's
+`typed_array_species_create` before its first callback, `filter` collects its
+selected values and then species-creates with the captured count, and the
+reduction pair walks the snapshot in either direction with the empty-view
+rule. The seven methods take seven code IDs from the TypedArray range and add
+no helper, intrinsic slot, heap kind, component, or generated-code entry
+point; the component moves `abiVersion` to `m5-112`.
+
+Fixed and generated native differential evidence at seed `0x60007400` covers
+the seven methods over Number and BigInt kinds, default, null, and subclass
+species, present and absent reduction initial values, and detach and shrink
+during the first callback, under both specialization policies with collection
+forced at every safepoint, a deliberate false-hint guard miss, and an
+independent model of every callback and result. The node reviews all 398
+paths under its seven inventory roots.
 
 ### Function prototype evidence
 

@@ -1855,6 +1855,383 @@ static OseoResult typed_array_iterator_method(
     return oseo_internal_array_iterator_create(context, receiver, kind);
 }
 
+/*
+ * TypedArrayGetElement for an iteration length snapshotted before any
+ * callback runs. A detach or shrink invalidates the stored index, and the
+ * shared integer-indexed getter then reports undefined instead of reading
+ * outside the Data Block.
+ */
+static OseoResult typed_array_iteration_element(
+    OseoContext *context,
+    OseoValue view,
+    size_t index
+) {
+    bool present = false;
+    return oseo_internal_typed_array_get_index(context, view, index, &present);
+}
+
+/*
+ * every, some, and forEach share ValidateTypedArray and one element loop.
+ * Each index is present by construction, so the callback always runs once
+ * per snapshot index and no hole check is needed.
+ */
+static OseoResult typed_array_iteration(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    OseoValue slots[7] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 7u};
+    oseo_roots_push(context, &frame);
+    slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    slots[2] = typed_array_argument(argument_count, arguments, 1u);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray callback is not callable."
+        );
+    }
+    bool decided = false;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        result = typed_array_iteration_element(
+            context,
+            slots[0],
+            index
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[3] = result.value;
+        slots[4] = oseo_number((double)index);
+        slots[5] = slots[0];
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[2],
+            3u,
+            &slots[3],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (code_id == OSEO_TYPED_ARRAY_EVERY_CODE_ID &&
+            !oseo_to_boolean(result.value)) {
+            result = normal(oseo_boolean(false));
+            decided = true;
+            break;
+        }
+        if (code_id == OSEO_TYPED_ARRAY_SOME_CODE_ID &&
+            oseo_to_boolean(result.value)) {
+            result = normal(oseo_boolean(true));
+            decided = true;
+            break;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !decided) {
+        if (code_id == OSEO_TYPED_ARRAY_EVERY_CODE_ID) {
+            result = normal(oseo_boolean(true));
+        } else if (code_id == OSEO_TYPED_ARRAY_SOME_CODE_ID) {
+            result = normal(oseo_boolean(false));
+        } else {
+            result = normal(oseo_undefined());
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * map allocates its result through TypedArraySpeciesCreate before the
+ * first callback and stores each mapped value with TypedArraySetElement,
+ * so a detach during a callback leaves the corresponding index unwritten
+ * rather than throwing.
+ */
+static OseoResult typed_array_map(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[7] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 7u};
+    oseo_roots_push(context, &frame);
+    slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    slots[2] = typed_array_argument(argument_count, arguments, 1u);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray callback is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[3] = oseo_number((double)length);
+        result = typed_array_species_create(
+            context,
+            slots[0],
+            1u,
+            &slots[3]
+        );
+        slots[3] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        result = typed_array_iteration_element(
+            context,
+            slots[0],
+            index
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[4] = result.value;
+        slots[5] = oseo_number((double)index);
+        slots[6] = slots[0];
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[2],
+            3u,
+            &slots[4],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        bool present = false;
+        result = oseo_internal_typed_array_set_index(
+            context,
+            slots[3],
+            index,
+            result.value,
+            &present
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[3];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * filter collects every selected element into an argument list before
+ * TypedArraySpeciesCreate runs, because the species constructor is
+ * observable and must not learn the captured count until every callback
+ * has finished.
+ */
+static OseoResult typed_array_filter(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[7] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 7u};
+    oseo_roots_push(context, &frame);
+    slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    slots[2] = typed_array_argument(argument_count, arguments, 1u);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray callback is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+        slots[3] = result.value;
+    }
+    size_t captured = 0u;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        result = typed_array_iteration_element(
+            context,
+            slots[0],
+            index
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[4] = result.value;
+        slots[5] = oseo_number((double)index);
+        slots[6] = slots[0];
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[2],
+            3u,
+            &slots[4],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (oseo_to_boolean(result.value)) {
+            result = oseo_argument_list_append(
+                context,
+                slots[3],
+                slots[4]
+            );
+            captured += 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[4] = oseo_number((double)captured);
+        result = typed_array_species_create(
+            context,
+            slots[0],
+            1u,
+            &slots[4]
+        );
+        slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        size_t count = 0u;
+        const OseoValue *values = NULL;
+        result = oseo_argument_list_view(context, slots[3], &count, &values);
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < count;
+             index += 1u) {
+            bool present = false;
+            result = oseo_internal_typed_array_set_index(
+                context,
+                slots[4],
+                index,
+                values[index],
+                &present
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[4];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * reduce and reduceRight. A typed array has no holes, so the traversal
+ * reads every index and a missing accumulator takes the first element in
+ * the chosen direction. The receiver, callback, accumulator, and current
+ * element stay rooted across user code and forced collection.
+ */
+static OseoResult typed_array_reduction(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool from_right
+) {
+    OseoValue slots[8] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 8u};
+    oseo_roots_push(context, &frame);
+    slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray callback is not callable."
+        );
+    }
+    bool has_accumulator = argument_count >= 2u;
+    if (result.status == OSEO_STATUS_NORMAL && has_accumulator) {
+        slots[2] = arguments[1];
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        length == 0u &&
+        !has_accumulator) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Reduce of an empty TypedArray needs an initial value."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !has_accumulator) {
+        result = typed_array_iteration_element(
+            context,
+            slots[0],
+            from_right ? length - 1u : 0u
+        );
+        slots[2] = result.value;
+    }
+    double cursor = has_accumulator
+        ? (from_right ? (double)length - 1.0 : 0.0)
+        : (from_right ? (double)length - 2.0 : 1.0);
+    while (result.status == OSEO_STATUS_NORMAL &&
+           (from_right ? cursor >= 0.0 : cursor < (double)length)) {
+        result = typed_array_iteration_element(
+            context,
+            slots[0],
+            (size_t)cursor
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[3] = slots[2];
+        slots[4] = result.value;
+        slots[5] = oseo_number(cursor);
+        slots[6] = slots[0];
+        result = oseo_call_function(
+            context,
+            slots[1],
+            oseo_undefined(),
+            4u,
+            &slots[3],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[2] = result.value;
+        cursor += from_right ? -1.0 : 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[2]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1891,6 +2268,38 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
         code_id == OSEO_TYPED_ARRAY_KEYS_CODE_ID ||
         code_id == OSEO_TYPED_ARRAY_VALUES_CODE_ID) {
         return typed_array_iterator_method(context, code_id, receiver);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_EVERY_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FOR_EACH_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_SOME_CODE_ID) {
+        return typed_array_iteration(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_MAP_CODE_ID) {
+        return typed_array_map(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_FILTER_CODE_ID) {
+        return typed_array_filter(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_REDUCE_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_REDUCE_RIGHT_CODE_ID) {
+        return typed_array_reduction(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_TYPED_ARRAY_REDUCE_RIGHT_CODE_ID
+        );
     }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
         return oseo_internal_throw_error(
@@ -2096,6 +2505,50 @@ static OseoResult typed_array_install_core(
             slots[2],
             method
         );
+    }
+    /*
+     * The iterative methods are a second loop so the first loop's final
+     * `values` function stays the one installed under Symbol.iterator.
+     */
+    static const size_t iterative_codes[] = {
+        OSEO_TYPED_ARRAY_EVERY_CODE_ID,
+        OSEO_TYPED_ARRAY_FILTER_CODE_ID,
+        OSEO_TYPED_ARRAY_FOR_EACH_CODE_ID,
+        OSEO_TYPED_ARRAY_MAP_CODE_ID,
+        OSEO_TYPED_ARRAY_REDUCE_CODE_ID,
+        OSEO_TYPED_ARRAY_REDUCE_RIGHT_CODE_ID,
+        OSEO_TYPED_ARRAY_SOME_CODE_ID,
+    };
+    static const char *const iterative_names[] = {
+        "every",
+        "filter",
+        "forEach",
+        "map",
+        "reduce",
+        "reduceRight",
+        "some",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 7u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            iterative_codes[index],
+            iterative_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[0],
+                iterative_names[index],
+                slots[2],
+                method
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_intrinsic(
@@ -2338,19 +2791,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
     if (object !=
         context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
         return NULL;
-    }
-    static const char *const iterative[] = {
-        "every",
-        "filter",
-        "forEach",
-        "map",
-        "reduce",
-        "reduceRight",
-        "some",
-    };
-    if (typed_array_key_matches(
-            key, iterative, sizeof(iterative) / sizeof(*iterative))) {
-        return "TypedArray iterative methods are not admitted yet.";
     }
     static const char *const mutation[] = {
         "copyWithin",
