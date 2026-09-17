@@ -89,6 +89,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_array_buffer.c"],
       ["source", "runtime_set.c"],
       ["source", "runtime_typed_array.c"],
+      ["source", "runtime_weak_collection.c"],
       ["source", "runtime_arguments.c"],
       ["source", "runtime_enumeration.c"],
       ["source", "runtime_function.c"],

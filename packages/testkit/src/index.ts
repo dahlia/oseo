@@ -128,6 +128,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "typed-array-core",
   "typed-array-iterative",
   "var-bindings",
+  "weak-collections",
 ]);
 
 /** Frontmatter and suite identity needed to reproduce one reviewed case. */

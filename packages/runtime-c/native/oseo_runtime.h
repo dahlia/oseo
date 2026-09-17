@@ -355,7 +355,25 @@ typedef enum {
     OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240,
     OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241,
     OSEO_INTRINSIC_ATOMICS = 242,
-    OSEO_INTRINSIC_COUNT = 243,
+    OSEO_INTRINSIC_WEAK_MAP_PROTOTYPE = 243,
+    OSEO_INTRINSIC_WEAK_MAP = 244,
+    OSEO_INTRINSIC_WEAK_MAP_DELETE = 245,
+    OSEO_INTRINSIC_WEAK_MAP_GET = 246,
+    OSEO_INTRINSIC_WEAK_MAP_HAS = 247,
+    OSEO_INTRINSIC_WEAK_MAP_SET = 248,
+    OSEO_INTRINSIC_WEAK_SET_PROTOTYPE = 249,
+    OSEO_INTRINSIC_WEAK_SET = 250,
+    OSEO_INTRINSIC_WEAK_SET_ADD = 251,
+    OSEO_INTRINSIC_WEAK_SET_DELETE = 252,
+    OSEO_INTRINSIC_WEAK_SET_HAS = 253,
+    OSEO_INTRINSIC_WEAK_REF_PROTOTYPE = 254,
+    OSEO_INTRINSIC_WEAK_REF = 255,
+    OSEO_INTRINSIC_WEAK_REF_DEREF = 256,
+    OSEO_INTRINSIC_FINALIZATION_REGISTRY_PROTOTYPE = 257,
+    OSEO_INTRINSIC_FINALIZATION_REGISTRY = 258,
+    OSEO_INTRINSIC_FINALIZATION_REGISTRY_REGISTER = 259,
+    OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260,
+    OSEO_INTRINSIC_COUNT = 261,
 } OseoIntrinsic;
 
 typedef struct {
@@ -520,6 +538,14 @@ struct OseoContext {
     OseoValue finalization_tail;
     uint64_t next_finalization_order;
     size_t finalization_pending_count;
+    /*
+     * The current job's KeptAlive set. The private open-addressed layout
+     * stays behind this public generated-code boundary; every occupied
+     * slot is a strong root until the event loop clears it.
+     */
+    void *kept_objects;
+    size_t kept_object_count;
+    size_t kept_object_capacity;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;

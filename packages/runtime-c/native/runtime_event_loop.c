@@ -214,12 +214,21 @@ static OseoResult wait_for_due_timer(OseoContext *context) {
     return normal(oseo_undefined());
 }
 
+/*
+ * Runs the earliest due timer as a job of its own. The preceding job's
+ * KeptAlive set ends before the callback. The outer event loop has already
+ * cleared it in its finalization checkpoint, but an internal await drives
+ * this turn directly, and its timer callback must not observe a target
+ * kept alive only by the WeakRef construction or deref of the job that
+ * awaited.
+ */
 static OseoResult run_timer_turn(
     OseoContext *context,
     OseoValue awaited_promise
 ) {
     OseoResult result = wait_for_due_timer(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    oseo_internal_clear_kept_objects(context);
     OseoRootFrame frame = {NULL, NULL, 0u};
     result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -296,11 +305,19 @@ static OseoResult run_timer_turn(
     return result;
 }
 
+static OseoResult run_finalization_turns(
+    OseoContext *context,
+    OseoValue awaited_promise
+);
+
 /*
  * An internal compatibility checkpoint for iterator adapter operations that
  * do not yet own a traced frame. Module top-level await and `for await` never
- * use this path. A body that can make no further progress reports a host
- * diagnostic naming the stalled operation.
+ * use this path. While the awaited promise stays pending, each timer turn it
+ * drives follows the finalization cleanup checkpoint, exactly as in the outer
+ * event loop, so cleanup jobs a collection queued run before the next timer.
+ * A body that can make no further progress reports a host diagnostic naming
+ * the stalled operation.
  */
 static OseoResult await_settled_value(
     OseoContext *context,
@@ -334,6 +351,11 @@ static OseoResult await_settled_value(
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            promise_object(frame.slots[1])->state == OSEO_PROMISE_PENDING) {
+        result = run_finalization_turns(context, frame.slots[1]);
+        if (result.status != OSEO_STATUS_NORMAL ||
+            promise_object(frame.slots[1])->state != OSEO_PROMISE_PENDING) {
+            break;
+        }
         if (tag_of(context->timer_head) == OSEO_TAG_UNDEFINED) {
             result = failure(context, "OSEO3001", stall_message);
             break;
@@ -401,6 +423,72 @@ OseoResult oseo_entry_task_checkpoint(
     return result;
 }
 
+/*
+ * The finalization cleanup checkpoint. It first ends the current job's
+ * KeptAlive set, then runs one cleanup job per registry with queued
+ * records, ordered by each registry's oldest record. A job calls the
+ * callback for all of its registry's records before promise jobs drain,
+ * exactly as a timer turn drains them after its callback. An abrupt
+ * callback ends the loop with that completion. Under an internal await,
+ * `awaited_promise` bounds each drain as it bounds a timer turn's, and no
+ * further cleanup job starts once that promise has settled; the outer event
+ * loop passes `undefined`.
+ */
+static OseoResult run_finalization_turns(
+    OseoContext *context,
+    OseoValue awaited_promise
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    oseo_internal_clear_kept_objects(context);
+    while (result.status == OSEO_STATUS_NORMAL &&
+           !oseo_internal_jobs_reached_promise(awaited_promise)) {
+        bool ran = false;
+        result = oseo_internal_finalization_cleanup_job(context, &ran);
+        if (!ran) break;
+        OseoResult callback_result = result;
+        const char *callback_error_code = context->error_code;
+        const char *callback_error_message = context->error_message;
+        const char *callback_source_id = context->source_id;
+        size_t callback_source_id_length = context->source_id_length;
+        size_t callback_line = context->line;
+        size_t callback_column = context->column;
+        bool callback_threw = result.status == OSEO_STATUS_THROW &&
+            !context->has_diagnostic;
+        if (callback_threw) {
+            frame.slots[0] = result.value;
+            result = normal(oseo_undefined());
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_jobs_drain_until(context, awaited_promise);
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !oseo_internal_jobs_reached_promise(awaited_promise)) {
+            result = oseo_rejection_checkpoint(context);
+        }
+        oseo_internal_clear_kept_objects(context);
+        if (callback_threw &&
+            (result.status == OSEO_STATUS_NORMAL ||
+             !context->has_diagnostic)) {
+            context->error_code = callback_error_code;
+            context->error_message = callback_error_message;
+            context->has_diagnostic = false;
+            context->source_id = callback_source_id;
+            context->source_id_length = callback_source_id_length;
+            context->line = callback_line;
+            context->column = callback_column;
+            callback_result.value = frame.slots[0];
+            result = callback_result;
+        }
+        frame.slots[0] = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_undefined())
+        : result;
+}
+
 static OseoResult entry_promise_completion(
     OseoContext *context,
     OseoValue entry_promise
@@ -437,11 +525,17 @@ OseoResult oseo_event_loop_run(
         result = oseo_rejection_checkpoint(context);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = run_finalization_turns(context, oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = entry_promise_completion(context, frame.slots[0]);
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
         result = run_timer_turn(context, oseo_undefined());
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = run_finalization_turns(context, oseo_undefined());
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = entry_promise_completion(context, frame.slots[0]);
         }

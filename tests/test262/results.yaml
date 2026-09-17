@@ -3881,6 +3881,132 @@ partitions:
   - group: built-ins/Error
     key: f2
     path: results/built-ins/Error/f2.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "04"
+    path: results/built-ins/FinalizationRegistry/04.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "09"
+    path: results/built-ins/FinalizationRegistry/09.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "12"
+    path: results/built-ins/FinalizationRegistry/12.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 1a
+    path: results/built-ins/FinalizationRegistry/1a.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 1c
+    path: results/built-ins/FinalizationRegistry/1c.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "20"
+    path: results/built-ins/FinalizationRegistry/20.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "24"
+    path: results/built-ins/FinalizationRegistry/24.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "29"
+    path: results/built-ins/FinalizationRegistry/29.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 2c
+    path: results/built-ins/FinalizationRegistry/2c.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "33"
+    path: results/built-ins/FinalizationRegistry/33.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "34"
+    path: results/built-ins/FinalizationRegistry/34.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "39"
+    path: results/built-ins/FinalizationRegistry/39.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 3c
+    path: results/built-ins/FinalizationRegistry/3c.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "41"
+    path: results/built-ins/FinalizationRegistry/41.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "45"
+    path: results/built-ins/FinalizationRegistry/45.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "46"
+    path: results/built-ins/FinalizationRegistry/46.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "47"
+    path: results/built-ins/FinalizationRegistry/47.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 4c
+    path: results/built-ins/FinalizationRegistry/4c.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 4d
+    path: results/built-ins/FinalizationRegistry/4d.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "50"
+    path: results/built-ins/FinalizationRegistry/50.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "52"
+    path: results/built-ins/FinalizationRegistry/52.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "61"
+    path: results/built-ins/FinalizationRegistry/61.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "70"
+    path: results/built-ins/FinalizationRegistry/70.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "73"
+    path: results/built-ins/FinalizationRegistry/73.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "78"
+    path: results/built-ins/FinalizationRegistry/78.yaml
+  - group: built-ins/FinalizationRegistry
+    key: "98"
+    path: results/built-ins/FinalizationRegistry/98.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 9b
+    path: results/built-ins/FinalizationRegistry/9b.yaml
+  - group: built-ins/FinalizationRegistry
+    key: 9f
+    path: results/built-ins/FinalizationRegistry/9f.yaml
+  - group: built-ins/FinalizationRegistry
+    key: a9
+    path: results/built-ins/FinalizationRegistry/a9.yaml
+  - group: built-ins/FinalizationRegistry
+    key: af
+    path: results/built-ins/FinalizationRegistry/af.yaml
+  - group: built-ins/FinalizationRegistry
+    key: b3
+    path: results/built-ins/FinalizationRegistry/b3.yaml
+  - group: built-ins/FinalizationRegistry
+    key: bc
+    path: results/built-ins/FinalizationRegistry/bc.yaml
+  - group: built-ins/FinalizationRegistry
+    key: c2
+    path: results/built-ins/FinalizationRegistry/c2.yaml
+  - group: built-ins/FinalizationRegistry
+    key: c8
+    path: results/built-ins/FinalizationRegistry/c8.yaml
+  - group: built-ins/FinalizationRegistry
+    key: d1
+    path: results/built-ins/FinalizationRegistry/d1.yaml
+  - group: built-ins/FinalizationRegistry
+    key: d2
+    path: results/built-ins/FinalizationRegistry/d2.yaml
+  - group: built-ins/FinalizationRegistry
+    key: d4
+    path: results/built-ins/FinalizationRegistry/d4.yaml
+  - group: built-ins/FinalizationRegistry
+    key: da
+    path: results/built-ins/FinalizationRegistry/da.yaml
+  - group: built-ins/FinalizationRegistry
+    key: e1
+    path: results/built-ins/FinalizationRegistry/e1.yaml
+  - group: built-ins/FinalizationRegistry
+    key: f6
+    path: results/built-ins/FinalizationRegistry/f6.yaml
+  - group: built-ins/FinalizationRegistry
+    key: f9
+    path: results/built-ins/FinalizationRegistry/f9.yaml
+  - group: built-ins/FinalizationRegistry
+    key: fd
+    path: results/built-ins/FinalizationRegistry/fd.yaml
   - group: built-ins/Function
     key: "00"
     path: results/built-ins/Function/00.yaml
@@ -12629,6 +12755,543 @@ partitions:
   - group: built-ins/TypedArrayConstructors
     key: fd
     path: results/built-ins/TypedArrayConstructors/fd.yaml
+  - group: built-ins/WeakMap
+    key: "00"
+    path: results/built-ins/WeakMap/00.yaml
+  - group: built-ins/WeakMap
+    key: "04"
+    path: results/built-ins/WeakMap/04.yaml
+  - group: built-ins/WeakMap
+    key: "05"
+    path: results/built-ins/WeakMap/05.yaml
+  - group: built-ins/WeakMap
+    key: "07"
+    path: results/built-ins/WeakMap/07.yaml
+  - group: built-ins/WeakMap
+    key: 0b
+    path: results/built-ins/WeakMap/0b.yaml
+  - group: built-ins/WeakMap
+    key: 0c
+    path: results/built-ins/WeakMap/0c.yaml
+  - group: built-ins/WeakMap
+    key: 0e
+    path: results/built-ins/WeakMap/0e.yaml
+  - group: built-ins/WeakMap
+    key: "14"
+    path: results/built-ins/WeakMap/14.yaml
+  - group: built-ins/WeakMap
+    key: "16"
+    path: results/built-ins/WeakMap/16.yaml
+  - group: built-ins/WeakMap
+    key: "17"
+    path: results/built-ins/WeakMap/17.yaml
+  - group: built-ins/WeakMap
+    key: "18"
+    path: results/built-ins/WeakMap/18.yaml
+  - group: built-ins/WeakMap
+    key: 1b
+    path: results/built-ins/WeakMap/1b.yaml
+  - group: built-ins/WeakMap
+    key: 1e
+    path: results/built-ins/WeakMap/1e.yaml
+  - group: built-ins/WeakMap
+    key: 1f
+    path: results/built-ins/WeakMap/1f.yaml
+  - group: built-ins/WeakMap
+    key: "26"
+    path: results/built-ins/WeakMap/26.yaml
+  - group: built-ins/WeakMap
+    key: "27"
+    path: results/built-ins/WeakMap/27.yaml
+  - group: built-ins/WeakMap
+    key: 2b
+    path: results/built-ins/WeakMap/2b.yaml
+  - group: built-ins/WeakMap
+    key: 2c
+    path: results/built-ins/WeakMap/2c.yaml
+  - group: built-ins/WeakMap
+    key: "30"
+    path: results/built-ins/WeakMap/30.yaml
+  - group: built-ins/WeakMap
+    key: "35"
+    path: results/built-ins/WeakMap/35.yaml
+  - group: built-ins/WeakMap
+    key: "39"
+    path: results/built-ins/WeakMap/39.yaml
+  - group: built-ins/WeakMap
+    key: 3c
+    path: results/built-ins/WeakMap/3c.yaml
+  - group: built-ins/WeakMap
+    key: "41"
+    path: results/built-ins/WeakMap/41.yaml
+  - group: built-ins/WeakMap
+    key: "43"
+    path: results/built-ins/WeakMap/43.yaml
+  - group: built-ins/WeakMap
+    key: "49"
+    path: results/built-ins/WeakMap/49.yaml
+  - group: built-ins/WeakMap
+    key: 4b
+    path: results/built-ins/WeakMap/4b.yaml
+  - group: built-ins/WeakMap
+    key: "51"
+    path: results/built-ins/WeakMap/51.yaml
+  - group: built-ins/WeakMap
+    key: "52"
+    path: results/built-ins/WeakMap/52.yaml
+  - group: built-ins/WeakMap
+    key: "56"
+    path: results/built-ins/WeakMap/56.yaml
+  - group: built-ins/WeakMap
+    key: "59"
+    path: results/built-ins/WeakMap/59.yaml
+  - group: built-ins/WeakMap
+    key: 5b
+    path: results/built-ins/WeakMap/5b.yaml
+  - group: built-ins/WeakMap
+    key: 5d
+    path: results/built-ins/WeakMap/5d.yaml
+  - group: built-ins/WeakMap
+    key: 5e
+    path: results/built-ins/WeakMap/5e.yaml
+  - group: built-ins/WeakMap
+    key: 5f
+    path: results/built-ins/WeakMap/5f.yaml
+  - group: built-ins/WeakMap
+    key: "61"
+    path: results/built-ins/WeakMap/61.yaml
+  - group: built-ins/WeakMap
+    key: "62"
+    path: results/built-ins/WeakMap/62.yaml
+  - group: built-ins/WeakMap
+    key: "63"
+    path: results/built-ins/WeakMap/63.yaml
+  - group: built-ins/WeakMap
+    key: "66"
+    path: results/built-ins/WeakMap/66.yaml
+  - group: built-ins/WeakMap
+    key: 6b
+    path: results/built-ins/WeakMap/6b.yaml
+  - group: built-ins/WeakMap
+    key: 6e
+    path: results/built-ins/WeakMap/6e.yaml
+  - group: built-ins/WeakMap
+    key: "70"
+    path: results/built-ins/WeakMap/70.yaml
+  - group: built-ins/WeakMap
+    key: "71"
+    path: results/built-ins/WeakMap/71.yaml
+  - group: built-ins/WeakMap
+    key: "75"
+    path: results/built-ins/WeakMap/75.yaml
+  - group: built-ins/WeakMap
+    key: 7f
+    path: results/built-ins/WeakMap/7f.yaml
+  - group: built-ins/WeakMap
+    key: "82"
+    path: results/built-ins/WeakMap/82.yaml
+  - group: built-ins/WeakMap
+    key: "85"
+    path: results/built-ins/WeakMap/85.yaml
+  - group: built-ins/WeakMap
+    key: "88"
+    path: results/built-ins/WeakMap/88.yaml
+  - group: built-ins/WeakMap
+    key: "92"
+    path: results/built-ins/WeakMap/92.yaml
+  - group: built-ins/WeakMap
+    key: "93"
+    path: results/built-ins/WeakMap/93.yaml
+  - group: built-ins/WeakMap
+    key: "95"
+    path: results/built-ins/WeakMap/95.yaml
+  - group: built-ins/WeakMap
+    key: "97"
+    path: results/built-ins/WeakMap/97.yaml
+  - group: built-ins/WeakMap
+    key: a0
+    path: results/built-ins/WeakMap/a0.yaml
+  - group: built-ins/WeakMap
+    key: a3
+    path: results/built-ins/WeakMap/a3.yaml
+  - group: built-ins/WeakMap
+    key: a7
+    path: results/built-ins/WeakMap/a7.yaml
+  - group: built-ins/WeakMap
+    key: aa
+    path: results/built-ins/WeakMap/aa.yaml
+  - group: built-ins/WeakMap
+    key: ac
+    path: results/built-ins/WeakMap/ac.yaml
+  - group: built-ins/WeakMap
+    key: ae
+    path: results/built-ins/WeakMap/ae.yaml
+  - group: built-ins/WeakMap
+    key: af
+    path: results/built-ins/WeakMap/af.yaml
+  - group: built-ins/WeakMap
+    key: b0
+    path: results/built-ins/WeakMap/b0.yaml
+  - group: built-ins/WeakMap
+    key: b1
+    path: results/built-ins/WeakMap/b1.yaml
+  - group: built-ins/WeakMap
+    key: b4
+    path: results/built-ins/WeakMap/b4.yaml
+  - group: built-ins/WeakMap
+    key: b8
+    path: results/built-ins/WeakMap/b8.yaml
+  - group: built-ins/WeakMap
+    key: bb
+    path: results/built-ins/WeakMap/bb.yaml
+  - group: built-ins/WeakMap
+    key: c2
+    path: results/built-ins/WeakMap/c2.yaml
+  - group: built-ins/WeakMap
+    key: c4
+    path: results/built-ins/WeakMap/c4.yaml
+  - group: built-ins/WeakMap
+    key: c5
+    path: results/built-ins/WeakMap/c5.yaml
+  - group: built-ins/WeakMap
+    key: c9
+    path: results/built-ins/WeakMap/c9.yaml
+  - group: built-ins/WeakMap
+    key: ca
+    path: results/built-ins/WeakMap/ca.yaml
+  - group: built-ins/WeakMap
+    key: cb
+    path: results/built-ins/WeakMap/cb.yaml
+  - group: built-ins/WeakMap
+    key: cc
+    path: results/built-ins/WeakMap/cc.yaml
+  - group: built-ins/WeakMap
+    key: d0
+    path: results/built-ins/WeakMap/d0.yaml
+  - group: built-ins/WeakMap
+    key: d9
+    path: results/built-ins/WeakMap/d9.yaml
+  - group: built-ins/WeakMap
+    key: db
+    path: results/built-ins/WeakMap/db.yaml
+  - group: built-ins/WeakMap
+    key: de
+    path: results/built-ins/WeakMap/de.yaml
+  - group: built-ins/WeakMap
+    key: e1
+    path: results/built-ins/WeakMap/e1.yaml
+  - group: built-ins/WeakMap
+    key: e2
+    path: results/built-ins/WeakMap/e2.yaml
+  - group: built-ins/WeakMap
+    key: ed
+    path: results/built-ins/WeakMap/ed.yaml
+  - group: built-ins/WeakMap
+    key: f0
+    path: results/built-ins/WeakMap/f0.yaml
+  - group: built-ins/WeakMap
+    key: f8
+    path: results/built-ins/WeakMap/f8.yaml
+  - group: built-ins/WeakMap
+    key: f9
+    path: results/built-ins/WeakMap/f9.yaml
+  - group: built-ins/WeakMap
+    key: fb
+    path: results/built-ins/WeakMap/fb.yaml
+  - group: built-ins/WeakRef
+    key: "05"
+    path: results/built-ins/WeakRef/05.yaml
+  - group: built-ins/WeakRef
+    key: "10"
+    path: results/built-ins/WeakRef/10.yaml
+  - group: built-ins/WeakRef
+    key: "15"
+    path: results/built-ins/WeakRef/15.yaml
+  - group: built-ins/WeakRef
+    key: 1a
+    path: results/built-ins/WeakRef/1a.yaml
+  - group: built-ins/WeakRef
+    key: 1d
+    path: results/built-ins/WeakRef/1d.yaml
+  - group: built-ins/WeakRef
+    key: "24"
+    path: results/built-ins/WeakRef/24.yaml
+  - group: built-ins/WeakRef
+    key: 2f
+    path: results/built-ins/WeakRef/2f.yaml
+  - group: built-ins/WeakRef
+    key: 3e
+    path: results/built-ins/WeakRef/3e.yaml
+  - group: built-ins/WeakRef
+    key: 5b
+    path: results/built-ins/WeakRef/5b.yaml
+  - group: built-ins/WeakRef
+    key: 6e
+    path: results/built-ins/WeakRef/6e.yaml
+  - group: built-ins/WeakRef
+    key: "72"
+    path: results/built-ins/WeakRef/72.yaml
+  - group: built-ins/WeakRef
+    key: "74"
+    path: results/built-ins/WeakRef/74.yaml
+  - group: built-ins/WeakRef
+    key: "79"
+    path: results/built-ins/WeakRef/79.yaml
+  - group: built-ins/WeakRef
+    key: 7c
+    path: results/built-ins/WeakRef/7c.yaml
+  - group: built-ins/WeakRef
+    key: 8f
+    path: results/built-ins/WeakRef/8f.yaml
+  - group: built-ins/WeakRef
+    key: "95"
+    path: results/built-ins/WeakRef/95.yaml
+  - group: built-ins/WeakRef
+    key: a0
+    path: results/built-ins/WeakRef/a0.yaml
+  - group: built-ins/WeakRef
+    key: a2
+    path: results/built-ins/WeakRef/a2.yaml
+  - group: built-ins/WeakRef
+    key: ae
+    path: results/built-ins/WeakRef/ae.yaml
+  - group: built-ins/WeakRef
+    key: b6
+    path: results/built-ins/WeakRef/b6.yaml
+  - group: built-ins/WeakRef
+    key: b7
+    path: results/built-ins/WeakRef/b7.yaml
+  - group: built-ins/WeakRef
+    key: bd
+    path: results/built-ins/WeakRef/bd.yaml
+  - group: built-ins/WeakRef
+    key: bf
+    path: results/built-ins/WeakRef/bf.yaml
+  - group: built-ins/WeakRef
+    key: cb
+    path: results/built-ins/WeakRef/cb.yaml
+  - group: built-ins/WeakRef
+    key: e5
+    path: results/built-ins/WeakRef/e5.yaml
+  - group: built-ins/WeakRef
+    key: ff
+    path: results/built-ins/WeakRef/ff.yaml
+  - group: built-ins/WeakSet
+    key: "06"
+    path: results/built-ins/WeakSet/06.yaml
+  - group: built-ins/WeakSet
+    key: "09"
+    path: results/built-ins/WeakSet/09.yaml
+  - group: built-ins/WeakSet
+    key: 0a
+    path: results/built-ins/WeakSet/0a.yaml
+  - group: built-ins/WeakSet
+    key: "19"
+    path: results/built-ins/WeakSet/19.yaml
+  - group: built-ins/WeakSet
+    key: 1b
+    path: results/built-ins/WeakSet/1b.yaml
+  - group: built-ins/WeakSet
+    key: 1c
+    path: results/built-ins/WeakSet/1c.yaml
+  - group: built-ins/WeakSet
+    key: "21"
+    path: results/built-ins/WeakSet/21.yaml
+  - group: built-ins/WeakSet
+    key: "22"
+    path: results/built-ins/WeakSet/22.yaml
+  - group: built-ins/WeakSet
+    key: "28"
+    path: results/built-ins/WeakSet/28.yaml
+  - group: built-ins/WeakSet
+    key: 2e
+    path: results/built-ins/WeakSet/2e.yaml
+  - group: built-ins/WeakSet
+    key: "30"
+    path: results/built-ins/WeakSet/30.yaml
+  - group: built-ins/WeakSet
+    key: "31"
+    path: results/built-ins/WeakSet/31.yaml
+  - group: built-ins/WeakSet
+    key: "33"
+    path: results/built-ins/WeakSet/33.yaml
+  - group: built-ins/WeakSet
+    key: "41"
+    path: results/built-ins/WeakSet/41.yaml
+  - group: built-ins/WeakSet
+    key: "46"
+    path: results/built-ins/WeakSet/46.yaml
+  - group: built-ins/WeakSet
+    key: "47"
+    path: results/built-ins/WeakSet/47.yaml
+  - group: built-ins/WeakSet
+    key: 4b
+    path: results/built-ins/WeakSet/4b.yaml
+  - group: built-ins/WeakSet
+    key: 4d
+    path: results/built-ins/WeakSet/4d.yaml
+  - group: built-ins/WeakSet
+    key: "50"
+    path: results/built-ins/WeakSet/50.yaml
+  - group: built-ins/WeakSet
+    key: "51"
+    path: results/built-ins/WeakSet/51.yaml
+  - group: built-ins/WeakSet
+    key: "53"
+    path: results/built-ins/WeakSet/53.yaml
+  - group: built-ins/WeakSet
+    key: 5f
+    path: results/built-ins/WeakSet/5f.yaml
+  - group: built-ins/WeakSet
+    key: "61"
+    path: results/built-ins/WeakSet/61.yaml
+  - group: built-ins/WeakSet
+    key: "62"
+    path: results/built-ins/WeakSet/62.yaml
+  - group: built-ins/WeakSet
+    key: 6e
+    path: results/built-ins/WeakSet/6e.yaml
+  - group: built-ins/WeakSet
+    key: "70"
+    path: results/built-ins/WeakSet/70.yaml
+  - group: built-ins/WeakSet
+    key: "72"
+    path: results/built-ins/WeakSet/72.yaml
+  - group: built-ins/WeakSet
+    key: "76"
+    path: results/built-ins/WeakSet/76.yaml
+  - group: built-ins/WeakSet
+    key: "77"
+    path: results/built-ins/WeakSet/77.yaml
+  - group: built-ins/WeakSet
+    key: "79"
+    path: results/built-ins/WeakSet/79.yaml
+  - group: built-ins/WeakSet
+    key: 7e
+    path: results/built-ins/WeakSet/7e.yaml
+  - group: built-ins/WeakSet
+    key: "80"
+    path: results/built-ins/WeakSet/80.yaml
+  - group: built-ins/WeakSet
+    key: "83"
+    path: results/built-ins/WeakSet/83.yaml
+  - group: built-ins/WeakSet
+    key: "85"
+    path: results/built-ins/WeakSet/85.yaml
+  - group: built-ins/WeakSet
+    key: 8c
+    path: results/built-ins/WeakSet/8c.yaml
+  - group: built-ins/WeakSet
+    key: 8f
+    path: results/built-ins/WeakSet/8f.yaml
+  - group: built-ins/WeakSet
+    key: "95"
+    path: results/built-ins/WeakSet/95.yaml
+  - group: built-ins/WeakSet
+    key: "97"
+    path: results/built-ins/WeakSet/97.yaml
+  - group: built-ins/WeakSet
+    key: "99"
+    path: results/built-ins/WeakSet/99.yaml
+  - group: built-ins/WeakSet
+    key: 9a
+    path: results/built-ins/WeakSet/9a.yaml
+  - group: built-ins/WeakSet
+    key: 9b
+    path: results/built-ins/WeakSet/9b.yaml
+  - group: built-ins/WeakSet
+    key: 9c
+    path: results/built-ins/WeakSet/9c.yaml
+  - group: built-ins/WeakSet
+    key: a3
+    path: results/built-ins/WeakSet/a3.yaml
+  - group: built-ins/WeakSet
+    key: a4
+    path: results/built-ins/WeakSet/a4.yaml
+  - group: built-ins/WeakSet
+    key: a8
+    path: results/built-ins/WeakSet/a8.yaml
+  - group: built-ins/WeakSet
+    key: aa
+    path: results/built-ins/WeakSet/aa.yaml
+  - group: built-ins/WeakSet
+    key: ab
+    path: results/built-ins/WeakSet/ab.yaml
+  - group: built-ins/WeakSet
+    key: ad
+    path: results/built-ins/WeakSet/ad.yaml
+  - group: built-ins/WeakSet
+    key: b0
+    path: results/built-ins/WeakSet/b0.yaml
+  - group: built-ins/WeakSet
+    key: b2
+    path: results/built-ins/WeakSet/b2.yaml
+  - group: built-ins/WeakSet
+    key: b3
+    path: results/built-ins/WeakSet/b3.yaml
+  - group: built-ins/WeakSet
+    key: bb
+    path: results/built-ins/WeakSet/bb.yaml
+  - group: built-ins/WeakSet
+    key: bf
+    path: results/built-ins/WeakSet/bf.yaml
+  - group: built-ins/WeakSet
+    key: c1
+    path: results/built-ins/WeakSet/c1.yaml
+  - group: built-ins/WeakSet
+    key: c3
+    path: results/built-ins/WeakSet/c3.yaml
+  - group: built-ins/WeakSet
+    key: c6
+    path: results/built-ins/WeakSet/c6.yaml
+  - group: built-ins/WeakSet
+    key: c8
+    path: results/built-ins/WeakSet/c8.yaml
+  - group: built-ins/WeakSet
+    key: cc
+    path: results/built-ins/WeakSet/cc.yaml
+  - group: built-ins/WeakSet
+    key: d0
+    path: results/built-ins/WeakSet/d0.yaml
+  - group: built-ins/WeakSet
+    key: d1
+    path: results/built-ins/WeakSet/d1.yaml
+  - group: built-ins/WeakSet
+    key: d3
+    path: results/built-ins/WeakSet/d3.yaml
+  - group: built-ins/WeakSet
+    key: d5
+    path: results/built-ins/WeakSet/d5.yaml
+  - group: built-ins/WeakSet
+    key: da
+    path: results/built-ins/WeakSet/da.yaml
+  - group: built-ins/WeakSet
+    key: e2
+    path: results/built-ins/WeakSet/e2.yaml
+  - group: built-ins/WeakSet
+    key: e7
+    path: results/built-ins/WeakSet/e7.yaml
+  - group: built-ins/WeakSet
+    key: ed
+    path: results/built-ins/WeakSet/ed.yaml
+  - group: built-ins/WeakSet
+    key: f1
+    path: results/built-ins/WeakSet/f1.yaml
+  - group: built-ins/WeakSet
+    key: f2
+    path: results/built-ins/WeakSet/f2.yaml
+  - group: built-ins/WeakSet
+    key: f3
+    path: results/built-ins/WeakSet/f3.yaml
+  - group: built-ins/WeakSet
+    key: f9
+    path: results/built-ins/WeakSet/f9.yaml
+  - group: built-ins/WeakSet
+    key: fa
+    path: results/built-ins/WeakSet/fa.yaml
+  - group: built-ins/WeakSet
+    key: ff
+    path: results/built-ins/WeakSet/ff.yaml
   - group: built-ins/decodeURI
     key: "03"
     path: results/built-ins/decodeURI/03.yaml
@@ -16396,9 +17059,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 16519
+  passes: 16789
   semanticFailures: 0
-  unsupportedProfileFeatures: 2093
+  unsupportedProfileFeatures: 2072
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -16523,9 +17186,9 @@ summary:
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1139
+      passes: 1150
       semanticFailures: 0
-      unsupportedProfileFeatures: 417
+      unsupportedProfileFeatures: 406
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -16572,9 +17235,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9665
+      passes: 9671
       semanticFailures: 0
-      unsupportedProfileFeatures: 412
+      unsupportedProfileFeatures: 406
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -16628,9 +17291,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 193
+      passes: 201
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 1
     - dependency: symbols
       expectedNegatives: 0
       harnessFailures: 0
@@ -16673,6 +17336,13 @@ summary:
       passes: 208
       semanticFailures: 0
       unsupportedProfileFeatures: 12
+    - dependency: weak-collections
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 245
+      semanticFailures: 0
+      unsupportedProfileFeatures: 4
   groups:
     - group: built-ins/AggregateError
       expectedNegatives: 0
@@ -16772,6 +17442,13 @@ summary:
       passes: 16
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/FinalizationRegistry
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 43
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/Function
       expectedNegatives: 0
       harnessFailures: 0
@@ -16818,9 +17495,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 158
+      passes: 169
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 1
     - group: built-ins/MapIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -16860,9 +17537,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3210
+      passes: 3216
       semanticFailures: 0
-      unsupportedProfileFeatures: 113
+      unsupportedProfileFeatures: 107
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -16895,9 +17572,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 367
+      passes: 375
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 1
     - group: built-ins/SetIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -16954,6 +17631,27 @@ summary:
       passes: 81
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/WeakMap
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 95
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/WeakRef
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 26
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: built-ins/WeakSet
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 81
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/decodeURI
       expectedNegatives: 0
       harnessFailures: 0

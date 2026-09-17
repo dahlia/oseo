@@ -42,6 +42,7 @@ const components = [
   "SET",
   "TYPED_ARRAY",
   "ATOMICS",
+  "WEAK_COLLECTION",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

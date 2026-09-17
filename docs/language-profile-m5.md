@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 127
+M5a is complete. The normative family records described below inventory 128
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 20,168 reviewed cases: 16,519 passes, 1,556
-expected negatives, and 2,093 unsupported profile features. It records no
+The current manifest contains 20,417 reviewed cases: 16,789 passes, 1,556
+expected negatives, and 2,072 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6972,6 +6972,115 @@ public intrinsic table gains four slots, the heap gains the Atomics waiter
 kind, and the context gains the WaiterList store roots.
 
 
+Weak collections
+----------------
+
+M5b node `weak-collections` materializes `WeakMap`, `WeakSet`, `WeakRef`, and
+`FinalizationRegistry` with their prototypes as one realm-owned intrinsic
+cluster and installs the four constructors as writable, configurable global
+properties. Each constructor rejects a call without `new` and selects the
+instance prototype through the new target's observable `prototype` property.
+`WeakRef` checks its target and `FinalizationRegistry` checks its cleanup
+callback before that lookup. Every prototype carries its constructor, its
+methods, and a `Symbol.toStringTag` string, and every method rejects a
+receiver of another brand with a `TypeError`.
+
+A value can be held weakly when it is an object or a symbol. This profile
+admits no `Symbol.for` registry, so every symbol, including a well-known
+symbol, is unregistered. A `WeakMap` or `WeakSet` owns one collector ephemeron
+table, and an address-keyed open-addressed index keeps `get`, `has`, `set`,
+`add`, and `delete` independent of the table's size. `set` and `add` throw a
+`TypeError` for a key that cannot be held weakly; `get`, `has`, and `delete`
+answer `undefined` or `false` instead. Deletion unlinks the entry and its
+index slot at once. A collection unlinks an entry whose key died and replaces
+its index slot with a tombstone, so lookup never observes a cleared entry.
+The `WeakMap` constructor reads the observable `set` adder and the `WeakSet`
+constructor reads `add` before either acquires the iterator. A non-object
+`WeakMap` entry, an abrupt `"0"` or `"1"` read, or an abrupt adder call closes
+the iterator, while an abrupt iterator step propagates without a close.
+
+`new WeakRef(target)` and `deref` add a live target to the current job's
+KeptAlive set. The set ends with that job: the runtime clears it before every
+promise job, before every timer turn, and before the cleanup checkpoint, so
+each promise reaction is a job of its own, including a reaction that an
+internal await drains. A target therefore survives collection for the rest of
+the job that created or dereferenced its reference, and a `deref` in a later
+job, including the next promise job, answers `undefined` once a collection has
+cleared it. `register` requires a target that can be held weakly and differs
+from the held value, and an unregister token that can be held weakly or is
+`undefined`. Targets and tokens are weak. `unregister` removes every
+registration with that token, including one the collector has already queued,
+and reports whether it removed any.
+
+The collector's existing fixed point, weak-target clearing, and deterministic
+queue decide what is eligible for cleanup. After the script's promise jobs
+drain, and again after each timer turn, the event loop consumes that queue in
+order. An internal await that drives timers directly consumes it the same way
+before each of those timer turns while its promise is pending. The queue
+appends the records each collection makes eligible in their
+registration order, so records from an earlier collection run before records
+from a later one. Each registry with queued records gets one cleanup job,
+ordered by its oldest record. The job calls the registry's callback with an
+`undefined` receiver and each record's held value in queue order, including a
+record queued while the job runs and excluding one an earlier callback
+unregistered, and promise jobs drain only after the job ends. An abrupt
+callback ends the program with that completion, exactly as an abrupt timer
+callback does. Collection itself still neither allocates nor invokes user code.
+
+Fixed Node.js, Deno, and native differential evidence covers descriptors,
+brands, object, function, Array, and symbol keys, primitives that cannot be
+held weakly, index growth under deletion churn, constructor adder order and
+iterator closing, derived construction, prototype fallback, `WeakRef` and
+`FinalizationRegistry` validation, and unregistration. Every observation there
+is independent of collection timing. A native-only observation with
+collection forced at every safepoint checks KeptAlive lifetime across the
+script and consecutive promise jobs, one cleanup job
+per registry with its promise jobs deferred until the job ends, skipping a
+queued record after `unregister` before or during its job, and an abrupt
+cleanup callback. Sanitized fixed C evidence checks index
+synchronization with deletion and collector unlinking, weak unregister tokens,
+KeptAlive roots, and a KeptAlive set that ends before each promise job of one
+drain and before each promise job or timer turn an internal await drives, a
+cleanup job that runs between two timers one internal await drives, and
+retains the AArch64 Linux cross-link. Generated
+evidence at property seed `0x60007500` starts with two or three fresh
+registrations, then compares one to sixteen `WeakMap`,
+`WeakSet`, `WeakRef`, and `FinalizationRegistry` operations over stable
+objects, unregistered symbols, fresh unreachable objects, and primitives with
+an independent identity model, Node.js, Deno, and both native specialization
+policies under forced collection, and checks the native cleanup report
+against a model where every callback precedes every promise job it enabled.
+One to four generated sibling or chained promise jobs then construct a
+`WeakRef` and dereference every earlier one, and the native report must show
+fresh targets from the script and earlier jobs already cleared; a
+false numeric hint deliberately misses its guard and reaches the compiled
+generic fallback.
+
+Of the 262 paths under the node's four inventory roots, 249 are reviewed: 245
+pass and four retain the explicit cross-realm prerequisite. The other 13 use
+`Symbol.for` to create a registered symbol. Ten of them fail only because that
+function is absent, and three would pass only because calling the absent
+function throws the `TypeError` their assertion expects. They stay outside the
+reviewed subset until the `symbol-intrinsic` node admits the registry.
+Twenty-five previously reviewed paths outside the roots also move from
+`unsupported-profile-feature` to `pass` because each uses a weak collection as
+an ordinary operand: ten `Map` and seven `Set` brand-check cases, two
+`Object.prototype.toString` tag cases, four `Object.seal` cases, and the `Map`
+and `Set` value-domain cases, whose only other gate the landed
+`typed-array-core` node had already lifted. No reviewed path moves away from
+`pass`. The reviewed feature list gains
+`FinalizationRegistry`, `WeakMap`, `WeakRef`, `WeakSet`, and
+`symbols-as-weakmap-keys`, and the dependency vocabulary gains
+`weak-collections`. The manifest moves from 20,168 to 20,417 cases and from
+16,519 to 16,789 passes, keeps 1,556 expected negatives, and moves from 2,093
+to 2,072 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, applicable inventory,
+classification vocabulary, forced-collection policy, and zero-override policy
+are unchanged. The new component, four heap kinds, and the public KeptAlive
+fields move the runtime ABI to `oseo-runtime-m5-113` without changing the
+graph's orchestration state.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -6983,6 +7092,19 @@ already admits and assigned every genuine remaining rejection an explicit
 owner. Unit 8.5o closes the sole M5a evidence gap from that audit, so M5a is
 complete. The remaining gaps retain their existing owners.
 
+ -  Weak collections, admitted by the M5b `weak-collections` node as recorded
+    above, observe collection only when one runs. The native runtime
+    collects when collection is forced at every safepoint and when a context
+    is destroyed, and has no allocation-pressure trigger yet. In an ordinary
+    run, `WeakRef.prototype.deref` therefore keeps answering its target and
+    no cleanup callback runs, which the liveness rules allow but other
+    engines do not exhibit, and weak entries hold memory until a collection.
+    `FinalizationRegistry.prototype.unregister` scans that registry's
+    registrations linearly. A pressure-driven collection policy is owned by
+    [*PLAN-GC.md*](../PLAN-GC.md). Registered symbols cannot yet be created,
+    so the rule that they cannot be held weakly has no reachable value until
+    the `symbol-intrinsic` node admits `Symbol.for`, which must then reject
+    them in the shared CanBeHeldWeakly check.
  -  `Set` element storage, admitted by the M5b `set-intrinsic` node as recorded
     above, is one insertion-ordered vector whose deleted slots stay as
     tombstones so that live iterators keep their forward cursor. Nothing
@@ -7064,8 +7186,9 @@ complete. The remaining gaps retain their existing owners.
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that
     block, the `Date` constructor with its statics and prototype, `Set`
-    with its insertion-ordered element vector, `%TypedArray%`, and the
-    eleven concrete TypedArray constructors. The remaining standard
+    with its insertion-ordered element vector, `%TypedArray%`, the
+    eleven concrete TypedArray constructors, and `WeakMap`, `WeakSet`,
+    `WeakRef`, and `FinalizationRegistry`. The remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
     `ArrayBuffer.isView` reports `true` for each admitted `DataView` or
     TypedArray view and `false` for every other value this profile can produce.
@@ -7081,7 +7204,8 @@ complete. The remaining gaps retain their existing owners.
     global object. M5b `global-object-record` completes its static declaration
     model and installs `Infinity`, `NaN`, and `undefined` alongside the
     admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
-    `Promise`, `Set`, `String`, and concrete TypedArray identities. The
+    `Promise`, `Set`, `String`, concrete TypedArray, and weak collection
+    identities. The
     `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
     `encodeURI`, and `encodeURIComponent` as four more replaceable
     properties of the same object, the `global-numeric-functions` node

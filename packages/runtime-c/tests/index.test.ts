@@ -5,8 +5,8 @@ import { cRuntimeProvider } from "../src/index.ts";
 
 test("provides the reviewed C runtime inputs", () => {
   const runtime = cRuntimeProvider.getRuntimeInput();
-  assert.equal(runtime.abiVersion, "m5-112");
-  assert.equal(runtime.assets.length, 44);
+  assert.equal(runtime.abiVersion, "m5-113");
+  assert.equal(runtime.assets.length, 45);
   assert.ok(
     runtime.assets.some((asset) =>
       asset.url.pathname.endsWith("/runtime_bigint.c"),
@@ -60,6 +60,11 @@ test("provides the reviewed C runtime inputs", () => {
   assert.ok(
     runtime.assets.some((asset) =>
       asset.url.pathname.endsWith("/runtime_set.c"),
+    ),
+  );
+  assert.ok(
+    runtime.assets.some((asset) =>
+      asset.url.pathname.endsWith("/runtime_weak_collection.c"),
     ),
   );
 });

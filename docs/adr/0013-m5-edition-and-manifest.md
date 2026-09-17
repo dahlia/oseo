@@ -454,6 +454,20 @@ prototype surface these algorithms operate over, and from
 the node's seven inventory roots carry it, and no reviewed row outside those
 roots gains or loses a tag.
 
+The M5b `weak-collections` node extends the vocabulary with
+`weak-collections`. The tag identifies the `WeakMap`, `WeakSet`, `WeakRef`,
+and `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly,
+ephemeron-backed membership, the job-scoped KeptAlive set, and registration,
+unregistration, and cleanup-job scheduling. One tag covers the cluster because
+every member stores its target through the same collector weak-edge contract
+and differs only in which of its ephemeron, weak-reference, or finalization
+records it exposes. The tag is distinct from `map-intrinsic` and
+`set-intrinsic`, which name strong, ordered, iterable storage, and from
+`symbols`, which names symbol values without their weak-key admissibility. The
+249 reviewed rows under the node's four inventory roots carry it. The 25
+reviewed rows outside those roots whose last unmet prerequisite was a weak
+collection move to `pass` and retain their existing tags.
+
 
 Alternatives considered
 -----------------------

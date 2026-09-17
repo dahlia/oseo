@@ -865,6 +865,40 @@
 #define OSEO_ATOMICS_FUNCTION_CODE_ID_FIRST \
     (OSEO_ATOMICS_CODE_ID_RANGE_LAST - (OSEO_ATOMICS_OPERATION_COUNT - 1u))
 
+#define OSEO_WEAK_COLLECTION_CODE_ID_RANGE_INDEX ((size_t)26u)
+#define OSEO_WEAK_COLLECTION_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_WEAK_COLLECTION_CODE_ID_RANGE_INDEX)
+#define OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_WEAK_COLLECTION_CODE_ID_RANGE_INDEX)
+#define OSEO_WEAK_MAP_CONSTRUCTOR_CODE_ID \
+    OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST
+#define OSEO_WEAK_MAP_DELETE_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_WEAK_MAP_GET_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_WEAK_MAP_HAS_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_WEAK_MAP_SET_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_WEAK_SET_CONSTRUCTOR_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_WEAK_SET_ADD_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_WEAK_SET_DELETE_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_WEAK_SET_HAS_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_WEAK_REF_CONSTRUCTOR_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_WEAK_REF_DEREF_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_FINALIZATION_REGISTRY_CONSTRUCTOR_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_FINALIZATION_REGISTRY_REGISTER_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_FINALIZATION_REGISTRY_UNREGISTER_CODE_ID \
+    (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 13u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -928,6 +962,10 @@ typedef enum {
     OSEO_HEAP_FINALIZATION_REGISTRY = 33,
     OSEO_HEAP_FINALIZATION_CELL = 34,
     OSEO_HEAP_ATOMICS_WAITER = 35,
+    OSEO_HEAP_WEAK_MAP = 36,
+    OSEO_HEAP_WEAK_SET = 37,
+    OSEO_HEAP_WEAK_REF = 38,
+    OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT = 39,
 } OseoHeapKind;
 
 typedef struct {
@@ -1033,11 +1071,32 @@ typedef struct {
     OseoValue head;
     OseoValue tail;
     size_t live_count;
+    /*
+     * Open-addressed index from a key's heap address to its linked entry,
+     * owned by the table and freed by the sweep. A zero slot is empty and
+     * OSEO_EPHEMERON_INDEX_TOMBSTONE marks a removed entry, so
+     * `index_used` counts live and removed slots while `live_count` counts
+     * linked entries. The collector replaces a dead entry's slot with a
+     * tombstone when it unlinks that entry, which keeps lookup in step with
+     * clearing without allocating during collection.
+     */
+    OseoValue *index;
+    size_t index_capacity;
+    size_t index_used;
 } OseoEphemeronTable;
 
+/* A removed index slot. It is no tagged heap value, so no key matches it. */
+#define OSEO_EPHEMERON_INDEX_TOMBSTONE UINT64_C(1)
+
+/*
+ * `previous` is an untraced back link: its target is always reachable
+ * through the same chain, and it lets a source-level delete unlink an
+ * indexed entry without walking from the head.
+ */
 typedef struct {
     OseoHeapObject header;
     OseoValue next;
+    OseoValue previous;
     OseoValue key;
     OseoValue value;
 } OseoEphemeronEntry;
@@ -1060,8 +1119,15 @@ typedef struct {
     OseoValue registry;
     OseoValue target;
     OseoValue holdings;
+    /* Weak like the target: undefined when absent or after it dies. */
+    OseoValue unregister_token;
     uint64_t registration_order;
     bool queued;
+    /*
+     * True once the scheduler consumed the record or an unregister removed
+     * it. A removed record that is still queued stays on the FIFO until the
+     * cleanup dequeue skips it.
+     */
     bool processed;
 } OseoFinalizationCell;
 
@@ -1738,6 +1804,29 @@ typedef struct {
     bool done;
 } OseoSetIterator;
 
+/*
+ * Source-visible weak collections wrap the collector-only ephemeron,
+ * weak-reference, and finalization records declared earlier.
+ * A WeakMap or WeakSet strongly owns one ephemeron table, a WeakRef one
+ * weak reference, and a FinalizationRegistry one registry record, so the
+ * collector's fixed point, clearing, and scheduling apply unchanged. The
+ * two collection kinds share a layout; WeakSet stores undefined values.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue table;
+} OseoWeakCollection;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue reference;
+} OseoWeakRef;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue registry;
+} OseoFinalizationRegistryObject;
+
 typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
@@ -2249,6 +2338,32 @@ static inline bool is_typed_array(OseoValue value) {
 static inline OseoTypedArray *typed_array_object(OseoValue value) {
     return (OseoTypedArray *)heap_object(value);
 }
+static inline bool is_weak_map(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_WEAK_MAP;
+}
+static inline bool is_weak_set(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_WEAK_SET;
+}
+static inline OseoWeakCollection *weak_collection_object(OseoValue value) {
+    return (OseoWeakCollection *)heap_object(value);
+}
+static inline bool is_weak_ref(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_WEAK_REF;
+}
+static inline OseoWeakRef *weak_ref_object(OseoValue value) {
+    return (OseoWeakRef *)heap_object(value);
+}
+static inline bool is_finalization_registry_object(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT;
+}
+static inline OseoFinalizationRegistryObject *
+finalization_registry_wrapper_object(OseoValue value) {
+    return (OseoFinalizationRegistryObject *)heap_object(value);
+}
 static inline bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
@@ -2259,7 +2374,9 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_DATE || kind == OSEO_HEAP_REGEXP ||
         kind == OSEO_HEAP_ITERATOR_HELPER || kind == OSEO_HEAP_PROXY ||
         kind == OSEO_HEAP_SET || kind == OSEO_HEAP_SET_ITERATOR ||
-        kind == OSEO_HEAP_TYPED_ARRAY;
+        kind == OSEO_HEAP_TYPED_ARRAY || kind == OSEO_HEAP_WEAK_MAP ||
+        kind == OSEO_HEAP_WEAK_SET || kind == OSEO_HEAP_WEAK_REF ||
+        kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2610,6 +2727,48 @@ OseoResult oseo_internal_install_set_global(
     OseoContext *context,
     OseoValue global
 );
+OseoResult oseo_internal_weak_collection_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/*
+ * Materializes %WeakMap%, %WeakSet%, %WeakRef%, %FinalizationRegistry%,
+ * and their prototypes as one realm-owned cluster.
+ */
+OseoResult oseo_internal_weak_collection_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_weak_collection_globals(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * AddToKeptObjects. The value stays a strong root until the next
+ * oseo_internal_clear_kept_objects, which the job queue calls before every
+ * promise job and the event loop calls before every timer turn and cleanup
+ * checkpoint, including the jobs and timer turns an internal await drives.
+ */
+OseoResult oseo_internal_keep_during_job(
+    OseoContext *context,
+    OseoValue value
+);
+/* ClearKeptObjects. It releases the roots without collecting. */
+void oseo_internal_clear_kept_objects(OseoContext *context);
+/*
+ * Runs one cleanup job, CleanupFinalizationRegistry for the registry of the
+ * oldest queued finalization record, if any. The job calls that registry's
+ * callback for each of its queued records in queue order, including one
+ * queued while the job runs, and stops at the first abrupt callback. `ran`
+ * reports whether a job ran; the caller owns the surrounding job
+ * checkpoint, so no promise job runs between two of the job's callbacks.
+ */
+OseoResult oseo_internal_finalization_cleanup_job(
+    OseoContext *context,
+    bool *ran
+);
 /* Materializes %TypedArray% and every concrete constructor/prototype pair. */
 OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_typed_array_globals(
@@ -2774,6 +2933,11 @@ bool oseo_internal_ephemeron_get(
     OseoValue key,
     OseoValue *value
 );
+/*
+ * Unlinks a key's live entry and its index slot. Returns false without
+ * mutation when the key has no entry.
+ */
+bool oseo_internal_ephemeron_delete(OseoValue table, OseoValue key);
 size_t oseo_internal_ephemeron_live_count(OseoValue table);
 OseoResult oseo_internal_weak_reference_create(
     OseoContext *context,
@@ -2791,6 +2955,27 @@ OseoResult oseo_internal_finalization_register(
     OseoValue holdings
 );
 /*
+ * Registers like oseo_internal_finalization_register and records a weak
+ * unregister token, which is undefined when the registration has none.
+ */
+OseoResult oseo_internal_finalization_register_token(
+    OseoContext *context,
+    OseoValue registry,
+    OseoValue target,
+    OseoValue holdings,
+    OseoValue unregister_token
+);
+/*
+ * Removes every unconsumed cell whose token is `unregister_token`,
+ * including one already queued for cleanup. Returns whether any was
+ * removed. It neither allocates nor invokes user code.
+ */
+bool oseo_internal_finalization_unregister(
+    OseoContext *context,
+    OseoValue registry,
+    OseoValue unregister_token
+);
+/*
  * Pops one cleanup record without allocating or invoking user code. The
  * caller supplies rooted output slots and schedules callback execution at
  * its explicit host checkpoint.
@@ -2798,6 +2983,17 @@ OseoResult oseo_internal_finalization_register(
 bool oseo_internal_finalization_take_cleanup(
     OseoContext *context,
     OseoValue *registry,
+    OseoValue *holdings
+);
+/*
+ * Pops the oldest unconsumed record that belongs to `registry`, leaving
+ * other registries' records queued in order. Like the unrestricted
+ * dequeue, it neither allocates nor invokes user code, and `holdings` is a
+ * caller-rooted output slot.
+ */
+bool oseo_internal_finalization_take_registry_cleanup(
+    OseoContext *context,
+    OseoValue registry,
     OseoValue *holdings
 );
 /*

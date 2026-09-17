@@ -236,6 +236,10 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "parseInt" ||
     name === "Set" ||
     name === "SharedArrayBuffer" ||
+    name === "FinalizationRegistry" ||
+    name === "WeakMap" ||
+    name === "WeakRef" ||
+    name === "WeakSet" ||
     name === "undefined" ||
     isTypedArrayIntrinsicName(name)
   );
@@ -603,6 +607,10 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "Set" ||
     name === "SharedArrayBuffer" ||
     name === "Symbol" ||
+    name === "FinalizationRegistry" ||
+    name === "WeakMap" ||
+    name === "WeakRef" ||
+    name === "WeakSet" ||
     isTypedArrayIntrinsicName(name) ||
     name === "setTimeout" ||
     name === "clearTimeout" ||

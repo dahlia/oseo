@@ -57,6 +57,7 @@ import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
+import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 
 const { typedArrayIterativeFixtures } =
   await import("./native/fixtures/typed-array-iterative.ts");
@@ -232,6 +233,7 @@ const fixtures: readonly Fixture[] = [
   ...jsonParseFixtures,
   ...setIntrinsicFixtures,
   ...setComposition.setCompositionMethodFixtures,
+  ...weakCollectionFixtures,
   ...jsonStringifyFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
@@ -646,6 +648,120 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
   }
 }
 
+/*
+ * Collection timing is host-defined, so reference engines cannot supply this
+ * observation. With collection forced at every safepoint, the native runtime
+ * clears a WeakRef only after the job that created or dereferenced it ends,
+ * including a promise job followed by another promise job of the same drain,
+ * and runs one cleanup job per registry after the script's promise jobs and
+ * before a timer. Jobs follow each registry's oldest queued record. A job calls
+ * its callback for every record of that registry in queue order before any
+ * promise job a callback enabled runs, and skips a record an unregister removed
+ * after the collector had already queued it, including one removed by an
+ * earlier callback of the same job.
+ */
+const weakCleanupSource = `
+const laterToken = {};
+const registry = new FinalizationRegistry((held) => {
+  console.log("cleanup", held);
+  if (held === "dead0") {
+    console.log("unregister in job", registry.unregister(laterToken));
+  }
+  Promise.resolve().then(() => console.log("cleanup job", held));
+});
+const other = new FinalizationRegistry((held) => {
+  console.log("other cleanup", held);
+  Promise.resolve().then(() => console.log("other cleanup job", held));
+});
+const kept = {};
+registry.register(kept, "kept");
+(function () {
+  for (let index = 0; index < 3; index = index + 1) {
+    registry.register(
+      { index },
+      "dead" + index,
+      index === 1 ? laterToken : undefined,
+    );
+    if (index === 0) other.register({}, "other0");
+  }
+})();
+const token = {};
+(function () {
+  registry.register({}, "queued then unregistered", token);
+})();
+const pressure = [{}, {}];
+console.log("unregister queued", registry.unregister(token), pressure.length);
+const reference = new WeakRef({ label: "temporary" });
+console.log("same job", reference.deref().label);
+let jobReference;
+Promise.resolve().then(() => {
+  console.log("promise job", typeof reference.deref());
+  jobReference = new WeakRef({ label: "job" });
+  console.log("promise job same", jobReference.deref().label);
+});
+Promise.resolve().then(() => {
+  console.log("next promise job", typeof jobReference.deref());
+});
+setTimeout(() => {
+  console.log("timer", typeof reference.deref(), typeof kept);
+}, 0);
+`;
+const weakCleanupExpected =
+  "unregister queued true 2\n" +
+  "same job temporary\n" +
+  "promise job undefined\n" +
+  "promise job same job\n" +
+  "next promise job undefined\n" +
+  "cleanup dead0\n" +
+  "unregister in job true\n" +
+  "cleanup dead2\n" +
+  "cleanup job dead0\n" +
+  "cleanup job dead2\n" +
+  "other cleanup other0\n" +
+  "other cleanup job other0\n" +
+  "timer undefined object\n";
+const weakCleanupThrowSource = `
+const registry = new FinalizationRegistry(() => {
+  throw new EvalError("cleanup failed");
+});
+(function () {
+  registry.register({}, "dead");
+})();
+const pressure = [{}];
+setTimeout(() => console.log("unreachable timer", pressure.length), 0);
+`;
+for (const specializationArgs of [[], ["--no-specialization"]] as const) {
+  process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+  try {
+    const cleanup = await runNativeCli(
+      {
+        args: [...specializationArgs, "weak-cleanup.ts"],
+        source: weakCleanupSource,
+        sourceId: "weak-cleanup.ts",
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(cleanup.exitStatus, 0, cleanup.stderr);
+    assert.equal(cleanup.stdout, weakCleanupExpected);
+    assert.equal(cleanup.stderr, "");
+    const thrown = await runNativeCli(
+      {
+        args: [...specializationArgs, "weak-cleanup-throw.ts"],
+        source: weakCleanupThrowSource,
+        sourceId: "weak-cleanup-throw.ts",
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.notEqual(thrown.exitStatus, 0);
+    assert.equal(thrown.stdout, "");
+    assert.match(thrown.stderr, /EvalError/u);
+  } finally {
+    delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+  }
+}
+
 const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
   const [nodeReference, denoReference] = await references(fixture);
@@ -724,6 +840,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
+    fixture.name === "weak-collections" ||
     fixture.name === "object-prototype" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -841,6 +958,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-intrinsic" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
+    fixture.name === "weak-collections" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1097,7 +1215,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "generic-string-coercion" ||
             fixture.name === "number-prototype" ||
             fixture.name === "set-intrinsic" ||
-            fixture.name === "set-composition-methods"
+            fixture.name === "set-composition-methods" ||
+            fixture.name === "weak-collections"
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1118,7 +1237,8 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "object-constructor" ||
                 fixture.name === "number-prototype" ||
                 fixture.name === "set-intrinsic" ||
-                fixture.name === "set-composition-methods"
+                fixture.name === "set-composition-methods" ||
+                fixture.name === "weak-collections"
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }
@@ -1328,9 +1448,10 @@ for (const fixture of selectedFixtures) {
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
             // builds. The eleven concrete TypedArray constructors add
-            // eleven property-name allocations, and SharedArrayBuffer and
-            // Atomics add one each.
-            assert.equal(native.counters.allocations, 61);
+            // eleven property-name allocations, SharedArrayBuffer and
+            // Atomics add one each, and WeakMap, WeakSet, WeakRef, and
+            // FinalizationRegistry add four more.
+            assert.equal(native.counters.allocations, 65);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-20,168 reviewed cases: 16,519 passes, 1,556 expected negatives, and 2,093
+20,417 reviewed cases: 16,789 passes, 1,556 expected negatives, and 2,072
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 127 indexed records in the normative
+M5a is complete. The 128 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-16,519 passes across 20,168 paths, and the property inventory records 149
-domains, 149 seeds, and an ordinary case budget of 5,707.
+16,789 passes across 20,417 paths, and the property inventory records 150
+domains, 150 seeds, and an ordinary case budget of 5,719.
 
 
 M5a implementation history
@@ -6185,8 +6185,9 @@ pre-sweep weak-edge phases. An entry parks on its unmarked key and activates
 its value through the ordinary worklist when that key becomes reachable; after
 that fixed-point closure,
 dead weak targets clear and dead ephemeron entries unlink so the sweep
-reclaims them. Marked finalization registries queue
-eligible holdings in deterministic registration order without allocating or
+reclaims them. Marked finalization registries append
+each collection's eligible holdings to a FIFO in registration order without
+allocating or
 invoking user code, and a later scheduler checkpoint consumes the rooted FIFO.
 Fixed C evidence covers activated chains, dead reachability cycles, clearing
 boundaries, and cross-collection finalization timing. The generated domain at
@@ -6405,6 +6406,61 @@ profile features with no semantic, harness, or infrastructure failures. The
 property ratchet moves from 148 to 149 domains and seeds and from 5,695 to
 5,707 ordinary cases, and the evidence inventory moves from 126 to 127
 families. The runtime ABI moves to `m5-112`.
+
+Implemented M5b node `weak-collections` exposes the ephemeron checkpoint's
+contract as `WeakMap`,
+`WeakSet`, `WeakRef`, and `FinalizationRegistry`. Each source-visible object
+wraps one collector record, so the ephemeron fixed point, weak-target
+clearing, and deterministic finalization queue are reused unchanged.
+The ephemeron table gains an open-addressed index keyed by heap address and a
+back link on each entry. Source-level deletion unlinks an entry and its index
+slot immediately, and collector unlinking tombstones the slot of an entry
+whose key died without allocating. Finalization cells gain a weak unregister
+token; `unregister` removes live and already queued records, and the cleanup
+dequeue skips a removed record. The context gains the job-scoped KeptAlive
+set that `WeakRef` construction and `deref` fill. The job queue clears it
+before every promise job, and the event loop clears it before every timer
+turn and after the script or timer callback and its promise jobs. It then
+runs one cleanup job per registry with queued records, ordered by each
+registry's oldest record, before the next timer, including a timer that an
+internal await drives. A job calls the callback for all of that registry's
+records in queue order before promise jobs drain.
+Objects and all symbols can be held weakly because the profile admits no
+`Symbol.for` registry.
+
+Fixed differential evidence covers descriptors, brands, key validity, index
+churn, constructor adder and iterator-closing order, derived construction,
+and registry validation independently of collection timing. A native-only
+observation under forced collection covers KeptAlive lifetime across the
+script and consecutive promise jobs, cleanup
+grouping by registry with promise jobs deferred until each registry's job
+ends, a queued record removed by `unregister` before or during its job, and an
+abrupt callback. Sanitized fixed C evidence covers index synchronization, weak
+tokens, KeptAlive roots, and the KeptAlive set ending before each promise job
+of one drain and before each promise job or timer turn that an internal await
+drives, and a cleanup job between two timers one internal await drives, with
+the AArch64 Linux cross-link. The generated
+domain at seed `0x60007500` compares WeakMap, WeakSet, WeakRef, and
+FinalizationRegistry operation sequences, after two or three fresh
+registrations and followed by one to four sibling or chained promise jobs
+that dereference earlier references, with an independent identity,
+job-boundary, and cleanup-job model under both
+specialization policies and collection forced at every safepoint,
+including a deliberate guard miss that reaches generic fallback. Of the 262
+paths under the node's four roots, 249 are reviewed: 245 pass and four keep
+the cross-realm boundary. The 13 paths that create a registered symbol through
+`Symbol.for` stay outside the reviewed subset until `symbol-intrinsic` lands,
+because ten would fail and three would pass only through the absent
+function's `TypeError`. Twenty-five reviewed `Map`, `Set`, and `Object` paths
+outside the roots move to `pass` because a weak collection was their last
+unmet prerequisite, and no reviewed path moves away from `pass`. The manifest
+moves from 20,168 to 20,417 paths, from 16,519 to 16,789 passes, and from
+2,093 to 2,072 unsupported profile features while keeping 1,556 expected
+negatives and zero failures. The runtime ABI moves to `oseo-runtime-m5-113`.
+The property ratchet moves from 149 to 150 domains and seeds and from 5,707 to
+5,719 ordinary cases, and the evidence inventory moves from 127 to 128
+families. The graph's
+orchestration state is unchanged.
 
 
 Ahead-of-time challenge boundary

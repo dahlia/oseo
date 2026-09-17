@@ -881,13 +881,13 @@ The `m5-107` ABI adds the collector-only weak-edge checkpoint. Ephemeron entries
 park on unmarked key objects and activate through the ordinary worklist to a
 fixed point. Dead weak targets then clear and dead ephemeron entries unlink
 before sweep, so the sweep reclaims each dead entry record. Marked finalization
-registries publish eligible cells to a rooted context FIFO in deterministic
-registration order without allocating or invoking callbacks during collection,
-and a consumed cell unlinks from its registry at the next collection. Nine
-private runtime helpers let the later weak-collections component create these
-records and consume cleanup records into rooted slots. No JavaScript global,
-intrinsic, built-in code ID, or generated-code operation is added at this
-checkpoint.
+registries append each collection's eligible cells, sorted by registration
+order, to a rooted context FIFO without allocating or invoking callbacks during
+collection, and a consumed cell unlinks from its registry at the next
+collection. Nine private runtime helpers let the later weak-collections
+component create these records and consume cleanup records into rooted slots.
+No JavaScript global, intrinsic, built-in code ID, or generated-code operation
+is added at this checkpoint.
 
 The entry chain serves collector traversal rather than JavaScript lookup. The
 later component owns an address-keyed index and the job-scoped strong root
@@ -915,6 +915,19 @@ and `filter` collects first and species-creates with the captured count;
 `reduce` and `reduceRight` share one bidirectional snapshot walk. Seven code
 IDs are allocated inside the existing TypedArray range; no intrinsic slot,
 heap kind, public layout, or generated-code entry point is added.
+
+The `m5-113` ABI materializes `WeakMap`, `WeakSet`, `WeakRef`, and
+`FinalizationRegistry` in *runtime\_weak\_collection.c*. Each source-visible
+object wraps one collector weak record. Ephemeron tables gain an address-keyed
+index that deletion and collector unlinking keep synchronized, and
+finalization cells gain weak unregister tokens. The public context gains the
+job-scoped KeptAlive set behind `WeakRef` construction and `deref`. The job
+queue clears that set before every promise job, and the event loop clears it
+before every timer turn and after each script or timer turn and its promise
+jobs, then runs queued cleanup records as separate jobs in queue order before
+the next timer, including each timer an internal await drives. Every
+object and every symbol can be held weakly because the profile admits no
+`Symbol.for` registry.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
