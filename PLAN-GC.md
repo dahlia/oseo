@@ -210,14 +210,17 @@ the reactions an internal await drains. The native event loop clears it again
 after the script or a timer callback and every promise job it enabled, and the
 same checkpoint then runs one cleanup job per registry before the next timer.
 Every timer turn also clears the set before its callback, because an internal
-await can drive a timer turn directly. Jobs follow each registry's oldest record
-in the FIFO, and a job consumes every record of its registry, including one
-queued while it runs, before promise jobs drain; ordering by registration
-ordinal therefore holds among the records one collection publishes, not across
-collections. Collection currently runs only when forced at every safepoint or
-when a context is destroyed, so in an ordinary run no weak target clears and no
-cleanup job runs. A pressure-driven collection trigger remains the policy work
-this plan owns.
+await can drive a timer turn directly. Such an await runs the same cleanup
+checkpoint before each timer turn it drives while its promise stays pending, so
+a record one of its timers queues runs before the next; its drains stop once
+that promise settles, and the outer loop runs any remaining work. Jobs follow
+each registry's oldest record in the FIFO, and a job consumes every record of
+its registry, including one queued while it runs, before promise jobs drain;
+ordering by registration ordinal therefore holds among the records one
+collection publishes, not across collections. Collection currently runs only
+when forced at every safepoint or when a context is destroyed, so in an
+ordinary run no weak target clears and no cleanup job runs. A pressure-driven
+collection trigger remains the policy work this plan owns.
 
 
 Tracing and object metadata

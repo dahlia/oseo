@@ -1547,16 +1547,17 @@ The public context gains the KeptAlive set that `WeakRef` construction and
 it before every promise job, and *runtime\_event\_loop.c* clears it before every
 timer turn and after the script or a timer callback and the promise jobs it
 enabled, and then runs one cleanup job per registry with queued records before
-the next timer. The component, the four heap kinds, eighteen intrinsic slots,
-one built-in code ID range, and the context fields move `abiVersion` to
-`m5-113`; no generated-code entry point is added. Fixed and generated native
-differential evidence, a native-only cleanup observation, and sanitized fixed C
-evidence with the AArch64 Linux cross-link cover the node under both
-specialization policies and collection forced at every safepoint. The node
-reviews 249 paths from its four test262 inventory roots and promotes 25 already
-reviewed `Map`, `Set`, and `Object` cases whose last unmet prerequisite was a
-weak collection; two of them, the `Map` and `Set` value-domain cases, also
-needed the landed `typed-array-core` node.
+the next timer, including each timer an internal await drives. The component,
+the four heap kinds, eighteen intrinsic slots, one built-in code ID range, and
+the context fields move `abiVersion` to `m5-113`; no generated-code entry point
+is added. Fixed and generated native differential evidence, a native-only
+cleanup observation, and sanitized fixed C evidence with the AArch64 Linux
+cross-link cover the node under both specialization policies and collection
+forced at every safepoint. The node reviews 249 paths from its four test262
+inventory roots and promotes 25 already reviewed `Map`, `Set`, and `Object`
+cases whose last unmet prerequisite was a weak collection; two of them, the
+`Map` and `Set` value-domain cases, also needed the landed `typed-array-core`
+node.
 
 ### Function prototype evidence
 

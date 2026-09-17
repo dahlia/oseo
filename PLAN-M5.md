@@ -6422,8 +6422,9 @@ set that `WeakRef` construction and `deref` fill. The job queue clears it
 before every promise job, and the event loop clears it before every timer
 turn and after the script or timer callback and its promise jobs. It then
 runs one cleanup job per registry with queued records, ordered by each
-registry's oldest record, before the next timer. A job calls the callback for
-all of that registry's records in queue order before promise jobs drain.
+registry's oldest record, before the next timer, including a timer that an
+internal await drives. A job calls the callback for all of that registry's
+records in queue order before promise jobs drain.
 Objects and all symbols can be held weakly because the profile admits no
 `Symbol.for` registry.
 
@@ -6437,7 +6438,8 @@ ends, a queued record removed by `unregister` before or during its job, and an
 abrupt callback. Sanitized fixed C evidence covers index synchronization, weak
 tokens, KeptAlive roots, and the KeptAlive set ending before each promise job
 of one drain and before each promise job or timer turn that an internal await
-drives, with the AArch64 Linux cross-link. The generated
+drives, and a cleanup job between two timers one internal await drives, with
+the AArch64 Linux cross-link. The generated
 domain at seed `0x60007500` compares WeakMap, WeakSet, WeakRef, and
 FinalizationRegistry operation sequences, after two or three fresh
 registrations and followed by one to four sibling or chained promise jobs

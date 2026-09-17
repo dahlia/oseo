@@ -7015,7 +7015,9 @@ and reports whether it removed any.
 The collector's existing fixed point, weak-target clearing, and deterministic
 queue decide what is eligible for cleanup. After the script's promise jobs
 drain, and again after each timer turn, the event loop consumes that queue in
-order. The queue appends the records each collection makes eligible in their
+order. An internal await that drives timers directly consumes it the same way
+before each of those timer turns while its promise is pending. The queue
+appends the records each collection makes eligible in their
 registration order, so records from an earlier collection run before records
 from a later one. Each registry with queued records gets one cleanup job,
 ordered by its oldest record. The job calls the registry's callback with an
@@ -7038,7 +7040,8 @@ queued record after `unregister` before or during its job, and an abrupt
 cleanup callback. Sanitized fixed C evidence checks index
 synchronization with deletion and collector unlinking, weak unregister tokens,
 KeptAlive roots, and a KeptAlive set that ends before each promise job of one
-drain and before each promise job or timer turn an internal await drives, and
+drain and before each promise job or timer turn an internal await drives, a
+cleanup job that runs between two timers one internal await drives, and
 retains the AArch64 Linux cross-link. Generated
 evidence at property seed `0x60007500` starts with two or three fresh
 registrations, then compares one to sixteen `WeakMap`,

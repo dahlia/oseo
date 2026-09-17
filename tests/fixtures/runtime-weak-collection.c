@@ -11,7 +11,8 @@
  * records dequeue together past another registry's, KeptAlive roots
  * last exactly until they are cleared, and every promise job and timer
  * turn, including one that an internal await drives, starts without the
- * KeptAlive set of the job before it.
+ * KeptAlive set of the job before it. An internal await that drives several
+ * timers also runs the cleanup jobs one timer queued before the next.
  */
 
 #define KEY_COUNT ((size_t)48u)
@@ -637,6 +638,114 @@ static void test_promise_jobs_end_kept_objects(void) {
     oseo_context_destroy(&context);
 }
 
+static size_t cleanup_timer_calls;
+static double cleanup_holdings;
+
+/*
+ * Timer 1 drops the only reference to a registered target and collects, so
+ * its record is queued. The cleanup job for that record must run before
+ * timer 2, which settles the awaited promise.
+ */
+static OseoResult dispatch_cleanup_timers(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)new_target;
+    if (argument_count == 1u) {
+        assert(cleanup_holdings == 0.0);
+        cleanup_holdings = number_value(arguments[0]);
+        return normal(oseo_undefined());
+    }
+    assert(argument_count == 2u);
+    cleanup_timer_calls += 1u;
+    if (cleanup_timer_calls == 1u) {
+        require_normal(oseo_environment_set(
+            context,
+            arguments[1],
+            0u,
+            oseo_undefined()
+        ));
+        oseo_collect(context);
+        assert(context->finalization_pending_count == 1u);
+        assert(cleanup_holdings == 0.0);
+        return normal(oseo_undefined());
+    }
+    assert(cleanup_holdings == 7.0);
+    return oseo_promise_resolve_into(context, arguments[1], oseo_undefined());
+}
+
+static void test_internal_await_timers_run_cleanup_between(void) {
+    OseoContext context;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    oseo_context_init(
+        &context,
+        "weak-await-cleanup",
+        sizeof("weak-await-cleanup") - 1u
+    );
+    oseo_context_set_function_dispatcher(&context, dispatch_cleanup_timers);
+    require_normal(oseo_roots_allocate(&context, &frame, 4u));
+    frame.slots[2] = node(&context);
+    frame.slots[0] = require_normal(oseo_function_create(
+        &context,
+        1u,
+        frame.slots[2],
+        NULL,
+        0u,
+        1u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+    frame.slots[1] = require_normal(
+        oseo_internal_finalization_registry_create(&context, frame.slots[0])
+    );
+    frame.slots[2] = node(&context);
+    frame.slots[3] = node(&context);
+    require_normal(oseo_environment_set(
+        &context,
+        frame.slots[2],
+        0u,
+        frame.slots[3]
+    ));
+    require_normal(oseo_internal_finalization_register(
+        &context,
+        frame.slots[1],
+        frame.slots[3],
+        oseo_number(7.0)
+    ));
+    frame.slots[3] = require_normal(oseo_internal_promise_create(&context));
+    OseoValue first[4] = {
+        frame.slots[0],
+        oseo_number(0.0),
+        oseo_number(1.0),
+        frame.slots[2],
+    };
+    require_normal(oseo_set_timeout(&context, 4u, first));
+    OseoValue second[4] = {
+        frame.slots[0],
+        oseo_number(0.0),
+        oseo_number(2.0),
+        frame.slots[3],
+    };
+    require_normal(oseo_set_timeout(&context, 4u, second));
+
+    cleanup_timer_calls = 0u;
+    cleanup_holdings = 0.0;
+    require_normal(oseo_internal_await_step(&context, frame.slots[3]));
+    assert(cleanup_timer_calls == 2u);
+    assert(cleanup_holdings == 7.0);
+
+    oseo_roots_release(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 int main(void) {
     test_index_survives_delete_and_clearing();
     test_index_reuses_tombstones();
@@ -645,5 +754,6 @@ int main(void) {
     test_kept_objects();
     test_internal_await_timer_ends_kept_objects();
     test_promise_jobs_end_kept_objects();
+    test_internal_await_timers_run_cleanup_between();
     return 0;
 }
