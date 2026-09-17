@@ -15,6 +15,7 @@ import {
   compileBodyFragment,
   compileSource,
   describeTarget,
+  targetForExecutionHost,
   prepareHarnessObject,
   scriptFragmentAbi,
 } from "../packages/compiler/src/index.ts";
@@ -127,9 +128,19 @@ try { recurse(); } catch (error) { console.log(error.name); }`,
   },
 ];
 
+const nativeTarget = targetForExecutionHost(
+  createNodeHost().executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
+
 test(
   "prebuilt harness equivalence, reuse and deterministic objects",
-  { timeout: 600_000 },
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+    timeout: 600_000,
+  },
   async () => {
     const baseHost = createNodeHost();
     const dir = await baseHost.makeTemporaryDirectory("oseo-split-test-");
@@ -153,9 +164,7 @@ test(
       const environment = (await host.captureEnvironment!(
         nativeToolchain.environment!,
       )) ?? { variables: {} };
-      const target = describeTarget(
-        process.platform === "darwin" ? "macos-aarch64" : "linux-x86_64-gnu",
-      );
+      const target = nativeTarget!;
       const runtime = cRuntimeProvider.getRuntimeInput();
       const assets = await Promise.all(
         runtime.assets.map(async (asset) => ({

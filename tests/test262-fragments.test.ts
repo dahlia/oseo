@@ -7,6 +7,7 @@ import { createNodeHost } from "../packages/host/src/index.ts";
 import {
   prepareHarnessObject,
   describeTarget,
+  targetForExecutionHost,
 } from "../packages/compiler/src/index.ts";
 import type {
   NativeToolchain,
@@ -20,6 +21,13 @@ import {
   withHarnessIntegrity,
 } from "../tools/test262-fragments.ts";
 import type { Test262FragmentInput } from "../tools/test262-fragments.ts";
+
+const nativeTarget = targetForExecutionHost(
+  createNodeHost().executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
 
 function assembled(input: Test262FragmentInput): string {
   return (
@@ -102,7 +110,10 @@ test("runner fallback retains the exact whole input", async () => {
 
 test(
   "runner split and shadowing fallback retain native output and locations",
-  { timeout: 180_000 },
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+    timeout: 180_000,
+  },
   async () => {
     const host = createNodeHost();
     const executor = createTest262FragmentExecutor(host, nativeToolchain);
@@ -257,62 +268,69 @@ test("explicit whole routes never build fragments", async () => {
   });
 });
 
-test("split build failures are evicted without whole fallback", async () => {
-  for (const phase of ["identity", "object"]) {
-    let attempts = 0;
-    const host = createNodeHost();
-    const directory = await host.makeTemporaryDirectory("oseo-failure-");
-    try {
-      const executor = createTest262FragmentExecutor(
-        {
-          ...host,
-          cache: {
-            ...host.cache!,
-            getDirectory: async () => directory,
-          },
-          async run() {
-            attempts += 1;
-            if (phase === "object" && attempts === 1) {
-              return { exitStatus: 0, stdout: "injected cc", stderr: "" };
-            }
-            throw new Error("injected build failure");
-          },
-        },
-        nativeToolchain,
-      );
-      const fragment = {
-        sources: [{ sourceId: "h.js", source: "var x = 1;" }],
-        body: "console.log(x);",
-        strict: false,
-        raw: false,
-      };
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        await assert.rejects(
-          executor.execute(
-            {
-              fragment,
-              source: assembled(fragment),
-              sourceId: "failure.js",
-              mode: "script",
-              specialization: "enabled",
+test(
+  "split build failures are evicted without whole fallback",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    for (const phase of ["identity", "object"]) {
+      let attempts = 0;
+      const host = createNodeHost();
+      const directory = await host.makeTemporaryDirectory("oseo-failure-");
+      try {
+        const executor = createTest262FragmentExecutor(
+          {
+            ...host,
+            cache: {
+              ...host.cache!,
+              getDirectory: async () => directory,
             },
-            async () => {
-              assert.fail("build errors must not fall back");
+            async run() {
+              attempts += 1;
+              if (phase === "object" && attempts === 1) {
+                return { exitStatus: 0, stdout: "injected cc", stderr: "" };
+              }
+              throw new Error("injected build failure");
             },
-          ),
-          /injected build failure/u,
+          },
+          nativeToolchain,
         );
+        const fragment = {
+          sources: [{ sourceId: "h.js", source: "var x = 1;" }],
+          body: "console.log(x);",
+          strict: false,
+          raw: false,
+        };
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          await assert.rejects(
+            executor.execute(
+              {
+                fragment,
+                source: assembled(fragment),
+                sourceId: "failure.js",
+                mode: "script",
+                specialization: "enabled",
+              },
+              async () => {
+                assert.fail("build errors must not fall back");
+              },
+            ),
+            /injected build failure/u,
+          );
+        }
+        assert.equal(attempts, phase === "identity" ? 2 : 3);
+      } finally {
+        await host.remove(directory);
       }
-      assert.equal(attempts, phase === "identity" ? 2 : 3);
-    } finally {
-      await host.remove(directory);
     }
-  }
-});
+  },
+);
 
 test(
   "fallback preserves harness TDZ and forced collection observations",
-  { timeout: 120_000 },
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+    timeout: 120_000,
+  },
   async () => {
     const executor = createTest262FragmentExecutor(
       createNodeHost(),
@@ -371,7 +389,10 @@ test(
 
 test(
   "split source maps count every ECMAScript line separator",
-  { timeout: 120_000 },
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+    timeout: 120_000,
+  },
   async () => {
     const executor = createTest262FragmentExecutor(
       createNodeHost(),
