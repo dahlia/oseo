@@ -14,7 +14,4 @@ dependencies:
   - map-intrinsic
   - set-intrinsic
 landed: false
-status: parked
-reason: "Coordinator Codex review used five rounds and the fifth found that
-  internal-await timer turns omit the FinalizationRegistry cleanup checkpoint.
-  Additional review authorization is required before another correction."
+status: ready
