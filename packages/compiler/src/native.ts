@@ -129,6 +129,9 @@ export interface RuntimeArchiveReuse {
 export interface NativeBuildInput {
   readonly environment?: ProcessEnvironment;
   readonly generatedSourcePath: string;
+  /** Opt-in additional units and already compiled objects, in link order. */
+  readonly additionalGeneratedSourcePaths?: readonly string[];
+  readonly prebuiltObjectPaths?: readonly string[];
   readonly prebuiltRuntimeArchivePath?: string;
   readonly runtimeDirectory: string;
   readonly runtimeSourcePaths: readonly string[];
@@ -143,6 +146,7 @@ export interface NativeToolchain {
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan;
   readonly environment?: ProcessEnvironmentPolicy;
   readonly runtimeArchiveReuse?: RuntimeArchiveReuse;
+  readonly harnessObjectReuse?: HarnessObjectReuse;
 }
 
 /** Exclusive lease over one host-owned compiler cache path. */
@@ -229,4 +233,34 @@ export function targetForExecutionHost(
     return describeTarget("macos-aarch64");
   }
   return undefined;
+}
+
+/** Normalized object staging contains harness.c and runtime headers. */
+export interface HarnessObjectBuildInput {
+  readonly workingDirectory: string;
+  readonly target: TargetDescription;
+  readonly environment: ProcessEnvironment;
+}
+
+/** Complete bundle, compiler, runtime, and tool inputs for object reuse. */
+export interface HarnessObjectKeyInput extends RuntimeArchiveKeyInput {
+  readonly fragmentAbiVersion: string;
+  readonly harnessSources: readonly {
+    readonly sourceId: string;
+    readonly source: string;
+  }[];
+  readonly strict: boolean;
+  readonly specialization: "enabled" | "disabled";
+  readonly observeSpecialization: boolean;
+  /** Content identities must include uncommitted implementation changes. */
+  readonly frontendIdentity: string;
+  readonly compilerIdentity: string;
+  readonly backendIdentity: string;
+  readonly generatedSource: string;
+}
+
+/** Adapter-owned flags are included by createKey, never supplied ambiently. */
+export interface HarnessObjectReuse {
+  createKey(input: HarnessObjectKeyInput): Promise<string>;
+  createBuildRequest(input: HarnessObjectBuildInput): ProcessRequest;
 }

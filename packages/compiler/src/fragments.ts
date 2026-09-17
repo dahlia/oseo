@@ -260,3 +260,24 @@ export function compileBodyFragment(
     bindingCount: resolved.nextBindingId,
   };
 }
+
+/** Separate launcher-owned initialization from ordered evaluation in MIR. */
+export function lowerFragmentPhases(
+  unit: ScriptFragment,
+): readonly [MirProgram, MirProgram] {
+  const initializers = new Set(unit.launcherInitializers);
+  const lower = (instantiate: boolean): MirProgram =>
+    buildMir(
+      {
+        ...unit.hir,
+        body: unit.hir.body.filter(
+          (_, index) => initializers.has(index) === instantiate,
+        ),
+      },
+      {
+        specialization: unit.mir.specialization,
+        observeSpecialization: unit.mir.observeSpecialization,
+      },
+    );
+  return [lower(true), lower(false)];
+}

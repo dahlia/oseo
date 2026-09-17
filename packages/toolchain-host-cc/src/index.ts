@@ -1,3 +1,4 @@
+import { createHarnessObjectKey } from "@oseo/compiler";
 import type {
   NativeToolchain,
   ProcessEnvironmentPolicy,
@@ -125,7 +126,13 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
             command: options.compiler,
             args: [
               ...common,
+              ...((input.prebuiltObjectPaths?.length ?? 0) > 0 ||
+              (input.additionalGeneratedSourcePaths?.length ?? 0) > 0
+                ? ["-fno-lto"]
+                : []),
               input.generatedSourcePath,
+              ...(input.additionalGeneratedSourcePaths ?? []),
+              ...(input.prebuiltObjectPaths ?? []),
               archive,
               ...libraries,
               "-o",
@@ -136,6 +143,63 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
           },
         ],
       };
+    },
+    harnessObjectReuse: {
+      async createKey(input) {
+        requireTarget(input.target);
+        return await createHarnessObjectKey(input, {
+          adapter: `host-cc-fragments-v1:${options.identity}`,
+          compileFlags: [
+            options.compiler,
+            ...flags,
+            "-I",
+            ".",
+            "-fno-lto",
+            "-ffile-prefix-map=<working-directory>=/oseo/harness",
+            "-c",
+            "harness.c",
+            "-o",
+            "harness.o",
+          ],
+          runtimeFlags: [...flags, "-I", "<runtime-directory>", "-O2"],
+          linkFlags: [
+            options.compiler,
+            ...flags,
+            "-I",
+            "<runtime-directory>",
+            "-fno-lto",
+            "<launcher>",
+            "<case>",
+            "<harness-object>",
+            "<runtime-archive>",
+            ...libraries,
+          ],
+        });
+      },
+      createBuildRequest(input) {
+        requireTarget(input.target);
+        for (const name of Object.keys(input.environment.variables)) {
+          if (!hostCcEnvironment.inherit.includes(name)) {
+            throw new Error(`Host C environment does not admit ${name}.`);
+          }
+        }
+        return {
+          command: options.compiler,
+          args: [
+            ...flags,
+            "-I",
+            ".",
+            "-fno-lto",
+            `-ffile-prefix-map=${input.workingDirectory}=/oseo/harness`,
+            "-c",
+            "harness.c",
+            "-o",
+            "harness.o",
+          ],
+          cwd: input.workingDirectory,
+          environment: input.environment,
+        };
+      },
     },
     runtimeArchiveReuse: {
       createIdentityRequest(cwd, environment) {

@@ -9,8 +9,9 @@ runtime ABI. Changes to either ABI invalidate cached harness objects.
 
 Stage 1 exposes opt-in compiler fragments and connection metadata. They are
 not standalone executable programs. The existing `compileSource`, CLI, C
-backend, and test262 runner retain their whole-Script behavior. Stage 2 will
-implement native emission and linking; stage 3 will admit runner inputs.
+backend, and test262 runner retain their whole-Script behavior. Stage 2 adds
+native emission and linking through opt-in APIs; stage 3 will admit runner
+inputs.
 
 
 Identity and storage
@@ -33,11 +34,11 @@ binding does not copy its current value or authorize cross-unit inlining.
 
 The launcher allocates and roots the shared Script environment. Its capacity
 is the case's exclusive binding limit, covering both units' locals as well as
-globals under the current flat-slot convention. Function environments receive
-that capacity as a run-time value, never a case-dependent constant in harness
-C. Fragment metadata gives both limits explicitly; do not infer capacity from
-reachable functions or emitted operations. Check IDs and capacities against
-the target's representable limits before C emission.
+globals under the current flat-slot convention. Function environments clone the
+captured environment, retaining its runtime capacity without a case-dependent
+constant in harness C. Fragment metadata gives both limits explicitly; do not
+infer capacity from reachable functions or emitted operations. Check IDs and
+capacities against the target's representable limits before C emission.
 
 JavaScript function IDs keep the backend's existing code-ID mapping. Harness
 IDs precede case IDs; runtime built-in IDs retain the runtime header's separate
@@ -51,16 +52,18 @@ The Script entry sentinel `-1` is unit-local and is never a callable code ID.
 Native linkage selected for stage 2
 -----------------------------------
 
-The launcher exports `const size_t oseo_fragment_binding_count`. Harness
-function prologues load this symbol instead of embedding a case-dependent
-environment capacity. It is immutable for the lifetime of one executable.
-Cross-unit LTO is disabled so this value cannot enter a cached harness object.
-Each unit exports an instantiation entry, an evaluation entry, and dispatch
-entries with distinct `oseo_harness_` and `oseo_case_` prefixes. Evaluation and
-instantiation accept `OseoContext *` and the rooted `OseoValue` environment,
-and return `OseoResult`. Dispatch entries retain the runtime's existing call
-arguments and additionally accept the already-decoded function code ID.
-Generator dispatch accepts that ID and the generator object.
+The launcher exports `const size_t oseo_fragment_binding_count`. The launcher
+uses this symbol when creating the shared environment. Inspection during stage
+2 corrected the earlier requirement that function prologues load it: the
+existing runtime environment clone already preserves capacity, so function
+prologues need no capacity argument. It is immutable for the lifetime of one
+executable. Cross-unit LTO is disabled so this value cannot enter a cached
+harness object. Each unit exports an instantiation entry, an evaluation entry,
+and dispatch entries with distinct `oseo_harness_` and `oseo_case_` prefixes.
+Evaluation and instantiation accept `OseoContext *` and the rooted `OseoValue`
+environment, and return `OseoResult`. Dispatch entries retain the runtime's
+existing call arguments and additionally accept the already-decoded function
+code ID. Generator dispatch accepts that ID and the generator object.
 
 The launcher routes IDs using the harness's exclusive function limit. Each
 unit's dispatcher owns its frame allocation and its own function root counts;
@@ -79,8 +82,13 @@ compatibility with a different fragment version.
 Declaration instantiation and execution
 ---------------------------------------
 
-The launcher combines the declaration tables in harness-then-case order and
-performs one GlobalDeclarationInstantiation before evaluating either unit.
+The launcher combines global-object declarations by kind: all functions first,
+then all vars, with harness-before-case order within each kind. This preserves
+the whole-Script path's global property insertion order. Simple concatenation
+of the fragment tables would place harness vars before case functions, which
+changes `Object.keys(this)` and related observations. Lexical declarations
+remain in harness-then-case order. The launcher performs one
+GlobalDeclarationInstantiation before evaluating either unit.
 It checks lexical/object conflicts and restricted global properties, allocates
 uninitialized lexical cells, initializes var bindings, and installs hoisted
 functions. Initially, redeclarations across units make the case ineligible for
@@ -226,3 +234,52 @@ global-object records. Printed HIR, printed MIR, and emitted C matched byte
 for byte. The checked-in baseline retains 44 SHA-256 records in
 *tests/harness-fragment-baseline.json*. These are measured code-generation
 comparisons, not split-native execution or performance evidence.
+
+
+Stage 2 interfaces and ownership
+--------------------------------
+
+`lowerFragmentPhases` lowers the compiler-owned initializer indices into
+separate instantiation and evaluation MIR entries. `emitScriptFragments` in
+*@oseo/backend-c* emits *harness.c*, *case.c*, and *launcher.c*. The launcher
+allocates every Script cell and validates the combined global declaration
+table before invoking either unit's instantiation helper. Those helpers own
+the generated instructions, while the launcher owns when they run. Both
+instantiations finish before harness evaluation starts.
+
+The source-map descriptor supplies an assembled source ID and signed line
+offsets. Strict fragments contain the compiler's leading directive, so the
+body offset subtracts that extra line relative to the actual assembly. These
+inputs belong to the caller's admission proof; this API does not admit runner
+inputs or replace whole-Script fallback.
+
+`NativeBuildInput` accepts ordered additional generated sources and prebuilt
+objects. Omitting both retains the existing command plan. Each adapter exposes
+`harnessObjectReuse`, and `prepareHarnessObject` stages relative source/header
+names, locks a host cache key, builds on a miss, and atomically publishes the
+object through the host cache. Without a cache, the caller owns the returned
+object's temporary parent directory. Cache corruption recovery remains stage 3.
+
+The composing caller supplies content identities for frontend, compiler, and
+backend, plus exact runtime contents and toolchain identity. A package version
+alone does not satisfy that contract. Adapters add their actual normalized
+compile/link flags to the canonical key. Debug and sanitizer builds compile
+relative *harness.c* and headers with file-prefix mapping; Zig additionally
+sets a fixed debug compilation directory. No default-path invocation changes.
+
+Separate phase root frames replace the combined Script frame. The launcher
+holds two root slots across phase calls; each phase retains its own budget.
+This changes resource accounting near the active-slot limit, so stage 3 must
+not treat ordinary execution equivalence as proof of identical resource
+thresholds.
+Recursive-call depth, abrupt completions, and forced collection are separate
+regression probes in *tests/harness-native.test.ts*.
+
+The stage 2 entry-frame probe measures a harness function called by the case.
+On Linux x86\_64, active root slots increased from 67 to 69. Measured native
+frame-address depth increased from 2,432 to 2,592 bytes with Zig and from
+2,624 to 2,816 bytes with host Clang 22 under ASan/UBSan. The test instruments
+only its own generated C; equivalence tests use unmodified output. These
+measurements describe that probe and build policy, not universal overhead or
+identical resource thresholds. The call-depth-limit probe retains the same
+exit status and diagnostic bytes in both builds.

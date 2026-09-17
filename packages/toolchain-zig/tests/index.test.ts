@@ -542,3 +542,30 @@ test("covers archive inputs and toolchain identity", async () => {
   ]);
   assert.equal(new Set([original, ...changedKeys]).size, 7);
 });
+
+test("links fragment units and compiles a normalized standalone object", () => {
+  const target = describeTarget("linux-x86_64-gnu");
+  const plan = zigToolchain.createBuildPlan({
+    generatedSourcePath: "/work/launcher.c",
+    additionalGeneratedSourcePaths: ["/work/case.c"],
+    prebuiltObjectPaths: ["/cache/harness.o"],
+    prebuiltRuntimeArchivePath: "/cache/runtime.a",
+    runtimeSourcePaths: [],
+    runtimeDirectory: "/runtime",
+    workingDirectory: "/work",
+    target,
+  });
+  assert.equal(plan.requests.length, 1);
+  assert.ok(plan.requests[0]!.args.includes("/work/case.c"));
+  assert.ok(plan.requests[0]!.args.includes("/cache/harness.o"));
+  const request = zigToolchain.harnessObjectReuse!.createBuildRequest({
+    workingDirectory: "/different/build",
+    target,
+    environment: { variables: {} },
+  });
+  assert.ok(request.args.includes("harness.c"));
+  assert.ok(request.args.includes("-fdebug-compilation-dir=/oseo/harness"));
+  assert.ok(
+    request.args.includes("-ffile-prefix-map=/different/build=/oseo/harness"),
+  );
+});
