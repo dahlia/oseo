@@ -7,11 +7,10 @@ case-owned launcher. The ABI identifier is `oseo-script-fragments-v1`.
 It is a private compiler/backend contract, versioned independently of the
 runtime ABI. Changes to either ABI invalidate cached harness objects.
 
-Stage 1 exposes opt-in compiler fragments and connection metadata. They are
-not standalone executable programs. The existing `compileSource`, CLI, C
-backend, and test262 runner retain their whole-Script behavior. Stage 2 adds
-native emission and linking through opt-in APIs; stage 3 will admit runner
-inputs.
+The test262 runner uses split compilation by default for admitted Scripts.
+The compiler fragment and multi-unit APIs remain opt-in for other callers;
+`compileSource` and the CLI still compile whole programs. Each executed variant
+retains its own process and runtime context.
 
 
 Identity and storage
@@ -138,7 +137,7 @@ fallback. Whole-Script resolution checks these writes against unresolved
 would otherwise discard that check. This restriction preserves both directions
 of the dependency without adding body inputs to harness lowering.
 
-Compilation failure does not establish eligibility for reuse. Stage 3 sends
+Compilation failure does not establish eligibility for reuse. The runner sends
 parse failures, unsupported inputs, unknown metadata, and collisions to the
 unchanged whole-Script path with the exact original assembled source and source
 ID. That path owns TDZ behavior, early errors, and diagnostic locations. A case
@@ -152,7 +151,7 @@ case separately under the same requested strictness. Locations are local to
 these compiler inputs. Stage 2 passes a logical source-map descriptor through
 the launcher: harness errors use the case's original assembled source ID and
 line mapping; case errors apply the harness-prefix offset. No case path may
-be baked into the harness object. Stage 3 must verify that source boundaries,
+be baked into the harness object. The runner verifies that source boundaries,
 directive prologues, automatic semicolon insertion, and source text retained
 for functions match the runner's original assembly before admitting reuse.
 A source boundary that cannot be represented exactly falls back.
@@ -208,11 +207,12 @@ mutations of globals, async/generator resumptions, source locations, and object
 determinism across directories. It must also measure stack/resource-limit
 effects of the extra entry frames.
 
-Stage 3 adds runner admission and fallback, a command-line bypass, concurrent
-cache publication and corruption recovery, and key-change tests. Compare the
-same small shards with and without reuse, preserve every observation and
-manifest field, then measure cold/warm CI work on Linux and macOS. Update
-*PLAN-GATE.md* and user documentation with measured results. The prior
+Stage 3 adds runner admission and fallback, an environment bypass, concurrent
+cache publication and corruption recovery, and key-change tests. Local shard
+measurements compare the same inputs with and without reuse; the full reviewed
+run compares every manifest field against main. CI wall time and CPU after
+merging remain to be measured on Linux and macOS. Local measurements belong in
+*PLAN-GATE.md* and do not establish CI savings. The prior
 765-to-511-minute macOS work projection and 102-to-106-minute wall-time floor
 are estimates, not stage 1 measurements.
 
@@ -258,7 +258,8 @@ objects. Omitting both retains the existing command plan. Each adapter exposes
 `harnessObjectReuse`, and `prepareHarnessObject` stages relative source/header
 names, locks a host cache key, builds on a miss, and atomically publishes the
 object through the host cache. Without a cache, the caller owns the returned
-object's temporary parent directory. Cache corruption recovery remains stage 3.
+object's temporary parent directory. The runner adds digest validation and
+corruption recovery under that lock.
 
 The composing caller supplies content identities for frontend, compiler, and
 backend, plus exact runtime contents and toolchain identity. A package version
@@ -269,7 +270,7 @@ sets a fixed debug compilation directory. No default-path invocation changes.
 
 Separate phase root frames replace the combined Script frame. The launcher
 holds two root slots across phase calls; each phase retains its own budget.
-This changes resource accounting near the active-slot limit, so stage 3 must
+This changes resource accounting near the active-slot limit, so the runner must
 not treat ordinary execution equivalence as proof of identical resource
 thresholds.
 Recursive-call depth, abrupt completions, and forced collection are separate
@@ -283,3 +284,73 @@ only its own generated C; equivalence tests use unmodified output. These
 measurements describe that probe and build policy, not universal overhead or
 identical resource thresholds. The call-depth-limit probe retains the same
 exit status and diagnostic bytes in both builds.
+
+
+Stage 3 runner behavior
+-----------------------
+
+The runner keeps the original assembled source as the fallback input and
+manifest hash input. An execution request also carries the original body,
+ordered harness sources, raw flag, and requested strictness. Admission checks
+both compiler fragment results and parsed top-level source boundaries before
+building any split artifact. Modules, raw inputs, strictness changes, boundary
+changes, and compiler fallback results take the whole-Script path.
+A conservative token check also falls back on `with`, including uses as a
+keyword-shaped property name. Body directive nodes that become expressions
+in the assembled Script fail the boundary check, even in an already strict
+variant. These conservative exclusions preserve the existing parse context.
+Native build failures are infrastructure failures; they do not trigger
+whole-Script fallback.
+
+`OSEO_TEST262_HARNESS_REUSE=disabled` forces the existing whole-Script executor.
+Build-path counters live outside the reviewed manifest and distinguish attempts
+from execution evidence. Every emitted harness is compared with the first C
+output for its bundle and policy, including across different bodies.
+
+The runner uses the host cache's exclusive object-key lock and atomic file
+publication. A runner-owned SHA-256 sidecar validates cached object bytes;
+a missing or invalid sidecar or an object digest mismatch causes a rebuild
+under the same lock. In-process promises
+coalesce concurrent preparation; rejected promises are evicted so later cases
+can retry preparation. The existing host cache directory is local to
+the CI job; no new cross-shard cache sharing is introduced. The cache key
+includes a content hash of package sources, manifests, and the dependency
+lockfile.
+
+A programmatic CLI native-unit entry point reuses the existing runtime archive,
+target validation, process diagnostics, execution, and cleanup workflow. The
+command-line interface and its default single-source compilation remain intact.
+
+Use the same shard to investigate a suspected split regression:
+
+~~~~ sh
+OSEO_TEST262_HARNESS_REUSE=disabled mise run test:test262 --shard 3/200
+OSEO_TEST262_HARNESS_REUSE=disabled \
+  mise run test:sanitizer:test262 --shard 3/200
+~~~~
+
+The `test262-builds` JSON log reports attempts and variants counted as
+execution evidence by build path or fallback reason, plus harness C comparisons
+and object builds and disk-cache hits. Compile-stage rejections are attempts,
+not executions; infrastructure failures are also excluded. These counters do
+not enter the manifest or alter any evidence class.
+
+On Linux, the host uses `$XDG_CACHE_HOME/oseo/harness-objects`, defaulting to
+`~/.cache/oseo/harness-objects`. On macOS it uses
+`~/Library/Caches/oseo/harness-objects`. The CI workflow does not restore or
+publish this namespace: shards in distinct jobs start independently. Workers
+inside one process share preparation promises; separate processes using the
+same directory share the host's renewable file lock. Removing the namespace
+between runs is safe. No age or size eviction policy is added.
+
+Set `OSEO_TEST262_VERIFY_HARNESS_OBJECTS=1` for determinism evidence. Once per
+encountered bundle and policy, the runner rebuilds its object in a separate
+temporary directory and compares the bytes with the object used for linking.
+A mismatch fails the run. The `deterministicObjects` counter records completed
+comparisons. This extra compilation is disabled in ordinary runs and timing
+comparisons, and is required for final full-corpus verification.
+
+Line offsets count all ECMAScript line separators, including CRLF as one
+separator and lone CR, LF, U+2028, and U+2029. Counting only LF would preserve
+ordinary harness inputs but misreport body errors after other separators;
+runner regression tests compare those locations with whole-Script execution.

@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { CompilerHost } from "@oseo/compiler";
+import type {
+  CompilerHost,
+  NativeBuildInput,
+  NativeToolchain,
+} from "@oseo/compiler";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 
-import { runCli, runNativeCli } from "../src/index.ts";
+import { runCli, runNativeCli, runNativeUnits } from "../src/index.ts";
 
 test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
@@ -1087,3 +1091,115 @@ for (const failure of [
     assert.doesNotMatch(result.stderr, /Error:| at /u);
   });
 }
+
+test("native units share the existing build and cleanup workflow", async () => {
+  const writes = new Map<string, string>();
+  const inputs: NativeBuildInput[] = [];
+  let cleaned = 0;
+  const host: CompilerHost = {
+    executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+    makeTemporaryDirectory: async () => "/work",
+    readTextFile: async () => "runtime asset",
+    writeTextFile: async (path, source) => {
+      writes.set(path, source);
+    },
+    remove: async () => {
+      cleaned += 1;
+    },
+    run: async () => ({ exitStatus: 0, stderr: "", stdout: "42\n" }),
+  };
+  const toolchain: NativeToolchain = {
+    createBuildPlan(input) {
+      inputs.push(input);
+      return {
+        executablePath: "/work/program",
+        requests: [],
+        target: input.target,
+      };
+    },
+  };
+  const result = await runNativeUnits(
+    {
+      sources: [
+        { sourceName: "launcher.c", source: "launcher" },
+        { sourceName: "case.c", source: "body" },
+      ],
+      prebuiltObjectPaths: ["/cache/harness.o"],
+    },
+    "original.js",
+    host,
+    toolchain,
+  );
+  assert.deepEqual(result, { exitStatus: 0, stderr: "", stdout: "42\n" });
+  assert.equal(writes.get("/work/case.c"), "body");
+  assert.equal(inputs[0]?.generatedSourcePath, "/work/launcher.c");
+  assert.deepEqual(inputs[0]?.additionalGeneratedSourcePaths, ["/work/case.c"]);
+  assert.deepEqual(inputs[0]?.prebuiltObjectPaths, ["/cache/harness.o"]);
+  assert.equal(cleaned, 1);
+  const invalid = await runNativeUnits(
+    {
+      sources: [{ sourceName: "../escape.c", source: "bad" }],
+      prebuiltObjectPaths: [],
+    },
+    "original.js",
+    host,
+    toolchain,
+  );
+  assert.match(invalid.stderr, /OSEO3001/u);
+  assert.equal(inputs.length, 1);
+  assert.equal(cleaned, 2);
+});
+
+test("native unit setup and cleanup failures match the CLI", async () => {
+  await Promise.all(
+    (["setup", "cleanup"] as const).map(async (failure) => {
+      const host: CompilerHost = {
+        executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+        async makeTemporaryDirectory() {
+          if (failure === "setup") throw new Error("ENOSPC");
+          return "/work";
+        },
+        readTextFile: async () => "runtime asset",
+        writeTextFile: async () => {},
+        async remove() {
+          throw new Error("cleanup failure");
+        },
+        run: async () => ({ exitStatus: 0, stderr: "", stdout: "42\n" }),
+      };
+      const toolchain: NativeToolchain = {
+        createBuildPlan(input) {
+          return {
+            executablePath: "/work/program",
+            requests: [],
+            target: input.target,
+          };
+        },
+      };
+      const expected = await runNativeCli(
+        {
+          args: ["original.js"],
+          source: "console.log(42);",
+          sourceId: "original.js",
+          version: "test",
+        },
+        host,
+        toolchain,
+      );
+      const actual = await runNativeUnits(
+        {
+          sources: [{ sourceName: "case.c", source: "body" }],
+          prebuiltObjectPaths: [],
+        },
+        "original.js",
+        host,
+        toolchain,
+      );
+      assert.deepEqual(actual, expected);
+      assert.match(actual.stderr, /original.js:1:1: error\[OSEO3001\]/u);
+      assert.match(
+        actual.stderr,
+        failure === "setup" ? /created/u : /removed/u,
+      );
+    }),
+  );
+});

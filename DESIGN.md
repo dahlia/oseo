@@ -957,6 +957,16 @@ partition. Each supported execution host reruns the complete reviewed subset
 and normalizes only the target ID before comparing the manifest, so target
 evidence cannot duplicate compatibility counts.
 
+The test262 runner compiles admitted Script harnesses into reusable objects
+and links each case with its own unit and launcher. The
+[harness fragment ABI](./docs/harness-fragment-abi.md) defines admission,
+source mapping, and cache ownership. Shadowing and other admission failures
+use the exact original assembled source through whole-Script compilation;
+build failures stay infrastructure failures.
+`OSEO_TEST262_HARNESS_REUSE=disabled` forces whole-Script compilation for a
+comparison run. These operational choices never change manifest schema,
+variant coverage, or compatibility classifications.
+
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to
 trace a native block back to the originating expression.
