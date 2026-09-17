@@ -1,0 +1,63 @@
+version: 1
+id: typed-array-iterative
+title: "TypedArray iteration methods"
+scope:
+  - "The %TypedArray.prototype% every, some, forEach, map, filter, reduce,
+    and reduceRight methods: ValidateTypedArray before the callable check and
+    the length snapshot, one TypedArrayGetElement read per snapshot index
+    with no hole test, detach and shrink observations taken while a callback
+    runs, every and some short-circuit results, the forEach undefined result,
+    the TypedArraySpeciesCreate allocation map performs before its first
+    callback and filter performs after it collects, the content-type and
+    result-length checks on the species result, and the reduce and
+    reduceRight accumulator selection when no initial value is supplied."
+  - "Reviewed standards coverage is every upstream path under the node's
+    seven inventory roots: test/built-ins/TypedArray/prototype/every,
+    filter, forEach, map, reduce, reduceRight, and some. Paths that need
+    ArrayBuffer.prototype.transferToFixedLength or the unreviewed
+    resizableArrayBufferUtils.js include retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-iterative.ts
+      - tests/property/m5-typed-array-iterative.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-iterative.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-iterative.ts
+      - tests/property/m5-typed-array-iterative.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-iterative.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-iterative.ts
+      - tests/property/m5-typed-array-iterative.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-iterative.ts
+      - tests/property/m5-typed-array-iterative.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c

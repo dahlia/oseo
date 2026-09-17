@@ -126,6 +126,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "top-level-await",
   "typed-array-constructors",
   "typed-array-core",
+  "typed-array-iterative",
   "var-bindings",
 ]);
 

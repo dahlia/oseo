@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-19,770 reviewed cases: 16,144 passes, 1,556 expected negatives, and 2,070
+20,168 reviewed cases: 16,519 passes, 1,556 expected negatives, and 2,093
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 126 indexed records in the normative
+M5a is complete. The 127 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-16,144 passes across 19,770 paths, and the property inventory records 148
-domains, 148 seeds, and an ordinary case budget of 5,695.
+16,519 passes across 20,168 paths, and the property inventory records 149
+domains, 149 seeds, and an ordinary case budget of 5,707.
 
 
 M5a implementation history
@@ -6375,6 +6375,36 @@ four realm intrinsic slots, one heap kind, and the context's WaiterList store
 roots; the value representation and the generated-code entry points are
 unchanged. Agent clusters, cross-agent shared-memory execution, and the
 `$262.agent` capability remain with the `atomics-and-shared-memory` node.
+
+Implemented M5b node `typed-array-iterative` adds `every`, `some`, `forEach`,
+`map`, `filter`, `reduce`, and `reduceRight` to `%TypedArray.prototype%` over
+the landed core. Each method validates its receiver and snapshots the view
+length before it checks the callback, then reads every snapshot index with
+TypedArrayGetElement and no hole test, so a detach or shrink a callback
+performs makes a later read `undefined` without leaving the Data Block.
+`every` and `some` short-circuit, `forEach` returns `undefined`, `map`
+performs TypedArraySpeciesCreate before its first callback and stores through
+TypedArraySetElement, `filter` collects first and species-creates with the
+captured count, and `reduce` and `reduceRight` traverse the snapshot in
+opposite directions with the specified empty-view rule. The methods take
+seven code IDs in the existing TypedArray range and add no realm intrinsic
+slot, heap kind, component, or generated-code entry point.
+
+Fixed native and generated differential evidence at seed `0x60007400` covers
+the seven methods over Number and BigInt kinds, default, null, and subclass
+species, present and absent reduction initial values, and no mutation, detach,
+and shrink during the first callback, with collection forced at every
+safepoint, a false numeric hint's deliberate guard miss, and an independent
+model of every callback and result. All 398 edition paths under the node's
+seven inventory roots enter the reviewed subset: 375 pass and twenty-three
+keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite. No reviewed path outside the roots changes classification. The
+manifest moves from 19,770 to 20,168 paths and from 16,144 to 16,519 passes,
+keeps 1,556 expected negatives, and moves from 2,070 to 2,093 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+property ratchet moves from 148 to 149 domains and seeds and from 5,695 to
+5,707 ordinary cases, and the evidence inventory moves from 126 to 127
+families. The runtime ABI moves to `m5-112`.
 
 
 Ahead-of-time challenge boundary

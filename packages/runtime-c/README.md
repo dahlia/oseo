@@ -905,6 +905,17 @@ set-like operand's `size`, `has`, and `keys`. `union` and
 no intrinsic slot, heap kind, public layout, or generated-code entry point is
 added.
 
+The `m5-112` ABI adds the TypedArray iteration methods `every`, `some`,
+`forEach`, `map`, `filter`, `reduce`, and `reduceRight`. Each validates its
+receiver and snapshots the view length before checking the callback, then
+reads every snapshot index through the existing integer-indexed element getter
+without a hole test, so a callback that detaches or shrinks the buffer only
+makes later reads `undefined`. `map` species-creates before its first callback
+and `filter` collects first and species-creates with the captured count;
+`reduce` and `reduceRight` share one bidirectional snapshot walk. Seven code
+IDs are allocated inside the existing TypedArray range; no intrinsic slot,
+heap kind, public layout, or generated-code entry point is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

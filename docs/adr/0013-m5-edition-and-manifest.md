@@ -440,6 +440,20 @@ unmet prerequisite was the `SharedArrayBuffer` feature gate move to `pass`
 and retain their existing tags. Admitting the tag changes no classification
 value.
 
+The M5b `typed-array-iterative` node extends the vocabulary with
+`typed-array-iterative`. The tag identifies the `every`, `some`, `forEach`,
+`map`, `filter`, `reduce`, and `reduceRight` members of
+`%TypedArray.prototype%`, including the ValidateTypedArray bounds check, the
+snapshotted element traversal, the `TypedArraySpeciesCreate` allocation the
+mapping and selecting members perform, and the detach and shrink observations
+each member makes while it runs. One tag covers the seven methods because each
+walks the same view record and shares the same element, callback, and result
+contracts, and the tag is distinct from `typed-array-core`, which names the
+prototype surface these algorithms operate over, and from
+`typed-array-constructors`, which names view creation. The reviewed rows under
+the node's seven inventory roots carry it, and no reviewed row outside those
+roots gains or loses a tag.
+
 
 Alternatives considered
 -----------------------

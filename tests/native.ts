@@ -58,6 +58,9 @@ import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 
+const { typedArrayIterativeFixtures } =
+  await import("./native/fixtures/typed-array-iterative.ts");
+
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpPrototypeAndExecFixtures } =
@@ -189,6 +192,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrays.typedArrayConstructorFixtures,
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
+  ...typedArrayIterativeFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -709,6 +713,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "typed-array-iterative" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -955,6 +960,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "generic-string-coercion" ||
     fixture.name === "number-prototype" ||
     fixture.name === "array-prototype-species-mapping" ||
+    fixture.name === "typed-array-iterative" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -1063,6 +1069,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "typed-array-core" ||
             fixture.name === "shared-array-buffer" ||
             fixture.name === "atomics-single-agent" ||
+            fixture.name === "typed-array-iterative" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

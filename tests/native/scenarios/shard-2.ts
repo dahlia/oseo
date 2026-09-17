@@ -12,11 +12,6 @@ export async function runNativeScenario2(
 
   for (const [name, source, message] of [
     [
-      "typed-array-iterative-method.ts",
-      "console.log(new Uint8Array(1).map);",
-      "TypedArray iterative methods are not admitted yet.",
-    ],
-    [
       "typed-array-search-method.ts",
       "console.log(new Uint8Array(1).includes);",
       "TypedArray search and join methods are not admitted yet.",
@@ -30,11 +25,6 @@ export async function runNativeScenario2(
       "typed-array-sort-method.ts",
       "console.log(new Uint8Array(1).sort);",
       "TypedArray sorting methods are not admitted yet.",
-    ],
-    [
-      "typed-array-method-in.ts",
-      'console.log("map" in new Uint8Array(1));',
-      "TypedArray iterative methods are not admitted yet.",
     ],
   ] as const) {
     const observed = await runNativeCli(
@@ -70,12 +60,6 @@ export async function runNativeScenario2(
       "const C = Object.getPrototypeOf(Uint8Array); " +
         'console.log(Object.hasOwn(C, "from"));',
       "TypedArray static APIs are not admitted yet.",
-    ],
-    [
-      "typed-array-method-descriptor.ts",
-      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
-        'console.log(Object.getOwnPropertyDescriptor(p, "map"));',
-      "TypedArray iterative methods are not admitted yet.",
     ],
     [
       "typed-array-prototype-own-names.ts",

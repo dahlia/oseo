@@ -11697,6 +11697,9 @@ partitions:
     key: "00"
     path: results/built-ins/TypedArray/00.yaml
   - group: built-ins/TypedArray
+    key: "01"
+    path: results/built-ins/TypedArray/01.yaml
+  - group: built-ins/TypedArray
     key: "02"
     path: results/built-ins/TypedArray/02.yaml
   - group: built-ins/TypedArray
@@ -11705,6 +11708,12 @@ partitions:
   - group: built-ins/TypedArray
     key: "05"
     path: results/built-ins/TypedArray/05.yaml
+  - group: built-ins/TypedArray
+    key: "06"
+    path: results/built-ins/TypedArray/06.yaml
+  - group: built-ins/TypedArray
+    key: "07"
+    path: results/built-ins/TypedArray/07.yaml
   - group: built-ins/TypedArray
     key: "08"
     path: results/built-ins/TypedArray/08.yaml
@@ -11715,6 +11724,9 @@ partitions:
     key: 0a
     path: results/built-ins/TypedArray/0a.yaml
   - group: built-ins/TypedArray
+    key: 0b
+    path: results/built-ins/TypedArray/0b.yaml
+  - group: built-ins/TypedArray
     key: 0c
     path: results/built-ins/TypedArray/0c.yaml
   - group: built-ins/TypedArray
@@ -11723,6 +11735,9 @@ partitions:
   - group: built-ins/TypedArray
     key: 0e
     path: results/built-ins/TypedArray/0e.yaml
+  - group: built-ins/TypedArray
+    key: 0f
+    path: results/built-ins/TypedArray/0f.yaml
   - group: built-ins/TypedArray
     key: "10"
     path: results/built-ins/TypedArray/10.yaml
@@ -11751,6 +11766,9 @@ partitions:
     key: "19"
     path: results/built-ins/TypedArray/19.yaml
   - group: built-ins/TypedArray
+    key: 1a
+    path: results/built-ins/TypedArray/1a.yaml
+  - group: built-ins/TypedArray
     key: 1b
     path: results/built-ins/TypedArray/1b.yaml
   - group: built-ins/TypedArray
@@ -11759,6 +11777,9 @@ partitions:
   - group: built-ins/TypedArray
     key: 1d
     path: results/built-ins/TypedArray/1d.yaml
+  - group: built-ins/TypedArray
+    key: 1e
+    path: results/built-ins/TypedArray/1e.yaml
   - group: built-ins/TypedArray
     key: 1f
     path: results/built-ins/TypedArray/1f.yaml
@@ -11771,6 +11792,9 @@ partitions:
   - group: built-ins/TypedArray
     key: "23"
     path: results/built-ins/TypedArray/23.yaml
+  - group: built-ins/TypedArray
+    key: "24"
+    path: results/built-ins/TypedArray/24.yaml
   - group: built-ins/TypedArray
     key: "25"
     path: results/built-ins/TypedArray/25.yaml
@@ -11786,6 +11810,9 @@ partitions:
   - group: built-ins/TypedArray
     key: "29"
     path: results/built-ins/TypedArray/29.yaml
+  - group: built-ins/TypedArray
+    key: 2a
+    path: results/built-ins/TypedArray/2a.yaml
   - group: built-ins/TypedArray
     key: 2b
     path: results/built-ins/TypedArray/2b.yaml
@@ -11820,8 +11847,14 @@ partitions:
     key: "35"
     path: results/built-ins/TypedArray/35.yaml
   - group: built-ins/TypedArray
+    key: "36"
+    path: results/built-ins/TypedArray/36.yaml
+  - group: built-ins/TypedArray
     key: "37"
     path: results/built-ins/TypedArray/37.yaml
+  - group: built-ins/TypedArray
+    key: "38"
+    path: results/built-ins/TypedArray/38.yaml
   - group: built-ins/TypedArray
     key: "39"
     path: results/built-ins/TypedArray/39.yaml
@@ -11841,14 +11874,32 @@ partitions:
     key: 3e
     path: results/built-ins/TypedArray/3e.yaml
   - group: built-ins/TypedArray
+    key: 3f
+    path: results/built-ins/TypedArray/3f.yaml
+  - group: built-ins/TypedArray
     key: "40"
     path: results/built-ins/TypedArray/40.yaml
+  - group: built-ins/TypedArray
+    key: "41"
+    path: results/built-ins/TypedArray/41.yaml
+  - group: built-ins/TypedArray
+    key: "42"
+    path: results/built-ins/TypedArray/42.yaml
+  - group: built-ins/TypedArray
+    key: "43"
+    path: results/built-ins/TypedArray/43.yaml
   - group: built-ins/TypedArray
     key: "44"
     path: results/built-ins/TypedArray/44.yaml
   - group: built-ins/TypedArray
     key: "45"
     path: results/built-ins/TypedArray/45.yaml
+  - group: built-ins/TypedArray
+    key: "46"
+    path: results/built-ins/TypedArray/46.yaml
+  - group: built-ins/TypedArray
+    key: "48"
+    path: results/built-ins/TypedArray/48.yaml
   - group: built-ins/TypedArray
     key: "49"
     path: results/built-ins/TypedArray/49.yaml
@@ -11858,6 +11909,9 @@ partitions:
   - group: built-ins/TypedArray
     key: 4b
     path: results/built-ins/TypedArray/4b.yaml
+  - group: built-ins/TypedArray
+    key: 4d
+    path: results/built-ins/TypedArray/4d.yaml
   - group: built-ins/TypedArray
     key: 4e
     path: results/built-ins/TypedArray/4e.yaml
@@ -11895,6 +11949,15 @@ partitions:
     key: "59"
     path: results/built-ins/TypedArray/59.yaml
   - group: built-ins/TypedArray
+    key: 5a
+    path: results/built-ins/TypedArray/5a.yaml
+  - group: built-ins/TypedArray
+    key: 5b
+    path: results/built-ins/TypedArray/5b.yaml
+  - group: built-ins/TypedArray
+    key: 5c
+    path: results/built-ins/TypedArray/5c.yaml
+  - group: built-ins/TypedArray
     key: 5d
     path: results/built-ins/TypedArray/5d.yaml
   - group: built-ins/TypedArray
@@ -11907,8 +11970,14 @@ partitions:
     key: "60"
     path: results/built-ins/TypedArray/60.yaml
   - group: built-ins/TypedArray
+    key: "61"
+    path: results/built-ins/TypedArray/61.yaml
+  - group: built-ins/TypedArray
     key: "62"
     path: results/built-ins/TypedArray/62.yaml
+  - group: built-ins/TypedArray
+    key: "63"
+    path: results/built-ins/TypedArray/63.yaml
   - group: built-ins/TypedArray
     key: "64"
     path: results/built-ins/TypedArray/64.yaml
@@ -11916,8 +11985,14 @@ partitions:
     key: "65"
     path: results/built-ins/TypedArray/65.yaml
   - group: built-ins/TypedArray
+    key: "66"
+    path: results/built-ins/TypedArray/66.yaml
+  - group: built-ins/TypedArray
     key: "67"
     path: results/built-ins/TypedArray/67.yaml
+  - group: built-ins/TypedArray
+    key: "68"
+    path: results/built-ins/TypedArray/68.yaml
   - group: built-ins/TypedArray
     key: "69"
     path: results/built-ins/TypedArray/69.yaml
@@ -11949,6 +12024,9 @@ partitions:
     key: "72"
     path: results/built-ins/TypedArray/72.yaml
   - group: built-ins/TypedArray
+    key: "73"
+    path: results/built-ins/TypedArray/73.yaml
+  - group: built-ins/TypedArray
     key: "74"
     path: results/built-ins/TypedArray/74.yaml
   - group: built-ins/TypedArray
@@ -11979,6 +12057,9 @@ partitions:
     key: 7d
     path: results/built-ins/TypedArray/7d.yaml
   - group: built-ins/TypedArray
+    key: 7e
+    path: results/built-ins/TypedArray/7e.yaml
+  - group: built-ins/TypedArray
     key: 7f
     path: results/built-ins/TypedArray/7f.yaml
   - group: built-ins/TypedArray
@@ -12006,11 +12087,17 @@ partitions:
     key: "87"
     path: results/built-ins/TypedArray/87.yaml
   - group: built-ins/TypedArray
+    key: "88"
+    path: results/built-ins/TypedArray/88.yaml
+  - group: built-ins/TypedArray
     key: "89"
     path: results/built-ins/TypedArray/89.yaml
   - group: built-ins/TypedArray
     key: 8b
     path: results/built-ins/TypedArray/8b.yaml
+  - group: built-ins/TypedArray
+    key: 8c
+    path: results/built-ins/TypedArray/8c.yaml
   - group: built-ins/TypedArray
     key: 8d
     path: results/built-ins/TypedArray/8d.yaml
@@ -12021,11 +12108,20 @@ partitions:
     key: 8f
     path: results/built-ins/TypedArray/8f.yaml
   - group: built-ins/TypedArray
+    key: "90"
+    path: results/built-ins/TypedArray/90.yaml
+  - group: built-ins/TypedArray
     key: "91"
     path: results/built-ins/TypedArray/91.yaml
   - group: built-ins/TypedArray
     key: "92"
     path: results/built-ins/TypedArray/92.yaml
+  - group: built-ins/TypedArray
+    key: "93"
+    path: results/built-ins/TypedArray/93.yaml
+  - group: built-ins/TypedArray
+    key: "94"
+    path: results/built-ins/TypedArray/94.yaml
   - group: built-ins/TypedArray
     key: "96"
     path: results/built-ins/TypedArray/96.yaml
@@ -12041,6 +12137,9 @@ partitions:
   - group: built-ins/TypedArray
     key: 9c
     path: results/built-ins/TypedArray/9c.yaml
+  - group: built-ins/TypedArray
+    key: 9d
+    path: results/built-ins/TypedArray/9d.yaml
   - group: built-ins/TypedArray
     key: 9e
     path: results/built-ins/TypedArray/9e.yaml
@@ -12060,6 +12159,9 @@ partitions:
     key: a4
     path: results/built-ins/TypedArray/a4.yaml
   - group: built-ins/TypedArray
+    key: a5
+    path: results/built-ins/TypedArray/a5.yaml
+  - group: built-ins/TypedArray
     key: a6
     path: results/built-ins/TypedArray/a6.yaml
   - group: built-ins/TypedArray
@@ -12069,11 +12171,17 @@ partitions:
     key: a8
     path: results/built-ins/TypedArray/a8.yaml
   - group: built-ins/TypedArray
+    key: a9
+    path: results/built-ins/TypedArray/a9.yaml
+  - group: built-ins/TypedArray
     key: aa
     path: results/built-ins/TypedArray/aa.yaml
   - group: built-ins/TypedArray
     key: ab
     path: results/built-ins/TypedArray/ab.yaml
+  - group: built-ins/TypedArray
+    key: ac
+    path: results/built-ins/TypedArray/ac.yaml
   - group: built-ins/TypedArray
     key: ad
     path: results/built-ins/TypedArray/ad.yaml
@@ -12084,6 +12192,9 @@ partitions:
     key: af
     path: results/built-ins/TypedArray/af.yaml
   - group: built-ins/TypedArray
+    key: b0
+    path: results/built-ins/TypedArray/b0.yaml
+  - group: built-ins/TypedArray
     key: b1
     path: results/built-ins/TypedArray/b1.yaml
   - group: built-ins/TypedArray
@@ -12092,6 +12203,12 @@ partitions:
   - group: built-ins/TypedArray
     key: b3
     path: results/built-ins/TypedArray/b3.yaml
+  - group: built-ins/TypedArray
+    key: b4
+    path: results/built-ins/TypedArray/b4.yaml
+  - group: built-ins/TypedArray
+    key: b5
+    path: results/built-ins/TypedArray/b5.yaml
   - group: built-ins/TypedArray
     key: b6
     path: results/built-ins/TypedArray/b6.yaml
@@ -12147,6 +12264,12 @@ partitions:
     key: c8
     path: results/built-ins/TypedArray/c8.yaml
   - group: built-ins/TypedArray
+    key: c9
+    path: results/built-ins/TypedArray/c9.yaml
+  - group: built-ins/TypedArray
+    key: ca
+    path: results/built-ins/TypedArray/ca.yaml
+  - group: built-ins/TypedArray
     key: cb
     path: results/built-ins/TypedArray/cb.yaml
   - group: built-ins/TypedArray
@@ -12168,8 +12291,14 @@ partitions:
     key: d1
     path: results/built-ins/TypedArray/d1.yaml
   - group: built-ins/TypedArray
+    key: d2
+    path: results/built-ins/TypedArray/d2.yaml
+  - group: built-ins/TypedArray
     key: d3
     path: results/built-ins/TypedArray/d3.yaml
+  - group: built-ins/TypedArray
+    key: d4
+    path: results/built-ins/TypedArray/d4.yaml
   - group: built-ins/TypedArray
     key: d5
     path: results/built-ins/TypedArray/d5.yaml
@@ -12183,11 +12312,26 @@ partitions:
     key: d8
     path: results/built-ins/TypedArray/d8.yaml
   - group: built-ins/TypedArray
+    key: d9
+    path: results/built-ins/TypedArray/d9.yaml
+  - group: built-ins/TypedArray
     key: da
     path: results/built-ins/TypedArray/da.yaml
   - group: built-ins/TypedArray
     key: db
     path: results/built-ins/TypedArray/db.yaml
+  - group: built-ins/TypedArray
+    key: dc
+    path: results/built-ins/TypedArray/dc.yaml
+  - group: built-ins/TypedArray
+    key: dd
+    path: results/built-ins/TypedArray/dd.yaml
+  - group: built-ins/TypedArray
+    key: df
+    path: results/built-ins/TypedArray/df.yaml
+  - group: built-ins/TypedArray
+    key: e0
+    path: results/built-ins/TypedArray/e0.yaml
   - group: built-ins/TypedArray
     key: e1
     path: results/built-ins/TypedArray/e1.yaml
@@ -12198,11 +12342,17 @@ partitions:
     key: e3
     path: results/built-ins/TypedArray/e3.yaml
   - group: built-ins/TypedArray
+    key: e4
+    path: results/built-ins/TypedArray/e4.yaml
+  - group: built-ins/TypedArray
     key: e6
     path: results/built-ins/TypedArray/e6.yaml
   - group: built-ins/TypedArray
     key: e8
     path: results/built-ins/TypedArray/e8.yaml
+  - group: built-ins/TypedArray
+    key: e9
+    path: results/built-ins/TypedArray/e9.yaml
   - group: built-ins/TypedArray
     key: ea
     path: results/built-ins/TypedArray/ea.yaml
@@ -12228,11 +12378,20 @@ partitions:
     key: f1
     path: results/built-ins/TypedArray/f1.yaml
   - group: built-ins/TypedArray
+    key: f2
+    path: results/built-ins/TypedArray/f2.yaml
+  - group: built-ins/TypedArray
+    key: f3
+    path: results/built-ins/TypedArray/f3.yaml
+  - group: built-ins/TypedArray
     key: f4
     path: results/built-ins/TypedArray/f4.yaml
   - group: built-ins/TypedArray
     key: f6
     path: results/built-ins/TypedArray/f6.yaml
+  - group: built-ins/TypedArray
+    key: f7
+    path: results/built-ins/TypedArray/f7.yaml
   - group: built-ins/TypedArray
     key: f8
     path: results/built-ins/TypedArray/f8.yaml
@@ -12242,6 +12401,9 @@ partitions:
   - group: built-ins/TypedArray
     key: fa
     path: results/built-ins/TypedArray/fa.yaml
+  - group: built-ins/TypedArray
+    key: fc
+    path: results/built-ins/TypedArray/fc.yaml
   - group: built-ins/TypedArray
     key: fd
     path: results/built-ins/TypedArray/fd.yaml
@@ -16234,9 +16396,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 16144
+  passes: 16519
   semanticFailures: 0
-  unsupportedProfileFeatures: 2070
+  unsupportedProfileFeatures: 2093
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -16497,6 +16659,13 @@ summary:
       passes: 288
       semanticFailures: 0
       unsupportedProfileFeatures: 49
+    - dependency: typed-array-iterative
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 375
+      semanticFailures: 0
+      unsupportedProfileFeatures: 23
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -16775,9 +16944,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 288
+      passes: 663
       semanticFailures: 0
-      unsupportedProfileFeatures: 49
+      unsupportedProfileFeatures: 72
     - group: built-ins/TypedArrayConstructors
       expectedNegatives: 0
       harnessFailures: 0

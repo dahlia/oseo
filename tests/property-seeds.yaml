@@ -464,3 +464,7 @@ families:
     owner: tests/property/m5-atomics-single-agent.property.test.ts
     start: 0x60007300
     end: 0x600073ff
+  - family: m5-typed-array-iterative
+    owner: tests/property/m5-typed-array-iterative.property.test.ts
+    start: 0x60007400
+    end: 0x600074ff

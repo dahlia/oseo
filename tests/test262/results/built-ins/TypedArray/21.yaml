@@ -4,6 +4,28 @@ results:
   - case:
       async: false
       features:
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - compareArray.js
+        - resizableArrayBufferUtils.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/map/speciesctor-resizable-buffer-grow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-iterative
+    observation:
+      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
+      passed: false
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - TypedArray
       flags: []
       includes:
