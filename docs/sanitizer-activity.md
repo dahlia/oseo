@@ -6,8 +6,11 @@ pinned Zig 0.16.0 build does not provide AddressSanitizer coverage. Passing the
 flags and completing a gate do not establish that ASan ran. This finding
 qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
 documentation, and gate-cost records. The Linux host C lane below supplies
-separate verified instrumentation. Historical Zig runs and macOS execution
-still lack ASan evidence; the declared target policy has not changed.
+separate verified instrumentation. Historical Zig runs still lack ASan
+evidence. A bounded Apple Clang sample below shows ASan and UBSan working
+through the host C adapter on one macOS arm64 machine. It is not CI coverage,
+and it does not cover leak detection. The declared target policy has not
+changed.
 
 
 Cause and reproduction
@@ -134,6 +137,18 @@ sanitizer native task omits only Zig-specific assembly and cross-link checks;
 all executable scenarios remain. The ordinary native gate still runs the
 assembly and cross-link checks.
 
+For a bounded ordinary property measurement, pass Node.js test options before
+an explicit file set. The shard task retains four workers and the same
+interrupt-time multiplier as the full sanitizer property task:
+
+~~~~ sh
+mise run test:sanitizer:property:shard \
+  --test-shard=1/12 tests/property/*.property.test.ts
+~~~~
+
+The full property task and the Linux CI lane remain unsharded. The shard task
+uses ordinary seeds, sizes, and case counts, not the extended property budget.
+
 The archive reuse key includes the exact resolved compiler path, full version
 output, archiver path, compile flags, target, runtime contents, and captured
 build environment. Failure metadata and property replay diagnostics include the
@@ -238,19 +253,21 @@ not a full-corpus result. Case mix, cache state, host contention, and runner
 capacity can change the cost.
 
 That cost is too high for this change's additional per-PR gate: the measured
-self, runtime, native, and property tasks together take 34.49 minutes, while
-full test262 would add roughly 142 minutes at the sampled throughput. Linux CI
+self, runtime, native, and property tasks together took 34.49 minutes on a
+16-thread workstation and about 57 runner-minutes as one job on GitHub's
+ubuntu runner, while full test262 would add roughly 142 workstation minutes at
+the sampled throughput. Linux CI
 therefore schedules those four tasks and an explicit GCC self-check, but not
 full sanitizer test262. Sharded periodic or on-demand corpus runs remain an
 option if their compute budget is accepted. No unsharded test262 run was made.
 
 
-Apple Clang proposal, not execution evidence
---------------------------------------------
+Earlier Apple Clang proposal
+----------------------------
 
-No macOS job is added. This Linux host cannot measure Apple Clang or verify
-macOS ASan/UBSan execution, and Linux LeakSanitizer results do not establish
-macOS leak checking.
+The Linux audit added no macOS job. That host could not measure Apple Clang or
+verify macOS ASan/UBSan execution, and Linux LeakSanitizer results do not
+establish macOS leak checking.
 
 For capacity planning only, consider Apple Clang taking one or two times the
 34.49-minute Linux lane measurement, excluding test262. Those assumptions give
@@ -258,9 +275,38 @@ about 35 or 69 runner-minutes. Dividing by the maintainer's stated five macOS
 slots gives an added capacity floor of 6.90 or 13.80 minutes; a stated
 156-minute existing floor would become approximately 163 or 170 minutes. These
 are estimates, not measured compiler-speed ratios. They exclude extra setup,
-queueing, and cold-cache costs.
+queueing, and cold-cache costs. The 34.49 minutes they scale is a workstation
+measurement; the same lane took about 57 runner-minutes on GitHub's ubuntu
+runner, so these estimates were low. The measured sample below supersedes them.
 
 The proposed next step is to run the self-check and a small native shard
 manually on an Apple Clang AArch64 host, record its full compiler identity, and
-then measure the complete lane before budgeting any CI job. Until that evidence
-exists, historical and current macOS ASan coverage remains unverified.
+then measure the complete lane before budgeting any CI job. The later sample
+below supplies that local evidence, without establishing coverage on a GitHub
+macOS runner or over the complete macOS corpus.
+
+
+Apple Clang sample (2026-09-17)
+-------------------------------
+
+A fresh clone at `779e281908622d39e2a138548058438903019046` passed the host C
+self-check on a MacBook Air with an M4, four performance and six efficiency
+cores, 32 GiB of memory, macOS 27.0, and Apple Clang 21.0.0. Both address and
+undefined-behavior faults were reported in runtime and generated code.
+`OSEO_HOST_CC=gcc` passed too, but its recorded version identifies Apple Clang,
+not GNU GCC. The target resolves to `macos-aarch64`.
+
+The preflight and lane do not require LeakSanitizer. A separate leaking
+program exited without a leak report under default ASan options; forcing
+`detect_leaks=1` failed because the platform does not support it. This sample
+therefore establishes ASan and UBSan activity, not leak detection.
+
+The full four-fixture runtime task, native shard `1/12` with 21 of 246
+fixtures and its selected scenarios, and ordinary property shard `1/12` with
+14 tests across ten of 115 files passed. The property shard retained four
+workers, ordinary budgets, and `OSEO_PROPERTY_TIME_SCALE=3`. These are bounded
+execution observations, not a full macOS sanitizer gate. Test262 shard
+`3/200` also passed: 101 of 20,168 paths, with 80 passes, seven expected
+negatives, 14 unsupported results, and zero retries. No compiler or
+runtime correction was needed. The additive property shard task above leaves
+the Linux CI lane and all existing default tasks unchanged.
