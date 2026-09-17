@@ -36,10 +36,23 @@ jobs:
         env:
           BASELINE: >-
             ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: git fetch --no-tags --depth=1 origin "$BASELINE"
+        run: git fetch --no-tags origin "$BASELINE"
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - name: Check introduced commit messages
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          COMMIT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # Fetch both endpoints without making the history shallow. A
+          # force-push's previous tip may no longer be on any remote ref.
+          git fetch --no-tags origin "$COMMIT_HEAD"
+          if [ "$BASE" != "0000000000000000000000000000000000000000" ]; then
+            git fetch --no-tags origin "$BASE"
+          fi
+          mise run check:commit-messages "$BASE..$COMMIT_HEAD"
       - run: mise run check
 
   test:

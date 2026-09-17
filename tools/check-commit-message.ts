@@ -75,7 +75,7 @@ export function stripCommentary(
   const scissors = scissorsLine(commentChar);
   const lines: string[] = [];
   for (const line of text.split("\n")) {
-    if (line === scissors) break;
+    if (commentChar !== "" && line === scissors) break;
     if (commentChar !== "" && line.startsWith(commentChar)) continue;
     lines.push(line.replace(/\s+$/u, ""));
   }
@@ -135,6 +135,84 @@ function looksLikeFlattenedBreaks(line: string, limit: number): boolean {
 }
 
 /**
+ * Check only assistant attribution, including in already published history.
+ *
+ * Git decides which final paragraph is a trailer block and unfolds continued
+ * values. --no-divider treats the input as a commit message, not a patch.
+ * Pin the separator so local configuration cannot disable colon trailers.
+ * Walk source headers backwards to locate duplicate keys in the actual footer,
+ * rather than an earlier paragraph that merely discusses the same trailer.
+ */
+export function checkCommitTrailers(
+  text: string,
+  commentChar: string = "#",
+  cwd: string = process.cwd(),
+): readonly CommitMessageProblem[] {
+  const lines = stripCommentary(text, commentChar);
+  const parse = (input: string): string =>
+    execFileSync(
+      "git",
+      [
+        "-c",
+        "trailer.separators=:",
+        "interpret-trailers",
+        "--parse",
+        "--no-divider",
+      ],
+      { input, encoding: "utf8", cwd },
+    );
+  const parsed = parse(lines.join("\n") + "\n");
+  const canonicalKeys = new Map<string, string>();
+  const canonicalKey = (key: string): string => {
+    const cached = canonicalKeys.get(key);
+    if (cached != null) return cached;
+    // Git can expand configured aliases (sob -> Signed-off-by). Ask the
+    // same parser to normalize source keys, without running trailer commands.
+    const canonical =
+      parse(`Subject\n\n${key}:\n`).split(":")[0]?.trim().toLowerCase() ?? "";
+    canonicalKeys.set(key, canonical);
+    return canonical;
+  };
+  const problems: CommitMessageProblem[] = [];
+  let sourceIndex = lines.length - 1;
+  for (const trailer of parsed.trimEnd().split("\n").toReversed()) {
+    const header = /^([^\s:]+):[ \t]*(.*)$/u.exec(trailer);
+    if (header == null) continue;
+    const key = header[1]?.toLowerCase();
+    const value = header[2] ?? "";
+    while (sourceIndex >= 0) {
+      const source = /^([^\s:]+)[ \t]*:/u.exec(lines[sourceIndex] ?? "");
+      if (source?.[1] != null && canonicalKey(source[1]) === key) break;
+      sourceIndex--;
+    }
+    if (sourceIndex < 0) {
+      throw new Error("Cannot locate Git's parsed trailer in the message");
+    }
+    const forbidden =
+      key === "claude-session" ||
+      (key === "co-authored-by" &&
+        (/\bclaude\b/iu.test(value) ||
+          /@(?:[a-z0-9-]+\.)*anthropic\.com(?![\w-]|\.\w)/iu.test(value)));
+    if (forbidden) {
+      problems.push({
+        line: sourceIndex + 1,
+        column: null,
+        message:
+          key === "claude-session"
+            ? "a Claude-Session trailer is not allowed"
+            : "a Co-authored-by trailer credits Claude or an " +
+              "anthropic.com address",
+        remedy:
+          "Use Assisted-by: AGENT:MODEL instead. Assistant contributions " +
+          "must not be credited as co-authors or carry session trailers.",
+      });
+    }
+    sourceIndex--;
+  }
+  return problems.toReversed();
+}
+
+/**
  * Report every way a commit message is malformed rather than merely unusual.
  *
  * The thresholds are deliberately looser than the convention. Style belongs to
@@ -148,7 +226,9 @@ export function checkCommitMessage(
   commentChar: string = "#",
 ): readonly CommitMessageProblem[] {
   const lines = stripCommentary(text, commentChar);
-  const problems: CommitMessageProblem[] = [];
+  const problems: CommitMessageProblem[] = [
+    ...checkCommitTrailers(text, commentChar),
+  ];
 
   if (lines.every((line) => line.trim() === "")) {
     return [
@@ -265,20 +345,17 @@ function renderExcerpt(line: string, column: number | null): string {
 }
 
 /**
- * Build the whole rejection report.
+ * Render the shared line diagnostics for hook and history reports.
  *
  * Kept separate from the entry point so the wording is testable, and written
  * so that reading it is enough to fix the message without opening this file.
  */
-export function formatCommitMessageReport(
+export function formatCommitMessageProblems(
   problems: readonly CommitMessageProblem[],
   text: string,
-  messagePath: string,
   commentChar: string = "#",
 ): string {
   const lines = stripCommentary(text, commentChar);
-  const count =
-    problems.length === 1 ? "1 problem" : `${problems.length} problems`;
   const sections = problems.map((problem) => {
     const source = lines[problem.line - 1] ?? "";
     const place =
@@ -291,10 +368,22 @@ export function formatCommitMessageReport(
       problem.remedy.replace(/^/gmu, "  "),
     ].join("\n");
   });
+  return sections.join("\n\n");
+}
+
+/** Render the hook report without changing the rejected message file. */
+export function formatCommitMessageReport(
+  problems: readonly CommitMessageProblem[],
+  text: string,
+  messagePath: string,
+  commentChar: string = "#",
+): string {
+  const count =
+    problems.length === 1 ? "1 problem" : `${problems.length} problems`;
   return [
     `The commit message was rejected: ${count}.`,
     "",
-    sections.join("\n\n"),
+    formatCommitMessageProblems(problems, text, commentChar),
     "",
     "Only the message is wrong. The change itself was not rejected and does",
     "not need to be redone or abandoned.",

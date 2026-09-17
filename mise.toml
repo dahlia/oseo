@@ -70,6 +70,11 @@ description = "Reject a malformed commit message given its file"
 raw_args = true
 run = "node tools/check-commit-message.ts"
 
+[tasks."check:commit-messages"]
+description = "Reject forbidden assistant trailers in a revision range"
+raw_args = true
+run = "node tools/check-commit-messages.ts"
+
 [tasks."check:compatibility-ratchet"]
 description = "Reject measured compatibility reversals"
 run = "node tools/compatibility-ratchet.ts"

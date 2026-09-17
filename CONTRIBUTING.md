@@ -49,7 +49,7 @@ passes it. Repeating the install refreshes both.
 
 A commit message uses a subject of 50 columns or fewer, a blank second line,
 and a body wrapped at 72. The commit-msg hook does not enforce that. It
-rejects only a message whose subject reaches 80 columns, whose second line is
+rejects a message whose subject reaches 80 columns, whose second line is
 not blank, or whose body has a line past 100 columns that wrapping could have
 shortened. It also rejects an escaped paragraph break, a doubled `\n` or `\t`
 on a line already past its limit, which is what a message looks like when
@@ -60,6 +60,32 @@ The looser thresholds are deliberate. The hook catches a message that went
 wrong mechanically and leaves style to review, so a message written to the
 convention never reaches them. A rejection names the line at fault and how to
 fix it, and keeps what you wrote for editing rather than discarding it.
+
+Assistant contributions are credited only with `Assisted-by: AGENT:MODEL`
+trailers. The hook rejects any `Claude-Session` trailer, and any
+`Co-authored-by` trailer whose value contains the word Claude or an email
+address at anthropic.com (including subdomains). Keys, Claude, and domains are
+matched without regard to case. Human co-authors remain allowed.
+
+Trailer recognition uses `git interpret-trailers --parse --no-divider` with
+`:` as the separator. Git selects a final block preceded by a blank line:
+either every line is a trailer, or at least 25% are trailers and one is a
+Git-recognized or configured trailer, such as `Signed-off-by`. A key starts at
+column one, has no internal whitespace, and may have spaces or tabs before
+its colon. Indented continuation lines belong to the preceding value.
+The `--no-divider` option treats `---` as message text, not a patch boundary.
+A prose mention or an example in an earlier paragraph is not a trailer.
+These rules also apply to merge messages. Rejection leaves the message file
+available for correction and another commit attempt.
+
+CI's `check` job runs the same attribution check through
+`mise run check:commit-messages base..head`. Pull requests use the event's
+base and head commits; pushes use `before..sha`. An all-zero `before` checks
+every commit reachable from `sha`, including merged side branches. Locally,
+`mise run check:commit-messages HEAD` checks all reachable history too.
+Range checks enforce only the attribution rule: published history includes
+messages that predate the hook's length rules. A missing revision fails the
+check. Manual workflow runs have no introduced range and skip this step.
 
 `mise tasks` is the source of truth for commands available in the current
 checkout. A command described in a design or plan document may not exist until
