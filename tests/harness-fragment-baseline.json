@@ -1,0 +1,266 @@
+[
+  {
+    "family": "bindings",
+    "name": "with-statements",
+    "specialization": "enabled",
+    "sha256": "e19ef94113e5554c3e4954d5ccd312bfa3ee327c83f4877467e16877eace7e05"
+  },
+  {
+    "family": "bindings",
+    "name": "with-statements",
+    "specialization": "disabled",
+    "sha256": "e33244ab7d7e99c19e6421521ecacafdd2d557d03bdd5273d898fe1497e05e32"
+  },
+  {
+    "family": "bindings",
+    "name": "labeled-statements",
+    "specialization": "enabled",
+    "sha256": "f4d64c0a7861482cc43a72331ada2263826a753bf1add0a6007530437b602d91"
+  },
+  {
+    "family": "bindings",
+    "name": "labeled-statements",
+    "specialization": "disabled",
+    "sha256": "6adc1fd57461b2159627ca5ebdbe57187510512468891e177247d0478aa629d2"
+  },
+  {
+    "family": "bindings",
+    "name": "switch-statements",
+    "specialization": "enabled",
+    "sha256": "c15c4fd73b2ae06876cc05fafb889b6a55181a94caa2c6578605562b258b9d8b"
+  },
+  {
+    "family": "bindings",
+    "name": "switch-statements",
+    "specialization": "disabled",
+    "sha256": "c15bc7b2a023d68e9d4b060f64e7feb0642d69a634e6b097a46819c36011951c"
+  },
+  {
+    "family": "functions",
+    "name": "function-prototype",
+    "specialization": "enabled",
+    "sha256": "90f2a528d55394a51e4fa58514315addec8d1e4f1fa8ec2bfca61a5952608271"
+  },
+  {
+    "family": "functions",
+    "name": "function-prototype",
+    "specialization": "disabled",
+    "sha256": "77edf0209aecc8c7ed6b4117bb2cebf4ee86c94a120d32234af2b6e157952984"
+  },
+  {
+    "family": "functions",
+    "name": "closures-and-methods",
+    "specialization": "enabled",
+    "sha256": "3fa6c22bba4175186046b7f72cb677cfd3ec786a449f8d867d4ea699dbc09e2a"
+  },
+  {
+    "family": "functions",
+    "name": "closures-and-methods",
+    "specialization": "disabled",
+    "sha256": "9574998e119312e4a501502ba72abeead5809e08ad84ebbb40218e3adc6739ed"
+  },
+  {
+    "family": "functions",
+    "name": "function-binding-patterns",
+    "specialization": "enabled",
+    "sha256": "dc766ed11da193a102c19e32a44ba5004c3a0a4b4c49abbd9a03d2d41761010b"
+  },
+  {
+    "family": "functions",
+    "name": "function-binding-patterns",
+    "specialization": "disabled",
+    "sha256": "9db6436be0e50659577b2a79769a3d16563880e9b36fe6b23e2a95a30f5ad0e1"
+  },
+  {
+    "family": "classes",
+    "name": "class-definitions",
+    "specialization": "enabled",
+    "sha256": "b19f1ab080521dfa1fe2b9355ab9ee45ec1f171c61deccb32fc9be2fc29f4a98"
+  },
+  {
+    "family": "classes",
+    "name": "class-definitions",
+    "specialization": "disabled",
+    "sha256": "bbc5a5a5626f095c37fe9c21e40eb69b9a813c241c5faa5e62f5e0007b5c907f"
+  },
+  {
+    "family": "classes",
+    "name": "class-identity",
+    "specialization": "enabled",
+    "sha256": "c9ca5352c9d51c3af9b4045a51c092a1b1687a9d4d58201603f0c407bac19b33"
+  },
+  {
+    "family": "classes",
+    "name": "class-identity",
+    "specialization": "disabled",
+    "sha256": "5936f54b43224e29f3854849c36bf58ee9b57b59757658b7dda62be03e5f3b49"
+  },
+  {
+    "family": "classes",
+    "name": "class-name-binding",
+    "specialization": "enabled",
+    "sha256": "9fbb84bd1bbc357419be511f3d5b1e1d317483634ceb42a8bfe153c439d23fca"
+  },
+  {
+    "family": "classes",
+    "name": "class-name-binding",
+    "specialization": "disabled",
+    "sha256": "adb3a5f02dc2856deace6de674e74a670c554797031695aaae436ba7885137fd"
+  },
+  {
+    "family": "objects",
+    "name": "object-constructor",
+    "specialization": "enabled",
+    "sha256": "c3727807b23193de0c5a9ceeedb70594d7f4ee2cb9473e754188023fd55754a0"
+  },
+  {
+    "family": "objects",
+    "name": "object-constructor",
+    "specialization": "disabled",
+    "sha256": "94b2efb035f4545fba0551202d3304b2573024f68b31ff78c0c47939db252ce1"
+  },
+  {
+    "family": "objects",
+    "name": "object-define-property",
+    "specialization": "enabled",
+    "sha256": "ccfc750ad007a58186c07b3ebf1fe7b8a4929dd4d783cb90cffad588bd9b0779"
+  },
+  {
+    "family": "objects",
+    "name": "object-define-property",
+    "specialization": "disabled",
+    "sha256": "549f9e43ba9becf503316091545d4363692326f226dc16e6751736a1238b6276"
+  },
+  {
+    "family": "objects",
+    "name": "object-define-properties",
+    "specialization": "enabled",
+    "sha256": "2f1df73a108445d3896ce2104e4f2d8ab7c8c14132707e845dc758794ae97d22"
+  },
+  {
+    "family": "objects",
+    "name": "object-define-properties",
+    "specialization": "disabled",
+    "sha256": "820a2709afbc7ae6db8dde71897ef68d3ce963b7a17aced97ac6680847638488"
+  },
+  {
+    "family": "expressions",
+    "name": "var-async",
+    "specialization": "enabled",
+    "sha256": "6f5d3778e48009100422cddb998ff9367b926bfb09616035ec8637c6b7af5c50"
+  },
+  {
+    "family": "expressions",
+    "name": "var-async",
+    "specialization": "disabled",
+    "sha256": "3a1c78488b4c7f45c6a26ba77a339be89749af8581688642e20f9e4f1f6b8075"
+  },
+  {
+    "family": "expressions",
+    "name": "loose-equality",
+    "specialization": "enabled",
+    "sha256": "a70f25444adb780ba28b915189d095329aaabc7722a078b7826bb81d533f6d8a"
+  },
+  {
+    "family": "expressions",
+    "name": "loose-equality",
+    "specialization": "disabled",
+    "sha256": "e4fd96c022b84b99be384d500ae50e1d8bcfc0c7a41598403e17539139562c0b"
+  },
+  {
+    "family": "expressions",
+    "name": "sequence-and-nullish",
+    "specialization": "enabled",
+    "sha256": "7478ebd89c0a068121d7fefbbbf17ca4a1cdebeabca53364422674a7b28e406b"
+  },
+  {
+    "family": "expressions",
+    "name": "sequence-and-nullish",
+    "specialization": "disabled",
+    "sha256": "3714a77245dff5e0c8d5ff9a0c451b052756904f4d8562069b9385cb102fa6a0"
+  },
+  {
+    "family": "generators",
+    "name": "generators",
+    "specialization": "enabled",
+    "sha256": "bfba29b7ac6df27dacfd63caa27d612df787c5a6e4b447c1e1d77a59f3845ae7"
+  },
+  {
+    "family": "generators",
+    "name": "generators",
+    "specialization": "disabled",
+    "sha256": "af569588dfe4a0dc0d46129d60a79aaea5e5ec841baf5c087bbe18bc76b393da"
+  },
+  {
+    "family": "generators",
+    "name": "generator-iterator-suspension",
+    "specialization": "enabled",
+    "sha256": "ab63407f4084ef6a9ef0f865f74366f40a0d37e4f3cab168b3cd18b1435500dc"
+  },
+  {
+    "family": "generators",
+    "name": "generator-iterator-suspension",
+    "specialization": "disabled",
+    "sha256": "4ebab44a484489346b41de09f4039a6df6a2c2d83a297478dd96d30c5f1d86d5"
+  },
+  {
+    "family": "generators",
+    "name": "generator-return",
+    "specialization": "enabled",
+    "sha256": "257beade6d10067f846987e802382bdc61cbc0e224af4c87a717c3f84b6440d4"
+  },
+  {
+    "family": "generators",
+    "name": "generator-return",
+    "specialization": "disabled",
+    "sha256": "87a889b5e309684b8605cc6529b50c92196247aa67c77bcd707fbc0c3922d58c"
+  },
+  {
+    "family": "async",
+    "name": "async-continuations",
+    "specialization": "enabled",
+    "sha256": "373fb1bd7f883c00a7e6b379f9cf191f1532d307ef6a5ca20a9fd4169e3c1ee8"
+  },
+  {
+    "family": "async",
+    "name": "async-continuations",
+    "specialization": "disabled",
+    "sha256": "350ca1e1eb92801df7079f0e7d2d20c12e83ce3f94e82644a6501d3258a33d3c"
+  },
+  {
+    "family": "async",
+    "name": "async-await-positions",
+    "specialization": "enabled",
+    "sha256": "772c9a29ce12ec63600c24e3bdffd8d24a2330c7516b16ea7bf59abbf337e87c"
+  },
+  {
+    "family": "async",
+    "name": "async-await-positions",
+    "specialization": "disabled",
+    "sha256": "4bce4fbfad05e7de03feb1499883ccaf39f191ad83c4324b381b88f37bd641f5"
+  },
+  {
+    "family": "async",
+    "name": "timer-event-loop",
+    "specialization": "enabled",
+    "sha256": "4bc2f14e567969a6145144ad952802eaf4f2a980a201ebb548e4e9495c3e6eab"
+  },
+  {
+    "family": "async",
+    "name": "timer-event-loop",
+    "specialization": "disabled",
+    "sha256": "a45a2f11a3fbfa53d7934f625ef28a0ebcf49bb7b31f4b5413f09fdb340879d6"
+  },
+  {
+    "family": "global-object-record",
+    "name": "global-object-record",
+    "specialization": "enabled",
+    "sha256": "a5c583c283095fe8b65da9a5acd7b255aae7f465c90647d1eac60a1318a2fcf1"
+  },
+  {
+    "family": "global-object-record",
+    "name": "global-object-record",
+    "specialization": "disabled",
+    "sha256": "945ec84ce36fcf0c0fdf00642b7697f9f54c2f38c5879672a66a42b91f36142d"
+  }
+]
