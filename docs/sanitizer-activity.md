@@ -8,8 +8,9 @@ qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
 documentation, and gate-cost records. The Linux host C lane below supplies
 separate verified instrumentation. Historical Zig runs still lack ASan
 evidence. A bounded Apple Clang sample below shows ASan and UBSan working
-through the host C adapter on one macOS arm64 machine. It is not CI coverage,
-and it does not cover leak detection. The declared target policy has not
+through the host C adapter on one macOS arm64 machine. The macOS CI jobs
+below are configured but have not run; the sample does not verify them.
+Leak detection remains excluded on macOS. The declared target policy has not
 changed.
 
 
@@ -279,9 +280,9 @@ queueing, and cold-cache costs. The 34.49 minutes they scale is a workstation
 measurement; the same lane took about 57 runner-minutes on GitHub's ubuntu
 runner, so these estimates were low. The measured sample below supersedes them.
 
-The proposed next step is to run the self-check and a small native shard
+The proposal was to run the self-check and a small native shard
 manually on an Apple Clang AArch64 host, record its full compiler identity, and
-then measure the complete lane before budgeting any CI job. The later sample
+then measure the complete lane before budgeting a CI job. The later sample
 below supplies that local evidence, without establishing coverage on a GitHub
 macOS runner or over the complete macOS corpus.
 
@@ -310,3 +311,76 @@ execution observations, not a full macOS sanitizer gate. Test262 shard
 negatives, 14 unsupported results, and zero retries. No compiler or
 runtime correction was needed. The additive property shard task above leaves
 the Linux CI lane and all existing default tasks unchanged.
+
+
+macOS CI configuration (2026-09-17)
+-----------------------------------
+
+The maintainer has chosen to run the complete self-check, runtime, native, and
+ordinary property tasks on every merge. The two `test_sanitizer_macos` matrix
+jobs in *.github/workflows/main.yaml* use `macos-15` and share the Linux lane's
+unfiltered `push`, `pull_request`, and `workflow_dispatch` triggers. Neither
+platform schedules sanitizer test262. Each macOS job runs
+`test:sanitizer:self` immediately after checkout and tool installation, before
+its other tests, so unsupported instrumentation fails at preflight. The native
+job then runs `test:sanitizer:runtime` and `test:sanitizer:native`; the property
+job runs `test:sanitizer:property`. Both require `clang`. There is no separate
+GCC check because the macOS `gcc` command is an Apple Clang alias.
+
+The [GitHub runner specification] lists `macos-15` as arm64 with three M1 CPUs
+and 7 GB of RAM. The [macOS 15 arm64 image README], checked on 2026-09-17,
+lists image `20260907.0337.1`, macOS 15.7.9, Clang/LLVM 17.0.0, and default
+Xcode 16.4. This differs from the M4/macOS 27/Apple Clang 21 sample above.
+Runner images change; the first run must record the actual image and compiler
+identity and confirm the self-check diagnostics on that compiler.
+
+The Linux runner's self, GCC self, runtime, native, and property steps took
+about 0.1, 0.1, 2.7, 29.0, and 25.2 minutes. The local Apple sample's
+same-shard host-C/Zig cost ratios were 0.62 for runtime, 1.08 for native, and
+1.11 for ordinary properties. These ratios compare compilers on that Mac,
+not Mac and Linux runner speeds. The supplied planning estimate for
+the macOS lane is 65–79 runner-minutes, with a wider 50–105 minute range.
+Allocating 65–79 minutes in proportion to the Linux runtime/native and
+property costs gives roughly 36–44 and 29–35 minutes respectively, before the
+extra job's setup and repeated self-check. These are estimates, not CI results.
+
+Two independently queued jobs can reduce the delay at the end of a run sharing
+the maintainer's five macOS slots. A single late-starting job could add almost
+the entire lane's duration. Earlier splitting of the longest macOS job family
+reduced a repository run from 260.8 to 181.4 minutes; that observation
+motivates the split but does not predict this lane's wall time. Two jobs also
+limit repeated setup costs. Each has a 75-minute timeout: about 31 minutes
+above the larger central estimate, and roughly 16 minutes above its
+proportional share of the 105-minute upper planning bound. That margin covers
+tool installation, cold archives, runner variation, and corpus growth. Queue
+time is separate; the split does not reduce total compiler work or guarantee
+earlier scheduling.
+
+The property job retains four Node workers and sets
+`OSEO_PROPERTY_TIME_SCALE=6`, twice Linux's value of 3, because four compiling
+workers share only three CPUs and the sample used a faster, larger machine.
+The full and shard property tasks accept this environment override and default
+to 3, leaving the Linux workflow at its existing settings. The multiplier
+widens only the interrupt deadline; it changes no seeds, sizes, or case counts,
+and `markInterruptAsFailure` remains enabled. It does not double successful
+run time. The first run must establish whether this allowance is sufficient.
+
+Both jobs upload _oseo-native-\*_ failure directories from `runner.temp` on
+failure or cancellation, using distinct artifact names and the Linux lane's
+warning when no files are found. Step-level `TMPDIR` makes the test output and
+upload paths agree. Matrix fail-fast is disabled so one failed suite does not
+cancel the other. The Linux sanitizer job has no aggregate `needs` wiring;
+the macOS jobs likewise report independent checks. The `native` aggregate
+continues to cover the ordinary native, native-support, and test262 shards.
+At configuration time, GitHub reported no main-branch protection or applicable
+rules; no server-side required-check settings were changed.
+
+No macOS CI run has happened for this configuration. The first GitHub run must
+confirm both runtime and generated-code ASan/UBSan self-checks, completion of
+all runtime/native/ordinary property tests without interrupts, actual step
+costs and timeout headroom, and retained diagnostics on any failure. The local
+sample is evidence only for that sample. LeakSanitizer remains explicitly
+excluded on macOS arm64; these jobs make no leak-detection claim.
+
+[GitHub runner specification]: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+[macOS 15 arm64 image README]: https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md

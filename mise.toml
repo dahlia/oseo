@@ -314,7 +314,8 @@ description = "Run ordinary native properties under host ASan and UBSan"
 depends = ["build"]
 run = "node --test --test-concurrency=4 tests/property/*.property.test.ts"
 env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
-env.OSEO_PROPERTY_TIME_SCALE = "3"
+env.OSEO_PROPERTY_TIME_SCALE = """
+{{ get_env(name='OSEO_PROPERTY_TIME_SCALE', default='3') }}"""
 
 [tasks."test:sanitizer:property:shard"]
 description = "Run selected ordinary native property test files with sanitizers"
@@ -322,7 +323,8 @@ depends = ["build"]
 raw_args = true
 run = "node --test --test-concurrency=4"
 env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
-env.OSEO_PROPERTY_TIME_SCALE = "3"
+env.OSEO_PROPERTY_TIME_SCALE = """
+{{ get_env(name='OSEO_PROPERTY_TIME_SCALE', default='3') }}"""
 
 [tasks."test:sanitizer:test262"]
 description = "Measure a bounded test262 shard under host ASan and UBSan"

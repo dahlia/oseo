@@ -92,11 +92,15 @@ Native failure records and property replay diagnostics retain that identity.
 Compiler subprocesses inherit only PATH, HOME, and TMPDIR; ambient sanitizer
 options and injected libraries are rejected at lane startup.
 
-Linux CI schedules this lane and an explicit GCC self-check. The host adapter
-rejects cross-target build requests; the ordinary Zig gate still owns
-cross-link and assembly evidence. macOS ASan coverage remains unverified, and
-no macOS CI job is added. Measurements and the Apple Clang proposal live in
-[the activity audit](../sanitizer-activity.md).
+Linux CI schedules this lane and an explicit GCC self-check. macOS CI now
+configures two Apple Clang jobs on `macos-15`: self/runtime/native and
+self/ordinary properties, with the same triggers as Linux. The self-check runs
+first in each job. The macOS jobs have not run yet; full macOS CI ASan/UBSan
+coverage remains unverified, and leak detection is excluded. A bounded local
+Apple Clang sample, the job split, and timing assumptions are recorded in
+[the activity audit](../sanitizer-activity.md). The host adapter rejects
+cross-target build requests; the ordinary Zig gate still owns cross-link and
+assembly evidence.
 
 
 Consequences
