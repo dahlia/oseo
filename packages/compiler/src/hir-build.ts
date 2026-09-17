@@ -103,10 +103,14 @@ function resolveName(
     const scope = scopes[index];
     if (scope == null) continue;
     const binding = scope.get(name);
-    if (binding != null) return { binding, objectBindingIds };
+    if (binding != null) {
+      if (scope === state.scriptScope) state.globalReferences?.add(name);
+      return { binding, objectBindingIds };
+    }
     const objectBindingId = state.withScopes.get(scope);
     if (objectBindingId != null) objectBindingIds.push(objectBindingId);
   }
+  state.globalReferences?.add(name);
   return { objectBindingIds };
 }
 
@@ -1527,7 +1531,7 @@ function resolveExpression(
   }
   let target: HirCallTarget;
   if (expression.target.kind === "console-log") {
-    const binding = findBinding(scopes, "console");
+    const binding = resolveName(scopes, state, "console").binding;
     target =
       binding == null
         ? { kind: "console-log" }
@@ -1581,7 +1585,11 @@ function resolveExpression(
       object,
     };
   } else if (expression.target.kind === "timer-intrinsic") {
-    const binding = findBinding(scopes, expression.target.method);
+    const binding = resolveName(
+      scopes,
+      state,
+      expression.target.method,
+    ).binding;
     target =
       binding == null
         ? {
@@ -4081,6 +4089,11 @@ function resolveStatement(
 }
 
 interface HirSeed {
+  readonly fragmentMetadata?: true;
+  /** Record actual Script/global lookups without traversing lowered IR. */
+  readonly globalReferences?: Set<string>;
+  /** Imported Script bindings retain their global-object storage. */
+  readonly globalObjectBindingIds?: readonly number[];
   readonly bindings?: ReadonlyMap<string, Binding>;
   /**
    * True when `program` is one module's body rather than a Script or
@@ -4095,6 +4108,8 @@ interface HirSeed {
 }
 
 interface SeededHirResult extends HirResult {
+  readonly scriptBindings?: ReadonlyMap<string, Binding>;
+  readonly initializingWithNames?: readonly string[];
   readonly nextBindingId: number;
   readonly nextFunctionId: number;
 }
@@ -4104,10 +4119,13 @@ export function buildSeededHir(
   seed: HirSeed = {},
 ): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
+  const scriptScope = new Map(seed.bindings);
   const state: ResolveState = {
     diagnostics,
     foldedTypeofReferences: [],
-    globalObjectBindingIds: new Set(),
+    globalObjectBindingIds: new Set(seed.globalObjectBindingIds),
+    globalReferences: seed.globalReferences,
+    scriptScope,
     functionInfo: new Map(),
     hirFunctions: [],
     intrinsicGlobalObjectBinding: undefined,
@@ -4121,7 +4139,6 @@ export function buildSeededHir(
     withInitializingFallbackNames: new Set(),
     withScopes: new Map(),
   };
-  const scriptScope = new Map(seed.bindings);
   predeclareBindings(
     program.body,
     scriptScope,
@@ -4194,6 +4211,13 @@ export function buildSeededHir(
     diagnostics,
     nextBindingId: state.nextBindingId,
     nextFunctionId: state.nextFunctionId,
+    ...includePropertiesWhen(() => {
+      if (seed.fragmentMetadata !== true) return undefined;
+      return {
+        scriptBindings: scriptScope,
+        initializingWithNames: [...state.withInitializingFallbackNames],
+      };
+    }),
     program: {
       body:
         state.intrinsicGlobalObjectBinding == null

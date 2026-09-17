@@ -259,3 +259,11 @@ export function renderDiagnostic(diagnostic: Diagnostic): string {
 export { describeTarget } from "./native.ts";
 export { canExecuteTarget } from "./native.ts";
 export { targetForExecutionHost } from "./native.ts";
+export { scriptFragmentAbi } from "./fragments.ts";
+export { compileHarnessFragment } from "./fragments.ts";
+export { compileBodyFragment } from "./fragments.ts";
+export type { FragmentBinding } from "./fragments.ts";
+export type { ScriptFragment } from "./fragments.ts";
+export type { HarnessFragment } from "./fragments.ts";
+export type { HarnessFragmentResult } from "./fragments.ts";
+export type { BodyFragmentResult } from "./fragments.ts";

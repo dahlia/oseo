@@ -1272,6 +1272,9 @@ export interface Binding {
 }
 
 export interface ResolveState {
+  /** Optional fragment analysis; absent on the whole-Script path. */
+  readonly globalReferences?: Set<string> | undefined;
+  readonly scriptScope?: ReadonlyMap<string, Binding> | undefined;
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
   /** Script bindings whose storage is the realm global object's property. */

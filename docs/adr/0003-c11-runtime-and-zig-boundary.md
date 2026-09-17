@@ -129,3 +129,14 @@ Links
 defines the pinned toolchain and targets.
 [*0005-generic-call-and-abrupt-completion.md*](./0005-generic-call-and-abrupt-completion.md)
 defines the first generic C ABI.
+
+
+Harness fragment amendment
+--------------------------
+
+The opt-in [harness fragment ABI](../harness-fragment-abi.md) permits a
+prebuilt generated harness translation unit and a case-owned launcher.
+Stage 1 defines the compiler fragments; native multi-unit emission and
+runner admission follow in separately reviewed stages. The default backend
+continues to emit one C11 source. Runtime and toolchain ownership remain
+unchanged.
