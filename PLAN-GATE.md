@@ -569,3 +569,46 @@ This plan is complete when:
  -  each admitted family has one normative profile record that concurrent
     units extend without conflicting; and
  -  every preserved invariant above has a test that fails when it is broken.
+
+
+Prebuilt test262 harnesses
+--------------------------
+
+The test262 runner now reuses a compiled harness object for admitted Scripts.
+The [fragment ABI](./docs/harness-fragment-abi.md) defines the unit boundary,
+admission and whole-Script fallback. The runtime archive cache remains in use.
+The environment bypass `OSEO_TEST262_HARNESS_REUSE=disabled` retains the
+original assembled-source compilation for regression comparisons. Neither
+path changes the reviewed manifest, variant budget, or evidence classes.
+
+The following local measurements use the same reviewed shard, `3/200`, on a
+shared Linux x86\_64 host. The task runs 101 reviewed paths: 80 pass, 7 expected
+negatives, and 14 unsupported. Both compilation paths retain 316 variants
+counted as execution evidence. CPU is user plus system time from GNU time,
+including child processes; wall time includes task setup and manifest checks.
+These are single-run measurements, not statistical estimates or CI timings.
+
+| Adapter                   | Harness path              | Wall seconds | CPU seconds | Objects built/reused |
+| ------------------------- | ------------------------- | -----------: | ----------: | -------------------- |
+| Zig                       | Whole Script              |        90.10 |      305.17 | 0/0                  |
+| Zig                       | Split, cold harness cache |        57.94 |      162.85 | 36/0                 |
+| Zig                       | Split, warm harness cache |        29.91 |      108.83 | 0/36                 |
+| Host Clang 22, ASan/UBSan | Whole Script              |       129.46 |      386.76 | 0/0                  |
+| Host Clang 22, ASan/UBSan | Split, cold harness cache |        90.69 |      229.48 | 36/0                 |
+| Host Clang 22, ASan/UBSan | Split, warm harness cache |        71.91 |      193.97 | 0/36                 |
+
+Cold here means that none of this shard's harness objects were reused. The
+runtime archive and toolchain installation were already available. Each split
+run performed 281 additional harness C comparisons across bodies and policies;
+all outputs matched their respective reference bytes. The task compared every
+serialized result with the unchanged reviewed manifest. The extra
+object-determinism verification option was off for these timing runs.
+
+CI jobs use their own existing host cache directories. The workflow does not
+restore or publish harness objects between shards; workers within one process
+share preparation promises. Separate processes using the same cache directory
+coordinate through the host's exclusive publication lock. Linux Zig and host
+Clang execution were measured locally. macOS runner execution and CI
+before/after wall time remain unmeasured in this change. The earlier macOS work
+projection is an estimate and must not be presented as an observed CI
+improvement.

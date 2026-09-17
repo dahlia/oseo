@@ -1,5 +1,7 @@
 import { nativeToolchain } from "../tests/native-toolchain.ts";
 import { runNativeCli } from "../tests/native-cli.ts";
+import { createTest262FragmentExecutor } from "./test262-fragments.ts";
+import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
@@ -265,6 +267,7 @@ export class ReviewedTest262RunError extends Error {
 
 /** Inputs passed to an injected native executor. */
 export interface Test262ExecutionRequest {
+  readonly fragment?: Test262FragmentInput;
   readonly mode: Test262ExecutionMode;
   readonly source: string;
   readonly sourceId: string;
@@ -1406,6 +1409,21 @@ async function executedResult(
   const request = (input: string, variant: Test262Variant) => ({
     mode: testCase.mode,
     source: input,
+    fragment: {
+      body: source,
+      sources: [
+        { sourceId: "base.js", source: harnesses.base },
+        ...(testCase.async
+          ? [{ sourceId: "doneprintHandle.js", source: harnesses.done }]
+          : []),
+        ...testCase.includes.map((name) => ({
+          sourceId: name,
+          source: harnesses.includes.get(name)!,
+        })),
+      ],
+      strict: variant.strictness === "strict",
+      raw: parsed.flags.includes("raw"),
+    },
     sourceId: testCase.path,
     ...includePropertiesWhen(() => {
       if (sourcePath == null) return undefined;
@@ -1903,6 +1921,10 @@ async function readHarnesses(): Promise<Test262Harnesses> {
   };
 }
 
+const fragmentExecutor = createTest262FragmentExecutor(
+  runnerHost,
+  nativeToolchain,
+);
 const nativeExecutor: Test262Executor = {
   ...includePropertiesWhen(() => {
     if (executionTarget == null) return undefined;
@@ -1924,12 +1946,14 @@ const nativeExecutor: Test262Executor = {
       ...(executionTarget == null ? [] : ["--target", executionTarget]),
       entry,
     ];
-    return await runNativeCli({
-      args,
-      source: request.source,
-      sourceId: request.sourceId,
-      version: "0.1.0",
-    });
+    return await fragmentExecutor.execute(request, () =>
+      runNativeCli({
+        args,
+        source: request.source,
+        sourceId: request.sourceId,
+        version: "0.1.0",
+      }),
+    );
   },
 };
 
@@ -2319,6 +2343,7 @@ async function main(): Promise<void> {
     { acceptPromotions: cliArguments.acceptPromotions },
   );
   const { manifest, metadata } = run;
+  console.log(`test262-builds ${JSON.stringify(fragmentExecutor.counts)}`);
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);
   if (cliArguments.update) {

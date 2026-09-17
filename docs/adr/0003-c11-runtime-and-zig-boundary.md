@@ -138,9 +138,15 @@ defines the first generic C ABI.
 Harness fragment amendment
 --------------------------
 
-The opt-in [harness fragment ABI](../harness-fragment-abi.md) permits a
-prebuilt generated harness translation unit and a case-owned launcher.
-Stage 1 defines the compiler fragments; native multi-unit emission and
-runner admission follow in separately reviewed stages. The default backend
-continues to emit one C11 source. Runtime and toolchain ownership remain
-unchanged.
+The [harness fragment ABI](../harness-fragment-abi.md) provides a prebuilt
+harness unit, a per-case unit, and a launcher. The test262 runner selects this
+path by default for admitted Scripts under both Zig and the host C sanitizer
+adapter. Modules, raw inputs, shadowing, strictness or source-boundary changes,
+and compiler admission failures retain whole-Script compilation. Build errors
+remain infrastructure failures and never trigger semantic fallback.
+
+`OSEO_TEST262_HARNESS_REUSE=disabled` forces the original path. Cache keys cover
+compiler contents, runtime ABI, source order, target, instrumentation, and
+flags. The host serializes object publication; the runner verifies cached
+bytes with a digest sidecar. Cache and build counters stay outside the reviewed
+manifest. The ordinary CLI and default backend still compile one whole program.

@@ -3,6 +3,7 @@ import type {
   CompilerCacheLock,
   CompilerHost,
   Diagnostic,
+  EmittedNativeSource,
   MirProgram,
   ModuleSourceFrontend,
   NativeBackend,
@@ -581,12 +582,30 @@ async function executeNativeWorkflow(
   host: CompilerHost,
   sourceId: string,
   directory: string,
-  mir: MirProgram,
+  input: MirProgram | NativeUnits,
   target: TargetDescription,
   archiveReuse: CliInvocation["runtimeArchiveReuse"],
   toolchain: NativeToolchain,
 ): Promise<CliResult> {
-  const emitted = defaultComponents.backend.emit(mir);
+  const units = "sources" in input ? input : undefined;
+  const emitted =
+    "sources" in input
+      ? input.sources[0]
+      : defaultComponents.backend.emit(input);
+  if (emitted == null) throw new Error("No native source units supplied.");
+  const extra = units?.sources.slice(1) ?? [];
+  const sourceNames = new Set<string>();
+  for (const unit of [emitted, ...extra]) {
+    const name = unit.sourceName.toLowerCase();
+    if (!isPortableAssetName(unit.sourceName) || sourceNames.has(name)) {
+      throw new Error("Invalid or duplicate native source unit name.");
+    }
+    sourceNames.add(name);
+  }
+  for (const unit of extra) {
+    // eslint-disable-next-line no-await-in-loop -- Ordered unit staging.
+    await host.writeTextFile(join(directory, unit.sourceName), unit.source);
+  }
   const generatedSourcePath = join(directory, emitted.sourceName);
   await host.writeTextFile(generatedSourcePath, emitted.source);
   const runtime = defaultComponents.runtime.getRuntimeInput();
@@ -603,7 +622,7 @@ async function executeNativeWorkflow(
     // Case-folded so one destination on a case-insensitive filesystem
     // cannot silently drop a copied asset.
     const folded = asset.name.toLowerCase();
-    if (folded === emitted.sourceName.toLowerCase()) {
+    if (sourceNames.has(folded)) {
       return diagnosticResult(
         hostDiagnostic(
           sourceId,
@@ -743,6 +762,15 @@ async function executeNativeWorkflow(
         };
       }),
       generatedSourcePath,
+      ...includePropertiesWhen(() => {
+        if (units == null) return undefined;
+        return {
+          additionalGeneratedSourcePaths: extra.map((unit) =>
+            join(directory, unit.sourceName),
+          ),
+          prebuiltObjectPaths: units.prebuiltObjectPaths,
+        };
+      }),
       ...includePropertiesWhen(() => {
         if (cachedArchivePath == null) return undefined;
         return {
@@ -966,6 +994,65 @@ export async function runNativeCli(
       mir,
       selected.target,
       parsed.value.runtimeArchiveReuse,
+      toolchain,
+    );
+  } catch {
+    result = diagnosticResult(
+      hostDiagnostic(sourceId, "The native host workflow failed."),
+    );
+  }
+  try {
+    await host.remove(directory);
+  } catch {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The native temporary directory could not be removed.",
+      ),
+    );
+  }
+  return result;
+}
+
+/** Pre-emitted units for native composition, with no JavaScript compilation. */
+export interface NativeUnits {
+  readonly sources: readonly EmittedNativeSource[];
+  readonly prebuiltObjectPaths: readonly string[];
+}
+
+/**
+ * Execute trusted generated units through the ordinary native host workflow.
+ * The composing caller owns admission, emission, and prebuilt object lifetime.
+ */
+export async function runNativeUnits(
+  units: NativeUnits,
+  sourceId: string,
+  host: CompilerHost,
+  toolchain: NativeToolchain,
+  archiveReuse: "enabled" | "disabled" = "enabled",
+): Promise<CliResult> {
+  const selected = selectExecutionTarget(host, undefined, sourceId);
+  if ("diagnostic" in selected) return diagnosticResult(selected.diagnostic);
+  let directory: string;
+  try {
+    directory = await host.makeTemporaryDirectory("oseo-cli-");
+  } catch {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The native temporary directory could not be created.",
+      ),
+    );
+  }
+  let result: CliResult;
+  try {
+    result = await executeNativeWorkflow(
+      host,
+      sourceId,
+      directory,
+      units,
+      selected.target,
+      archiveReuse,
       toolchain,
     );
   } catch {
