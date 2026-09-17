@@ -7,8 +7,10 @@ flags and completing a gate do not establish that ASan ran. This finding
 qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
 documentation, and gate-cost records. The Linux host C lane below supplies
 separate verified instrumentation. Historical Zig runs still lack ASan
-evidence. The Apple Clang sample below establishes separate macOS coverage; the
-declared target policy has not changed.
+evidence. A bounded Apple Clang sample below shows ASan and UBSan working
+through the host C adapter on one macOS arm64 machine. It is not CI coverage,
+and it does not cover leak detection. The declared target policy has not
+changed.
 
 
 Cause and reproduction
@@ -251,8 +253,10 @@ not a full-corpus result. Case mix, cache state, host contention, and runner
 capacity can change the cost.
 
 That cost is too high for this change's additional per-PR gate: the measured
-self, runtime, native, and property tasks together take 34.49 minutes, while
-full test262 would add roughly 142 minutes at the sampled throughput. Linux CI
+self, runtime, native, and property tasks together took 34.49 minutes on a
+16-thread workstation and about 57 runner-minutes as one job on GitHub's
+ubuntu runner, while full test262 would add roughly 142 workstation minutes at
+the sampled throughput. Linux CI
 therefore schedules those four tasks and an explicit GCC self-check, but not
 full sanitizer test262. Sharded periodic or on-demand corpus runs remain an
 option if their compute budget is accepted. No unsharded test262 run was made.
@@ -271,7 +275,9 @@ about 35 or 69 runner-minutes. Dividing by the maintainer's stated five macOS
 slots gives an added capacity floor of 6.90 or 13.80 minutes; a stated
 156-minute existing floor would become approximately 163 or 170 minutes. These
 are estimates, not measured compiler-speed ratios. They exclude extra setup,
-queueing, and cold-cache costs.
+queueing, and cold-cache costs. The 34.49 minutes they scale is a workstation
+measurement; the same lane took about 57 runner-minutes on GitHub's ubuntu
+runner, so these estimates were low. The measured sample below supersedes them.
 
 The proposed next step is to run the self-check and a small native shard
 manually on an Apple Clang AArch64 host, record its full compiler identity, and
