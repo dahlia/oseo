@@ -16,5 +16,5 @@ inventory:
 dependencies:
   - array-prototype-species-mapping
   - typed-array-core
-landed: false
+landed: true
 status: ready
