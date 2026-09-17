@@ -86,8 +86,9 @@ that a kernel or worker has stopped using a resource.
 This plan does not itself expose weak references, finalization, or ephemerons
 to JavaScript. The M5 `ephemeron-tracing-checkpoint` first designs and
 implements weak-edge tracing, clearing, and finalization scheduling here.
-WeakMap, WeakSet, WeakRef, and FinalizationRegistry then expose that collector
-contract with their own standards evidence.
+The M5b `weak-collections` node then exposes that collector contract as
+WeakMap, WeakSet, WeakRef, and FinalizationRegistry with their own standards
+evidence.
 
 
 Implemented baseline
@@ -178,11 +179,12 @@ Only after that fixed point does the collector clear an unmarked weak target
 and unlink an ephemeron entry whose key stayed unmarked, so the same sweep
 reclaims the entry record and a churning table does not grow. Marked
 finalization registries then publish dead-target cells to one collector-owned
-FIFO. The FIFO orders newly eligible cells by their realm-wide registration
-ordinal, retains the registry and holdings as strong edges, and is itself a
-context root until the scheduler consumes each record. A record the scheduler
-has consumed is unlinked from its registry at the next collection so a
-long-lived registry does not retain one dead cell per registration.
+FIFO. Each collection sorts its newly eligible cells by their realm-wide
+registration ordinal and appends that batch to the FIFO, which retains the
+registry and holdings as strong edges and is itself a context root until the
+scheduler consumes each record. A record the scheduler has consumed is unlinked
+from its registry at the next collection so a long-lived registry does not
+retain one dead cell per registration.
 
 Collection performs no allocation and invokes no callback during those phases.
 The private cleanup dequeue writes the registry and holdings into caller-owned
@@ -190,6 +192,26 @@ root slots without collecting; the later JavaScript-facing component must turn
 those records into scheduled cleanup jobs at an explicit runtime checkpoint.
 This separates reachability and clearing from callback execution and keeps
 collection forced at every safepoint sound.
+
+The M5b `weak-collections` node completes those reservations without changing
+the phase order. Each ephemeron table owns an open-addressed index keyed by
+heap address, and each entry carries an untraced back link. A source-level
+delete unlinks its entry and tombstones the index slot immediately. When the
+collector unlinks an entry whose key died, it tombstones that slot in the same
+pass, which needs no allocation. Finalization cells carry a weak unregister
+token that clears with the other weak edges. Unregistration marks matching
+live and queued cells consumed; the cleanup dequeue skips a consumed cell, and
+compaction keeps a consumed cell that is still queued alive until then.
+
+The context's KeptAlive set is a root set filled by `WeakRef` construction and
+`deref`. The native event loop clears it after the script or a timer callback
+and every promise job it enabled. The same checkpoint then runs each queued
+record as its own cleanup job before the next timer, in FIFO order; ordering by
+registration ordinal therefore holds among the records one collection
+publishes, not across collections. Collection currently
+runs only when forced at every safepoint or when a context is destroyed, so in
+an ordinary run no weak target clears and no cleanup job runs. A
+pressure-driven collection trigger remains the policy work this plan owns.
 
 
 Tracing and object metadata

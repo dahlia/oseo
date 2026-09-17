@@ -401,6 +401,62 @@ OseoResult oseo_entry_task_checkpoint(
     return result;
 }
 
+/*
+ * The finalization cleanup checkpoint. It first ends the current job's
+ * KeptAlive set, then runs every record the collector has queued as its
+ * own cleanup job, draining promise jobs after each callback exactly as a
+ * timer turn does. An abrupt callback ends the loop with that completion.
+ */
+static OseoResult run_finalization_turns(OseoContext *context) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    oseo_internal_clear_kept_objects(context);
+    while (result.status == OSEO_STATUS_NORMAL) {
+        bool ran = false;
+        result = oseo_internal_finalization_cleanup_job(context, &ran);
+        if (!ran) break;
+        OseoResult callback_result = result;
+        const char *callback_error_code = context->error_code;
+        const char *callback_error_message = context->error_message;
+        const char *callback_source_id = context->source_id;
+        size_t callback_source_id_length = context->source_id_length;
+        size_t callback_line = context->line;
+        size_t callback_column = context->column;
+        bool callback_threw = result.status == OSEO_STATUS_THROW &&
+            !context->has_diagnostic;
+        if (callback_threw) {
+            frame.slots[0] = result.value;
+            result = normal(oseo_undefined());
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_jobs_drain(context);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_rejection_checkpoint(context);
+        }
+        oseo_internal_clear_kept_objects(context);
+        if (callback_threw &&
+            (result.status == OSEO_STATUS_NORMAL ||
+             !context->has_diagnostic)) {
+            context->error_code = callback_error_code;
+            context->error_message = callback_error_message;
+            context->has_diagnostic = false;
+            context->source_id = callback_source_id;
+            context->source_id_length = callback_source_id_length;
+            context->line = callback_line;
+            context->column = callback_column;
+            callback_result.value = frame.slots[0];
+            result = callback_result;
+        }
+        frame.slots[0] = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_undefined())
+        : result;
+}
+
 static OseoResult entry_promise_completion(
     OseoContext *context,
     OseoValue entry_promise
@@ -437,11 +493,17 @@ OseoResult oseo_event_loop_run(
         result = oseo_rejection_checkpoint(context);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = run_finalization_turns(context);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = entry_promise_completion(context, frame.slots[0]);
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
         result = run_timer_turn(context, oseo_undefined());
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = run_finalization_turns(context);
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = entry_promise_completion(context, frame.slots[0]);
         }

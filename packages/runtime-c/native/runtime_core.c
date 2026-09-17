@@ -78,6 +78,9 @@ void oseo_context_init(
     context->finalization_tail = oseo_undefined();
     context->next_finalization_order = 0u;
     context->finalization_pending_count = 0u;
+    context->kept_objects = NULL;
+    context->kept_object_count = 0u;
+    context->kept_object_capacity = 0u;
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -180,6 +183,10 @@ void oseo_context_destroy(OseoContext *context) {
     context->finalization_head = oseo_undefined();
     context->finalization_tail = oseo_undefined();
     context->finalization_pending_count = 0u;
+    free(context->kept_objects);
+    context->kept_objects = NULL;
+    context->kept_object_count = 0u;
+    context->kept_object_capacity = 0u;
     oseo_collect(context);
     oseo_internal_clock_destroy(context);
 }

@@ -1,0 +1,399 @@
+/* eslint-disable no-await-in-loop -- Native observations are isolated. */
+
+import assert from "node:assert/strict";
+import process from "node:process";
+import test from "node:test";
+
+import fc from "fast-check";
+
+import { cBackend } from "../../packages/backend-c/src/index.ts";
+import {
+  compileSource,
+  describeTarget,
+  printMir,
+  targetForExecutionHost,
+} from "../../packages/compiler/src/index.ts";
+import { createNodeHost } from "../../packages/host/src/index.ts";
+import { babelFrontend } from "../../packages/parser-babel/src/index.ts";
+import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
+import {
+  assertMatchingObservations,
+  withNativeFixture,
+} from "../../packages/testkit/src/index.ts";
+import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
+
+const { assertAsyncProperty } = await import(
+  ["../../packages/testkit/tests/", "property-support.ts"].join("")
+);
+
+/*
+ * Stable identities can be held weakly and stay reachable for the whole
+ * program. A fresh object is unreachable as soon as its operation ends, so
+ * forced collection may clear it; the model only asks questions whose
+ * answers every conforming collection schedule shares.
+ */
+type KeyToken =
+  | "fresh-object"
+  | "number"
+  | "object-a"
+  | "object-b"
+  | "string"
+  | "symbol-a"
+  | "symbol-b"
+  | "undefined";
+
+type Operation =
+  | { readonly kind: "map-delete"; readonly key: KeyToken }
+  | { readonly kind: "map-get"; readonly key: KeyToken }
+  | { readonly kind: "map-has"; readonly key: KeyToken }
+  | { readonly kind: "map-set"; readonly key: KeyToken; readonly value: number }
+  | { readonly kind: "ref"; readonly key: KeyToken }
+  | {
+      readonly held: KeyToken;
+      readonly kind: "register";
+      readonly key: KeyToken;
+      readonly token: KeyToken;
+    }
+  | { readonly kind: "set-add"; readonly key: KeyToken }
+  | { readonly kind: "set-delete"; readonly key: KeyToken }
+  | { readonly kind: "set-has"; readonly key: KeyToken }
+  | { readonly kind: "unregister"; readonly key: KeyToken };
+
+const keyArbitrary = fc.constantFrom<KeyToken>(
+  "fresh-object",
+  "number",
+  "object-a",
+  "object-b",
+  "string",
+  "symbol-a",
+  "symbol-b",
+  "undefined",
+);
+
+const operationArbitrary: fc.Arbitrary<Operation> = fc.oneof(
+  fc.record({ key: keyArbitrary, kind: fc.constant("map-delete" as const) }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("map-get" as const) }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("map-has" as const) }),
+  fc.record({
+    key: keyArbitrary,
+    kind: fc.constant("map-set" as const),
+    value: fc.integer({ max: 9, min: 0 }),
+  }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("ref" as const) }),
+  fc.record({
+    held: keyArbitrary,
+    key: keyArbitrary,
+    kind: fc.constant("register" as const),
+    token: keyArbitrary,
+  }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("set-add" as const) }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("set-delete" as const) }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("set-has" as const) }),
+  fc.record({ key: keyArbitrary, kind: fc.constant("unregister" as const) }),
+);
+
+const caseArbitrary = fc.array(operationArbitrary, {
+  maxLength: 16,
+  minLength: 1,
+});
+
+const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
+
+function expression(token: KeyToken): string {
+  switch (token) {
+    case "fresh-object":
+      return "{}";
+    case "number":
+      return "1";
+    case "object-a":
+      return "objectA";
+    case "object-b":
+      return "objectB";
+    case "string":
+      return '"a"';
+    case "symbol-a":
+      return "symbolA";
+    case "symbol-b":
+      return "symbolB";
+    case "undefined":
+      return "undefined";
+  }
+}
+
+function printOperation(operation: Operation, index: number): string {
+  const key = expression(operation.key);
+  switch (operation.kind) {
+    case "map-set":
+      return (
+        `probe(${index}, () => ` +
+        `map.set(${key}, ${operation.value}) === map);`
+      );
+    case "map-delete":
+    case "map-get":
+    case "map-has":
+      return `probe(${index}, () => map.${operation.kind.slice(4)}(${key}));`;
+    case "set-add":
+      return `probe(${index}, () => set.add(${key}) === set);`;
+    case "set-delete":
+    case "set-has":
+      return `probe(${index}, () => set.${operation.kind.slice(4)}(${key}));`;
+    case "ref":
+      return `probe(${index}, () => {
+  const target = ${key};
+  return new WeakRef(target).deref() === target;
+});`;
+    case "register":
+      return `probe(${index}, () => registry.register(
+  ${key},
+  ${expression(operation.held)},
+  ${expression(operation.token)},
+));`;
+    case "unregister":
+      return `probe(${index}, () => registry.unregister(${key}));`;
+  }
+}
+
+function printCase(operations: readonly Operation[]): string {
+  return `
+const objectA = {};
+const objectB = {};
+const symbolA = Symbol("a");
+const symbolB = Symbol("b");
+const map = new WeakMap();
+const set = new WeakSet();
+const registry = new FinalizationRegistry(function () {});
+function probe(index, operation) {
+  try {
+    console.log(index, String(operation()));
+  } catch (error) {
+    console.log(index, error instanceof TypeError ? "TypeError" : "other");
+  }
+}
+${operations.map(printOperation).join("\n")}
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(2, 3), hinted("2", 3), objectA !== objectB);
+`;
+}
+
+function weakly(token: KeyToken): boolean {
+  return (
+    token === "fresh-object" ||
+    token === "object-a" ||
+    token === "object-b" ||
+    token === "symbol-a" ||
+    token === "symbol-b"
+  );
+}
+
+/* A fresh key never equals any earlier or later identity. */
+function stable(token: KeyToken): boolean {
+  return weakly(token) && token !== "fresh-object";
+}
+
+function expected(operations: readonly Operation[]): string {
+  const map = new Map<KeyToken, number>();
+  const set = new Set<KeyToken>();
+  const tokens: KeyToken[] = [];
+  const lines = operations.map((operation, index) => {
+    const key = operation.key;
+    let result: string;
+    switch (operation.kind) {
+      case "map-set":
+        if (!weakly(key)) {
+          result = "TypeError";
+        } else {
+          if (stable(key)) map.set(key, operation.value);
+          result = "true";
+        }
+        break;
+      case "map-get":
+        result = String(stable(key) ? map.get(key) : undefined);
+        break;
+      case "map-has":
+        result = String(stable(key) && map.has(key));
+        break;
+      case "map-delete":
+        result = String(stable(key) && map.delete(key));
+        break;
+      case "set-add":
+        if (!weakly(key)) {
+          result = "TypeError";
+        } else {
+          if (stable(key)) set.add(key);
+          result = "true";
+        }
+        break;
+      case "set-has":
+        result = String(stable(key) && set.has(key));
+        break;
+      case "set-delete":
+        result = String(stable(key) && set.delete(key));
+        break;
+      case "ref":
+        result = weakly(key) ? "true" : "TypeError";
+        break;
+      case "register":
+        if (
+          !weakly(key) ||
+          (stable(key) && key === operation.held) ||
+          (!weakly(operation.token) && operation.token !== "undefined")
+        ) {
+          result = "TypeError";
+        } else {
+          if (stable(operation.token)) tokens.push(operation.token);
+          result = "undefined";
+        }
+        break;
+      case "unregister":
+        if (!weakly(key)) {
+          result = "TypeError";
+        } else {
+          const before = tokens.length;
+          const kept = tokens.filter((token) => token !== key);
+          tokens.length = 0;
+          tokens.push(...kept);
+          result = String(kept.length !== before);
+        }
+        break;
+    }
+    return `${index} ${result}`;
+  });
+  lines.push("hint 5 23 true", "");
+  return lines.join("\n");
+}
+
+async function references(source: string): Promise<
+  readonly [
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+  ]
+> {
+  const directory = await host.makeTemporaryDirectory("oseo-weak-property-");
+  const sourcePath = `${directory}/case.ts`;
+  let succeeded = false;
+  try {
+    await host.writeTextFile(
+      sourcePath,
+      `(0, eval)(${JSON.stringify(source)});\n`,
+    );
+    const observations = [
+      await host.run({
+        args: [sourcePath],
+        command: process.execPath,
+        cwd: directory,
+      }),
+      await host.run({
+        args: ["run", "--quiet", sourcePath],
+        command: "deno",
+        cwd: directory,
+      }),
+    ] as const;
+    succeeded = true;
+    return observations;
+  } finally {
+    if (succeeded) await host.remove(directory);
+  }
+}
+
+test(
+  "generated weak collection observations match the identity model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "WeakMap, WeakSet, WeakRef, and FinalizationRegistry agree",
+      fc.asyncProperty(caseArbitrary, async (operations) => {
+        const source = printCase(operations);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expected(operations),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-weak-collections.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-smi/u);
+            assert.match(mir, /generic-fallback/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-(?:smi|shape)/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardHits > 0);
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to sixteen WeakMap set, get, has, and delete, WeakSet add, " +
+          "has, and delete, WeakRef construction and deref, and " +
+          "FinalizationRegistry register and unregister operations over " +
+          "two stable objects, two unregistered symbols, a fresh " +
+          "unreachable object, and three primitives that cannot be held " +
+          "weakly, plus truthful and false number hints",
+        numRuns: 12,
+        profile: "M5 weak collections",
+        seed: 0x6000_7500,
+        sizeLimit:
+          "at most sixteen operations over eight reviewed key tokens, one " +
+          "WeakMap, one WeakSet, and one FinalizationRegistry",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

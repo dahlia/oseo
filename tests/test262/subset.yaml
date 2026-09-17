@@ -19,6 +19,7 @@ supportedFeatures:
   - DataView.prototype.getUint16
   - DataView.prototype.getUint32
   - DataView.prototype.setUint8
+  - FinalizationRegistry
   - Float16Array
   - Map
   - Object.fromEntries
@@ -42,6 +43,9 @@ supportedFeatures:
   - String.prototype.trimStart
   - Set
   - SharedArrayBuffer
+  - WeakMap
+  - WeakRef
+  - WeakSet
   - align-detached-buffer-semantics-with-web-reality
   - array-find-from-last
   - array-grouping
@@ -107,6 +111,7 @@ supportedFeatures:
   - Symbol.toPrimitive
   - Symbol.toStringTag
   - Symbol.unscopables
+  - symbols-as-weakmap-keys
   - template
   - top-level-await
   - TypedArray
@@ -14702,6 +14707,138 @@ tests:
   - path: test/built-ins/Error/prototype/toString/name.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/FinalizationRegistry/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/instance-extensible.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/newtarget-prototype-is-not-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/proto.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype-from-newtarget-abrupt.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype-from-newtarget-custom.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype-from-newtarget.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/custom-this.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/heldValue-same-as-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/holdings-any-value-type.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/return-undefined-register-itself.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/return-undefined-register-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/return-undefined-register-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/this-does-not-have-internal-target-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/unregisterToken-same-as-holdings-and-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/unregisterToken-same-as-holdings.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/register/unregisterToken-same-as-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/custom-this.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/this-does-not-have-internal-cells-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/unregister-object-token.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/prototype/unregister/unregister-symbol-token.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/returns-new-object-from-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/target-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/FinalizationRegistry/unnaffected-by-poisoned-cleanupCallback.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
   - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
@@ -17736,7 +17873,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/clear/context-is-weakmap-object-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/clear/length.js
     expectedClassification: pass
@@ -17766,7 +17903,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/delete/context-is-weakmap-object-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/delete/delete.js
     expectedClassification: pass
@@ -17796,7 +17933,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -17841,7 +17978,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/forEach/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -17883,7 +18020,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/get/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -17916,7 +18053,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -17949,7 +18086,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -17988,7 +18125,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/set/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -18021,7 +18158,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -18054,7 +18191,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot.js
     expectedClassification: pass
@@ -18084,7 +18221,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Map/valid-keys.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/MapIteratorPrototype/Symbol.toStringTag.js
     expectedClassification: pass
@@ -29709,10 +29846,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-weakmap-builtin.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-weakset-builtin.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/valueOf/15.2.4.4-1.js
     expectedClassification: pass
@@ -29937,7 +30074,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-finalizationregistry.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-float32array.js
     expectedClassification: pass
@@ -30030,13 +30167,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-weakmap.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-weakref.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/seal-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/seal/symbol-object-contains-symbol-properties-non-strict.js
     expectedClassification: pass
@@ -38214,7 +38351,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/add/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/add/length.js
     expectedClassification: pass
@@ -38283,7 +38420,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/clear/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/clear/length.js
     expectedClassification: pass
@@ -38346,7 +38483,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/delete/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/delete/length.js
     expectedClassification: pass
@@ -38478,7 +38615,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/entries/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/entries/entries.js
     expectedClassification: pass
@@ -38547,7 +38684,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/forEach/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/forEach/forEach.js
     expectedClassification: pass
@@ -38610,7 +38747,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/has/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/has/has.js
     expectedClassification: pass
@@ -39195,7 +39332,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/values/does-not-have-setdata-internal-slot-weakset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/prototype/values/length.js
     expectedClassification: pass
@@ -39276,7 +39413,7 @@ tests:
     expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/Set/valid-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [set-intrinsic]
   - path: test/built-ins/SetIteratorPrototype/Symbol.toStringTag.js
     expectedClassification: pass
@@ -45719,6 +45856,621 @@ tests:
   - path: test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/bigint-tobiguint64.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]
+  - path: test/built-ins/WeakMap/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/empty-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/get-set-method-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterable-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterable-with-object-keys.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterable-with-symbol-keys.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-close-after-set-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-item-first-entry-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-item-second-entry-returns-abrupt.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-next-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-value-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/no-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/properties-of-map-instances.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/properties-of-the-weakmap-prototype-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype-of-weakmap.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/delete-entry-with-object-key-initial-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/delete-entry-with-object-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/delete-entry-with-symbol-key-initial-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/delete-entry-with-symbol-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/delete.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/does-not-have-weakmapdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/does-not-have-weakmapdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/does-not-have-weakmapdata-internal-slot-weakmap-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/returns-false-when-object-key-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/returns-false-when-symbol-key-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/does-not-have-weakmapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/get.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/returns-undefined-with-object-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/returns-undefined-with-symbol-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/returns-value-with-object-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/returns-value-with-symbol-key.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-weakmap-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/has.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/returns-false-when-object-key-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/returns-false-when-symbol-key-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/returns-true-when-object-key-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/returns-true-when-symbol-key-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/prototype-attributes.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/adds-object-element.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/adds-symbol-element.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/does-not-have-weakmapdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/does-not-have-weakmapdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/does-not-have-weakmapdata-internal-slot-weakmap-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/returns-this-when-ignoring-duplicate.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/returns-this.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/set-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/undefined-newtarget.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/weakmap.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/instance-extensible.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/newtarget-prototype-is-not-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/proto.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype-from-newtarget-abrupt.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype-from-newtarget-custom.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype-from-newtarget.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/custom-this.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/return-object-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/return-symbol-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/this-does-not-have-internal-target-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/deref/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/returns-new-object-from-constructor-with-object-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/returns-new-object-from-constructor-with-symbol-target.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/add-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/empty-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/get-add-method-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterable-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterable-with-object-values.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterable-with-symbol-values.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterator-close-after-add-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterator-next-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/iterator-value-failure.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/no-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/properties-of-the-weakset-prototype-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype-of-weakset.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/add.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/adds-object-element.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/adds-symbol-element.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/does-not-have-weaksetdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/does-not-have-weaksetdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/does-not-have-weaksetdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/does-not-have-weaksetdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/does-not-have-weaksetdata-internal-slot-weakset-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/returns-this-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/returns-this-when-ignoring-duplicate-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/returns-this-when-ignoring-duplicate.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/returns-this.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/constructor/weakset-prototype-constructor-intrinsic.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/constructor/weakset-prototype-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/delete-entry-initial-iterable.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/delete-object-entry.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/delete-symbol-entry.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/delete.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/does-not-have-weaksetdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/does-not-have-weaksetdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/does-not-have-weaksetdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/does-not-have-weaksetdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/does-not-have-weaksetdata-internal-slot-weakset-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/returns-false-when-delete-is-noop.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/does-not-have-weaksetdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/does-not-have-weaksetdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/does-not-have-weaksetdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/does-not-have-weaksetdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/does-not-have-weaksetdata-internal-slot-weakset-prototype.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/has.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/length.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/name.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/returns-false-when-object-value-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/returns-false-when-symbol-value-not-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/returns-true-when-object-value-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/returns-true-when-symbol-value-present.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/this-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/prototype-attributes.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/undefined-newtarget.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/weakset.js
+    expectedClassification: pass
+    dependencies: [weak-collections]
   - path: test/built-ins/decodeURI/S15.1.3.1_A1.10_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]

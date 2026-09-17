@@ -385,6 +385,10 @@ export function intrinsicGlobalKind(
     name === "Set" ||
     name === "SharedArrayBuffer" ||
     name === "Symbol" ||
+    name === "FinalizationRegistry" ||
+    name === "WeakMap" ||
+    name === "WeakRef" ||
+    name === "WeakSet" ||
     name === "decodeURI" ||
     name === "decodeURIComponent" ||
     name === "encodeURI" ||

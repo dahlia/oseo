@@ -1468,6 +1468,97 @@ test("installs the Set composition methods over GetSetRecord", () => {
   assert.match(setSource, /oseo_iterator_close\(/u);
 });
 
+test("populates the realm-owned weak collection intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const weakSource = sources.get("runtime_weak_collection.c") ?? "";
+
+  for (const intrinsic of [
+    "WEAK_MAP_PROTOTYPE",
+    "WEAK_MAP",
+    "WEAK_MAP_DELETE",
+    "WEAK_MAP_GET",
+    "WEAK_MAP_HAS",
+    "WEAK_MAP_SET",
+    "WEAK_SET_PROTOTYPE",
+    "WEAK_SET",
+    "WEAK_SET_ADD",
+    "WEAK_SET_DELETE",
+    "WEAK_SET_HAS",
+    "WEAK_REF_PROTOTYPE",
+    "WEAK_REF",
+    "WEAK_REF_DEREF",
+    "FINALIZATION_REGISTRY_PROTOTYPE",
+    "FINALIZATION_REGISTRY",
+    "FINALIZATION_REGISTRY_REGISTER",
+    "FINALIZATION_REGISTRY_UNREGISTER",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic} = `, "u"));
+  }
+  // The cluster owns the last realm slots, so it pins the table's size.
+  assert.match(
+    header,
+    /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
+  );
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 261/u);
+  for (const property of [
+    "WeakMap",
+    "WeakSet",
+    "WeakRef",
+    "FinalizationRegistry",
+    "add",
+    "constructor",
+    "delete",
+    "deref",
+    "get",
+    "has",
+    "register",
+    "set",
+    "unregister",
+  ]) {
+    assert.match(weakSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(weakSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(weakSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
+  assert.match(weakSource, /is_object\(value\) \|\| is_symbol\(value\)/u);
+  assert.match(
+    internalHeader,
+    /oseo_internal_install_weak_collection_globals/u,
+  );
+  assert.match(bindingSource, /oseo_internal_install_weak_collection_globals/u);
+});
+
+test("wraps collector weak records and owns job-scoped kept objects", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const weakSource = sources.get("runtime_weak_collection.c") ?? "";
+  const eventLoopSource = sources.get("runtime_event_loop.c") ?? "";
+
+  assert.match(internalHeader, /OSEO_HEAP_WEAK_MAP = 36/u);
+  assert.match(internalHeader, /OSEO_HEAP_WEAK_SET = 37/u);
+  assert.match(internalHeader, /OSEO_HEAP_WEAK_REF = 38/u);
+  assert.match(internalHeader, /OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT = 39/u);
+  assert.match(internalHeader, /OseoValue \*index;/u);
+  assert.match(internalHeader, /OseoValue unregister_token;/u);
+  assert.match(header, /void \*kept_objects;/u);
+  assert.match(memorySource, /OseoWeakCollection \*\)object\)->table/u);
+  assert.match(memorySource, /OseoWeakRef \*\)object\)->reference/u);
+  assert.match(memorySource, /index < context->kept_object_capacity;/u);
+  assert.match(memorySource, /\*slot = OSEO_EPHEMERON_INDEX_TOMBSTONE;/u);
+  assert.match(
+    memorySource,
+    /free\(\(\(OseoEphemeronTable \*\)object\)->index\)/u,
+  );
+  assert.match(weakSource, /oseo_internal_ephemeron_delete/u);
+  assert.match(weakSource, /oseo_internal_keep_during_job/u);
+  assert.match(weakSource, /oseo_internal_finalization_take_cleanup/u);
+  assert.doesNotMatch(memorySource, /oseo_call_function/u);
+  assert.match(eventLoopSource, /oseo_internal_clear_kept_objects/u);
+  assert.match(eventLoopSource, /oseo_internal_finalization_cleanup_job/u);
+});
+
 test("populates the realm-owned Promise intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
@@ -2200,7 +2291,6 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 243/u);
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one

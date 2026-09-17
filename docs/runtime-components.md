@@ -25,14 +25,15 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists forty-four reviewed assets in this order:
+The runtime input now lists forty-five reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
 *runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
 *runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_set.c*,
-*runtime\_typed\_array.c*, *runtime\_arguments.c*,
+*runtime\_typed\_array.c*, *runtime\_weak\_collection.c*,
+*runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
@@ -53,7 +54,8 @@ map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions,
 Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
-Set-intrinsic, and single-agent Atomics units each
+Set-intrinsic, TypedArray-constructor, single-agent Atomics, and
+weak-collections units each
 added one
 component the same
 way. The M5b
@@ -216,6 +218,10 @@ Ownership follows the plan's target layout:
     the generic property components delegate to, the core prototype
     accessors and methods, and the every, some, forEach, map, filter,
     reduce, and reduceRight iteration methods;
+ -  *runtime\_weak\_collection.c*: the `WeakMap`, `WeakSet`, `WeakRef`, and
+    `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
+    job-scoped KeptAlive set, and the cleanup job step that calls a
+    registry's callback for one queued record;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
     the mapped object 10.4.4 creates from a simple parameter list, the
     `@@iterator` both shapes define, and the realm's single
@@ -366,7 +372,7 @@ one.
 
 ### Internal helpers
 
-One hundred and ninety-eight helpers cross a
+Two hundred and seven helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -411,6 +417,15 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_finalization_registry_create`        | *runtime\_memory.c*           |
 | `oseo_internal_finalization_register`               | *runtime\_memory.c*           |
 | `oseo_internal_finalization_take_cleanup`           | *runtime\_memory.c*           |
+| `oseo_internal_ephemeron_delete`                    | *runtime\_memory.c*           |
+| `oseo_internal_finalization_register_token`         | *runtime\_memory.c*           |
+| `oseo_internal_finalization_unregister`             | *runtime\_memory.c*           |
+| `oseo_internal_weak_collection_builtin_dispatch`    | *runtime\_weak\_collection.c* |
+| `oseo_internal_weak_collection_intrinsic`           | *runtime\_weak\_collection.c* |
+| `oseo_internal_install_weak_collection_globals`     | *runtime\_weak\_collection.c* |
+| `oseo_internal_keep_during_job`                     | *runtime\_weak\_collection.c* |
+| `oseo_internal_clear_kept_objects`                  | *runtime\_weak\_collection.c* |
+| `oseo_internal_finalization_cleanup_job`            | *runtime\_weak\_collection.c* |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
 | `oseo_internal_error_to_string`                     | *runtime\_error.c*            |
@@ -675,7 +690,8 @@ their entry chain. Collection parks an entry on its unmarked key and activates
 the value when that key becomes reachable, clears dead weak targets,
 unlinks dead ephemeron entries and consumed finalization cells so the sweep
 reclaims them, then publishes eligible finalization cells to the context's
-rooted FIFO in registration order. The collector performs neither allocation
+rooted FIFO, sorting each collection's batch by registration order. The
+collector performs neither allocation
 nor callback invocation in these phases.
 
 Nine private helpers create and inspect those records for the later weak
@@ -690,9 +706,9 @@ specialization policy settings. The node owns no test262 paths and admits no
 language-profile family.
 
 The entry chain is collector traversal state, not the indexed representation
-for future JavaScript lookup. The later weak-collections component owns that
-index and its synchronization with dead-entry unlinking. It also owns the
-job-scoped strong root and later ABI increment required by
+for JavaScript lookup. The weak-collections component, recorded below under
+weak collection evidence, adds that index, its synchronization with
+dead-entry unlinking, and the job-scoped strong root required by
 `WeakRef.prototype.deref`; private target inspection at this checkpoint does
 not implement `KeepDuringJob`.
 
@@ -1503,6 +1519,42 @@ during the first callback, under both specialization policies with collection
 forced at every safepoint, a deliberate false-hint guard miss, and an
 independent model of every callback and result. The node reviews all 398
 paths under its seven inventory roots.
+
+### Weak collection evidence
+
+M5b node `weak-collections` adds *runtime\_weak\_collection.c* as the
+runtime's forty-fifth reviewed asset and four heap kinds, 36 through 39, for
+the source-visible `WeakMap`, `WeakSet`, `WeakRef`, and
+`FinalizationRegistry` objects. Each embeds the ordinary object layout and
+strongly traces exactly one collector record from the ephemeron checkpoint: an
+ephemeron table, a weak reference, or a finalization registry. Collector
+phases, phase order, and the no-allocation, no-callback rule are unchanged.
+
+*runtime\_memory.c* extends those records rather than the phases. An
+ephemeron table owns an open-addressed index from key address to entry, and
+each entry gains an untraced back link, so source-level lookup and deletion
+do not walk the chain. Deletion unlinks the entry and tombstones its slot at
+once; when the collector unlinks an entry whose key died, it tombstones the
+same slot without allocating, and the sweep frees the index with its table.
+A finalization cell gains a weak unregister token that clears with the other
+weak edges. Unregistration marks matching live and queued cells consumed, the
+cleanup dequeue skips consumed cells, and registry compaction keeps a consumed
+cell that is still queued alive until that dequeue.
+
+The public context gains the KeptAlive set that `WeakRef` construction and
+`deref` fill and that the collector marks as roots. *runtime\_event\_loop.c*
+clears it after the script or a timer callback and the promise jobs it
+enabled, and then runs each queued cleanup record as its own job before the
+next timer. The component, the four heap kinds, eighteen intrinsic slots, one
+built-in code ID range, and the context fields move `abiVersion` to `m5-113`;
+no generated-code entry point is added. Fixed and generated native
+differential evidence, a native-only cleanup observation, and sanitized fixed
+C evidence with the AArch64 Linux cross-link cover the node under both
+specialization policies and collection forced at every safepoint. The node
+reviews 249 paths from its four test262 inventory roots and promotes 25
+already reviewed `Map`, `Set`, and `Object` cases whose last unmet
+prerequisite was a weak collection; two of them, the `Map` and `Set`
+value-domain cases, also needed the landed `typed-array-core` node.
 
 ### Function prototype evidence
 
