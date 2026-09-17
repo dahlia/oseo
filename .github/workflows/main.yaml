@@ -116,6 +116,53 @@ jobs:
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
+  # Two jobs keep a late start from adding the whole 65–79 minute estimate
+  # to the five-slot macOS queue. Each has its own instrumentation preflight.
+  test_sanitizer_macos:
+    name: host C sanitizers (macOS, ${{ matrix.suite }})
+    runs-on: macos-15
+    # About 36–44 minutes for runtime/native and 29–35 for properties;
+    # 75 minutes leaves room for setup, cold caches, and slower runner images.
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - native
+          - property
+    env:
+      OSEO_HOST_CC: clang
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - run: mise run test:sanitizer:self
+        env:
+          TMPDIR: ${{ runner.temp }}
+      # No GCC verification: macOS gcc is an Apple Clang alias.
+      - if: matrix.suite == 'native'
+        run: mise run test:sanitizer:runtime
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: matrix.suite == 'native'
+        run: mise run test:sanitizer:native
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: matrix.suite == 'property'
+        run: mise run test:sanitizer:property
+        env:
+          # Four workers share three CPUs. Double Linux's interrupt allowance,
+          # retaining every ordinary case and seed; interruptions still fail.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   test_test262:
     name: >-
       test262 (${{ matrix.target }},

@@ -253,3 +253,10 @@ Its Linux tests do not replace the Zig AArch64 cross-links or establish macOS
 ASan coverage. Zig's address self-checks remain TODOs; target sanitizer lists
 are unchanged. Native failure records and property replay diagnostics include
 the compiler identity.
+
+The macOS CI lane now configures self/runtime/native and self/ordinary property
+jobs on `macos-15`, with instrumentation checked first in each. The bounded
+local Apple Clang sample in [the activity audit](../sanitizer-activity.md)
+establishes ASan/UBSan activity only for that sample. The first GitHub run is
+still pending, so full macOS CI coverage remains unverified. Leak detection is
+excluded on macOS arm64.
