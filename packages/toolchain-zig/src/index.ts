@@ -1,5 +1,7 @@
+import { createHarnessObjectKey } from "@oseo/compiler";
 import type {
   NativeBuildInput,
+  HarnessObjectKeyInput,
   NativeBuildPlan,
   NativeToolchain,
   ProcessRequest,
@@ -333,7 +335,13 @@ export const zigToolchain: NativeToolchain = {
           [
             "cc",
             ...linkCommon,
+            ...((input.prebuiltObjectPaths?.length ?? 0) > 0 ||
+            (input.additionalGeneratedSourcePaths?.length ?? 0) > 0
+              ? ["-fno-lto"]
+              : []),
             input.generatedSourcePath,
+            ...(input.additionalGeneratedSourcePaths ?? []),
+            ...(input.prebuiltObjectPaths ?? []),
             archivePath,
             "-o",
             executablePath,
@@ -350,6 +358,52 @@ export const zigToolchain: NativeToolchain = {
       target: input.target,
     };
   },
+  harnessObjectReuse: {
+    async createKey(input: HarnessObjectKeyInput) {
+      requireZigEnvironment(input.toolchainEnvironment);
+      return await createHarnessObjectKey(input, {
+        adapter: "zig-fragments-v1",
+        compileFlags: [
+          "cc",
+          ...harnessFlags(input.target),
+          "-ffile-prefix-map=<working-directory>=/oseo/harness",
+          "-c",
+          "harness.c",
+          "-o",
+          "harness.o",
+        ],
+        runtimeFlags: [
+          ...runtimeCompileFlags(input.target, "."),
+          ...runtimePathFlags(),
+        ],
+        linkFlags: [
+          "cc",
+          ...commonFlags(input.target, "<runtime-directory>"),
+          "-fno-lto",
+          "<launcher>",
+          "<case>",
+          "<harness-object>",
+          "<runtime-archive>",
+        ],
+      });
+    },
+    createBuildRequest(input) {
+      return request(
+        input.workingDirectory,
+        "zig",
+        [
+          "cc",
+          ...harnessFlags(input.target),
+          `-ffile-prefix-map=${input.workingDirectory}=/oseo/harness`,
+          "-c",
+          "harness.c",
+          "-o",
+          "harness.o",
+        ],
+        input.environment,
+      );
+    },
+  },
   runtimeArchiveReuse: {
     createKey: createRuntimeArchiveKey,
     createIdentityRequest(workingDirectory, environment) {
@@ -357,3 +411,12 @@ export const zigToolchain: NativeToolchain = {
     },
   },
 };
+
+function harnessFlags(target: TargetDescription): readonly string[] {
+  return [
+    ...commonFlags(target, "."),
+    "-g",
+    "-fno-lto",
+    "-fdebug-compilation-dir=/oseo/harness",
+  ];
+}

@@ -1,5 +1,8 @@
 import type {
   BinaryOperator,
+  HarnessFragment,
+  ScriptFragment,
+  EmittedNativeSource,
   MirBlock,
   MirConstant,
   MirFunction,
@@ -11,6 +14,8 @@ import type {
   NativeBackend,
   SourceRange,
 } from "@oseo/compiler";
+
+import { lowerFragmentPhases, scriptFragmentAbi } from "@oseo/compiler";
 
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
 import { encodeRegExpProgram } from "./regexp-program.ts";
@@ -89,6 +94,7 @@ function renderC<const Fragment extends RenderedCFragment>(
 }
 
 interface EmitState {
+  readonly fragmentUnit?: "harness" | "case";
   readonly argumentSlotStart: number;
   readonly completionSlotStart: number;
   readonly derivedThisBindingId?: number;
@@ -163,11 +169,20 @@ function escapeCString(value: string): string {
   return result;
 }
 
-function line(state: EmitState, source: string): void {
+function line(state: Pick<EmitState, "lines">, source: string): void {
   state.lines.push(renderC(emittedC.line.indentLine, source));
 }
 
 function location(state: EmitState, range: SourceRange): void {
+  if (state.fragmentUnit != null) {
+    line(
+      state,
+      `oseo_fragment_location(context, ` +
+        `${state.fragmentUnit === "harness" ? 0 : 1}u, ` +
+        `${range.start.line}u, ${range.start.column}u);`,
+    );
+    return;
+  }
   if (range.sourceId != null) {
     const sourceId = escapeCString(range.sourceId);
     const length = new TextEncoder().encode(range.sourceId).length;
@@ -3547,7 +3562,7 @@ interface GlobalNameTable {
 
 /** Emit one static UTF-16 name table used by the global record prologue. */
 function emitGlobalNameTable(
-  state: EmitState,
+  state: Pick<EmitState, "lines">,
   prefix: string,
   entries: readonly {
     readonly name: string;
@@ -3625,7 +3640,7 @@ function emitGlobalNameTable(
  * Validate and instantiate one Script's global lexical and var-scoped names.
  */
 function emitGlobalObject(
-  state: EmitState,
+  state: Pick<EmitState, "lines" | "environmentSlot">,
   lexicalNames: readonly MirGlobalLexicalName[],
   bindings: readonly MirGlobalObjectBinding[],
 ): void {
@@ -3753,6 +3768,10 @@ function emitPrologue(
   globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): void {
   const environmentSlot = state.environmentSlot;
+  if (functionValue.id < 0 && state.fragmentUnit != null) {
+    line(state, `roots[${environmentSlot}] = callee;`);
+    return;
+  }
   if (functionValue.id < 0) {
     line(
       state,
@@ -4051,6 +4070,8 @@ function emitFunction(
   observeSpecialization: boolean,
   globalLexicalNames: readonly MirGlobalLexicalName[],
   globalObjectBindings: readonly MirGlobalObjectBinding[],
+  fragmentUnit?: "harness" | "case",
+  scriptName = "script",
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -4086,6 +4107,9 @@ function emitFunction(
       ? blocks
       : reachableBlocksFrom(functionValue, generatorBodyStart);
   const base: Omit<EmitState, "generator" | "lines"> = {
+    ...includePropertiesWhen(() =>
+      fragmentUnit == null ? undefined : { fragmentUnit },
+    ),
     argumentSlotStart: baseRootCount,
     blockParameters: new Map(
       blocks.map((block) => [block.id, block.parameters ?? []]),
@@ -4130,7 +4154,7 @@ function emitFunction(
     }),
     lines: [],
   };
-  state.usesAbrupt = true;
+  state.usesAbrupt = fragmentUnit == null || functionValue.id >= 0;
   if (generator) {
     line(
       state,
@@ -4177,10 +4201,7 @@ function emitFunction(
     line(state, renderC(emittedC.function.oseoRootsReleaseContextAddressFrame));
     line(state, renderC(emittedC.common.returnResult));
   }
-  const id =
-    functionValue.id < 0
-      ? renderC(emittedC.common.script)
-      : String(functionValue.id);
+  const id = functionValue.id < 0 ? scriptName : String(functionValue.id);
   const entry =
     renderC(emittedC.function.staticOseoResultOseoFunctionLine, id) +
     renderC(emittedC.common.oseoContextPointerContextLine) +
@@ -4408,3 +4429,336 @@ export const cBackend: NativeBackend = {
     };
   },
 };
+
+/** Logical assembled-source coordinates supplied by the composing caller. */
+export interface FragmentSourceMap {
+  readonly sourceId: string;
+  /** Added to each fragment-local line, including any strict directive. */
+  readonly harnessLineOffset: number;
+  readonly bodyLineOffset: number;
+}
+
+/** Three translation units linked with one runtime and no cross-unit LTO. */
+export interface EmittedScriptFragments {
+  readonly harness: EmittedNativeSource;
+  readonly body: EmittedNativeSource;
+  readonly launcher: EmittedNativeSource;
+}
+
+const fragmentIncludes = `#include "oseo_runtime.h"
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+void oseo_fragment_location(OseoContext *, unsigned, size_t, size_t);
+`;
+const fragmentCallParameters = `OseoContext *context, OseoValue callee,
+    OseoValue receiver, size_t argument_count,
+    const OseoValue *arguments, OseoValue new_target`;
+const fragmentCallArguments = `context, callee, receiver, argument_count,
+            arguments, new_target`;
+
+function emitFragmentUnit(
+  fragment: ScriptFragment,
+  unit: "harness" | "case",
+  globalObjects: readonly MirGlobalObjectBinding[],
+): string {
+  const phases = lowerFragmentPhases(fragment);
+  const functions = fragment.mir.functions;
+  const counts = new Map(functions.map((fn) => [fn.id, rootCount(fn)]));
+  const definitions = functions.map((fn) =>
+    emitFunction(
+      fn,
+      counts,
+      fragment.nextBindingId,
+      fragment.mir.observeSpecialization,
+      [],
+      globalObjects,
+      unit,
+    ),
+  );
+  const entries = phases.map((phase, index) => {
+    const name = index === 0 ? "instantiate" : "evaluate";
+    const count = rootCount(phase.script);
+    const phaseCounts = new Map([...counts, [-1, count]]);
+    return (
+      emitFunction(
+        phase.script,
+        phaseCounts,
+        fragment.nextBindingId,
+        fragment.mir.observeSpecialization,
+        [],
+        globalObjects,
+        unit,
+        name,
+      ) +
+      `
+OseoResult oseo_${unit}_${name}(OseoContext *context,
+    OseoValue environment) {
+    OseoResult result = oseo_frame_enter(context, ${count}u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_function_${name}(context, environment,
+        oseo_undefined(), 0u, NULL, oseo_undefined());
+    oseo_frame_leave(context, ${count}u);
+    return result;
+}
+`
+    );
+  });
+  const cases = functions
+    .map((fn) =>
+      renderC(
+        emittedC.functionDispatcher.caseClause,
+        fn.id,
+        counts.get(fn.id)!,
+        fn.id,
+        counts.get(fn.id)!,
+      ),
+    )
+    .join("\n");
+  const generatorCases = functions
+    .filter((fn) => fn.generator === true)
+    .map((fn) =>
+      renderC(
+        emittedC.generatorDispatcher.caseClause,
+        fn.id,
+        generatorBodyName(fn),
+      ),
+    )
+    .join("\n");
+  return (
+    fragmentIncludes +
+    `
+typedef OseoResult (*OseoFunctionEntry)(OseoContext *, OseoValue,
+    OseoValue, size_t, const OseoValue *, OseoValue);
+${functions.map(prototype).join("\n")}
+${definitions.join("\n")}
+${entries.join("\n")}
+OseoResult oseo_${unit}_dispatch(size_t code_id,
+    ${fragmentCallParameters}) {
+    OseoResult result;
+    (void)result; (void)callee; (void)receiver;
+    (void)argument_count; (void)arguments; (void)new_target;
+    switch (code_id) {
+${cases}
+    default: return oseo_unknown_function(context, code_id);
+    }
+}
+OseoResult oseo_${unit}_resume(size_t code_id,
+    OseoContext *context, OseoValue generator) {
+    (void)generator;
+    switch (code_id) {
+${generatorCases}
+    default: return oseo_unknown_function(context, code_id);
+    }
+}
+`
+  );
+}
+
+/**
+ * Emit the opt-in fragment ABI. The caller must retain whole-Script fallback
+ * and provide offsets for the exact source assembly it admitted.
+ */
+export function emitScriptFragments(
+  harness: HarnessFragment,
+  body: ScriptFragment,
+  mapping: FragmentSourceMap,
+): EmittedScriptFragments {
+  if (
+    harness.abi !== scriptFragmentAbi ||
+    ![
+      harness.nextBindingId,
+      body.nextBindingId,
+      harness.nextFunctionId,
+      body.nextFunctionId,
+    ].every(
+      (value) =>
+        Number.isSafeInteger(value) && value >= 0 && value <= 0xffffffff,
+    ) ||
+    body.nextBindingId < harness.nextBindingId ||
+    body.nextFunctionId < harness.nextFunctionId ||
+    body.mir.functions.some((fn) => fn.id < harness.nextFunctionId) ||
+    ![mapping.harnessLineOffset, mapping.bodyLineOffset].every(
+      Number.isSafeInteger,
+    )
+  ) {
+    throw new Error("Invalid fragment ABI limits or source mapping.");
+  }
+  const functions = [...harness.mir.functions, ...body.mir.functions];
+  const globals = [
+    ...harness.mir.globalObjectBindings,
+    ...body.mir.globalObjectBindings,
+  ];
+  const remap = (range: SourceRange, offset: number): SourceRange => ({
+    ...range,
+    sourceId: mapping.sourceId,
+    start: { ...range.start, line: range.start.line + offset },
+    end: { ...range.end, line: range.end.line + offset },
+  });
+  const fragments = [harness, body];
+  const offsets = [mapping.harnessLineOffset, mapping.bodyLineOffset];
+  const lexical = fragments.flatMap((fragment, index) =>
+    (fragment.mir.globalLexicalNames ?? []).map((entry) => ({
+      name: entry.name,
+      range: remap(entry.range, offsets[index]!),
+    })),
+  );
+  // Whole-Script instantiation creates every function property before vars.
+  // Concatenating the already partitioned tables would interleave these kinds.
+  const objectBindings = (["function", "var"] as const).flatMap((kind) =>
+    fragments.flatMap((fragment, index) =>
+      fragment.mir.globalObjectBindings
+        .filter((entry) => entry.declaration === kind)
+        .map((entry) => ({
+          id: entry.id,
+          name: entry.name,
+          declaration: entry.declaration,
+          range: remap(entry.range, offsets[index]!),
+        })),
+    ),
+  );
+  const lines: string[] = [];
+  emitGlobalObject({ lines, environmentSlot: 0 }, lexical, objectBindings);
+  const cells = [
+    ...new Set(
+      fragments.flatMap(
+        (fragment) => fragment.mir.script.localBindingIds ?? [],
+      ),
+    ),
+  ];
+  const declarations = ["harness", "case"]
+    .map(
+      (unit) => `
+OseoResult oseo_${unit}_instantiate(OseoContext *, OseoValue);
+OseoResult oseo_${unit}_evaluate(OseoContext *, OseoValue);
+OseoResult oseo_${unit}_dispatch(size_t, ${fragmentCallParameters});
+OseoResult oseo_${unit}_resume(size_t, OseoContext *, OseoValue);
+`,
+    )
+    .join("\n");
+  const dispatcher = `
+static OseoResult oseo_dispatch_function(${fragmentCallParameters}) {
+    size_t code_id = 0u;
+    OseoResult result = oseo_function_code_id(context, callee, &code_id);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    ${
+      harness.nextFunctionId === 0
+        ? `return oseo_case_dispatch(code_id, ${fragmentCallArguments});`
+        : `return code_id < ${harness.nextFunctionId}u
+        ? oseo_harness_dispatch(code_id, ${fragmentCallArguments})
+        : oseo_case_dispatch(code_id, ${fragmentCallArguments});`
+    }
+}
+static OseoResult oseo_dispatch_generator(OseoContext *context,
+    OseoValue generator) {
+    size_t code_id = 0u;
+    OseoResult result = oseo_function_code_id(context,
+        oseo_generator_callee(generator), &code_id);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    ${
+      harness.nextFunctionId === 0
+        ? "return oseo_case_resume(code_id, context, generator);"
+        : `return code_id < ${harness.nextFunctionId}u
+        ? oseo_harness_resume(code_id, context, generator)
+        : oseo_case_resume(code_id, context, generator);`
+    }
+}
+`;
+  const sourceId = escapeCString(mapping.sourceId);
+  const sourceLength = new TextEncoder().encode(mapping.sourceId).length;
+  const script = `
+const size_t oseo_fragment_binding_count = ${body.nextBindingId}u;
+void oseo_fragment_location(OseoContext *context, unsigned unit,
+    size_t line, size_t column) {
+    ptrdiff_t offset = unit == 0u ? ${mapping.harnessLineOffset}
+        : ${mapping.bodyLineOffset};
+    oseo_context_source_location(context, "${sourceId}", ${sourceLength}u,
+        (size_t)((ptrdiff_t)line + offset), column);
+}
+static OseoResult oseo_function_script(${fragmentCallParameters}) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue *roots = frame.slots;
+    (void)callee; (void)receiver; (void)argument_count;
+    (void)arguments; (void)new_target;
+    result = oseo_environment_create(context, oseo_fragment_binding_count);
+    roots[0] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+${cells
+  .map(
+    (id) => `    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[0], ${id}u, roots[1]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;`,
+  )
+  .join("\n")}
+${lines.join("\n")}
+${[
+  "harness_instantiate",
+  "case_instantiate",
+  "harness_evaluate",
+  "case_evaluate",
+]
+  .map(
+    (entry) =>
+      `    result = oseo_${entry}(context, roots[0]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;`,
+  )
+  .join("\n")}
+    abrupt:
+    oseo_roots_release(context, &frame);
+    return result;
+}
+`;
+  // Retain the existing entry task/event loop and observation contract.
+  const launcher = renderC(
+    emittedC.program.source,
+    "",
+    declarations,
+    dispatcher,
+    "",
+    script,
+    "",
+    "",
+    sourceId,
+    sourceLength,
+    "    oseo_context_set_generator_dispatcher(\n" +
+      "        &context, oseo_dispatch_generator);\n",
+    harness.mir.observeSpecialization
+      ? "    context.observe_specialization = true;\n"
+      : "",
+    2,
+    2,
+    harness.mir.observeSpecialization
+      ? "    oseo_context_print_observations(&context);\n"
+      : "",
+  );
+  // IDs are compiler-owned, so reject mismatched independently prepared inputs.
+  if (
+    functions.some((fn, index) =>
+      functions.some(
+        (other, otherIndex) => index !== otherIndex && fn.id === other.id,
+      ),
+    )
+  ) {
+    throw new Error("Fragment function IDs overlap.");
+  }
+  return {
+    harness: {
+      source: emitFragmentUnit(
+        harness,
+        "harness",
+        harness.mir.globalObjectBindings,
+      ),
+      sourceName: "harness.c",
+    },
+    body: {
+      source: emitFragmentUnit(body, "case", globals),
+      sourceName: "case.c",
+    },
+    launcher: { source: launcher, sourceName: "launcher.c" },
+  };
+}

@@ -115,3 +115,30 @@ test("does not accept a caller-selected foreign execution host", () => {
     /requires execution host target/u,
   );
 });
+
+test(
+  "links fragment units and normalizes instrumented harness objects",
+  { skip: !supported },
+  () => {
+    const adapter = createHostCcToolchain(options);
+    const plan = adapter.createBuildPlan({
+      ...input,
+      additionalGeneratedSourcePaths: ["/work/case.c"],
+      prebuiltObjectPaths: ["/cache/harness.o"],
+    });
+    const link = plan.requests.at(-1)!;
+    assert.ok(link.args.includes("/work/case.c"));
+    assert.ok(link.args.includes("/cache/harness.o"));
+    const request = adapter.harnessObjectReuse!.createBuildRequest({
+      workingDirectory: "/different/build",
+      target,
+      environment: { variables: {} },
+    });
+    assert.ok(request.args.includes("harness.c"));
+    assert.ok(request.args.includes("-fsanitize=address,undefined"));
+    assert.ok(
+      request.args.includes("-ffile-prefix-map=/different/build=/oseo/harness"),
+    );
+    assert.equal(request.cwd, "/different/build");
+  },
+);

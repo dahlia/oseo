@@ -267,3 +267,16 @@ export type { ScriptFragment } from "./fragments.ts";
 export type { HarnessFragment } from "./fragments.ts";
 export type { HarnessFragmentResult } from "./fragments.ts";
 export type { BodyFragmentResult } from "./fragments.ts";
+
+export type {
+  HarnessObjectBuildInput,
+  HarnessObjectKeyInput,
+  HarnessObjectReuse,
+} from "./native.ts";
+export { prepareHarnessObject } from "./native-fragments.ts";
+export type { PreparedHarnessObject } from "./native-fragments.ts";
+
+export { lowerFragmentPhases } from "./fragments.ts";
+
+export { createHarnessObjectKey } from "./native-fragments.ts";
+export type { HarnessToolchainPolicy } from "./native-fragments.ts";

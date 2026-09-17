@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { cBackend } from "../packages/backend-c/src/index.ts";
+import {
+  cBackend,
+  emitScriptFragments,
+} from "../packages/backend-c/src/index.ts";
 import {
   compileBodyFragment,
   compileHarnessFragment,
@@ -57,6 +60,11 @@ for (const strict of [false, true]) {
         assert.ok(compiled.bindingCount >= harness.nextBindingId);
         outputs.push(
           JSON.stringify({
+            splitC: emitScriptFragments(harness, compiled.body, {
+              sourceId: "case.js",
+              harnessLineOffset: 0,
+              bodyLineOffset: 1,
+            }).harness.source,
             hir: printHir(harness.hir),
             mir: printMir(harness.mir),
             metadata: harness,
@@ -361,4 +369,38 @@ test("lexical imports retain binding IDs and mutability", () => {
   assert.equal(wholeWrite.expression.kind, "binding-set");
   if (wholeWrite.expression.kind !== "binding-set") return;
   assert.equal(constWrite.expression.mutable, wholeWrite.expression.mutable);
+});
+
+test("launcher global property order matches whole Script", () => {
+  const source = "var h = 1; function hf() {}";
+  const bodySource = "function c() {} var b = 2;";
+  const prepared = compileHarnessFragment(babelFrontend, [
+    { sourceId: "h.js", source },
+  ]);
+  assert.equal(prepared.kind, "compiled");
+  if (prepared.kind !== "compiled") return;
+  const compiled = compileBodyFragment(babelFrontend, prepared.harness, {
+    sourceId: "case.js",
+    source: bodySource,
+  });
+  assert.equal(compiled.kind, "compiled");
+  if (compiled.kind !== "compiled") return;
+  const whole = compileSource(babelFrontend, {
+    sourceId: "case.js",
+    source: source + "\n" + bodySource,
+  });
+  assert.ok(whole.mir);
+  const c = emitScriptFragments(prepared.harness, compiled.body, {
+    sourceId: "case.js",
+    harnessLineOffset: 0,
+    bodyLineOffset: 1,
+  }).launcher.source;
+  const names = [
+    ...c.matchAll(/global_object_units_\d+\[\] = \{([\d, ]+)\};/gu),
+  ].map((match) => String.fromCharCode(...match[1]!.split(",").map(Number)));
+  assert.deepEqual(
+    names,
+    whole.mir.globalObjectBindings.map((entry) => entry.name),
+  );
+  assert.deepEqual(names, ["hf", "c", "h", "b"]);
 });
