@@ -22,6 +22,14 @@ import {
 } from "../tools/test262-fragments.ts";
 import type { Test262FragmentInput } from "../tools/test262-fragments.ts";
 
+// These fallback tests must never reach a native build. Omitting reuse
+// metadata also makes an accidental split fail before invoking a compiler.
+const fallbackToolchain: NativeToolchain = {
+  createBuildPlan() {
+    throw new Error("fallback tests must not build native artifacts");
+  },
+};
+
 const nativeTarget = targetForExecutionHost(
   createNodeHost().executionHost ?? {
     architecture: "unknown",
@@ -63,7 +71,7 @@ test("fragment boundaries reject ASI joins", () => {
 
 test("runner fallback retains the exact whole input", async () => {
   const host = createNodeHost();
-  const executor = createTest262FragmentExecutor(host, nativeToolchain);
+  const executor = createTest262FragmentExecutor(host, fallbackToolchain);
   const cases = [
     { source: "let Object = 1;", harness: "Object;", reason: "shadowing" },
     {
@@ -234,7 +242,7 @@ test("object cache coalesces workers and repairs corruption", async () => {
 
 test("explicit whole routes never build fragments", async () => {
   const host = createNodeHost();
-  const executor = createTest262FragmentExecutor(host, nativeToolchain);
+  const executor = createTest262FragmentExecutor(host, fallbackToolchain);
   const base = {
     mode: "script" as const,
     source: "42;",
@@ -433,7 +441,7 @@ test(
 test("execution counts use the first diagnostic prefix", async () => {
   const executor = createTest262FragmentExecutor(
     createNodeHost(),
-    nativeToolchain,
+    fallbackToolchain,
   );
   const request = {
     source: "",
