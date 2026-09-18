@@ -216,8 +216,10 @@ Ownership follows the plan's target layout:
     iterables, array-like objects, and typed arrays, element conversion,
     the backing-buffer view record, the integer-indexed element operations
     the generic property components delegate to, the core prototype
-    accessors and methods, and the every, some, forEach, map, filter,
-    reduce, and reduceRight iteration methods;
+    accessors and methods, the every, some, forEach, map, filter,
+    reduce, and reduceRight iteration methods, and the find, findIndex,
+    findLast, findLastIndex, includes, indexOf, lastIndexOf, join, and
+    toLocaleString search and join methods;
  -  *runtime\_weak\_collection.c*: the `WeakMap`, `WeakSet`, `WeakRef`, and
     `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
     job-scoped KeptAlive set, and the cleanup job step that calls a
@@ -1558,6 +1560,32 @@ inventory roots and promotes 25 already reviewed `Map`, `Set`, and `Object`
 cases whose last unmet prerequisite was a weak collection; two of them, the
 `Map` and `Set` value-domain cases, also needed the landed `typed-array-core`
 node.
+
+### TypedArray search and join evidence
+
+M5b node `typed-array-search-and-join` adds nine search and join methods to
+*runtime\_typed\_array.c* without changing the view record or the
+component's helper surface. Each method validates the receiver and snapshots
+the view length before converting an argument or calling user code. The
+predicate searches and `includes` read every visited snapshot index through
+the existing integer-indexed element getter, `indexOf` and `lastIndexOf` add
+the integer-indexed presence test, and `join` and `toLocaleString` append
+each element's string into a host-memory `OseoStringBuilder`, so collection
+between two appends cannot move the partial result. The stringifiers push
+the receiver onto the context's existing array-string stack that
+*runtime\_array.c* and *runtime\_primitive.c* already consult, which makes
+cross-component re-entry render an empty string. The nine methods take nine
+code IDs from the TypedArray range and add no helper, intrinsic slot, heap
+kind, component, or generated-code entry point; the component moves
+`abiVersion` to `m5-114`.
+
+Fixed and generated native differential evidence at seed `0x60007600` covers
+the ten methods over Number and BigInt kinds with `NaN`, signed-zero, and
+infinite elements, plain and observably converted fromIndex, separator, and
+locale inputs, and detach and shrink during the first callback or conversion,
+under both specialization policies with collection forced at every safepoint,
+a deliberate false-hint guard miss, and an independent model of every
+observation. The node reviews all 356 paths under its ten inventory roots.
 
 ### Function prototype evidence
 

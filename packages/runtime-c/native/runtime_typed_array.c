@@ -12,8 +12,9 @@
  * This component owns construction, element conversion, the
  * integer-indexed exotic element operations the generic property paths
  * delegate to, the prototype accessors, at, set, subarray, and the
- * iterator methods. The iterative, mutation, search and join, and sorting
- * prototype methods and the from and of statics remain later graph nodes.
+ * iterator methods, and the iterative and search and join prototype
+ * methods. The mutation and sorting prototype methods and the from and of
+ * statics remain later graph nodes.
  */
 
 #define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
@@ -2232,6 +2233,288 @@ static OseoResult typed_array_reduction(
     return result;
 }
 
+/*
+ * find, findIndex, findLast, and findLastIndex share FindViaPredicate over
+ * the length snapshotted by ValidateTypedArray. Every snapshot index is
+ * read without a presence test, so a detach or shrink the predicate
+ * performs makes a later read undefined and the predicate still runs for
+ * it. The receiver, predicate, this value, and current element stay rooted
+ * across user code and forced collection.
+ */
+static OseoResult typed_array_predicate_search(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    const bool from_last = code_id == OSEO_TYPED_ARRAY_FIND_LAST_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FIND_LAST_INDEX_CODE_ID;
+    const bool wants_index = code_id == OSEO_TYPED_ARRAY_FIND_INDEX_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FIND_LAST_INDEX_CODE_ID;
+    OseoValue slots[6] = {
+        receiver,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 6u};
+    oseo_roots_push(context, &frame);
+    slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    slots[2] = typed_array_argument(argument_count, arguments, 1u);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray predicate is not callable."
+        );
+    }
+    bool found = false;
+    for (size_t visited = 0u;
+         result.status == OSEO_STATUS_NORMAL && visited < length;
+         visited += 1u) {
+        size_t index = from_last ? length - 1u - visited : visited;
+        result = typed_array_iteration_element(context, slots[0], index);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        slots[3] = result.value;
+        slots[4] = oseo_number((double)index);
+        slots[5] = slots[0];
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[2],
+            3u,
+            &slots[3],
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (oseo_to_boolean(result.value)) {
+            result = normal(
+                wants_index ? oseo_number((double)index) : slots[3]
+            );
+            found = true;
+            break;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !found) {
+        result = normal(
+            wants_index ? oseo_number(-1.0) : oseo_undefined()
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * includes, indexOf, and lastIndexOf. An empty view answers before the
+ * fromIndex conversion, which may run user code that detaches or resizes
+ * the buffer. After it, includes reads every remaining snapshot index with
+ * no presence test and compares with SameValueZero, so an index the
+ * conversion invalidated matches undefined. indexOf and lastIndexOf skip
+ * an index that HasProperty no longer reports and compare with strict
+ * equality.
+ */
+static OseoResult typed_array_index_search(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t code_id
+) {
+    const bool includes = code_id == OSEO_TYPED_ARRAY_INCLUDES_CODE_ID;
+    const bool from_right = code_id == OSEO_TYPED_ARRAY_LAST_INDEX_OF_CODE_ID;
+    OseoValue slots[3] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = (double)typed_array_length(typed_array_object(slots[0]));
+    }
+    double index = 0.0;
+    bool searching = result.status == OSEO_STATUS_NORMAL && length > 0.0;
+    if (searching) {
+        double relative = length - 1.0;
+        if (!from_right || argument_count >= 2u) {
+            result = typed_array_integer_or_infinity(
+                context,
+                typed_array_argument(argument_count, arguments, 1u),
+                &relative
+            );
+        }
+        searching = result.status == OSEO_STATUS_NORMAL;
+        if (searching && from_right) {
+            searching = relative != -INFINITY;
+            index = relative >= 0.0
+                ? fmin(relative, length - 1.0)
+                : length + relative;
+        } else if (searching) {
+            searching = relative != INFINITY;
+            index = relative >= 0.0
+                ? relative
+                : fmax(length + relative, 0.0);
+        }
+    }
+    bool matched = false;
+    while (searching && (from_right ? index >= 0.0 : index < length)) {
+        size_t position = (size_t)index;
+        if (includes ||
+            oseo_internal_typed_array_has_index(slots[0], position)) {
+            result = typed_array_iteration_element(
+                context,
+                slots[0],
+                position
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            slots[2] = result.value;
+            matched = includes
+                ? oseo_internal_same_value_zero(slots[2], slots[1])
+                : oseo_to_boolean(
+                      oseo_strict_equal(context, slots[2], slots[1]).value
+                  );
+            if (matched) break;
+        }
+        index += from_right ? -1.0 : 1.0;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = includes
+            ? normal(oseo_boolean(matched))
+            : normal(oseo_number(matched ? index : -1.0));
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * join and toLocaleString over the snapshotted length. join converts its
+ * separator after the snapshot, so a detach or shrink during that
+ * conversion leaves later indices undefined and renders them as empty
+ * fields. toLocaleString follows Array.prototype.toLocaleString under the
+ * ECMA-402 call contract: each element's current toLocaleString method is
+ * invoked with exactly the outer locales and options arguments, and an
+ * element a callback invalidated renders empty. As in Array
+ * stringification, a receiver already being joined or converted on the
+ * active string stack renders an empty string after the separator
+ * conversion instead of recursing without bound. The pieces accumulate in
+ * host memory so collection between two appends cannot move them.
+ */
+static OseoResult typed_array_join(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool locale
+) {
+    OseoValue slots[6] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 6u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+        result = locale || tag_of(slots[1]) == OSEO_TAG_UNDEFINED
+            ? oseo_internal_ascii_string(context, ",")
+            : oseo_internal_value_string(context, slots[1]);
+        slots[3] = result.value;
+    }
+    const OseoArrayStringAncestor *previous_string =
+        context->array_string_stack;
+    bool recursive = false;
+    for (const OseoArrayStringAncestor *current = previous_string;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == slots[0]) recursive = true;
+    }
+    OseoArrayStringAncestor current_string = {slots[0], previous_string};
+    if (result.status == OSEO_STATUS_NORMAL && recursive) length = 0u;
+    const bool pushed = result.status == OSEO_STATUS_NORMAL && !recursive;
+    if (pushed) context->array_string_stack = &current_string;
+    OseoStringBuilder builder = {NULL, 0u, 0u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        if (index > 0u) {
+            const OseoString *separator = string_object(slots[3]);
+            result = oseo_internal_string_builder_append(
+                context,
+                &builder,
+                separator->units,
+                separator->length
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
+        result = typed_array_iteration_element(context, slots[0], index);
+        slots[4] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (tag_of(slots[4]) == OSEO_TAG_UNDEFINED) continue;
+        if (locale) {
+            result = oseo_internal_ascii_string(context, "toLocaleString");
+            slots[5] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(context, slots[4], slots[5]);
+                slots[5] = result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL &&
+                !is_callable(slots[5])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Element toLocaleString is not callable."
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_call_function(
+                    context,
+                    slots[5],
+                    slots[4],
+                    2u,
+                    &slots[1],
+                    oseo_undefined()
+                );
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            slots[5] = result.value;
+        } else {
+            slots[5] = slots[4];
+        }
+        result = oseo_internal_value_string(context, slots[5]);
+        slots[5] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        const OseoString *element = string_object(slots[5]);
+        result = oseo_internal_string_builder_append(
+            context,
+            &builder,
+            element->units,
+            element->length
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_string_from_units(context, builder.units, builder.length);
+    }
+    if (pushed) context->array_string_stack = (void *)previous_string;
+    oseo_internal_string_builder_release(&builder);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -2299,6 +2582,39 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
             argument_count,
             arguments,
             code_id == OSEO_TYPED_ARRAY_REDUCE_RIGHT_CODE_ID
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_FIND_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FIND_INDEX_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FIND_LAST_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_FIND_LAST_INDEX_CODE_ID) {
+        return typed_array_predicate_search(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_INCLUDES_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_INDEX_OF_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_LAST_INDEX_OF_CODE_ID) {
+        return typed_array_index_search(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_JOIN_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_TO_LOCALE_STRING_CODE_ID) {
+        return typed_array_join(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_TYPED_ARRAY_TO_LOCALE_STRING_CODE_ID
         );
     }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
@@ -2545,6 +2861,53 @@ static OseoResult typed_array_install_core(
                 context,
                 slots[0],
                 iterative_names[index],
+                slots[2],
+                method
+            );
+        }
+    }
+    static const size_t search_codes[] = {
+        OSEO_TYPED_ARRAY_FIND_CODE_ID,
+        OSEO_TYPED_ARRAY_FIND_INDEX_CODE_ID,
+        OSEO_TYPED_ARRAY_FIND_LAST_CODE_ID,
+        OSEO_TYPED_ARRAY_FIND_LAST_INDEX_CODE_ID,
+        OSEO_TYPED_ARRAY_INCLUDES_CODE_ID,
+        OSEO_TYPED_ARRAY_INDEX_OF_CODE_ID,
+        OSEO_TYPED_ARRAY_JOIN_CODE_ID,
+        OSEO_TYPED_ARRAY_LAST_INDEX_OF_CODE_ID,
+        OSEO_TYPED_ARRAY_TO_LOCALE_STRING_CODE_ID,
+    };
+    static const char *const search_names[] = {
+        "find",
+        "findIndex",
+        "findLast",
+        "findLastIndex",
+        "includes",
+        "indexOf",
+        "join",
+        "lastIndexOf",
+        "toLocaleString",
+    };
+    static const size_t search_lengths[] = {
+        1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 0u,
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 9u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            search_codes[index],
+            search_names[index],
+            search_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[0],
+                search_names[index],
                 slots[2],
                 method
             );
@@ -2803,23 +3166,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
     if (typed_array_key_matches(
             key, mutation, sizeof(mutation) / sizeof(*mutation))) {
         return "TypedArray mutation methods are not admitted yet.";
-    }
-    static const char *const search_and_join[] = {
-        "find",
-        "findIndex",
-        "findLast",
-        "findLastIndex",
-        "includes",
-        "indexOf",
-        "join",
-        "lastIndexOf",
-        "toLocaleString",
-    };
-    if (typed_array_key_matches(
-            key,
-            search_and_join,
-            sizeof(search_and_join) / sizeof(*search_and_join))) {
-        return "TypedArray search and join methods are not admitted yet.";
     }
     static const char *const sorting[] = {"sort", "toSorted"};
     if (typed_array_key_matches(

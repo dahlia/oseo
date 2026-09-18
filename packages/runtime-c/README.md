@@ -929,6 +929,19 @@ the next timer, including each timer an internal await drives. Every
 object and every symbol can be held weakly because the profile admits no
 `Symbol.for` registry.
 
+The `m5-114` ABI adds the TypedArray search and join methods `find`,
+`findIndex`, `findLast`, `findLastIndex`, `includes`, `indexOf`,
+`lastIndexOf`, `join`, and `toLocaleString`. Each validates its receiver and
+snapshots the view length first. The predicate searches and `includes` read
+every visited snapshot index through the integer-indexed element getter,
+`indexOf` and `lastIndexOf` also test integer-indexed presence, and an empty
+view answers before fromIndex is converted. `join` converts its separator
+after the snapshot and `toLocaleString` forwards the outer locales and
+options to each element's method; both render an invalidated index as an
+empty field and share the Array stringification stack for re-entry. Nine code
+IDs are allocated inside the existing TypedArray range; no intrinsic slot,
+heap kind, public layout, or generated-code entry point is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

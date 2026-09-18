@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 128
+M5a is complete. The normative family records described below inventory 129
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 20,417 reviewed cases: 16,789 passes, 1,556
-expected negatives, and 2,072 unsupported profile features. It records no
+The current manifest contains 20,773 reviewed cases: 17,133 passes, 1,556
+expected negatives, and 2,084 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6679,8 +6679,8 @@ function object, recorded when `%Array.prototype%` materializes. This node
 also materializes the `%TypedArray%[Symbol.species]` getter, because
 `subarray` cannot construct its default result without that lookup; the
 `typed-array-statics` node reuses it and still owns `from` and `of`. The
-mutation, search and join, and sorting prototype methods keep their
-explicit lookup boundaries, and so does own-key reflection over
+mutation and sorting prototype methods keep their explicit lookup
+boundaries, and so does own-key reflection over
 `%TypedArray.prototype%`, whose key list completes only after those nodes
 land.
 
@@ -6785,6 +6785,88 @@ negatives and moving from 2,070 to 2,093 unsupported profile features with no
 semantic, harness, or infrastructure failures. The property inventory reaches
 149 domains and seeds with a 5,707-case ordinary budget, the evidence
 inventory reaches 127 families, and the runtime ABI moves to `m5-112`.
+
+
+TypedArray search and joining
+-----------------------------
+
+M5b node `typed-array-search-and-join` adds `find`, `findIndex`, `findLast`,
+`findLastIndex`, `includes`, `indexOf`, `lastIndexOf`, `join`, and
+`toLocaleString` to `%TypedArray.prototype%`. Each is an ordinary
+non-constructible method with the standard writable, non-enumerable,
+configurable descriptor; `toLocaleString` has length zero and the others
+length one. `%TypedArray.prototype%.toString` remains the shared
+`Array.prototype.toString` function object the core node installs, which
+reaches this node's `join` for a typed-array receiver. Each method begins with
+ValidateTypedArray, so a receiver without a `[[TypedArrayName]]` slot, or one
+whose buffer is detached or too short for its view, throws a `TypeError`
+before any argument is inspected or converted, and the element length is read
+once at that point.
+
+`find` and `findIndex` visit the snapshot in ascending order and `findLast`
+and `findLastIndex` in descending order. After the callable check each reads
+every visited index through TypedArrayGetElement with no presence test, so a
+detach or shrink the predicate performs makes a later element `undefined` and
+the predicate still runs for it; the predicate receives the element, index,
+and receiver with the supplied `this` value, and the first truthy result
+stops the walk.
+
+`includes`, `indexOf`, and `lastIndexOf` return `false` or `-1` for an empty
+view before converting fromIndex. Otherwise fromIndex goes through
+ToIntegerOrInfinity: a positive infinity ends `includes` and `indexOf`, a
+negative infinity ends `lastIndexOf`, negative values count from the snapshot
+length, and an omitted `lastIndexOf` fromIndex starts at the last snapshot
+index. The conversion may run user code. `includes` then reads every remaining
+snapshot index and compares with SameValueZero, so `NaN` matches `NaN` and an
+index the conversion invalidated matches `undefined`. `indexOf` and
+`lastIndexOf` skip any index HasProperty no longer reports and compare with
+strict equality, so `NaN` never matches and a Number never matches a BigInt
+element.
+
+`join` converts a defined separator with ToString after the length snapshot,
+defaulting to a comma, and renders an index a detach or shrink during that
+conversion invalidated as an empty field; a growth never extends the
+snapshot. `toLocaleString` uses a comma separator and follows the Array
+method under the ECMA-402 call contract: it reads each defined element's
+current `toLocaleString` through the element's primitive prototype, throws a
+`TypeError` when that value is not callable, calls it with the element as its
+receiver and exactly the outer locales and options arguments, forwarding two
+`undefined` values when they were omitted, and converts the result with
+ToString. An abrupt completion from any of these steps propagates at once.
+Both methods share Array stringification's active-receiver stack, so a
+re-entrant `join` or `toLocaleString` of a view that is already being
+stringified renders an empty string, as V8 does, instead of exhausting the
+call-depth boundary.
+
+Fixed native and generated differential evidence at property seed
+`0x60007600` covers the ten methods over Number, `NaN`, signed-zero, infinite,
+and BigInt element kinds, absent, present, and `undefined` search targets,
+absent, plain, infinite, fractional, and observably converted fromIndex,
+separator, and locale inputs, and no mutation, detach, and shrink during the
+first callback or conversion. Node.js, Deno, and both native specialization
+policies agree with collection forced at every safepoint, a false numeric hint
+deliberately misses its guard and reaches the compiled generic fallback, and
+an independent model computes every callback, conversion, and result
+observation. The fixed fixture also pins method metadata and identity,
+fromIndex clamping, the empty-view short circuit, separator and locale
+conversion and their abrupt completions, locale argument forwarding, locale
+cycles, non-typed-array and detached receivers, non-callable predicates, an
+element offset, and grow and shrink through resizable buffers.
+
+The reviewed feature list and harness are unchanged, and the dependency
+vocabulary gains `typed-array-search-and-join`. All 356 paths under the
+node's ten inventory roots enter the reviewed subset: 324 pass, twenty-nine
+keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite, two `toLocaleString` cases need primitive wrapper objects, and
+one `lastIndexOf` case needs a TypedArray mutation method. Twenty already
+reviewed `set` and `subarray` paths outside the roots, which reach a search or
+join method through the reviewed harness, move from unsupported to pass. The
+manifest moves from 20,417 to 20,773 cases and from 16,789 to 17,133 passes
+while keeping 1,556 expected negatives and moving from 2,072 to 2,084
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property inventory reaches 151 domains and seeds with a
+5,731-case ordinary budget, the evidence inventory reaches 129 families, and
+the runtime ABI moves to `m5-114`.
 
 
 Set composition methods

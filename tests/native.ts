@@ -61,6 +61,8 @@ import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 
 const { typedArrayIterativeFixtures } =
   await import("./native/fixtures/typed-array-iterative.ts");
+const { typedArraySearchAndJoinFixtures } =
+  await import("./native/fixtures/typed-array-search-and-join.ts");
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -194,6 +196,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...typedArrayIterativeFixtures,
+  ...typedArraySearchAndJoinFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -830,6 +833,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
     fixture.name === "typed-array-iterative" ||
+    fixture.name === "typed-array-search-and-join" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1079,6 +1083,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "number-prototype" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "typed-array-iterative" ||
+    fixture.name === "typed-array-search-and-join" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -1188,6 +1193,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "shared-array-buffer" ||
             fixture.name === "atomics-single-agent" ||
             fixture.name === "typed-array-iterative" ||
+            fixture.name === "typed-array-search-and-join" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

@@ -12,11 +12,6 @@ export async function runNativeScenario2(
 
   for (const [name, source, message] of [
     [
-      "typed-array-search-method.ts",
-      "console.log(new Uint8Array(1).includes);",
-      "TypedArray search and join methods are not admitted yet.",
-    ],
-    [
       "typed-array-mutation-method.ts",
       "console.log(new Uint8Array(1).fill);",
       "TypedArray mutation methods are not admitted yet.",

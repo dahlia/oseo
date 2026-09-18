@@ -1,0 +1,64 @@
+version: 1
+id: typed-array-search-and-join
+title: "TypedArray search and joining"
+scope:
+  - "The %TypedArray.prototype% find, findIndex, findLast, findLastIndex,
+    includes, indexOf, lastIndexOf, join, and toLocaleString methods and the
+    shared toString identity: ValidateTypedArray before the length snapshot,
+    the predicate callable check, one TypedArrayGetElement read per visited
+    snapshot index, the empty-view answer before the fromIndex conversion,
+    the ToIntegerOrInfinity fromIndex clamps, SameValueZero for includes and
+    strict equality with a HasProperty test for indexOf and lastIndexOf, the
+    separator conversion after the snapshot, the ECMA-402 toLocaleString
+    call contract, and the detach, shrink, and grow observations a predicate
+    or conversion causes."
+  - "Reviewed standards coverage is every upstream path under the node's ten
+    inventory roots: test/built-ins/TypedArray/prototype/find, findIndex,
+    findLast, findLastIndex, includes, indexOf, join, lastIndexOf,
+    toLocaleString, and toString. Paths that need the unreviewed
+    resizableArrayBufferUtils.js include retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-search-and-join.ts
+      - tests/property/m5-typed-array-search-and-join.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-search-and-join.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-search-and-join.ts
+      - tests/property/m5-typed-array-search-and-join.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-search-and-join.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-search-and-join.ts
+      - tests/property/m5-typed-array-search-and-join.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-search-and-join.ts
+      - tests/property/m5-typed-array-search-and-join.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c
