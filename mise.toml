@@ -232,7 +232,7 @@ run = "mise run --skip-deps test:property:extended:native"
 [tasks."test:property:extended:native"]
 description = "Run extended host-native semantic properties"
 depends = ["build"]
-run = "node tools/run-native-tests.ts tests/property/*.property.test.ts"
+run = "node --test tests/property/*.property.test.ts"
 
 [tasks."test:property:extended:native".env]
 OSEO_PROPERTY_RUN_SCALE = "10"
@@ -243,7 +243,7 @@ OSEO_PROPERTY_SIZE = "large"
 description = "Run selected extended host-native property test files"
 depends = ["build"]
 raw_args = true
-run = "node tools/run-native-tests.ts"
+run = "node --test"
 
 [tasks."test:property:extended:native:shard".env]
 OSEO_PROPERTY_RUN_SCALE = "10"
@@ -265,7 +265,7 @@ for seed in [1592590337 1592590338] {
     OSEO_PROPERTY_SIZE: "large"
     OSEO_PROPERTY_SEED: ($seed | into string)
   } {
-    ^node tools/run-native-tests.ts ...$package_tests
+    ^node --test ...$package_tests
     ^deno test -A ...$package_tests
   }
 }
@@ -274,7 +274,7 @@ for seed in [1592590337 1592590338] {
 [tasks."test:property:native"]
 description = "Run bounded host-native semantic properties"
 depends = ["build"]
-run = "node tools/run-native-tests.ts tests/property/*.property.test.ts"
+run = "node --test tests/property/*.property.test.ts"
 
 [tasks."test:test262"]
 description = "Run the pinned test262 subset on the matching native target"
@@ -344,7 +344,3 @@ run = '''
 node --test tests/native-toolchains.test.ts
 node tools/check-native-toolchains.ts
 '''
-
-[tasks."ci:runtime-archive-cache"]
-description = "Print the exact native runtime archive cache key and path"
-run = "node tests/ci-runtime-archive-cache.ts"
