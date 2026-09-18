@@ -19,5 +19,5 @@ inventory:
 dependencies:
   - string-prototype-access
   - typed-array-core
-landed: false
+landed: true
 status: ready
