@@ -72,6 +72,8 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
 
   test_native:
@@ -95,6 +97,7 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
       - run: mise run test:native --shard ${{ matrix.shard }}/3
         env:
           TMPDIR: ${{ runner.temp }}
@@ -114,6 +117,9 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
       - run: mise run test:sanitizer:self
       - name: Verify GCC sanitizer instrumentation
         run: mise run test:sanitizer:self
@@ -150,6 +156,11 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+        env:
+          TMPDIR: ${{ runner.temp }}
       - run: mise run test:sanitizer:self
         env:
           TMPDIR: ${{ runner.temp }}
@@ -271,6 +282,7 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
           --shard ${{ matrix.shard }}/${{ matrix.total }}
@@ -367,6 +379,7 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
+      - uses: ./.github/actions/runtime-archive-cache
       - if: matrix.shard == 1
         run: mise run test:property:extended:package
       - run: >-
