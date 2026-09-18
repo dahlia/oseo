@@ -12,8 +12,4 @@ inventory:
 dependencies:
   - array-prototype-copying
 landed: false
-status: parked
-reason: "Additional cross-model review approval is required. Five Fable 5.1
-  rounds completed on the preserved implementation, but rebasing after Weak
-  Collections changed 13 shared serialization files, so the non-byte-identical
-  combined diff needs one new Fable review before manifest regeneration."
+status: ready
