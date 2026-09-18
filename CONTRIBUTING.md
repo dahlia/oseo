@@ -326,6 +326,44 @@ imports select no compiler and are allowed. Do not obtain the compiler from
 `defaultComponents.toolchain` or spread `defaultComponents` into native build
 options; pass the selected `nativeToolchain` explicitly instead.
 
+`mise run check:native-host-guards`, also included in `mise run check`, scans
+all TypeScript sources under *tests/* recursively for `node:test` registrations.
+A test that builds or executes native code must use this option, with a target
+selected by `targetForExecutionHost`:
+
+~~~~ ts
+{ skip: nativeTarget == null ? "requires a supported native host" : false }
+~~~~
+
+The check follows calls and named callbacks through functions in the same file,
+including enclosing registration functions and Promise/array callbacks.
+It recognizes value imports, including aliases, of `runNativeCli`,
+`withNativeFixture`, and `buildHostCcFixture`; `runNativeUnits` and
+`prepareHarnessObject` with the imported `nativeToolchain`; execution through
+`createTest262FragmentExecutor` with that toolchain; consumption of
+a `nativeToolchain.createBuildPlan` result's `executablePath` or iterated
+`requests` in process calls; and literal `zig`/`cc` invocations through local
+wrappers. The clock entry points
+`buildClockProgram`, `runClockProbe`, and `runClockScheduler` are included too.
+It accepts `hostClockTarget()` and shared skip constants, plus the existing
+explicit Linux x64/macOS arm64 target selection and additional `||` skip
+conditions. Reports include the file, line, test name, and required option.
+
+This is a syntactic check, not general call-graph or control-flow analysis.
+Type-only imports, unused functions, CLI emission modes, build-plan inspection
+(including rejected-target assertions), and unused executors need no guard.
+Harness and fragment tests with fake toolchains do not select a native compiler.
+Fallback-only fragment tests should supply a toolchain that refuses builds so
+an accidental split fails before invoking a compiler. The check does not infer
+that a real-toolchain execution falls back from JavaScript source strings.
+
+When adding a native entry point or changing how a test invokes one, update
+`nativeHelpers` and the call patterns in *tools/check-native-host-guards.ts*.
+Add guarded and unguarded examples and a non-building counterexample to
+*tests/native-host-guards.test.ts*, then run the check over the whole tree.
+Imported wrappers must be listed explicitly; calls through arbitrary object
+aliases and dynamically computed API names are not resolved.
+
 ### Property-based tests
 
 Use property tests when a semantic unit has a useful generated domain or state

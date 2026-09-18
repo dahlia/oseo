@@ -110,7 +110,7 @@ description = "Keep reviewed evidence within the named M5b node scope"
 run = "node tools/m5b-node-scope.ts"
 
 [tasks."check:native-host-guards"]
-description = "Require unsupported-host skips for native property tests"
+description = "Require unsupported-host skips throughout tests/"
 run = '''
 node --test tests/native-host-guards.test.ts
 node tools/check-native-host-guards.ts
