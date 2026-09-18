@@ -468,6 +468,21 @@ records it exposes. The tag is distinct from `map-intrinsic` and
 reviewed rows outside those roots whose last unmet prerequisite was a weak
 collection move to `pass` and retain their existing tags.
 
+The M5b `typed-array-search-and-join` node extends the vocabulary with
+`typed-array-search-and-join`. The tag identifies the `find`, `findIndex`,
+`findLast`, `findLastIndex`, `includes`, `indexOf`, `lastIndexOf`, `join`, and
+`toLocaleString` members of `%TypedArray.prototype%` and the `toString`
+identity that reaches `join`, including the ValidateTypedArray bounds check,
+the snapshotted element reads, the fromIndex, separator, and locale
+conversions, and the detach and shrink observations those conversions and
+predicates make. One tag covers the ten methods because each reads the same
+view record through the same snapshot and element contracts and none
+allocates a TypedArray result, and the tag is distinct from `typed-array-core`,
+which names the prototype surface these algorithms operate over, and from
+`typed-array-iterative`, whose members call a callback for every element and
+may species-create a result. The reviewed rows under the node's ten inventory
+roots carry it, and no reviewed row outside those roots gains or loses a tag.
+
 
 Alternatives considered
 -----------------------

@@ -472,3 +472,7 @@ families:
     owner: tests/property/m5-weak-collections.property.test.ts
     start: 0x60007500
     end: 0x600075ff
+  - family: m5-typed-array-search-and-join
+    owner: tests/property/m5-typed-array-search-and-join.property.test.ts
+    start: 0x60007600
+    end: 0x600076ff

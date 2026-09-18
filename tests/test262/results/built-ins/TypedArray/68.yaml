@@ -4,6 +4,91 @@ results:
   - case:
       async: false
       features:
+        - TypedArray
+      flags:
+        - noStrict
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/find/predicate-call-this-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - compareArray.js
+        - resizableArrayBufferUtils.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-search-and-join
+    observation:
+      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
+      passed: false
+      unsupportedCapability: harness-include
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/lastIndexOf/negative-index-and-resize-to-smaller.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/TypedArray/prototype/lastIndexOf/negative-index-and-resize-to-smaller.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/TypedArray/prototype/lastIndexOf/negative-index-and-resize-to-smaller.js:623:5:
+        error[OSEO2001]: TypedArray mutation methods are not admitted
+        yet.\n"'
+      unsupportedCapability: typed-array-mutation
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - Symbol.species
         - TypedArray
       flags: []

@@ -114,6 +114,112 @@ results:
       async: false
       features:
         - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-may-detach-buffer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - ArrayBuffer
+        - BigInt
+        - TypedArray
+        - arrow-function
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/join/BigInt/return-abrupt-from-this-out-of-bounds.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/join/result-from-tostring-on-each-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
         - Symbol.species
         - TypedArray
       flags: []
@@ -227,7 +333,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - typed-array-core
     execution:
@@ -239,13 +345,13 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type.js:628:46:
-        error[OSEO2001]: TypedArray search and join methods are not
-        admitted yet.\n"'
-      unsupportedCapability: typed-array-search-and-join
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

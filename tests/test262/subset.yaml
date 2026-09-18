@@ -44095,6 +44095,462 @@ tests:
   - path: test/built-ins/TypedArray/prototype/filter/values-are-set.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/BigInt/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/find/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/BigInt/return-negative-one-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/return-negative-one-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findIndex/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/BigInt/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/return-found-value-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/return-undefined-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLast/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/BigInt/return-negative-one-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/callbackfn-resize.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-call-changes-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-call-parameters.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-call-this-non-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-call-this-strict.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-is-not-callable-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-may-detach-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/predicate-not-called-on-empty-array.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer-grow-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer-shrink-mid-iteration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/return-abrupt-from-predicate-call.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/return-index-predicate-result-is-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/return-negative-one-if-predicate-returns-false-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/findLastIndex/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/forEach/BigInt/arraylength-internal.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
@@ -44221,6 +44677,366 @@ tests:
   - path: test/built-ins/TypedArray/prototype/forEach/values-are-not-cached.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/detached-buffer-during-fromIndex-returns-false-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/detached-buffer-during-fromIndex-returns-true-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/fromIndex-equal-or-greater-length-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/length-zero-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/search-found-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/search-not-found-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/BigInt/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/coerced-searchelement-fromindex-resize.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/detached-buffer-during-fromIndex-returns-false-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/detached-buffer-during-fromIndex-returns-true-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/fromIndex-equal-or-greater-length-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/index-compared-against-initial-length-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/index-compared-against-initial-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/length-zero-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/resizable-buffer-special-float-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/samevaluezero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/search-found-returns-true.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/search-not-found-returns-false.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/search-undefined-after-shrinking-buffer-index-is-oob.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/search-undefined-after-shrinking-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/searchelement-not-integer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/includes/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/detached-buffer-during-fromIndex-returns-minus-one-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/fromIndex-equal-or-greater-length-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/length-zero-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/no-arg.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/search-found-returns-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/search-not-found-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/BigInt/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/coerced-searchelement-fromindex-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/coerced-searchelement-fromindex-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/detached-buffer-during-fromIndex-returns-minus-one-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/fromIndex-equal-or-greater-length-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/length-zero-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/no-arg.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/resizable-buffer-special-float-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/search-found-returns-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/search-not-found-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/strict-comparison.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/indexOf/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/custom-separator-result-from-tostring-on-each-simple-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/detached-buffer-during-fromIndex-returns-single-comma.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/empty-instance-empty-string.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/result-from-tostring-on-each-simple-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/return-abrupt-from-separator-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/return-abrupt-from-separator.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/coerced-separator-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/coerced-separator-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/custom-separator-result-from-tostring-on-each-simple-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/custom-separator-result-from-tostring-on-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/detached-buffer-during-fromIndex-returns-single-comma.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/empty-instance-empty-string.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/result-from-tostring-on-each-simple-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/result-from-tostring-on-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/return-abrupt-from-separator-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/return-abrupt-from-separator.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/separator-tostring-once-after-resized.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/join/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/keys/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -44278,6 +45094,132 @@ tests:
   - path: test/built-ins/TypedArray/prototype/keys/this-is-not-typedarray-instance.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/detached-buffer-during-fromIndex-returns-minus-one-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/length-zero-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/no-arg.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/search-found-returns-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/search-not-found-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/BigInt/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/coerced-position-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/coerced-position-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/detached-buffer-during-fromIndex-returns-minus-one-for-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/fromIndex-infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/fromIndex-minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/length-zero-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/negative-index-and-resize-to-smaller.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/no-arg.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/resizable-buffer-special-float-values.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/return-abrupt-tointeger-fromindex-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/return-abrupt-tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/search-found-returns-index.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/search-not-found-returns-minus-one.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/strict-comparison.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/lastIndexOf/tointeger-fromindex.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/length/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -44924,13 +45866,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-set-values-in-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-set-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-src-tonumber-value-type-conversions.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-src-values-are-not-cached.js
     expectedClassification: pass
@@ -44987,25 +45929,25 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-other-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-other-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-same-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-diff-buffer-same-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type-resized.js
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-set-values-same-buffer-same-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/typedarray-arg-src-arraylength-internal.js
     expectedClassification: pass
@@ -45071,16 +46013,16 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/array-arg-set-values-in-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/array-arg-set-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/array-arg-src-tonumber-value-conversions.js
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/array-arg-src-tonumber-value-type-conversions.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/array-arg-src-values-are-not-cached.js
     expectedClassification: pass
@@ -45164,16 +46106,16 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-same-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-other-type.js
     expectedClassification: pass
@@ -45182,10 +46124,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-same-buffer-same-type.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-arraylength-internal.js
     expectedClassification: pass
@@ -45365,7 +46307,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/BigInt/results-with-different-length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/BigInt/results-with-empty-length.js
     expectedClassification: pass
@@ -45479,7 +46421,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/results-with-different-length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/results-with-empty-length.js
     expectedClassification: pass
@@ -45547,9 +46489,135 @@ tests:
   - path: test/built-ins/TypedArray/prototype/subarray/tointeger-end.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-tolocalestring-from-each-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-tostring-from-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-valueof-from-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/empty-instance-returns-empty-string.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-firstelement-tolocalestring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-firstelement-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-firstelement-valueof.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-nextelement-tolocalestring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-nextelement-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-nextelement-valueof.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-result.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/calls-tolocalestring-from-each-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/calls-tostring-from-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/calls-valueof-from-each-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/empty-instance-returns-empty-string.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-firstelement-tolocalestring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-firstelement-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-firstelement-valueof.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-nextelement-tolocalestring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-nextelement-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-nextelement-valueof.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/return-result.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/user-provided-tolocalestring-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/toString.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/toString/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toString/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/values/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]

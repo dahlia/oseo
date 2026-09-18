@@ -11829,6 +11829,9 @@ partitions:
     key: "02"
     path: results/built-ins/TypedArray/02.yaml
   - group: built-ins/TypedArray
+    key: "03"
+    path: results/built-ins/TypedArray/03.yaml
+  - group: built-ins/TypedArray
     key: "04"
     path: results/built-ins/TypedArray/04.yaml
   - group: built-ins/TypedArray
@@ -11879,6 +11882,9 @@ partitions:
   - group: built-ins/TypedArray
     key: "14"
     path: results/built-ins/TypedArray/14.yaml
+  - group: built-ins/TypedArray
+    key: "15"
+    path: results/built-ins/TypedArray/15.yaml
   - group: built-ins/TypedArray
     key: "16"
     path: results/built-ins/TypedArray/16.yaml
@@ -12024,6 +12030,9 @@ partitions:
     key: "46"
     path: results/built-ins/TypedArray/46.yaml
   - group: built-ins/TypedArray
+    key: "47"
+    path: results/built-ins/TypedArray/47.yaml
+  - group: built-ins/TypedArray
     key: "48"
     path: results/built-ins/TypedArray/48.yaml
   - group: built-ins/TypedArray
@@ -12035,6 +12044,9 @@ partitions:
   - group: built-ins/TypedArray
     key: 4b
     path: results/built-ins/TypedArray/4b.yaml
+  - group: built-ins/TypedArray
+    key: 4c
+    path: results/built-ins/TypedArray/4c.yaml
   - group: built-ins/TypedArray
     key: 4d
     path: results/built-ins/TypedArray/4d.yaml
@@ -12219,6 +12231,9 @@ partitions:
     key: "89"
     path: results/built-ins/TypedArray/89.yaml
   - group: built-ins/TypedArray
+    key: 8a
+    path: results/built-ins/TypedArray/8a.yaml
+  - group: built-ins/TypedArray
     key: 8b
     path: results/built-ins/TypedArray/8b.yaml
   - group: built-ins/TypedArray
@@ -12249,14 +12264,23 @@ partitions:
     key: "94"
     path: results/built-ins/TypedArray/94.yaml
   - group: built-ins/TypedArray
+    key: "95"
+    path: results/built-ins/TypedArray/95.yaml
+  - group: built-ins/TypedArray
     key: "96"
     path: results/built-ins/TypedArray/96.yaml
+  - group: built-ins/TypedArray
+    key: "97"
+    path: results/built-ins/TypedArray/97.yaml
   - group: built-ins/TypedArray
     key: "98"
     path: results/built-ins/TypedArray/98.yaml
   - group: built-ins/TypedArray
     key: "99"
     path: results/built-ins/TypedArray/99.yaml
+  - group: built-ins/TypedArray
+    key: 9a
+    path: results/built-ins/TypedArray/9a.yaml
   - group: built-ins/TypedArray
     key: 9b
     path: results/built-ins/TypedArray/9b.yaml
@@ -12281,6 +12305,9 @@ partitions:
   - group: built-ins/TypedArray
     key: a2
     path: results/built-ins/TypedArray/a2.yaml
+  - group: built-ins/TypedArray
+    key: a3
+    path: results/built-ins/TypedArray/a3.yaml
   - group: built-ins/TypedArray
     key: a4
     path: results/built-ins/TypedArray/a4.yaml
@@ -12453,6 +12480,9 @@ partitions:
     key: dd
     path: results/built-ins/TypedArray/dd.yaml
   - group: built-ins/TypedArray
+    key: de
+    path: results/built-ins/TypedArray/de.yaml
+  - group: built-ins/TypedArray
     key: df
     path: results/built-ins/TypedArray/df.yaml
   - group: built-ins/TypedArray
@@ -12471,8 +12501,14 @@ partitions:
     key: e4
     path: results/built-ins/TypedArray/e4.yaml
   - group: built-ins/TypedArray
+    key: e5
+    path: results/built-ins/TypedArray/e5.yaml
+  - group: built-ins/TypedArray
     key: e6
     path: results/built-ins/TypedArray/e6.yaml
+  - group: built-ins/TypedArray
+    key: e7
+    path: results/built-ins/TypedArray/e7.yaml
   - group: built-ins/TypedArray
     key: e8
     path: results/built-ins/TypedArray/e8.yaml
@@ -17059,9 +17095,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 16789
+  passes: 17133
   semanticFailures: 0
-  unsupportedProfileFeatures: 2072
+  unsupportedProfileFeatures: 2084
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17319,9 +17355,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 288
+      passes: 308
       semanticFailures: 0
-      unsupportedProfileFeatures: 49
+      unsupportedProfileFeatures: 29
     - dependency: typed-array-iterative
       expectedNegatives: 0
       harnessFailures: 0
@@ -17329,6 +17365,13 @@ summary:
       passes: 375
       semanticFailures: 0
       unsupportedProfileFeatures: 23
+    - dependency: typed-array-search-and-join
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 324
+      semanticFailures: 0
+      unsupportedProfileFeatures: 32
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -17621,9 +17664,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 663
+      passes: 1007
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 84
     - group: built-ins/TypedArrayConstructors
       expectedNegatives: 0
       harnessFailures: 0

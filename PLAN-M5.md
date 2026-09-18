@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-20,417 reviewed cases: 16,789 passes, 1,556 expected negatives, and 2,072
+20,773 reviewed cases: 17,133 passes, 1,556 expected negatives, and 2,084
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 128 indexed records in the normative
+M5a is complete. The 129 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-16,789 passes across 20,417 paths, and the property inventory records 150
-domains, 150 seeds, and an ordinary case budget of 5,719.
+17,133 passes across 20,773 paths, and the property inventory records 151
+domains, 151 seeds, and an ordinary case budget of 5,731.
 
 
 M5a implementation history
@@ -6461,6 +6461,46 @@ The property ratchet moves from 149 to 150 domains and seeds and from 5,707 to
 5,719 ordinary cases, and the evidence inventory moves from 127 to 128
 families. The graph's
 orchestration state is unchanged.
+
+Implemented M5b node `typed-array-search-and-join` adds `find`, `findIndex`,
+`findLast`, `findLastIndex`, `includes`, `indexOf`, `lastIndexOf`, `join`, and
+`toLocaleString` to `%TypedArray.prototype%`, whose `toString` is already the
+shared `Array.prototype.toString` identity from the core node. Each method
+validates its receiver and snapshots the view length first. The four
+predicate searches read every snapshot index in their direction with
+TypedArrayGetElement. `includes`, `indexOf`, and `lastIndexOf` answer an empty
+view before converting fromIndex; afterward `includes` compares every
+remaining snapshot index with SameValueZero, so an index the conversion
+invalidated matches `undefined`, while `indexOf` and `lastIndexOf` skip an
+index HasProperty no longer reports and compare with strict equality. `join`
+converts its separator after the snapshot and renders an invalidated index as
+an empty field, and `toLocaleString` invokes each element's current method
+with the outer locales and options, as the Array method does under the
+ECMA-402 call contract. Both stringifiers share Array stringification's
+active-receiver stack, so a re-entrant conversion of the same view renders an
+empty string. The methods take nine code IDs in the existing TypedArray range
+and add no realm intrinsic slot, heap kind, component, or generated-code entry
+point.
+
+Fixed native and generated differential evidence at seed `0x60007600` covers
+the ten methods over Number, NaN, signed-zero, infinite, and BigInt elements,
+absent, plain, infinite, fractional, and observably converted fromIndex,
+separator, and locale inputs, and no mutation, detach, and shrink during the
+first callback or conversion, with collection forced at every safepoint, a
+false numeric hint's deliberate guard miss, and an independent model of every
+callback, conversion, and result. All 356 edition paths under the node's ten
+inventory roots enter the reviewed subset: 324 pass, twenty-nine keep the
+unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite, two locale cases need primitive wrapper objects, and one needs a
+TypedArray mutation method. Twenty already reviewed `set` and
+`subarray` paths outside the roots, which reached a search or join method
+through the reviewed harness, move to pass. The manifest moves from 20,417 to
+20,773 paths and from 16,789 to 17,133 passes, keeps 1,556 expected negatives,
+and moves from 2,072 to 2,084 unsupported profile features with no semantic,
+harness, or infrastructure failures. The property
+ratchet moves from 150 to 151 domains and seeds and from 5,719 to 5,731
+ordinary cases, and the evidence inventory moves from 128 to 129 families. The
+runtime ABI moves to `m5-114`.
 
 
 Ahead-of-time challenge boundary
