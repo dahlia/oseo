@@ -1162,7 +1162,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     ) {
         materialized = oseo_internal_async_generator_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE ||
-               intrinsic == OSEO_INTRINSIC_SYMBOL) {
+               intrinsic == OSEO_INTRINSIC_SYMBOL ||
+               (intrinsic >= OSEO_INTRINSIC_SYMBOL_FOR &&
+                intrinsic <= OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER)) {
         materialized = oseo_symbol_intrinsic(context);
     } else if (intrinsic >= OSEO_INTRINSIC_ERROR_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_AGGREGATE_ERROR_PROTOTYPE) {

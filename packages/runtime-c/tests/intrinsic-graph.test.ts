@@ -77,6 +77,39 @@ test("populates the realm-owned Object prototype", () => {
   );
 });
 
+test("populates the realm-owned Symbol intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const symbols = sources.get("runtime_symbol.c") ?? "";
+
+  for (const [index, intrinsic] of [
+    "SYMBOL_FOR",
+    "SYMBOL_KEY_FOR",
+    "SYMBOL_TO_STRING",
+    "SYMBOL_VALUE_OF",
+    "SYMBOL_TO_PRIMITIVE",
+    "SYMBOL_DESCRIPTION_GETTER",
+  ].entries()) {
+    assert.match(
+      header,
+      new RegExp(`OSEO_INTRINSIC_${intrinsic} = ${261 + index},`, "u"),
+    );
+  }
+  for (const property of [
+    "constructor",
+    "description",
+    "for",
+    "keyFor",
+    "toString",
+    "valueOf",
+  ]) {
+    assert.match(symbols, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(symbols, /static atomic_flag symbol_registry_lock/u);
+  assert.match(internalHeader, /registry_entry/u);
+  assert.match(header, /registered_symbols/u);
+});
+
 test("populates the realm-owned Object constructor cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const functions = sources.get("runtime_function.c") ?? "";
@@ -1533,7 +1566,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 261/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 267/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -1553,7 +1586,13 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
   }
   assert.match(weakSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(weakSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
-  assert.match(weakSource, /is_object\(value\) \|\| is_symbol\(value\)/u);
+  // CanBeHeldWeakly takes every object and every symbol the Symbol registry
+  // did not return, which is what excludes a registered symbol.
+  assert.match(weakSource, /if \(is_object\(value\)\) return true;/u);
+  assert.match(
+    weakSource,
+    /is_symbol\(value\) &&\s*symbol_object\(value\)->registry_entry == NULL/u,
+  );
   assert.match(
     internalHeader,
     /oseo_internal_install_weak_collection_globals/u,
@@ -2323,6 +2362,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 267/u);
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one

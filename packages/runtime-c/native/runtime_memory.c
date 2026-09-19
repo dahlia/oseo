@@ -581,6 +581,23 @@ static void destroy_heap_object(OseoHeapObject *object) {
     free(object);
 }
 
+/*
+ * Drops every mark this heap carries. A mark belongs to one collection of
+ * one context, but a context that holds a value another context owns in
+ * its roots marks that value while collecting, and only the owning
+ * context's sweep clears a mark on its own heap. Such a mark therefore
+ * survives until this heap sweeps again, which the final sweep of a
+ * destroyed context never does: the object would stay linked with nothing
+ * left to free it. Clearing the marks first makes that sweep unconditional.
+ */
+void oseo_internal_clear_heap_marks(OseoContext *context) {
+    for (OseoHeapObject *object = context->objects;
+         object != NULL;
+         object = object->next) {
+        object->marked = false;
+    }
+}
+
 void oseo_collect(OseoContext *context) {
     if (context->observe_specialization) context->collections += 1u;
     OseoHeapObject *worklist = NULL;
@@ -605,6 +622,11 @@ void oseo_collect(OseoContext *context) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
     mark_value(context->global_this, &worklist);
+    for (size_t index = 0u;
+         index < context->registered_symbol_capacity;
+         index += 1u) {
+        mark_value(context->registered_symbols[index], &worklist);
+    }
     OseoTemplateCacheEntry *template_cache = context->template_cache;
     for (size_t index = 0u;
          index < context->template_cache_count;
@@ -697,6 +719,7 @@ OseoResult oseo_internal_publish_heap(
     object->ephemeron_pending = NULL;
     object->kind = kind;
     object->marked = false;
+    object->retained = false;
     context->objects = object;
     if (context->observe_specialization &&
         kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&

@@ -115,6 +115,18 @@
 #define OSEO_SYMBOL_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_SYMBOL_CODE_ID_RANGE_INDEX)
 #define OSEO_SYMBOL_CONSTRUCT_CODE_ID OSEO_SYMBOL_CODE_ID_RANGE_LAST
+#define OSEO_SYMBOL_FOR_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_SYMBOL_KEY_FOR_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_SYMBOL_TO_STRING_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_SYMBOL_VALUE_OF_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_SYMBOL_TO_PRIMITIVE_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_SYMBOL_DESCRIPTION_GETTER_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 6u)
 
 #define OSEO_ITERATOR_CODE_ID_RANGE_INDEX ((size_t)3u)
 #define OSEO_ITERATOR_CODE_ID_RANGE_FIRST \
@@ -1010,6 +1022,15 @@ struct OseoHeapObject {
     OseoHeapObject *ephemeron_pending;
     OseoHeapKind kind;
     bool marked;
+    /*
+     * True for an object that has to outlive the context that allocated
+     * it, which today is a registered symbol representative and the
+     * description it holds. `oseo_internal_retire_registered_symbols`
+     * selects exactly these when a context is destroyed. Ordinary
+     * collection ignores the flag: while the context lives, its own roots
+     * keep the object and its own sweep may clear the mark like any other.
+     */
+    bool retained;
 };
 
 /* Active native array stringification across user-code re-entry. */
@@ -1063,6 +1084,14 @@ typedef struct {
     OseoHeapObject header;
     /* The description string, or undefined for a bare Symbol(). */
     OseoValue description;
+    /*
+     * Null for a unique or well-known symbol. A registered symbol points
+     * at its process-wide immutable registry entry; each realm keeps one
+     * rooted representative per entry in `registered_symbols`. The entry
+     * is what symbol identity compares, so this field is the only thing
+     * that joins two realms' representatives of one registered symbol.
+     */
+    const void *registry_entry;
 } OseoSymbol;
 
 /*
@@ -2197,6 +2226,26 @@ static inline bool is_symbol(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_SYMBOL;
 }
+/*
+ * True when left and right are two distinct heap values that represent one
+ * GlobalSymbolRegistry entry. The registry is process-wide while each
+ * context roots its own representative per entry, so a representative that
+ * crosses a context boundary is a distinct heap value naming the same
+ * registered symbol. Every symbol identity rule, strict and loose equality,
+ * SameValue, SameValueZero, and property-key equality among them, consults
+ * this after its ordinary pointer test fails. Comparing entry pointers keeps
+ * identity exact without any context reading or tracing another context's
+ * heap. A unique or well-known symbol has no entry and so never matches one.
+ * `oseo_internal_local_symbol` covers the storing side of the same rule.
+ */
+static inline bool same_registered_symbol(
+    OseoValue left,
+    OseoValue right
+) {
+    if (!is_symbol(left) || !is_symbol(right)) return false;
+    const void *entry = symbol_object(left)->registry_entry;
+    return entry != NULL && entry == symbol_object(right)->registry_entry;
+}
 static inline bool is_private_name(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_PRIVATE_NAME;
@@ -2914,6 +2963,14 @@ OseoResult oseo_internal_typed_array_iteration_length(
     double *length
 );
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
+/*
+ * Clears the collector mark on every object this context still owns. A
+ * context that roots a value another context owns marks that value during
+ * its own collection, and only the owning heap's sweep clears such a mark,
+ * so the owner drops every mark before its last sweep rather than leaving
+ * a foreign mark to keep an object alive after the context is gone.
+ */
+void oseo_internal_clear_heap_marks(OseoContext *context);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
     OseoValue callee,
@@ -4004,6 +4061,43 @@ OseoResult oseo_internal_object_define_data(
     OseoPropertyAttributes attributes,
     bool has_value
 );
+/*
+ * The representative of `value` this context owns. A non-symbol, a unique
+ * or well-known symbol, and a representative this context already holds
+ * answer themselves; a registered representative another context created
+ * answers this context's own representative of the same registry entry,
+ * created here from the shared key when this context has not seen it.
+ *
+ * Every operation that stores a symbol in an identity position, a property
+ * key, a Map key, or a Set element, stores this value, so every key a
+ * lookup probes is one this context owns. A value position, an ordinary
+ * property value or a Map value among them, keeps whatever representative
+ * reached it. Such a value stays valid because
+ * `oseo_internal_retire_registered_symbols` makes a representative outlive
+ * the context that created it.
+ * A foreign representative this context traces leaves a mark only the
+ * owning heap's sweep clears, so a context drops every mark its heap
+ * carries before its final sweep. `same_registered_symbol` decides identity,
+ * so a stored key resolves whichever representative a lookup presents. The
+ * result is rooted by `registered_symbols`, so a caller may hold it across
+ * a later safepoint without rooting it.
+ */
+OseoResult oseo_internal_local_symbol(OseoContext *context, OseoValue value);
+/*
+ * Takes every retained object out of this heap and keeps it for the rest of
+ * the process. A representative is the one value a context hands to another
+ * context, and a receiving context may store it in any value position, so
+ * freeing it with its creator would leave the receiving heap holding a
+ * dangling pointer that no localization of identity positions can prevent.
+ * Retiring costs one symbol and one string for each key the context
+ * registered, so the process retains a pair for every destroyed context
+ * and key rather than one per key.
+ *
+ * Only `oseo_context_destroy` calls this, once, before its final
+ * collection. A retired object leaves with its mark set, so no later
+ * collection in any context traces it and no sweep list holds it.
+ */
+void oseo_internal_retire_registered_symbols(OseoContext *context);
 OseoResult oseo_internal_symbol_create(
     OseoContext *context,
     OseoValue description

@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 130
+M5a is complete. The normative family records described below inventory 131
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 20,841 reviewed cases: 17,198 passes, 1,556
-expected negatives, and 2,087 unsupported profile features. It records no
+The current manifest contains 20,898 reviewed cases: 17,275 passes, 1,556
+expected negatives, and 2,067 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -885,17 +885,62 @@ current evidence assessment. Those live only in the indexed records above.
     `Symbol.split`, `Symbol.toPrimitive`, `Symbol.toStringTag`, and
     `Symbol.unscopables`. Each property has a stable identity, is distinct
     from every other entry, has the description `Symbol.<name>`, and is
-    non-writable, non-enumerable, and non-configurable. The generated property
+    non-writable, non-enumerable, and non-configurable. A build of the
+    intrinsic that fails partway keeps the well-known symbols it already
+    created, because materializing the constructor materializes
+    `%Function.prototype%`, which keys its `[Symbol.hasInstance]` method by
+    the symbol of that moment, so a retry answers the identity that key
+    already holds. The generated property
     suite uses seed `0x60003000`, an independent table oracle, both
     specialization policies, and forced collection. `Symbol.toPrimitive`
     methods participate in generic `ToPrimitive`. Deliberate boundaries:
     adding an identity does not admit the corresponding consuming algorithm.
-    `Symbol.for`, `Symbol.keyFor`, `Symbol.prototype` methods including
-    `toString` and the `description` accessor, and `Symbol.hasInstance`
-    dispatch in `instanceof` remain outside the profile until their
-    prerequisites land. `Object.prototype.toString` now observes a string
-    `Symbol.toStringTag`. Multiple realms are unavailable, so cross-realm
-    well-known-symbol identity remains an owned unsupported dependency.
+    The `Symbol` intrinsic now owns ordinary `for` and `keyFor` functions, and
+    `%Symbol.prototype%` owns its `constructor`, `toString`, `valueOf`,
+    `description`, `Symbol.toPrimitive`, and `Symbol.toStringTag` properties
+    with standard descriptors, names, lengths, receiver checks, and
+    non-constructibility. `Symbol` itself has `[[Construct]]` for
+    `IsConstructor`, but every construction throws a `TypeError`. The methods
+    accept symbol primitives and direct symbol wrappers, reject incompatible
+    and proxied receivers, preserve an absent description as `undefined`, and
+    render an empty description as `Symbol()`. `Object.prototype.toString`
+    observes the string `Symbol.toStringTag`. `Symbol.for` converts its key
+    before consulting the GlobalSymbolRegistry, a process-wide table of
+    immutable UTF-16 keys shared by every runtime context. Each context keeps
+    one collector-rooted representative per registry entry, so repeated
+    `Symbol.for` calls return the same heap value. The registry entry, not
+    the heap value, is the identity: strict and loose equality, SameValue,
+    SameValueZero, property keys, and Map and Set keys treat two contexts'
+    representatives of one entry as one symbol, so the registry stays one
+    registry however many contexts observe it. `Symbol.keyFor`
+    validates its argument, returns a context-local copy of the shared key,
+    and returns `undefined` for unique and well-known symbols. Registry
+    entries live for the process, so tearing down one context never
+    invalidates a key another context observes. A host-native C fixture
+    proves that separate contexts share one registry entry per key and that
+    the entry outlives the context that created it, with forced collection.
+    A property key, a Map key, and a Set element are always the storing
+    context's own representative, whichever representative created them, so
+    every key a lookup probes is a value the probing context owns. A value
+    position keeps whatever representative reached it: an ordinary property
+    value, an array element, a Map or WeakMap value, and a settled promise's
+    result among them. A representative therefore outlives the context that
+    created it. Destroying a context takes its representatives and their
+    descriptions out of that heap rather than freeing them, so every store
+    another context made stays readable, keeps naming the same registry
+    entry, and still answers `Symbol.keyFor` and the description accessor. A
+    context still traces a value another context owns while its own roots
+    hold one as an argument, so destruction drops every mark the heap
+    carries before its final sweep: a mark belongs to the collection that
+    set it and never outlives the heap it was set on. The test262
+    `$262.createRealm` harness remains unavailable, so reviewed cases that
+    compare symbols across realms retain that explicit harness boundary.
+    `Symbol.hasInstance` dispatch in `instanceof` remains outside this unit. A
+    registered symbol cannot be held weakly, so `WeakMap.prototype.set`,
+    `WeakSet.prototype.add`, `WeakRef`, and
+    `FinalizationRegistry.prototype.register` and `unregister` reject one with
+    a `TypeError`, while `get`, `has`, and `delete` answer as they do for any
+    other invalid key.
  -  The synchronous iterator protocol. `GetIterator` reads a value's
     `Symbol.iterator` method and calls it, throwing a catchable
     `TypeError` for a non-iterable, a non-callable method, or a
@@ -7067,19 +7112,21 @@ callback before that lookup. Every prototype carries its constructor, its
 methods, and a `Symbol.toStringTag` string, and every method rejects a
 receiver of another brand with a `TypeError`.
 
-A value can be held weakly when it is an object or a symbol. This profile
-admits no `Symbol.for` registry, so every symbol, including a well-known
-symbol, is unregistered. A `WeakMap` or `WeakSet` owns one collector ephemeron
-table, and an address-keyed open-addressed index keeps `get`, `has`, `set`,
-`add`, and `delete` independent of the table's size. `set` and `add` throw a
-`TypeError` for a key that cannot be held weakly; `get`, `has`, and `delete`
-answer `undefined` or `false` instead. Deletion unlinks the entry and its
-index slot at once. A collection unlinks an entry whose key died and replaces
-its index slot with a tombstone, so lookup never observes a cleared entry.
-The `WeakMap` constructor reads the observable `set` adder and the `WeakSet`
-constructor reads `add` before either acquires the iterator. A non-object
-`WeakMap` entry, an abrupt `"0"` or `"1"` read, or an abrupt adder call closes
-the iterator, while an abrupt iterator step propagates without a close.
+A value can be held weakly when it is an object or an unregistered symbol.
+A symbol the `symbol-intrinsic` node's registry returned from `Symbol.for`
+is registered and cannot be held weakly; every other symbol, including a
+well-known symbol, is unregistered. A `WeakMap` or `WeakSet` owns one collector
+ephemeron table, and an address-keyed open-addressed index keeps `get`, `has`,
+`set`, `add`, and `delete` independent of the table's size. `set` and `add`
+throw a `TypeError` for a key that cannot be held weakly; `get`, `has`, and
+`delete` answer `undefined` or `false` instead. Deletion unlinks the entry and
+its index slot at once. A collection unlinks an entry whose key died and
+replaces its index slot with a tombstone, so lookup never observes a cleared
+entry. The `WeakMap` constructor reads the observable `set` adder and the
+`WeakSet` constructor reads `add` before either acquires the iterator. A
+non-object `WeakMap` entry, an abrupt `"0"` or `"1"` read, or an abrupt adder
+call closes the iterator, while an abrupt iterator step propagates without a
+close.
 
 `new WeakRef(target)` and `deref` add a live target to the current job's
 KeptAlive set. The set ends with that job: the runtime clears it before every
@@ -7140,10 +7187,11 @@ generic fallback.
 
 Of the 262 paths under the node's four inventory roots, 249 are reviewed: 245
 pass and four retain the explicit cross-realm prerequisite. The other 13 use
-`Symbol.for` to create a registered symbol. Ten of them fail only because that
-function is absent, and three would pass only because calling the absent
-function throws the `TypeError` their assertion expects. They stay outside the
-reviewed subset until the `symbol-intrinsic` node admits the registry.
+`Symbol.for` to create a registered symbol. The `symbol-intrinsic` node has
+since admitted the registry and narrowed this shared CanBeHeldWeakly check to
+unregistered symbols, and a focused run shows all 13 passing, but they belong
+to this node's inventory rather than that one's, so the reviewed-subset-growth
+backlog promotes them in a later change.
 Twenty-five previously reviewed paths outside the roots also move from
 `unsupported-profile-feature` to `pass` because each uses a weak collection as
 an ordinary operand: ten `Map` and seven `Set` brand-check cases, two

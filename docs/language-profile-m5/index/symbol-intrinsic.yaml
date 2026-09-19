@@ -1,0 +1,3 @@
+version: 1
+id: symbol-intrinsic
+record: docs/language-profile-m5/families/symbol-intrinsic.yaml

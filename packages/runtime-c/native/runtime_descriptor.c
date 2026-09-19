@@ -91,7 +91,7 @@ bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_bigint(left) && is_bigint(right)) {
         return oseo_internal_bigint_equal(left, right);
     }
-    return left == right;
+    return left == right || same_registered_symbol(left, right);
 }
 
 bool oseo_internal_same_value_zero(OseoValue left, OseoValue right) {
@@ -107,7 +107,7 @@ bool oseo_internal_same_value_zero(OseoValue left, OseoValue right) {
     if (is_bigint(left) && is_bigint(right)) {
         return oseo_internal_bigint_equal(left, right);
     }
-    return left == right;
+    return left == right || same_registered_symbol(left, right);
 }
 
 bool oseo_internal_virtual_string_iterator_descriptor(
@@ -480,6 +480,13 @@ static OseoResult define_data_property(
             "Cannot define a property on a non-extensible object.";
         return normal(object_value);
     }
+    /* A stored key is this realm's own representative of a registered
+     * symbol, so the property vector never holds a value another realm
+     * owns. The caller already roots `key`, and the representative is
+     * rooted by `registered_symbols`. */
+    OseoResult local_key = oseo_internal_local_symbol(context, key);
+    if (local_key.status != OSEO_STATUS_NORMAL) return local_key;
+    key = local_key.value;
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
@@ -505,7 +512,13 @@ OseoResult oseo_internal_append_own_property(
 ) {
     /* The growth step is a safepoint, so key and value must already be
      * rooted by the caller, exactly as they must be for a definition
-     * that reaches the same step through define_data_property. */
+     * that reaches the same step through define_data_property. A stored
+     * key is this realm's own representative of a registered symbol, so
+     * the property vector never holds a value another realm owns; the
+     * representative itself is rooted by `registered_symbols`. */
+    OseoResult local_key = oseo_internal_local_symbol(context, key);
+    if (local_key.status != OSEO_STATUS_NORMAL) return local_key;
+    key = local_key.value;
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     OseoOrdinaryObject *object = ordinary_object(object_value);
@@ -730,6 +743,13 @@ static OseoResult define_accessor_property(
             "Cannot define a property on a non-extensible object.";
         return normal(object_value);
     }
+    /* A stored key is this realm's own representative of a registered
+     * symbol, so the property vector never holds a value another realm
+     * owns. The caller already roots `key`, and the representative is
+     * rooted by `registered_symbols`. */
+    OseoResult local_key = oseo_internal_local_symbol(context, key);
+    if (local_key.status != OSEO_STATUS_NORMAL) return local_key;
+    key = local_key.value;
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);

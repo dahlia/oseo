@@ -63,6 +63,7 @@ const { typedArrayIterativeFixtures } =
   await import("./native/fixtures/typed-array-iterative.ts");
 const { typedArraySearchAndJoinFixtures } =
   await import("./native/fixtures/typed-array-search-and-join.ts");
+import { symbolIntrinsicFixtures } from "./native/fixtures/symbol-intrinsic.ts";
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -224,6 +225,7 @@ const fixtures: readonly Fixture[] = [
   ...numberFixtures.numberIntrinsicFixtures,
   ...promiseFixtures.promiseIntrinsicFixtures,
   ...stringFixtures.stringIntrinsicFixtures,
+  ...symbolIntrinsicFixtures,
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
   ...stringPrototypeCaseFixtures,
@@ -873,6 +875,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
     fixture.name === "string-iterator" ||
+    fixture.name === "symbol-intrinsic" ||
     fixture.name === "generic-string-coercion" ||
     fixture.name === "function-intrinsic-chains" ||
     fixture.name === "number-prototype"
@@ -1069,6 +1072,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
     fixture.name === "symbols" ||
+    fixture.name === "symbol-intrinsic" ||
     fixture.name === "string-prototype-access" ||
     fixture.name === "string-prototype-case" ||
     fixture.name === "array-prototype-copying" ||
@@ -1224,6 +1228,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-prototype-match-and-split" ||
             fixture.name === "string-prototype-replace" ||
             fixture.name === "string-iterator" ||
+            fixture.name === "symbol-intrinsic" ||
             fixture.name === "generic-string-coercion" ||
             fixture.name === "number-prototype" ||
             fixture.name === "set-intrinsic" ||

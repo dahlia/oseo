@@ -237,7 +237,8 @@ Ownership follows the plan's target layout:
     constructor and prototype pairs, typed runtime error creation, the
     shared `Error.prototype.toString`, and unhandled-throw rendering;
  -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol`
-    intrinsic, the well-known symbols, and descriptive symbol text;
+    intrinsic and `%Symbol.prototype%` methods, the well-known symbols, the
+    process-wide GlobalSymbolRegistry, and descriptive symbol text;
  -  *runtime\_iterator.c*: the synchronous iterator protocol
     (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
     first-class array iterator, its realm-owned prototype methods, and
@@ -374,7 +375,7 @@ one.
 
 ### Internal helpers
 
-Two hundred and seven helpers cross a
+Two hundred and nine helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -410,6 +411,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_json_global`                 | *runtime\_json.c*             |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
+| `oseo_internal_clear_heap_marks`                    | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_table_create`              | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_set`                       | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_get`                       | *runtime\_memory.c*           |
@@ -509,6 +511,8 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_define_from_descriptor`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_to_object_for_property`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_install_primitive_wrapper_methods`   | *runtime\_object\_builtin.c*  |
+| `oseo_internal_local_symbol`                        | *runtime\_symbol.c*           |
+| `oseo_internal_retire_registered_symbols`           | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_create`                       | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_text`                         | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*           |
@@ -1608,6 +1612,64 @@ locale inputs, and detach and shrink during the first callback or conversion,
 under both specialization policies with collection forced at every safepoint,
 a deliberate false-hint guard miss, and an independent model of every
 observation. The node reviews all 356 paths under its ten inventory roots.
+
+### Symbol prototype and registry evidence
+
+M5b node `symbol-intrinsic` completes *runtime\_symbol.c* with `Symbol.for`,
+`Symbol.keyFor`, and the `%Symbol.prototype%` methods, description getter,
+`Symbol.toPrimitive` method, and tag. The GlobalSymbolRegistry is a
+process-wide open-addressed hash table of immutable UTF-16 keys guarded by an
+atomic flag and never freed. `OseoContext` gains the `registered_symbols`
+open-addressed table of representatives keyed by registry entry, whose every
+slot the collector marks as a root, so each context keeps one Symbol per entry.
+Symbol identity is the entry rather than the heap value: the shared
+`same_registered_symbol` predicate in *runtime\_internal.h* joins two
+representatives of one entry, and strict and loose equality in
+*runtime\_primitive.c*, `oseo_internal_same_value` and
+`oseo_internal_same_value_zero` in *runtime\_descriptor.c*, and
+`oseo_internal_property_key_equal` in *runtime\_string.c* each consult it
+after their pointer test fails, which gives Map, Set, and every property
+operation the same rule. The predicate reads only the two heap headers and
+their entry pointers and stores nothing. `oseo_internal_local_symbol` keeps
+the storage side of the same rule: the property append paths in
+*runtime\_descriptor.c* and *runtime\_property.c*, `map_append_entry` in
+*runtime\_map.c*, and `set_append` in *runtime\_set.c* replace a registered
+symbol with the receiving context's own representative before they store it,
+so every key a lookup probes is a value the probing context owns and a stored
+key outlives the context that first registered it. A value position keeps
+whatever representative reached it: the collector traces more than forty value
+fields across twenty heap kinds, from an ordinary property value and an array
+element to a Map value, a WeakMap value, a settled promise's result, and a
+suspended generator's saved slot, and every one of them accepts an arbitrary
+value, so localizing at each store could not be complete. A representative
+therefore outlives the context that created it. The `retained` header flag in
+*runtime\_internal.h* names a representative and the description it holds,
+`oseo_internal_retire_registered_symbols` takes every flagged object out of a
+dying heap into a process-wide list that keeps it reachable, and
+`oseo_context_destroy` calls it before its final collection, so a store another
+context made stays readable and still names the same registry entry. Retiring
+costs one symbol and one string for each key the destroyed context registered,
+so the retained total grows with the number of destroyed contexts that used the
+registry, not with the number of keys: one context retains one pair per key it
+registered, and an embedder that creates and destroys contexts in a loop
+retains one pair per context and key. Bounding it by the entry count instead
+would need one process-owned representative per entry, which would replace the
+per-context representative this component's identity rule is built on, so the
+component keeps the cost. A retired object leaves with its mark set so no later
+collection traces it. A receiving context does
+still trace a foreign value while its own roots hold one as an argument, and
+only the owning heap's own sweep clears a mark on that heap, so
+`oseo_context_destroy` drops every mark through
+`oseo_internal_clear_heap_marks` before that collection and frees the rest of
+the heap whatever another context marked. A build of the
+cluster that fails partway keeps the well-known symbols it already created,
+because materializing the constructor materializes `%Function.prototype%`,
+whose `[Symbol.hasInstance]` key no later build can rewrite; a retry reuses
+those symbols and creates only the ones still missing. The component takes six
+code IDs from the Symbol range and six intrinsic slots, adds two internal
+helpers of its own and one collector helper in *runtime\_memory.c*, and no heap
+kind, component, or generated-code entry point, and moves `abiVersion` to
+`m5-116`.
 
 ### Function prototype evidence
 

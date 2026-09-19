@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-20,841 reviewed cases: 17,198 passes, 1,556 expected negatives, and 2,087
+20,898 reviewed cases: 17,275 passes, 1,556 expected negatives, and 2,067
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 130 indexed records in the normative
+M5a is complete. The 131 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,198 passes across 20,841 paths, and the property inventory records 152
-domains, 152 seeds, and an ordinary case budget of 5,743.
+17,275 passes across 20,898 paths, and the property inventory records 153
+domains, 153 seeds, and an ordinary case budget of 5,755.
 
 
 M5a implementation history
@@ -6471,8 +6471,9 @@ runs one cleanup job per registry with queued records, ordered by each
 registry's oldest record, before the next timer, including a timer that an
 internal await drives. A job calls the callback for all of that registry's
 records in queue order before promise jobs drain.
-Objects and all symbols can be held weakly because the profile admits no
-`Symbol.for` registry.
+Objects and unregistered symbols can be held weakly; the `symbol-intrinsic`
+node below adds the registry that makes a registered symbol the one symbol
+that cannot be.
 
 Fixed differential evidence covers descriptors, brands, key validity, index
 churn, constructor adder and iterator-closing order, derived construction,
@@ -6547,6 +6548,121 @@ harness, or infrastructure failures. The property
 ratchet moves from 150 to 151 domains and seeds and from 5,719 to 5,731
 ordinary cases, and the evidence inventory moves from 128 to 129 families. The
 runtime ABI moves to `m5-114`.
+
+Implemented M5b node `symbol-intrinsic` completes the realm-owned `Symbol`
+intrinsic with ordinary `for` and `keyFor` functions and completes
+`%Symbol.prototype%` with `constructor`, `toString`, `valueOf`, the
+`description` accessor, `Symbol.toPrimitive`, and `Symbol.toStringTag`. Their
+descriptors, names, lengths, receiver validation, primitive and direct-wrapper
+behavior, undefined and empty descriptions, and rendered text follow the
+corresponding intrinsic contracts. `Symbol` now has `[[Construct]]`, as
+`IsConstructor` observes, while every construction still throws a `TypeError`.
+The C runtime owns the unit because symbol values, wrapper SymbolData, and
+collector roots meet there.
+
+The GlobalSymbolRegistry is a process-wide hash table of immutable UTF-16 keys
+that is never freed. Each runtime context keeps one collector-rooted Symbol
+representative per registry entry in `OseoContext`, so `Symbol.for` returns
+the same heap value on every call. The registry entry, not the heap value, is
+the identity: strict and loose equality, SameValue, SameValueZero, property
+keys, and Map and Set keys treat two contexts' representatives of one entry as
+one symbol, and every other value keeps ordinary pointer identity. A property
+key, a Map key, and a Set element are always the storing context's own
+representative, because every append replaces a registered symbol with it
+first, so every key a lookup probes is a value the probing context owns. A
+value position keeps whatever representative reached it, and the collector
+traces more than forty such fields across twenty heap kinds, from an ordinary
+property value and an array element to a Map value, a WeakMap value, a settled
+promise's result, and a suspended generator's saved slot, so localizing at each
+store could not be complete. A representative therefore outlives the context
+that created it: a `retained` header flag names it and the description it
+holds, and destroying a context moves every flagged object into a process-wide
+list rather than freeing it. Tearing one context down therefore invalidates
+neither a key nor a value nor an entry another context still observes. The
+retained memory is one symbol and one string for each key that context
+registered, so it grows with the number of destroyed contexts that used the
+registry rather than with the number of keys: a program with one context
+retains one pair per key, and an embedder that creates and destroys contexts in
+a loop retains one pair per context and key. Bounding it by the entry count
+instead would need one process-owned representative per entry, which would
+replace the per-context representative that this node's identity rule, its
+storing rule, and its evidence are built on, so the node keeps the cost and
+records it. The node adds two
+internal helpers of its own, one for the replacement and one for the
+retirement, and one collector helper that drops the marks a foreign context
+left. `Symbol.keyFor` validates
+that its argument is a symbol, returns a context-local copy of the shared key,
+and returns `undefined` for unique and well-known symbols. A registered
+symbol is the one symbol CanBeHeldWeakly refuses, so this node also narrows
+the weak collections' key rule to unregistered symbols. The runtime ABI
+moves to `oseo-runtime-m5-116` with six intrinsic slots, six code IDs in the
+existing Symbol range, three context fields, and one heap-header flag; no heap
+kind, component, or generated-code entry point is added.
+
+Fixed Node.js, Deno, and native differential evidence covers the complete
+surface, coercion order, descriptors, construction, wrappers, incompatible
+receivers, registry identity through every equality form, property keys, and
+Map and Set keys. A host-native runtime fixture that reads the private entry
+pointer, run with and without collection forced at every safepoint, proves
+that separate contexts resolve a key, including NUL, astral, and
+lone-surrogate units, to one shared registry entry, that the entry survives
+destruction of the context that created it, and that 300 keys grow both
+tables without changing any identity. The same fixture hands one context's
+representative to the other and proves that every equality form, the property
+key lookup, and `Map` and `Set` resolve it to the receiving context's own
+representative, and that a different key, an unregistered symbol, a well-known
+symbol, and an ordinary object stay distinct. A property, a Map key, and a Set
+element created through a foreign representative for a key the receiving
+context had never registered still hold that context's own representative,
+which `Symbol.for` there then returns, and they survive destruction of the
+originating context and a following collection. A separate teardown case
+stores one context's representative in the value positions the storing rule
+does not reach, an ordinary property value, an array element, a Map value, a
+WeakMap value behind an object key, and a fulfilled promise's result, destroys
+the originating context, collects in the receiving one, and then hands the
+allocator a run of symbol-sized requests before reading each store back. A
+build that freed the representative with its context then reads a block the
+allocator has handed out again, which is what makes the defect observable on
+the Zig lane: that lane's address sanitizer does not report a plain
+heap-use-after-free in this environment, while the host C compiler sanitizer
+lane reports the access directly. Reuse is an allocator behavior rather than a
+guarantee, so the two lanes together are the evidence. Each store still answers
+as
+one symbol with the receiving context's own later representative, still renders
+its description and `Symbol.keyFor` key, and still keys a property. An ordinary
+object the receiving context roots across a collection covers the mark the
+owning heap must drop before its final sweep, which retirement cannot mask.
+A generated family at seed
+`0x60007800` draws bounded repeated UTF-16 keys and unique descriptions against
+an independent registry and property-key model under both specialization
+policies, collection forced at every safepoint, a false numeric hint, a
+deliberate shape-guard miss, and generic fallback.
+
+All 64 paths under the node's four inventory roots are reviewed. Sixty-two
+pass, including the eight `Symbol.prototype.description` cases after that
+upstream feature joins the reviewed feature list, and the two `cross-realm`
+cases keep that harness boundary. Twenty-two reviewed paths outside the roots
+move from `unsupported-profile-feature` to `pass` because each reaches a Symbol
+prototype method the realm now provides:
+*test/built-ins/Date/prototype/toJSON/to-object.js*,
+*test/built-ins/Object/assign/Target-Symbol.js*, twelve
+*test/language/expressions/* BigInt operator cases that add a symbol operand,
+the four `BigInt.asIntN` and `asUintN` conversion-error cases, the two
+`DataView` `getBigInt64` and `getBigUint64` byte-offset cases, and the two
+`String.prototype.indexOf` conversion-error cases. Each of the last twenty
+builds a `Symbol.toPrimitive` method or converts a symbol through the prototype
+this node completes. Thirteen upstream paths under the `weak-collections`
+node's roots that assert CanBeHeldWeakly over a registered symbol also become
+executable and pass under a focused run; they belong to that node's inventory,
+so they stay outside this change and are reported for its owner to review. The
+manifest moves from 20,841 to 20,898 paths and from 17,198 to 17,275 passes,
+keeps 1,556 expected negatives, and moves from 2,087 to 2,067 unsupported
+profile features, and has no semantic, harness, or infrastructure failures. The
+property ratchet moves from 152 to 153 domains and seeds and from 5,743 to
+5,755 ordinary cases, and the evidence inventory moves from 130 to 131
+families. The family evidence record is
+[*docs/language-profile-m5/families/symbol-intrinsic.yaml*](./docs/language-profile-m5/families/symbol-intrinsic.yaml),
+and the graph's orchestration state remains coordinator-owned.
 
 
 Ahead-of-time challenge boundary

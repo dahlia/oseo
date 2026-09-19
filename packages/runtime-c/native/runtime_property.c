@@ -502,6 +502,13 @@ OseoResult oseo_object_set(
         }
         return normal(value);
     }
+    /* A stored key is this realm's own representative of a registered
+     * symbol, so the property vector never holds a value another realm
+     * owns. The caller already roots `key`, and the representative is
+     * rooted by `registered_symbols`. */
+    OseoResult local_key = oseo_internal_local_symbol(context, key);
+    if (local_key.status != OSEO_STATUS_NORMAL) return local_key;
+    key = local_key.value;
     OseoResult grown = oseo_internal_grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     OseoOrdinaryObject *object = ordinary_object(object_value);

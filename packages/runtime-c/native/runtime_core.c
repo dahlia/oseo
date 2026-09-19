@@ -64,6 +64,9 @@ void oseo_context_init(
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
+    context->registered_symbols = NULL;
+    context->registered_symbol_count = 0u;
+    context->registered_symbol_capacity = 0u;
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
@@ -168,6 +171,10 @@ void oseo_context_destroy(OseoContext *context) {
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
+    free(context->registered_symbols);
+    context->registered_symbols = NULL;
+    context->registered_symbol_count = 0u;
+    context->registered_symbol_capacity = 0u;
     free(context->template_cache);
     context->template_cache = NULL;
     context->template_cache_count = 0u;
@@ -187,6 +194,20 @@ void oseo_context_destroy(OseoContext *context) {
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    /*
+     * A mark another context set while it rooted one of this context's
+     * values is still set here, and no sweep of that context ever clears
+     * it, so it has to go before the sweep that decides what this last
+     * collection frees.
+     */
+    oseo_internal_clear_heap_marks(context);
+    /*
+     * A registered representative is the one value another context may
+     * still hold, in a property value, a Map value, or any other value
+     * position no localization reaches, so it and its description leave
+     * this heap rather than being freed with it.
+     */
+    oseo_internal_retire_registered_symbols(context);
     oseo_collect(context);
     oseo_internal_clock_destroy(context);
 }

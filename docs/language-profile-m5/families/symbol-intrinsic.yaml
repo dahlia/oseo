@@ -1,0 +1,98 @@
+version: 1
+id: symbol-intrinsic
+title: "Symbol intrinsic prototype and registry"
+scope:
+  - "The realm-owned Symbol intrinsic's for and keyFor functions and the
+    Symbol prototype's constructor, toString, valueOf, description accessor,
+    Symbol.toPrimitive method, and Symbol.toStringTag value, including their
+    names, lengths, constructibility, descriptors, receiver checks, wrapper
+    handling, and observable identities. A build of the cluster that fails
+    partway keeps the well-known symbols it already created, so a retry
+    answers the identity the %Function.prototype% Symbol.hasInstance key
+    already holds."
+  - "The process-wide GlobalSymbolRegistry shared by independently
+    initialized runtime contexts. Registry keys are immutable UTF-16
+    sequences that live for the process; each context keeps one
+    collector-rooted Symbol representative per entry, so Symbol.for returns
+    one heap identity. The registry entry is the identity: strict and loose
+    equality, SameValue, SameValueZero, property keys, and Map and Set keys
+    treat two contexts' representatives of one entry as one symbol, while a
+    property key, a Map key, and a Set element are always the storing
+    context's own representative, so every key a lookup probes is a value
+    the probing context owns. A value position keeps whatever representative
+    reached it, including an ordinary property value, an array element, a
+    Map or WeakMap value, and a settled promise's result, so a representative
+    outlives the context that created it: destruction takes every
+    representative and description out of that heap instead of freeing them,
+    and each store another context made stays readable and usable. A context
+    does trace a value another context owns while its own roots hold one, so
+    destruction drops every mark its heap carries before the final sweep and
+    frees the rest of the heap.
+    Symbol.keyFor returns a context-local copy
+    of the shared key and returns undefined for unique and well-known
+    symbols. A registered symbol is the one symbol CanBeHeldWeakly refuses,
+    so the weak collections, WeakRef, and FinalizationRegistry reject one as
+    a key, target, or token."
+  - "The generated domain draws bounded UTF-16 registry keys, including NUL,
+    non-ASCII, astral, and lone-surrogate units, with repetition and optional
+    unique-symbol descriptions from stable seed 0x60007800. An independent
+    model predicts registry identity, descriptions, rendered
+    text, keyFor results, and property-key cardinality under both
+    specialization policies, forced collection, a deliberate shape-guard
+    miss, and a false numeric hint."
+  - "Reviewed standards coverage is every applicable path the node owns
+    under test/built-ins/Symbol, including its for, keyFor, and prototype
+    inventories. Cases needing an unavailable realm harness or another
+    unadmitted prerequisite retain explicit unsupported classifications."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/symbol-intrinsic.ts
+      - tests/property/m5-symbol-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/fixtures/runtime-symbol-registry.c
+      - tests/runtime-symbol-registry.test.ts
+      - tests/native/fixtures/symbol-intrinsic.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/fixtures/runtime-symbol-registry.c
+      - tests/runtime-symbol-registry.test.ts
+      - tests/native.ts
+      - tests/native/fixtures/symbol-intrinsic.ts
+      - tests/property/m5-symbol-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-symbol-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/symbol-intrinsic.ts
+      - tests/property/m5-symbol-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/symbol-intrinsic.ts
+      - tests/property/m5-symbol-intrinsic.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_symbol.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - tests/fixtures/runtime-symbol-registry.c
+      - tests/runtime-symbol-registry.test.ts

@@ -1,7 +1,382 @@
 #include "runtime_internal.h"
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
+
+/*
+ * The GlobalSymbolRegistry is shared by every realm in one process. Each
+ * realm owns its Symbol heap values: `Symbol.for` resolves the key to one
+ * immortal entry here and then to the realm's single rooted representative
+ * of that entry. The entry is the identity, so `same_registered_symbol`
+ * joins two realms' representatives of one entry wherever a symbol identity
+ * rule applies, while `oseo_internal_local_symbol` replaces a registered
+ * symbol with the storing realm's own representative before a property key,
+ * a Map key, or a Set element keeps it, so every identity position a lookup
+ * probes is a value the probing realm owns. A value position keeps whatever
+ * representative reached it, and a representative outlives the realm that
+ * created it: `oseo_internal_retire_registered_symbols` moves it out of a
+ * dying heap rather than freeing it. A foreign representative is traced only
+ * while this realm's roots or stores hold it, and
+ * `oseo_internal_clear_heap_marks` keeps such a mark from outliving the
+ * realm that owns the value. Entries are never removed because a registered
+ * key stays observable for the agent's lifetime.
+ */
+typedef struct OseoSymbolRegistryEntry {
+    size_t hash;
+    size_t length;
+    uint16_t units[];
+} OseoSymbolRegistryEntry;
+
+/*
+ * An open-addressed table of entry pointers, grown before it is half full,
+ * so a lookup takes an expected constant number of probes. The hash is
+ * deterministic, like every other runtime table, so keys chosen to collide
+ * degrade toward a linear scan rather than failing. The table and its
+ * entries change only under the lock.
+ */
+static atomic_flag symbol_registry_lock = ATOMIC_FLAG_INIT;
+static OseoSymbolRegistryEntry **symbol_registry;
+static size_t symbol_registry_count;
+static size_t symbol_registry_capacity;
+
+static void lock_symbol_registry(void) {
+    while (atomic_flag_test_and_set_explicit(
+        &symbol_registry_lock,
+        memory_order_acquire
+    )) {}
+}
+
+static void unlock_symbol_registry(void) {
+    atomic_flag_clear_explicit(&symbol_registry_lock, memory_order_release);
+}
+
+static size_t symbol_key_hash(const uint16_t *units, size_t length) {
+    uint64_t hash = UINT64_C(14695981039346656037);
+    for (size_t index = 0u; index < length; index += 1u) {
+        hash ^= (uint64_t)units[index];
+        hash *= UINT64_C(1099511628211);
+    }
+    return (size_t)(hash ^ (hash >> 32u));
+}
+
+/* Doubles the process table; the caller holds the lock. */
+static bool symbol_registry_grow(void) {
+    size_t capacity = symbol_registry_capacity == 0u
+        ? 64u
+        : symbol_registry_capacity;
+    if (symbol_registry_capacity != 0u) {
+        if (capacity > SIZE_MAX / 2u / sizeof(*symbol_registry)) return false;
+        capacity *= 2u;
+    }
+    OseoSymbolRegistryEntry **table = calloc(capacity, sizeof(*table));
+    if (table == NULL) return false;
+    for (size_t index = 0u; index < symbol_registry_capacity; index += 1u) {
+        OseoSymbolRegistryEntry *entry = symbol_registry[index];
+        if (entry == NULL) continue;
+        size_t slot = entry->hash & (capacity - 1u);
+        while (table[slot] != NULL) slot = (slot + 1u) & (capacity - 1u);
+        table[slot] = entry;
+    }
+    free(symbol_registry);
+    symbol_registry = table;
+    symbol_registry_capacity = capacity;
+    return true;
+}
+
+static OseoResult symbol_registry_find_or_create(
+    OseoContext *context,
+    OseoValue key,
+    const OseoSymbolRegistryEntry **entry
+) {
+    OseoString *string = string_object(key);
+    if (string->length >
+        (SIZE_MAX - sizeof(OseoSymbolRegistryEntry)) / sizeof(uint16_t)) {
+        return failure(context, "OSEO2001", "Symbol registry key is long.");
+    }
+    size_t hash = symbol_key_hash(string->units, string->length);
+    lock_symbol_registry();
+    if ((symbol_registry_count + 1u) * 2u > symbol_registry_capacity &&
+        !symbol_registry_grow()) {
+        unlock_symbol_registry();
+        return failure(
+            context,
+            "OSEO2001",
+            "Symbol registry allocation failed."
+        );
+    }
+    size_t mask = symbol_registry_capacity - 1u;
+    size_t slot = hash & mask;
+    for (OseoSymbolRegistryEntry *candidate = symbol_registry[slot];
+         candidate != NULL;
+         candidate = symbol_registry[slot]) {
+        if (candidate->hash == hash &&
+            candidate->length == string->length &&
+            (string->length == 0u || memcmp(
+                candidate->units,
+                string->units,
+                string->length * sizeof(uint16_t)
+            ) == 0)) {
+            *entry = candidate;
+            unlock_symbol_registry();
+            return normal(key);
+        }
+        slot = (slot + 1u) & mask;
+    }
+    size_t size = sizeof(OseoSymbolRegistryEntry) +
+        string->length * sizeof(uint16_t);
+    OseoSymbolRegistryEntry *created = malloc(size);
+    if (created == NULL) {
+        unlock_symbol_registry();
+        return failure(
+            context,
+            "OSEO2001",
+            "Symbol registry allocation failed."
+        );
+    }
+    created->hash = hash;
+    created->length = string->length;
+    if (string->length > 0u) {
+        memcpy(
+            created->units,
+            string->units,
+            string->length * sizeof(uint16_t)
+        );
+    }
+    symbol_registry[slot] = created;
+    symbol_registry_count += 1u;
+    *entry = created;
+    unlock_symbol_registry();
+    return normal(key);
+}
+
+/*
+ * Rehashes the realm's open-addressed representative table into twice its
+ * capacity. Empty slots hold undefined so the collector can mark every slot.
+ */
+static bool registered_symbols_grow(OseoContext *context) {
+    size_t old_capacity = context->registered_symbol_capacity;
+    size_t capacity = old_capacity == 0u ? 16u : old_capacity;
+    if (old_capacity != 0u) {
+        if (capacity > SIZE_MAX / 2u / sizeof(OseoValue)) return false;
+        capacity *= 2u;
+    }
+    OseoValue *table = malloc(capacity * sizeof(OseoValue));
+    if (table == NULL) return false;
+    for (size_t index = 0u; index < capacity; index += 1u) {
+        table[index] = oseo_undefined();
+    }
+    for (size_t index = 0u; index < old_capacity; index += 1u) {
+        OseoValue symbol = context->registered_symbols[index];
+        if (tag_of(symbol) != OSEO_TAG_HEAP) continue;
+        const OseoSymbolRegistryEntry *entry =
+            symbol_object(symbol)->registry_entry;
+        size_t slot = entry->hash & (capacity - 1u);
+        while (tag_of(table[slot]) == OSEO_TAG_HEAP) {
+            slot = (slot + 1u) & (capacity - 1u);
+        }
+        table[slot] = symbol;
+    }
+    free(context->registered_symbols);
+    context->registered_symbols = table;
+    context->registered_symbol_capacity = capacity;
+    return true;
+}
+
+static OseoResult symbol_create(
+    OseoContext *context,
+    OseoValue description,
+    const OseoSymbolRegistryEntry *registry_entry
+);
+
+static OseoResult symbol_this_value(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_symbol(receiver)) return normal(receiver);
+    if (is_object(receiver) && !is_proxy(receiver)) {
+        OseoOrdinaryObject *object = ordinary_object(receiver);
+        if (object->primitive_data && is_symbol(object->primitive_value)) {
+            return normal(object->primitive_value);
+        }
+    }
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "Symbol method receiver has no SymbolData."
+    );
+}
+
+/*
+ * This context's own representative of one registry entry, created here
+ * from the shared key when the context has not seen the entry before.
+ * The result is reachable from `registered_symbols`, which the collector
+ * marks as a root, so a caller may hold it across a later safepoint
+ * without rooting it.
+ */
+static OseoResult context_representative(
+    OseoContext *context,
+    const OseoSymbolRegistryEntry *entry
+) {
+    if ((context->registered_symbol_count + 1u) * 2u >
+            context->registered_symbol_capacity &&
+        !registered_symbols_grow(context)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Symbol registry allocation failed."
+        );
+    }
+    size_t mask = context->registered_symbol_capacity - 1u;
+    size_t slot = entry->hash & mask;
+    while (tag_of(context->registered_symbols[slot]) == OSEO_TAG_HEAP) {
+        OseoValue candidate = context->registered_symbols[slot];
+        if (symbol_object(candidate)->registry_entry == entry) {
+            return normal(candidate);
+        }
+        slot = (slot + 1u) & mask;
+    }
+    OseoResult description = oseo_internal_allocate_string(
+        context,
+        entry->units,
+        entry->length
+    );
+    if (description.status != OSEO_STATUS_NORMAL) return description;
+    OseoValue slots[1] = {description.value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult created = symbol_create(context, slots[0], entry);
+    oseo_roots_pop(context, &frame);
+    if (created.status != OSEO_STATUS_NORMAL) return created;
+    /*
+     * Another context may keep this representative in a value position
+     * that no localization reaches, so it and the description it holds
+     * outlive this context rather than being freed with it.
+     */
+    heap_object(created.value)->retained = true;
+    heap_object(slots[0])->retained = true;
+    /*
+     * Allocation may collect but never resizes this table, so the empty
+     * slot found before it is still the insertion point.
+     */
+    context->registered_symbols[slot] = created.value;
+    context->registered_symbol_count += 1u;
+    return created;
+}
+
+OseoResult oseo_internal_local_symbol(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (!is_symbol(value)) return normal(value);
+    const OseoSymbolRegistryEntry *entry =
+        symbol_object(value)->registry_entry;
+    if (entry == NULL) return normal(value);
+    return context_representative(context, entry);
+}
+
+/*
+ * Representatives whose context is gone. A registered representative is the
+ * one heap value a context hands to another context, and the receiving
+ * context may keep it in any persistent store: an ordinary property value, a
+ * Map value, an array element, a closure slot, a promise result, a saved
+ * generator slot. The collector traces more than forty such value fields
+ * across twenty heap kinds, and every one of them accepts an arbitrary
+ * value, so localizing at each store could not be complete and would have to
+ * be repeated by every later component. Localizing covers the identity
+ * positions, a property key, a Map key, and a Set element, where a
+ * representative also decides a lookup; a value position keeps whatever
+ * representative it was given. Such a value stays valid because the
+ * representative outlives the context that created it: a destroyed context
+ * hands its representatives and their descriptions to this list instead of
+ * freeing them, and a symbol and its description are the whole closure,
+ * since a description is an immutable string with its units inline. The
+ * retained memory is one symbol and one string for each key a destroyed
+ * context registered, so it grows with the number of destroyed contexts
+ * that used the registry rather than with the number of keys: a program
+ * with one context retains one pair per key it registered, while an
+ * embedder that creates and destroys contexts in a loop retains one pair
+ * per context and key. That cost buys a per-context representative, which
+ * is what makes a context's own lookup tables hold only values it owns.
+ * The alternative, one process-owned representative per entry, would bound
+ * the retention by the entry count but would replace the per-context
+ * representative that decides identity here, so this component keeps the
+ * cost and states it. The list head keeps every retired object reachable
+ * rather than leaked. The `retained` header flag names exactly these
+ * objects, so retiring never depends on what a collection left behind, and
+ * a retired object leaves with its mark set, so no later collection traces
+ * it and no sweep list holds it.
+ */
+static OseoHeapObject *retired_symbols;
+
+void oseo_internal_retire_registered_symbols(OseoContext *context) {
+    OseoHeapObject *head = NULL;
+    OseoHeapObject *tail = NULL;
+    OseoHeapObject **link = &context->objects;
+    while (*link != NULL) {
+        OseoHeapObject *object = *link;
+        if (!object->retained) {
+            link = &object->next;
+            continue;
+        }
+        *link = object->next;
+        object->next = NULL;
+        object->trace_next = NULL;
+        object->ephemeron_pending = NULL;
+        object->marked = true;
+        if (tail == NULL) head = object; else tail->next = object;
+        tail = object;
+    }
+    if (tail == NULL) return;
+    lock_symbol_registry();
+    tail->next = retired_symbols;
+    retired_symbols = head;
+    unlock_symbol_registry();
+}
+
+static OseoResult symbol_for(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue key = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    OseoRootFrame frame = {NULL, &key, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_value_string(context, key);
+    key = result.value;
+    const OseoSymbolRegistryEntry *entry = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = symbol_registry_find_or_create(context, key, &entry);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = context_representative(context, entry);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult symbol_key_for(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue symbol = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (!is_symbol(symbol)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Symbol.keyFor requires a Symbol."
+        );
+    }
+    const OseoSymbolRegistryEntry *entry =
+        symbol_object(symbol)->registry_entry;
+    if (entry == NULL) return normal(oseo_undefined());
+    return oseo_internal_allocate_string(context, entry->units, entry->length);
+}
 
 OseoResult oseo_internal_symbol_builtin_dispatch(
     OseoContext *context,
@@ -13,23 +388,58 @@ OseoResult oseo_internal_symbol_builtin_dispatch(
     OseoValue new_target
 ) {
     (void)callee;
-    (void)receiver;
-    (void)new_target;
-    if (code_id != OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
-        return oseo_unknown_function(context, code_id);
+    bool constructing = tag_of(new_target) != OSEO_TAG_UNDEFINED;
+    if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
+        if (constructing) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Symbol is not a constructor."
+            );
+        }
+        OseoValue description_input = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
+            return oseo_internal_symbol_create(context, oseo_undefined());
+        }
+        OseoResult result =
+            oseo_internal_value_string(context, description_input);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_symbol_create(context, result.value);
+        }
+        return result;
     }
-    OseoValue description_input = argument_count > 0u
-        ? arguments[0]
-        : oseo_undefined();
-    if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
-        return oseo_internal_symbol_create(context, oseo_undefined());
+    if (constructing) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Symbol built-in method is not a constructor."
+        );
     }
-    OseoResult result =
-        oseo_internal_value_string(context, description_input);
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_symbol_create(context, result.value);
+    if (code_id == OSEO_SYMBOL_FOR_CODE_ID) {
+        return symbol_for(context, argument_count, arguments);
     }
-    return result;
+    if (code_id == OSEO_SYMBOL_KEY_FOR_CODE_ID) {
+        return symbol_key_for(context, argument_count, arguments);
+    }
+    if (code_id == OSEO_SYMBOL_TO_STRING_CODE_ID) {
+        OseoResult value = symbol_this_value(context, receiver);
+        return value.status == OSEO_STATUS_NORMAL
+            ? oseo_internal_symbol_text(context, value.value)
+            : value;
+    }
+    if (code_id == OSEO_SYMBOL_VALUE_OF_CODE_ID ||
+        code_id == OSEO_SYMBOL_TO_PRIMITIVE_CODE_ID) {
+        return symbol_this_value(context, receiver);
+    }
+    if (code_id == OSEO_SYMBOL_DESCRIPTION_GETTER_CODE_ID) {
+        OseoResult value = symbol_this_value(context, receiver);
+        return value.status == OSEO_STATUS_NORMAL
+            ? normal(symbol_object(value.value)->description)
+            : value;
+    }
+    return oseo_unknown_function(context, code_id);
 }
 
 /*
@@ -38,9 +448,10 @@ OseoResult oseo_internal_symbol_builtin_dispatch(
  * stored on it.
  */
 
-OseoResult oseo_internal_symbol_create(
+static OseoResult symbol_create(
     OseoContext *context,
-    OseoValue description
+    OseoValue description,
+    const OseoSymbolRegistryEntry *registry_entry
 ) {
     OseoValue slots[1] = {description};
     OseoRootFrame frame = {NULL, slots, 1u};
@@ -52,11 +463,19 @@ OseoResult oseo_internal_symbol_create(
         return failure(context, "OSEO2001", "Symbol allocation failed.");
     }
     symbol->description = slots[0];
+    symbol->registry_entry = registry_entry;
     return oseo_internal_publish_heap(
         context,
         &symbol->header,
         OSEO_HEAP_SYMBOL
     );
+}
+
+OseoResult oseo_internal_symbol_create(
+    OseoContext *context,
+    OseoValue description
+) {
+    return symbol_create(context, description, NULL);
 }
 
 /* Render "Symbol(description)" for console output and diagnostics. */
@@ -151,7 +570,8 @@ static OseoResult define_symbol_property(
     OseoContext *context,
     OseoValue target,
     const char *name,
-    OseoValue value
+    OseoValue value,
+    OseoPropertyAttributes attributes
 ) {
     size_t name_length = strlen(name);
     uint16_t units[20];
@@ -167,13 +587,84 @@ static OseoResult define_symbol_property(
     OseoResult result = oseo_string_from_units(context, units, name_length);
     if (result.status == OSEO_STATUS_NORMAL) {
         slots[2] = result.value;
-        const OseoPropertyAttributes fixed = {false, false, false, false};
         result = oseo_object_define(
             context,
             slots[0],
             slots[2],
             slots[1],
-            fixed
+            attributes
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult create_symbol_builtin(
+    OseoContext *context,
+    size_t code_id,
+    const char *name,
+    size_t length,
+    OseoFunctionNamePrefix prefix
+) {
+    size_t name_length = strlen(name);
+    if (name_length > 31u) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
+    uint16_t units[31];
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /*
+         * Only the constructor has [[Construct]]: IsConstructor observes it,
+         * while dispatch still rejects every construction before conversion.
+         */
+        OseoFunctionKind kind = code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID
+            ? OSEO_FUNCTION_ORDINARY
+            : OSEO_FUNCTION_INTERNAL;
+        result = oseo_function_create(
+            context,
+            code_id,
+            environment,
+            units,
+            name_length,
+            length,
+            kind,
+            oseo_undefined(),
+            oseo_undefined(),
+            prefix
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult define_symbol_accessor(
+    OseoContext *context,
+    OseoValue object,
+    const char *name,
+    OseoValue getter
+) {
+    OseoValue slots[3] = {object, getter, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, name);
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define_accessor(
+            context,
+            slots[0],
+            slots[2],
+            slots[1],
+            oseo_undefined(),
+            true,
+            false,
+            (OseoPropertyAttributes){true, false, false, true}
         );
     }
     oseo_roots_pop(context, &frame);
@@ -213,34 +704,41 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "Symbol.toStringTag",
         "Symbol.unscopables",
     };
+    OseoValue *marker = &context->intrinsics[
+        OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER
+    ];
+    if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The Symbol intrinsic cluster is already being built."
+        );
+    }
+    if (tag_of(*marker) != OSEO_TAG_UNDEFINED) {
+        return normal(context->intrinsics[OSEO_INTRINSIC_SYMBOL]);
+    }
+    *marker = oseo_uninitialized();
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_environment_create(context, 0u);
-    frame.slots[0] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        static const uint16_t name_units[] = {
-            'S', 'y', 'm', 'b', 'o', 'l',
-        };
-        result = oseo_function_create(
-            context,
-            OSEO_SYMBOL_CONSTRUCT_CODE_ID,
-            frame.slots[0],
-            name_units,
-            sizeof(name_units) / sizeof(*name_units),
-            0u,
-            OSEO_FUNCTION_INTERNAL,
-            oseo_undefined(),
-            oseo_undefined(),
-            OSEO_FUNCTION_NAME_PREFIX_NONE
-        );
-        frame.slots[1] = result.value;
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        *marker = oseo_undefined();
+        return result;
     }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
              index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
+        /*
+         * A failed build leaves the symbols it created in place, and an
+         * intrinsic materialized under it may already key a method by one
+         * of them, so a retry reuses an identity that is already
+         * observable rather than replacing it.
+         */
+        if (tag_of(context->well_known_symbols[index]) !=
+            OSEO_TAG_UNDEFINED) {
+            continue;
+        }
         const char *description = well_known_descriptions[index];
         size_t description_length = strlen(description);
         uint16_t units[32];
@@ -262,69 +760,194 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         context->well_known_symbols[index] = frame.slots[2];
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_symbol_builtin(
+            context,
+            OSEO_SYMBOL_CONSTRUCT_CODE_ID,
+            "Symbol",
+            0u,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /*
+         * The ordinary kind synthesizes the fixed `prototype` property, so
+         * only its writability needs to match the specified descriptor.
+         */
+        OseoFunction *constructor = function_object(frame.slots[0]);
+        constructor->prototype_writable = false;
+        frame.slots[1] = constructor->prototype_object;
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[0];
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] = frame.slots[1];
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        frame.slots[2] = context->well_known_symbols[index];
         result = define_symbol_property(
             context,
-            frame.slots[1],
+            frame.slots[0],
             well_known_names[index],
-            frame.slots[2]
+            frame.slots[2],
+            (OseoPropertyAttributes){false, false, false, false}
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        /*
-         * Symbol is non-constructible, so the object layer does not
-         * synthesize its prototype property. The prototype object still
-         * exists and is exposed here as a fixed own property; only its
-         * methods are the deferred boundary.
-         */
-        result = define_symbol_property(
+    static const size_t static_codes[] = {
+        OSEO_SYMBOL_FOR_CODE_ID,
+        OSEO_SYMBOL_KEY_FOR_CODE_ID,
+    };
+    static const OseoIntrinsic static_intrinsics[] = {
+        OSEO_INTRINSIC_SYMBOL_FOR,
+        OSEO_INTRINSIC_SYMBOL_KEY_FOR,
+    };
+    static const char *const static_names[] = {"for", "keyFor"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_symbol_builtin(
             context,
-            frame.slots[1],
-            "prototype",
-            function_object(frame.slots[1])->prototype_object
+            static_codes[index],
+            static_names[index],
+            1u,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
-            function_object(frame.slots[1])->prototype_object;
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[1];
-        result = oseo_internal_install_primitive_wrapper_methods(
-            context,
-            context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE],
-            false
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        /*
-         * Object.prototype.toString observes the inherited standard tag.
-         * Removing it must expose the Symbol primitive's ordinary Object
-         * fallback instead of a private builtin tag.
-         */
-        result = oseo_internal_ascii_string(context, "Symbol");
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            const OseoPropertyAttributes tag = {
-                true,
-                false,
-                false,
-                false,
-            };
-            result = oseo_object_define(
+            context->intrinsics[static_intrinsics[index]] = frame.slots[2];
+            result = define_symbol_property(
                 context,
-                context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE],
-                context->well_known_symbols[OSEO_WELL_KNOWN_TO_STRING_TAG],
+                frame.slots[0],
+                static_names[index],
                 frame.slots[2],
-                tag
+                (OseoPropertyAttributes){true, false, true, false}
             );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result.value = frame.slots[1];
+        result = define_symbol_property(
+            context,
+            frame.slots[1],
+            "constructor",
+            frame.slots[0],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    static const size_t method_codes[] = {
+        OSEO_SYMBOL_TO_STRING_CODE_ID,
+        OSEO_SYMBOL_VALUE_OF_CODE_ID,
+    };
+    static const OseoIntrinsic method_intrinsics[] = {
+        OSEO_INTRINSIC_SYMBOL_TO_STRING,
+        OSEO_INTRINSIC_SYMBOL_VALUE_OF,
+    };
+    static const char *const method_names[] = {"toString", "valueOf"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_symbol_builtin(
+            context,
+            method_codes[index],
+            method_names[index],
+            0u,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->intrinsics[method_intrinsics[index]] = frame.slots[2];
+            result = define_symbol_property(
+                context,
+                frame.slots[1],
+                method_names[index],
+                frame.slots[2],
+                (OseoPropertyAttributes){true, false, true, false}
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_symbol_builtin(
+            context,
+            OSEO_SYMBOL_DESCRIPTION_GETTER_CODE_ID,
+            "description",
+            0u,
+            OSEO_FUNCTION_NAME_PREFIX_GET
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_symbol_accessor(
+            context,
+            frame.slots[1],
+            "description",
+            frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[3] =
+            context->well_known_symbols[OSEO_WELL_KNOWN_TO_STRING_TAG];
+        result = oseo_internal_ascii_string(context, "Symbol");
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[4],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_symbol_builtin(
+            context,
+            OSEO_SYMBOL_TO_PRIMITIVE_CODE_ID,
+            "[Symbol.toPrimitive]",
+            1u,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_TO_PRIMITIVE] =
+            frame.slots[4];
+        frame.slots[3] =
+            context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[4],
+            (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER] =
+            frame.slots[2];
+        result.value = frame.slots[0];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
+            oseo_undefined();
         context->intrinsics[OSEO_INTRINSIC_SYMBOL] = oseo_undefined();
+        for (size_t intrinsic = OSEO_INTRINSIC_SYMBOL_FOR;
+             intrinsic <= OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER;
+             intrinsic += 1u) {
+            context->intrinsics[intrinsic] = oseo_undefined();
+        }
+        /*
+         * The well-known symbols stay. Creating the constructor
+         * materializes %Function.prototype%, which keys its
+         * `[Symbol.hasInstance]` method by the symbol this build created,
+         * and that key cannot be rewritten, so replacing the symbol would
+         * leave the method unreachable through `Symbol.hasInstance`. They
+         * are edition-fixed values that no part of this cluster owns,
+         * and `oseo_internal_well_known_symbol` answers them without a
+         * constructor, so keeping them costs the retry nothing.
+         */
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -345,6 +968,8 @@ OseoResult oseo_internal_well_known_symbol(
     if (index >= OSEO_WELL_KNOWN_SYMBOL_COUNT) {
         return failure(context, "OSEO2001", "Unknown well-known symbol.");
     }
+    OseoValue value = context->well_known_symbols[index];
+    if (tag_of(value) != OSEO_TAG_UNDEFINED) return normal(value);
     OseoResult result = oseo_symbol_intrinsic(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(context->well_known_symbols[index]);
