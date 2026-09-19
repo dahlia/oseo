@@ -9,6 +9,7 @@ import { isBoolean, isNumber, isObject, isString } from "./value-kinds.ts";
 // Keep this list and the build/runner cases in nativeCall in sync with the
 // native entry points under tests/. See CONTRIBUTING.md for the rule.
 const nativeHelpers = new Set([
+  "runNativeFixture",
   "runNativeCli",
   "withNativeFixture",
   "runNativeUnits",
@@ -21,6 +22,7 @@ const nativeHelpers = new Set([
   "nativeToolchain",
 ]);
 const processHelpers = new Set([
+  "runNativeFixture",
   "spawn",
   "spawnSync",
   "execFile",

@@ -132,10 +132,16 @@ import { prepareHarnessObject } from "../packages/compiler/src/index.ts";
 import { createTest262FragmentExecutor } from "../tools/test262-fragments.ts";
 import { buildHostCcFixture } from "./host-cc-runtime.ts";
 import { spawnSync } from "node:child_process";
+import { runNativeFixture } from "../tools/native-fixture.ts";
 function runCommand(command, args) { return spawnSync(command, args); }
 `;
 
 for (const [name, body] of [
+  [
+    "supervised fixture",
+    `const plan = compiler.createBuildPlan(input);
+    runNativeFixture(plan.executablePath, []);`,
+  ],
   ["aliased CLI", "await run({ args: ['case.js'] });"],
   ["option-like filename", "await run({ args: ['--', '--emit-c'] });"],
   ["dynamic option prefix", "await run({ args: [...prefix, '--emit-c'] });"],
@@ -204,6 +210,7 @@ async () => { ${body} });`,
 }
 
 for (const [name, body] of [
+  ["supervised Node program", "runNativeFixture(process.execPath, []);"],
   ["unused helper", "assert.equal(typeof run, 'function');"],
   ["Zig argument assertion", "assert.deepEqual('zig', ['cc']);"],
   ["uncalled local helper", "const unused = () => run({});"],

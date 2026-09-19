@@ -1,3 +1,4 @@
+import { runNativeFixture } from "../tools/native-fixture.ts";
 import { runNativeCli as run } from "../packages/cli/src/index.ts";
 /* eslint-disable no-await-in-loop -- Compiler probing is ordered. */
 import { spawnSync } from "node:child_process";
@@ -135,7 +136,7 @@ int main(int argc, char **argv) {
           `install this compiler's ASan and UBSan runtimes.\n${built.stderr}`,
       );
     }
-    const observed = spawnSync(binary, [], {
+    const observed = runNativeFixture(binary, [], {
       env,
       encoding: "utf8",
       timeout: 30_000,

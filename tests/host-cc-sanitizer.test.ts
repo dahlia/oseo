@@ -1,3 +1,4 @@
+import { runNativeFixture } from "../tools/native-fixture.ts";
 /* eslint-disable no-await-in-loop -- Each probe owns an isolated build. */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -97,7 +98,7 @@ for (const sanitizer of target.sanitizers) {
             assert.ifError(built.error);
             assert.equal(built.status, 0, built.stderr);
           }
-          const observed = spawnSync(plan.executablePath, [], {
+          const observed = runNativeFixture(plan.executablePath, [], {
             encoding: "utf8",
             env: environment,
             timeout: 30_000,

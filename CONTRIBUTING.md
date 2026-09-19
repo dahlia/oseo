@@ -342,8 +342,8 @@ It recognizes value imports, including aliases, of `runNativeCli`,
 `prepareHarnessObject` with the imported `nativeToolchain`; execution through
 `createTest262FragmentExecutor` with that toolchain; consumption of
 a `nativeToolchain.createBuildPlan` result's `executablePath` or iterated
-`requests` in process calls; and literal `zig`/`cc` invocations through local
-wrappers. The clock entry points
+`requests` in process calls (including `runNativeFixture`); and literal
+`zig`/`cc` invocations through local wrappers. The clock entry points
 `buildClockProgram`, `runClockProbe`, and `runClockScheduler` are included too.
 It accepts `hostClockTarget()` and shared skip constants, plus the existing
 explicit Linux x64/macOS arm64 target selection and additional `||` skip

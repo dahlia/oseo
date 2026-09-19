@@ -1,3 +1,4 @@
+import { runNativeFixture } from "../../tools/native-fixture.ts";
 import { hostCcLane } from "../native-toolchain.ts";
 import { buildHostCcFixture } from "../host-cc-runtime.ts";
 import assert from "node:assert/strict";
@@ -66,11 +67,15 @@ const zigNativeTarget =
       : undefined;
 
 function run(command: string, args: readonly string[]): string {
-  const result = spawnSync(command, args, {
+  const optionsForRun = {
     cwd: root,
-    encoding: "utf8",
+    encoding: "utf8" as const,
     env: { ...process.env, OSEO_GC_EVERY_SAFEPOINT: "1" },
-  });
+  };
+  const result =
+    command === "zig"
+      ? spawnSync(command, args, optionsForRun)
+      : runNativeFixture(command, args, optionsForRun);
   assert.equal(
     result.status,
     0,

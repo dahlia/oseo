@@ -345,6 +345,9 @@ static OseoResult dispatch(
 }
 
 int main(void) {
+  /* Preserve the last trace even if a later wait never returns. */
+  setvbuf(stdout, NULL, _IONBF, 0);
+
     char line[256];
     uint64_t monotonic = 0u;
     double real_time = 0.0;
