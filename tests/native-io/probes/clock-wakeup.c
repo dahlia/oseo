@@ -406,6 +406,9 @@ static void probe_configuration(
 }
 
 int main(int argc, char **argv) {
+  /* Preserve the last trace even if a later wait never returns. */
+  setvbuf(stdout, NULL, _IONBF, 0);
+
     uint64_t wait_milliseconds = 200u;
     if (argc > 1) {
         char *end = NULL;

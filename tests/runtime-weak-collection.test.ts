@@ -1,3 +1,4 @@
+import { runNativeFixture } from "../tools/native-fixture.ts";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -27,11 +28,15 @@ function run(
   args: readonly string[],
   environment?: Readonly<Record<string, string>>,
 ): void {
-  const result = spawnSync(command, args, {
+  const optionsForRun = {
     cwd: root,
-    encoding: "utf8",
+    encoding: "utf8" as const,
     env: environment == null ? process.env : { ...process.env, ...environment },
-  });
+  };
+  const result =
+    command === "zig"
+      ? spawnSync(command, args, optionsForRun)
+      : runNativeFixture(command, args, optionsForRun);
   assert.equal(
     result.status,
     0,

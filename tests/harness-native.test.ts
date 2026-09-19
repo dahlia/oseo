@@ -1,7 +1,8 @@
 /* eslint-disable no-await-in-loop -- Native commands run serially. */
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
-import { spawnSync } from "node:child_process";
+import { runNativeFixture } from "../tools/native-fixture.ts";
 import { readFile, readdir, mkdir, copyFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,15 +41,16 @@ async function identity(directory: URL): Promise<string> {
 }
 
 function observe(path: string, gc: boolean) {
-  const result = spawnSync(path, [], {
+  const result = runNativeFixture(path, [], {
+    encoding: "base64",
     env: gc ? { OSEO_GC_EVERY_SAFEPOINT: "1" } : {},
     timeout: 30_000,
   });
   assert.equal(result.error, undefined);
   assert.equal(result.signal, null);
   return {
-    stdout: result.stdout,
-    stderr: result.stderr,
+    stdout: Buffer.from(result.stdout, "base64"),
+    stderr: Buffer.from(result.stderr, "base64"),
     status: result.status,
   };
 }
