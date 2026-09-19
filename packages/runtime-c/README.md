@@ -960,7 +960,12 @@ registry entry, not the heap value, is the identity: strict and loose
 equality, SameValue, SameValueZero, property keys, and Map and Set keys treat
 two contexts' representatives of one entry as one symbol, while a property
 key, a Map key, and a Set element are always the storing context's own
-representative. Six code
+representative. A value position, such as an ordinary property value, an array
+element, a Map value, or a settled promise's result, keeps whatever
+representative reached it, so a representative outlives the context that
+created it: destroying a context takes its representatives and their
+descriptions out of that heap rather than freeing them, and every store another
+context made stays readable and keeps naming the same registry entry. Six code
 IDs are allocated inside the existing Symbol range and six intrinsic slots are
 added; no heap kind or generated-code entry point is. A value can be held
 weakly when it is an object or an unregistered symbol: a symbol the registry

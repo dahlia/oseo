@@ -18,11 +18,16 @@ scope:
     equality, SameValue, SameValueZero, property keys, and Map and Set keys
     treat two contexts' representatives of one entry as one symbol, while a
     property key, a Map key, and a Set element are always the storing
-    context's own representative, so no context's heap holds a value another
-    context owns and destroying one context never invalidates a stored key.
-    A context does trace a representative another context owns while its own
-    roots hold one, so destruction drops every mark its heap carries before
-    the final sweep and frees the whole heap.
+    context's own representative, so every key a lookup probes is a value
+    the probing context owns. A value position keeps whatever representative
+    reached it, including an ordinary property value, an array element, a
+    Map or WeakMap value, and a settled promise's result, so a representative
+    outlives the context that created it: destruction takes every
+    representative and description out of that heap instead of freeing them,
+    and each store another context made stays readable and usable. A context
+    does trace a value another context owns while its own roots hold one, so
+    destruction drops every mark its heap carries before the final sweep and
+    frees the rest of the heap.
     Symbol.keyFor returns a context-local copy
     of the shared key and returns undefined for unique and well-known
     symbols. A registered symbol is the one symbol CanBeHeldWeakly refuses,

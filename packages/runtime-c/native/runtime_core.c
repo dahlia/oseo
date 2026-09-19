@@ -201,6 +201,13 @@ void oseo_context_destroy(OseoContext *context) {
      * collection frees.
      */
     oseo_internal_clear_heap_marks(context);
+    /*
+     * A registered representative is the one value another context may
+     * still hold, in a property value, a Map value, or any other value
+     * position no localization reaches, so it and its description leave
+     * this heap rather than being freed with it.
+     */
+    oseo_internal_retire_registered_symbols(context);
     oseo_collect(context);
     oseo_internal_clock_destroy(context);
 }

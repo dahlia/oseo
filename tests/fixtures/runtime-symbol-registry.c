@@ -266,13 +266,14 @@ static void assert_boolean(OseoResult result, bool expected) {
  * A registered representative is the one value this fixture hands across.
  * It and its description never change and its own context roots it for
  * that context's lifetime, so the receiving context can compare it, and
- * can mark it while it is an argument, without ever freeing it, hiding
- * a later mutation from its owner, or leaving a mark that outlives it.
- * Nothing the receiving context keeps points across the boundary: a
- * property key, a Map key, and a Set element are the receiving context's
- * own representative whether a local or a foreign representative created
- * them, so no collector reaches the other heap through stored state and
- * destroying the originating context leaves them intact.
+ * can mark it while it is an argument, without hiding a later mutation
+ * from its owner or leaving a mark that outlives it. Every key the
+ * receiving context keeps is its own: a property key, a Map key, and a Set
+ * element are the receiving context's own representative whether a local
+ * or a foreign representative created them, so destroying the originating
+ * context leaves each lookup inside this heap.
+ * `test_foreign_value_survives_origin_teardown` covers the value positions
+ * that rule does not reach.
  */
 static void test_identity_across_contexts(void) {
     static const uint16_t shared[] = {'c', 'r', 'o', 's', 's'};
@@ -620,11 +621,16 @@ static void test_failed_build_retry_keeps_symbol_identity(void) {
 }
 
 /*
- * A receiving context traces every value its roots hold, including a
- * representative another context owns and created, and the mark it leaves
- * belongs to a heap it never sweeps. The owning context therefore drops
- * every mark before its own last sweep, so destroying it frees the
- * representative and its description whatever another context marked.
+ * A receiving context traces every value its roots hold, including one
+ * another context owns, and the mark it leaves belongs to a heap it never
+ * sweeps. The owning context therefore drops every mark before its own last
+ * sweep, so destroying it frees its whole heap whatever another context
+ * marked. An ordinary object carries that rule here: unlike a registered
+ * representative, nothing keeps it alive past its own context, so a mark
+ * left on it is what the final sweep would otherwise honor. The
+ * representatives the same collection marks are the storage side of the
+ * rule: a store keeps this context's own representative, so the other
+ * heap's teardown leaves each stored key untouched.
  */
 static void test_foreign_representative_leaves_no_mark(void) {
     static const uint16_t shared[] = {'m', 'a', 'r', 'k', 'e', 'd'};
@@ -634,15 +640,22 @@ static void test_foreign_representative_leaves_no_mark(void) {
     OseoRootFrame receiver_roots = {NULL, NULL, 0u};
     init_context(&origin, "symbol-mark-origin");
     init_context(&receiver, "symbol-mark-receiver");
-    (void)require_normal(oseo_roots_allocate(&origin, &origin_roots, 4u));
-    (void)require_normal(oseo_roots_allocate(&receiver, &receiver_roots, 8u));
+    (void)require_normal(oseo_roots_allocate(&origin, &origin_roots, 8u));
+    (void)require_normal(oseo_roots_allocate(&receiver, &receiver_roots, 12u));
 
     origin_roots.slots[3] =
         register_units(&origin, origin_roots.slots, shared, 6u);
+    origin_roots.slots[4] =
+        require_normal(oseo_object_create(&origin, oseo_null()));
     receiver_roots.slots[3] =
         require_normal(oseo_object_create(&receiver, oseo_null()));
     receiver_roots.slots[4] =
         construct_intrinsic(&receiver, OSEO_INTRINSIC_MAP);
+    /*
+     * An object the origin owns and nothing outlives, rooted here only long
+     * enough for one collection of this heap to mark it.
+     */
+    receiver_roots.slots[8] = origin_roots.slots[4];
 
     /*
      * The foreign representative is an argument the receiving context
@@ -679,6 +692,7 @@ static void test_foreign_representative_leaves_no_mark(void) {
     assert(map_object(receiver_roots.slots[4])->entries[0].key == local);
     receiver_roots.slots[5] = oseo_undefined();
     receiver_roots.slots[6] = oseo_undefined();
+    receiver_roots.slots[8] = oseo_undefined();
 
     /* The owning context frees its whole heap, marks and all. */
     oseo_roots_release(&origin, &origin_roots);
@@ -705,11 +719,245 @@ static void test_foreign_representative_leaves_no_mark(void) {
     assert(receiver.objects == NULL);
 }
 
+/*
+ * A value position keeps whatever representative reached it. Localizing
+ * covers the identity positions a lookup probes, a property key, a Map key,
+ * and a Set element, but an ordinary property value, an array element, a
+ * Map value, a WeakMap value, and a settled promise's result each keep the
+ * value they were handed, and the collector traces dozens more fields like
+ * them. A receiving context therefore does hold a representative another
+ * context created, and destroying that context has to leave every one of
+ * those stores readable rather than dangling: the representative and its
+ * description leave the dying heap instead of being freed with it. Each
+ * read below dereferences the retired symbol, which is what an
+ * address sanitizer reports when the value is freed with its context.
+ */
+static void test_foreign_value_survives_origin_teardown(void) {
+    static const uint16_t shared[] = {'k', 'e', 'p', 't'};
+    OseoContext origin;
+    OseoContext receiver;
+    OseoRootFrame origin_roots = {NULL, NULL, 0u};
+    OseoRootFrame receiver_roots = {NULL, NULL, 0u};
+    init_context(&origin, "symbol-value-origin");
+    init_context(&receiver, "symbol-value-receiver");
+    (void)require_normal(oseo_roots_allocate(&origin, &origin_roots, 4u));
+    (void)require_normal(oseo_roots_allocate(&receiver, &receiver_roots, 16u));
+
+    origin_roots.slots[3] =
+        register_units(&origin, origin_roots.slots, shared, 4u);
+    OseoValue foreign = origin_roots.slots[3];
+
+    receiver_roots.slots[3] =
+        require_normal(oseo_object_create(&receiver, oseo_null()));
+    receiver_roots.slots[4] = require_normal(oseo_array_create(&receiver, 0u));
+    receiver_roots.slots[5] =
+        construct_intrinsic(&receiver, OSEO_INTRINSIC_MAP);
+    receiver_roots.slots[6] =
+        construct_intrinsic(&receiver, OSEO_INTRINSIC_WEAK_MAP);
+    receiver_roots.slots[8] =
+        require_normal(oseo_object_create(&receiver, oseo_null()));
+    receiver_roots.slots[13] =
+        require_normal(oseo_internal_ascii_string(&receiver, "held"));
+    receiver_roots.slots[14] =
+        require_normal(oseo_internal_ascii_string(&receiver, "0"));
+    receiver_roots.slots[9] = foreign;
+
+    /* An ordinary property value. */
+    (void)require_normal(oseo_object_set(
+        &receiver,
+        receiver_roots.slots[3],
+        receiver_roots.slots[13],
+        receiver_roots.slots[9],
+        true
+    ));
+
+    /* An array element. */
+    (void)require_normal(oseo_array_append(
+        &receiver,
+        receiver_roots.slots[4],
+        receiver_roots.slots[9]
+    ));
+
+    /* A Map value under a string key. */
+    receiver_roots.slots[11] = receiver_roots.slots[13];
+    receiver_roots.slots[12] = receiver_roots.slots[9];
+    (void)call_method(
+        &receiver,
+        receiver_roots.slots[5],
+        "set",
+        2u,
+        &receiver_roots.slots[11]
+    );
+
+    /* A WeakMap value behind an object key, which is an ephemeron value. */
+    receiver_roots.slots[11] = receiver_roots.slots[8];
+    receiver_roots.slots[12] = receiver_roots.slots[9];
+    (void)call_method(
+        &receiver,
+        receiver_roots.slots[6],
+        "set",
+        2u,
+        &receiver_roots.slots[11]
+    );
+
+    /* A fulfilled promise's result. */
+    receiver_roots.slots[7] = require_normal(
+        oseo_promise_resolve(&receiver, receiver_roots.slots[9])
+    );
+    (void)require_normal(oseo_jobs_drain(&receiver));
+
+    /*
+     * Every one of these stores kept the value it was handed, which is the
+     * representative the other context owns.
+     */
+    assert(ordinary_object(receiver_roots.slots[3])->properties[0].value ==
+        foreign);
+    assert(map_object(receiver_roots.slots[5])->entries[0].value == foreign);
+    assert(oseo_promise_state(receiver_roots.slots[7]) ==
+        OSEO_PROMISE_FULFILLED);
+    receiver_roots.slots[9] = oseo_undefined();
+    receiver_roots.slots[11] = oseo_undefined();
+    receiver_roots.slots[12] = oseo_undefined();
+
+    /* The originating context goes away while every store still holds it. */
+    oseo_roots_release(&origin, &origin_roots);
+    oseo_context_destroy(&origin);
+    assert(origin.objects == NULL);
+    oseo_collect(&receiver);
+    oseo_collect(&receiver);
+
+    /*
+     * Hand the allocator a run of requests the size of a symbol before
+     * anything reads a store back. A build that freed the representative
+     * with its context then reads a block the allocator has handed out
+     * again, which is what makes this case fail on the Zig lane: its
+     * address sanitizer does not report a plain heap-use-after-free here,
+     * while the host C compiler sanitizer lane reports the access itself.
+     * Reuse is allocator behavior rather than a guarantee, so the two lanes
+     * together are the evidence. The array keeps every request alive.
+     */
+    receiver_roots.slots[15] = require_normal(oseo_array_create(&receiver, 0u));
+    for (size_t index = 0u; index < 64u; index += 1u) {
+        receiver_roots.slots[9] = require_normal(
+            oseo_internal_symbol_create(&receiver, oseo_undefined())
+        );
+        (void)require_normal(oseo_array_append(
+            &receiver,
+            receiver_roots.slots[15],
+            receiver_roots.slots[9]
+        ));
+    }
+    receiver_roots.slots[9] = oseo_undefined();
+
+    /* Each store reads back a usable symbol that names the same key. */
+    OseoValue stores[5] = {
+        require_normal(oseo_object_get(
+            &receiver,
+            receiver_roots.slots[3],
+            receiver_roots.slots[13]
+        )),
+        require_normal(oseo_object_get(
+            &receiver,
+            receiver_roots.slots[4],
+            receiver_roots.slots[14]
+        )),
+        oseo_undefined(),
+        oseo_undefined(),
+        require_normal(oseo_promise_result(&receiver, receiver_roots.slots[7]))
+    };
+    receiver_roots.slots[11] = receiver_roots.slots[13];
+    stores[2] = call_method(
+        &receiver,
+        receiver_roots.slots[5],
+        "get",
+        1u,
+        &receiver_roots.slots[11]
+    );
+    receiver_roots.slots[11] = receiver_roots.slots[8];
+    stores[3] = call_method(
+        &receiver,
+        receiver_roots.slots[6],
+        "get",
+        1u,
+        &receiver_roots.slots[11]
+    );
+    receiver_roots.slots[11] = oseo_undefined();
+
+    /*
+     * This context registers the same key for the first time only now, so
+     * its own representative is a value the retired one has to answer for.
+     */
+    receiver_roots.slots[10] =
+        register_units(&receiver, receiver_roots.slots, shared, 4u);
+    OseoValue local = receiver_roots.slots[10];
+    assert(local != foreign);
+    for (size_t index = 0u; index < 5u; index += 1u) {
+        OseoValue stored = stores[index];
+        assert(stored == foreign);
+        assert(is_symbol(stored));
+        assert(entry_of(stored) == entry_of(local));
+        assert(oseo_internal_same_value(stored, local));
+        assert_boolean(oseo_strict_equal(&receiver, stored, local), true);
+
+        /* The description is readable, so its string outlived the heap. */
+        receiver_roots.slots[9] = stored;
+        receiver_roots.slots[11] = require_normal(
+            oseo_internal_ascii_string(&receiver, "description")
+        );
+        receiver_roots.slots[11] = require_normal(oseo_object_get(
+            &receiver,
+            receiver_roots.slots[9],
+            receiver_roots.slots[11]
+        ));
+        assert(is_string(receiver_roots.slots[11]));
+        assert(string_object(receiver_roots.slots[11])->length == 4u);
+        for (size_t unit = 0u; unit < 4u; unit += 1u) {
+            assert(string_object(receiver_roots.slots[11])->units[unit] ==
+                shared[unit]);
+        }
+
+        /* keyFor answers from the shared entry the retired symbol names. */
+        receiver_roots.slots[11] = call_symbol_static(
+            &receiver,
+            receiver_roots.slots,
+            "keyFor",
+            stored
+        );
+        assert(is_string(receiver_roots.slots[11]));
+        assert(string_object(receiver_roots.slots[11])->length == 4u);
+
+        /* It still keys a property, and the store keeps the local value. */
+        receiver_roots.slots[9] = stored;
+        (void)require_normal(oseo_object_set(
+            &receiver,
+            receiver_roots.slots[8],
+            receiver_roots.slots[9],
+            oseo_number((double)index),
+            true
+        ));
+        assert(ordinary_object(receiver_roots.slots[8])->properties[0].key ==
+            local);
+        assert(oseo_internal_same_value(
+            require_normal(
+                oseo_object_get(&receiver, receiver_roots.slots[8], local)
+            ),
+            oseo_number((double)index)
+        ));
+        receiver_roots.slots[9] = oseo_undefined();
+        receiver_roots.slots[11] = oseo_undefined();
+    }
+
+    oseo_roots_release(&receiver, &receiver_roots);
+    oseo_context_destroy(&receiver);
+    assert(receiver.objects == NULL);
+}
+
 int main(void) {
     test_shared_entries_across_contexts();
     test_identity_across_contexts();
     test_growth_preserves_identity();
     test_failed_build_retry_keeps_symbol_identity();
     test_foreign_representative_leaves_no_mark();
+    test_foreign_value_survives_origin_teardown();
     return 0;
 }

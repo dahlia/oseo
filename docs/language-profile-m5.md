@@ -921,12 +921,18 @@ current evidence assessment. Those live only in the indexed records above.
     the entry outlives the context that created it, with forced collection.
     A property key, a Map key, and a Set element are always the storing
     context's own representative, whichever representative created them, so
-    no context's heap holds a value another context owns and destroying one
-    context never invalidates a key another context stored. A context still
-    traces a representative another context owns while its own roots hold
-    one as an argument, so destruction drops every mark the heap carries
-    before its final sweep: a mark belongs to the collection that set it and
-    never outlives the heap it was set on. The test262
+    every key a lookup probes is a value the probing context owns. A value
+    position keeps whatever representative reached it: an ordinary property
+    value, an array element, a Map or WeakMap value, and a settled promise's
+    result among them. A representative therefore outlives the context that
+    created it. Destroying a context takes its representatives and their
+    descriptions out of that heap rather than freeing them, so every store
+    another context made stays readable, keeps naming the same registry
+    entry, and still answers `Symbol.keyFor` and the description accessor. A
+    context still traces a value another context owns while its own roots
+    hold one as an argument, so destruction drops every mark the heap
+    carries before its final sweep: a mark belongs to the collection that
+    set it and never outlives the heap it was set on. The test262
     `$262.createRealm` harness remains unavailable, so reviewed cases that
     compare symbols across realms retain that explicit harness boundary.
     `Symbol.hasInstance` dispatch in `instanceof` remains outside this unit. A

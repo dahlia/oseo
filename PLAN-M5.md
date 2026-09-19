@@ -6569,17 +6569,35 @@ keys, and Map and Set keys treat two contexts' representatives of one entry as
 one symbol, and every other value keeps ordinary pointer identity. A property
 key, a Map key, and a Set element are always the storing context's own
 representative, because every append replaces a registered symbol with it
-first, so no context's heap holds a value another context owns, no collector
-traces another context's heap, and tearing one context down never invalidates
-a key or an entry another context still observes. The node adds one internal
-helper for that replacement. `Symbol.keyFor` validates
+first, so every key a lookup probes is a value the probing context owns. A
+value position keeps whatever representative reached it, and the collector
+traces more than forty such fields across twenty heap kinds, from an ordinary
+property value and an array element to a Map value, a WeakMap value, a settled
+promise's result, and a suspended generator's saved slot, so localizing at each
+store could not be complete. A representative therefore outlives the context
+that created it: a `retained` header flag names it and the description it
+holds, and destroying a context moves every flagged object into a process-wide
+list rather than freeing it. Tearing one context down therefore invalidates
+neither a key nor a value nor an entry another context still observes. The
+retained memory is one symbol and one string for each key that context
+registered, so it grows with the number of destroyed contexts that used the
+registry rather than with the number of keys: a program with one context
+retains one pair per key, and an embedder that creates and destroys contexts in
+a loop retains one pair per context and key. Bounding it by the entry count
+instead would need one process-owned representative per entry, which would
+replace the per-context representative that this node's identity rule, its
+storing rule, and its evidence are built on, so the node keeps the cost and
+records it. The node adds two
+internal helpers of its own, one for the replacement and one for the
+retirement, and one collector helper that drops the marks a foreign context
+left. `Symbol.keyFor` validates
 that its argument is a symbol, returns a context-local copy of the shared key,
 and returns `undefined` for unique and well-known symbols. A registered
 symbol is the one symbol CanBeHeldWeakly refuses, so this node also narrows
 the weak collections' key rule to unregistered symbols. The runtime ABI
 moves to `oseo-runtime-m5-116` with six intrinsic slots, six code IDs in the
-existing Symbol range, and three context fields; no heap kind, component,
-helper, or generated-code entry point is added.
+existing Symbol range, three context fields, and one heap-header flag; no heap
+kind, component, or generated-code entry point is added.
 
 Fixed Node.js, Deno, and native differential evidence covers the complete
 surface, coercion order, descriptors, construction, wrappers, incompatible
@@ -6597,7 +6615,23 @@ symbol, and an ordinary object stay distinct. A property, a Map key, and a Set
 element created through a foreign representative for a key the receiving
 context had never registered still hold that context's own representative,
 which `Symbol.for` there then returns, and they survive destruction of the
-originating context and a following collection.
+originating context and a following collection. A separate teardown case
+stores one context's representative in the value positions the storing rule
+does not reach, an ordinary property value, an array element, a Map value, a
+WeakMap value behind an object key, and a fulfilled promise's result, destroys
+the originating context, collects in the receiving one, and then hands the
+allocator a run of symbol-sized requests before reading each store back. A
+build that freed the representative with its context then reads a block the
+allocator has handed out again, which is what makes the defect observable on
+the Zig lane: that lane's address sanitizer does not report a plain
+heap-use-after-free in this environment, while the host C compiler sanitizer
+lane reports the access directly. Reuse is an allocator behavior rather than a
+guarantee, so the two lanes together are the evidence. Each store still answers
+as
+one symbol with the receiving context's own later representative, still renders
+its description and `Symbol.keyFor` key, and still keys a property. An ordinary
+object the receiving context roots across a collection covers the mark the
+owning heap must drop before its final sweep, which retirement cannot mask.
 A generated family at seed
 `0x60007800` draws bounded repeated UTF-16 keys and unique descriptions against
 an independent registry and property-key model under both specialization

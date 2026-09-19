@@ -12,13 +12,15 @@
  * joins two realms' representatives of one entry wherever a symbol identity
  * rule applies, while `oseo_internal_local_symbol` replaces a registered
  * symbol with the storing realm's own representative before a property key,
- * a Map key, or a Set element keeps it. A realm's heap therefore holds only
- * values it owns, and no collector traces another realm's heap through
- * stored state; a foreign representative is traced only while this realm's
- * roots hold it as an argument, and `oseo_internal_clear_heap_marks` keeps
- * such a mark from outliving the realm that owns the value. Entries
- * are never removed because a registered key stays observable for the
- * agent's lifetime.
+ * a Map key, or a Set element keeps it, so every identity position a lookup
+ * probes is a value the probing realm owns. A value position keeps whatever
+ * representative reached it, and a representative outlives the realm that
+ * created it: `oseo_internal_retire_registered_symbols` moves it out of a
+ * dying heap rather than freeing it. A foreign representative is traced only
+ * while this realm's roots or stores hold it, and
+ * `oseo_internal_clear_heap_marks` keeps such a mark from outliving the
+ * realm that owns the value. Entries are never removed because a registered
+ * key stays observable for the agent's lifetime.
  */
 typedef struct OseoSymbolRegistryEntry {
     size_t hash;
@@ -247,6 +249,13 @@ static OseoResult context_representative(
     oseo_roots_pop(context, &frame);
     if (created.status != OSEO_STATUS_NORMAL) return created;
     /*
+     * Another context may keep this representative in a value position
+     * that no localization reaches, so it and the description it holds
+     * outlive this context rather than being freed with it.
+     */
+    heap_object(created.value)->retained = true;
+    heap_object(slots[0])->retained = true;
+    /*
      * Allocation may collect but never resizes this table, so the empty
      * slot found before it is still the insertion point.
      */
@@ -264,6 +273,65 @@ OseoResult oseo_internal_local_symbol(
         symbol_object(value)->registry_entry;
     if (entry == NULL) return normal(value);
     return context_representative(context, entry);
+}
+
+/*
+ * Representatives whose context is gone. A registered representative is the
+ * one heap value a context hands to another context, and the receiving
+ * context may keep it in any persistent store: an ordinary property value, a
+ * Map value, an array element, a closure slot, a promise result, a saved
+ * generator slot. The collector traces more than forty such value fields
+ * across twenty heap kinds, and every one of them accepts an arbitrary
+ * value, so localizing at each store could not be complete and would have to
+ * be repeated by every later component. Localizing covers the identity
+ * positions, a property key, a Map key, and a Set element, where a
+ * representative also decides a lookup; a value position keeps whatever
+ * representative it was given. Such a value stays valid because the
+ * representative outlives the context that created it: a destroyed context
+ * hands its representatives and their descriptions to this list instead of
+ * freeing them, and a symbol and its description are the whole closure,
+ * since a description is an immutable string with its units inline. The
+ * retained memory is one symbol and one string for each key a destroyed
+ * context registered, so it grows with the number of destroyed contexts
+ * that used the registry rather than with the number of keys: a program
+ * with one context retains one pair per key it registered, while an
+ * embedder that creates and destroys contexts in a loop retains one pair
+ * per context and key. That cost buys a per-context representative, which
+ * is what makes a context's own lookup tables hold only values it owns.
+ * The alternative, one process-owned representative per entry, would bound
+ * the retention by the entry count but would replace the per-context
+ * representative that decides identity here, so this component keeps the
+ * cost and states it. The list head keeps every retired object reachable
+ * rather than leaked. The `retained` header flag names exactly these
+ * objects, so retiring never depends on what a collection left behind, and
+ * a retired object leaves with its mark set, so no later collection traces
+ * it and no sweep list holds it.
+ */
+static OseoHeapObject *retired_symbols;
+
+void oseo_internal_retire_registered_symbols(OseoContext *context) {
+    OseoHeapObject *head = NULL;
+    OseoHeapObject *tail = NULL;
+    OseoHeapObject **link = &context->objects;
+    while (*link != NULL) {
+        OseoHeapObject *object = *link;
+        if (!object->retained) {
+            link = &object->next;
+            continue;
+        }
+        *link = object->next;
+        object->next = NULL;
+        object->trace_next = NULL;
+        object->ephemeron_pending = NULL;
+        object->marked = true;
+        if (tail == NULL) head = object; else tail->next = object;
+        tail = object;
+    }
+    if (tail == NULL) return;
+    lock_symbol_registry();
+    tail->next = retired_symbols;
+    retired_symbols = head;
+    unlock_symbol_registry();
 }
 
 static OseoResult symbol_for(

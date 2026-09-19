@@ -719,6 +719,7 @@ OseoResult oseo_internal_publish_heap(
     object->ephemeron_pending = NULL;
     object->kind = kind;
     object->marked = false;
+    object->retained = false;
     context->objects = object;
     if (context->observe_specialization &&
         kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&
