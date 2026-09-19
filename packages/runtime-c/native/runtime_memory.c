@@ -605,6 +605,11 @@ void oseo_collect(OseoContext *context) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
     mark_value(context->global_this, &worklist);
+    for (size_t index = 0u;
+         index < context->registered_symbol_capacity;
+         index += 1u) {
+        mark_value(context->registered_symbols[index], &worklist);
+    }
     OseoTemplateCacheEntry *template_cache = context->template_cache;
     for (size_t index = 0u;
          index < context->template_cache_count;

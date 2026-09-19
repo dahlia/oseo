@@ -925,9 +925,7 @@ job-scoped KeptAlive set behind `WeakRef` construction and `deref`. The job
 queue clears that set before every promise job, and the event loop clears it
 before every timer turn and after each script or timer turn and its promise
 jobs, then runs queued cleanup records as separate jobs in queue order before
-the next timer, including each timer an internal await drives. Every
-object and every symbol can be held weakly because the profile admits no
-`Symbol.for` registry.
+the next timer, including each timer an internal await drives.
 
 The `m5-114` ABI adds the TypedArray search and join methods `find`,
 `findIndex`, `findLast`, `findLastIndex`, `includes`, `indexOf`,
@@ -951,6 +949,19 @@ are copied, and the original receiver is never written. `toReversed` reads in
 descending source order, `toSpliced` skips deleted entries, and `with` skips
 the replaced index. Three code IDs come from the existing Array range; the
 generated-code ABI gains no entry point.
+
+The `m5-116` ABI completes the `Symbol` intrinsic with `for`, `keyFor`, and
+the `%Symbol.prototype%` methods, description getter, `Symbol.toPrimitive`
+method, and tag. The GlobalSymbolRegistry is a process-wide open-addressed
+table of immutable UTF-16 keys that is never freed, and the public context
+gains the `registered_symbols` table of one collector-rooted representative
+per entry, so `Symbol.for` returns the same heap value on every call. Six code
+IDs are allocated inside the existing Symbol range and six intrinsic slots are
+added; no heap kind or generated-code entry point is. A value can be held
+weakly when it is an object or an unregistered symbol: a symbol the registry
+returned is registered and `WeakMap.prototype.set`, `WeakSet.prototype.add`,
+`WeakRef`, and `FinalizationRegistry.prototype.register` and `unregister`
+reject it.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

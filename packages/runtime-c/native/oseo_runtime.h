@@ -373,7 +373,13 @@ typedef enum {
     OSEO_INTRINSIC_FINALIZATION_REGISTRY = 258,
     OSEO_INTRINSIC_FINALIZATION_REGISTRY_REGISTER = 259,
     OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260,
-    OSEO_INTRINSIC_COUNT = 261,
+    OSEO_INTRINSIC_SYMBOL_FOR = 261,
+    OSEO_INTRINSIC_SYMBOL_KEY_FOR = 262,
+    OSEO_INTRINSIC_SYMBOL_TO_STRING = 263,
+    OSEO_INTRINSIC_SYMBOL_VALUE_OF = 264,
+    OSEO_INTRINSIC_SYMBOL_TO_PRIMITIVE = 265,
+    OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER = 266,
+    OSEO_INTRINSIC_COUNT = 267,
 } OseoIntrinsic;
 
 typedef struct {
@@ -506,6 +512,17 @@ struct OseoContext {
      * every non-strict nullish receiver observe one identity.
      */
     OseoValue global_this;
+    /*
+     * The realm's representatives of GlobalSymbolRegistry entries. The
+     * registry itself is process-wide; this open-addressed table, whose
+     * empty slots hold undefined, gives each entry one collector-rooted
+     * Symbol per realm, so `Symbol.for` returns the same heap value on
+     * every call. Registered symbols cannot be collected, which matches
+     * their unbounded observable lifetime.
+     */
+    OseoValue *registered_symbols;
+    size_t registered_symbol_count;
+    size_t registered_symbol_capacity;
     /*
      * Realm-local GetTemplateObject cache. The private entry layout stays
      * behind this public generated-code boundary.

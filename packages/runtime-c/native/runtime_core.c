@@ -64,6 +64,9 @@ void oseo_context_init(
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
+    context->registered_symbols = NULL;
+    context->registered_symbol_count = 0u;
+    context->registered_symbol_capacity = 0u;
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
@@ -168,6 +171,10 @@ void oseo_context_destroy(OseoContext *context) {
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
+    free(context->registered_symbols);
+    context->registered_symbols = NULL;
+    context->registered_symbol_count = 0u;
+    context->registered_symbol_capacity = 0u;
     free(context->template_cache);
     context->template_cache = NULL;
     context->template_cache_count = 0u;

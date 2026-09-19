@@ -63,11 +63,13 @@ static void initialize_ordinary(
 }
 
 /*
- * CanBeHeldWeakly (9.13). This profile admits no Symbol.for registry, so
- * every Symbol value is unregistered and may be held weakly.
+ * CanBeHeldWeakly (9.13). A registered Symbol is excluded because its key
+ * keeps it observable for the agent's lifetime, so only an unregistered
+ * Symbol, whose representative has no registry entry, may be held weakly.
  */
 static bool can_be_held_weakly(OseoValue value) {
-    return is_object(value) || is_symbol(value);
+    if (is_object(value)) return true;
+    return is_symbol(value) && symbol_object(value)->registry_entry == NULL;
 }
 
 static OseoValue argument_at(

@@ -115,6 +115,18 @@
 #define OSEO_SYMBOL_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_SYMBOL_CODE_ID_RANGE_INDEX)
 #define OSEO_SYMBOL_CONSTRUCT_CODE_ID OSEO_SYMBOL_CODE_ID_RANGE_LAST
+#define OSEO_SYMBOL_FOR_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_SYMBOL_KEY_FOR_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_SYMBOL_TO_STRING_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_SYMBOL_VALUE_OF_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_SYMBOL_TO_PRIMITIVE_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_SYMBOL_DESCRIPTION_GETTER_CODE_ID \
+    (OSEO_SYMBOL_CODE_ID_RANGE_LAST - 6u)
 
 #define OSEO_ITERATOR_CODE_ID_RANGE_INDEX ((size_t)3u)
 #define OSEO_ITERATOR_CODE_ID_RANGE_FIRST \
@@ -1063,6 +1075,12 @@ typedef struct {
     OseoHeapObject header;
     /* The description string, or undefined for a bare Symbol(). */
     OseoValue description;
+    /*
+     * Null for a unique or well-known symbol. A registered symbol points
+     * at its process-wide immutable registry entry; each realm keeps one
+     * rooted representative per entry in `registered_symbols`.
+     */
+    const void *registry_entry;
 } OseoSymbol;
 
 /*

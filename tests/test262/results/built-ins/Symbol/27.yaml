@@ -1,0 +1,56 @@
+group: built-ins/Symbol
+key: "27"
+results:
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/for/cross-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - symbols
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/prototype/toString/undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

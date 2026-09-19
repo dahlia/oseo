@@ -237,7 +237,8 @@ Ownership follows the plan's target layout:
     constructor and prototype pairs, typed runtime error creation, the
     shared `Error.prototype.toString`, and unhandled-throw rendering;
  -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol`
-    intrinsic, the well-known symbols, and descriptive symbol text;
+    intrinsic and `%Symbol.prototype%` methods, the well-known symbols, the
+    process-wide GlobalSymbolRegistry, and descriptive symbol text;
  -  *runtime\_iterator.c*: the synchronous iterator protocol
     (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
     first-class array iterator, its realm-owned prototype methods, and
@@ -1608,6 +1609,20 @@ locale inputs, and detach and shrink during the first callback or conversion,
 under both specialization policies with collection forced at every safepoint,
 a deliberate false-hint guard miss, and an independent model of every
 observation. The node reviews all 356 paths under its ten inventory roots.
+
+### Symbol prototype and registry evidence
+
+M5b node `symbol-intrinsic` completes *runtime\_symbol.c* with `Symbol.for`,
+`Symbol.keyFor`, and the `%Symbol.prototype%` methods, description getter,
+`Symbol.toPrimitive` method, and tag. The GlobalSymbolRegistry is a
+process-wide open-addressed hash table of immutable UTF-16 keys guarded by an
+atomic flag and never freed. `OseoContext` gains the `registered_symbols`
+open-addressed table of representatives keyed by registry entry, whose every
+slot the collector marks as a root, so each context keeps one Symbol per entry
+and symbol identity inside a context remains heap-pointer identity. The
+component takes six code IDs from the Symbol range and six intrinsic slots,
+adds no helper, heap kind, component, or generated-code entry point, and moves
+`abiVersion` to `m5-116`.
 
 ### Function prototype evidence
 

@@ -104,6 +104,7 @@ supportedFeatures:
   - Symbol.iterator
   - Symbol.match
   - Symbol.matchAll
+  - Symbol.prototype.description
   - Symbol.replace
   - Symbol.search
   - Symbol.species
@@ -11227,7 +11228,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, object-properties]
   - path: test/built-ins/BigInt/asIntN/bigint-tobigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/asIntN/bigint-tobigint-toprimitive.js
     expectedClassification: pass
@@ -11239,7 +11240,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive]
   - path: test/built-ins/BigInt/asIntN/bits-toindex-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/asIntN/bits-toindex-toprimitive.js
     expectedClassification: pass
@@ -11269,7 +11270,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, object-properties]
   - path: test/built-ins/BigInt/asUintN/bigint-tobigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/asUintN/bigint-tobigint-toprimitive.js
     expectedClassification: pass
@@ -11281,7 +11282,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive]
   - path: test/built-ins/BigInt/asUintN/bits-toindex-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/asUintN/bits-toindex-toprimitive.js
     expectedClassification: pass
@@ -11766,7 +11767,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getBigInt64/toindex-byteoffset-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getBigInt64/toindex-byteoffset-toprimitive.js
     expectedClassification: pass
@@ -11831,7 +11832,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getBigUint64/toindex-byteoffset-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, symbols]
   - path: test/built-ins/DataView/prototype/getBigUint64/toindex-byteoffset-toprimitive.js
     expectedClassification: pass
@@ -14690,7 +14691,7 @@ tests:
     expectedClassification: pass
     dependencies: [date, functions]
   - path: test/built-ins/Date/prototype/toJSON/to-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [date, symbols]
   - path: test/built-ins/Date/prototype/toJSON/to-primitive-abrupt.js
     expectedClassification: pass
@@ -20720,7 +20721,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/Target-Symbol.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-own-keys]
   - path: test/built-ins/Object/assign/Target-Undefined.js
     expectedClassification: pass
@@ -40934,7 +40935,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/indexOf/position-tointeger-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/indexOf/position-tointeger-toprimitive.js
     expectedClassification: pass
@@ -40949,7 +40950,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/indexOf/searchstring-tostring-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/indexOf/searchstring-tostring-toprimitive.js
     expectedClassification: pass
@@ -43477,7 +43478,40 @@ tests:
   - path: test/built-ins/Symbol/auto-boxing-strict.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/Symbol/constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
   - path: test/built-ins/Symbol/desc-to-string-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/desc-to-string.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/create-value.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/description.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/retrieve-value.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/for/to-string-err.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/hasInstance/cross-realm.js
@@ -43487,6 +43521,9 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/invoked-with-new.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/is-constructor.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/isConcatSpreadable/cross-realm.js
@@ -43499,6 +43536,30 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [symbols]
   - path: test/built-ins/Symbol/iterator/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/arg-non-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/arg-symbol-registry-hit.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/arg-symbol-registry-miss.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/keyFor/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/length.js
@@ -43517,6 +43578,114 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/not-callable.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/redefined-symbol-wrapper-ordinary-toprimitive.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/removed-symbol-wrapper-ordinary-toprimitive.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/this-val-obj-non-symbol-wrapper.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/this-val-obj-symbol-wrapper.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toPrimitive/this-val-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/description-symboldescriptivestring.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/descriptor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/get.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/is-not-own-property.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/this-val-non-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/this-val-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/description/wrapper.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/intrinsic.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/toString-default-attributes-non-strict.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/toString-default-attributes-strict.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/toString.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/toString/undefined.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/this-val-non-obj.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/this-val-obj-non-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/this-val-obj-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/prototype/valueOf/this-val-symbol.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/replace/cross-realm.js
@@ -43547,6 +43716,9 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [symbols]
   - path: test/built-ins/Symbol/split/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/symbol.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toPrimitive/cross-realm.js
@@ -49909,7 +50081,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/addition/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -52082,7 +52254,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions]
   - path: test/language/expressions/bitwise-and/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -52108,7 +52280,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/bitwise-or/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -52131,7 +52303,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/bitwise-xor/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -54011,7 +54183,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, error-intrinsics, expression-operators]
   - path: test/language/expressions/division/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -54096,7 +54268,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/exponentiation/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -54492,7 +54664,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/left-shift/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -54597,7 +54769,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/modulus/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -54623,7 +54795,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/multiplication/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -55885,7 +56057,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/right-shift/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -55955,7 +56127,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/subtraction/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,
@@ -56305,7 +56477,7 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, error-intrinsics, expression-operators]
   - path: test/language/expressions/unsigned-right-shift/bigint-errors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         bigint-primitive,

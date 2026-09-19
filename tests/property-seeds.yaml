@@ -480,3 +480,7 @@ families:
     owner: tests/property/m5-array-prototype-change-by-copy.property.test.ts
     start: 0x60007700
     end: 0x600077ff
+  - family: m5-symbol-intrinsic
+    owner: tests/property/m5-symbol-intrinsic.property.test.ts
+    start: 0x60007800
+    end: 0x600078ff
