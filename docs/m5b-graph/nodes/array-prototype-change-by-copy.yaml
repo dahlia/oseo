@@ -11,5 +11,5 @@ inventory:
     - test/built-ins/Array/prototype/with/
 dependencies:
   - array-prototype-copying
-landed: false
+landed: true
 status: ready
