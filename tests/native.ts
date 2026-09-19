@@ -84,6 +84,8 @@ const { arrayPrototypeIteratorFixtures } =
   await import("./native/fixtures/array-prototype-iterators.ts");
 const { arrayPrototypeMutationFixtures } =
   await import("./native/fixtures/array-prototype-mutation.ts");
+const { arrayPrototypeChangeByCopyFixtures } =
+  await import("./native/fixtures/array-prototype-change-by-copy.ts");
 const { arrayPrototypePredicateSearchFixtures } =
   await import("./native/fixtures/array-prototype-predicate-search.ts");
 const { arrayPrototypeSortFixtures } =
@@ -184,6 +186,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayBufferFixtures,
   ...arrayConstructorFixtures,
   ...arrayPrototypeCopyingFixtures,
+  ...arrayPrototypeChangeByCopyFixtures,
   ...arrayPrototypeIterativeFixtures,
   ...arrayPrototypeIndexSearchFixtures,
   ...arrayPrototypeIteratorFixtures,
@@ -812,6 +815,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "array-buffer" ||
     fixture.name === "array-prototype-copying" ||
+    fixture.name === "array-prototype-change-by-copy" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-index-search" ||
     fixture.name === "array-prototype-iterators" ||
@@ -1068,6 +1072,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-prototype-access" ||
     fixture.name === "string-prototype-case" ||
     fixture.name === "array-prototype-copying" ||
+    fixture.name === "array-prototype-change-by-copy" ||
     fixture.name === "array-prototype-iterative" ||
     fixture.name === "array-prototype-index-search" ||
     fixture.name === "array-prototype-iterators" ||
@@ -1172,6 +1177,7 @@ for (const fixture of selectedFixtures) {
           if (
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
+            fixture.name === "array-prototype-change-by-copy" ||
             fixture.name === "array-prototype-iterative" ||
             fixture.name === "array-prototype-index-search" ||
             fixture.name === "array-prototype-iterators" ||
@@ -1229,6 +1235,7 @@ for (const fixture of selectedFixtures) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
+                fixture.name === "array-prototype-change-by-copy" ||
                 fixture.name === "array-prototype-index-search" ||
                 fixture.name === "array-prototype-iterators" ||
                 fixture.name === "array-prototype-mutation" ||

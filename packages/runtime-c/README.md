@@ -942,6 +942,16 @@ empty field and share the Array stringification stack for re-entry. Nine code
 IDs are allocated inside the existing TypedArray range; no intrinsic slot,
 heap kind, public layout, or generated-code entry point is added.
 
+The `m5-115` ABI adds ordinary `with`, `toSpliced`, and `toReversed`
+functions to `%Array.prototype%`. Each converts its receiver, snapshots its
+array-like length, allocates a plain realm Array without reading `constructor`
+or `Symbol.species`, and copies retained indices with Get followed by
+CreateDataProperty. Holes become own `undefined` properties, inherited values
+are copied, and the original receiver is never written. `toReversed` reads in
+descending source order, `toSpliced` skips deleted entries, and `with` skips
+the replaced index. Three code IDs come from the existing Array range; the
+generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

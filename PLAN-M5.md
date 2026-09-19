@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-20,773 reviewed cases: 17,133 passes, 1,556 expected negatives, and 2,084
+20,841 reviewed cases: 17,198 passes, 1,556 expected negatives, and 2,087
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 129 indexed records in the normative
+M5a is complete. The 130 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,133 passes across 20,773 paths, and the property inventory records 151
-domains, 151 seeds, and an ordinary case budget of 5,731.
+17,198 passes across 20,841 paths, and the property inventory records 152
+domains, 152 seeds, and an ordinary case budget of 5,743.
 
 
 M5a implementation history
@@ -5857,6 +5857,52 @@ generated-code entry point, and does not change the graph's orchestration
 state. The reviewed test262 revision, applicable inventory, ADR 0013
 vocabulary, inventory policy, forced-collection policy, and zero-override
 policy are unchanged.
+
+Implemented M5b node `array-prototype-change-by-copy` adds ordinary `with`,
+`toSpliced`, and `toReversed` functions to the realm-owned
+`%Array.prototype%`. Each converts its receiver with ToObject and snapshots
+LengthOfArrayLike. `with` converts a relative index and throws a `RangeError`
+when the resolved position is outside that snapshot. `toSpliced`
+distinguishes absent start and delete-count arguments from explicit
+`undefined`, clamps the requested deletion, and rejects a result length above
+`2**53 - 1` before allocation.
+
+All three methods allocate a realm Array at their result length before reading
+any retained source element and never read `constructor` or `Symbol.species`.
+A result length above `2**32 - 1` therefore throws a `RangeError` before
+indexed access. `toSpliced` can accept a source length above that limit when
+deletion reduces the result length to the limit or below. Get reads every
+retained index and CreateDataProperty writes every result index, so a hole
+becomes an own `undefined` property and an inherited value is copied.
+`toReversed` reads in descending source order, `toSpliced` omits reads of the
+deleted range, and `with` omits the replaced-index read. The source is never
+written, and an Array subclass or generic receiver always produces a plain
+Array over `%Array.prototype%`.
+
+Fixed native and generated differential evidence at seed `0x60007700` covers
+all three methods over one through six sparse Array or ordinary array-like
+entries, inherited, primitive, and frozen receivers, negative and fractional
+indices, omitted and explicit splice arguments, clamped splice ranges, zero
+through three inserted values, snapshot
+mutation, observable conversion and read order, abrupt completion, plain-Array
+allocation, and range limits. Both specialization policies, forced collection
+at every safepoint, false hints, deliberate shape-guard misses, and compiled
+generic fallback are exercised. The generated family has a 12-case ordinary
+budget and an independent indexed-copy model.
+
+All 68 paths under the node's three inventory roots are reviewed: 65 pass and
+three retain the separately owned Boolean intrinsic prerequisite. No reviewed
+path outside the roots changes classification, and no reviewed path moves away
+from `pass`. The manifest moves from 20,773 to 20,841 paths and from 17,133 to
+17,198 passes, keeps 1,556 expected negatives, and moves from 2,084 to 2,087
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 151 to 152 domains and seeds and
+from 5,731 to 5,743 ordinary cases. The admitted runtime checkpoint moves the
+ABI to `oseo-runtime-m5-115`, allocates three code IDs inside the existing
+Array range, and adds no generated-code entry point, realm intrinsic slot, or
+graph-state change. The reviewed test262 revision, 41,091-path applicable
+inventory, ADR 0013 vocabulary, inventory policy, forced-collection policy,
+and zero-override policy are unchanged.
 
 Implemented M5b node `regexp-matcher-backend-probes` builds the five probes
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) delivery item 8 requires and records one

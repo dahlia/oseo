@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 129
+M5a is complete. The normative family records described below inventory 130
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 20,773 reviewed cases: 17,133 passes, 1,556
-expected negatives, and 2,084 unsupported profile features. It records no
+The current manifest contains 20,841 reviewed cases: 17,198 passes, 1,556
+expected negatives, and 2,087 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -7161,6 +7161,55 @@ classification vocabulary, forced-collection policy, and zero-override policy
 are unchanged. The new component, four heap kinds, and the public KeptAlive
 fields move the runtime ABI to `oseo-runtime-m5-113` without changing the
 graph's orchestration state.
+
+
+Array prototype change by copy
+------------------------------
+
+M5b node `array-prototype-change-by-copy` adds ordinary `with`, `toSpliced`,
+and `toReversed` functions to the realm-owned `%Array.prototype%`. Each first
+applies ToObject and snapshots LengthOfArrayLike. `with` converts its relative
+index and throws a `RangeError` when the resolved position is outside that
+snapshot. `toSpliced` distinguishes an absent start, an absent delete count,
+and an explicit `undefined` delete count, clamps the supplied values, and
+rejects a result length above `2**53 - 1` before allocation.
+
+All three methods allocate a realm Array at their result length before reading
+any retained source element. A result length above `2**32 - 1` therefore
+throws a `RangeError` without an indexed read. `toSpliced` can accept a source
+length above that limit when deletion reduces the result length to the limit
+or below. They use Get for every retained index and CreateDataProperty on the
+result, so holes become own `undefined` properties and inherited values are
+copied. `toReversed` reads from the last index to the first. `toSpliced` does
+not read deleted entries and inserts its argument values between ascending
+prefix and suffix reads. `with` does not read the replaced index. The source
+is never written. None reads `constructor` or `Symbol.species`, so an Array
+subclass or generic receiver still produces a plain Array with
+`%Array.prototype%`.
+
+Fixed native and generated differential evidence at property seed
+`0x60007700` covers all three methods over one through six sparse Array or
+ordinary array-like entries, inherited and primitive receivers, negative and
+fractional indices, omitted and explicit splice arguments, clamped splice
+ranges, zero through three inserted values,
+plain-Array allocation, snapshot mutation, read and coercion order, abrupt
+completion, frozen sources, and range limits. Both specialization policies,
+collection forced at every safepoint, false hints, deliberate shape-guard
+misses, and compiled generic fallback are exercised. The generated family has
+a 12-case ordinary budget and an independent indexed-copy model.
+
+All 68 paths under the node's three inventory roots are reviewed: 65 pass and
+three retain the separately owned Boolean intrinsic prerequisite. No reviewed
+path outside the roots changes classification, and no reviewed path moves away
+from `pass`. The manifest moves from 20,773 to 20,841 paths and from 17,133 to
+17,198 passes, keeps 1,556 expected negatives, and moves from 2,084 to 2,087
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 151 to 152 domains and seeds and
+from 5,731 to 5,743 ordinary cases. The runtime ABI moves to
+`oseo-runtime-m5-115`, allocates three internal code IDs in the existing Array
+range, and adds no generated-code entry point or realm intrinsic slot. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary,
+forced-collection policy, and zero-override policy are unchanged.
 
 
 Known gaps inside the claim
