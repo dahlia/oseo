@@ -8661,6 +8661,57 @@ tests:
   - path: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/frozen-this-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/get-descending-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/holes-not-preserved.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/ignores-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/toReversed/immutable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length-casted-to-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length-decreased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length-exceeding-array-length-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length-increased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length-tolength.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/this-value-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/this-value-nullish.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toReversed/zero-or-one-element.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toSorted/comparefn-called-after-get-elements.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -8722,6 +8773,96 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toSorted/zero-or-one-element.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/deleteCount-clamped-between-zero-and-remaining-count.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/deleteCount-missing.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/deleteCount-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/discarded-element-not-read.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/elements-read-in-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/frozen-this-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/holes-not-preserved.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/ignores-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/toSpliced/immutable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-casted-to-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-clamped-to-2pow53minus1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-decreased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-exceeding-array-length-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-increased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length-tolength.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/mutate-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-and-deleteCount-missing.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-and-deleteCount-undefineds.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-bigger-than-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-neg-infinity-is-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-neg-less-than-minus-length-is-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-neg-subtracted-from-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/start-undefined-and-deleteCount-missing.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/this-value-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/this-value-nullish.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toSpliced/unmodified.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toString/S15.4.4.2_A1_T1.js
@@ -8859,6 +9000,69 @@ tests:
   - path: test/built-ins/Array/prototype/values/this-val-non-obj-coercible.js
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/with/frozen-this-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/holes-not-preserved.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/ignores-species.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols]
+  - path: test/built-ins/Array/prototype/with/immutable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/index-bigger-or-eq-than-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/index-casted-to-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/index-negative.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/index-smaller-than-minus-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/index-throw-completion.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/length-decreased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/length-exceeding-array-length-limit.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/length-increased-while-iterating.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/length-tolength.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/negative-fractional-index-truncated-to-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/no-get-replaced-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/this-value-boolean.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/with/this-value-nullish.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/ArrayBuffer/Symbol.species/length.js
     expectedClassification: pass
     dependencies: [array-buffer]

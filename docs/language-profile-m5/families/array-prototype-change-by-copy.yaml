@@ -1,0 +1,61 @@
+version: 1
+id: array-prototype-change-by-copy
+title: "Array prototype change by copy"
+scope:
+  - "Array.prototype with, toSpliced, and toReversed, including receiver and
+    length conversion, relative-index and splice-argument coercion, immutable
+    source handling, omitted and explicit splice arguments, dense copies of
+    sparse or inherited values, snapshot length with observable indexed reads,
+    abrupt completion, and plain-Array allocation that never consults
+    constructor or Symbol.species."
+  - "Reviewed standards coverage is all 68 upstream paths under
+    test/built-ins/Array/prototype/toReversed/,
+    test/built-ins/Array/prototype/toSpliced/, and
+    test/built-ins/Array/prototype/with/: 65 pass and three retain the
+    separately owned Boolean intrinsic prerequisite."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-change-by-copy.ts
+      - tests/property/m5-array-prototype-change-by-copy.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-prototype-change-by-copy.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-change-by-copy.ts
+      - tests/property/m5-array-prototype-change-by-copy.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-array-prototype-change-by-copy.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-change-by-copy.ts
+      - tests/property/m5-array-prototype-change-by-copy.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/array-prototype-change-by-copy.ts
+      - tests/property/m5-array-prototype-change-by-copy.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_array.c
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

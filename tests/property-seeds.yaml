@@ -476,3 +476,7 @@ families:
     owner: tests/property/m5-typed-array-search-and-join.property.test.ts
     start: 0x60007600
     end: 0x600076ff
+  - family: m5-array-prototype-change-by-copy
+    owner: tests/property/m5-array-prototype-change-by-copy.property.test.ts
+    start: 0x60007700
+    end: 0x600077ff

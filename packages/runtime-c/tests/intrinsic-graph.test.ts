@@ -453,6 +453,38 @@ test("populates Array mutation methods with hole-preserving moves", () => {
   );
 });
 
+test("populates Array change-by-copy methods with plain allocation", () => {
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = arraySource.indexOf(opening, arraySource.indexOf("{"));
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = arraySource.indexOf("\nstatic ", begin + opening.length);
+    return arraySource.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["toReversed", "toSpliced", "with"]) {
+    assert.match(arraySource, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["TO_REVERSED", "TO_SPLICED", "WITH"]) {
+    assert.match(internalHeader, new RegExp(`OSEO_ARRAY_${code}_CODE_ID`, "u"));
+  }
+
+  for (const name of ["array_to_reversed", "array_to_spliced", "array_with"]) {
+    const method = definition(name);
+    assert.match(method, /oseo_internal_to_object/u);
+    assert.match(method, /array_like_length/u);
+    assert.match(method, /oseo_array_create/u);
+    assert.match(method, /create_index_property/u);
+    assert.doesNotMatch(method, /array_species_create/u);
+    assert.doesNotMatch(method, /oseo_object_set/u);
+  }
+  assert.match(definition("array_to_reversed"), /length - index - 1\.0/u);
+  assert.match(definition("array_to_spliced"), /actual_start \+ delete_count/u);
+  assert.match(definition("array_with"), /index != actual_index/u);
+});
+
 test("orders Object.defineProperty conversion before descriptors", () => {
   const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
 

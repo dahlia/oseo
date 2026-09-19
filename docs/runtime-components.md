@@ -1268,6 +1268,28 @@ component, internal helper, generated header asset, or generated-code entry
 point, leaves the fixed specialization allocation count at 47, and moves
 `abiVersion` to `m5-105`.
 
+M5b node `array-prototype-change-by-copy` remains in *runtime\_array.c*. It
+adds `with`, `toSpliced`, and `toReversed` to the materialized
+`%Array.prototype%`. The methods reuse the component's ordinary property
+operations, array-like length conversion, realm Array allocator, and collector
+roots, but deliberately do not call its ArraySpeciesCreate helper.
+
+Each method snapshots the receiver length before it allocates a plain Array.
+Indexed reads use Get and result writes use CreateDataProperty, so holes become
+own `undefined` values and inherited values are copied. `toReversed` reads in
+descending source order, `toSpliced` skips deleted entries, and `with` skips
+the replaced entry. Receiver, arguments, current values, and result stay
+rooted across every conversion, allocation, and property read.
+
+Fixed and generated native differential evidence covers generic, sparse,
+inherited, primitive, and frozen receivers, plain-Array allocation, length and
+index coercion, mutation during reads, abrupt completion, both specialization
+policies, false hints, deliberate guard hits and misses, generic fallback, and
+collection at every safepoint. The node adds no component, generated-code
+entry point, or realm intrinsic slot, leaves the fixed specialization
+allocation count at 65, allocates three code IDs in the existing Array range,
+and moves `abiVersion` to `m5-115`.
+
 ### Lazy iterator helper evidence
 
 M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
