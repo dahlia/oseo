@@ -6,7 +6,10 @@ scope:
     Symbol prototype's constructor, toString, valueOf, description accessor,
     Symbol.toPrimitive method, and Symbol.toStringTag value, including their
     names, lengths, constructibility, descriptors, receiver checks, wrapper
-    handling, and observable identities."
+    handling, and observable identities. A build of the cluster that fails
+    partway keeps the well-known symbols it already created, so a retry
+    answers the identity the %Function.prototype% Symbol.hasInstance key
+    already holds."
   - "The process-wide GlobalSymbolRegistry shared by independently
     initialized runtime contexts. Registry keys are immutable UTF-16
     sequences that live for the process; each context keeps one
@@ -15,8 +18,11 @@ scope:
     equality, SameValue, SameValueZero, property keys, and Map and Set keys
     treat two contexts' representatives of one entry as one symbol, while a
     property key, a Map key, and a Set element are always the storing
-    context's own representative, so no context traces another context's heap
-    and destroying one context never invalidates a stored key.
+    context's own representative, so no context's heap holds a value another
+    context owns and destroying one context never invalidates a stored key.
+    A context does trace a representative another context owns while its own
+    roots hold one, so destruction drops every mark its heap carries before
+    the final sweep and frees the whole heap.
     Symbol.keyFor returns a context-local copy
     of the shared key and returns undefined for unique and well-known
     symbols. A registered symbol is the one symbol CanBeHeldWeakly refuses,

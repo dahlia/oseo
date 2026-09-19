@@ -885,7 +885,12 @@ current evidence assessment. Those live only in the indexed records above.
     `Symbol.split`, `Symbol.toPrimitive`, `Symbol.toStringTag`, and
     `Symbol.unscopables`. Each property has a stable identity, is distinct
     from every other entry, has the description `Symbol.<name>`, and is
-    non-writable, non-enumerable, and non-configurable. The generated property
+    non-writable, non-enumerable, and non-configurable. A build of the
+    intrinsic that fails partway keeps the well-known symbols it already
+    created, because materializing the constructor materializes
+    `%Function.prototype%`, which keys its `[Symbol.hasInstance]` method by
+    the symbol of that moment, so a retry answers the identity that key
+    already holds. The generated property
     suite uses seed `0x60003000`, an independent table oracle, both
     specialization policies, and forced collection. `Symbol.toPrimitive`
     methods participate in generic `ToPrimitive`. Deliberate boundaries:
@@ -917,7 +922,11 @@ current evidence assessment. Those live only in the indexed records above.
     A property key, a Map key, and a Set element are always the storing
     context's own representative, whichever representative created them, so
     no context's heap holds a value another context owns and destroying one
-    context never invalidates a key another context stored. The test262
+    context never invalidates a key another context stored. A context still
+    traces a representative another context owns while its own roots hold
+    one as an argument, so destruction drops every mark the heap carries
+    before its final sweep: a mark belongs to the collection that set it and
+    never outlives the heap it was set on. The test262
     `$262.createRealm` harness remains unavailable, so reviewed cases that
     compare symbols across realms retain that explicit harness boundary.
     `Symbol.hasInstance` dispatch in `instanceof` remains outside this unit. A

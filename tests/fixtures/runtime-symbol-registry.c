@@ -9,7 +9,10 @@
  * context resolves one key to one process-wide entry, keeps one rooted
  * representative per entry, and never loses an entry when another context
  * is destroyed. The entry pointer is private to the runtime, so this fixture
- * includes the internal header to observe it directly.
+ * includes the internal header to observe it directly. The same header makes
+ * the heap list and the well-known symbol table observable, which is what
+ * lets this fixture also cover the two identity rules that only a failed
+ * build or a destroyed context can break.
  */
 
 static OseoValue require_normal(OseoResult result) {
@@ -123,6 +126,7 @@ static void test_shared_entries_across_contexts(void) {
     const void *shared_entry = entry_of(right_roots.slots[3]);
     oseo_roots_release(&left, &left_roots);
     oseo_context_destroy(&left);
+    assert(left.objects == NULL);
     oseo_collect(&right);
     right_roots.slots[6] =
         register_units(&right, right_roots.slots, shared, 6u);
@@ -150,9 +154,11 @@ static void test_shared_entries_across_contexts(void) {
     assert(entry_of(late_roots.slots[3]) == shared_entry);
     oseo_roots_release(&late, &late_roots);
     oseo_context_destroy(&late);
+    assert(late.objects == NULL);
 
     oseo_roots_release(&right, &right_roots);
     oseo_context_destroy(&right);
+    assert(right.objects == NULL);
 }
 
 /*
@@ -195,6 +201,7 @@ static void test_growth_preserves_identity(void) {
     assert(context.registered_symbol_count == KEY_COUNT);
     oseo_roots_release(&context, &roots);
     oseo_context_destroy(&context);
+    assert(context.objects == NULL);
 }
 
 /* Calls `receiver[name](...arguments)`. The caller roots every argument. */
@@ -259,12 +266,13 @@ static void assert_boolean(OseoResult result, bool expected) {
  * A registered representative is the one value this fixture hands across.
  * It and its description never change and its own context roots it for
  * that context's lifetime, so the receiving context can compare it, and
- * can mark it while it is an argument, without ever freeing it or hiding
- * a later mutation from its owner. Nothing the receiving context keeps
- * points across the boundary: a property key, a Map key, and a Set element
- * are the receiving context's own representative whether a local or a
- * foreign representative created them, so no collector reaches the other
- * heap and destroying the originating context leaves them intact.
+ * can mark it while it is an argument, without ever freeing it, hiding
+ * a later mutation from its owner, or leaving a mark that outlives it.
+ * Nothing the receiving context keeps points across the boundary: a
+ * property key, a Map key, and a Set element are the receiving context's
+ * own representative whether a local or a foreign representative created
+ * them, so no collector reaches the other heap through stored state and
+ * destroying the originating context leaves them intact.
  */
 static void test_identity_across_contexts(void) {
     static const uint16_t shared[] = {'c', 'r', 'o', 's', 's'};
@@ -514,6 +522,7 @@ static void test_identity_across_contexts(void) {
      */
     oseo_roots_release(&left, &left_roots);
     oseo_context_destroy(&left);
+    assert(left.objects == NULL);
     oseo_collect(&right);
     assert(oseo_internal_same_value(
         require_normal(
@@ -539,11 +548,168 @@ static void test_identity_across_contexts(void) {
 
     oseo_roots_release(&right, &right_roots);
     oseo_context_destroy(&right);
+    assert(right.objects == NULL);
+}
+
+/*
+ * A Symbol build that fails partway keeps the well-known symbols it has
+ * already created. Creating the constructor materializes
+ * %Function.prototype%, which keys its `[Symbol.hasInstance]` method by the
+ * well-known symbol of that moment, and no later build can rewrite that
+ * key, so a retry that created a fresh symbol would leave the method
+ * unreachable through `Symbol.hasInstance` for the rest of the context's
+ * life. Every allocation the build makes is a failure point, so this sweeps
+ * all of them rather than choosing one.
+ */
+static void test_failed_build_retry_keeps_symbol_identity(void) {
+    size_t failures = 0u;
+    bool completed = false;
+    for (size_t attempt = 1u; attempt <= 4096u && !completed; attempt += 1u) {
+        OseoContext context;
+        OseoRootFrame roots = {NULL, NULL, 0u};
+        init_context(&context, "symbol-intrinsic-retry");
+        (void)require_normal(oseo_roots_allocate(&context, &roots, 4u));
+        oseo_context_fail_allocation_at(&context, attempt);
+        OseoResult first = oseo_symbol_intrinsic(&context);
+        oseo_context_fail_allocation_at(&context, 0u);
+        context.has_diagnostic = false;
+        context.error_code = NULL;
+        context.error_message = NULL;
+        if (first.status == OSEO_STATUS_NORMAL) {
+            completed = true;
+        } else {
+            assert(first.status == OSEO_STATUS_THROW);
+            assert(first.value == oseo_undefined());
+            failures += 1u;
+        }
+
+        /*
+         * The retry answers one intrinsic graph, and its
+         * `Symbol.hasInstance` is still the key %Function.prototype% holds,
+         * whether the attempt that failed defined that method or a later
+         * materialization did.
+         */
+        roots.slots[0] = require_normal(oseo_symbol_intrinsic(&context));
+        roots.slots[1] = require_normal(
+            oseo_intrinsic(&context, OSEO_INTRINSIC_FUNCTION_PROTOTYPE)
+        );
+        roots.slots[2] = require_normal(oseo_internal_well_known_symbol(
+            &context,
+            OSEO_WELL_KNOWN_HAS_INSTANCE
+        ));
+        roots.slots[3] = require_normal(
+            oseo_object_get(&context, roots.slots[1], roots.slots[2])
+        );
+        assert(roots.slots[3] == require_normal(
+            oseo_intrinsic(&context, OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE)
+        ));
+
+        /* The constructor exposes that same symbol, not another one. */
+        roots.slots[1] = require_normal(
+            oseo_internal_ascii_string(&context, "hasInstance")
+        );
+        assert(require_normal(
+            oseo_object_get(&context, roots.slots[0], roots.slots[1])
+        ) == roots.slots[2]);
+        oseo_roots_release(&context, &roots);
+        oseo_context_destroy(&context);
+        assert(context.objects == NULL);
+    }
+    assert(failures > 0u);
+    assert(completed);
+}
+
+/*
+ * A receiving context traces every value its roots hold, including a
+ * representative another context owns and created, and the mark it leaves
+ * belongs to a heap it never sweeps. The owning context therefore drops
+ * every mark before its own last sweep, so destroying it frees the
+ * representative and its description whatever another context marked.
+ */
+static void test_foreign_representative_leaves_no_mark(void) {
+    static const uint16_t shared[] = {'m', 'a', 'r', 'k', 'e', 'd'};
+    OseoContext origin;
+    OseoContext receiver;
+    OseoRootFrame origin_roots = {NULL, NULL, 0u};
+    OseoRootFrame receiver_roots = {NULL, NULL, 0u};
+    init_context(&origin, "symbol-mark-origin");
+    init_context(&receiver, "symbol-mark-receiver");
+    (void)require_normal(oseo_roots_allocate(&origin, &origin_roots, 4u));
+    (void)require_normal(oseo_roots_allocate(&receiver, &receiver_roots, 8u));
+
+    origin_roots.slots[3] =
+        register_units(&origin, origin_roots.slots, shared, 6u);
+    receiver_roots.slots[3] =
+        require_normal(oseo_object_create(&receiver, oseo_null()));
+    receiver_roots.slots[4] =
+        construct_intrinsic(&receiver, OSEO_INTRINSIC_MAP);
+
+    /*
+     * The foreign representative is an argument the receiving context
+     * roots, and localizing it allocates, so this collection is the one a
+     * safepoint inside that localization takes anyway.
+     */
+    receiver_roots.slots[5] = origin_roots.slots[3];
+    oseo_collect(&receiver);
+    (void)require_normal(oseo_object_set(
+        &receiver,
+        receiver_roots.slots[3],
+        receiver_roots.slots[5],
+        oseo_number(1.0),
+        true
+    ));
+    receiver_roots.slots[6] = receiver_roots.slots[5];
+    receiver_roots.slots[7] = oseo_number(2.0);
+    (void)call_method(
+        &receiver,
+        receiver_roots.slots[4],
+        "set",
+        2u,
+        &receiver_roots.slots[6]
+    );
+    oseo_collect(&receiver);
+
+    /* Both stores kept the receiving context's own representative. */
+    OseoValue local = require_normal(
+        oseo_internal_local_symbol(&receiver, origin_roots.slots[3])
+    );
+    assert(local != origin_roots.slots[3]);
+    assert(ordinary_object(receiver_roots.slots[3])->properties[0].key ==
+        local);
+    assert(map_object(receiver_roots.slots[4])->entries[0].key == local);
+    receiver_roots.slots[5] = oseo_undefined();
+    receiver_roots.slots[6] = oseo_undefined();
+
+    /* The owning context frees its whole heap, marks and all. */
+    oseo_roots_release(&origin, &origin_roots);
+    oseo_context_destroy(&origin);
+    assert(origin.objects == NULL);
+
+    oseo_collect(&receiver);
+    assert(oseo_internal_same_value(
+        require_normal(
+            oseo_object_get(&receiver, receiver_roots.slots[3], local)
+        ),
+        oseo_number(1.0)
+    ));
+    receiver_roots.slots[5] = local;
+    assert(call_method(
+        &receiver,
+        receiver_roots.slots[4],
+        "has",
+        1u,
+        &receiver_roots.slots[5]
+    ) == oseo_boolean(true));
+    oseo_roots_release(&receiver, &receiver_roots);
+    oseo_context_destroy(&receiver);
+    assert(receiver.objects == NULL);
 }
 
 int main(void) {
     test_shared_entries_across_contexts();
     test_identity_across_contexts();
     test_growth_preserves_identity();
+    test_failed_build_retry_keeps_symbol_identity();
+    test_foreign_representative_leaves_no_mark();
     return 0;
 }

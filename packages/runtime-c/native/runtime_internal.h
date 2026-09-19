@@ -2954,6 +2954,14 @@ OseoResult oseo_internal_typed_array_iteration_length(
     double *length
 );
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
+/*
+ * Clears the collector mark on every object this context still owns. A
+ * context that roots a value another context owns marks that value during
+ * its own collection, and only the owning heap's sweep clears such a mark,
+ * so the owner drops every mark before its last sweep rather than leaving
+ * a foreign mark to keep an object alive after the context is gone.
+ */
+void oseo_internal_clear_heap_marks(OseoContext *context);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
     OseoValue callee,
@@ -4054,7 +4062,10 @@ OseoResult oseo_internal_object_define_data(
  * Every operation that stores a symbol in an identity position, a property
  * key, a Map key, or a Set element, stores this value, so a context's heap
  * holds only values that context owns and no collector ever reaches
- * another context's heap. `same_registered_symbol` still decides identity,
+ * another context's heap through stored state. A foreign representative
+ * this context roots as an argument is still traced, and only the owning
+ * heap's sweep clears the mark, so a context drops every mark its heap
+ * carries before its final sweep. `same_registered_symbol` decides identity,
  * so a stored key resolves whichever representative a lookup presents. The
  * result is rooted by `registered_symbols`, so a caller may hold it across
  * a later safepoint without rooting it.

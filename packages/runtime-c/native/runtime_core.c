@@ -194,6 +194,13 @@ void oseo_context_destroy(OseoContext *context) {
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    /*
+     * A mark another context set while it rooted one of this context's
+     * values is still set here, and no sweep of that context ever clears
+     * it, so it has to go before the sweep that decides what this last
+     * collection frees.
+     */
+    oseo_internal_clear_heap_marks(context);
     oseo_collect(context);
     oseo_internal_clock_destroy(context);
 }

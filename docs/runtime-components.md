@@ -375,7 +375,7 @@ one.
 
 ### Internal helpers
 
-Two hundred and seven helpers cross a
+Two hundred and eight helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -411,6 +411,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_json_global`                 | *runtime\_json.c*             |
 | `oseo_internal_install_object_global`               | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
+| `oseo_internal_clear_heap_marks`                    | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_table_create`              | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_set`                       | *runtime\_memory.c*           |
 | `oseo_internal_ephemeron_get`                       | *runtime\_memory.c*           |
@@ -1634,10 +1635,20 @@ the storage side of the same rule: the property append paths in
 *runtime\_map.c*, and `set_append` in *runtime\_set.c* replace a registered
 symbol with the receiving context's own representative before they store it,
 so a heap holds only values its own context owns, no collector reaches another
-context's heap, and a stored key outlives the context that first registered
-it. The component takes six code IDs from the Symbol range and six intrinsic
-slots, adds one internal helper and no heap kind, component, or
-generated-code entry point, and moves `abiVersion` to `m5-116`.
+context's heap through stored state, and a stored key outlives the context
+that first registered it. A receiving context does still trace a foreign
+representative while its own roots hold one as an argument, and only the owning
+heap's own sweep clears a mark on that heap, so `oseo_context_destroy` drops
+every mark through `oseo_internal_clear_heap_marks` before its final collection
+and frees the whole heap whatever another context marked. A build of the
+cluster that fails partway keeps the well-known symbols it already created,
+because materializing the constructor materializes `%Function.prototype%`,
+whose `[Symbol.hasInstance]` key no later build can rewrite; a retry reuses
+those symbols and creates only the ones still missing. The component takes six
+code IDs from the Symbol range and six intrinsic slots, adds one internal
+helper of its own and one collector helper in *runtime\_memory.c*, and no heap
+kind, component, or generated-code entry point, and moves `abiVersion` to
+`m5-116`.
 
 ### Function prototype evidence
 

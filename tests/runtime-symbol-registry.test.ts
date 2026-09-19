@@ -48,7 +48,7 @@ function run(
 }
 
 test(
-  "shares the GlobalSymbolRegistry across contexts on the host-native target",
+  "keeps symbol identity across contexts and failed builds natively",
   {
     skip: zigNativeTarget == null ? "requires a supported native host" : false,
   },

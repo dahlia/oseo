@@ -581,6 +581,23 @@ static void destroy_heap_object(OseoHeapObject *object) {
     free(object);
 }
 
+/*
+ * Drops every mark this heap carries. A mark belongs to one collection of
+ * one context, but a context that holds a value another context owns in
+ * its roots marks that value while collecting, and only the owning
+ * context's sweep clears a mark on its own heap. Such a mark therefore
+ * survives until this heap sweeps again, which the final sweep of a
+ * destroyed context never does: the object would stay linked with nothing
+ * left to free it. Clearing the marks first makes that sweep unconditional.
+ */
+void oseo_internal_clear_heap_marks(OseoContext *context) {
+    for (OseoHeapObject *object = context->objects;
+         object != NULL;
+         object = object->next) {
+        object->marked = false;
+    }
+}
+
 void oseo_collect(OseoContext *context) {
     if (context->observe_specialization) context->collections += 1u;
     OseoHeapObject *worklist = NULL;

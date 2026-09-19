@@ -13,7 +13,10 @@
  * rule applies, while `oseo_internal_local_symbol` replaces a registered
  * symbol with the storing realm's own representative before a property key,
  * a Map key, or a Set element keeps it. A realm's heap therefore holds only
- * values it owns and no collector ever traces another realm's heap. Entries
+ * values it owns, and no collector traces another realm's heap through
+ * stored state; a foreign representative is traced only while this realm's
+ * roots hold it as an argument, and `oseo_internal_clear_heap_marks` keeps
+ * such a mark from outliving the realm that owns the value. Entries
  * are never removed because a registered key stays observable for the
  * agent's lifetime.
  */
@@ -658,6 +661,16 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
          result.status == OSEO_STATUS_NORMAL &&
              index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
+        /*
+         * A failed build leaves the symbols it created in place, and an
+         * intrinsic materialized under it may already key a method by one
+         * of them, so a retry reuses an identity that is already
+         * observable rather than replacing it.
+         */
+        if (tag_of(context->well_known_symbols[index]) !=
+            OSEO_TAG_UNDEFINED) {
+            continue;
+        }
         const char *description = well_known_descriptions[index];
         size_t description_length = strlen(description);
         uint16_t units[32];
@@ -857,11 +870,16 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
              intrinsic += 1u) {
             context->intrinsics[intrinsic] = oseo_undefined();
         }
-        for (size_t index = 0u;
-             index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
-             index += 1u) {
-            context->well_known_symbols[index] = oseo_undefined();
-        }
+        /*
+         * The well-known symbols stay. Creating the constructor
+         * materializes %Function.prototype%, which keys its
+         * `[Symbol.hasInstance]` method by the symbol this build created,
+         * and that key cannot be rewritten, so replacing the symbol would
+         * leave the method unreachable through `Symbol.hasInstance`. They
+         * are edition-fixed values that no part of this cluster owns,
+         * and `oseo_internal_well_known_symbol` answers them without a
+         * constructor, so keeping them costs the retry nothing.
+         */
     }
     oseo_roots_release(context, &frame);
     return result;
