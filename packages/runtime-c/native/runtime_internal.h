@@ -1078,7 +1078,9 @@ typedef struct {
     /*
      * Null for a unique or well-known symbol. A registered symbol points
      * at its process-wide immutable registry entry; each realm keeps one
-     * rooted representative per entry in `registered_symbols`.
+     * rooted representative per entry in `registered_symbols`. The entry
+     * is what symbol identity compares, so this field is the only thing
+     * that joins two realms' representatives of one registered symbol.
      */
     const void *registry_entry;
 } OseoSymbol;
@@ -2214,6 +2216,26 @@ static inline bool is_cell(OseoValue value) {
 static inline bool is_symbol(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_SYMBOL;
+}
+/*
+ * True when left and right are two distinct heap values that represent one
+ * GlobalSymbolRegistry entry. The registry is process-wide while each
+ * context roots its own representative per entry, so a representative that
+ * crosses a context boundary is a distinct heap value naming the same
+ * registered symbol. Every symbol identity rule, strict and loose equality,
+ * SameValue, SameValueZero, and property-key equality among them, consults
+ * this after its ordinary pointer test fails. Comparing entry pointers keeps
+ * identity exact without any context reading or tracing another context's
+ * heap. A unique or well-known symbol has no entry and so never matches one.
+ * `oseo_internal_local_symbol` covers the storing side of the same rule.
+ */
+static inline bool same_registered_symbol(
+    OseoValue left,
+    OseoValue right
+) {
+    if (!is_symbol(left) || !is_symbol(right)) return false;
+    const void *entry = symbol_object(left)->registry_entry;
+    return entry != NULL && entry == symbol_object(right)->registry_entry;
 }
 static inline bool is_private_name(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -4022,6 +4044,22 @@ OseoResult oseo_internal_object_define_data(
     OseoPropertyAttributes attributes,
     bool has_value
 );
+/*
+ * The representative of `value` this context owns. A non-symbol, a unique
+ * or well-known symbol, and a representative this context already holds
+ * answer themselves; a registered representative another context created
+ * answers this context's own representative of the same registry entry,
+ * created here from the shared key when this context has not seen it.
+ *
+ * Every operation that stores a symbol in an identity position, a property
+ * key, a Map key, or a Set element, stores this value, so a context's heap
+ * holds only values that context owns and no collector ever reaches
+ * another context's heap. `same_registered_symbol` still decides identity,
+ * so a stored key resolves whichever representative a lookup presents. The
+ * result is rooted by `registered_symbols`, so a caller may hold it across
+ * a later safepoint without rooting it.
+ */
+OseoResult oseo_internal_local_symbol(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_symbol_create(
     OseoContext *context,
     OseoValue description

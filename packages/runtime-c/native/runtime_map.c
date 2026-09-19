@@ -78,7 +78,13 @@ static OseoResult map_append_entry(
     OseoValue slots[3] = {map_value, key, value};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    OseoResult result = map_grow_entries(context, slots[0]);
+    /* A record stores this realm's own representative of a registered
+     * symbol, so [[MapData]] never holds a value another realm owns. */
+    OseoResult result = oseo_internal_local_symbol(context, slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = map_grow_entries(context, slots[0]);
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoMap *map = map_object(slots[0]);
         map->entries[map->entry_count].key = slots[1];

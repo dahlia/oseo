@@ -197,8 +197,353 @@ static void test_growth_preserves_identity(void) {
     oseo_context_destroy(&context);
 }
 
+/* Calls `receiver[name](...arguments)`. The caller roots every argument. */
+static OseoValue call_method(
+    OseoContext *context,
+    OseoValue receiver,
+    const char *name,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    slots[1] = require_normal(oseo_internal_ascii_string(context, name));
+    slots[1] = require_normal(oseo_object_get(context, slots[0], slots[1]));
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        argument_count,
+        arguments,
+        oseo_undefined()
+    );
+    oseo_roots_pop(context, &frame);
+    return require_normal(result);
+}
+
+/* `new Intrinsic()` for an argumentless collection constructor. */
+static OseoValue construct_intrinsic(
+    OseoContext *context,
+    OseoIntrinsic intrinsic
+) {
+    OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    slots[0] = require_normal(oseo_intrinsic(context, intrinsic));
+    slots[1] = require_normal(oseo_function_prototype(context, slots[0]));
+    slots[1] = require_normal(oseo_constructor_receiver(context, slots[1]));
+    OseoValue returned = require_normal(oseo_call_function(
+        context,
+        slots[0],
+        slots[1],
+        0u,
+        NULL,
+        slots[0]
+    ));
+    OseoResult result = oseo_constructor_result(context, returned, slots[1]);
+    oseo_roots_pop(context, &frame);
+    return require_normal(result);
+}
+
+static void assert_boolean(OseoResult result, bool expected) {
+    assert(require_normal(result) == oseo_boolean(expected));
+}
+
+/*
+ * Identity across a context boundary. The registry entry, not the heap
+ * pointer, is what makes two representatives one registered symbol, so
+ * every identity rule a context applies to a representative another
+ * context created has to answer the way it answers for its own.
+ *
+ * A registered representative is the one value this fixture hands across.
+ * It and its description never change and its own context roots it for
+ * that context's lifetime, so the receiving context can compare it, and
+ * can mark it while it is an argument, without ever freeing it or hiding
+ * a later mutation from its owner. Nothing the receiving context keeps
+ * points across the boundary: a property key, a Map key, and a Set element
+ * are the receiving context's own representative whether a local or a
+ * foreign representative created them, so no collector reaches the other
+ * heap and destroying the originating context leaves them intact.
+ */
+static void test_identity_across_contexts(void) {
+    static const uint16_t shared[] = {'c', 'r', 'o', 's', 's'};
+    static const uint16_t apart[] = {'a', 'p', 'a', 'r', 't'};
+    static const uint16_t unseen[] = {'u', 'n', 's', 'e', 'e', 'n'};
+    OseoContext left;
+    OseoContext right;
+    OseoRootFrame left_roots = {NULL, NULL, 0u};
+    OseoRootFrame right_roots = {NULL, NULL, 0u};
+    init_context(&left, "symbol-identity-left");
+    init_context(&right, "symbol-identity-right");
+    (void)require_normal(oseo_roots_allocate(&left, &left_roots, 8u));
+    (void)require_normal(oseo_roots_allocate(&right, &right_roots, 16u));
+
+    left_roots.slots[3] = register_units(&left, left_roots.slots, shared, 5u);
+    right_roots.slots[3] =
+        register_units(&right, right_roots.slots, shared, 5u);
+    right_roots.slots[4] = register_units(&right, right_roots.slots, apart, 5u);
+    left_roots.slots[4] =
+        require_normal(oseo_internal_symbol_create(&left, oseo_undefined()));
+    right_roots.slots[5] =
+        require_normal(oseo_internal_symbol_create(&right, oseo_undefined()));
+    right_roots.slots[6] = require_normal(
+        oseo_internal_well_known_symbol(&right, OSEO_WELL_KNOWN_ITERATOR)
+    );
+    left_roots.slots[5] =
+        require_normal(oseo_object_create(&left, oseo_null()));
+    right_roots.slots[7] =
+        require_normal(oseo_object_create(&right, oseo_null()));
+    OseoValue local = right_roots.slots[3];
+    OseoValue foreign = left_roots.slots[3];
+    assert(local != foreign);
+    assert(entry_of(local) == entry_of(foreign));
+
+    /* Every equality form, from either side of the boundary. */
+    assert_boolean(oseo_strict_equal(&right, local, foreign), true);
+    assert_boolean(oseo_strict_equal(&left, foreign, local), true);
+    assert_boolean(oseo_not_strict_equal(&right, local, foreign), false);
+    assert_boolean(oseo_loose_equal(&right, local, foreign), true);
+    assert_boolean(oseo_not_loose_equal(&right, foreign, local), false);
+    assert(oseo_internal_same_value(local, foreign));
+    assert(oseo_internal_same_value(foreign, local));
+    assert(oseo_internal_same_value_zero(local, foreign));
+    assert(oseo_internal_property_key_equal(local, foreign));
+
+    /*
+     * Another key, an unregistered symbol from either context, a
+     * well-known symbol, and an ordinary object keep pointer identity:
+     * only one matching non-null entry joins two distinct heap values.
+     */
+    assert_boolean(
+        oseo_strict_equal(&right, right_roots.slots[4], foreign),
+        false
+    );
+    assert(!oseo_internal_same_value(right_roots.slots[4], foreign));
+    assert(!oseo_internal_property_key_equal(right_roots.slots[4], foreign));
+    assert_boolean(
+        oseo_strict_equal(&right, right_roots.slots[5], left_roots.slots[4]),
+        false
+    );
+    assert(!oseo_internal_same_value_zero(
+        right_roots.slots[5],
+        left_roots.slots[4]
+    ));
+    assert(!oseo_internal_property_key_equal(right_roots.slots[6], foreign));
+    assert_boolean(
+        oseo_strict_equal(&right, right_roots.slots[7], left_roots.slots[5]),
+        false
+    );
+
+    /* A property the local representative defined answers the foreign one. */
+    (void)require_normal(oseo_object_set(
+        &right,
+        right_roots.slots[7],
+        local,
+        oseo_number(1.0),
+        true
+    ));
+    assert(oseo_internal_same_value(
+        require_normal(oseo_object_get(&right, right_roots.slots[7], foreign)),
+        oseo_number(1.0)
+    ));
+    (void)require_normal(oseo_object_set(
+        &right,
+        right_roots.slots[7],
+        foreign,
+        oseo_number(2.0),
+        true
+    ));
+    assert(ordinary_object(right_roots.slots[7])->property_count == 1u);
+    assert(ordinary_object(right_roots.slots[7])->properties[0].key == local);
+    assert(oseo_internal_same_value(
+        require_normal(oseo_object_get(&right, right_roots.slots[7], local)),
+        oseo_number(2.0)
+    ));
+
+    /* Map keys and Set elements resolve the foreign representative too. */
+    right_roots.slots[8] = construct_intrinsic(&right, OSEO_INTRINSIC_MAP);
+    right_roots.slots[9] = construct_intrinsic(&right, OSEO_INTRINSIC_SET);
+    right_roots.slots[10] = local;
+    right_roots.slots[11] = oseo_number(3.0);
+    (void)call_method(
+        &right,
+        right_roots.slots[8],
+        "set",
+        2u,
+        &right_roots.slots[10]
+    );
+    (void)call_method(
+        &right,
+        right_roots.slots[9],
+        "add",
+        1u,
+        &right_roots.slots[10]
+    );
+    right_roots.slots[10] = foreign;
+    assert(oseo_internal_same_value(
+        call_method(
+            &right,
+            right_roots.slots[8],
+            "get",
+            1u,
+            &right_roots.slots[10]
+        ),
+        oseo_number(3.0)
+    ));
+    assert(call_method(
+        &right,
+        right_roots.slots[8],
+        "has",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+    assert(call_method(
+        &right,
+        right_roots.slots[9],
+        "has",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+    right_roots.slots[11] = oseo_number(4.0);
+    (void)call_method(
+        &right,
+        right_roots.slots[8],
+        "set",
+        2u,
+        &right_roots.slots[10]
+    );
+    (void)call_method(
+        &right,
+        right_roots.slots[9],
+        "add",
+        1u,
+        &right_roots.slots[10]
+    );
+
+    /* Neither collection grew, and neither stored the foreign value. */
+    assert(map_object(right_roots.slots[8])->live_count == 1u);
+    assert(map_object(right_roots.slots[8])->entries[0].key == local);
+    assert(oseo_internal_same_value(
+        map_object(right_roots.slots[8])->entries[0].value,
+        oseo_number(4.0)
+    ));
+    assert(set_object(right_roots.slots[9])->size == 1u);
+    assert(set_object(right_roots.slots[9])->elements[0].value == local);
+
+    /* Deleting through the foreign representative empties both. */
+    assert(call_method(
+        &right,
+        right_roots.slots[8],
+        "delete",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+    assert(call_method(
+        &right,
+        right_roots.slots[9],
+        "delete",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+    assert(map_object(right_roots.slots[8])->live_count == 0u);
+    assert(set_object(right_roots.slots[9])->size == 0u);
+    right_roots.slots[10] = oseo_undefined();
+
+    /* keyFor reads the shared entry, not the receiving context's copy. */
+    right_roots.slots[12] = call_symbol_static(
+        &right,
+        right_roots.slots,
+        "keyFor",
+        left_roots.slots[3]
+    );
+    assert(is_string(right_roots.slots[12]));
+    OseoString *key = string_object(right_roots.slots[12]);
+    assert(key->length == 5u);
+    for (size_t index = 0u; index < 5u; index += 1u) {
+        assert(key->units[index] == shared[index]);
+    }
+
+    /*
+     * First insertion through a foreign representative, for a key the
+     * receiving context has never registered. Each store still keeps the
+     * receiving context's own representative, which `Symbol.for` there
+     * afterwards returns, so nothing in this heap points into the other.
+     */
+    left_roots.slots[6] = register_units(&left, left_roots.slots, unseen, 6u);
+    right_roots.slots[13] =
+        require_normal(oseo_object_create(&right, oseo_null()));
+    right_roots.slots[10] = left_roots.slots[6];
+    right_roots.slots[11] = oseo_number(5.0);
+    (void)require_normal(oseo_object_set(
+        &right,
+        right_roots.slots[13],
+        right_roots.slots[10],
+        right_roots.slots[11],
+        true
+    ));
+    right_roots.slots[8] = construct_intrinsic(&right, OSEO_INTRINSIC_MAP);
+    right_roots.slots[9] = construct_intrinsic(&right, OSEO_INTRINSIC_SET);
+    (void)call_method(
+        &right,
+        right_roots.slots[8],
+        "set",
+        2u,
+        &right_roots.slots[10]
+    );
+    (void)call_method(
+        &right,
+        right_roots.slots[9],
+        "add",
+        1u,
+        &right_roots.slots[10]
+    );
+    right_roots.slots[10] = oseo_undefined();
+    right_roots.slots[12] =
+        register_units(&right, right_roots.slots, unseen, 6u);
+    OseoValue stored = right_roots.slots[12];
+    assert(stored != left_roots.slots[6]);
+    assert(ordinary_object(right_roots.slots[13])->properties[0].key ==
+        stored);
+    assert(map_object(right_roots.slots[8])->entries[0].key == stored);
+    assert(set_object(right_roots.slots[9])->elements[0].value == stored);
+
+    /*
+     * The originating context goes away. Every stored key is a value this
+     * context owns, so collection and lookup stay inside this heap.
+     */
+    oseo_roots_release(&left, &left_roots);
+    oseo_context_destroy(&left);
+    oseo_collect(&right);
+    assert(oseo_internal_same_value(
+        require_normal(
+            oseo_object_get(&right, right_roots.slots[13], stored)
+        ),
+        oseo_number(5.0)
+    ));
+    right_roots.slots[10] = stored;
+    assert(call_method(
+        &right,
+        right_roots.slots[8],
+        "has",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+    assert(call_method(
+        &right,
+        right_roots.slots[9],
+        "has",
+        1u,
+        &right_roots.slots[10]
+    ) == oseo_boolean(true));
+
+    oseo_roots_release(&right, &right_roots);
+    oseo_context_destroy(&right);
+}
+
 int main(void) {
     test_shared_entries_across_contexts();
+    test_identity_across_contexts();
     test_growth_preserves_identity();
     return 0;
 }

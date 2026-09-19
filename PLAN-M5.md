@@ -6563,10 +6563,16 @@ collector roots meet there.
 The GlobalSymbolRegistry is a process-wide hash table of immutable UTF-16 keys
 that is never freed. Each runtime context keeps one collector-rooted Symbol
 representative per registry entry in `OseoContext`, so `Symbol.for` returns
-the same heap value on every call and strict and loose equality, SameValue,
-property keys, and Map and Set keys observe ordinary pointer identity. No
-context traces another context's heap, and tearing one context down never
-invalidates a key another context still observes. `Symbol.keyFor` validates
+the same heap value on every call. The registry entry, not the heap value, is
+the identity: strict and loose equality, SameValue, SameValueZero, property
+keys, and Map and Set keys treat two contexts' representatives of one entry as
+one symbol, and every other value keeps ordinary pointer identity. A property
+key, a Map key, and a Set element are always the storing context's own
+representative, because every append replaces a registered symbol with it
+first, so no context's heap holds a value another context owns, no collector
+traces another context's heap, and tearing one context down never invalidates
+a key or an entry another context still observes. The node adds one internal
+helper for that replacement. `Symbol.keyFor` validates
 that its argument is a symbol, returns a context-local copy of the shared key,
 and returns `undefined` for unique and well-known symbols. A registered
 symbol is the one symbol CanBeHeldWeakly refuses, so this node also narrows
@@ -6583,7 +6589,16 @@ pointer, run with and without collection forced at every safepoint, proves
 that separate contexts resolve a key, including NUL, astral, and
 lone-surrogate units, to one shared registry entry, that the entry survives
 destruction of the context that created it, and that 300 keys grow both
-tables without changing any identity. A generated family at seed
+tables without changing any identity. The same fixture hands one context's
+representative to the other and proves that every equality form, the property
+key lookup, and `Map` and `Set` resolve it to the receiving context's own
+representative, and that a different key, an unregistered symbol, a well-known
+symbol, and an ordinary object stay distinct. A property, a Map key, and a Set
+element created through a foreign representative for a key the receiving
+context had never registered still hold that context's own representative,
+which `Symbol.for` there then returns, and they survive destruction of the
+originating context and a following collection.
+A generated family at seed
 `0x60007800` draws bounded repeated UTF-16 keys and unique descriptions against
 an independent registry and property-key model under both specialization
 policies, collection forced at every safepoint, a false numeric hint, a

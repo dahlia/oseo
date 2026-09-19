@@ -98,12 +98,15 @@ bool oseo_internal_string_equal(OseoValue left, OseoValue right) {
         ) == 0;
 }
 
-/* Property keys are strings compared by content or symbols by identity. */
+/*
+ * Property keys are strings compared by content or symbols by identity,
+ * where two representatives of one registry entry name one symbol.
+ */
 bool oseo_internal_property_key_equal(OseoValue left, OseoValue right) {
     if (is_string(left) && is_string(right)) {
         return oseo_internal_string_equal(left, right);
     }
-    return left == right;
+    return left == right || same_registered_symbol(left, right);
 }
 
 bool oseo_internal_array_index(OseoValue key, uint32_t *result) {

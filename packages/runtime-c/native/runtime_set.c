@@ -194,7 +194,13 @@ static OseoResult set_append(
     OseoValue slots[2] = {set_value, value};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
-    OseoResult result = grow_set(context, slots[0]);
+    /* An element stores this realm's own representative of a registered
+     * symbol, so [[SetData]] never holds a value another realm owns. */
+    OseoResult result = oseo_internal_local_symbol(context, slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = grow_set(context, slots[0]);
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoSet *set = set_object(slots[0]);
         OseoSetElement *element = &set->elements[set->element_count];

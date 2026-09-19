@@ -1609,7 +1609,9 @@ static bool strict_equal_value(OseoValue left, OseoValue right) {
                 left_string->length * sizeof(uint16_t)
             ) == 0;
     }
-    if (left_tag == OSEO_TAG_HEAP) return left == right;
+    if (left_tag == OSEO_TAG_HEAP) {
+        return left == right || same_registered_symbol(left, right);
+    }
     return false;
 }
 
@@ -1658,7 +1660,7 @@ static OseoResult loose_equal_value(
     }
     if ((is_symbol(left) || is_symbol(right)) &&
         !is_object(left) && !is_object(right)) {
-        *equal = left == right;
+        *equal = left == right || same_registered_symbol(left, right);
         return normal(oseo_undefined());
     }
     if (left_tag == OSEO_TAG_BOOLEAN) {

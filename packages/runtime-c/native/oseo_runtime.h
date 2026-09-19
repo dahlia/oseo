@@ -517,8 +517,10 @@ struct OseoContext {
      * registry itself is process-wide; this open-addressed table, whose
      * empty slots hold undefined, gives each entry one collector-rooted
      * Symbol per realm, so `Symbol.for` returns the same heap value on
-     * every call. Registered symbols cannot be collected, which matches
-     * their unbounded observable lifetime.
+     * every call. Identity is the entry, so two realms' representatives of
+     * one entry compare equal wherever a symbol identity rule applies.
+     * Registered symbols cannot be collected, which matches their
+     * unbounded observable lifetime.
      */
     OseoValue *registered_symbols;
     size_t registered_symbol_count;

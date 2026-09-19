@@ -903,22 +903,29 @@ current evidence assessment. Those live only in the indexed records above.
     before consulting the GlobalSymbolRegistry, a process-wide table of
     immutable UTF-16 keys shared by every runtime context. Each context keeps
     one collector-rooted representative per registry entry, so repeated
-    `Symbol.for` calls return the same heap value and equality, property keys,
-    Map and Set keys, and SameValue observe ordinary identity. `Symbol.keyFor`
+    `Symbol.for` calls return the same heap value. The registry entry, not
+    the heap value, is the identity: strict and loose equality, SameValue,
+    SameValueZero, property keys, and Map and Set keys treat two contexts'
+    representatives of one entry as one symbol, so the registry stays one
+    registry however many contexts observe it. `Symbol.keyFor`
     validates its argument, returns a context-local copy of the shared key,
     and returns `undefined` for unique and well-known symbols. Registry
     entries live for the process, so tearing down one context never
     invalidates a key another context observes. A host-native C fixture
     proves that separate contexts share one registry entry per key and that
     the entry outlives the context that created it, with forced collection.
-    Values never cross context heaps, and the test262 `$262.createRealm`
-    harness remains unavailable, so reviewed cases that compare symbols across
-    realms retain that explicit harness boundary. `Symbol.hasInstance` dispatch
-    in `instanceof` remains outside this unit. A registered symbol cannot be
-    held weakly, so `WeakMap.prototype.set`, `WeakSet.prototype.add`,
-    `WeakRef`, and `FinalizationRegistry.prototype.register` and `unregister`
-    reject one with a `TypeError`, while `get`, `has`, and `delete` answer as
-    they do for any other invalid key.
+    A property key, a Map key, and a Set element are always the storing
+    context's own representative, whichever representative created them, so
+    no context's heap holds a value another context owns and destroying one
+    context never invalidates a key another context stored. The test262
+    `$262.createRealm` harness remains unavailable, so reviewed cases that
+    compare symbols across realms retain that explicit harness boundary.
+    `Symbol.hasInstance` dispatch in `instanceof` remains outside this unit. A
+    registered symbol cannot be held weakly, so `WeakMap.prototype.set`,
+    `WeakSet.prototype.add`, `WeakRef`, and
+    `FinalizationRegistry.prototype.register` and `unregister` reject one with
+    a `TypeError`, while `get`, `has`, and `delete` answer as they do for any
+    other invalid key.
  -  The synchronous iterator protocol. `GetIterator` reads a value's
     `Symbol.iterator` method and calls it, throwing a catchable
     `TypeError` for a non-iterable, a non-callable method, or a

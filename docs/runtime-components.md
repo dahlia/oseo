@@ -510,6 +510,7 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_define_from_descriptor`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_to_object_for_property`              | *runtime\_object\_builtin.c*  |
 | `oseo_internal_install_primitive_wrapper_methods`   | *runtime\_object\_builtin.c*  |
+| `oseo_internal_local_symbol`                        | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_create`                       | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_text`                         | *runtime\_symbol.c*           |
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*           |
@@ -1618,11 +1619,25 @@ M5b node `symbol-intrinsic` completes *runtime\_symbol.c* with `Symbol.for`,
 process-wide open-addressed hash table of immutable UTF-16 keys guarded by an
 atomic flag and never freed. `OseoContext` gains the `registered_symbols`
 open-addressed table of representatives keyed by registry entry, whose every
-slot the collector marks as a root, so each context keeps one Symbol per entry
-and symbol identity inside a context remains heap-pointer identity. The
-component takes six code IDs from the Symbol range and six intrinsic slots,
-adds no helper, heap kind, component, or generated-code entry point, and moves
-`abiVersion` to `m5-116`.
+slot the collector marks as a root, so each context keeps one Symbol per entry.
+Symbol identity is the entry rather than the heap value: the shared
+`same_registered_symbol` predicate in *runtime\_internal.h* joins two
+representatives of one entry, and strict and loose equality in
+*runtime\_primitive.c*, `oseo_internal_same_value` and
+`oseo_internal_same_value_zero` in *runtime\_descriptor.c*, and
+`oseo_internal_property_key_equal` in *runtime\_string.c* each consult it
+after their pointer test fails, which gives Map, Set, and every property
+operation the same rule. The predicate reads only the two heap headers and
+their entry pointers and stores nothing. `oseo_internal_local_symbol` keeps
+the storage side of the same rule: the property append paths in
+*runtime\_descriptor.c* and *runtime\_property.c*, `map_append_entry` in
+*runtime\_map.c*, and `set_append` in *runtime\_set.c* replace a registered
+symbol with the receiving context's own representative before they store it,
+so a heap holds only values its own context owns, no collector reaches another
+context's heap, and a stored key outlives the context that first registered
+it. The component takes six code IDs from the Symbol range and six intrinsic
+slots, adds one internal helper and no heap kind, component, or
+generated-code entry point, and moves `abiVersion` to `m5-116`.
 
 ### Function prototype evidence
 

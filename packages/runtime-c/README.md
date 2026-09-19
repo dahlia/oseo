@@ -955,7 +955,12 @@ the `%Symbol.prototype%` methods, description getter, `Symbol.toPrimitive`
 method, and tag. The GlobalSymbolRegistry is a process-wide open-addressed
 table of immutable UTF-16 keys that is never freed, and the public context
 gains the `registered_symbols` table of one collector-rooted representative
-per entry, so `Symbol.for` returns the same heap value on every call. Six code
+per entry, so `Symbol.for` returns the same heap value on every call. The
+registry entry, not the heap value, is the identity: strict and loose
+equality, SameValue, SameValueZero, property keys, and Map and Set keys treat
+two contexts' representatives of one entry as one symbol, while a property
+key, a Map key, and a Set element are always the storing context's own
+representative. Six code
 IDs are allocated inside the existing Symbol range and six intrinsic slots are
 added; no heap kind or generated-code entry point is. A value can be held
 weakly when it is an object or an unregistered symbol: a symbol the registry

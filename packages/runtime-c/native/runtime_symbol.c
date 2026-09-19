@@ -8,9 +8,14 @@
  * The GlobalSymbolRegistry is shared by every realm in one process. Each
  * realm owns its Symbol heap values: `Symbol.for` resolves the key to one
  * immortal entry here and then to the realm's single rooted representative
- * of that entry, so identity inside a realm stays heap-pointer identity and
- * no collector ever traces another realm's heap. Entries are never removed
- * because a registered key stays observable for the agent's lifetime.
+ * of that entry. The entry is the identity, so `same_registered_symbol`
+ * joins two realms' representatives of one entry wherever a symbol identity
+ * rule applies, while `oseo_internal_local_symbol` replaces a registered
+ * symbol with the storing realm's own representative before a property key,
+ * a Map key, or a Set element keeps it. A realm's heap therefore holds only
+ * values it owns and no collector ever traces another realm's heap. Entries
+ * are never removed because a registered key stays observable for the
+ * agent's lifetime.
  */
 typedef struct OseoSymbolRegistryEntry {
     size_t hash;
@@ -197,6 +202,67 @@ static OseoResult symbol_this_value(
     );
 }
 
+/*
+ * This context's own representative of one registry entry, created here
+ * from the shared key when the context has not seen the entry before.
+ * The result is reachable from `registered_symbols`, which the collector
+ * marks as a root, so a caller may hold it across a later safepoint
+ * without rooting it.
+ */
+static OseoResult context_representative(
+    OseoContext *context,
+    const OseoSymbolRegistryEntry *entry
+) {
+    if ((context->registered_symbol_count + 1u) * 2u >
+            context->registered_symbol_capacity &&
+        !registered_symbols_grow(context)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Symbol registry allocation failed."
+        );
+    }
+    size_t mask = context->registered_symbol_capacity - 1u;
+    size_t slot = entry->hash & mask;
+    while (tag_of(context->registered_symbols[slot]) == OSEO_TAG_HEAP) {
+        OseoValue candidate = context->registered_symbols[slot];
+        if (symbol_object(candidate)->registry_entry == entry) {
+            return normal(candidate);
+        }
+        slot = (slot + 1u) & mask;
+    }
+    OseoResult description = oseo_internal_allocate_string(
+        context,
+        entry->units,
+        entry->length
+    );
+    if (description.status != OSEO_STATUS_NORMAL) return description;
+    OseoValue slots[1] = {description.value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult created = symbol_create(context, slots[0], entry);
+    oseo_roots_pop(context, &frame);
+    if (created.status != OSEO_STATUS_NORMAL) return created;
+    /*
+     * Allocation may collect but never resizes this table, so the empty
+     * slot found before it is still the insertion point.
+     */
+    context->registered_symbols[slot] = created.value;
+    context->registered_symbol_count += 1u;
+    return created;
+}
+
+OseoResult oseo_internal_local_symbol(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (!is_symbol(value)) return normal(value);
+    const OseoSymbolRegistryEntry *entry =
+        symbol_object(value)->registry_entry;
+    if (entry == NULL) return normal(value);
+    return context_representative(context, entry);
+}
+
 static OseoResult symbol_for(
     OseoContext *context,
     size_t argument_count,
@@ -213,37 +279,8 @@ static OseoResult symbol_for(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = symbol_registry_find_or_create(context, key, &entry);
     }
-    if (result.status == OSEO_STATUS_NORMAL &&
-        (context->registered_symbol_count + 1u) * 2u >
-            context->registered_symbol_capacity &&
-        !registered_symbols_grow(context)) {
-        result = failure(
-            context,
-            "OSEO2001",
-            "Symbol registry allocation failed."
-        );
-    }
-    size_t slot = 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
-        size_t mask = context->registered_symbol_capacity - 1u;
-        slot = entry->hash & mask;
-        while (tag_of(context->registered_symbols[slot]) == OSEO_TAG_HEAP) {
-            OseoValue candidate = context->registered_symbols[slot];
-            if (symbol_object(candidate)->registry_entry == entry) {
-                oseo_roots_pop(context, &frame);
-                return normal(candidate);
-            }
-            slot = (slot + 1u) & mask;
-        }
-        result = symbol_create(context, key, entry);
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        /*
-         * Allocation may collect but never resizes this table, so the empty
-         * slot found before it is still the insertion point.
-         */
-        context->registered_symbols[slot] = result.value;
-        context->registered_symbol_count += 1u;
+        result = context_representative(context, entry);
     }
     oseo_roots_pop(context, &frame);
     return result;
