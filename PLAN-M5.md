@@ -5867,11 +5867,13 @@ distinguishes absent start and delete-count arguments from explicit
 `undefined`, clamps the requested deletion, and rejects a result length above
 `2**53 - 1` before allocation.
 
-All three methods allocate a realm Array before reading any retained source
-element and never read `constructor` or `Symbol.species`. A length above
-`2**32 - 1` therefore throws a `RangeError` before indexed access. Get reads
-every retained index and CreateDataProperty writes every result index, so a
-hole becomes an own `undefined` property and an inherited value is copied.
+All three methods allocate a realm Array at their result length before reading
+any retained source element and never read `constructor` or `Symbol.species`.
+A result length above `2**32 - 1` therefore throws a `RangeError` before
+indexed access. `toSpliced` can accept a source length above that limit when
+deletion reduces the result length to the limit or below. Get reads every
+retained index and CreateDataProperty writes every result index, so a hole
+becomes an own `undefined` property and an inherited value is copied.
 `toReversed` reads in descending source order, `toSpliced` omits reads of the
 deleted range, and `with` omits the replaced-index read. The source is never
 written, and an Array subclass or generic receiver always produces a plain

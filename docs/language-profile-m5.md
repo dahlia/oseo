@@ -7174,16 +7174,18 @@ snapshot. `toSpliced` distinguishes an absent start, an absent delete count,
 and an explicit `undefined` delete count, clamps the supplied values, and
 rejects a result length above `2**53 - 1` before allocation.
 
-All three methods allocate a realm Array at the final snapshot length before
-reading any retained source element. A length above `2**32 - 1` therefore
-throws a `RangeError` without an indexed read. They use Get for every retained
-index and CreateDataProperty on the result, so holes become own `undefined`
-properties and inherited values are copied. `toReversed` reads from the last
-index to the first. `toSpliced` does not read deleted entries and inserts its
-argument values between ascending prefix and suffix reads. `with` does not
-read the replaced index. The source is never written. None reads `constructor`
-or `Symbol.species`, so an Array subclass or generic receiver still produces a
-plain Array with `%Array.prototype%`.
+All three methods allocate a realm Array at their result length before reading
+any retained source element. A result length above `2**32 - 1` therefore
+throws a `RangeError` without an indexed read. `toSpliced` can accept a source
+length above that limit when deletion reduces the result length to the limit
+or below. They use Get for every retained index and CreateDataProperty on the
+result, so holes become own `undefined` properties and inherited values are
+copied. `toReversed` reads from the last index to the first. `toSpliced` does
+not read deleted entries and inserts its argument values between ascending
+prefix and suffix reads. `with` does not read the replaced index. The source
+is never written. None reads `constructor` or `Symbol.species`, so an Array
+subclass or generic receiver still produces a plain Array with
+`%Array.prototype%`.
 
 Fixed native and generated differential evidence at property seed
 `0x60007700` covers all three methods over one through six sparse Array or
