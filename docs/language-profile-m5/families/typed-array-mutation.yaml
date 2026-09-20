@@ -1,0 +1,70 @@
+version: 1
+id: typed-array-mutation
+title: "TypedArray mutation and copying"
+scope:
+  - "The %TypedArray.prototype% copyWithin, fill, and reverse methods:
+    ValidateTypedArray before the length snapshot, the ToIntegerOrInfinity
+    relative-index clamps copyWithin and fill apply against that snapshot,
+    the revalidation fill performs unconditionally and copyWithin performs
+    only for a positive count, the surviving-length clamp that bounds an
+    in-place move or fill, and the bit-level byte moves that keep every
+    element encoding, including a Float NaN payload, verbatim. reverse
+    converts no argument, so it neither clamps an index nor revalidates."
+  - "The %TypedArray.prototype% slice, toReversed, and with methods: the
+    TypedArraySpeciesCreate that slice performs after both bound
+    conversions and the TypedArrayCreateSameType that toReversed and with
+    perform instead, the content-type and result-length checks a species
+    result must satisfy, the same-kind byte copy and the cross-kind element
+    conversion slice chooses between, the index and value conversion order
+    with's IsValidIntegerIndex answer follows, and the detach, shrink, and
+    grow observations those conversions cause."
+  - "Reviewed standards coverage is every upstream path under the node's six
+    inventory roots: test/built-ins/TypedArray/prototype/copyWithin, fill,
+    reverse, slice, toReversed, and with. Paths that need the unreviewed
+    resizableArrayBufferUtils.js include retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-mutation.ts
+      - tests/property/m5-typed-array-mutation.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-mutation.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-mutation.ts
+      - tests/property/m5-typed-array-mutation.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-mutation.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-mutation.ts
+      - tests/property/m5-typed-array-mutation.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-mutation.ts
+      - tests/property/m5-typed-array-mutation.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

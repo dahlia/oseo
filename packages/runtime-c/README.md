@@ -973,6 +973,22 @@ returned is registered and `WeakMap.prototype.set`, `WeakSet.prototype.add`,
 `WeakRef`, and `FinalizationRegistry.prototype.register` and `unregister`
 reject it.
 
+The `m5-117` ABI adds the TypedArray mutation and copying methods
+`copyWithin`, `fill`, `reverse`, `slice`, `toReversed`, and `with`. Each
+validates its receiver and snapshots the view length before converting an
+argument. `fill` then revalidates unconditionally, and `copyWithin` and
+`slice` revalidate only when their clamped count is positive; each throws a
+`TypeError` on an out-of-bounds view and clamps its write to the bytes the
+Data Block still holds. `with` instead answers IsValidIntegerIndex against
+the view its conversions left behind and throws a `RangeError` when the
+index no longer addresses an element. `slice` builds its result through
+TypedArraySpeciesCreate; `toReversed` and `with` allocate the receiver's own
+element kind without consulting `Symbol.species`. `reverse`, `toReversed`,
+the same-kind branch of `slice`, and the surviving prefix of `with` move raw
+bytes, so an element's exact encoding survives. Six code IDs are allocated
+inside the existing TypedArray range; no intrinsic slot, heap kind, public
+layout, or generated-code entry point is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

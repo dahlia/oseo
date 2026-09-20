@@ -217,9 +217,10 @@ Ownership follows the plan's target layout:
     the backing-buffer view record, the integer-indexed element operations
     the generic property components delegate to, the core prototype
     accessors and methods, the every, some, forEach, map, filter,
-    reduce, and reduceRight iteration methods, and the find, findIndex,
+    reduce, and reduceRight iteration methods, the find, findIndex,
     findLast, findLastIndex, includes, indexOf, lastIndexOf, join, and
-    toLocaleString search and join methods;
+    toLocaleString search and join methods, and the copyWithin, fill,
+    reverse, slice, toReversed, and with mutation and copying methods;
  -  *runtime\_weak\_collection.c*: the `WeakMap`, `WeakSet`, `WeakRef`, and
     `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
     job-scoped KeptAlive set, and the cleanup job step that calls a
@@ -1670,6 +1671,38 @@ code IDs from the Symbol range and six intrinsic slots, adds two internal
 helpers of its own and one collector helper in *runtime\_memory.c*, and no heap
 kind, component, or generated-code entry point, and moves `abiVersion` to
 `m5-116`.
+
+### TypedArray mutation evidence
+
+M5b node `typed-array-mutation` adds six mutation and copying methods to
+*runtime\_typed\_array.c*. The component gains three file-static helpers and
+no `oseo_internal_` entry: one resolves an element range's first Data Block
+byte, one copies a same-kind element prefix between two views, and one
+builds the same-kind result `with` and `toReversed` allocate through this
+realm's concrete constructor rather than SpeciesConstructor. Each method
+validates the receiver and snapshots the view length before converting an
+argument. `fill` then revalidates unconditionally and `copyWithin` and
+`slice` revalidate only when their clamped count is positive, so a detach
+throws a `TypeError` and a shrink clamps the write to the bytes the Data
+Block still holds; `with` instead answers IsValidIntegerIndex against the
+surviving view and throws a `RangeError`. `reverse`, `toReversed`, the
+same-kind branch of `slice`, and the surviving prefix of `with` exchange or
+copy raw bytes, which keeps a Float NaN payload that the number representation
+would canonicalize; only a cross-kind species result converts one element at a
+time, and only that loop allocates, so it re-reads both view records between
+elements. The six methods take six code IDs from the TypedArray range and add
+no intrinsic slot, heap kind, component, or generated-code entry point; the
+component moves `abiVersion` to `m5-117`.
+
+Fixed and generated native differential evidence at seed `0x60007900` covers
+the six methods over Number and BigInt kinds with `NaN`, signed-zero, and
+infinite elements, omitted, plain, infinite, fractional, negative, and
+observably converted relative indices and element values, species and
+same-type result construction, and detach, shrink, and grow during the first
+argument conversion, under both specialization policies with collection
+forced at every safepoint, a deliberate false-hint guard miss, and an
+independent model of every observation. The node reviews all 258 paths under
+its six inventory roots.
 
 ### Function prototype evidence
 

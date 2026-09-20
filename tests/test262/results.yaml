@@ -12525,6 +12525,9 @@ partitions:
     key: bf
     path: results/built-ins/TypedArray/bf.yaml
   - group: built-ins/TypedArray
+    key: c0
+    path: results/built-ins/TypedArray/c0.yaml
+  - group: built-ins/TypedArray
     key: c1
     path: results/built-ins/TypedArray/c1.yaml
   - group: built-ins/TypedArray
@@ -12681,6 +12684,9 @@ partitions:
     key: f4
     path: results/built-ins/TypedArray/f4.yaml
   - group: built-ins/TypedArray
+    key: f5
+    path: results/built-ins/TypedArray/f5.yaml
+  - group: built-ins/TypedArray
     key: f6
     path: results/built-ins/TypedArray/f6.yaml
   - group: built-ins/TypedArray
@@ -12695,6 +12701,9 @@ partitions:
   - group: built-ins/TypedArray
     key: fa
     path: results/built-ins/TypedArray/fa.yaml
+  - group: built-ins/TypedArray
+    key: fb
+    path: results/built-ins/TypedArray/fb.yaml
   - group: built-ins/TypedArray
     key: fc
     path: results/built-ins/TypedArray/fc.yaml
@@ -17227,9 +17236,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 17275
+  passes: 17524
   semanticFailures: 0
-  unsupportedProfileFeatures: 2067
+  unsupportedProfileFeatures: 2076
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17497,13 +17506,20 @@ summary:
       passes: 375
       semanticFailures: 0
       unsupportedProfileFeatures: 23
+    - dependency: typed-array-mutation
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 248
+      semanticFailures: 0
+      unsupportedProfileFeatures: 10
     - dependency: typed-array-search-and-join
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 324
+      passes: 325
       semanticFailures: 0
-      unsupportedProfileFeatures: 32
+      unsupportedProfileFeatures: 31
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -17796,9 +17812,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1007
+      passes: 1256
       semanticFailures: 0
-      unsupportedProfileFeatures: 84
+      unsupportedProfileFeatures: 93
     - group: built-ins/TypedArrayConstructors
       expectedNegatives: 0
       harnessFailures: 0

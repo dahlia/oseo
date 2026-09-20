@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 131
+M5a is complete. The normative family records described below inventory 132
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 20,898 reviewed cases: 17,275 passes, 1,556
-expected negatives, and 2,067 unsupported profile features. It records no
+The current manifest contains 21,156 reviewed cases: 17,524 passes, 1,556
+expected negatives, and 2,076 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6724,10 +6724,9 @@ function object, recorded when `%Array.prototype%` materializes. This node
 also materializes the `%TypedArray%[Symbol.species]` getter, because
 `subarray` cannot construct its default result without that lookup; the
 `typed-array-statics` node reuses it and still owns `from` and `of`. The
-mutation and sorting prototype methods keep their explicit lookup
-boundaries, and so does own-key reflection over
-`%TypedArray.prototype%`, whose key list completes only after those nodes
-land.
+sorting prototype methods keep their explicit lookup boundaries, and so does
+own-key reflection over `%TypedArray.prototype%`, whose key list completes
+only after those nodes land.
 
 Fixed native and generated differential evidence at property seed
 `0x60007100` covers all eleven element kinds over fixed and length-tracking
@@ -6912,6 +6911,99 @@ unsupported profile features with no semantic, harness, or infrastructure
 failures. The property inventory reaches 151 domains and seeds with a
 5,731-case ordinary budget, the evidence inventory reaches 129 families, and
 the runtime ABI moves to `m5-114`.
+
+
+TypedArray mutation and copying
+-------------------------------
+
+M5b node `typed-array-mutation` adds `copyWithin`, `fill`, `reverse`,
+`slice`, `toReversed`, and `with` to `%TypedArray.prototype%`. Each is an
+ordinary non-constructible method with the standard writable,
+non-enumerable, configurable descriptor and its own function object, so none
+of them is the `Array.prototype` method of the same name; `copyWithin`,
+`slice`, and `with` have length two, `fill` has length one, and `reverse`
+and `toReversed` have length zero. Every method begins with
+ValidateTypedArray, so a receiver without a `[[TypedArrayName]]` slot, or one
+whose buffer is detached or too short for its view, throws a `TypeError`
+before any argument is inspected, and the element length is read once at
+that point.
+
+`copyWithin`, `fill`, and `slice` convert their relative bounds with
+ToIntegerOrInfinity in argument order and clamp each against that snapshot
+length: a negative infinity selects zero, a negative value counts from the
+snapshot end, and a larger value saturates at the snapshot length. `fill`
+converts its element value before those bounds, and `with` converts its
+index before its value. A conversion may run user code that grows, shrinks,
+or detaches the buffer, so `fill` revalidates the view unconditionally
+while `copyWithin` and `slice` revalidate only when their clamped count is
+positive; an out-of-bounds view throws a `TypeError` there. `fill` then
+clamps both bounds to the surviving length, `slice` clamps its end, and
+`copyWithin` clamps its byte move to the bytes the Data Block still holds,
+in both copy directions. A `copyWithin` or `slice` whose count is not
+positive performs no revalidation at all, so a `copyWithin` returns even a
+detached receiver unchanged and a `slice` returns its species-created
+result without revalidating or copying, however long that result is.
+
+`reverse` exchanges elements in place and returns the receiver, as
+`copyWithin` and `fill` do. `slice` builds its result with
+TypedArraySpeciesCreate after both bounds convert, so a `Symbol.species`
+constructor runs before the copy and must return a long enough typed array
+of the same content type; `toReversed` and `with` ignore `Symbol.species`
+and allocate a view of the receiver's own element kind through this realm's
+constructor. `reverse`, `toReversed`, the same-kind branch of `slice`, and
+the surviving prefix of `with` move raw bytes, so a Float `NaN` payload
+survives unchanged; only a cross-kind `slice` result converts elements one
+at a time. `with` answers IsValidIntegerIndex against the view the
+conversions left behind and throws a `RangeError` when the index no longer
+addresses an element, copies the elements that survived the conversion,
+reads an index the conversion invalidated as `undefined`, which a BigInt
+element kind refuses with a `TypeError`, and writes the converted value only
+when the snapshot length still covers the replaced index.
+
+`with` resolves a negative index against the snapshot length, as the
+specification does and as
+*test/built-ins/TypedArray/prototype/with/negative-index-resize-to-in-bounds.js*
+and its out-of-bounds sibling require. V8 resolves it against the length the
+value conversion left behind instead, so Node.js and Deno disagree with this
+runtime for a negative index whose value conversion resizes the buffer.
+Generated evidence keeps that one combination out of the host comparison,
+because no differential observation can hold both contracts at once; the two
+reviewed paths and a structural assertion over the runtime source pin the
+choice instead. The `copyWithin` byte clamp goes
+the other way: the specification's descending byte loop abandons a backward
+move whose last byte lies past the surviving limit, while this runtime and
+both reference hosts copy the part that still fits.
+
+Fixed native and generated differential evidence at property seed
+`0x60007900` covers the six methods over Number, `NaN`, signed-zero,
+infinite, and BigInt element kinds, omitted, plain, infinite, fractional,
+negative, and observably converted relative indices and element values, and
+no mutation, detach, shrink, and grow during the first conversion. Node.js,
+Deno,
+and both native specialization policies agree with collection forced at
+every safepoint, a false numeric hint deliberately misses its guard and
+reaches the compiled generic fallback, and an independent model computes
+every conversion, write, and result observation. The fixed fixture also pins
+method metadata and identity, argument conversion order and its abrupt
+completions, overlapping in-place moves, element offsets, species results
+that are too short or of the wrong content type, a species getter that
+throws, non-typed-array, primitive, and detached receivers, Float `NaN`
+payload preservation, and grow and shrink through resizable buffers.
+
+The reviewed feature list and harness are unchanged, and the dependency
+vocabulary gains `typed-array-mutation`. All 258 paths under the node's six
+inventory roots enter the reviewed subset: 248 pass and the remaining ten
+keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite. One already reviewed `lastIndexOf` path outside the roots,
+whose last unmet prerequisite was a TypedArray mutation method, moves from
+unsupported to pass, and no reviewed path moves away from pass. The manifest
+moves from 20,898 to
+21,156 cases and from 17,275 to 17,524 passes while keeping
+1,556 expected negatives and moving from 2,067 to 2,076
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property inventory reaches 154 domains and seeds with a
+5,767-case ordinary budget, the evidence inventory reaches 132
+families, and the runtime ABI moves to `m5-117`.
 
 
 Set composition methods

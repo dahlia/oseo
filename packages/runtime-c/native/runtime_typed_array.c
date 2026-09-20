@@ -12,9 +12,9 @@
  * This component owns construction, element conversion, the
  * integer-indexed exotic element operations the generic property paths
  * delegate to, the prototype accessors, at, set, subarray, and the
- * iterator methods, and the iterative and search and join prototype
- * methods. The mutation and sorting prototype methods and the from and of
- * statics remain later graph nodes.
+ * iterator methods, and the iterative, search and join, and mutation and
+ * copying prototype methods. The sorting prototype methods and the from
+ * and of statics remain later graph nodes.
  */
 
 #define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
@@ -2515,6 +2515,505 @@ static OseoResult typed_array_join(
     return result;
 }
 
+/*
+ * TypedArrayCreateSameType. The exemplar's own element kind builds the
+ * result through this realm's concrete constructor, so `with` and
+ * `toReversed` never consult Symbol.species and always answer a view of
+ * the same kind. Allocating the result can collect, so every caller
+ * re-reads its view records afterward.
+ */
+static OseoResult typed_array_create_same_type(
+    OseoContext *context,
+    OseoValue exemplar,
+    size_t length
+) {
+    OseoTypedArrayKind kind = typed_array_object(exemplar)->element_kind;
+    OseoValue slots[2] = {oseo_undefined(), oseo_number((double)length)};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        oseo_internal_intrinsic(context, typed_array_constructors[kind]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_construct_with(context, slots[0], 1u, &slots[1]);
+        slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_validate(context, slots[0]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        typed_array_length(typed_array_object(slots[0])) < length) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray result is too short."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The first byte of an element range inside a view's Data Block. */
+static uint8_t *typed_array_element_bytes(
+    const OseoTypedArray *view,
+    size_t index
+) {
+    return array_buffer_object(view->viewed_buffer)->data +
+        view->byte_offset + index * typed_array_bytes[view->element_kind];
+}
+
+/*
+ * %TypedArray%.prototype.copyWithin. All three relative indices convert
+ * against the snapshot length before any byte moves, so user code in a
+ * conversion can resize or detach the buffer. A positive clamped count
+ * then revalidates, throwing on an out-of-bounds view and re-reading the
+ * byte limit, which keeps the move inside the bytes the Data Block still
+ * holds; a count that is not positive revalidates nothing and returns
+ * even a detached receiver unchanged. The clamp applies in both copy
+ * directions, as V8 does; the specification's descending byte loop abandons
+ * the whole move instead of copying the part that still fits.
+ */
+static OseoResult typed_array_copy_within(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[4] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        typed_array_argument(argument_count, arguments, 2u),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    double length = (double)typed_array_length(typed_array_object(slots[0]));
+    double relative = 0.0;
+    double to = 0.0;
+    double from = 0.0;
+    double end = length;
+    result = typed_array_integer_or_infinity(context, slots[1], &relative);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        to = typed_array_clamped_index(relative, length);
+        result = typed_array_integer_or_infinity(context, slots[2], &relative);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        from = typed_array_clamped_index(relative, length);
+        if (tag_of(slots[3]) != OSEO_TAG_UNDEFINED) {
+            result =
+                typed_array_integer_or_infinity(context, slots[3], &relative);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                end = typed_array_clamped_index(relative, length);
+            }
+        }
+    }
+    double count = fmin(end - from, length - to);
+    if (result.status == OSEO_STATUS_NORMAL && count > 0.0) {
+        const OseoTypedArray *view = typed_array_object(slots[0]);
+        if (typed_array_out_of_bounds(view)) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The TypedArray is detached or out of bounds."
+            );
+        } else {
+            size_t element_size = typed_array_bytes[view->element_kind];
+            size_t limit = typed_array_length(view) * element_size;
+            size_t to_byte = (size_t)to * element_size;
+            size_t from_byte = (size_t)from * element_size;
+            size_t moved = (size_t)count * element_size;
+            size_t highest = to_byte > from_byte ? to_byte : from_byte;
+            size_t room = limit > highest ? limit - highest : 0u;
+            if (moved > room) moved = room;
+            if (moved > 0u) {
+                memmove(
+                    typed_array_element_bytes(view, (size_t)to),
+                    typed_array_element_bytes(view, (size_t)from),
+                    moved
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * %TypedArray%.prototype.fill. The value converts once, before the
+ * bounds, so user code in that conversion or in a bound conversion can
+ * resize or detach the buffer. Unlike copyWithin and slice, fill always
+ * revalidates: it throws on an out-of-bounds view and clamps both bounds
+ * to the surviving length. Nothing observable runs during the write, so the
+ * converted element goes straight into the Data Block.
+ */
+static OseoResult typed_array_fill(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[4] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        typed_array_argument(argument_count, arguments, 2u),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    const OseoTypedArray *view = typed_array_object(slots[0]);
+    OseoTypedArrayKind kind = view->element_kind;
+    double length = (double)typed_array_length(view);
+    uint64_t bits = UINT64_C(0);
+    double number = 0.0;
+    if (typed_array_bigint_kind(kind)) {
+        result = typed_array_to_bigint_bits(context, slots[1], &bits);
+    } else {
+        result = oseo_internal_to_number(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            number = number_value(result.value);
+        }
+    }
+    double relative = 0.0;
+    double start = 0.0;
+    double end = length;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_integer_or_infinity(context, slots[2], &relative);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        start = typed_array_clamped_index(relative, length);
+        if (tag_of(slots[3]) != OSEO_TAG_UNDEFINED) {
+            result =
+                typed_array_integer_or_infinity(context, slots[3], &relative);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                end = typed_array_clamped_index(relative, length);
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        view = typed_array_object(slots[0]);
+        if (typed_array_out_of_bounds(view)) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The TypedArray is detached or out of bounds."
+            );
+        } else {
+            double current = (double)typed_array_length(view);
+            if (end > current) end = current;
+            if (start > current) start = current;
+            for (double index = start; index < end; index += 1.0) {
+                typed_array_write_raw(
+                    kind,
+                    typed_array_element_bytes(view, (size_t)index),
+                    number,
+                    bits
+                );
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * %TypedArray%.prototype.reverse. It converts no argument, so nothing
+ * runs between the validation and the last swap and no revalidation is
+ * needed; the elements exchange their Data Block bytes and every encoding
+ * survives verbatim, including a Float NaN payload that the number
+ * representation would canonicalize.
+ */
+static OseoResult typed_array_reverse(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    const OseoTypedArray *view = typed_array_object(receiver);
+    size_t element_size = typed_array_bytes[view->element_kind];
+    uint8_t scratch[8];
+    size_t upper = typed_array_length(view);
+    for (size_t lower = 0u; lower + 1u < upper; lower += 1u) {
+        upper -= 1u;
+        uint8_t *left = typed_array_element_bytes(view, lower);
+        uint8_t *right = typed_array_element_bytes(view, upper);
+        memcpy(scratch, left, element_size);
+        memcpy(left, right, element_size);
+        memcpy(right, scratch, element_size);
+    }
+    return normal(receiver);
+}
+
+/*
+ * %TypedArray%.prototype.slice. Both bounds convert against the snapshot
+ * length, and the species constructor that follows may resize or detach
+ * the source, so a positive clamped count revalidates the view and clamps
+ * its end to the surviving length; a count that is not positive
+ * revalidates nothing and returns the species-created result as it came,
+ * which a custom species may make longer than the count. A same-kind
+ * result takes the source bytes verbatim in ascending order; a
+ * different-kind result converts one element at a time, which is the only
+ * path that can allocate and therefore re-reads both view records.
+ */
+static OseoResult typed_array_slice(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[5] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    double length = (double)typed_array_length(typed_array_object(slots[0]));
+    double relative = 0.0;
+    double start = 0.0;
+    double end = length;
+    result = typed_array_integer_or_infinity(context, slots[1], &relative);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        start = typed_array_clamped_index(relative, length);
+        if (tag_of(slots[2]) != OSEO_TAG_UNDEFINED) {
+            result =
+                typed_array_integer_or_infinity(context, slots[2], &relative);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                end = typed_array_clamped_index(relative, length);
+            }
+        }
+    }
+    double count = fmax(end - start, 0.0);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[3] = oseo_number(count);
+        result = typed_array_species_create(context, slots[0], 1u, &slots[3]);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && count > 0.0) {
+        const OseoTypedArray *view = typed_array_object(slots[0]);
+        if (typed_array_out_of_bounds(view)) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The TypedArray is detached or out of bounds."
+            );
+        } else {
+            double current = (double)typed_array_length(view);
+            if (end > current) end = current;
+            count = fmax(end - start, 0.0);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && count > 0.0) {
+        const OseoTypedArray *source = typed_array_object(slots[0]);
+        const OseoTypedArray *target = typed_array_object(slots[3]);
+        if (source->element_kind == target->element_kind) {
+            /*
+             * The specification copies these bytes in ascending order, so
+             * a species result that views the source buffer at a higher
+             * offset reads back the bytes this loop already wrote. That
+             * differs from memmove, which a shared buffer would make
+             * observable, and test262 pins it.
+             */
+            const uint8_t *from = typed_array_element_bytes(
+                source,
+                (size_t)start
+            );
+            uint8_t *to = typed_array_element_bytes(target, 0u);
+            size_t moved =
+                (size_t)count * typed_array_bytes[source->element_kind];
+            for (size_t offset = 0u; offset < moved; offset += 1u) {
+                to[offset] = from[offset];
+            }
+        } else {
+            for (size_t index = 0u;
+                 result.status == OSEO_STATUS_NORMAL && index < (size_t)count;
+                 index += 1u) {
+                bool present = false;
+                result = oseo_internal_typed_array_get_index(
+                    context,
+                    slots[0],
+                    (size_t)start + index,
+                    &present
+                );
+                slots[4] = result.value;
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    result = oseo_internal_typed_array_set_index(
+                        context,
+                        slots[3],
+                        index,
+                        slots[4],
+                        &present
+                    );
+                }
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[3];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Copies `count` elements from one view's Data Block into another's,
+ * preserving each element's exact encoding. Both views must already hold
+ * `count` elements and share an element kind.
+ */
+static void typed_array_copy_prefix(
+    const OseoTypedArray *target,
+    const OseoTypedArray *source,
+    size_t count
+) {
+    if (count == 0u) return;
+    memmove(
+        typed_array_element_bytes(target, 0u),
+        typed_array_element_bytes(source, 0u),
+        count * typed_array_bytes[source->element_kind]
+    );
+}
+
+/*
+ * %TypedArray%.prototype.with. The index converts first and the value
+ * second, so a conversion can resize or detach the view before
+ * IsValidIntegerIndex answers; an index that no longer addresses an
+ * element throws a RangeError before the result exists. The result is a
+ * same-kind view of the snapshot length: the elements that survived the
+ * conversion keep their bytes, an index the conversion invalidated reads
+ * as undefined, which a BigInt element kind refuses, and the converted
+ * value overwrites the replaced index when the snapshot still covers it.
+ */
+static OseoResult typed_array_with(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[4] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    const OseoTypedArray *view = typed_array_object(slots[0]);
+    OseoTypedArrayKind kind = view->element_kind;
+    size_t length = typed_array_length(view);
+    double relative = 0.0;
+    double actual = 0.0;
+    uint64_t bits = UINT64_C(0);
+    double number = 0.0;
+    result = typed_array_integer_or_infinity(context, slots[1], &relative);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        actual = relative >= 0.0 ? relative : (double)length + relative;
+        if (typed_array_bigint_kind(kind)) {
+            result = typed_array_to_bigint_bits(context, slots[2], &bits);
+        } else {
+            result = oseo_internal_to_number(context, slots[2]);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                number = number_value(result.value);
+            }
+        }
+    }
+    size_t live = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        view = typed_array_object(slots[0]);
+        size_t current = typed_array_length(view);
+        if (typed_array_out_of_bounds(view) || actual < 0.0 ||
+            actual >= (double)current) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_RANGE,
+                "The TypedArray index is out of range."
+            );
+        } else {
+            live = current < length ? current : length;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && live < length &&
+        typed_array_bigint_kind(kind)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert the value to BigInt."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_create_same_type(context, slots[0], length);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoTypedArray *target = typed_array_object(slots[3]);
+        typed_array_copy_prefix(target, typed_array_object(slots[0]), live);
+        /* An invalidated index reads as undefined, whose ToNumber is NaN. */
+        for (size_t index = live; index < length; index += 1u) {
+            typed_array_write_raw(
+                kind,
+                typed_array_element_bytes(target, index),
+                NAN,
+                UINT64_C(0)
+            );
+        }
+        if (actual < (double)length) {
+            typed_array_write_raw(
+                kind,
+                typed_array_element_bytes(target, (size_t)actual),
+                number,
+                bits
+            );
+        }
+        result = normal(slots[3]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * %TypedArray%.prototype.toReversed. No user code runs between the
+ * validation and the last element, so the new same-kind view takes each
+ * source element's Data Block bytes verbatim and no encoding is
+ * canonicalized.
+ */
+static OseoResult typed_array_to_reversed(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    OseoResult result = typed_array_validate(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    size_t length = typed_array_length(typed_array_object(slots[0]));
+    result = typed_array_create_same_type(context, slots[0], length);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoTypedArray *source = typed_array_object(slots[0]);
+        const OseoTypedArray *target = typed_array_object(slots[1]);
+        size_t element_size = typed_array_bytes[source->element_kind];
+        for (size_t index = 0u; index < length; index += 1u) {
+            memcpy(
+                typed_array_element_bytes(target, index),
+                typed_array_element_bytes(source, length - index - 1u),
+                element_size
+            );
+        }
+        result = normal(slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -2616,6 +3115,29 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
             arguments,
             code_id == OSEO_TYPED_ARRAY_TO_LOCALE_STRING_CODE_ID
         );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_COPY_WITHIN_CODE_ID) {
+        return typed_array_copy_within(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_FILL_CODE_ID) {
+        return typed_array_fill(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_REVERSE_CODE_ID) {
+        return typed_array_reverse(context, receiver);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_SLICE_CODE_ID) {
+        return typed_array_slice(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_TO_REVERSED_CODE_ID) {
+        return typed_array_to_reversed(context, receiver);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_WITH_CODE_ID) {
+        return typed_array_with(context, receiver, argument_count, arguments);
     }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
         return oseo_internal_throw_error(
@@ -2913,6 +3435,45 @@ static OseoResult typed_array_install_core(
             );
         }
     }
+    static const size_t mutation_codes[] = {
+        OSEO_TYPED_ARRAY_COPY_WITHIN_CODE_ID,
+        OSEO_TYPED_ARRAY_FILL_CODE_ID,
+        OSEO_TYPED_ARRAY_REVERSE_CODE_ID,
+        OSEO_TYPED_ARRAY_SLICE_CODE_ID,
+        OSEO_TYPED_ARRAY_TO_REVERSED_CODE_ID,
+        OSEO_TYPED_ARRAY_WITH_CODE_ID,
+    };
+    static const char *const mutation_names[] = {
+        "copyWithin",
+        "fill",
+        "reverse",
+        "slice",
+        "toReversed",
+        "with",
+    };
+    static const size_t mutation_lengths[] = {2u, 1u, 0u, 2u, 0u, 2u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 6u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            mutation_codes[index],
+            mutation_names[index],
+            mutation_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[0],
+                mutation_names[index],
+                slots[2],
+                method
+            );
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_intrinsic(
             context,
@@ -3154,18 +3715,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
     if (object !=
         context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
         return NULL;
-    }
-    static const char *const mutation[] = {
-        "copyWithin",
-        "fill",
-        "reverse",
-        "slice",
-        "toReversed",
-        "with",
-    };
-    if (typed_array_key_matches(
-            key, mutation, sizeof(mutation) / sizeof(*mutation))) {
-        return "TypedArray mutation methods are not admitted yet.";
     }
     static const char *const sorting[] = {"sort", "toSorted"};
     if (typed_array_key_matches(

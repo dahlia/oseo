@@ -44030,6 +44030,198 @@ tests:
   - path: test/built-ins/TypedArray/prototype/constructor.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/coerced-values-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/coerced-values-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/coerced-values-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-out-of-bounds-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-out-of-bounds-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-out-of-bounds-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/negative-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/non-negative-out-of-bounds-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/non-negative-out-of-bounds-target-and-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/non-negative-target-and-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/non-negative-target-start-and-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-end-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-start-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-target-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/BigInt/undefined-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/bit-precision.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/byteoffset.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-target-start-end-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-target-start-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached-prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-start-detached.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-out-of-bounds-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-out-of-bounds-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-out-of-bounds-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/negative-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/non-negative-out-of-bounds-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/non-negative-out-of-bounds-target-and-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/non-negative-target-and-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/non-negative-target-start-and-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-end-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-start-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-target-is-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-target.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/return-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/copyWithin/undefined-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/entries/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -44219,6 +44411,159 @@ tests:
   - path: test/built-ins/TypedArray/prototype/every/values-are-not-cached.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/coerced-indexes.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-conversion-once.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-custom-start-and-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-non-numeric-throw.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-non-numeric.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-relative-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-relative-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values-symbol-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/fill-values.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-end-as-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-set-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-start-as-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/BigInt/return-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/absent-indices-computed-from-initial-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/coerced-end-detach.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/coerced-indexes.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/coerced-start-detach.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/coerced-value-detach.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/coerced-value-start-end-resize.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-conversion-once.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-conversion-operations-consistent-nan.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-conversion-operations.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-custom-start-and-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-non-numeric.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-relative-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-relative-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values-symbol-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/fill-values.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/get-length-ignores-length-prop.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-end-as-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-set-value.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-start-as-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/return-this.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/fill/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/filter/BigInt/arraylength-internal.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
@@ -45552,7 +45897,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/negative-index-and-resize-to-smaller.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/no-arg.js
     expectedClassification: pass
@@ -46205,6 +46550,69 @@ tests:
   - path: test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/preserves-non-numeric-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/returns-original-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/BigInt/reverts.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/get-length-uses-internal-arraylength.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/preserves-non-numeric-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/returns-original-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/reverts.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/reverse/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/set/BigInt/array-arg-negative-integer-offset-throws.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -46532,6 +46940,279 @@ tests:
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-targetbuffer-detached-during-tointeger-offset-throws.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-custom-ctor-other-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-custom-ctor-same-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-zero-count-custom-ctor-other-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer-zero-count-custom-ctor-same-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/result-does-not-copy-ordinary-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/results-with-different-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/results-with-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/results-with-same-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/return-abrupt-from-end-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/return-abrupt-from-start-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/set-values-from-different-ctor-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/tointeger-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/BigInt/tointeger-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/bit-precision.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/coerced-start-end-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/coerced-start-end-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-custom-ctor-other-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-custom-ctor-same-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-zero-count-custom-ctor-other-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-zero-count-custom-ctor-same-targettype.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/infinity.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/minus-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/resize-count-bytes-to-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/result-does-not-copy-ordinary-properties.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/results-with-different-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/results-with-empty-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/results-with-same-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/return-abrupt-from-end-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/return-abrupt-from-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/return-abrupt-from-start-symbol.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/return-abrupt-from-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/set-values-from-different-ctor-type.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-destination-resizable.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-ctor-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-ctor-inherited.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-ctor-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-abrupt.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-invocation.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-length-throws-resizable-arraybuffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-length-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-returns-another-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-returns-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species-use-default-ctor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-get-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-resize.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/speciesctor-return-same-buffer-with-offset.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/tointeger-end.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/slice/tointeger-start.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/some/BigInt/callbackfn-arguments-with-thisarg.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
@@ -46982,6 +47663,33 @@ tests:
   - path: test/built-ins/TypedArray/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
     expectedClassification: unsupported-profile-feature
     dependencies: [typed-array-search-and-join]
+  - path: test/built-ins/TypedArray/prototype/toReversed/ignores-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/immutable.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/length-property-ignored.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/reverses.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toReversed/this-value-invalid.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/toString.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -47057,6 +47765,72 @@ tests:
   - path: test/built-ins/TypedArray/prototype/values/this-is-not-typedarray-instance.js
     expectedClassification: pass
     dependencies: [typed-array-core]
+  - path: test/built-ins/TypedArray/prototype/with/BigInt/early-type-coercion-bigint.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/early-type-coercion.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/ignores-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/immutable.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-bigger-or-eq-than-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-casted-to-number.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-negative.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-smaller-than-minus-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-throw-completion.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/index-validated-against-current-length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/length-property-ignored.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/negative-fractional-index-truncated-to-zero.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/negative-index-resize-to-in-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/negative-index-resize-to-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/order-of-evaluation.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/this-value-invalid.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/valid-typedarray-index-checked-after-coercions.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/with/value-throw-completion.js
+    expectedClassification: pass
+    dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/BYTES_PER_ELEMENT.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]

@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-20,898 reviewed cases: 17,275 passes, 1,556 expected negatives, and 2,067
+21,156 reviewed cases: 17,524 passes, 1,556 expected negatives, and 2,076
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 131 indexed records in the normative
+M5a is complete. The 132 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,275 passes across 20,898 paths, and the property inventory records 153
-domains, 153 seeds, and an ordinary case budget of 5,755.
+17,524 passes across 21,156 paths, and the property inventory records 154
+domains, 154 seeds, and an ordinary case budget of 5,767.
 
 
 M5a implementation history
@@ -6663,6 +6663,56 @@ property ratchet moves from 152 to 153 domains and seeds and from 5,743 to
 families. The family evidence record is
 [*docs/language-profile-m5/families/symbol-intrinsic.yaml*](./docs/language-profile-m5/families/symbol-intrinsic.yaml),
 and the graph's orchestration state remains coordinator-owned.
+
+Implemented M5b node `typed-array-mutation` adds `copyWithin`, `fill`,
+`reverse`, `slice`, `toReversed`, and `with` to `%TypedArray.prototype%` as
+six distinct non-constructible methods. Each validates its receiver and
+snapshots the view length first, then converts its arguments in order:
+`fill` converts its element value before its bounds and `with` converts its
+index before its value. Because a conversion can grow, shrink, or detach the
+buffer, `fill` revalidates the view unconditionally while `copyWithin` and
+`slice` revalidate only when their clamped count is positive, each throwing
+a `TypeError` on an out-of-bounds view; `fill` then clamps both bounds to
+the surviving length, `slice` clamps its end, and `copyWithin` clamps its
+byte move to the bytes the Data Block still holds in both directions.
+`reverse` converts no argument and so revalidates nothing. `slice` builds its
+result with TypedArraySpeciesCreate after both bounds convert, while
+`toReversed` and `with` ignore `Symbol.species` and allocate the receiver's own
+element kind. `reverse`, `toReversed`, the same-kind branch of `slice`, and the
+surviving prefix of `with` move raw bytes, so a Float `NaN` payload survives
+unchanged. `with` answers IsValidIntegerIndex against the view its conversions
+left behind, resolves a negative index against the snapshot length as the
+specification requires, reads an index the conversion invalidated as
+`undefined`, which a BigInt element kind refuses, and writes the converted
+value only when the snapshot still covers the replaced index. The methods take
+six code IDs in the existing TypedArray range, add three file-static helpers
+and no realm intrinsic slot, heap kind, component, or generated-code entry
+point.
+
+Fixed native and generated differential evidence at seed `0x60007900` covers
+the six methods over Number, `NaN`, signed-zero, infinite, and BigInt
+elements of six kinds, omitted, plain, infinite, fractional, negative, and
+observably converted relative indices and element values, and no mutation,
+detach, shrink, and grow during the first conversion, with collection forced at
+every safepoint, a false numeric hint's deliberate guard miss, and an
+independent model of every conversion, write, and result. All 258 edition
+paths under the node's six inventory roots enter the reviewed subset:
+248 pass and the remaining ten keep the unreviewed
+*resizableArrayBufferUtils.js* include as an explicit prerequisite. One
+already reviewed `lastIndexOf` path outside the roots, whose last unmet
+prerequisite was a TypedArray mutation method, moves to pass, and no
+reviewed path moves away from pass. Node.js and Deno
+resolve a negative `with` index against the length its value conversion left
+behind rather than the snapshot length, so the generated suite keeps that one
+combination out of the host comparison and the two reviewed
+*negative-index-resize* paths carry the contract, with a structural assertion
+over the runtime source pinning the same choice. The manifest moves
+from 20,898 to 21,156 paths and from 17,275 to 17,524
+passes, keeps 1,556 expected negatives, and moves from 2,067 to
+2,076 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property ratchet moves from 153 to 154 domains
+and seeds and from 5,755 to 5,767 ordinary cases, and the evidence inventory
+moves from 131 to 132 families. The runtime ABI moves to `m5-117`.
 
 
 Ahead-of-time challenge boundary
