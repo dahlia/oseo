@@ -484,3 +484,7 @@ families:
     owner: tests/property/m5-symbol-intrinsic.property.test.ts
     start: 0x60007800
     end: 0x600078ff
+  - family: m5-typed-array-mutation
+    owner: tests/property/m5-typed-array-mutation.property.test.ts
+    start: 0x60007900
+    end: 0x600079ff

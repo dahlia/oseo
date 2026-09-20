@@ -1353,6 +1353,81 @@ test("installs the core TypedArray prototype surface", () => {
   assert.doesNotMatch(typedArrays, /typed_array_deferred_accessor/u);
 });
 
+test("populates TypedArray mutation methods with bit-level moves", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const typedArrays = sources.get("runtime_typed_array.c") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = typedArrays.indexOf(opening);
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = typedArrays.indexOf("\nstatic ", begin + opening.length);
+    return typedArrays.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of [
+    "copyWithin",
+    "fill",
+    "reverse",
+    "slice",
+    "toReversed",
+    "with",
+  ]) {
+    assert.match(typedArrays, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of [
+    "COPY_WITHIN",
+    "FILL",
+    "REVERSE",
+    "SLICE",
+    "TO_REVERSED",
+    "WITH",
+  ]) {
+    assert.match(
+      internalHeader,
+      new RegExp(`OSEO_TYPED_ARRAY_${code}_CODE_ID`, "u"),
+    );
+  }
+  // The deferred diagnostic these six names shared is retired.
+  assert.doesNotMatch(typedArrays, /mutation methods are not admitted yet/u);
+
+  // fill always revalidates; copyWithin only for a positive count.
+  for (const name of ["typed_array_copy_within", "typed_array_fill"]) {
+    const method = definition(name);
+    assert.match(method, /typed_array_integer_or_infinity/u);
+    assert.match(method, /typed_array_out_of_bounds\(view\)/u);
+  }
+  // Same-kind copies move bytes; only a species result converts elements.
+  assert.match(definition("typed_array_reverse"), /memcpy/u);
+  assert.match(definition("typed_array_to_reversed"), /memcpy/u);
+  assert.match(definition("typed_array_slice"), /typed_array_species_create/u);
+  assert.match(
+    definition("typed_array_slice"),
+    /element_kind == target->element_kind/u,
+  );
+  // with and toReversed allocate their own kind without a species lookup.
+  for (const name of ["typed_array_to_reversed", "typed_array_with"]) {
+    const method = definition(name);
+    assert.match(method, /typed_array_create_same_type/u);
+    assert.doesNotMatch(method, /typed_array_species_create/u);
+  }
+  /*
+   * with resolves a negative index against the length snapshotted before
+   * the conversions and then answers IsValidIntegerIndex against the view
+   * they left behind. V8, and so both reference hosts, use the later
+   * length for both, which keeps that combination out of the generated
+   * host comparison, so this assertion is where the source-level choice
+   * is pinned alongside the two reviewed negative-index-resize paths.
+   */
+  const withMethod = definition("typed_array_with");
+  assert.match(
+    withMethod,
+    /actual = relative >= 0\.0 \? relative : \(double\)length \+ relative;/u,
+  );
+  assert.match(withMethod, /size_t current = typed_array_length\(view\);/u);
+  assert.match(withMethod, /actual >= \(double\)current/u);
+  assert.match(withMethod, /OSEO_ERROR_RANGE/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";

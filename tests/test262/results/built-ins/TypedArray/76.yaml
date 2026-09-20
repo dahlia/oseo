@@ -212,6 +212,76 @@ results:
   - case:
       async: false
       features:
+        - align-detached-buffer-semantics-with-web-reality
+        - Symbol.species
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/slice/detached-buffer-get-ctor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-mutation
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - detachArrayBuffer.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/slice/result-does-not-copy-ordinary-properties.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-mutation
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - TypedArray
       flags: []
       includes:
@@ -228,6 +298,43 @@ results:
     execution:
       harnessIncludes:
         - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+        - change-array-by-copy
+        - Reflect.construct
+      flags: []
+      includes:
+        - isConstructor.js
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArray/prototype/with/not-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - typed-array-mutation
+    execution:
+      harnessIncludes:
+        - base.js
+        - isConstructor.js
         - testTypedArray.js
       target: linux-x86_64-gnu
       variants:

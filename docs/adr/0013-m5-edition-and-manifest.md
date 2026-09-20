@@ -483,6 +483,27 @@ which names the prototype surface these algorithms operate over, and from
 may species-create a result. The reviewed rows under the node's ten inventory
 roots carry it, and no reviewed row outside those roots gains or loses a tag.
 
+The M5b `typed-array-mutation` node extends the vocabulary with
+`typed-array-mutation`. The tag identifies the `copyWithin`, `fill`,
+`reverse`, `slice`, `toReversed`, and `with` members of
+`%TypedArray.prototype%`, including the ValidateTypedArray bounds check, the
+relative-index clamps `copyWithin`, `fill`, and `slice` apply against the
+snapshot length, the revalidation and surviving-length clamp that `fill`
+reaches unconditionally and `copyWithin` and `slice` reach only for a
+positive count, the negative index `with` resolves and validates instead,
+the bit-level byte moves, the species and same-type result construction, and
+the detach, shrink, and grow observations those conversions cause. One tag
+covers the six methods because each moves or copies elements of one
+validated TypedArray view, not because they share an index or revalidation
+contract: `reverse` and `toReversed` take no index and convert no argument,
+`with` resolves and validates an index rather than clamping it, and only
+`fill` revalidates unconditionally. The tag is distinct from
+`typed-array-core`, which names the integer-indexed surface they operate over,
+from `typed-array-iterative`, whose members call a callback for every element,
+and from `typed-array-search-and-join`, whose members allocate no TypedArray
+result. The reviewed rows under the node's six inventory roots carry it, and
+no reviewed row outside those roots gains or loses a tag.
+
 
 Alternatives considered
 -----------------------

@@ -65,6 +65,9 @@ const { typedArraySearchAndJoinFixtures } =
   await import("./native/fixtures/typed-array-search-and-join.ts");
 import { symbolIntrinsicFixtures } from "./native/fixtures/symbol-intrinsic.ts";
 
+const { typedArrayMutationFixtures } =
+  await import("./native/fixtures/typed-array-mutation.ts");
+
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpPrototypeAndExecFixtures } =
@@ -201,6 +204,7 @@ const fixtures: readonly Fixture[] = [
   ...atomics.atomicsSingleAgentFixtures,
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
+  ...typedArrayMutationFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -840,6 +844,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "atomics-single-agent" ||
     fixture.name === "typed-array-iterative" ||
     fixture.name === "typed-array-search-and-join" ||
+    fixture.name === "typed-array-mutation" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1093,6 +1098,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "typed-array-iterative" ||
     fixture.name === "typed-array-search-and-join" ||
+    fixture.name === "typed-array-mutation" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -1204,6 +1210,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "atomics-single-agent" ||
             fixture.name === "typed-array-iterative" ||
             fixture.name === "typed-array-search-and-join" ||
+            fixture.name === "typed-array-mutation" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||
