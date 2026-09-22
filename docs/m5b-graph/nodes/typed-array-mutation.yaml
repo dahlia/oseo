@@ -14,5 +14,5 @@ inventory:
     - test/built-ins/TypedArray/prototype/with/
 dependencies:
   - typed-array-core
-landed: false
+landed: true
 status: ready
