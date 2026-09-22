@@ -13,5 +13,5 @@ inventory:
     - test/built-ins/String/prototype/toWellFormed/
 dependencies:
   - string-prototype-search-and-slice
-landed: false
+landed: true
 status: ready
