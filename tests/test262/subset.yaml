@@ -37,8 +37,10 @@ supportedFeatures:
   - String.prototype.at
   - String.prototype.endsWith
   - String.prototype.includes
+  - String.prototype.isWellFormed
   - String.prototype.matchAll
   - String.prototype.replaceAll
+  - String.prototype.toWellFormed
   - String.prototype.trimEnd
   - String.prototype.trimStart
   - Set
@@ -40964,6 +40966,30 @@ tests:
   - path: test/built-ins/String/prototype/indexOf/this-value-not-obj-coercible.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/returns-boolean.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/to-string-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/isWellFormed/to-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/String/prototype/lastIndexOf/S15.5.4.8_A10.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -41346,6 +41372,132 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/normalize/this-is-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/exception-fill-string-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/exception-not-object-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/exception-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/fill-string-empty.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/fill-string-non-strings.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/fill-string-omitted.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/function-length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/function-name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/function-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/max-length-not-greater-than-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/normal-operation.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padEnd/observable-operations.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/exception-fill-string-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/exception-not-object-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/exception-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/fill-string-empty.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/fill-string-non-strings.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/fill-string-omitted.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/function-length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/function-name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/function-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/max-length-not-greater-than-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/normal-operation.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/padStart/observable-operations.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/count-coerced-to-zero-returns-empty-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/count-is-infinity-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/count-is-zero-returns-empty-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/count-less-than-zero-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/empty-string-returns-empty.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/repeat-string-n-times.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/repeat.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/return-abrupt-from-count-as-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/return-abrupt-from-count.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/return-abrupt-from-this-as-symbol.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/this-is-null-throws.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/repeat/this-is-undefined-throws.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/replace/15.5.4.11-1.js
@@ -42801,6 +42953,30 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/toUpperCase/this-value-not-obj-coercible.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/return-abrupt-from-this.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/returns-well-formed-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/to-string-primitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties]
+  - path: test/built-ins/String/prototype/toWellFormed/to-string.js
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/trim/15.5.4.20-0-1.js

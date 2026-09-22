@@ -104,6 +104,8 @@ const { stringPrototypeSearchAndSliceFixtures } =
   await import("./native/fixtures/string-prototype-search-and-slice.ts");
 const { stringPrototypeCaseFixtures } =
   await import("./native/fixtures/string-prototype-case.ts");
+const { stringPrototypePadFixtures } =
+  await import("./native/fixtures/string-prototype-pad.ts");
 const { stringPrototypeMatchAndSplitFixtures } =
   await import("./native/fixtures/string-prototype-match-and-split.ts");
 const { numberPrototypeFixtures } =
@@ -233,6 +235,7 @@ const fixtures: readonly Fixture[] = [
   ...stringPrototypeAccessFixtures,
   ...stringPrototypeSearchAndSliceFixtures,
   ...stringPrototypeCaseFixtures,
+  ...stringPrototypePadFixtures,
   ...stringPrototypeMatchAndSplitFixtures,
   ...stringPrototypeReplaceFixtures,
   ...stringIteratorFixtures,
@@ -876,6 +879,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "string-intrinsic" ||
     fixture.name === "string-prototype-access" ||
     fixture.name === "string-prototype-case" ||
+    fixture.name === "string-prototype-pad" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
@@ -1080,6 +1084,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "symbol-intrinsic" ||
     fixture.name === "string-prototype-access" ||
     fixture.name === "string-prototype-case" ||
+    fixture.name === "string-prototype-pad" ||
     fixture.name === "array-prototype-copying" ||
     fixture.name === "array-prototype-change-by-copy" ||
     fixture.name === "array-prototype-iterative" ||
@@ -1231,6 +1236,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "string-intrinsic" ||
             fixture.name === "string-prototype-access" ||
             fixture.name === "string-prototype-case" ||
+            fixture.name === "string-prototype-pad" ||
             fixture.name === "string-prototype-search-and-slice" ||
             fixture.name === "string-prototype-match-and-split" ||
             fixture.name === "string-prototype-replace" ||

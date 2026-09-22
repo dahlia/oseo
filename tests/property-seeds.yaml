@@ -488,3 +488,7 @@ families:
     owner: tests/property/m5-typed-array-mutation.property.test.ts
     start: 0x60007900
     end: 0x600079ff
+  - family: m5-string-prototype-pad
+    owner: tests/property/m5-string-prototype-pad.property.test.ts
+    start: 0x60007a00
+    end: 0x60007aff

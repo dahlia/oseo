@@ -17236,9 +17236,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 17524
+  passes: 17580
   semanticFailures: 0
-  unsupportedProfileFeatures: 2076
+  unsupportedProfileFeatures: 2078
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17412,9 +17412,9 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9750
+      passes: 9806
       semanticFailures: 0
-      unsupportedProfileFeatures: 395
+      unsupportedProfileFeatures: 397
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -17784,9 +17784,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1098
+      passes: 1154
       semanticFailures: 0
-      unsupportedProfileFeatures: 62
+      unsupportedProfileFeatures: 64
     - group: built-ins/StringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

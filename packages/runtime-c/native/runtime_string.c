@@ -1062,6 +1062,244 @@ static OseoResult string_method_subject(
     return oseo_internal_value_string(context, receiver);
 }
 
+static OseoResult string_repeat(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[3] = {
+        receiver,
+        string_builtin_argument(argument_count, arguments, 0u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = string_method_subject(context, slots[0]);
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_integer_or_infinity(context, slots[1]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    double count_number = number_value(result.value);
+    if (count_number < 0.0 || count_number == INFINITY) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid repeat count."
+        );
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    const OseoString *subject = string_object(slots[2]);
+    if (subject->length == 0u || count_number == 0.0) {
+        result = oseo_internal_allocate_string(context, NULL, 0u);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (count_number > (double)(OSEO_MAX_STRING_LENGTH / subject->length)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid string length."
+        );
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    size_t count = (size_t)count_number;
+    size_t length = subject->length * count;
+    uint16_t *units = malloc(length * sizeof(uint16_t));
+    if (units == NULL) {
+        result = failure(context, "OSEO2001", "String allocation failed.");
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    memcpy(units, subject->units, subject->length * sizeof(uint16_t));
+    size_t copied = subject->length;
+    while (copied < length) {
+        size_t chunk = copied < length - copied ? copied : length - copied;
+        memcpy(units + copied, units, chunk * sizeof(uint16_t));
+        copied += chunk;
+    }
+    result = oseo_internal_allocate_string(context, units, length);
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult string_pad(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool at_start
+) {
+    OseoValue slots[5] = {
+        receiver,
+        string_builtin_argument(argument_count, arguments, 0u),
+        string_builtin_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = string_method_subject(context, slots[0]);
+    slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_integer_or_infinity(context, slots[1]);
+    }
+    double target_number = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        target_number = number_value(result.value);
+        if (!(target_number > 0.0)) target_number = 0.0;
+        else if (target_number == INFINITY ||
+                 target_number > 9007199254740991.0) {
+            target_number = 9007199254740991.0;
+        }
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    const OseoString *subject = string_object(slots[3]);
+    if (target_number <= (double)subject->length) {
+        result = normal(slots[3]);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (tag_of(slots[2]) == OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_ascii_string(context, " ");
+        slots[4] = result.value;
+    } else {
+        result = oseo_internal_value_string(context, slots[2]);
+        slots[4] = result.value;
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    const OseoString *filler = string_object(slots[4]);
+    if (filler->length == 0u) {
+        result = normal(slots[3]);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (target_number > (double)OSEO_MAX_STRING_LENGTH) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid string length."
+        );
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    size_t target = (size_t)target_number;
+    size_t fill_length = target - subject->length;
+    uint16_t *units = malloc(target * sizeof(uint16_t));
+    if (units == NULL) {
+        result = failure(context, "OSEO2001", "String allocation failed.");
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    size_t fill_offset = at_start ? 0u : subject->length;
+    for (size_t index = 0u; index < fill_length; index += 1u) {
+        units[fill_offset + index] = filler->units[index % filler->length];
+    }
+    size_t subject_offset = at_start ? fill_length : 0u;
+    memcpy(
+        units + subject_offset,
+        subject->units,
+        subject->length * sizeof(uint16_t)
+    );
+    result = oseo_internal_allocate_string(context, units, target);
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static bool string_is_leading_surrogate(uint16_t unit) {
+    return unit >= UINT16_C(0xd800) && unit <= UINT16_C(0xdbff);
+}
+
+static bool string_is_trailing_surrogate(uint16_t unit) {
+    return unit >= UINT16_C(0xdc00) && unit <= UINT16_C(0xdfff);
+}
+
+static bool string_is_well_formed_value(const OseoString *subject) {
+    for (size_t index = 0u; index < subject->length; index += 1u) {
+        uint16_t unit = subject->units[index];
+        if (string_is_leading_surrogate(unit)) {
+            if (index + 1u >= subject->length ||
+                !string_is_trailing_surrogate(subject->units[index + 1u])) {
+                return false;
+            }
+            index += 1u;
+        } else if (string_is_trailing_surrogate(unit)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static OseoResult string_well_formed(
+    OseoContext *context,
+    OseoValue receiver,
+    bool repair
+) {
+    OseoValue slots[2] = {receiver, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = string_method_subject(context, slots[0]);
+    slots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    const OseoString *subject = string_object(slots[1]);
+    bool well_formed = string_is_well_formed_value(subject);
+    if (!repair) {
+        result = normal(oseo_boolean(well_formed));
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (well_formed) {
+        result = normal(slots[1]);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    uint16_t *units = malloc(subject->length * sizeof(uint16_t));
+    if (units == NULL) {
+        result = failure(context, "OSEO2001", "String allocation failed.");
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    for (size_t index = 0u; index < subject->length; index += 1u) {
+        uint16_t unit = subject->units[index];
+        bool paired_lead = string_is_leading_surrogate(unit) &&
+            index + 1u < subject->length &&
+            string_is_trailing_surrogate(subject->units[index + 1u]);
+        units[index] = string_is_trailing_surrogate(unit) ||
+                (string_is_leading_surrogate(unit) && !paired_lead)
+            ? UINT16_C(0xfffd)
+            : unit;
+        if (paired_lead) {
+            index += 1u;
+            units[index] = subject->units[index];
+        }
+    }
+    result = oseo_internal_allocate_string(
+        context,
+        units,
+        subject->length
+    );
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult string_at_index(
     OseoContext *context,
     size_t code_id,
@@ -1772,6 +2010,27 @@ OseoResult oseo_internal_string_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_STRING_REPEAT_CODE_ID) {
+        return string_repeat(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_STRING_PAD_START_CODE_ID ||
+        code_id == OSEO_STRING_PAD_END_CODE_ID) {
+        return string_pad(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_STRING_PAD_START_CODE_ID
+        );
+    }
+    if (code_id == OSEO_STRING_IS_WELL_FORMED_CODE_ID ||
+        code_id == OSEO_STRING_TO_WELL_FORMED_CODE_ID) {
+        return string_well_formed(
+            context,
+            receiver,
+            code_id == OSEO_STRING_TO_WELL_FORMED_CODE_ID
+        );
+    }
     if (code_id == OSEO_STRING_MATCH_CODE_ID ||
         code_id == OSEO_STRING_MATCH_ALL_CODE_ID ||
         code_id == OSEO_STRING_SEARCH_CODE_ID ||
@@ -1962,6 +2221,11 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         OSEO_STRING_TRIM_START_CODE_ID,
         OSEO_STRING_TRIM_END_CODE_ID,
         OSEO_STRING_NORMALIZE_CODE_ID,
+        OSEO_STRING_REPEAT_CODE_ID,
+        OSEO_STRING_PAD_START_CODE_ID,
+        OSEO_STRING_PAD_END_CODE_ID,
+        OSEO_STRING_IS_WELL_FORMED_CODE_ID,
+        OSEO_STRING_TO_WELL_FORMED_CODE_ID,
     };
     static const char *const access_names[] = {
         "at",
@@ -1993,12 +2257,18 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         "trimStart",
         "trimEnd",
         "normalize",
+        "repeat",
+        "padStart",
+        "padEnd",
+        "isWellFormed",
+        "toWellFormed",
     };
     static const size_t access_lengths[] = {
         1u, 1u, 1u, 1u, 0u, 0u, 1u,
         1u, 1u, 1u, 1u, 1u, 2u, 2u,
         1u, 1u, 1u, 2u, 2u, 2u,
         1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+        1u, 1u, 1u, 0u, 0u,
     };
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
