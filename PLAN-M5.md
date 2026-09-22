@@ -3481,10 +3481,12 @@ fixed-width conversions remain an M5b boundary.
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns the regular expression family. It
 keeps one owned pattern and matcher model across dynamic construction and
 ahead-of-time literal compilation, preserves fresh object identity and
-`lastIndex`, and defers the matcher backend choice until code-size, Unicode,
-resource, and target probes compare the candidates. Regular expressions remain
-outside the active profile until that plan admits a coherent semantic
-checkpoint.
+`lastIndex`, and records the M5b matcher backend choice in
+[ADR 0024](./docs/adr/0024-regexp-matcher-backend-selection.md) after
+maintainer review of the recorded probe report. The code-size, Unicode,
+resource, and target measurements that report leaves unperformed remain open
+under that plan's delivery item 8. Regular expressions remain outside the
+active profile until that plan admits a coherent semantic checkpoint.
 
 An intrinsic enters through a table or owned runtime interface whose identity
 and attributes are testable. Generated C must not duplicate mutable singleton
@@ -6713,6 +6715,27 @@ passes, keeps 1,556 expected negatives, and moves from 2,067 to
 infrastructure failures. The property ratchet moves from 153 to 154 domains
 and seeds and from 5,755 to 5,767 ordinary cases, and the evidence inventory
 moves from 131 to 132 families. The runtime ABI moves to `m5-117`.
+
+Implemented M5b node `regexp-matcher-backend-selection` records the
+maintainer-selected composed owned backend in
+[ADR 0024](./docs/adr/0024-regexp-matcher-backend-selection.md). For M5b, the
+existing ordered matcher remains the semantic authority and complete fallback,
+and an owned automaton path is selected for patterns or regions whose
+regularity and bounded state space are proved before execution. The record
+also defines the runtime split: the build-time compiler builds static
+automata as generated data, a dynamic pattern may build one at run time only
+as data under the same bounded proof, and the runtime matcher component
+executes both artifact kinds with the ordered executor as the fallback. This
+decision-only node implements neither that path nor an external component.
+
+After M5b, direct generated C is the preferred primary backend for static
+matcher artifacts, subject to a future reviewed lowering and measurements. It
+is direction rather than current implementation: serialized instructions and
+the ordered executor remain the only executable matcher path at this node.
+The node admits no behavior, moves no reviewed row, and changes no runtime ABI,
+component, generated-code entry point, evidence record, property seed, or
+manifest policy. Delivery item 8 remains open for every measurement its probe
+report names.
 
 
 Ahead-of-time challenge boundary
