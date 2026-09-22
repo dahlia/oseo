@@ -6721,7 +6721,11 @@ maintainer-selected composed owned backend in
 [ADR 0024](./docs/adr/0024-regexp-matcher-backend-selection.md). For M5b, the
 existing ordered matcher remains the semantic authority and complete fallback,
 and an owned automaton path is selected for patterns or regions whose
-regularity and bounded state space are proved before execution. This
+regularity and bounded state space are proved before execution. The record
+also defines the runtime split: the build-time compiler builds static
+automata as generated data, a dynamic pattern may build one at run time only
+as data under the same bounded proof, and the runtime matcher component
+executes both artifact kinds with the ordered executor as the fallback. This
 decision-only node implements neither that path nor an external component.
 
 After M5b, direct generated C is the preferred primary backend for static

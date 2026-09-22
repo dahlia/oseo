@@ -855,9 +855,13 @@ Delivery order
     dependency. Landed. ADR 0024 selects the composed owned backend for M5b:
     the ordered matcher remains the semantic authority and fallback, and an
     owned automaton path is selected for proven regular patterns or regions.
-    The record implements no new path. It prefers direct generated C as the
-    primary static backend after M5b, subject to a future implementation and
-    measurements.
+    The record implements no new path. It also defines the runtime split:
+    static automata are built by the build-time compiler and written as
+    generated data, a dynamic pattern may build an automaton at run time
+    only as data under the same bounded proof, and the runtime matcher
+    component executes both artifact kinds with the ordered executor as the
+    fallback. It prefers direct generated C as the primary static backend
+    after M5b, subject to a future implementation and measurements.
 10. Implement the selected M5b automaton path, then add other measured
     string-search or representation fast paths one at a time. Each lands with
     a structural guard or applicability proof and comparison with the ordered

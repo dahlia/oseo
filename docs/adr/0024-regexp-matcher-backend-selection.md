@@ -136,6 +136,72 @@ does not authorize direct-C work in this node, and does not change the owned
 fallback required for dynamic patterns or unsupported lowering cases.
 
 
+Compiler and runtime split
+--------------------------
+
+Delivery item 9 of [*PLAN-REGEXP.md*](../../PLAN-REGEXP.md) requires this
+record to define the runtime split as well as the backend. The split at this
+record's acceptance is a fact; the automaton parts of it are direction that
+the implementing M5b node must satisfy, and none of them exists yet.
+
+At acceptance, the build-time compiler in `@oseo/compiler` parses a literal
+and compiles it into serialized ordered instructions. The C backend writes
+that artifact as generated read-only data, and generated C contains no
+matcher control flow. The runtime pattern compiler in
+*runtime\_regexp\_matcher.c* compiles a dynamic pattern into the same
+artifact shape as data in owned unmanaged memory, which is released when the
+collector reclaims the matcher that owns it; no retained-byte accounting for
+that memory exists yet. The ordered executor in that same translation unit
+executes both, and the compiler-side executor in `@oseo/compiler` executes
+the same artifact under Node.js and Deno as the oracle for generated,
+differential, and probe evidence rather than as a native execution path.
+
+The composed backend adds one artifact kind and keeps that split:
+
+1.  Static automata are built during ahead-of-time compilation. The
+    build-time compiler runs the regularity proof and the state bound over a
+    literal's ordered artifact, and only when both succeed emits the
+    automaton's state and transition tables as generated read-only data
+    beside the ordered artifact it was derived from. A literal whose proof
+    fails keeps only the ordered artifact. Generated C carries automaton
+    tables as data, never as control flow; lowering matcher control flow into
+    generated C is option D and stays outside M5b.
+2.  A dynamic pattern may build an automaton at run time only as data and only
+    under the same proof. The runtime pattern compiler applies the compiler's
+    decision procedure to the dynamic pattern's ordered artifact, checks the
+    state count against a fixed reviewed ceiling and the table size against
+    the checked work area before it allocates any state, and builds the
+    tables in the same owned unmanaged memory, released with the matcher
+    that owns them. Reporting their retained bytes through the accounting
+    categories in [*PLAN-GC.md*](../../PLAN-GC.md) is a requirement on the
+    implementing node, not a current fact. Crossing either bound or
+    failing an allocation discards the partial automaton and selects the
+    ordered artifact before any match state is exposed. The runtime never
+    generates executable memory, compiles JavaScript, or adds an interpreter
+    for this. The implementing node may land the static path first and keep
+    every dynamic pattern on the ordered artifact; the runtime path is
+    permitted under these conditions, not required.
+3.  The runtime matcher component executes both artifact kinds. The ordered
+    artifact runs in the existing ordered executor. An automaton artifact
+    runs in an owned automaton executor added to the same component, which
+    also owns the fallback edge. A whole-pattern automaton needs no per-input
+    guard because its proof holds for every input. A region automaton is
+    admitted only when its proof also shows that no choice or capture state
+    can escape the region, so the ordered executor never has to retry an
+    alternative inside it, or when the automaton executor exposes a
+    resumable continuation that yields the region's alternatives in ordered
+    priority and restores captures on each retry before the ordered executor
+    continues. Handing a region's first result to the ordered executor
+    one way is not a fallback edge. The C backend writes, and the
+    runtime reads, the strategy an artifact carries; no generated code
+    entry point selects a strategy. The compiler-side executor gains the same
+    automaton execution so the oracle comparison covers both artifact forms.
+
+Recording this split changes no component or runtime ABI now. The generated
+data layout, the ABI identifier for the matcher format, and the evidence for
+each part of the split belong to the node that implements the automaton.
+
+
 Consequences
 ------------
 
