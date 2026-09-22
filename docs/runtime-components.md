@@ -1007,6 +1007,15 @@ intrinsic, and four dynamic `eval`. The node adds no generated-code entry point,
 allocates seven code IDs inside the existing String range, adds the one
 generated header asset, and moves `abiVersion` to `m5-84`.
 
+M5b node `string-prototype-pad` keeps the same component ownership and adds
+ordinary `repeat`, `padStart`, `padEnd`, `isWellFormed`, and `toWellFormed`
+functions. Repetition and padding enforce the reviewed maximum UTF-16 length
+before allocation, padding converts its filler only when padding is needed,
+and the well-formedness pair detects or replaces lone surrogates without
+disturbing valid pairs. The node allocates five code IDs inside the existing
+String range, adds no component, heap kind, intrinsic slot, public layout, or
+generated-code entry point, and moves `abiVersion` to `m5-118`.
+
 M5b node `array-prototype-species-mapping` keeps ownership in
 *runtime\_array.c* and adds ordinary `filter` and `map` functions to the
 materialized `%Array.prototype%`. Both methods retain the shared

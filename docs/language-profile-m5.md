@@ -7352,6 +7352,51 @@ suite revision, 41,091-path inventory, manifest schema and vocabulary,
 forced-collection policy, and zero-override policy are unchanged.
 
 
+String prototype padding and well-formedness
+--------------------------------------------
+
+M5b node `string-prototype-pad` adds `repeat`, `padStart`, `padEnd`,
+`isWellFormed`, and `toWellFormed` to the realm-owned
+`%String.prototype%`. Every method first rejects a nullish receiver and then
+applies the shared `ToString`, so String primitives, String wrappers, and
+generic receivers preserve the same conversion order and abrupt completion.
+
+`repeat` converts its count with `ToIntegerOrInfinity`, rejects a negative
+value or positive infinity, and checks the reviewed maximum UTF-16 length
+before allocating. `padStart` and `padEnd` convert their target with
+`ToLength`, return the converted receiver without converting the filler when
+the target is not longer, and otherwise use a single space for an omitted
+filler. An empty converted filler returns the receiver. A nonempty filler is
+repeated and truncated to the exact required code-unit length before it is
+prepended or appended, with the same reviewed result-length ceiling.
+
+`isWellFormed` scans UTF-16 code units and reports whether every leading
+surrogate is followed by a trailing surrogate and every trailing surrogate is
+paired. `toWellFormed` returns the converted receiver unchanged when it is
+already well formed and otherwise replaces each lone surrogate with U+FFFD
+without disturbing valid pairs.
+
+Fixed Node.js, Deno, and native differential evidence covers descriptors,
+constructor rejection, length limits, default and explicit fillers, receiver
+and argument conversion order, abrupt conversions, valid pairs, and lone
+surrogates. Generated differential evidence at seed `0x60007a00` covers
+arbitrary bounded UTF-16 subjects and fillers, primitive, wrapper, and generic
+receivers, both specialization policies, collection forced at every
+safepoint, false hints, and a deliberate shape-guard miss that reaches the
+compiled generic fallback. All 58 paths under the node's five inventory roots
+are reviewed: 56 pass, while the two primitive-conversion cases retain the
+separately owned Boolean intrinsic prerequisite. No reviewed path outside
+those roots changes classification, and no reviewed path moves away from
+`pass`. The manifest moves from 21,156 to 21,214 paths and from 17,524 to
+17,580 passes, keeps 1,556 expected negatives, and moves from 2,076 to 2,078
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 154 to 155 domains and seeds and
+from 5,767 to 5,779 ordinary cases, and the evidence inventory moves from 132
+to 133 families. The node allocates five IDs in the existing String built-in
+range, adds no runtime component or generated-code entry point, and moves the
+runtime ABI to `m5-118`.
+
+
 Known gaps inside the claim
 ---------------------------
 

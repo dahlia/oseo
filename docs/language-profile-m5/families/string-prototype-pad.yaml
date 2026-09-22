@@ -1,0 +1,53 @@
+version: 1
+id: string-prototype-pad
+title: "String prototype padding and well-formedness methods"
+scope:
+  - "String.prototype.repeat, padStart, padEnd, isWellFormed, and
+    toWellFormed, including receiver and argument conversion order, bounded
+    UTF-16 result lengths, filler truncation, and lone-surrogate repair."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-pad.ts
+      - tests/property/m5-string-prototype-pad.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/string-prototype-pad.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-pad.ts
+      - tests/property/m5-string-prototype-pad.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-string-prototype-pad.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-pad.ts
+      - tests/property/m5-string-prototype-pad.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/string-prototype-pad.ts
+      - tests/property/m5-string-prototype-pad.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_string.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

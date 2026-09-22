@@ -989,6 +989,13 @@ bytes, so an element's exact encoding survives. Six code IDs are allocated
 inside the existing TypedArray range; no intrinsic slot, heap kind, public
 layout, or generated-code entry point is added.
 
+The `m5-118` ABI adds `String.prototype.repeat`, `padStart`, `padEnd`,
+`isWellFormed`, and `toWellFormed` within the existing String component and
+built-in code range. Repetition and padding enforce the reviewed maximum
+UTF-16 length before allocation, padding converts its filler only when padding
+is needed, and the well-formedness pair detects or replaces lone surrogates
+without disturbing valid pairs. The generated-code ABI gains no entry point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

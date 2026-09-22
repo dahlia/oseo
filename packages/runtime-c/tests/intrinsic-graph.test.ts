@@ -1794,6 +1794,7 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "fromCharCode",
     "fromCodePoint",
     "includes",
+    "isWellFormed",
     "indexOf",
     "lastIndexOf",
     "length",
@@ -1801,7 +1802,10 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "match",
     "matchAll",
     "normalize",
+    "padEnd",
+    "padStart",
     "raw",
+    "repeat",
     "replace",
     "replaceAll",
     "search",
@@ -1815,6 +1819,7 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "toLowerCase",
     "toString",
     "toUpperCase",
+    "toWellFormed",
     "trim",
     "trimEnd",
     "trimStart",
@@ -1855,6 +1860,11 @@ test("populates the realm-owned String intrinsic cluster", () => {
   assert.match(stringSource, /OSEO_STRING_TRIM_START_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_TRIM_END_CODE_ID/u);
   assert.match(stringSource, /OSEO_STRING_NORMALIZE_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_REPEAT_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_PAD_START_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_PAD_END_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_IS_WELL_FORMED_CODE_ID/u);
+  assert.match(stringSource, /OSEO_STRING_TO_WELL_FORMED_CODE_ID/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE/u);
   assert.match(header, /OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT/u);
   assert.match(internalHeader, /bool regexp_string_iterator;/u);
