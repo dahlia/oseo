@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 134
+M5a is complete. The normative family records described below inventory 135
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,156 reviewed cases: 17,524 passes, 1,556
-expected negatives, and 2,076 unsupported profile features. It records no
+The current manifest contains 21,265 reviewed cases: 17,895 passes, 1,556
+expected negatives, and 1,814 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3284,11 +3284,11 @@ shape-guard miss and compiled generic fallback. The node adds no component,
 built-in code ID, intrinsic slot, or generated-code entry point.
 The node declares no test262 inventory roots, so the applicable upstream paths
 remain outside the reviewed subset and fixed and generated cases replace the
-standards lane. The reviewed manifest stays at 21,214 cases with 17,580 passes,
-1,556 expected negatives, and 2,078 unsupported profile features. The property
-inventory moves from 155 to 157 domains and seeds and from 5,779 to 5,803
-ordinary cases, the evidence inventory moves from 133 to 134 families, and
-the runtime ABI moves to `m5-119`.
+standards lane. The reviewed manifest stays at 21,265 cases with 17,895 passes,
+1,556 expected negatives, and 1,814 unsupported profile features. The property
+inventory moves from 156 to 158 domains and seeds and from 5,791 to 5,815
+ordinary cases, the evidence inventory moves from 134 to 135 families, and
+the runtime ABI moves to `m5-120`.
 
 M5b node `object-descriptor-queries` completes the descriptor checkpoint's
 reporting half. `Object.getOwnPropertyDescriptor` and the new
