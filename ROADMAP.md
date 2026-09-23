@@ -596,8 +596,7 @@ merged units from `fa119c7` to `8f2fff6`.
 
 Units landed is not the same as fully admitted. The profile still records open
 behavior in these families, including the unmaterialized
-`%GeneratorFunction%` chain and the *nativeFunctionMatcher.js* include the
-`async-iteration`-tagged `Function.prototype.toString` cases need.
+`%GeneratorFunction%` chain.
 Each count is the size of the family in the inventory, not a total of admitted
 paths.
 

@@ -1084,6 +1084,43 @@ test("assembles strict source with reviewed includes in order", () => {
   );
 });
 
+test("native matcher enforces the reviewed source grammar", async () => {
+  const helper = await readFile(
+    new URL("test262/harness/nativeFunctionMatcher.js", import.meta.url),
+    "utf8",
+  );
+  // SAFETY: the helper defines `validateNativeFunctionSource` as a function
+  // that throws `SyntaxError` and returns nothing.
+  const validate = runInNewContext(`${helper}\nvalidateNativeFunctionSource;`, {
+    SyntaxError,
+  }) as (source: string) => void;
+  const accepted = [
+    "function(){[native code]}",
+    "function ( ) { [ native code ] }",
+    "function get value() { [native code] }",
+    "function set [Symbol.value](next) { [native code] }",
+    "function \u03bb(a, b = function() { []; }) { [native code] }",
+    "/* before */ function() { [native code] } // after",
+  ];
+  const nearMisses = [
+    "native code",
+    "function() {}",
+    'function(){ "native code" }',
+    "function(){ [] native code }",
+    "function()) { [native code] }",
+    "function []] () { [native code] }",
+    "function() { [native code] /* }",
+    "function() { [native code] } trailing",
+    "// function() { [native code] }",
+  ];
+  for (const source of accepted) {
+    assert.doesNotThrow(() => validate(source), source);
+  }
+  for (const source of nearMisses) {
+    assert.throws(() => validate(source), SyntaxError, source);
+  }
+});
+
 test("property helper checks behavior beyond reported flags", async () => {
   const helper = await readFile(
     new URL("test262/harness/propertyHelper.js", import.meta.url),
@@ -1716,7 +1753,7 @@ test("classifies unsupported features without native execution", async () => {
 
 test("classifies reviewed missing includes as unsupported", async () => {
   await Promise.all(
-    ["nativeFunctionMatcher.js", "wellKnownIntrinsicObjects.js"].map(
+    ["resizableArrayBufferUtils.js", "wellKnownIntrinsicObjects.js"].map(
       async (include) => {
         const source = `/*---
 includes: [${include}]

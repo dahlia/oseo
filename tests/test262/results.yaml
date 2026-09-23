@@ -17380,9 +17380,9 @@ summary:
   expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 17895
+  passes: 17958
   semanticFailures: 0
-  unsupportedProfileFeatures: 1814
+  unsupportedProfileFeatures: 1751
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17493,9 +17493,9 @@ summary:
       expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4249
+      passes: 4312
       semanticFailures: 0
-      unsupportedProfileFeatures: 769
+      unsupportedProfileFeatures: 706
     - dependency: generators
       expectedNegatives: 83
       harnessFailures: 0
@@ -17795,9 +17795,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 180
+      passes: 243
       semanticFailures: 0
-      unsupportedProfileFeatures: 150
+      unsupportedProfileFeatures: 87
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0

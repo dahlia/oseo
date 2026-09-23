@@ -178,7 +178,7 @@ function namedNodeFailures(
   const paths = scopes.nodes.get(nodeId);
   return changes
     .filter((change) => {
-      if (paths == null) return true;
+      if (paths == null) return !isOutOfRootImprovement(change);
       return !paths.has(change.path) && !isOutOfRootImprovement(change);
     })
     .map((change) => {
@@ -207,6 +207,9 @@ function namedNodeFailures(
  * `unsupported-profile-feature` to `expected-negative` is also allowed when
  * the node makes an already reviewed negative test executable. Inventory
  * roots assign test paths, not the implementation causes that improve them.
+ * A node with no inventory block owns no path at all, so it allows those
+ * same improvements and rejects every other reviewed change, such as a
+ * subset addition or removal or any other reclassification.
  */
 export function checkM5bNodeScope(inputs: M5bNodeScopeInputs): void {
   const nodeId = inputs.nodeId;
