@@ -35,6 +35,7 @@ import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
+import * as booleanFixture from "./native/fixtures/boolean-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
@@ -211,6 +212,7 @@ const fixtures: readonly Fixture[] = [
   ...bindingFixtures,
   ...bigintFixtures,
   ...bigintIntrinsicFixtures,
+  ...booleanFixture.booleanIntrinsicFixtures,
   ...dataViewFixtures,
   ...dateFamilyFixtures,
   ...expressionFixtures,
@@ -834,6 +836,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-sort" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
+    fixture.name === "boolean-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "date-family" ||
     fixture.name === "regexp-intrinsic" ||
@@ -1117,6 +1120,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typeof-void-remainder" ||
     fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-intrinsic" ||
+    fixture.name === "boolean-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "date-family" ||
     fixture.name === "regexp-intrinsic" ||
@@ -1202,6 +1206,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-sort" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
+            fixture.name === "boolean-intrinsic" ||
             fixture.name === "data-view" ||
             fixture.name === "date-family" ||
             fixture.name === "monotonic-timer-wakeups" ||
@@ -1473,7 +1478,7 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             // The function and its environment allocate six objects. The
             // Script global record contributes the eleven standard-object
-            // and value-property allocations plus forty-two admitted
+            // and value-property allocations plus forty-three admitted
             // standard global property names shared by every Script, with
             // Proxy adding one allocation in each group and Date, JSON,
             // and Set adding only their property names, because the
@@ -1482,7 +1487,7 @@ for (const fixture of selectedFixtures) {
             // eleven property-name allocations, SharedArrayBuffer and
             // Atomics add one each, and WeakMap, WeakSet, WeakRef, and
             // FinalizationRegistry add four more.
-            assert.equal(native.counters.allocations, 65);
+            assert.equal(native.counters.allocations, 66);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

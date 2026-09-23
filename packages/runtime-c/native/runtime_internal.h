@@ -957,6 +957,17 @@
 #define OSEO_FINALIZATION_REGISTRY_UNREGISTER_CODE_ID \
     (OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST - 13u)
 
+#define OSEO_BOOLEAN_CODE_ID_RANGE_INDEX ((size_t)27u)
+#define OSEO_BOOLEAN_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_BOOLEAN_CODE_ID_RANGE_INDEX)
+#define OSEO_BOOLEAN_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_BOOLEAN_CODE_ID_RANGE_INDEX)
+#define OSEO_BOOLEAN_CONSTRUCTOR_CODE_ID OSEO_BOOLEAN_CODE_ID_RANGE_LAST
+#define OSEO_BOOLEAN_TO_STRING_CODE_ID \
+    (OSEO_BOOLEAN_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_BOOLEAN_VALUE_OF_CODE_ID \
+    (OSEO_BOOLEAN_CODE_ID_RANGE_LAST - 2u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -2682,6 +2693,15 @@ OseoResult oseo_internal_number_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_boolean_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_internal_math_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -3963,6 +3983,11 @@ OseoResult oseo_internal_define_from_descriptor(
 );
 OseoResult oseo_internal_number_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_number_global(
+    OseoContext *context,
+    OseoValue global
+);
+OseoResult oseo_internal_boolean_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_boolean_global(
     OseoContext *context,
     OseoValue global
 );

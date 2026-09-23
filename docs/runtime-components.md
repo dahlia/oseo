@@ -25,13 +25,14 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists forty-five reviewed assets in this order:
+The runtime input now lists forty-six reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
 *runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
 *runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
-*runtime\_number.c*, *runtime\_array\_buffer.c*, *runtime\_set.c*,
+*runtime\_number.c*, *runtime\_boolean.c*, *runtime\_array\_buffer.c*,
+*runtime\_set.c*,
 *runtime\_typed\_array.c*, *runtime\_weak\_collection.c*,
 *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
@@ -52,7 +53,7 @@ component, and the symbol, iterator-protocol, generator,
 asynchronous-generator, BigInt, string-prototype-match-and-split,
 map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
-RegExp-symbol-methods, URI-handling-functions,
+RegExp-symbol-methods, URI-handling-functions, Boolean-intrinsic,
 Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
 Set-intrinsic, TypedArray-constructor, single-agent Atomics, and
 weak-collections units each
@@ -135,6 +136,10 @@ Ownership follows the plan's target layout:
     `toExponential`, `toPrecision`, `toLocaleString`, and `valueOf`,
     including the exact bignum arithmetic their rounding and radix
     conversion share;
+ -  *runtime\_boolean.c*: the `Boolean` constructor, branded wrapper
+    construction, the false-valued `%Boolean.prototype%`, its `constructor`
+    link, its branded `toString` and `valueOf` methods, and the standard
+    global constructor property;
  -  *runtime\_array\_buffer.c*: the `ArrayBuffer` and `SharedArrayBuffer`
     constructors, the Data Block or Shared Data Block one buffer owns,
     `isView`, both `Symbol.species` accessors, the `byteLength`, `detached`,
@@ -376,7 +381,7 @@ one.
 
 ### Internal helpers
 
-Two hundred and nine helpers cross a
+Two hundred and twelve helpers cross a
 translation-unit boundary. Each uses
 the `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
@@ -398,6 +403,9 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_number_global`               | *runtime\_number.c*           |
 | `oseo_internal_global_numeric_intrinsic`            | *runtime\_number.c*           |
 | `oseo_internal_install_global_numeric_functions`    | *runtime\_number.c*           |
+| `oseo_internal_boolean_builtin_dispatch`            | *runtime\_boolean.c*          |
+| `oseo_internal_boolean_intrinsic`                   | *runtime\_boolean.c*          |
+| `oseo_internal_install_boolean_global`              | *runtime\_boolean.c*          |
 | `oseo_internal_math_builtin_dispatch`               | *runtime\_math.c*             |
 | `oseo_internal_math_intrinsic`                      | *runtime\_math.c*             |
 | `oseo_internal_install_math_global`                 | *runtime\_math.c*             |
@@ -769,6 +777,23 @@ The public intrinsic table and ordinary-object layout expand, moving
 covers both specialization policies, false hints, deliberate guard misses,
 generic fallback, global `Object` replacement, and collection forced at every
 safepoint. The node reviews all five declared test262 inventory roots.
+
+### Boolean intrinsic evidence
+
+M5b node `boolean-intrinsic` materializes `%Boolean%` in
+*runtime\_boolean.c*. The component owns its callable and constructible
+conversion, the false-valued `%Boolean.prototype%`, branded wrapper objects,
+and the `toString` and `valueOf` brand checks. The binding component installs
+the constructor as the realm global's writable, non-enumerable, configurable
+`Boolean` property, and Object conversion reuses the completed prototype.
+
+The public intrinsic table expands, one built-in code range and three internal
+helpers are added, and `abiVersion` moves to `m5-119`. Fixed and generated
+native differential evidence covers falsy and truthy inputs, object conversion
+without primitive coercion, branded and unbranded receivers, derived and
+alternate prototype construction, both specialization policies, false hints,
+deliberate shape-guard misses, generic fallback, and collection forced at every
+safepoint. The node reviews its declared Boolean test262 inventory root.
 
 ### Object define-property evidence
 

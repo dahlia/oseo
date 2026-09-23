@@ -1,0 +1,27 @@
+group: built-ins/Boolean
+key: 2d
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Boolean/S9.2_A6_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: 'test/built-ins/Boolean/S9.2_A6_T1.js non-strict disabled failed
+        (1): stdout=""
+        stderr="test/built-ins/Boolean/S9.2_A6_T1.js:112:26:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
