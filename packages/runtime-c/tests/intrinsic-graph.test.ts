@@ -132,7 +132,7 @@ test("populates the realm-owned Object constructor cluster", () => {
   assert.match(objectBuiltins, /oseo_internal_to_object/u);
   assert.match(objectBuiltins, /primitive_value/u);
   assert.match(objectBuiltins, /oseo_internal_same_value/u);
-  assert.match(functions, /intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE/u);
+  assert.match(functions, /intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE/u);
   assert.match(functions, /intrinsic <= OSEO_INTRINSIC_ASYNC_ITERATOR_SELF/u);
 });
 
@@ -995,6 +995,37 @@ test("populates the realm-owned Number intrinsic cluster", () => {
   assert.match(numberSource, /number_data/u);
 });
 
+test("populates the realm-owned Boolean intrinsic cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+  const booleanSource = sources.get("runtime_boolean.c") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const intrinsic of [
+    "BOOLEAN_PROTOTYPE",
+    "BOOLEAN",
+    "BOOLEAN_TO_STRING",
+    "BOOLEAN_VALUE_OF",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of ["Boolean", "constructor", "toString", "valueOf"]) {
+    assert.match(booleanSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(internalHeader, /OSEO_BOOLEAN_CONSTRUCTOR_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_BOOLEAN_TO_STRING_CODE_ID/u);
+  assert.match(internalHeader, /OSEO_BOOLEAN_VALUE_OF_CODE_ID/u);
+  assert.match(booleanSource, /OSEO_FUNCTION_ORDINARY/u);
+  assert.match(booleanSource, /primitive_data/u);
+  assert.match(booleanSource, /OSEO_TAG_BOOLEAN/u);
+  assert.match(bindingSource, /oseo_internal_install_boolean_global/u);
+  assert.match(
+    objectBuiltins,
+    /intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE/u,
+  );
+});
+
 test("populates the realm-owned Math namespace object", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const bindingSource = sources.get("runtime_binding.c") ?? "";
@@ -1641,7 +1672,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 267/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 270/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2447,7 +2478,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 267/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 270/u);
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one

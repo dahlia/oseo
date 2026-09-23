@@ -190,6 +190,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_WEAK_COLLECTION_CODE_ID_RANGE_FIRST,
      OSEO_WEAK_COLLECTION_CODE_ID_RANGE_LAST,
      oseo_internal_weak_collection_builtin_dispatch},
+    {OSEO_BOOLEAN_CODE_ID_RANGE_FIRST,
+     OSEO_BOOLEAN_CODE_ID_RANGE_LAST,
+     oseo_internal_boolean_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -1065,6 +1068,10 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_NUMBER_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_NUMBER_PARSE_INT) {
         materialized = oseo_internal_number_intrinsic(context);
+    } else if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE ||
+               (intrinsic >= OSEO_INTRINSIC_BOOLEAN &&
+                intrinsic <= OSEO_INTRINSIC_BOOLEAN_VALUE_OF)) {
+        materialized = oseo_internal_boolean_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_IS_FINITE ||
                intrinsic == OSEO_INTRINSIC_IS_NAN) {
         materialized = oseo_internal_global_numeric_intrinsic(
@@ -1084,12 +1091,6 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
                (intrinsic >= OSEO_INTRINSIC_BIGINT &&
                 intrinsic <= OSEO_INTRINSIC_BIGINT_VALUE_OF)) {
         materialized = oseo_internal_bigint_intrinsic(context);
-    } else if (intrinsic >= OSEO_INTRINSIC_BOOLEAN_PROTOTYPE &&
-               intrinsic <= OSEO_INTRINSIC_STRING_PROTOTYPE) {
-        materialized = oseo_internal_primitive_wrapper_prototype(
-            context,
-            intrinsic
-        );
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE ||
                (intrinsic >= OSEO_INTRINSIC_PROMISE &&
                 intrinsic <= OSEO_INTRINSIC_PROMISE_SPECIES)) {

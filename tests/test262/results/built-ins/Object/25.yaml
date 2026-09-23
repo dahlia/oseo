@@ -409,16 +409,19 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/built-ins/Object/prototype/toLocaleString/primitive_this_\
-        value_getter.js strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Object/prototype/toLocaleString/primiti\
-        ve_this_value_getter.js:91:23: error[OSEO1001]: Unknown binding
-        'Boolean'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

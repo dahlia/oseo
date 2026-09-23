@@ -996,6 +996,13 @@ UTF-16 length before allocation, padding converts its filler only when padding
 is needed, and the well-formedness pair detects or replaces lone surrogates
 without disturbing valid pairs. The generated-code ABI gains no entry point.
 
+The `m5-119` ABI materializes the callable and constructible `%Boolean%`, its
+false-valued prototype, branded wrapper objects, and the prototype's branded
+`toString` and `valueOf` methods in *runtime\_boolean.c*. Three code IDs use a
+new Boolean built-in range, and three intrinsic slots are added. The public
+context layout expands with those slots; the generated-code ABI gains no entry
+point.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

@@ -202,6 +202,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "ArrayBuffer" ||
     name === "Atomics" ||
     name === "BigInt" ||
+    name === "Boolean" ||
     name === "DataView" ||
     name === "Date" ||
     name === "Error" ||
@@ -593,6 +594,7 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
     name === "Array" ||
     name === "ArrayBuffer" ||
     name === "BigInt" ||
+    name === "Boolean" ||
     name === "DataView" ||
     name === "Date" ||
     name === "Function" ||

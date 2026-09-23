@@ -6782,6 +6782,34 @@ to 133 families. The node allocates five IDs in the existing String built-in
 range, adds no runtime component or generated-code entry point, and moves the
 runtime ABI to `m5-118`.
 
+Implemented M5b node `boolean-intrinsic` materializes the callable and
+constructible `Boolean` global, its false-valued `%Boolean.prototype%`,
+collector-traced wrapper objects carrying `[[BooleanData]]`, and the branded
+`toString` and `valueOf` methods. Calling the constructor applies `ToBoolean`
+without coercing an object; construction applies the same conversion and then
+uses the new target's prototype, falling back to the constructor realm's
+intrinsic prototype. The methods accept Boolean primitives and branded
+wrappers only, and `toString` returns the exact `"true"` or `"false"` text.
+
+Fixed native and generated differential evidence at seed `0x60007b00` covers
+falsy and truthy primitive classes, object conversion without `ToPrimitive`,
+branded and unbranded receivers, derived and alternate prototype construction,
+both specialization policies, false numeric hints, deliberate shape-guard
+misses, generic fallback, and collection forced at every safepoint. All 51
+paths under *test/built-ins/Boolean/* are reviewed: 47 pass, one retains the
+cross-realm prerequisite, and three retain the separately owned dynamic
+`eval`, Function-constructor, and sloppy undeclared-binding boundaries. Another
+268 reviewed paths outside the root move from `unsupported-profile-feature` to
+`pass`, and no reviewed path moves away from `pass`. The manifest moves from
+21,214 to 21,265 paths and from 17,580 to 17,895 passes, keeps 1,556 expected
+negatives, and moves from 2,078 to 1,814 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property ratchet moves from
+155 to 156 domains and seeds and from 5,779 to 5,791 ordinary cases, and the
+evidence inventory moves from 133 to 134 families. The public intrinsic table,
+Boolean built-in code range, and new runtime component move the ABI to
+`oseo-runtime-m5-119` without adding a generated-code entry point or changing
+the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

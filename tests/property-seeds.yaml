@@ -492,3 +492,7 @@ families:
     owner: tests/property/m5-string-prototype-pad.property.test.ts
     start: 0x60007a00
     end: 0x60007aff
+  - family: m5-boolean-intrinsic
+    owner: tests/property/m5-boolean-intrinsic.property.test.ts
+    start: 0x60007b00
+    end: 0x60007bff

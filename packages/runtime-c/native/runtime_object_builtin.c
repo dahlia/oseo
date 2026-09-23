@@ -469,7 +469,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
      * the exotic own properties and the `constructor` property, is
      * reached through the realm intrinsic table rather than built here.
      */
-    if (intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
+    if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
@@ -490,7 +491,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         }
     }
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
+    if (intrinsic == OSEO_INTRINSIC_BOOLEAN_PROTOTYPE ||
+        intrinsic == OSEO_INTRINSIC_BIGINT_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_NUMBER_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {

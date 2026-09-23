@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { buildHir, buildMir, printHir, printMir } from "../src/index.ts";
+import { intrinsicGlobalKind } from "../src/hir.ts";
 import type { SourceRange, SyntaxProgram } from "../src/index.ts";
 
 function includePropertiesWhen<const Properties extends object>(
@@ -234,13 +235,19 @@ test("admits a function declaration that replaces a replaceable global", () => {
   // CreateGlobalFunctionBinding redefines a configurable intrinsic
   // property whole, which is exactly this profile's uniform writable,
   // enumerable, non-configurable property.
-  for (const name of ["Symbol", "TypeError"]) {
+  for (const name of ["Boolean", "Symbol", "TypeError"]) {
     const result = buildHir(intrinsicGlobalProgram("function", name));
     assert.deepEqual(result.diagnostics, []);
     assert.deepEqual(result.program?.globalObjectBindings, [
       { declaration: "function", id: 0, name, range },
     ]);
   }
+});
+
+test("classifies Boolean as a replaceable intrinsic global", () => {
+  assert.equal(intrinsicGlobalKind("Boolean"), "replaceable");
+  assert.equal(intrinsicGlobalKind("undefined"), "restricted");
+  assert.equal(intrinsicGlobalKind("BooleanLike"), undefined);
 });
 
 test("carries intrinsic global declarations to the global record", () => {

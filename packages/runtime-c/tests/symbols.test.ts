@@ -86,6 +86,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_array.c"],
       ["source", "runtime_object_builtin.c"],
       ["source", "runtime_number.c"],
+      ["source", "runtime_boolean.c"],
       ["source", "runtime_array_buffer.c"],
       ["source", "runtime_set.c"],
       ["source", "runtime_typed_array.c"],
