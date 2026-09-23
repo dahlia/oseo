@@ -13,4 +13,9 @@ dependencies:
   - reviewed-evidence-direction-policy
   - runtime-error-observation
 landed: false
-status: ready
+status: parked
+reason: "The port exposes five out-of-root global-code rows where assert.throws
+  catches an absent $262 binding and 453 RegExp rows whose reviewed harness
+  omits required helper definitions. A maintainer must decide whether parsed
+  AST and harness metadata may preclassify those capabilities as unsupported
+  before manifest regeneration."
