@@ -1163,21 +1163,19 @@ OseoResult oseo_promise_resolve(
     OseoContext *context,
     OseoValue value
 ) {
-    if (is_promise(value)) return normal(value);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = value;
-    result = oseo_internal_promise_create(context);
+    result = oseo_internal_intrinsic(context, OSEO_INTRINSIC_PROMISE);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_promise_resolve_into(
+        result = promise_resolve_with(
             context,
             frame.slots[1],
             frame.slots[0]
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -2333,44 +2331,58 @@ static OseoResult promise_species_constructor(
     return result;
 }
 
-/*
- * PromiseResolve(C, x) as this profile admits it. ECMA-262 returns an
- * already-native promise unchanged only after reading its `constructor`
- * and finding it SameValue with C. This profile does not perform that
- * read, so it compares C with %Promise% instead and keeps the missing
- * read as a recorded gap; every other constructor still gets its own
- * capability.
- */
+/* PromiseResolve(C, x), including the observable constructor read for a
+ * native promise. A matching constructor returns x itself; every other
+ * value is resolved through a fresh capability for C. */
 static OseoResult promise_resolve_with(
     OseoContext *context,
     OseoValue constructor,
     OseoValue value
 ) {
-    OseoResult promise_intrinsic =
-        oseo_internal_intrinsic(context, OSEO_INTRINSIC_PROMISE);
-    if (promise_intrinsic.status != OSEO_STATUS_NORMAL) {
-        return promise_intrinsic;
-    }
-    if (constructor == promise_intrinsic.value) {
-        return oseo_promise_resolve(context, value);
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = constructor;
     frame.slots[1] = value;
-    result = new_promise_capability(context, frame.slots[0]);
-    frame.slots[2] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
+
+    bool matching_constructor = false;
+    if (is_promise(frame.slots[1])) {
+        static const uint16_t constructor_units[] = {
+            'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
+        };
+        result = oseo_string_from_units(
+            context,
+            constructor_units,
+            sizeof(constructor_units) / sizeof(*constructor_units)
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[1],
+                frame.slots[2]
+            );
+            frame.slots[3] = result.value;
+        }
+        matching_constructor = result.status == OSEO_STATUS_NORMAL &&
+            frame.slots[3] == frame.slots[0];
+    }
+    if (result.status == OSEO_STATUS_NORMAL && matching_constructor) {
+        result = normal(frame.slots[1]);
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = new_promise_capability(context, frame.slots[0]);
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !matching_constructor) {
         result = capability_settle(
             context,
-            frame.slots[2],
+            frame.slots[4],
             frame.slots[1],
             true
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = capability_promise(context, frame.slots[2]);
+    if (result.status == OSEO_STATUS_NORMAL && !matching_constructor) {
+        result = capability_promise(context, frame.slots[4]);
     }
     oseo_roots_release(context, &frame);
     return result;

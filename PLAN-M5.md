@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,156 reviewed cases: 17,524 passes, 1,556 expected negatives, and 2,076
+21,265 reviewed cases: 17,895 passes, 1,556 expected negatives, and 1,814
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 132 indexed records in the normative
+M5a is complete. The 135 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,524 passes across 21,156 paths, and the property inventory records 154
-domains, 154 seeds, and an ordinary case budget of 5,767.
+17,895 passes across 21,265 paths, and the property inventory records 158
+domains, 158 seeds, and an ordinary case budget of 5,815.
 
 
 M5a implementation history
@@ -1113,12 +1113,13 @@ in the 2027 edition, outside the M5a denominator.
 Seven cases stay outside the reviewed subset. Unit 7.6 promotes the four
 *next* cases and one *throw* case that
 observe AsyncFromSyncIteratorContinuation closing the wrapped synchronous
-iterator when an awaited stepped value rejects. `PromiseResolve` does not read
-the resolved value's
-`constructor`, so a poisoned `constructor` getter neither rejects nor reaches
-the generator, which three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
-cases and the three *AsyncGeneratorPrototype/return/* broken-promise cases
-observe. The remaining
+iterator when an awaited stepped value rejects. At that checkpoint,
+`PromiseResolve` did not read the resolved value's `constructor`, so a
+poisoned getter neither rejected nor reached the generator. The M5b
+`promise-resolve-constructor-read` node later closed that behavior, but its
+three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper cases and the three
+*AsyncGeneratorPrototype/return/* broken-promise cases remain outside the
+reviewed subset because the node declares no inventory roots. The remaining
 *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case stayed outside
 Unit 7.6; its former missing `%GeneratorPrototype%.throw` attribution was
 stale, and M5a Unit 8.4 later traced the forwarded throw, repaired the two
@@ -3783,6 +3784,39 @@ expected negatives, and 1,006 unsupported profile features. Materializing the
 intrinsic retires the `oseo_promise_construct`, `oseo_promise_race`, and
 `oseo_promise_reject` generated-code entry points and moves the runtime ABI to
 `oseo-runtime-m5-53` without changing the graph's orchestration state.
+
+Implemented M5b node `promise-resolve-constructor-read` completes
+`PromiseResolve(C, x)` for native Promise values. The operation reads
+`x.constructor` through ordinary property access before deciding whether to
+reuse `x`. It returns the value unchanged only when that read is SameValue
+with `C`; a different constructor creates and resolves a fresh capability for
+`C`, and an abrupt getter propagates before capability construction. A
+non-Promise thenable does not receive the constructor read and keeps the
+existing asynchronous thenable assimilation path. The shared operation covers
+`Promise.resolve`, derived Promise statics, combinators,
+`Promise.prototype.finally`, await, asynchronous generators, and
+asynchronous-from-synchronous iterator continuations.
+
+Fixed native differential evidence covers matching intrinsic and derived
+constructors, both directions of a different constructor, a throwing getter,
+and a thenable whose poisoned constructor must remain unread. The generated
+property at seed `0x60003801` draws the same constructor relations over bounded
+integers with a 12-case ordinary budget and an independent identity,
+constructor-read, result-brand, and settlement oracle. A second property at
+seed `0x60003802` crosses a throwing read with async-function await,
+async-generator await and return, and an asynchronous-from-synchronous
+iterator continuation. Fixed and generated suites compare Node.js, Deno, and
+native execution with specialization enabled and disabled, force collection
+at every safepoint, and retain a false numeric hint with a deliberate
+shape-guard miss and compiled generic fallback. The node adds no component,
+built-in code ID, intrinsic slot, or generated-code entry point.
+The node declares no test262 inventory roots, so the applicable upstream paths
+remain outside the reviewed subset and fixed and generated cases replace the
+standards lane. The reviewed manifest stays at 21,265 cases with 17,895 passes,
+1,556 expected negatives, and 1,814 unsupported profile features. The property
+inventory moves from 156 to 158 domains and seeds and from 5,791 to 5,815
+ordinary cases, the evidence inventory moves from 134 to 135 families, and
+the runtime ABI moves to `m5-120`.
 
 Implemented M5b node `object-descriptor-queries` completes the descriptor
 checkpoint's reporting half over the existing property-key and descriptor

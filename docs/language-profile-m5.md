@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 132
+M5a is complete. The normative family records described below inventory 135
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,156 reviewed cases: 17,524 passes, 1,556
-expected negatives, and 2,076 unsupported profile features. It records no
+The current manifest contains 21,265 reviewed cases: 17,895 passes, 1,556
+expected negatives, and 1,814 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -2269,9 +2269,10 @@ current evidence assessment. Those live only in the indexed records above.
     and `value`, and both happen before completion precedence applies, so an
     in-flight body error still observes those getters. The reviewed
     *test/built-ins/AsyncFromSyncIteratorPrototype/* cases pin that wrapper
-    directly: thirty-one pass, four are unsupported, and three stay outside
-    the reviewed subset, all of them poisoned-wrapper cases belonging to the
-    `PromiseResolve` gap below. The *throw/iterator-result.js* case entered
+    directly: thirty-one pass, four are unsupported, and three poisoned-wrapper
+    cases stay outside the reviewed subset because the
+    `promise-resolve-constructor-read` node declares no inventory roots. The
+    *throw/iterator-result.js* case entered
     as a pass once M5a Unit 8.4, recorded below, repaired the throw
     forwarded through the wrapper to a synchronous generator.
     The head reuses the synchronous
@@ -3255,6 +3256,39 @@ revision, 41,091-path inventory, manifest schema and vocabulary, and
 zero-override policy are unchanged. The materialized constructor and its
 retired fast-path entry points move the runtime ABI to `oseo-runtime-m5-53`
 without changing the graph's orchestration state.
+
+M5b node `promise-resolve-constructor-read` completes
+`PromiseResolve(C, x)` for native Promise values. The operation reads
+`x.constructor` through ordinary property access before deciding whether to
+reuse `x`. It returns the value unchanged only when that read is SameValue
+with `C`; a different constructor creates and resolves a fresh capability for
+`C`, and an abrupt getter propagates before capability construction. A
+non-Promise thenable does not receive the constructor read and keeps the
+existing asynchronous thenable assimilation path. The shared operation covers
+`Promise.resolve`, derived Promise statics, combinators,
+`Promise.prototype.finally`, await, asynchronous generators, and
+asynchronous-from-synchronous iterator continuations.
+
+Fixed native differential evidence covers matching intrinsic and derived
+constructors, both directions of a different constructor, a throwing getter,
+and a thenable whose poisoned constructor must remain unread. The generated
+property at seed `0x60003801` draws the same constructor relations over bounded
+integers with a 12-case ordinary budget and an independent identity,
+constructor-read, result-brand, and settlement oracle. A second property at
+seed `0x60003802` crosses a throwing read with async-function await,
+async-generator await and return, and an asynchronous-from-synchronous
+iterator continuation. Fixed and generated suites compare Node.js, Deno, and
+native execution with specialization enabled and disabled, force collection
+at every safepoint, and retain a false numeric hint with a deliberate
+shape-guard miss and compiled generic fallback. The node adds no component,
+built-in code ID, intrinsic slot, or generated-code entry point.
+The node declares no test262 inventory roots, so the applicable upstream paths
+remain outside the reviewed subset and fixed and generated cases replace the
+standards lane. The reviewed manifest stays at 21,265 cases with 17,895 passes,
+1,556 expected negatives, and 1,814 unsupported profile features. The property
+inventory moves from 156 to 158 domains and seeds and from 5,791 to 5,815
+ordinary cases, the evidence inventory moves from 134 to 135 families, and
+the runtime ABI moves to `m5-120`.
 
 M5b node `object-descriptor-queries` completes the descriptor checkpoint's
 reporting half. `Object.getOwnPropertyDescriptor` and the new
@@ -5194,10 +5228,10 @@ dynamic-source dependency, six need `Reflect.construct` for their
 *isConstructor.js* include, five need `cross-realm` and `Reflect`, and
 *AsyncFunction/is-not-a-global.js* expects the runtime `ReferenceError` an
 unresolved global name produces, which this profile reports as a
-source-located diagnostic instead. The six paths that stay outside the
-reviewed subset are the already-recorded `PromiseResolve` constructor-read
-cases owned by the intrinsics and built-in objects stream. No previously
-reviewed path loses a pass. Four reviewed paths outside the roots move from
+source-located diagnostic instead. The six `PromiseResolve` constructor-read
+paths stay outside the reviewed subset because that node declares no inventory
+roots. No previously reviewed path loses a pass. Four reviewed paths outside
+the roots move from
 `unsupported-profile-feature` to `pass`:
 *Object/prototype/toString/symbol-tag-generators-builtin.js* and
 *async-generator/default-proto.js* reached the retired reflection boundary,
@@ -7623,18 +7657,6 @@ complete. The remaining gaps retain their existing owners.
     *packages/parser-babel/tests/bindings.test.ts* and
     *packages/compiler/tests/modules.test.ts* prove the diagnostic and its
     location. Owner: the modules and asynchronous execution stream.
- -  `PromiseResolve` does not read the resolved value's `constructor`. The
-    specification returns an already-native promise unchanged only after
-    `SameValue(value.constructor, %Promise%)` holds, so a value carrying a
-    throwing `constructor` getter must make the operation abrupt. This
-    profile resolves the value without that read, so the getter never runs
-    and the abrupt completion the specification propagates never appears.
-    Six reviewed-candidate cases turn on the difference and stay outside the
-    reviewed subset: three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
-    cases and the three *AsyncGeneratorPrototype/return/* broken-promise
-    cases and *test/built-ins/Promise/resolve/arg-uniq-ctor.js*. `Promise`
-    is now a materialized intrinsic value, so only the `constructor` read
-    itself remains. Owner: the intrinsics and built-in objects stream.
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal

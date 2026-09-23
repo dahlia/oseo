@@ -1003,6 +1003,16 @@ new Boolean built-in range, and three intrinsic slots are added. The public
 context layout expands with those slots; the generated-code ABI gains no entry
 point.
 
+The `m5-120` ABI completes PromiseResolve for native Promise values. It reads
+the value's `constructor` through ordinary property access and reuses the
+value only when that result is the selected constructor. A different
+constructor creates and settles a fresh capability, and an abrupt getter
+propagates before capability construction. Non-Promise thenables skip this
+constructor read. Await and asynchronous-generator drivers deliver that
+abrupt completion through their existing rejection or throw continuation
+instead of returning it synchronously. No built-in code ID, intrinsic slot,
+heap kind, public layout, or generated-code entry point is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

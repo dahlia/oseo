@@ -3146,6 +3146,24 @@ static OseoResult async_from_sync_promise(
         result = oseo_promise_resolve(context, frame.slots[2]);
         frame.slots[5] = result.value;
     }
+    if (result.status == OSEO_STATUS_THROW &&
+        !context->has_diagnostic && close_on_rejection && !done) {
+        OseoResult closed = oseo_iterator_close(
+            context,
+            frame.slots[0],
+            true
+        );
+        if (closed.status == OSEO_STATUS_THROW && context->has_diagnostic) {
+            result = closed;
+        } else {
+            result = (OseoResult){OSEO_STATUS_THROW, frame.slots[5]};
+        }
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        result = rejected_async_step(context, result);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     if (result.status == OSEO_STATUS_NORMAL &&
         close_on_rejection && !done) {
         result = oseo_environment_create(context, 1u);
@@ -3290,12 +3308,11 @@ OseoResult oseo_async_iterator_next_start(
     OseoValue next_method
 ) {
     bool from_sync = is_async_from_sync_iterator(iterator);
-    OseoValue slots[3] = {
+    OseoValue slots[2] = {
         from_sync ? ordinary_object(iterator)->async_sync_iterator : iterator,
         next_method,
-        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 3u};
+    OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
     OseoResult result;
     if (from_sync) {
@@ -3316,10 +3333,6 @@ OseoResult oseo_async_iterator_next_start(
             NULL,
             oseo_undefined()
         );
-        slots[2] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_promise_resolve(context, slots[2]);
-        }
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -3570,8 +3583,6 @@ OseoResult oseo_async_iterator_close_start(
             } else {
                 result = rejected_async_step(context, result);
             }
-        } else if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_promise_resolve(context, slots[2]);
         }
         *needs_await = result.status == OSEO_STATUS_NORMAL;
     }
@@ -3926,10 +3937,6 @@ static OseoResult async_delegate_start_invoke(
             &slots[3],
             oseo_undefined()
         );
-        slots[3] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_promise_resolve(context, slots[3]);
-        }
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -3993,7 +4000,7 @@ OseoResult oseo_async_iterator_delegate_return_start(
         }
     } else {
         *value_only = oseo_boolean(true);
-        result = oseo_promise_resolve(context, slots[1]);
+        result = normal(slots[1]);
     }
     oseo_roots_pop(context, &frame);
     return result;

@@ -845,6 +845,22 @@ generic fallback, deliberate guard misses, subclass and species behavior, and
 collection forced at every safepoint. The node reviews only its declared
 `Promise.all` and `Promise.race` test262 inventory roots.
 
+### PromiseResolve constructor-read evidence
+
+M5b node `promise-resolve-constructor-read` completes the shared
+PromiseResolve operation in *runtime\_promise.c*. It reads a native Promise
+value's `constructor` before identity reuse and propagates an abrupt getter
+through await, asynchronous generators, and asynchronous iterator
+continuations. Non-Promise thenables retain their existing path.
+
+The node adds no component, internal helper, built-in code ID, intrinsic
+slot, or generated-code entry point. It moves `abiVersion` to `m5-120` after
+the Boolean intrinsic's `m5-119`. Fixed and generated native differential
+evidence covers both specialization policies, false hints, guard misses,
+generic fallback, and collection forced at every safepoint. It declares no
+test262 inventory roots, so the applicable upstream paths remain outside
+the reviewed subset.
+
 ### Object descriptor query evidence
 
 M5b node `object-descriptor-queries` completes the reporting half of the

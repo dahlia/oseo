@@ -255,7 +255,9 @@ static OseoResult complete_step(
  * The promise `then` derives is never observed: only these two reactions
  * settle it, and a body throw becomes the pending request's rejection
  * rather than this promise's, so it is marked handled the way every
- * other internal await marks its own.
+ * other internal await marks its own. This is the Await operation's sole
+ * PromiseResolve: iterator start helpers supply the raw value returned by
+ * next, return, or throw rather than resolving it before suspension.
  */
 static OseoResult install_await_reactions(
     OseoContext *context,
@@ -324,15 +326,38 @@ static OseoResult park_awaiting_return(
     OseoValue generator,
     OseoValue value
 ) {
-    OseoGenerator *state = generator_state(generator);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = generator;
+    frame.slots[1] = value;
+    OseoGenerator *state = generator_state(frame.slots[0]);
     state->state = OSEO_GENERATOR_AWAITING;
     state->awaiting_return = true;
-    OseoResult result = install_await_reactions(context, generator, value);
-    if (result.status != OSEO_STATUS_NORMAL) {
-        state = generator_state(generator);
+    result = install_await_reactions(
+        context,
+        frame.slots[0],
+        frame.slots[1]
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+        oseo_context_clear_language_error(context);
+        state = generator_state(frame.slots[0]);
+        state->state = OSEO_GENERATOR_COMPLETED;
+        state->awaiting_return = false;
+        result = complete_step(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            true,
+            true
+        );
+    } else if (result.status != OSEO_STATUS_NORMAL) {
+        state = generator_state(frame.slots[0]);
         state->state = OSEO_GENERATOR_COMPLETED;
         state->awaiting_return = false;
     }
+    oseo_roots_release(context, &frame);
     return result;
 }
 
@@ -382,6 +407,11 @@ static OseoResult drain_queue(
                     frame.slots[0],
                     frame.slots[1]
                 );
+                if (result.status == OSEO_STATUS_NORMAL &&
+                    generator_state(frame.slots[0])->state !=
+                        OSEO_GENERATOR_AWAITING) {
+                    continue;
+                }
                 break;
             }
             bool throwing = resume_kind == OSEO_GENERATOR_RESUME_THROW;
@@ -443,6 +473,18 @@ static OseoResult drain_queue(
                     frame.slots[0],
                     frame.slots[1]
                 );
+                if (result.status == OSEO_STATUS_THROW &&
+                    !context->has_diagnostic) {
+                    frame.slots[1] = result.value;
+                    oseo_context_clear_language_error(context);
+                    state = generator_state(frame.slots[0]);
+                    state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
+                    state->suspend_reason = OSEO_GENERATOR_SUSPEND_YIELD;
+                    result = normal(oseo_undefined());
+                    resumed = true;
+                    resumption_kind = OSEO_GENERATOR_RESUME_THROW;
+                    continue;
+                }
                 break;
             }
             result = complete_step(
@@ -654,6 +696,7 @@ static OseoResult drive_async_function(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = generator;
     frame.slots[1] = resumption_value;
+resume_body:
     state = generator_state(frame.slots[0]);
     if (resumed) {
         state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
@@ -703,6 +746,14 @@ static OseoResult drive_async_function(
             frame.slots[0],
             frame.slots[1]
         );
+        if (result.status == OSEO_STATUS_THROW &&
+            !context->has_diagnostic) {
+            frame.slots[1] = result.value;
+            oseo_context_clear_language_error(context);
+            resumed = true;
+            rejected = true;
+            goto resume_body;
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result.value = oseo_undefined();
         }

@@ -1,0 +1,3 @@
+version: 1
+id: promise-resolve-constructor-read
+record: docs/language-profile-m5/families/promise-resolve-constructor-read.yaml
