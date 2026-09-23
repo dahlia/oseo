@@ -255,7 +255,9 @@ static OseoResult complete_step(
  * The promise `then` derives is never observed: only these two reactions
  * settle it, and a body throw becomes the pending request's rejection
  * rather than this promise's, so it is marked handled the way every
- * other internal await marks its own.
+ * other internal await marks its own. This is the Await operation's sole
+ * PromiseResolve: iterator start helpers supply the raw value returned by
+ * next, return, or throw rather than resolving it before suspension.
  */
 static OseoResult install_await_reactions(
     OseoContext *context,

@@ -1718,7 +1718,8 @@ OseoResult oseo_async_iterator_next(
 );
 /*
  * Start one asynchronous iterator step without draining jobs. The returned
- * promise is awaited by generated traced-frame code, then inspected through
+ * value is the operand of the generated traced-frame Await, which owns the
+ * step's sole PromiseResolve. The settled result is inspected through
  * oseo_async_iterator_result after the frame resumes.
  */
 OseoResult oseo_async_iterator_next_start(
@@ -1837,10 +1838,11 @@ OseoResult oseo_async_iterator_delegate_throw(
     bool *done
 );
 /*
- * Start asynchronous yield-delegation steps without draining their result
- * promises. `value_only` is true only when a native asynchronous iterator
- * has no `return` method and the returned promise directly awaits the
- * delivered completion value.
+ * Start asynchronous yield-delegation steps without draining jobs. Each
+ * returned value is the operand of the generated traced-frame Await, which
+ * owns the step's sole PromiseResolve. `value_only` is true only when a
+ * native asynchronous iterator has no `return` method and that Await directly
+ * consumes the delivered completion value.
  */
 OseoResult oseo_async_iterator_delegate_next_start(
     OseoContext *context,

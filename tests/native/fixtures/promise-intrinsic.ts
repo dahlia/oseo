@@ -228,10 +228,117 @@ async function observeBrokenAsyncFromSync() {
     console.log("resolve async from sync", error === broken.error);
   }
 }
+function observedAwaitOperand(label, value, poisonSecondRead) {
+  const promise = Promise.resolve(value);
+  let reads = 0;
+  Object.defineProperty(promise, "constructor", {
+    configurable: true,
+    get() {
+      reads = reads + 1;
+      console.log("resolve iterator constructor read", label, reads);
+      if (poisonSecondRead && reads === 2) {
+        throw new EvalError(label + " second constructor read");
+      }
+      return Promise;
+    },
+  });
+  return {
+    promise,
+    reads() { return reads; },
+  };
+}
+async function observeAsyncIteratorNextConstructorRead() {
+  const observed = observedAwaitOperand(
+    "next",
+    { value: undefined, done: true },
+    false,
+  );
+  const iterable = {
+    [Symbol.asyncIterator]() {
+      return { next() { return observed.promise; } };
+    },
+  };
+  for await (const value of iterable) console.log("unexpected next", value);
+  console.log("resolve async iterator next reads", observed.reads());
+}
+async function observeAsyncIteratorCloseConstructorRead() {
+  const observed = observedAwaitOperand(
+    "close",
+    { value: undefined, done: true },
+    true,
+  );
+  const iterable = {
+    [Symbol.asyncIterator]() {
+      return {
+        next() { return Promise.resolve({ value: 38, done: false }); },
+        return() { return observed.promise; },
+      };
+    },
+  };
+  try {
+    for await (const value of iterable) {
+      console.log("resolve async iterator close value", value);
+      break;
+    }
+    console.log("resolve async iterator close reads", observed.reads());
+  } catch (error) {
+    console.log("unexpected async iterator close", error.message);
+  }
+}
+async function observeAsyncDelegationConstructorRead() {
+  const observed = observedAwaitOperand(
+    "delegate next",
+    { value: 39, done: true },
+    true,
+  );
+  const source = {
+    [Symbol.asyncIterator]() {
+      return { next() { return observed.promise; } };
+    },
+  };
+  async function* forward() { return yield* source; }
+  try {
+    const step = await forward().next();
+    console.log(
+      "resolve async delegate next",
+      step.value,
+      step.done,
+      observed.reads(),
+    );
+  } catch (error) {
+    console.log("unexpected async delegate next", error.message);
+  }
+
+  const returned = observedAwaitOperand("delegate return", 40, true);
+  const openSource = {
+    [Symbol.asyncIterator]() {
+      return {
+        next() { return Promise.resolve({ value: 1, done: false }); },
+      };
+    },
+  };
+  async function* forwardOpen() { yield* openSource; }
+  const iterator = forwardOpen();
+  await iterator.next();
+  try {
+    const step = await iterator.return(returned.promise);
+    console.log(
+      "resolve async delegate return",
+      step.value,
+      step.done,
+      returned.reads(),
+    );
+  } catch (error) {
+    console.log("unexpected async delegate return", error.message);
+  }
+}
 observeBrokenAwait()
   .then(observeBrokenGeneratorAwait)
   .then(observeBrokenGeneratorReturn)
-  .then(observeBrokenAsyncFromSync);
+  .then(observeBrokenAsyncFromSync)
+  .then(observeAsyncIteratorNextConstructorRead)
+  .then(observeAsyncIteratorCloseConstructorRead)
+  .then(observeAsyncDelegationConstructorRead);
 Promise.reject(new RangeError("no")).catch(function (error) {
   console.log("reject", error instanceof RangeError, error.message);
 });
