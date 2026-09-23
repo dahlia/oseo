@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 133 indexed records in the normative
+M5a is complete. The 134 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,524 passes across 21,156 paths, and the property inventory records 156
-domains, 156 seeds, and an ordinary case budget of 5,791.
+17,580 passes across 21,214 paths, and the property inventory records 157
+domains, 157 seeds, and an ordinary case budget of 5,803.
 
 
 M5a implementation history
