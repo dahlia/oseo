@@ -12,9 +12,9 @@
  * This component owns construction, element conversion, the
  * integer-indexed exotic element operations the generic property paths
  * delegate to, the prototype accessors, at, set, subarray, and the
- * iterator methods, and the iterative, search and join, and mutation and
- * copying prototype methods. The sorting prototype methods and the from
- * and of statics remain later graph nodes.
+ * iterator methods, and the iterative, search and join, mutation and
+ * copying, and sorting prototype methods. The from and of statics remain
+ * later graph nodes.
  */
 
 #define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
@@ -3014,6 +3014,225 @@ static OseoResult typed_array_to_reversed(
     return result;
 }
 
+/*
+ * CompareTypedArrayElements. A supplied comparator observes the two captured
+ * elements and its result passes through ToNumber, with NaN treated as zero.
+ * The default path compares Number values numerically, orders NaN last and
+ * negative zero before positive zero, and compares BigInt values directly.
+ */
+static OseoResult typed_array_compare_elements(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    OseoValue comparator,
+    double *order
+) {
+    OseoValue slots[4] = {left, right, comparator, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_number(0.0));
+    *order = 0.0;
+    if (tag_of(slots[2]) != OSEO_TAG_UNDEFINED) {
+        result = oseo_call_function(
+            context,
+            slots[2],
+            oseo_undefined(),
+            2u,
+            slots,
+            oseo_undefined()
+        );
+        slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_to_number(context, slots[3]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            double compared = number_value(result.value);
+            *order = isnan(compared) ? 0.0 : compared;
+        }
+    } else if (is_bigint(slots[0])) {
+        *order = (double)oseo_internal_bigint_compare(slots[0], slots[1]);
+    } else {
+        double left_number = number_value(slots[0]);
+        double right_number = number_value(slots[1]);
+        if (isnan(left_number) || isnan(right_number)) {
+            if (isnan(left_number) && !isnan(right_number)) *order = 1.0;
+            else if (!isnan(left_number) && isnan(right_number)) *order = -1.0;
+        } else if (left_number < right_number) {
+            *order = -1.0;
+        } else if (left_number > right_number) {
+            *order = 1.0;
+        } else if (left_number == 0.0 && right_number == 0.0) {
+            if (signbit(left_number) && !signbit(right_number)) *order = -1.0;
+            else if (!signbit(left_number) && signbit(right_number)) {
+                *order = 1.0;
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_number(*order));
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Stable bottom-up merge sort over the rooted element snapshot. Both the
+ * source and scratch buffers remain roots while a comparator runs, and an
+ * abrupt comparator or result conversion stops before another call.
+ */
+static OseoResult typed_array_merge_sort(
+    OseoContext *context,
+    OseoRootFrame *elements,
+    size_t length,
+    OseoValue comparator
+) {
+    if (length < 2u) return normal(oseo_undefined());
+    OseoValue comparator_slot = comparator;
+    OseoRootFrame comparator_frame = {NULL, &comparator_slot, 1u};
+    oseo_roots_push(context, &comparator_frame);
+    OseoRootFrame scratch = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &scratch, length);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &comparator_frame);
+        return result;
+    }
+    OseoValue *source = elements->slots;
+    OseoValue *target = scratch.slots;
+    for (size_t width = 1u;
+         result.status == OSEO_STATUS_NORMAL && width < length;
+         width *= 2u) {
+        for (size_t start = 0u;
+             result.status == OSEO_STATUS_NORMAL && start < length;
+             start += 2u * width) {
+            size_t middle = length - start < width
+                ? length
+                : start + width;
+            size_t end = length - start < 2u * width
+                ? length
+                : start + 2u * width;
+            size_t left = start;
+            size_t right = middle;
+            size_t output = start;
+            while (result.status == OSEO_STATUS_NORMAL && left < middle &&
+                   right < end) {
+                double order = 0.0;
+                result = typed_array_compare_elements(
+                    context,
+                    source[left],
+                    source[right],
+                    comparator_slot,
+                    &order
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (order > 0.0) {
+                    target[output] = source[right];
+                    right += 1u;
+                } else {
+                    target[output] = source[left];
+                    left += 1u;
+                }
+                output += 1u;
+            }
+            while (result.status == OSEO_STATUS_NORMAL && left < middle) {
+                target[output] = source[left];
+                left += 1u;
+                output += 1u;
+            }
+            while (result.status == OSEO_STATUS_NORMAL && right < end) {
+                target[output] = source[right];
+                right += 1u;
+                output += 1u;
+            }
+        }
+        OseoValue *completed = source;
+        source = target;
+        target = completed;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && source != elements->slots) {
+        memcpy(elements->slots, source, length * sizeof(*source));
+    }
+    oseo_roots_release(context, &scratch);
+    oseo_roots_pop(context, &comparator_frame);
+    return result;
+}
+
+/*
+ * %TypedArray%.prototype.sort and toSorted. Comparator validation precedes
+ * receiver validation. Both snapshot every element before comparison;
+ * sort writes back only to indices that survive a comparator resize or
+ * detach, while toSorted writes to a same-kind result allocated before the
+ * snapshot and never consults constructor or Symbol.species.
+ */
+static OseoResult typed_array_sorting(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool copy
+) {
+    OseoValue comparator =
+        typed_array_argument(argument_count, arguments, 0u);
+    if (tag_of(comparator) != OSEO_TAG_UNDEFINED &&
+        !is_callable(comparator)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            copy
+                ? "TypedArray toSorted comparator is not callable."
+                : "TypedArray sort comparator is not callable."
+        );
+    }
+    OseoValue slots[3] = {receiver, comparator, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = typed_array_validate(context, slots[0]);
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        length = typed_array_length(typed_array_object(slots[0]));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && copy) {
+        result = typed_array_create_same_type(context, slots[0], length);
+        slots[2] = result.value;
+    }
+    OseoRootFrame elements = {NULL, NULL, 0u};
+    bool elements_rooted = false;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_roots_allocate(context, &elements, length);
+        elements_rooted = result.status == OSEO_STATUS_NORMAL;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        result = typed_array_iteration_element(context, slots[0], index);
+        elements.slots[index] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_merge_sort(
+            context,
+            &elements,
+            length,
+            slots[1]
+        );
+    }
+    OseoValue target = copy ? slots[2] : slots[0];
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < length;
+         index += 1u) {
+        bool present = false;
+        result = oseo_internal_typed_array_set_index(
+            context,
+            target,
+            index,
+            elements.slots[index],
+            &present
+        );
+    }
+    if (elements_rooted) oseo_roots_release(context, &elements);
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(target);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -3138,6 +3357,16 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
     }
     if (code_id == OSEO_TYPED_ARRAY_WITH_CODE_ID) {
         return typed_array_with(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_TYPED_ARRAY_SORT_CODE_ID ||
+        code_id == OSEO_TYPED_ARRAY_TO_SORTED_CODE_ID) {
+        return typed_array_sorting(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_TYPED_ARRAY_TO_SORTED_CODE_ID
+        );
     }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
         return oseo_internal_throw_error(
@@ -3344,9 +3573,36 @@ static OseoResult typed_array_install_core(
             method
         );
     }
+    static const size_t sorting_codes[] = {
+        OSEO_TYPED_ARRAY_SORT_CODE_ID,
+        OSEO_TYPED_ARRAY_TO_SORTED_CODE_ID,
+    };
+    static const char *const sorting_names[] = {"sort", "toSorted"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            sorting_codes[index],
+            sorting_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[0],
+                sorting_names[index],
+                slots[2],
+                method
+            );
+        }
+    }
     /*
-     * The iterative methods are a second loop so the first loop's final
-     * `values` function stays the one installed under Symbol.iterator.
+     * The iterative methods stay in a separate loop after the first loop's
+     * final `values` function is installed under Symbol.iterator.
      */
     static const size_t iterative_codes[] = {
         OSEO_TYPED_ARRAY_EVERY_CODE_ID,
@@ -3689,17 +3945,6 @@ OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context) {
     return typed_array_intrinsic_build(context);
 }
 
-static bool typed_array_key_matches(
-    OseoValue key,
-    const char *const *names,
-    size_t name_count
-) {
-    for (size_t index = 0u; index < name_count; index += 1u) {
-        if (oseo_internal_string_is_ascii(key, names[index])) return true;
-    }
-    return false;
-}
-
 const char *oseo_internal_typed_array_deferred_diagnostic(
     OseoContext *context,
     OseoValue object,
@@ -3712,15 +3957,6 @@ const char *oseo_internal_typed_array_deferred_diagnostic(
         }
         return NULL;
     }
-    if (object !=
-        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
-        return NULL;
-    }
-    static const char *const sorting[] = {"sort", "toSorted"};
-    if (typed_array_key_matches(
-            key, sorting, sizeof(sorting) / sizeof(*sorting))) {
-        return "TypedArray sorting methods are not admitted yet.";
-    }
     return NULL;
 }
 
@@ -3728,9 +3964,8 @@ const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
     OseoContext *context,
     OseoValue object
 ) {
-    /* The prototype's own-key list stays incomplete until every later
-     * prototype method node lands, and the constructor's until the
-     * statics node lands. */
+    /* The statics node owns the final shared-component reflection step for
+     * both the prototype and constructor after it adds from and of. */
     if (object ==
         context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
         return "TypedArray prototype own-key reflection is not admitted yet.";

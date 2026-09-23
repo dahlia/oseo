@@ -1459,6 +1459,59 @@ test("populates TypedArray mutation methods with bit-level moves", () => {
   assert.match(withMethod, /OSEO_ERROR_RANGE/u);
 });
 
+test("populates TypedArray sorting with stable numeric snapshots", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const typedArrays = sources.get("runtime_typed_array.c") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = typedArrays.indexOf(opening);
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = typedArrays.indexOf("\nstatic ", begin + opening.length);
+    return typedArrays.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const method of ["sort", "toSorted"]) {
+    assert.match(typedArrays, new RegExp(`"${method}"`, "u"));
+  }
+  for (const code of ["SORT", "TO_SORTED"]) {
+    assert.match(
+      internalHeader,
+      new RegExp(`OSEO_TYPED_ARRAY_${code}_CODE_ID`, "u"),
+    );
+  }
+  assert.doesNotMatch(
+    typedArrays,
+    /TypedArray sorting methods are not admitted yet/u,
+  );
+
+  const compare = definition("typed_array_compare_elements");
+  assert.match(compare, /oseo_call_function/u);
+  assert.match(compare, /oseo_internal_to_number/u);
+  assert.match(compare, /oseo_internal_bigint_compare/u);
+  assert.match(compare, /isnan/u);
+  assert.match(compare, /signbit/u);
+
+  const merge = definition("typed_array_merge_sort");
+  assert.match(merge, /typed_array_compare_elements/u);
+  assert.match(merge, /if \(order > 0\.0\)/u);
+  assert.match(merge, /target\[output\] = source\[left\]/u);
+
+  const sorting = definition("typed_array_sorting");
+  assert.ok(
+    sorting.indexOf("!is_callable(comparator)") <
+      sorting.indexOf("typed_array_validate(context, slots[0])"),
+    "comparator validation must precede receiver validation",
+  );
+  assert.match(sorting, /typed_array_create_same_type/u);
+  assert.doesNotMatch(sorting, /typed_array_species_create/u);
+  assert.ok(
+    sorting.indexOf("typed_array_iteration_element") <
+      sorting.indexOf("typed_array_merge_sort"),
+    "sorting must compare a captured element snapshot",
+  );
+  assert.match(sorting, /oseo_internal_typed_array_set_index/u);
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
