@@ -3146,6 +3146,24 @@ static OseoResult async_from_sync_promise(
         result = oseo_promise_resolve(context, frame.slots[2]);
         frame.slots[5] = result.value;
     }
+    if (result.status == OSEO_STATUS_THROW &&
+        !context->has_diagnostic && close_on_rejection && !done) {
+        OseoResult closed = oseo_iterator_close(
+            context,
+            frame.slots[0],
+            true
+        );
+        if (closed.status == OSEO_STATUS_THROW && context->has_diagnostic) {
+            result = closed;
+        } else {
+            result = (OseoResult){OSEO_STATUS_THROW, frame.slots[5]};
+        }
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        result = rejected_async_step(context, result);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     if (result.status == OSEO_STATUS_NORMAL &&
         close_on_rejection && !done) {
         result = oseo_environment_create(context, 1u);

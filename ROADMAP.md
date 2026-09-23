@@ -595,10 +595,9 @@ merged units from `fa119c7` to `8f2fff6`.
 | 4     | Asynchronous iteration | 2,231           | Units landed |
 
 Units landed is not the same as fully admitted. The profile still records open
-behavior in these families, including the `PromiseResolve` constructor read
-the poisoned-wrapper cases need, the unmaterialized `%GeneratorFunction%`
-chain, and the *nativeFunctionMatcher.js* include the `async-iteration`-tagged
-`Function.prototype.toString` cases need.
+behavior in these families, including the unmaterialized
+`%GeneratorFunction%` chain and the *nativeFunctionMatcher.js* include the
+`async-iteration`-tagged `Function.prototype.toString` cases need.
 Each count is the size of the family in the inventory, not a total of admitted
 paths.
 

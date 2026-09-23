@@ -106,6 +106,132 @@ thrown.catch(function (error) {
 Promise.resolve(2).then(function (value) { console.log("resolve", value); });
 const already = Promise.resolve(3);
 console.log("resolve identity", Promise.resolve(already) === already);
+let resolveConstructorReads = 0;
+Object.defineProperty(already, "constructor", {
+  configurable: true,
+  get() {
+    resolveConstructorReads = resolveConstructorReads + 1;
+    return Promise;
+  },
+});
+console.log(
+  "resolve matching constructor",
+  Promise.resolve(already) === already,
+  resolveConstructorReads,
+);
+class ResolveDerived extends Promise {}
+const derivedAlready = ResolveDerived.resolve(31);
+console.log(
+  "resolve matching derived constructor",
+  ResolveDerived.resolve(derivedAlready) === derivedAlready,
+);
+const baseFromDerived = Promise.resolve(derivedAlready);
+const derivedFromBase = ResolveDerived.resolve(already);
+console.log(
+  "resolve different constructors",
+  baseFromDerived !== derivedAlready,
+  baseFromDerived instanceof Promise,
+  !(baseFromDerived instanceof ResolveDerived),
+  derivedFromBase !== already,
+  derivedFromBase instanceof ResolveDerived,
+);
+const poisonedConstructor = Promise.resolve(32);
+let poisonedConstructorReads = 0;
+const constructorError = new EvalError("resolve constructor getter");
+Object.defineProperty(poisonedConstructor, "constructor", {
+  configurable: true,
+  get() {
+    poisonedConstructorReads = poisonedConstructorReads + 1;
+    throw constructorError;
+  },
+});
+try {
+  Promise.resolve(poisonedConstructor);
+} catch (error) {
+  console.log(
+    "resolve throwing constructor",
+    error === constructorError,
+    poisonedConstructorReads,
+  );
+}
+const constructorPoisonedThenable = {
+  then(resolve) { resolve(33); },
+};
+Object.defineProperty(constructorPoisonedThenable, "constructor", {
+  configurable: true,
+  get() { throw new EvalError("thenable constructor"); },
+});
+Promise.resolve(constructorPoisonedThenable).then(function (value) {
+  console.log("resolve thenable skips constructor", value);
+});
+/** @param {number} left @param {number} right */
+function resolveHinted(left, right) { return left + right; }
+console.log(
+  "resolve hint fallback",
+  resolveHinted(1, 2),
+  resolveHinted("x", 2),
+);
+function brokenResolveCandidate(label, value) {
+  const promise = Promise.resolve(value);
+  const error = new EvalError(label);
+  Object.defineProperty(promise, "constructor", {
+    configurable: true,
+    get() { throw error; },
+  });
+  return { error, promise };
+}
+async function observeBrokenAwait() {
+  const broken = brokenResolveCandidate("async await", 34);
+  try {
+    await broken.promise;
+  } catch (error) {
+    console.log("resolve async await", error === broken.error);
+  }
+}
+async function observeBrokenGeneratorAwait() {
+  const broken = brokenResolveCandidate("async generator await", 35);
+  async function* generator() {
+    try {
+      await broken.promise;
+    } catch (error) {
+      console.log("resolve async generator catch", error === broken.error);
+      return 35;
+    }
+  }
+  const step = await generator().next();
+  console.log("resolve async generator await", step.value, step.done);
+}
+async function observeBrokenGeneratorReturn() {
+  const broken = brokenResolveCandidate("async generator return", 36);
+  async function* generator() { throw new Error("must not resume"); }
+  try {
+    await generator().return(broken.promise);
+  } catch (error) {
+    console.log("resolve async generator return", error === broken.error);
+  }
+}
+async function observeBrokenAsyncFromSync() {
+  const broken = brokenResolveCandidate("async from sync", 37);
+  const iterable = {
+    [Symbol.iterator]() {
+      return {
+        next() { return { done: false, value: broken.promise }; },
+      };
+    },
+  };
+  try {
+    for await (const value of iterable) {
+      console.log("unexpected async from sync", value);
+      break;
+    }
+  } catch (error) {
+    console.log("resolve async from sync", error === broken.error);
+  }
+}
+observeBrokenAwait()
+  .then(observeBrokenGeneratorAwait)
+  .then(observeBrokenGeneratorReturn)
+  .then(observeBrokenAsyncFromSync);
 Promise.reject(new RangeError("no")).catch(function (error) {
   console.log("reject", error instanceof RangeError, error.message);
 });

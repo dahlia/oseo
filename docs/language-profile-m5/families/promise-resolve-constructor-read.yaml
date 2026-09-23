@@ -1,0 +1,65 @@
+version: 1
+id: promise-resolve-constructor-read
+title: "PromiseResolve constructor read"
+scope:
+  - "PromiseResolve reads the constructor property of a native Promise value
+    through ordinary property access before deciding whether to reuse that
+    value. A matching constructor returns the value unchanged, a different
+    constructor produces a fresh capability, and an abrupt getter propagates
+    without creating that capability."
+  - "Values that are not native Promise objects do not receive the constructor
+    read. They continue through NewPromiseCapability and ordinary thenable
+    assimilation, including a thenable with a poisoned constructor getter."
+  - "The rule applies to Promise.resolve, derived Promise constructors,
+    Promise combinators, Promise.prototype.finally, await, asynchronous
+    generators, and asynchronous-from-synchronous iterator continuations
+    through their shared PromiseResolve operation."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  standards:
+    status: omitted
+    reason: "The node declares no test262 inventory roots, and the applicable
+      upstream paths remain outside the reviewed subset."
+    replacements:
+      - tests/native/fixtures/promise-intrinsic.ts
+      - tests/property/m5-promise-intrinsic.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_async_generator.c
+      - packages/runtime-c/native/runtime_iterator.c
+      - packages/runtime-c/native/runtime_promise.c
