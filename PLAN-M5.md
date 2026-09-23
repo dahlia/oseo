@@ -1113,12 +1113,13 @@ in the 2027 edition, outside the M5a denominator.
 Seven cases stay outside the reviewed subset. Unit 7.6 promotes the four
 *next* cases and one *throw* case that
 observe AsyncFromSyncIteratorContinuation closing the wrapped synchronous
-iterator when an awaited stepped value rejects. `PromiseResolve` does not read
-the resolved value's
-`constructor`, so a poisoned `constructor` getter neither rejects nor reaches
-the generator, which three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
-cases and the three *AsyncGeneratorPrototype/return/* broken-promise cases
-observe. The remaining
+iterator when an awaited stepped value rejects. At that checkpoint,
+`PromiseResolve` did not read the resolved value's `constructor`, so a
+poisoned getter neither rejected nor reached the generator. The M5b
+`promise-resolve-constructor-read` node later closed that behavior, but its
+three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper cases and the three
+*AsyncGeneratorPrototype/return/* broken-promise cases remain outside the
+reviewed subset because the node declares no inventory roots. The remaining
 *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case stayed outside
 Unit 7.6; its former missing `%GeneratorPrototype%.throw` attribution was
 stale, and M5a Unit 8.4 later traced the forwarded throw, repaired the two

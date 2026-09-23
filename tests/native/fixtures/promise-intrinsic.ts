@@ -210,6 +210,24 @@ async function observeBrokenGeneratorReturn() {
     console.log("resolve async generator return", error === broken.error);
   }
 }
+async function observeBrokenSuspendedGeneratorReturn() {
+  const broken = brokenResolveCandidate("suspended generator return", 36);
+  async function* generator() {
+    try {
+      yield 1;
+    } finally {
+      console.log("resolve suspended generator finally");
+    }
+  }
+  const iterator = generator();
+  const first = await iterator.next();
+  console.log("resolve suspended generator first", first.value, first.done);
+  try {
+    await iterator.return(broken.promise);
+  } catch (error) {
+    console.log("resolve suspended generator return", error === broken.error);
+  }
+}
 async function observeBrokenAsyncFromSync() {
   const broken = brokenResolveCandidate("async from sync", 37);
   const iterable = {
@@ -335,6 +353,7 @@ async function observeAsyncDelegationConstructorRead() {
 observeBrokenAwait()
   .then(observeBrokenGeneratorAwait)
   .then(observeBrokenGeneratorReturn)
+  .then(observeBrokenSuspendedGeneratorReturn)
   .then(observeBrokenAsyncFromSync)
   .then(observeAsyncIteratorNextConstructorRead)
   .then(observeAsyncIteratorCloseConstructorRead)
