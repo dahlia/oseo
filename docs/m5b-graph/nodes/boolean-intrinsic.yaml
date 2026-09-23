@@ -9,5 +9,5 @@ inventory:
     - test/built-ins/Boolean/
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready
