@@ -925,9 +925,10 @@ function agentMemberRead(node: AgentSyntaxNode): boolean {
  * provide, decided before execution from the parsed case and the harness
  * metadata rather than from the source text. Only an unresolved reference
  * in the parsed syntax counts: a name inside a comment or a string, a
- * property key, a `typeof` operand, and a name the case declares itself
- * never withhold execution, and a body that does not parse reads nothing
- * and executes as usual.
+ * property key, a `typeof` operand, a name inside a `with` body, whose
+ * object may provide it, and a name the case declares itself never
+ * withhold execution, and a body that does not parse reads nothing and
+ * executes as usual.
  *
  * `$262` outside `$262.agent` names the host object this profile never
  * installs. A harness definition is one an upstream include lists in its
@@ -1070,6 +1071,14 @@ function collectBoundNames(
  */
 type ReferenceMode = "binding" | "reference" | "skip";
 
+/**
+ * One scope the walk below passes through: the names a declarative scope
+ * binds, or `"object"` for a `with` statement's object environment. Any
+ * name may resolve through an object environment, since its bindings are
+ * the properties the object and its prototype chain hold only at run time.
+ */
+type ReferenceScope = ReadonlySet<string> | "object";
+
 const syntaxMetadataKeys = new Set([
   "comments",
   "end",
@@ -1091,7 +1100,8 @@ const syntaxMetadataKeys = new Set([
  * function with its parameters and hoisted `var` and function declarations,
  * each block, `switch`, `for` head, `catch` clause, and class name. A
  * `typeof` operand is left out, because `typeof` answers an unresolvable
- * reference without needing its binding.
+ * reference without needing its binding, and so is every reference inside
+ * a `with` body, because the object may provide the binding.
  */
 export function unresolvedReferenceNames(
   source: string,
@@ -1108,7 +1118,7 @@ export function unresolvedReferenceNames(
   const referenced = new Set<string>();
   const pending: {
     readonly mode: ReferenceMode;
-    readonly scopes: readonly ReadonlySet<string>[];
+    readonly scopes: readonly ReferenceScope[];
     readonly value: unknown;
   }[] = [{ mode: "reference", scopes: [], value: program }];
   while (pending.length > 0) {
@@ -1127,7 +1137,9 @@ export function unresolvedReferenceNames(
       const name = node.name;
       // A declaration position is collected by its scope instead.
       if (entry.mode === "binding" || !isString(name)) continue;
-      if (!entry.scopes.some((scope) => scope.has(name))) {
+      if (
+        !entry.scopes.some((scope) => scope === "object" || scope.has(name))
+      ) {
         referenced.add(name);
       }
       continue;
@@ -1153,13 +1165,14 @@ export function unresolvedReferenceNames(
  * declarations visible where it is evaluated: function parameters and
  * their defaults do not see the body's declarations, a computed method key
  * and a `switch` discriminant see neither the method's nor the cases'
- * declarations, and a class name is visible to its heritage and body.
- * Declaration positions are read here, so the walk above never treats them
- * as references.
+ * declarations, a class name is visible to its heritage and body, and a
+ * `with` object is evaluated outside the object environment its body
+ * sees. Declaration positions are read here, so the walk above never
+ * treats them as references.
  */
 function scopedChildren(
   node: AgentSyntaxNode,
-): ((key: string) => readonly ReadonlySet<string>[]) | undefined {
+): ((key: string) => readonly ReferenceScope[]) | undefined {
   switch (node.type) {
     case "Program": {
       const names = new Set<string>();
@@ -1227,6 +1240,8 @@ function scopedChildren(
       collectBoundNames(node.param, names);
       return () => [names];
     }
+    case "WithStatement":
+      return (key) => (key === "body" ? ["object"] : []);
     case "ClassDeclaration":
     case "ClassExpression": {
       const names = new Set<string>();

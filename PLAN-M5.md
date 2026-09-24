@@ -6957,13 +6957,14 @@ each upstream include's `defines` metadata with the names the reviewed
 include declares and withholds a case whose syntax references an omitted
 definition with the `harness-definition` capability. Both decisions read
 parsed syntax, never source text: a name inside a comment or string, a
-property key, a `typeof` operand, and a name the case declares itself never
-withhold execution. The reviewed *regExpUtils.js* still omits `buildString`
-and `testPropertyEscapes`. An unhandled rejection whose reason is an
-intrinsic error instance now reports the rejection boundary text and keeps
-its kind marker, so *Promise/race/invoke-resolve-error-close.js* classifies
-with the existing `unhandled-rejection-policy` capability exactly like its
-*Promise/all* sibling.
+property key, a `typeof` operand, a name inside a `with` body, whose object
+may provide it, and a name the case declares itself never withhold execution.
+The reviewed *regExpUtils.js* still omits `buildString` and
+`testPropertyEscapes`. An unhandled rejection whose reason is an intrinsic
+error instance now reports the rejection boundary text and keeps its kind
+marker, so *Promise/race/invoke-resolve-error-close.js* classifies with the
+existing `unhandled-rejection-policy` capability exactly like its *Promise/all*
+sibling.
 
 Fixed native evidence and generated differential evidence at property seed
 `0x60007e00` cover absent, writable, accessor, non-writable, and inherited
