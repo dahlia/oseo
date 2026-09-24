@@ -1934,6 +1934,47 @@ test("executes a case that names $262 without referencing it", async () => {
   assert.equal(result.classification, "pass");
 });
 
+test("executes a module that only re-exports $262", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-host-"));
+  try {
+    await writeFile(
+      join(directory, "host_FIXTURE.js"),
+      "export const $262 = 1;\n",
+    );
+    const run = async (body: string): Promise<Test262Result> => {
+      const source = `/*---\nflags: [module]\n---*/\n${body}`;
+      const parsed = parseTest262Case(source, "test/host-export.js", revision);
+      return await executeTest262Case(
+        source,
+        parsed,
+        new Set<string>(),
+        harnesses,
+        { execute: async () => await Promise.resolve(successfulResult()) },
+        ["module-linking"],
+        {
+          rootPath: directory,
+          sourcePath: join(directory, "host-export.js"),
+        },
+      );
+    };
+    // A re-export names another module's export, so the case executes.
+    const reexported = await run(
+      'export { $262 } from "./host_FIXTURE.js";\n' +
+        'export { $262 as host } from "./host_FIXTURE.js";\n',
+    );
+    assert.equal(reexported.classification, "pass");
+    // A re-export declares no local binding, so a read still references
+    // the unresolved host binding.
+    const read = await run(
+      'export { $262 } from "./host_FIXTURE.js";\n$262.gc();\n',
+    );
+    assert.equal(read.classification, "unsupported-profile-feature");
+    assert.equal(read.observation.unsupportedCapability, "host-binding");
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
 test("withholds a case that reads an omitted harness definition", async () => {
   const omitting = {
     ...harnesses,

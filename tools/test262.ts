@@ -1377,6 +1377,10 @@ function referenceMode(
     case "ImportDefaultSpecifier":
     case "ImportNamespaceSpecifier":
       return key === "local" ? "binding" : "skip";
+    case "ExportNamedDeclaration":
+      // A re-export's specifiers name another module's exports, not
+      // bindings of this module.
+      return key === "specifiers" && node.source != null ? "skip" : "reference";
     case "ExportSpecifier":
     case "ExportNamespaceSpecifier":
     case "ExportDefaultSpecifier":
