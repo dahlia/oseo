@@ -6,5 +6,5 @@ delivers: "Implements the reviewed nativeFunctionMatcher.js include so cases
 dependencies:
   - function-prototype
   - string-prototype-search-and-slice
-landed: false
+landed: true
 status: ready
