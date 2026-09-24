@@ -7702,7 +7702,7 @@ complete. The remaining gaps retain their existing owners.
     completes its static declaration model, the intrinsic nodes install the
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
-    other unresolved global reference through it at run time. Four
+    other unresolved global reference through it at run time. Three
     boundaries remain. First, the realm still binds neither `eval` nor
     `Float16Array`, the two clause 19 standard globals this profile has not
     admitted as values, so a reference to either stays a source-located
@@ -7718,11 +7718,6 @@ complete. The remaining gaps retain their existing owners.
     target and every strict write through such a chain stay source-located
     rejections. Third, the record validates one independently compiled
     Script at a time and does not retain `[[VarNames]]` across Scripts.
-    Fourth, a global-object reference to a present name performs one
-    `HasProperty` before its `Get` or `Set`, where the Object Environment
-    Record's HasBinding step and its GetBindingValue or SetMutableBinding
-    step perform two; only a Proxy on the global object's prototype chain
-    can count the difference.
     Two interactions sit outside this unit for different reasons. Annex B
     block-level function hoisting is outside the candidate claim under
     [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Indirect `eval` var
