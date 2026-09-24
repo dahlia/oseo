@@ -11,5 +11,5 @@ inventory:
 dependencies:
   - array-prototype-sort
   - typed-array-core
-landed: false
+landed: true
 status: ready
