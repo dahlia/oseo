@@ -32,8 +32,8 @@ import type {
   HirPrivateName,
   HirPrivateNameKey,
   HirResult,
+  HirGlobalReference,
   HirStatement,
-  HirStrictGlobalFallback,
   HirSwitchCase,
   ResolveState,
 } from "./hir.ts";
@@ -339,31 +339,6 @@ function intrinsicGlobalPropertyExists(
   };
 }
 
-/**
- * The realm global object as the base of one identifier reference that
- * PutValue will write. ResolveBinding tests the global object's property
- * with HasProperty before the right-hand side or iterator value exists, so
- * the test runs here, when the reference itself is evaluated, and only
- * the object flows on to the write. Strict code already performs that
- * test as the first half of its strict-global write check, whose result it
- * must keep, so it receives the plain object instead of a second test.
- */
-function intrinsicGlobalReferenceObject(
-  name: string,
-  range: SourceRange,
-  state: ResolveState,
-): HirExpression {
-  if (state.strict) return intrinsicGlobalObjectRead(range, state);
-  return {
-    expressions: [
-      intrinsicGlobalPropertyExists(name, range, state),
-      intrinsicGlobalObjectRead(range, state),
-    ],
-    kind: "sequence",
-    range,
-  };
-}
-
 /** Return the uninitialized fallback for one absent mutable intrinsic. */
 function missingIntrinsicBinding(name: string, state: ResolveState): Binding {
   let fallback = state.intrinsicReadFallbacks.get(name);
@@ -388,14 +363,19 @@ function missingIntrinsicRead(
   return bindingExpression(missingIntrinsicBinding(name, state), range);
 }
 
-/** Return the missing-binding check required by a strict global write. */
-function strictIntrinsicGlobalFallback(
+/**
+ * Mark one global-object property reference as an identifier reference,
+ * so MIR lowering performs the global Environment Record's own
+ * HasProperty tests around it. Only strict code needs the hidden cell
+ * whose read throws the missing binding's ReferenceError.
+ */
+function intrinsicGlobalReference(
   name: string,
   state: ResolveState,
-): HirStrictGlobalFallback | undefined {
-  if (!state.strict) return undefined;
+): HirGlobalReference {
+  if (!state.strict) return {};
   const fallback = missingIntrinsicBinding(name, state);
-  return { bindingId: fallback.id, name: fallback.name };
+  return { strictFallback: { bindingId: fallback.id, name: fallback.name } };
 }
 
 /** Resolve one assignment-pattern leaf to a mutable intrinsic property. */
@@ -405,7 +385,6 @@ function intrinsicGlobalPatternTarget(
   state: ResolveState,
 ): HirAssignmentMemberTarget {
   const reference = intrinsicGlobalPropertyRead(name, located.range, state);
-  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
   return {
     ...includePropertiesWhen(() => {
       if (located.byteRange == null) return undefined;
@@ -413,17 +392,12 @@ function intrinsicGlobalPatternTarget(
         byteRange: located.byteRange,
       };
     }),
+    globalReference: intrinsicGlobalReference(name, state),
     inferredName: name,
     key: reference.key,
     kind: "assignment-member",
-    object: intrinsicGlobalReferenceObject(name, located.range, state),
+    object: reference.object,
     range: located.range,
-    ...includePropertiesWhen(() => {
-      if (strictGlobalFallback == null) return undefined;
-      return {
-        strictGlobalFallback,
-      };
-    }),
   };
 }
 
@@ -434,26 +408,45 @@ function intrinsicGlobalLoopTarget(
   state: ResolveState,
 ): Extract<HirForOfTarget, { readonly kind: "property" }> {
   const reference = intrinsicGlobalPropertyRead(name, range, state);
-  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
   return {
+    globalReference: intrinsicGlobalReference(name, state),
     key: reference.key,
     kind: "property",
-    object: intrinsicGlobalReferenceObject(name, range, state),
+    object: reference.object,
     range,
-    ...includePropertiesWhen(() => {
-      if (strictGlobalFallback == null) return undefined;
-      return {
-        strictGlobalFallback,
-      };
-    }),
   };
 }
 
 /**
- * Read a mutable intrinsic global with ordinary identifier semantics.
- * The property owns the value, while an absent property reaches one hidden
- * uninitialized cell so GetValue throws ReferenceError instead of returning
- * the `undefined` that an ordinary property read would produce.
+ * GetBindingValue of the global object's Object Environment Record for a
+ * reference ResolveBinding already found. It tests the property again
+ * before reading it, because the answer can change between the two
+ * tests; a property gone by then reads as `undefined` in non-strict code
+ * and throws the missing binding's ReferenceError in strict code.
+ */
+function intrinsicGlobalBindingValue(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return {
+    alternate: state.strict
+      ? missingIntrinsicRead(name, range, state)
+      : { kind: "undefined", range },
+    consequent: intrinsicGlobalPropertyRead(name, range, state),
+    kind: "conditional",
+    range,
+    test: intrinsicGlobalPropertyExists(name, range, state),
+  };
+}
+
+/**
+ * Read a global-object name with ordinary identifier semantics. The
+ * first test is ResolveBinding's, and an absent property is an
+ * unresolvable reference, so it reaches one hidden uninitialized cell
+ * whose read throws ReferenceError instead of returning the `undefined`
+ * an ordinary property read would produce. A found reference then reads
+ * through GetBindingValue, which performs its own test.
  */
 function intrinsicGlobalIdentifierRead(
   name: string,
@@ -462,7 +455,7 @@ function intrinsicGlobalIdentifierRead(
 ): HirExpression {
   return {
     alternate: missingIntrinsicRead(name, range, state),
-    consequent: intrinsicGlobalPropertyRead(name, range, state),
+    consequent: intrinsicGlobalBindingValue(name, range, state),
     kind: "conditional",
     range,
     test: intrinsicGlobalPropertyExists(name, range, state),
@@ -819,13 +812,13 @@ function resolveTypeofIdentifier(
     };
   }
   if (isGlobalObjectResolvedName(argument.name) && resolution.binding == null) {
-    // HasBinding on the global object precedes GetBindingValue, and
-    // `typeof` answers an absent name without reading it. A plain
-    // property read would differ once the global object's prototype
-    // chain observes `has` separately from `get`, as a Proxy can.
+    // ResolveBinding's HasProperty decides resolvability, and `typeof`
+    // answers an unresolvable name without reading it. GetBindingValue
+    // then tests the property again, so a Proxy on the global object's
+    // prototype chain observes two `has` calls before any `get`.
     const fallback: HirExpression = {
       alternate: { kind: "undefined", range: argument.range },
-      consequent: intrinsicGlobalPropertyRead(
+      consequent: intrinsicGlobalBindingValue(
         argument.name,
         argument.range,
         state,
@@ -929,46 +922,24 @@ function resolveExpression(
         expression.range,
         state,
       );
-      const strictGlobalFallback = state.strict
-        ? missingIntrinsicBinding(expression.name, state)
-        : undefined;
+      const globalReference = intrinsicGlobalReference(expression.name, state);
       const write: HirExpression =
         expression.kind === "binding-set"
           ? {
               ...locatedOf(expression),
+              globalReference,
               key: reference.key,
               kind: "property-set",
-              object: intrinsicGlobalReferenceObject(
-                expression.name,
-                expression.range,
-                state,
-              ),
-              ...includePropertiesWhen(() => {
-                if (strictGlobalFallback == null) return undefined;
-                return {
-                  strictGlobalFallback: {
-                    bindingId: strictGlobalFallback.id,
-                    name: strictGlobalFallback.name,
-                  },
-                };
-              }),
+              object: reference.object,
               value: inferred,
             }
           : {
               ...locatedOf(expression),
+              globalReference,
               key: reference.key,
               kind: "property-update",
               object: reference.object,
               operator: expression.operator,
-              ...includePropertiesWhen(() => {
-                if (strictGlobalFallback == null) return undefined;
-                return {
-                  strictGlobalFallback: {
-                    bindingId: strictGlobalFallback.id,
-                    name: strictGlobalFallback.name,
-                  },
-                };
-              }),
               value: inferred,
             };
       if (expression.kind === "binding-set") return write;
@@ -1142,25 +1113,14 @@ function resolveExpression(
         expression.range,
         state,
       );
-      const strictGlobalFallback = state.strict
-        ? missingIntrinsicBinding(expression.name, state)
-        : undefined;
       const step: HirExpression = {
         ...locatedOf(expression),
+        globalReference: intrinsicGlobalReference(expression.name, state),
         key: reference.key,
         kind: "property-step",
         object: reference.object,
         operator: expression.operator,
         prefix: expression.prefix,
-        ...includePropertiesWhen(() => {
-          if (strictGlobalFallback == null) return undefined;
-          return {
-            strictGlobalFallback: {
-              bindingId: strictGlobalFallback.id,
-              name: strictGlobalFallback.name,
-            },
-          };
-        }),
       };
       return {
         alternate: missingIntrinsicRead(

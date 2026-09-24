@@ -609,3 +609,124 @@ while (turn < 2) {
     });
   },
 );
+
+test(
+  "each global record operation tests the property itself per ECMA-262",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    // ResolveBinding, GetBindingValue, and SetMutableBinding each ask the
+    // global object's HasProperty, and a Proxy prototype can answer each
+    // one differently. A property found by ResolveBinding but gone for
+    // GetBindingValue reads as undefined in non-strict code and throws
+    // ReferenceError in strict code; one gone for SetMutableBinding is
+    // still written in non-strict code and throws in strict code. Node.js
+    // and Deno ask once per reference and skip the write's query, so only
+    // the specification order is compared. Each script lists the `has`
+    // answers in order; `miss` logs a false one.
+    const source = `
+const realm = this;
+const base = Object.getPrototypeOf(realm);
+const log = [];
+let answers = [];
+Object.setPrototypeOf(realm, new Proxy(base, {
+  has(target, key) {
+    if (key !== "ghost") return Reflect.has(target, key);
+    const answer = answers.length > 0 && answers.shift();
+    log.push(answer ? "has" : "miss");
+    return answer;
+  },
+  get(target, key, receiver) {
+    if (key !== "ghost") return Reflect.get(target, key, receiver);
+    log.push("get");
+    return 1;
+  },
+}));
+function rhs(value) { log.push("rhs"); return value; }
+function observe(label, script, run) {
+  answers = script;
+  log.length = 0;
+  let result;
+  try { result = String(run()); } catch (error) { result = error.name; }
+  const own = Object.prototype.hasOwnProperty.call(realm, "ghost");
+  console.log(label, result, log.join(","), own ? realm.ghost : "-");
+  delete realm.ghost;
+}
+observe("typeof", [true, false], () => typeof ghost);
+observe("strict typeof", [true, false], () => {
+  "use strict";
+  return typeof ghost;
+});
+observe("read", [true, true], () => ghost);
+observe("read gone", [true, false], () => ghost);
+observe("strict read gone", [true, false], () => {
+  "use strict";
+  return ghost;
+});
+observe("write", [true, false], () => (ghost = rhs(2)));
+observe("strict write", [true, false], () => {
+  "use strict";
+  return (ghost = rhs(2));
+});
+observe("compound", [true, false, true], () => (ghost += rhs(1)));
+observe("strict compound", [true, false], () => {
+  "use strict";
+  return (ghost += rhs(1));
+});
+observe("strict compound kept", [true, true, false], () => {
+  "use strict";
+  return (ghost += rhs(1));
+});
+observe("update", [true, false, false], () => ghost++);
+observe("logical", [true, false, true], () => (ghost ||= rhs(3)));
+observe("with read", [true, false], () => { with ({}) return ghost; });
+observe("with write", [true, false], () => {
+  with ({}) return (ghost = rhs(4));
+});
+observe("with compound", [true, false, true], () => {
+  with ({}) return (ghost += rhs(1));
+});
+observe("pattern", [true, false], () => ([ghost] = [rhs(5)]));
+observe("loop", [true, false], () => {
+  for (ghost of [6]) log.push("body");
+});
+Object.setPrototypeOf(realm, base);
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 1), hinted("1", 1));
+const probe = { value: 0 };
+let turn = 0;
+while (turn < 2) {
+  console.log("guard", probe.value);
+  if (turn === 0) probe.marker = 1;
+  turn = turn + 1;
+}
+`;
+    await assertNative(source, {
+      exitStatus: 0,
+      stderr: "",
+      stdout: [
+        "typeof undefined has,miss -",
+        "strict typeof ReferenceError has,miss -",
+        "read 1 has,has,get -",
+        "read gone undefined has,miss -",
+        "strict read gone ReferenceError has,miss -",
+        "write 2 has,rhs,miss 2",
+        "strict write ReferenceError has,rhs,miss -",
+        "compound NaN has,miss,rhs,has NaN",
+        "strict compound ReferenceError has,miss -",
+        "strict compound kept ReferenceError has,has,get,rhs,miss -",
+        "update NaN has,miss,miss NaN",
+        "logical 3 has,miss,rhs,has 3",
+        "with read undefined has,miss -",
+        "with write 4 has,rhs,miss 4",
+        "with compound NaN has,miss,rhs,has NaN",
+        "pattern 5 rhs,has,miss 5",
+        "loop undefined has,miss,body 6",
+        "hint 2 11",
+        "guard 0",
+        "guard 0",
+        "",
+      ].join("\n"),
+    });
+  },
+);
