@@ -18,11 +18,20 @@ const range: SourceRange = {
  * The printed presence-checked global-object read that `typeof` of an
  * unresolved `name` performs, as a regular expression source.
  */
-function typeofGlobalRead(name: string): string {
+/**
+ * The printed HIR `typeof` operand of a global-object name: ResolveBinding's
+ * presence test, then GetBindingValue's own test before the read, whose
+ * miss is `undefined` in non-strict code and the missing cell in strict.
+ */
+function typeofGlobalRead(name: string, strict = false): string {
   const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("${name}" in ${object}\)`;
+  const missing = strict
+    ? String.raw`%b\d+\(\*missing intrinsic:${name}\*\)`
+    : "undefined";
   return (
-    String.raw`\(\("${name}" in ${object}\) \? ` +
-    String.raw`get ${object}\["${name}"\] : undefined\)`
+    String.raw`\(${exists} \? \(${exists} \? ` +
+    String.raw`get ${object}\["${name}"\] : ${missing}\) : undefined\)`
   );
 }
 

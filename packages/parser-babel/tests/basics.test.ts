@@ -537,11 +537,7 @@ test("writes the replaceable Number value through its global property", () => {
   const hir = printHir(result.hir);
   assert.match(
     hir,
-    new RegExp(
-      String.raw`set \(\("Number" in %b\d+\(\*intrinsic global object\*\)\), ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\)\["Number"\] = 40`,
-      "u",
-    ),
+    /set %b\d+\(\*intrinsic global object\*\)\["Number"\] = 40/u,
   );
   assert.match(
     hir,
@@ -558,6 +554,10 @@ test("writes the replaceable Number value through its global property", () => {
   const mir = printMir(result.mir);
   assert.equal(mir.match(/property-set property-set/gu)?.length, 5);
   assert.equal(mir.match(/property-get property-get/gu)?.length, 3);
+  // Each read and simple write tests the property for ResolveBinding and
+  // again for GetBindingValue or SetMutableBinding; each compound or
+  // update assignment tests it for all three.
+  assert.equal(mir.match(/binary in %\d+, %\d+/gu)?.length, 15);
 });
 
 test("writes Number assignment targets through its global property", () => {
@@ -576,8 +576,13 @@ test("writes Number assignment targets through its global property", () => {
   const hir = printHir(result.hir);
   assert.doesNotMatch(hir, /%b\d+ Number/u);
   assert.equal(
-    hir.match(/\*intrinsic global object\*\)\)\["Number"\]/gu)?.length,
+    hir.match(/\*intrinsic global object\*\)\["Number"\]/gu)?.length,
     6,
+  );
+  // ResolveBinding and SetMutableBinding each test every target's property.
+  assert.equal(
+    printMir(result.mir).match(/binary in %\d+, %\d+/gu)?.length,
+    12,
   );
 });
 

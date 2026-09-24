@@ -245,7 +245,10 @@ the same change and says why: M5b node `globalthis-binding` moved 32 records,
 because each hidden missing-intrinsic cell now reports its unresolvable
 reference, an unresolved `with` read in *bindings/with-statements* reaches
 the realm global object instead of a hidden cell, and `typeof`, writes, and
-deletes of a global-object name check the property's presence first.
+deletes of a global-object name check the property's presence first. The
+same node's review correction moved the same 32 records again, because
+ResolveBinding, GetBindingValue, and SetMutableBinding now each test a
+global-object name's property separately.
 
 
 Stage 2 interfaces and ownership

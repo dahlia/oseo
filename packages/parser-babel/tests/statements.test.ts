@@ -14,11 +14,20 @@ import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
  * The printed presence-checked global-object read that `typeof` of an
  * unresolved `name` performs, as a regular expression source.
  */
-function typeofGlobalRead(name: string): string {
+/**
+ * The printed HIR `typeof` operand of a global-object name: ResolveBinding's
+ * presence test, then GetBindingValue's own test before the read, whose
+ * miss is `undefined` in non-strict code and the missing cell in strict.
+ */
+function typeofGlobalRead(name: string, strict = false): string {
   const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("${name}" in ${object}\)`;
+  const missing = strict
+    ? String.raw`%b\d+\(\*missing intrinsic:${name}\*\)`
+    : "undefined";
   return (
-    String.raw`\(\("${name}" in ${object}\) \? ` +
-    String.raw`get ${object}\["${name}"\] : undefined\)`
+    String.raw`\(${exists} \? \(${exists} \? ` +
+    String.raw`get ${object}\["${name}"\] : ${missing}\) : undefined\)`
   );
 }
 
@@ -814,7 +823,7 @@ test("admits direct typeof with an unresolvable name in strict code", () => {
   assert.ok(result.hir != null);
   assert.match(
     printHir(result.hir),
-    new RegExp(`typeof ${typeofGlobalRead("missing")}`, "u"),
+    new RegExp(`typeof ${typeofGlobalRead("missing", true)}`, "u"),
   );
 });
 
@@ -822,10 +831,12 @@ test("resolves every non-typeof unresolved reference by lookup", () => {
   // Every other reference reads the realm global object's property and
   // falls back to the hidden cell whose read throws the ReferenceError
   // GetValue owes an unresolvable Reference; a write sets the property.
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("missing" in ${object}\)`;
   const lookup = new RegExp(
-    String.raw`\("missing" in %b\d+\(\*intrinsic global object\*\)\) \? ` +
-      String.raw`get %b\d+\(\*intrinsic global object\*\)\["missing"\] : ` +
-      String.raw`%b\d+\(\*missing intrinsic:missing\*\)`,
+    String.raw`${exists} \? \(${exists} \? ` +
+      String.raw`get ${object}\["missing"\] : ` +
+      String.raw`undefined\) : %b\d+\(\*missing intrinsic:missing\*\)`,
     "u",
   );
   for (const source of [
@@ -849,12 +860,14 @@ test("resolves every non-typeof unresolved reference by lookup", () => {
   assert.ok(write.hir != null);
   assert.match(
     printHir(write.hir),
-    new RegExp(
-      String.raw`set \(\("missing" in ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\), ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\)\["missing"\] = 1`,
-      "u",
-    ),
+    /set %b\d+\(\*intrinsic global object\*\)\["missing"\] = 1/u,
+  );
+  // ResolveBinding tests the property before the right-hand side, and
+  // SetMutableBinding tests it again only for a found reference.
+  assert.ok(write.mir != null);
+  assert.match(
+    printMir(write.mir),
+    /binary in %\d+, %\d+[^]*constant 1[^]*branch && [^]*binary in /u,
   );
   // A standard global the profile has not admitted as a value is never
   // unresolvable in a conforming realm, so it stays rejected.

@@ -7515,17 +7515,25 @@ non-enumerable, configurable `globalThis` property. Known globals keep their
 property-backed cells. Every other unshadowed name that no declaration
 resolves, except the runtime-owned call targets `console`, `setTimeout`, and
 `clearTimeout` and the unadmitted standard globals `eval` and `Float16Array`,
-resolves through the realm global object at run time. A read performs
-`HasProperty` and then `Get`, and an absent property reaches a hidden cell
-that throws the `ReferenceError` naming the unresolvable reference. `typeof`
-performs the same presence check and answers `"undefined"` without reading an
-absent property. `delete` deletes a present property and answers `true` for
-an absent one, a sloppy write creates or updates the property, and a strict
-write to an absent name throws `ReferenceError`. Each write and delete tests
-the property's presence when its reference is resolved, before a right-hand
-side, iterator value, or loop body runs, as ResolveBinding requires; Node.js
-and Deno skip that test on the global object's prototype chain, so fixed
-native evidence checks the specified order against the model alone. A property
+resolves through the realm global object at run time. ResolveBinding,
+GetBindingValue, and SetMutableBinding each perform their own `HasProperty`,
+so a Proxy on the global object's prototype chain observes every test and
+may answer each one differently. A read tests the property to resolve the
+reference, and an absent property reaches a hidden cell that throws the
+`ReferenceError` naming the unresolvable reference; a found reference tests
+it again before `Get`, and a property gone by then reads as `undefined` in
+non-strict code and throws `ReferenceError` in strict code. `typeof` answers
+`"undefined"` for an unresolvable name without reading it and otherwise reads
+through the same second test. `delete` deletes a present property and answers
+`true` for an absent one, a sloppy write creates or updates the property, and
+a strict write to an absent name throws `ReferenceError`. Each write and
+delete tests the property's presence when its reference is resolved, before
+a right-hand side, iterator value, or loop body runs, and a write to a
+resolved reference tests it once more before the store, where only strict
+code throws for a missing property. Node.js and Deno perform one test per
+reference and skip the others on the global object's prototype chain, so
+fixed native evidence checks the specified order against the model alone. A
+property
 a program creates at run time, directly, through `globalThis`, or through
 `Object.defineProperty`, is therefore visible to every later reference,
 including accessors and inherited properties. A non-strict all-miss `with`

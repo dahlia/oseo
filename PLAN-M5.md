@@ -6923,16 +6923,21 @@ populated object reachable through its own name. Known globals keep their
 property-backed cells. Every other unshadowed name that no declaration
 resolves, except the runtime-owned call targets and the two unadmitted
 standard globals `eval` and `Float16Array`, now resolves through the realm
-global object at run time: a read is `HasProperty` followed by `Get`, and an
-absent property reaches a hidden cell that throws the `ReferenceError`
-GetValue owes an unresolvable reference, naming it; `typeof` performs the
-same presence check and answers `"undefined"` without reading an absent
-property; `delete` deletes a present property and answers `true` for an
-absent one; and a sloppy write creates or updates the property, while a
-strict write to an absent name throws. Each write and delete tests presence
-when its reference is resolved, before a right-hand side, iterator value, or
-loop body runs, which Node.js and Deno skip on the global object's prototype
-chain, so a fixed native test checks that order against the model alone. A
+global object at run time: a read is ResolveBinding's `HasProperty`, then
+GetBindingValue's own `HasProperty` and `Get`, and an absent property reaches
+a hidden cell that throws the `ReferenceError` GetValue owes an unresolvable
+reference, naming it, while a property that disappears between the two tests
+reads as `undefined` in sloppy code and throws in strict code; `typeof`
+answers `"undefined"` for an unresolvable name without reading it; `delete`
+deletes a present property and answers `true` for an absent one; and a sloppy
+write creates or updates the property, while a strict write to an absent name
+throws. Each write and delete tests presence when its reference is resolved,
+before a right-hand side, iterator value, or loop body runs, and a write to a
+resolved reference repeats the test for SetMutableBinding before the store.
+Node.js and Deno perform only one of these tests on the global object's
+prototype chain, so fixed native tests check the specified order against the
+model alone, including a stateful Proxy prototype that answers each test
+differently. A
 non-strict all-miss `with` chain reaches the same property for simple,
 compound, logical, and update writes. Destructuring and loop-head targets and
 strict writes behind such a chain stay source-located rejections. The fragment

@@ -73,6 +73,22 @@ export interface HirStrictGlobalFallback {
   readonly name: string;
 }
 
+/**
+ * Marks a property reference as an identifier reference that the global
+ * Environment Record resolves through the realm global object. Each
+ * record operation tests the property with its own HasProperty, which a
+ * Proxy on the global object's prototype chain can observe and answer
+ * differently every time: ResolveBinding before the right-hand side,
+ * GetBindingValue before a compound or update read, and
+ * SetMutableBinding before the write. Only strict code turns a missing
+ * property into the ReferenceError that `strictFallback` throws; a
+ * non-strict GetBindingValue reads `undefined` and a non-strict PutValue
+ * still writes.
+ */
+export interface HirGlobalReference {
+  readonly strictFallback?: HirStrictGlobalFallback;
+}
+
 /** One resolved identifier read through active `with` environments. */
 export interface HirWithReference extends LocatedSyntax {
   readonly fallback: HirExpression;
@@ -96,8 +112,8 @@ export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly object: HirExpression;
   /** Name used by named evaluation for a synthetic global target. */
   readonly inferredName?: string;
-  /** Missing-binding fallback for a strict global property reference. */
-  readonly strictGlobalFallback?: HirStrictGlobalFallback;
+  /** Present when the leaf is an identifier on the global object. */
+  readonly globalReference?: HirGlobalReference;
 }
 
 /** One resolved private reference used as an assignment-pattern leaf. */
@@ -213,7 +229,7 @@ export type HirForOfTarget =
       readonly kind: "property";
       readonly object: HirExpression;
       readonly range: SourceRange;
-      readonly strictGlobalFallback?: HirStrictGlobalFallback;
+      readonly globalReference?: HirGlobalReference;
     }
   | {
       readonly kind: "private";
@@ -891,7 +907,7 @@ export type HirExpression =
       readonly key: HirExpression;
       readonly kind: "property-set";
       readonly object: HirExpression;
-      readonly strictGlobalFallback?: HirStrictGlobalFallback;
+      readonly globalReference?: HirGlobalReference;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -899,7 +915,7 @@ export type HirExpression =
       readonly kind: "property-update";
       readonly object: HirExpression;
       readonly operator: AssignmentOperator;
-      readonly strictGlobalFallback?: HirStrictGlobalFallback;
+      readonly globalReference?: HirGlobalReference;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -908,7 +924,7 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: "++" | "--";
       readonly prefix: boolean;
-      readonly strictGlobalFallback?: HirStrictGlobalFallback;
+      readonly globalReference?: HirGlobalReference;
     })
   | (LocatedSyntax & {
       /**
