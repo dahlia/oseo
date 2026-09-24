@@ -7687,21 +7687,23 @@ complete. The remaining gaps retain their existing owners.
     shared-memory execution, and the `$262.agent` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
-    *nans.js*, *promiseHelper.js*, and *propertyHelper.js*. *nans.js*
-    joined that list with the `math-namespace` node, whose `Math.pow`
-    intrinsic was its only unadmitted dependency, and
-    *decimalToHexString.js* with the `uri-handling-functions` node that
-    its 78 reviewed cases observe. Cases in the reviewed
-    function inventory that need *nativeFunctionMatcher.js* or
-    *wellKnownIntrinsicObjects.js* classify as unsupported until those
-    includes have reviewed implementations. The reviewed
-    *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
-    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, because this
-    profile does not admit `globalThis`. Its `assert.throwsAsync` reports a
-    constructor mismatch without composing a message from the observed value,
-    so a rejection whose `constructor` is missing or exotic cannot replace
-    the mismatch report with a thrown conversion. Owner: the standards
-    harness expansion in [*PLAN-M5.md*](../PLAN-M5.md).
+    *nans.js*, *nativeFunctionMatcher.js*, *promiseHelper.js*, and
+    *propertyHelper.js*. *nans.js* joined that list with the
+    `math-namespace` node, whose `Math.pow` intrinsic was its only
+    unadmitted dependency, *decimalToHexString.js* with the
+    `uri-handling-functions` node that its 78 reviewed cases observe, and
+    *nativeFunctionMatcher.js* with the `harness-native-function-matcher`
+    node whose function-to-string cases observe it. Cases in the reviewed
+    function inventory that need *wellKnownIntrinsicObjects.js* classify
+    as unsupported until that include has a reviewed implementation. The
+    reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
+    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`,
+    because this profile does not admit `globalThis`. Its
+    `assert.throwsAsync` reports a constructor mismatch without composing a
+    message from the observed value, so a rejection whose `constructor` is
+    missing or exotic cannot replace the mismatch report with a thrown
+    conversion. Owner: the standards harness expansion in
+    [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host
     contract tolerates one. Cases that deliberately leave a rejection

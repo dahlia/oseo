@@ -146,6 +146,10 @@ const detachArrayBufferHarnessPath = join(
   "tests/test262/harness/detachArrayBuffer.js",
 );
 const nansHarnessPath = join(repositoryRoot, "tests/test262/harness/nans.js");
+const nativeFunctionMatcherHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/nativeFunctionMatcher.js",
+);
 const nativeErrorsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/nativeErrors.js",
@@ -195,7 +199,6 @@ const unavailableHarnessIncludes = new Set([
   // through the Function constructor, which this profile keeps outside
   // the admitted dynamic source, so no unreviewed copy can execute them.
   "resizableArrayBufferUtils.js",
-  "nativeFunctionMatcher.js",
   "wellKnownIntrinsicObjects.js",
 ]);
 
@@ -1910,6 +1913,10 @@ async function readHarnesses(): Promise<Test262Harnesses> {
       ],
       ["isConstructor.js", await readFile(isConstructorHarnessPath, "utf8")],
       ["nans.js", await readFile(nansHarnessPath, "utf8")],
+      [
+        "nativeFunctionMatcher.js",
+        await readFile(nativeFunctionMatcherHarnessPath, "utf8"),
+      ],
       ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],

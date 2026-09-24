@@ -6844,6 +6844,43 @@ Boolean built-in code range, and new runtime component move the ABI to
 `oseo-runtime-m5-119` without adding a generated-code entry point or changing
 the graph's orchestration state.
 
+Implemented M5b node `harness-native-function-matcher` delivers the reviewed
+*nativeFunctionMatcher.js* harness include. Its ordinary JavaScript adaptation
+of the upstream `validateNativeFunctionSource`, `assertNativeFunction`, and
+`assertToStringOrNativeFunction` helpers asserts the _NativeFunction_
+production: an optional `get` or `set` accessor, an optional identifier or
+computed property name, balanced formal parameters with nested functions,
+arrays, and strings, and whitespace or comment runs between tokens. The
+test262 adapter assembles that source ahead of each test body and adds no
+native shortcut or runtime surface; every token stays opt-in through
+frontmatter.
+
+Fixed native and generated differential evidence at property seed `0x60007c00`
+covers none, `get`, and `set` accessors, no name, an identifier name, or a
+computed name, eight balanced parameter lists including strings with
+unbalanced brackets, six whitespace and comment runs, four prefix and four
+suffix decorations, and one of six single-step mutations. The independent
+verdict is decided by construction, and Node.js, Deno, and both native
+specialization policies agree under collection forced at every safepoint with
+a false numeric hint that deliberately misses its guard and reaches the
+compiled generic fallback.
+
+The 68 reviewed paths that include the harness are reclassified. Sixty-three
+move from `unsupported-profile-feature` to `pass`, and five retain
+`unsupported-profile-feature` with a changed detail only: four because the
+`AsyncFunction`, `AsyncGenerator`, `Function`, and `GeneratorFunction`
+constructors compile source text at run time, and one because it still needs
+*wellKnownIntrinsicObjects.js*. No reviewed path moves away from `pass` or
+loses its reviewed status. The manifest keeps 21,265 paths, 1,556 expected
+negatives, and moves from 17,895 to 17,958 passes and from 1,814 to 1,751
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 156 to 157 domains and seeds and
+from 5,791 to 5,803 ordinary cases, and the evidence inventory moves from 134
+to 135 families. The node adds no component, code ID, realm intrinsic,
+generated-code entry point, ABI change, or graph-state change; the suite
+revision, applicable inventory, classification vocabulary, target-parity
+policy, forced-collection policy, and zero-override policy are unchanged.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

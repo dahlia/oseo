@@ -152,17 +152,54 @@ test("allows every reviewed change inside the named node's roots", () => {
   assert.doesNotThrow(() => checkM5bNodeScope(inputs(baseline, current)));
 });
 
-test("rejects any reviewed change for a node without inventory", () => {
+test("allows an out-of-root promotion for a node without inventory", () => {
   const baseline = snapshot([
     { classification: "unsupported-profile-feature", path: otherPath },
   ]);
   const current = snapshot([{ classification: "pass", path: otherPath }]);
+  assert.doesNotThrow(() =>
+    checkM5bNodeScope(
+      inputs(baseline, current, { nodeId: "infrastructure-node" }),
+    ),
+  );
+});
+
+test("allows an out-of-root unsupported negative without inventory", () => {
+  const baseline = snapshot([
+    { classification: "unsupported-profile-feature", path: otherPath },
+  ]);
+  const current = snapshot([
+    { classification: "expected-negative", path: otherPath },
+  ]);
+  assert.doesNotThrow(() =>
+    checkM5bNodeScope(
+      inputs(baseline, current, { nodeId: "infrastructure-node" }),
+    ),
+  );
+});
+
+test("rejects a reviewed subset removal for a node without inventory", () => {
+  const baseline = snapshot([{ classification: "pass", path: otherPath }]);
+  assert.throws(
+    () =>
+      checkM5bNodeScope(
+        inputs(baseline, snapshot([]), { nodeId: "infrastructure-node" }),
+      ),
+    /node infrastructure-node has no inventory block/u,
+  );
+});
+
+test("rejects a reviewed demotion for a node without inventory", () => {
+  const baseline = snapshot([{ classification: "pass", path: otherPath }]);
+  const current = snapshot([
+    { classification: "unsupported-profile-feature", path: otherPath },
+  ]);
   assert.throws(
     () =>
       checkM5bNodeScope(
         inputs(baseline, current, { nodeId: "infrastructure-node" }),
       ),
-    /node infrastructure-node has no inventory block/u,
+    /expectedClassification "pass" -> "unsupported-profile-feature"/u,
   );
 });
 

@@ -496,3 +496,7 @@ families:
     owner: tests/property/m5-boolean-intrinsic.property.test.ts
     start: 0x60007b00
     end: 0x60007bff
+  - family: m5-harness-native-function-matcher
+    owner: tests/property/m5-harness-native-function-matcher.property.test.ts
+    start: 0x60007c00
+    end: 0x60007cff

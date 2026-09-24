@@ -1,0 +1,54 @@
+version: 1
+id: harness-native-function-matcher
+title: "nativeFunctionMatcher.js harness include"
+scope:
+  - "The reviewed validateNativeFunctionSource helper over the NativeFunction
+    production, including an optional get or set accessor, an optional
+    identifier or computed property name, balanced formal parameters with
+    nested functions, arrays, and strings, and whitespace and comment runs
+    between every token."
+  - "The reviewed assertNativeFunction and assertToStringOrNativeFunction
+    helpers, which prefer an exact string comparison and fall back to the
+    source-grammar check with the upstream failure text."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/property/m5-harness-native-function-matcher.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/nativeFunctionMatcher.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: omitted
+    reason: "The include is ordinary JavaScript assembled ahead of each
+      reviewed test body and adds no IR construct, generated-C contract,
+      realm intrinsic, runtime helper, or ABI surface of its own."
+    replacements:
+      - tools/test262.ts
+      - tests/test262/harness/nativeFunctionMatcher.js
