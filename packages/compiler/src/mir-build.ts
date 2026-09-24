@@ -1,5 +1,5 @@
 import { specializeAddition } from "./mir-specialize.ts";
-import { anonymousDefinition } from "./hir.ts";
+import { anonymousDefinition, intrinsicGlobalObjectName } from "./hir.ts";
 import type {
   HirArrayBindingPattern,
   HirArraySpreadElement,
@@ -19,6 +19,7 @@ import type {
   HirSpreadArgument,
   HirStatement,
   HirWithBindingReference,
+  HirWithGlobalObjectFallback,
   HirWithReference,
 } from "./hir.ts";
 import { declaredHirBindingIds, hirBindingIdentifiers } from "./hir-build.ts";
@@ -973,6 +974,7 @@ function lowerIsObject(
 function lowerWithReference(
   reference: Pick<HirWithReference, "name" | "objectBindingIds" | "range">,
   builder: MirBuilder,
+  globalFallback?: HirWithGlobalObjectFallback,
 ): LoweredWithReference {
   const key = lowerPropertyKey(
     { kind: "string", range: reference.range, value: reference.name },
@@ -1060,6 +1062,18 @@ function lowerWithReference(
       values: [object, found],
     };
     builder.current = nextBlock;
+  }
+  if (globalFallback != null) {
+    // An all-miss chain continues to the global Environment Record,
+    // whose HasBinding tests the global object's property while the
+    // reference is resolved, before a write's right-hand side runs.
+    const globalObject = lowerBindingRead(
+      globalFallback.objectBindingId,
+      intrinsicGlobalObjectName,
+      reference.range,
+      builder,
+    );
+    lowerBinaryValues(key, "in", globalObject, reference.range, builder);
   }
   const noObject = lowerSyntheticUndefined(reference.range, builder);
   const noProperty = lowerExpression(
@@ -1179,10 +1193,14 @@ function lowerWithDelete(
 
 function lowerWithBindingRead(
   selected: LoweredWithReference,
-  fallback: HirWithBindingReference,
+  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
   range: SourceRange,
   builder: MirBuilder,
 ): number {
+  const globalRead = "objectBindingId" in fallback ? fallback.read : undefined;
+  if ("objectBindingId" in fallback && globalRead == null) {
+    throw new Error("A with global-object read fallback has no read.");
+  }
   const propertyBlock = createMirBlock(builder);
   const fallbackBlock = createMirBlock(builder);
   const joinBlock = createMirBlock(builder);
@@ -1208,13 +1226,19 @@ function lowerWithBindingRead(
     values: [propertyValue],
   };
   builder.current = fallbackBlock;
-  const fallbackValue = lowerBindingRead(
-    fallback.bindingId,
-    fallback.name,
-    range,
-    builder,
-  );
-  fallbackBlock.terminator = {
+  const fallbackValue =
+    globalRead != null
+      ? lowerExpression(globalRead, builder)
+      : "bindingId" in fallback
+        ? lowerBindingRead(fallback.bindingId, fallback.name, range, builder)
+        : undefined;
+  if (fallbackValue == null) {
+    throw new Error("A with read fallback has no source.");
+  }
+  // The global-object read is itself a conditional over the property's
+  // presence, so it can leave the builder in its own join block; the jump
+  // belongs to whichever block the read ended in.
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [fallbackValue],
@@ -1223,9 +1247,34 @@ function lowerWithBindingRead(
   return recordRoot(builder, value, range);
 }
 
+/**
+ * Write the realm global object's property behind an all-miss `with`
+ * chain. Only non-strict code reaches it, so the write is the ordinary
+ * non-throwing Set that creates the property when it is absent, exactly
+ * as a sloppy PutValue does for an unresolvable reference.
+ */
+function lowerWithGlobalObjectWrite(
+  fallback: HirWithGlobalObjectFallback,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const object = lowerBindingRead(
+    fallback.objectBindingId,
+    intrinsicGlobalObjectName,
+    range,
+    builder,
+  );
+  const key = lowerExpression(
+    { kind: "string", range, value: fallback.name },
+    builder,
+  );
+  return lowerPropertyWrite(object, key, value, range, builder);
+}
+
 function lowerWithBindingWrite(
   selected: LoweredWithReference,
-  fallback: HirWithBindingReference,
+  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
   value: number,
   range: SourceRange,
   builder: MirBuilder,
@@ -1256,11 +1305,10 @@ function lowerWithBindingWrite(
     values: [propertyResult],
   };
   builder.current = fallbackBlock;
-  const fallbackResult = lowerBindingWrite(
-    { ...fallback, range },
-    value,
-    builder,
-  );
+  const fallbackResult =
+    "objectBindingId" in fallback
+      ? lowerWithGlobalObjectWrite(fallback, value, range, builder)
+      : lowerBindingWrite({ ...fallback, range }, value, builder);
   fallbackBlock.terminator = {
     kind: "jump",
     target: joinBlock.id,
@@ -3481,7 +3529,13 @@ function lowerExpression(
     return lowerWithRead(expression, builder, false).value;
   }
   if (expression.kind === "with-set") {
-    const selected = lowerWithReference(expression, builder);
+    const selected = lowerWithReference(
+      expression,
+      builder,
+      "objectBindingId" in expression.fallback
+        ? expression.fallback
+        : undefined,
+    );
     const value = lowerExpression(expression.value, builder);
     return lowerWithBindingWrite(
       selected,

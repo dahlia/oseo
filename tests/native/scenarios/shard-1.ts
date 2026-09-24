@@ -506,6 +506,46 @@ throw "entry failure";
     /error\[OSEO2001\]: TypeError: Cannot read properties of a nullish/u,
   );
 
+  const unresolvableReference = await runNativeCli(
+    {
+      args: ["unresolvable-reference.ts"],
+      source: "missingName;",
+      sourceId: "unresolvable-reference.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(unresolvableReference.exitStatus, 1);
+  assert.equal(unresolvableReference.stdout, "");
+  // GetValue on an unresolvable Reference names the reference, which is
+  // what separates it from a declarative binding read before its
+  // initialization.
+  assert.match(
+    unresolvableReference.stderr,
+    /error\[OSEO2001\]: ReferenceError: missingName is not defined\.\n/u,
+  );
+  assert.match(
+    unresolvableReference.stderr,
+    /\nOSEO_THROWN ReferenceError\n$/u,
+  );
+
+  const temporalDeadZone = await runNativeCli(
+    {
+      args: ["temporal-dead-zone.ts"],
+      source: "declared; let declared = 1;",
+      sourceId: "temporal-dead-zone.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(temporalDeadZone.exitStatus, 1);
+  // A declared binding read before its initialization keeps its own
+  // message, so the two ReferenceErrors stay distinguishable.
+  assert.match(
+    temporalDeadZone.stderr,
+    /error\[OSEO2001\]: ReferenceError: Binding is read before initial/u,
+  );
+
   const thrownRenamedEntry = await runNativeCli(
     {
       args: ["thrown-renamed-entry.ts"],
@@ -802,13 +842,23 @@ throw boom;
       undefined,
     ],
     [
-      // An intrinsic error instance keeps the rendering it already had
-      // on this path, which is what makes the boundary rule specific to
-      // a value with no intrinsic error identity.
+      // An intrinsic error instance reports the same boundary text, so
+      // the boundary reads alike for every reason, and keeps its kind
+      // marker, which reading needs no user JavaScript. That keeps the
+      // rejected value observable (M5b node globalthis-binding).
       "rejected-intrinsic-error.ts",
       'Promise.reject(new TypeError("bad"));\n',
-      "TypeError: bad",
+      "Unhandled promise rejection.",
       "TypeError",
+    ],
+    [
+      // An unresolvable reference inside a settled reaction rejects with
+      // the ReferenceError it throws, and the rejection stays the same
+      // host-policy boundary.
+      "rejected-unresolvable.ts",
+      "Promise.resolve().then(() => missingReaction);\n",
+      "Unhandled promise rejection.",
+      "ReferenceError",
     ],
   ] as const) {
     for (const specialization of ["disabled", "enabled"] as const) {

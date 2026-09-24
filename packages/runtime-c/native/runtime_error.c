@@ -761,6 +761,20 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
         return;
     }
     /*
+     * A rejected intrinsic error instance keeps the boundary text as
+     * well, so the host-policy boundary reads the same whatever the
+     * reason is. Its intrinsic kind marker still follows, which keeps
+     * the rejected value observable; reading that kind runs no user
+     * JavaScript.
+     */
+    bool rejection = context->error_message != NULL &&
+        strcmp(context->error_message, OSEO_UNHANDLED_REJECTION_MESSAGE) == 0;
+    if (identified && rejection) {
+        oseo_context_print_error(context);
+        (void)fprintf(stderr, "OSEO_THROWN %s\n", error_names[kind]);
+        return;
+    }
+    /*
      * Converting an object-valued name or message, and reading the
      * constructor identity of a value that is not an error instance, run
      * user JavaScript, which moves the context's source location. The

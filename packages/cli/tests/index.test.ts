@@ -250,7 +250,9 @@ test("separates the source path from its diagnostic identifier", async () => {
     },
     readTextFile(path) {
       readPath = path;
-      return Promise.resolve("console.log(class extends Base {});");
+      // `eval` stays outside the admitted global-object profile, so the
+      // source still ends in a source-located compile diagnostic.
+      return Promise.resolve("console.log(eval);");
     },
     remove() {
       return Promise.reject(new Error("unexpected cleanup"));

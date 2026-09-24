@@ -1,3 +1,4 @@
+import { intrinsicGlobalObjectName } from "./hir.ts";
 import type {
   HirBindingPattern,
   HirCallArgument,
@@ -6,6 +7,8 @@ import type {
   HirPrivateName,
   HirProgram,
   HirStatement,
+  HirWithBindingReference,
+  HirWithGlobalObjectFallback,
 } from "./hir.ts";
 import type { SourceRange } from "./source.ts";
 import type { Hint } from "./syntax.ts";
@@ -48,6 +51,21 @@ function withObjectText(objectBindingIds: readonly number[]): string {
   return objectBindingIds.map((bindingId) => `%b${bindingId}`).join(" -> ");
 }
 
+/**
+ * The realm global-object fallback of an all-miss `with` write, or the
+ * empty string for a hidden-cell fallback, which prints nothing.
+ */
+function withGlobalFallbackText(
+  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
+): string {
+  if (!("objectBindingId" in fallback)) return "";
+  const target = `%b${fallback.objectBindingId}(${intrinsicGlobalObjectName})`;
+  return (
+    ` fallback ${target}[${JSON.stringify(fallback.name)}]` +
+    (fallback.read == null ? "" : ` read ${printHirExpression(fallback.read)}`)
+  );
+}
+
 function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding-set") {
     return (
@@ -73,15 +91,19 @@ function printHirExpression(expression: HirExpression): string {
     return (
       `with[${withObjectText(expression.objectBindingIds)}] ` +
       `${expression.name} ${operator} ` +
-      printHirExpression(expression.value)
+      printHirExpression(expression.value) +
+      withGlobalFallbackText(expression.fallback)
     );
   }
   if (expression.kind === "with-step") {
     const target =
       `with[${withObjectText(expression.objectBindingIds)}] ` + expression.name;
-    return expression.prefix
-      ? `${expression.operator}${target}`
-      : `${target}${expression.operator}`;
+    return (
+      (expression.prefix
+        ? `${expression.operator}${target}`
+        : `${target}${expression.operator}`) +
+      withGlobalFallbackText(expression.fallback)
+    );
   }
   if (expression.kind === "destructuring-set") {
     return (

@@ -1858,6 +1858,209 @@ test("executes a case that only mentions $262.agent in text", async () => {
   assert.equal(result.classification, "pass");
 });
 
+test("withholds a case that references the $262 host binding", async () => {
+  const cases = [
+    "$262.evalScript('1;');\n",
+    "assert.throws(ReferenceError, () => { $262.gc(); });\n",
+    "const host = $262;\n",
+    "$262.agent.start(''); $262.detachArrayBuffer;\n",
+    // A declaration in another scope does not shadow the reference.
+    "function local($262) {}\nassert.throws(Error, () => $262.gc());\n",
+    "{ let $262; }\n$262.gc();\n",
+    "function withDefault(value = $262) {}\n",
+    // A parameter default, a computed key, and a discriminant do not see
+    // the declarations of the body they precede, and a strict block
+    // function stays inside its block.
+    "function shadowed(value = $262) { var $262; }\n",
+    "({ [$262]($262) {} });\n",
+    "switch ($262) { case 1: let $262; }\n",
+    '"use strict";\n{ function $262() {} }\n$262.gc();\n',
+    "class Leak { static { var $262; } }\n$262.gc();\n",
+  ];
+  await Promise.all(
+    cases.map(async (body) => {
+      const source = `/*---\n---*/\n${body}`;
+      const parsed = parseTest262Case(source, "test/host.js", revision);
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set<string>(),
+        harnesses,
+        {
+          async execute() {
+            return assert.fail("a host-binding case must not execute");
+          },
+        },
+        ["functions"],
+      );
+      assert.equal(result.classification, "unsupported-profile-feature");
+      // `$262.agent` keeps its own, earlier capability.
+      assert.equal(
+        result.observation.unsupportedCapability,
+        body.includes("agent") ? "test262-agent" : "host-binding",
+      );
+    }),
+  );
+});
+
+test("executes a case that names $262 without referencing it", async () => {
+  const source =
+    "/*---\n---*/\n" +
+    "// $262.evalScript is not called here.\n" +
+    'const label = "$262";\n' +
+    "const object = { $262: 1 };\n" +
+    "object.$262;\n" +
+    "typeof $262;\n" +
+    "function local($262) { return $262; }\n" +
+    "function hoisted() { { var $262; } return $262; }\n" +
+    "try {} catch ($262) { $262; }\n" +
+    "class Static { static { { var $262 = 1; } $262; } }\n";
+  const parsed = parseTest262Case(source, "test/host-text.js", revision);
+  let executions = 0;
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      async execute() {
+        executions += 1;
+        return successfulResult();
+      },
+    },
+    ["functions"],
+  );
+  assert.ok(executions > 0);
+  assert.equal(result.classification, "pass");
+});
+
+test("withholds a case that reads an omitted harness definition", async () => {
+  const omitting = {
+    ...harnesses,
+    includes: new Map([
+      ...harnesses.includes,
+      ["regExpUtils.js", "function matchValidator() {}\nconst shared = 1;"],
+    ]),
+    upstreamDefinitions: new Map([
+      ["regExpUtils.js", ["buildString", "matchValidator", "shared"]],
+    ]),
+  };
+  const run = async (body: string): Promise<Test262Result> => {
+    const source = `/*---\nincludes: [regExpUtils.js]\n---*/\n${body}`;
+    const parsed = parseTest262Case(source, "test/harness.js", revision);
+    return await executeTest262Case(
+      source,
+      parsed,
+      new Set<string>(),
+      omitting,
+      { execute: async () => await Promise.resolve(successfulResult()) },
+      ["functions"],
+    );
+  };
+  const omitted = await run(
+    "function local(buildString) {}\nbuildString({ loneCodePoints: [] });\n",
+  );
+  assert.equal(omitted.classification, "unsupported-profile-feature");
+  assert.equal(omitted.observation.unsupportedCapability, "harness-definition");
+  assert.match(omitted.observation.detail ?? "", /omits buildString\./u);
+  // A provided definition, a name only in text, and a local declaration
+  // of the omitted name all execute as usual.
+  const executed = await Promise.all(
+    [
+      "matchValidator([], 0, '');\n",
+      "// buildString\nconst text = 'buildString';\n",
+      "function buildString() {}\nbuildString();\n",
+      "const buildString = () => 1;\nbuildString();\n",
+    ].map(run),
+  );
+  for (const result of executed) assert.equal(result.classification, "pass");
+});
+
+test("names an unavailable host binding as a capability boundary", async () => {
+  const source = "/*---\n---*/\nArray.print = globalThis.print;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      async execute(): Promise<CliResult> {
+        return await Promise.resolve({
+          exitStatus: 1,
+          stderr:
+            "test/example.js:3:1: error[OSEO2001]: " +
+            "ReferenceError: print is not defined.\n" +
+            "OSEO_THROWN ReferenceError\n",
+          stdout: "",
+        });
+      },
+    },
+    ["functions"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(result.observation.unsupportedCapability, "host-binding");
+});
+
+test("keeps an ordinary unresolvable reference a failure", async () => {
+  const source = "/*---\n---*/\nmissingName;\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      async execute(): Promise<CliResult> {
+        return await Promise.resolve({
+          exitStatus: 1,
+          stderr:
+            "test/example.js:3:1: error[OSEO2001]: " +
+            "ReferenceError: missingName is not defined.\n" +
+            "OSEO_THROWN ReferenceError\n",
+          stdout: "",
+        });
+      },
+    },
+    ["functions"],
+  );
+  // Only the reviewed host-binding names are a capability boundary; every
+  // other unresolvable reference stays an observed disagreement.
+  assert.equal(result.classification, "semantic-failure");
+  assert.equal(result.observation.unsupportedCapability, undefined);
+});
+
+test("names an unhandled rejection with a typed reason", async () => {
+  const source = "/*---\n---*/\nPromise.reject(new TypeError('r'));\n";
+  const parsed = parseTest262Case(source, "test/example.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      async execute(): Promise<CliResult> {
+        return await Promise.resolve({
+          exitStatus: 1,
+          stderr:
+            "test/example.js:3:1: error[OSEO2001]: " +
+            "Unhandled promise rejection.\nOSEO_THROWN TypeError\n",
+          stdout: "",
+        });
+      },
+    },
+    ["functions"],
+  );
+  // The reason's kind marker still follows the boundary text, so the
+  // rejection is recognized before the uncaught-throw bail to stay
+  // symmetric with a rejection whose reason is an ordinary value.
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(
+    result.observation.unsupportedCapability,
+    "unhandled-rejection-policy",
+  );
+});
+
 test("recognizes strict early errors as expected parse failures", async () => {
   const source = `/*---
 negative:

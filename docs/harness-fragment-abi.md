@@ -98,9 +98,11 @@ selection.
 The launcher owns top-level hoisted function installation and each fragment's
 hidden intrinsic-global-object initializer. Ownership is identified by HIR
 statement kind and the explicit intrinsic binding ID, never by source ranges.
-Hidden missing-intrinsic cells remain uninitialized. A fragment may have its
-own hidden cell for the same realm object; those cells hold the same object
-and occupy disjoint slots. This avoids making harness allocation depend on
+The launcher also creates each fragment's hidden missing-intrinsic cells, which
+stay uninitialized and report the unresolvable reference that names them, as
+the whole-Script prologue does. A fragment may have its own hidden cell for
+the same realm object; those cells hold the same object and occupy disjoint
+slots. This avoids making harness allocation depend on
 which intrinsics a case uses. The initializer metadata also identifies the
 frontend's synthetic var initialization by its global-object binding
 descriptors. Source-level var initializer assignments stay in evaluation order.
@@ -131,11 +133,15 @@ against these names and all harness Script declarations. Any overlap returns
 an explicit fallback result. This covers `let Object`, destructuring, class
 names, hoisted var declarations, and function replacements conservatively.
 
-An unresolved initializing `with` write in either fragment also requires
-fallback. Whole-Script resolution checks these writes against unresolved
-`typeof` folds anywhere in the Script; resolving fragments independently
-would otherwise discard that check. This restriction preserves both directions
-of the dependency without adding body inputs to harness lowering.
+An initializing `with` write that still reaches a hidden fallback cell in
+either fragment also requires fallback. Only a runtime-owned intrinsic or a
+standard global this profile has not admitted as a value keeps such a cell;
+every other unresolved name reaches the realm global object, which the
+launcher shares between both fragments, so its writes and `typeof` reads need
+no fallback. ECMA-262 models the remaining write as creating a real global
+binding, which the other fragment could not observe through a cell private to
+the writing fragment. This restriction preserves both directions of the
+dependency without adding body inputs to harness lowering.
 
 Compilation failure does not establish eligibility for reuse. The runner sends
 parse failures, unsupported inputs, unknown metadata, and collisions to the
@@ -233,7 +239,13 @@ functions, classes, objects, expressions, generators, async functions, and
 global-object records. Printed HIR, printed MIR, and emitted C matched byte
 for byte. The checked-in baseline retains 44 SHA-256 records in
 *tests/harness-fragment-baseline.json*. These are measured code-generation
-comparisons, not split-native execution or performance evidence.
+comparisons, not split-native execution or performance evidence. A change
+that deliberately alters code generation regenerates the affected records in
+the same change and says why: M5b node `globalthis-binding` moved 32 records,
+because each hidden missing-intrinsic cell now reports its unresolvable
+reference, an unresolved `with` read in *bindings/with-statements* reaches
+the realm global object instead of a hidden cell, and `typeof`, writes, and
+deletes of a global-object name check the property's presence first.
 
 
 Stage 2 interfaces and ownership

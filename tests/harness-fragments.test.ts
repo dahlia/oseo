@@ -245,7 +245,10 @@ test("whole-Script output matches the main baseline", async () => {
   }
 });
 
-test("unresolved with writes require fallback in either fragment", () => {
+test("unresolved with writes share the global object across fragments", () => {
+  // A sloppy all-miss write reaches the realm global object's property,
+  // which the launcher shares between the two fragments, so a later
+  // typeof in either fragment observes it and neither needs fallback.
   const write = "with ({}) { absent = 1; }";
   const read = "console.log(typeof absent);";
   for (const [harnessSource, bodySource] of [
@@ -258,8 +261,40 @@ test("unresolved with writes require fallback in either fragment", () => {
       source: `${harnessSource}\n${bodySource}`,
       sourceId: "case.js",
     });
-    assert.equal(whole.mir, undefined);
-    assert.match(whole.diagnostics[0]?.message ?? "", /typeof with fallback/);
+    assert.deepEqual(whole.diagnostics, []);
+    assert.ok(whole.mir);
+    const prepared = compileHarnessFragment(babelFrontend, [
+      {
+        source: harnessSource,
+        sourceId: "helpers.js",
+      },
+    ]);
+    assert.equal(prepared.kind, "compiled");
+    if (prepared.kind !== "compiled") return;
+    const body = compileBodyFragment(babelFrontend, prepared.harness, {
+      source: bodySource,
+      sourceId: "case.js",
+    });
+    assert.equal(body.kind, "compiled");
+  }
+});
+
+test("hidden with fallback writes require fallback in either fragment", () => {
+  // A runtime-owned name still owns a hidden fallback cell, which one
+  // fragment's write would initialize without the other observing it.
+  const write = "with ({}) { console = 1; }";
+  const read = "var observed = 1;";
+  for (const [harnessSource, bodySource] of [
+    [write, read],
+    [read, write],
+  ]) {
+    assert.ok(harnessSource);
+    assert.ok(bodySource);
+    const whole = compileSource(babelFrontend, {
+      source: `${harnessSource}\n${bodySource}`,
+      sourceId: "case.js",
+    });
+    assert.deepEqual(whole.diagnostics, []);
     const prepared = compileHarnessFragment(babelFrontend, [
       {
         source: harnessSource,
@@ -276,7 +311,10 @@ test("unresolved with writes require fallback in either fragment", () => {
         sourceId: "case.js",
       });
       assert.equal(body.kind, "fallback");
-      if (body.kind === "fallback") assert.equal(body.reason, "global-effects");
+      if (body.kind === "fallback") {
+        assert.equal(body.reason, "global-effects");
+        assert.deepEqual(body.names, ["console"]);
+      }
     }
   }
 });
