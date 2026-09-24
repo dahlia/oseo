@@ -19,14 +19,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/CharacterClassEscapes/character-class-wh\
-        itespace-class-escape-negative-cases.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
-        class-whitespace-class-escape-negative-cases.js:173:13:
-        error[OSEO1001]: Unknown binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -97,13 +93,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lepc\
-        ha.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Lepcha.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -122,13 +115,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Tirh\
-        uta.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Tirhuta.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

@@ -84,8 +84,10 @@ Ownership follows the plan's target layout:
     weak-edge clearing, finalization-record scheduling, collection, and
     destruction; [*PLAN-GC.md*](../PLAN-GC.md) owns the planned policy,
     accounting, slot, descriptor, and collector evolution boundaries;
- -  *runtime\_binding.c*: environments, binding cells, module
-    namespaces, and the realm's global this value;
+ -  *runtime\_binding.c*: environments, binding cells including the
+    hidden cells that report an unresolvable global reference, module
+    namespaces, and the realm's global this value with its own `globalThis`
+    property;
  -  *runtime\_string.c*: string values and the string half of a property
     key, meaning allocation, content equality, ASCII name matching,
     canonical array-index recognition, and the own properties a String
@@ -860,6 +862,22 @@ evidence covers both specialization policies, false hints, guard misses,
 generic fallback, and collection forced at every safepoint. It declares no
 test262 inventory roots, so the applicable upstream paths remain outside
 the reviewed subset.
+
+### globalThis binding evidence
+
+M5b node `globalthis-binding` extends *runtime\_binding.c*. The global object
+creation installs its own `globalThis` property last, and the new
+`oseo_unresolvable_cell_create` entry point creates the hidden cell whose read
+throws the `ReferenceError` naming an unresolvable global reference. The exit
+reporter in *runtime\_error.c* keeps the rejection boundary text for an
+intrinsic error reason while still printing its kind marker.
+
+The node adds no component, internal helper, built-in code ID, intrinsic slot,
+or heap kind. Its generated-code entry point moves `abiVersion` to `m5-122`
+after TypedArray sorting's `m5-121`. Fixed and generated native differential
+evidence covers both specialization policies, false hints, guard misses,
+generic fallback, and collection forced at every safepoint, and the node
+reviews its declared *test/built-ins/global/* inventory root.
 
 ### Object descriptor query evidence
 

@@ -114,13 +114,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Bidi_Mirrored\
-        .js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Bidi_\
-        Mirrored.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -139,14 +136,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/General_Categ\
-        ory_-_Currency_Symbol.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Gener\
-        al_Category_-_Currency_Symbol.js:140:22: error[OSEO1001]:
-        Unknown binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -165,13 +158,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Limb\
-        u.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Limbu.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -190,13 +180,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
-        ions_-_Saurashtra.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Saurashtra.js:140:22: error[OSEO1001]: Unknown
-        binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

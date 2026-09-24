@@ -173,13 +173,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Oriy\
-        a.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Oriya.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -198,13 +195,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
-        ions_-_Old_Uyghur.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Old_Uyghur.js:140:22: error[OSEO1001]: Unknown
-        binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -223,13 +217,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
-        ions_-_Palmyrene.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Palmyrene.js:140:22: error[OSEO1001]: Unknown
-        binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

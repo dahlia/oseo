@@ -80,13 +80,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Old_\
-        Sogdian.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_-_Old_Sogdian.js:140:22: error[OSEO1001]: Unknown binding
-        'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -105,14 +102,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
-        ions_-_Cypro_Minoan.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Cypro_Minoan.js:140:22: error[OSEO1001]: Unknown
-        binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -131,13 +124,10 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
-        ions_-_Nabataean.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
-        t_Extensions_-_Nabataean.js:140:22: error[OSEO1001]: Unknown
-        binding 'buildString'.\\n\""
-      unsupportedCapability: profile-syntax
+      detail: "Not executed: the reviewed harness regExpUtils.js omits
+        buildString, testPropertyEscapes."
       passed: false
+      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

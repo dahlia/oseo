@@ -3151,7 +3151,7 @@ OseoResult oseo_rejection_checkpoint(OseoContext *context) {
         return normal(oseo_undefined());
     }
     context->error_code = "OSEO2001";
-    context->error_message = "Unhandled promise rejection.";
+    context->error_message = OSEO_UNHANDLED_REJECTION_MESSAGE;
     context->has_diagnostic = false;
     context->source_id = first_source_id;
     context->source_id_length = first_source_id_length;
