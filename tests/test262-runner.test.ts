@@ -1876,6 +1876,10 @@ test("withholds a case that references the $262 host binding", async () => {
     "switch ($262) { case 1: let $262; }\n",
     '"use strict";\n{ function $262() {} }\n$262.gc();\n',
     "class Leak { static { var $262; } }\n$262.gc();\n",
+    // A `with` object is evaluated outside its own object environment,
+    // which reaches no reference after the statement.
+    "with ($262) {}\n",
+    "with ({ $262: 1 }) {}\n$262.gc();\n",
   ];
   await Promise.all(
     cases.map(async (body) => {
@@ -1934,6 +1938,37 @@ test("executes a case that names $262 without referencing it", async () => {
   assert.equal(result.classification, "pass");
 });
 
+test("executes a case whose with object may provide $262", async () => {
+  const cases = [
+    "with ({ $262: { gc() {} } }) { $262.gc(); }\n",
+    // A function inside the body keeps the object environment.
+    "var host = { $262: { gc() {} } };\n" +
+      "with (host) { (function () { return $262.gc(); })(); }\n",
+  ];
+  await Promise.all(
+    cases.map(async (body) => {
+      const source = `/*---\nflags: [noStrict]\n---*/\n${body}`;
+      const parsed = parseTest262Case(source, "test/host-with.js", revision);
+      let executions = 0;
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set<string>(),
+        harnesses,
+        {
+          async execute() {
+            executions += 1;
+            return successfulResult();
+          },
+        },
+        ["functions"],
+      );
+      assert.ok(executions > 0);
+      assert.equal(result.classification, "pass");
+    }),
+  );
+});
+
 test("executes a module that only re-exports $262", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oseo-test262-host-"));
   try {
@@ -1987,7 +2022,8 @@ test("withholds a case that reads an omitted harness definition", async () => {
     ]),
   };
   const run = async (body: string): Promise<Test262Result> => {
-    const source = `/*---\nincludes: [regExpUtils.js]\n---*/\n${body}`;
+    const flags = body.includes("with") ? "flags: [noStrict]\n" : "";
+    const source = `/*---\n${flags}includes: [regExpUtils.js]\n---*/\n` + body;
     const parsed = parseTest262Case(source, "test/harness.js", revision);
     return await executeTest262Case(
       source,
@@ -1998,12 +2034,23 @@ test("withholds a case that reads an omitted harness definition", async () => {
       ["functions"],
     );
   };
-  const omitted = await run(
-    "function local(buildString) {}\nbuildString({ loneCodePoints: [] });\n",
+  const withheld = await Promise.all(
+    [
+      "function local(buildString) {}\nbuildString({ loneCodePoints: [] });\n",
+      // A reference outside the `with` body still reaches no object
+      // environment.
+      "with (buildString) {}\n",
+      "with ({ buildString() {} }) {}\nbuildString();\n",
+    ].map(run),
   );
-  assert.equal(omitted.classification, "unsupported-profile-feature");
-  assert.equal(omitted.observation.unsupportedCapability, "harness-definition");
-  assert.match(omitted.observation.detail ?? "", /omits buildString\./u);
+  for (const omitted of withheld) {
+    assert.equal(omitted.classification, "unsupported-profile-feature");
+    assert.equal(
+      omitted.observation.unsupportedCapability,
+      "harness-definition",
+    );
+    assert.match(omitted.observation.detail ?? "", /omits buildString\./u);
+  }
   // A provided definition, a name only in text, and a local declaration
   // of the omitted name all execute as usual.
   const executed = await Promise.all(
@@ -2012,6 +2059,8 @@ test("withholds a case that reads an omitted harness definition", async () => {
       "// buildString\nconst text = 'buildString';\n",
       "function buildString() {}\nbuildString();\n",
       "const buildString = () => 1;\nbuildString();\n",
+      // The `with` object may provide the omitted name.
+      "with ({ buildString() {} }) { buildString({ loneCodePoints: [] }); }\n",
     ].map(run),
   );
   for (const result of executed) assert.equal(result.classification, "pass");
