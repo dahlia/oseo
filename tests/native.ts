@@ -68,6 +68,8 @@ import { symbolIntrinsicFixtures } from "./native/fixtures/symbol-intrinsic.ts";
 
 const { typedArrayMutationFixtures } =
   await import("./native/fixtures/typed-array-mutation.ts");
+const { typedArraySortFixtures } =
+  await import("./native/fixtures/typed-array-sort.ts");
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
@@ -208,6 +210,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
   ...typedArrayMutationFixtures,
+  ...typedArraySortFixtures,
   ...classFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
@@ -851,6 +854,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-iterative" ||
     fixture.name === "typed-array-search-and-join" ||
     fixture.name === "typed-array-mutation" ||
+    fixture.name === "typed-array-sort" ||
     fixture.name === "object-constructor" ||
     fixture.name === "object-define-property" ||
     fixture.name === "object-define-properties" ||
@@ -1107,6 +1111,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-iterative" ||
     fixture.name === "typed-array-search-and-join" ||
     fixture.name === "typed-array-mutation" ||
+    fixture.name === "typed-array-sort" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -1221,6 +1226,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "typed-array-iterative" ||
             fixture.name === "typed-array-search-and-join" ||
             fixture.name === "typed-array-mutation" ||
+            fixture.name === "typed-array-sort" ||
             fixture.name === "object-constructor" ||
             fixture.name === "object-define-property" ||
             fixture.name === "object-define-properties" ||

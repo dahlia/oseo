@@ -12,40 +12,6 @@ export async function runNativeScenario2(
 
   for (const [name, source, message] of [
     [
-      "typed-array-sort-method.ts",
-      "console.log(new Uint8Array(1).sort);",
-      "TypedArray sorting methods are not admitted yet.",
-    ],
-  ] as const) {
-    const observed = await runNativeCli(
-      {
-        args: [name],
-        source,
-        sourceId: name,
-        version: "0.1.0",
-      },
-      host,
-    );
-    assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
-    assert.match(
-      observed.stderr,
-      new RegExp(
-        `^${name.replace(".", "\\.")}:1:\\d+: error\\[OSEO2001\\]: ` +
-          message.replace(".", "\\."),
-        "u",
-      ),
-    );
-  }
-
-  for (const [name, source, message] of [
-    [
-      "typed-array-has-own-method.ts",
-      "const p = Object.getPrototypeOf(Uint8Array.prototype); " +
-        'console.log(Object.hasOwn(p, "sort"));',
-      "TypedArray sorting methods are not admitted yet.",
-    ],
-    [
       "typed-array-has-own-static.ts",
       "const C = Object.getPrototypeOf(Uint8Array); " +
         'console.log(Object.hasOwn(C, "from"));',

@@ -500,3 +500,7 @@ families:
     owner: tests/property/m5-harness-native-function-matcher.property.test.ts
     start: 0x60007c00
     end: 0x60007cff
+  - family: m5-typed-array-sort
+    owner: tests/property/m5-typed-array-sort.property.test.ts
+    start: 0x60007d00
+    end: 0x60007dff

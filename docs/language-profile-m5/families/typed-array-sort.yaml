@@ -1,0 +1,65 @@
+version: 1
+id: typed-array-sort
+title: "TypedArray sorting"
+scope:
+  - "The %TypedArray.prototype% sort and toSorted methods: comparator
+    validation before receiver validation, the validated length snapshot and
+    captured element list, stable sorting, and abrupt comparator completion
+    without a partial writeback."
+  - "CompareTypedArrayElements semantics: numeric rather than string default
+    ordering, NaN after every other Number, negative zero before positive zero,
+    direct BigInt comparison, and ToNumber of a supplied comparator result
+    with NaN treated as equal."
+  - "The distinction between sort's in-place writeback and toSorted's
+    same-element-kind copy, including allocation before element collection,
+    no constructor or Symbol.species lookup, and detach, shrink, and grow
+    observations during a comparator call."
+  - "Reviewed standards coverage is every upstream path under the node's two
+    inventory roots: test/built-ins/TypedArray/prototype/sort and toSorted.
+    Paths that need an unreviewed harness include retain explicit boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-sort.ts
+      - tests/property/m5-typed-array-sort.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-sort.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-sort.ts
+      - tests/property/m5-typed-array-sort.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-sort.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-sort.ts
+      - tests/property/m5-typed-array-sort.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-sort.ts
+      - tests/property/m5-typed-array-sort.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 135
+M5a is complete. The normative family records described below inventory 137
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,265 reviewed cases: 17,895 passes, 1,556
-expected negatives, and 1,814 unsupported profile features. It records no
+The current manifest contains 21,312 reviewed cases: 18,001 passes, 1,556
+expected negatives, and 1,755 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6757,10 +6757,10 @@ exhausting the iterator.
 function object, recorded when `%Array.prototype%` materializes. This node
 also materializes the `%TypedArray%[Symbol.species]` getter, because
 `subarray` cannot construct its default result without that lookup; the
-`typed-array-statics` node reuses it and still owns `from` and `of`. The
-sorting prototype methods keep their explicit lookup boundaries, and so does
-own-key reflection over `%TypedArray.prototype%`, whose key list completes
-only after those nodes land.
+`typed-array-statics` node reuses it and still owns `from` and `of`. That
+last node in the shared runtime component also owns the final reflection
+step for both `%TypedArray%` and `%TypedArray.prototype%`, so their own-key
+lists keep an explicit boundary until it lands.
 
 Fixed native and generated differential evidence at property seed
 `0x60007100` covers all eleven element kinds over fixed and length-tracking
@@ -7038,6 +7038,64 @@ unsupported profile features with no semantic, harness, or infrastructure
 failures. The property inventory reaches 154 domains and seeds with a
 5,767-case ordinary budget, the evidence inventory reaches 132
 families, and the runtime ABI moves to `m5-117`.
+
+
+TypedArray sorting
+------------------
+
+M5b node `typed-array-sort` adds `sort` and `toSorted` to
+`%TypedArray.prototype%`. They are distinct ordinary non-constructible methods
+of length one with writable, non-enumerable, configurable descriptors, and
+neither is the `Array.prototype` method of the same name. Each first checks a
+supplied comparator for callability, so an invalid comparator throws a
+`TypeError` before an invalid, detached, or out-of-bounds receiver is examined.
+ValidateTypedArray then fixes the element length and the methods capture every
+element before the first comparison.
+
+The default CompareTypedArrayElements ordering is numeric, not the string
+ordering used by `Array.prototype.sort`. Number element kinds place `NaN`
+after every non-`NaN`, keep `NaN` values stable with respect to each other, and
+place negative zero before positive zero. BigInt element kinds compare their
+integer values directly. A supplied comparator is called with `undefined` as
+its `this` value and two captured elements. Its result passes through ToNumber,
+with `NaN` treated as zero, and an abrupt call or conversion stops sorting
+before any element is written. The stable bottom-up merge keeps the left
+element whenever a comparison is equal.
+
+`sort` writes the completed captured order back to the receiver and returns
+that same view. If a comparator detaches or shrinks the buffer, invalid
+integer-index writes are ignored; a grow adds elements that were never part of
+the captured list, so they remain after the sorted prefix. `toSorted` instead
+allocates a same-element-kind view of the snapshot length before collecting
+the source elements, never reads `constructor` or `Symbol.species`, writes only
+the new view, and returns it. Comparator-driven detach, shrink, and grow can
+therefore change the later source observation without changing the copied
+result.
+
+Fixed native and generated differential evidence at property seed
+`0x60007d00` covers `Float64Array`, `Int16Array`, and `BigInt64Array`; `NaN`,
+signed-zero, infinite, bounded integer, and BigInt elements; default,
+ascending, descending, equal, `NaN`, and observably coerced comparator results;
+stable ordering; abrupt comparator and result conversion; detach, shrink, and
+grow during the first comparison; and the in-place and copied results. Node.js,
+Deno, and both native specialization policies agree with collection forced at
+every safepoint, a false numeric hint deliberately misses its guard and reaches
+the generic fallback, and an insertion-sort model independent of the host sort
+computes the expected order and surviving source view. The fixed fixture also
+pins metadata and identities, invalid comparator and receiver ordering,
+constructor and species avoidance, and initial detached and out-of-bounds
+receivers.
+
+The dependency vocabulary gains `typed-array-sort`, and all 47 paths under
+the node's `sort` and `toSorted` inventory roots enter the reviewed subset: 43
+pass, while four retain the unreviewed *resizableArrayBufferUtils.js* harness
+prerequisite. The manifest moves from 21,265 to 21,312 paths and from 17,958
+to 18,001 passes, keeps 1,556 expected negatives, and moves from 1,751 to 1,755
+unsupported profile features with no semantic, harness, or infrastructure
+failures. No reviewed path moves away from pass. The property
+inventory reaches 160 domains and seeds with a 5,839-case ordinary budget,
+the evidence inventory reaches 137 families, and the runtime ABI moves to
+`m5-121`.
 
 
 Set composition methods

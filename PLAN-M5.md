@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,265 reviewed cases: 17,895 passes, 1,556 expected negatives, and 1,814
+21,312 reviewed cases: 18,001 passes, 1,556 expected negatives, and 1,755
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 135 indexed records in the normative
+M5a is complete. The 137 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-17,895 passes across 21,265 paths, and the property inventory records 158
-domains, 158 seeds, and an ordinary case budget of 5,815.
+18,001 passes across 21,312 paths, and the property inventory records 160
+domains, 160 seeds, and an ordinary case budget of 5,839.
 
 
 M5a implementation history
@@ -6750,6 +6750,41 @@ infrastructure failures. The property ratchet moves from 153 to 154 domains
 and seeds and from 5,755 to 5,767 ordinary cases, and the evidence inventory
 moves from 131 to 132 families. The runtime ABI moves to `m5-117`.
 
+Implemented M5b node `typed-array-sort` adds `sort` and `toSorted` to
+`%TypedArray.prototype%` as distinct non-constructible methods of length one.
+Each checks a supplied comparator for callability before validating the
+receiver, snapshots the validated length and elements, and runs one stable
+bottom-up merge. The default comparator orders Number elements numerically,
+with `NaN` last and negative zero before positive zero, and compares BigInt
+elements directly. A supplied comparator receives the captured elements, its
+result passes through ToNumber with `NaN` treated as equality, and an abrupt
+call or conversion prevents writeback. `sort` writes back to and returns its
+receiver. `toSorted` allocates a same-element-kind result before collecting the
+source values, ignores `constructor` and `Symbol.species`, and leaves the
+source unchanged apart from comparator side effects. Detach, shrink, and grow
+during a comparison therefore affect only surviving in-place writes and the
+later source observation, not the captured order or copied result. The methods
+take two code IDs in the TypedArray range, add two file-static helpers and one
+shared method body, and add no realm intrinsic slot, heap kind, component, or
+generated-code entry point.
+
+Fixed native and generated differential evidence at seed `0x60007d00` covers
+Number and BigInt kinds, numeric default and five supplied comparator modes,
+stable equality, abrupt calls and comparator-result conversion, initial and
+comparator-driven detach, shrink, and grow, and in-place versus copied results,
+with both specialization policies, collection forced at every safepoint, one
+deliberate numeric-hint guard miss, and an independent stable insertion-sort
+model. All 47 edition paths under the node's two inventory roots enter the
+reviewed subset: 43 pass, while four retain the unreviewed
+*resizableArrayBufferUtils.js* harness prerequisite explicitly. The manifest
+moves from 21,265 to 21,312 paths and from 17,958 to 18,001 passes, keeps 1,556
+expected negatives, and moves from 1,751 to 1,755 unsupported profile features
+with no semantic, harness, or infrastructure failures. No reviewed path moves
+away from pass. The property ratchet moves from 159 to
+160 domains and seeds and from 5,827 to 5,839 ordinary cases, the evidence
+inventory moves from 136 to 137 families, and the runtime ABI moves to
+`m5-121`.
+
 Implemented M5b node `regexp-matcher-backend-selection` records the
 maintainer-selected composed owned backend in
 [ADR 0024](./docs/adr/0024-regexp-matcher-backend-selection.md). For M5b, the
@@ -6874,9 +6909,9 @@ constructors compile source text at run time, and one because it still needs
 loses its reviewed status. The manifest keeps 21,265 paths, 1,556 expected
 negatives, and moves from 17,895 to 17,958 passes and from 1,814 to 1,751
 unsupported profile features with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 156 to 157 domains and seeds and
-from 5,791 to 5,803 ordinary cases, and the evidence inventory moves from 134
-to 135 families. The node adds no component, code ID, realm intrinsic,
+failures. The property ratchet moves from 158 to 159 domains and seeds and
+from 5,815 to 5,827 ordinary cases, and the evidence inventory moves from 135
+to 136 families. The node adds no component, code ID, realm intrinsic,
 generated-code entry point, ABI change, or graph-state change; the suite
 revision, applicable inventory, classification vocabulary, target-parity
 policy, forced-collection policy, and zero-override policy are unchanged.

@@ -504,6 +504,21 @@ and from `typed-array-search-and-join`, whose members allocate no TypedArray
 result. The reviewed rows under the node's six inventory roots carry it, and
 no reviewed row outside those roots gains or loses a tag.
 
+The M5b `typed-array-sort` node extends the vocabulary with
+`typed-array-sort`. The tag identifies the `sort` and `toSorted` members of
+`%TypedArray.prototype%`, including comparator validation before receiver
+validation, the captured element list, stable numeric default ordering for
+Number and BigInt element kinds, comparator result conversion, and the
+in-place and same-type-copy writeback contracts. One tag covers both methods
+because they share CompareTypedArrayElements and the same stable sorting
+algorithm; it does not imply identical allocation or writeback. The tag is
+distinct from `array-prototype-sort`, whose default comparator is string
+ordering and whose indexed collection preserves holes, and from
+`typed-array-mutation`, whose copying methods do not invoke a comparator. The
+reviewed rows under the node's two inventory roots carry it, and an already
+reviewed row outside those roots may only move to pass when this was its last
+unmet prerequisite.
+
 
 Alternatives considered
 -----------------------

@@ -1013,6 +1013,18 @@ abrupt completion through their existing rejection or throw continuation
 instead of returning it synchronously. No built-in code ID, intrinsic slot,
 heap kind, public layout, or generated-code entry point is added.
 
+The `m5-121` ABI adds `%TypedArray.prototype%.sort` and `toSorted`. Both
+validate a supplied comparator before the receiver, capture the validated
+length and elements, and run one stable merge sort. The default comparator is
+numeric: it orders `NaN` last and negative zero before positive zero for Number
+kinds and compares BigInt values directly. A supplied comparator result passes
+through ToNumber, with `NaN` treated as equality, and an abrupt completion
+prevents writeback. `sort` writes back to and returns its receiver; `toSorted`
+allocates a same-kind result before collecting elements and does not consult
+`constructor` or `Symbol.species`. Two code IDs are allocated inside the
+existing TypedArray range; no intrinsic slot, heap kind, public layout, or
+generated-code entry point is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

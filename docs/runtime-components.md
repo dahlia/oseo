@@ -1754,6 +1754,37 @@ forced at every safepoint, a deliberate false-hint guard miss, and an
 independent model of every observation. The node reviews all 258 paths under
 its six inventory roots.
 
+### TypedArray sorting evidence
+
+M5b node `typed-array-sort` adds `sort` and `toSorted` to
+*runtime\_typed\_array.c*. The component gains two file-static helpers and one
+shared method body with no `oseo_internal_` entry. The method body checks a
+supplied comparator for callability before it validates the receiver, captures
+the validated length and every element, and then runs a stable bottom-up merge
+sort over rooted Number or BigInt values. The default comparison is numeric,
+places `NaN` after other Numbers and negative zero before positive zero, and
+compares BigInts directly. A supplied comparator is called with `undefined` as
+`this`, and its result passes through ToNumber with `NaN` treated as equality;
+either abrupt completion stops before writeback.
+
+`sort` writes the sorted snapshot back to the receiver and returns that same
+view, while `toSorted` allocates a same-element-kind result before collecting
+the source elements, ignores `constructor` and `Symbol.species`, writes the
+snapshot to the new view, and returns it. Comparator-driven detach, shrink, and
+grow therefore affect only the later in-place writes and the source
+observation, not the already captured list or a `toSorted` result. The two
+methods take two code IDs from the TypedArray range and add no intrinsic slot,
+heap kind, component, or generated-code entry point; the component moves
+`abiVersion` to `m5-121`.
+
+Fixed and generated native differential evidence at seed `0x60007d00` covers
+Number and BigInt kinds, numeric default, ascending, descending, equal, `NaN`,
+and observably coerced comparator results, stable ordering, abrupt completion,
+detach, shrink, and grow during the first comparison, in-place and copied
+results, both specialization policies, collection forced at every safepoint,
+a deliberate false-hint guard miss, and an independent model. The node reviews
+all 47 paths under its two inventory roots.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

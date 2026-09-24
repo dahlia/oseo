@@ -98,6 +98,7 @@ supportedFeatures:
   - rest-parameters
   - set-methods
   - stable-array-sort
+  - stable-typedarray-sort
   - string-trimming
   - Symbol
   - Symbol.asyncIterator
@@ -47674,6 +47675,111 @@ tests:
   - path: test/built-ins/TypedArray/prototype/some/values-are-not-cached.js
     expectedClassification: pass
     dependencies: [typed-array-iterative]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/comparefn-call-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/comparefn-calls.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/comparefn-is-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/comparefn-nonfunction-call-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/return-same-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/sortcompare-with-no-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/BigInt/sorted-values.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/arraylength-internal.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-call-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-calls.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-grow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-is-undefined.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-nonfunction-call-throws.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/comparefn-shrink.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/resizable-buffer-default-comparator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/return-abrupt-from-this-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/return-same-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/sort-tonumber.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/sortcompare-with-no-tostring.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/sorted-values-nan.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/sorted-values.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/stability.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/this-is-not-object.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/sort/this-is-not-typedarray-instance.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/subarray/BigInt/detached-buffer.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -48019,6 +48125,42 @@ tests:
   - path: test/built-ins/TypedArray/prototype/toReversed/this-value-invalid.js
     expectedClassification: pass
     dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/prototype/toSorted/comparefn-controls-sort.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/comparefn-default.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/comparefn-not-a-function.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/comparefn-stop-after-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/ignores-species.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/immutable.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/length-property-ignored.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/property-descriptor.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
+  - path: test/built-ins/TypedArray/prototype/toSorted/this-value-invalid.js
+    expectedClassification: pass
+    dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/toString.js
     expectedClassification: pass
     dependencies: [typed-array-core]

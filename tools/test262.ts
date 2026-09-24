@@ -693,9 +693,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "typed-array-search-and-join";
   }
-  if (diagnostic === "TypedArray sorting methods are not admitted yet.") {
-    return "typed-array-sort";
-  }
   if (diagnostic === "TypedArray static APIs are not admitted yet.") {
     return "typed-array-statics";
   }
