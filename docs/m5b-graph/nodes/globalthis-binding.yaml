@@ -13,4 +13,7 @@ dependencies:
   - reviewed-evidence-direction-policy
   - runtime-error-observation
 landed: false
-status: ready
+status: parked
+reason: "The implementation passed every local gate, but GitHub Actions failed
+  in four attempts on the unchanged Object own-key property timeout and Zig
+  sanitizer activity probe. The merge was reverted to restore a green main."
