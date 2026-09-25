@@ -80,7 +80,7 @@ test("runner fallback retains the exact whole input", async () => {
       reason: "strictness",
     },
     {
-      source: "with ({}) { console = 1; }",
+      source: "with ({}) { missing = 1; }",
       harness: "var x;",
       reason: "global-effects",
     },

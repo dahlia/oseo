@@ -14093,84 +14093,6 @@ partitions:
   - group: built-ins/encodeURIComponent
     key: f6
     path: results/built-ins/encodeURIComponent/f6.yaml
-  - group: built-ins/global
-    key: 0d
-    path: results/built-ins/global/0d.yaml
-  - group: built-ins/global
-    key: 1f
-    path: results/built-ins/global/1f.yaml
-  - group: built-ins/global
-    key: "33"
-    path: results/built-ins/global/33.yaml
-  - group: built-ins/global
-    key: 3b
-    path: results/built-ins/global/3b.yaml
-  - group: built-ins/global
-    key: "48"
-    path: results/built-ins/global/48.yaml
-  - group: built-ins/global
-    key: "50"
-    path: results/built-ins/global/50.yaml
-  - group: built-ins/global
-    key: "53"
-    path: results/built-ins/global/53.yaml
-  - group: built-ins/global
-    key: "60"
-    path: results/built-ins/global/60.yaml
-  - group: built-ins/global
-    key: "65"
-    path: results/built-ins/global/65.yaml
-  - group: built-ins/global
-    key: "77"
-    path: results/built-ins/global/77.yaml
-  - group: built-ins/global
-    key: 7c
-    path: results/built-ins/global/7c.yaml
-  - group: built-ins/global
-    key: 7e
-    path: results/built-ins/global/7e.yaml
-  - group: built-ins/global
-    key: "81"
-    path: results/built-ins/global/81.yaml
-  - group: built-ins/global
-    key: "82"
-    path: results/built-ins/global/82.yaml
-  - group: built-ins/global
-    key: "88"
-    path: results/built-ins/global/88.yaml
-  - group: built-ins/global
-    key: 8b
-    path: results/built-ins/global/8b.yaml
-  - group: built-ins/global
-    key: "97"
-    path: results/built-ins/global/97.yaml
-  - group: built-ins/global
-    key: 9e
-    path: results/built-ins/global/9e.yaml
-  - group: built-ins/global
-    key: 9f
-    path: results/built-ins/global/9f.yaml
-  - group: built-ins/global
-    key: a0
-    path: results/built-ins/global/a0.yaml
-  - group: built-ins/global
-    key: a8
-    path: results/built-ins/global/a8.yaml
-  - group: built-ins/global
-    key: b7
-    path: results/built-ins/global/b7.yaml
-  - group: built-ins/global
-    key: cc
-    path: results/built-ins/global/cc.yaml
-  - group: built-ins/global
-    key: dd
-    path: results/built-ins/global/dd.yaml
-  - group: built-ins/global
-    key: e1
-    path: results/built-ins/global/e1.yaml
-  - group: built-ins/global
-    key: e8
-    path: results/built-ins/global/e8.yaml
   - group: built-ins/isFinite
     key: 0d
     path: results/built-ins/isFinite/0d.yaml
@@ -17455,48 +17377,48 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1560
+  expectedNegatives: 1556
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 18161
+  passes: 18001
   semanticFailures: 0
-  unsupportedProfileFeatures: 1620
+  unsupportedProfileFeatures: 1755
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 165
+      passes: 159
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 706
+      passes: 705
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 37
     - dependency: async-functions
-      expectedNegatives: 162
+      expectedNegatives: 161
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 475
+      passes: 471
       semanticFailures: 0
-      unsupportedProfileFeatures: 5
+      unsupportedProfileFeatures: 10
     - dependency: async-iteration
-      expectedNegatives: 212
+      expectedNegatives: 211
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1268
+      passes: 1182
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 106
     - dependency: atomics-single-agent
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 359
+      passes: 356
       semanticFailures: 0
-      unsupportedProfileFeatures: 120
+      unsupportedProfileFeatures: 123
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
@@ -17505,26 +17427,26 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 5
     - dependency: classes
-      expectedNegatives: 580
+      expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 881
+      passes: 869
       semanticFailures: 0
-      unsupportedProfileFeatures: 47
+      unsupportedProfileFeatures: 60
     - dependency: control-flow
-      expectedNegatives: 229
+      expectedNegatives: 225
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 511
+      passes: 499
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 31
     - dependency: data-view
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 519
+      passes: 518
       semanticFailures: 0
-      unsupportedProfileFeatures: 31
+      unsupportedProfileFeatures: 32
     - dependency: date
       expectedNegatives: 0
       harnessFailures: 0
@@ -17543,51 +17465,51 @@ summary:
       expectedNegatives: 166
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1112
+      passes: 1032
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 81
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 6
       semanticFailures: 0
-      unsupportedProfileFeatures: 81
+      unsupportedProfileFeatures: 71
     - dependency: error-intrinsics
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 131
+      passes: 124
       semanticFailures: 0
-      unsupportedProfileFeatures: 5
+      unsupportedProfileFeatures: 12
     - dependency: expression-operators
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 291
+      passes: 288
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 19
     - dependency: functions
-      expectedNegatives: 290
+      expectedNegatives: 287
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4327
+      passes: 4312
       semanticFailures: 0
-      unsupportedProfileFeatures: 692
+      unsupportedProfileFeatures: 706
     - dependency: generators
-      expectedNegatives: 84
+      expectedNegatives: 83
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 334
+      passes: 333
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 18
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1154
+      passes: 1151
       semanticFailures: 0
-      unsupportedProfileFeatures: 402
+      unsupportedProfileFeatures: 405
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -17603,26 +17525,26 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: lexical-bindings
-      expectedNegatives: 152
+      expectedNegatives: 148
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 367
+      passes: 358
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 23
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 33
+      passes: 27
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 35
     - dependency: object-literals
       expectedNegatives: 12
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 395
+      passes: 394
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 24
     - dependency: object-own-keys
       expectedNegatives: 0
       harnessFailures: 0
@@ -17634,23 +17556,23 @@ summary:
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10086
+      passes: 10039
       semanticFailures: 0
-      unsupportedProfileFeatures: 193
+      unsupportedProfileFeatures: 215
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 922
+      passes: 920
       semanticFailures: 0
-      unsupportedProfileFeatures: 56
+      unsupportedProfileFeatures: 58
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 55
+      passes: 46
       semanticFailures: 0
-      unsupportedProfileFeatures: 18
+      unsupportedProfileFeatures: 19
     - dependency: proxy-exotic-object
       expectedNegatives: 0
       harnessFailures: 0
@@ -17669,9 +17591,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 500
+      passes: 498
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 9
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -17697,16 +17619,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 771
+      passes: 770
       semanticFailures: 0
-      unsupportedProfileFeatures: 32
+      unsupportedProfileFeatures: 33
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 18
+      passes: 15
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 4
     - dependency: typed-array-constructors
       expectedNegatives: 0
       harnessFailures: 0
@@ -17753,9 +17675,9 @@ summary:
       expectedNegatives: 69
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 214
+      passes: 208
       semanticFailures: 0
-      unsupportedProfileFeatures: 8
+      unsupportedProfileFeatures: 12
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -17775,9 +17697,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2851
+      passes: 2845
       semanticFailures: 0
-      unsupportedProfileFeatures: 117
+      unsupportedProfileFeatures: 123
     - group: built-ins/ArrayBuffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -17803,9 +17725,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 4
+      unsupportedProfileFeatures: 5
     - group: built-ins/AsyncGeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -17845,16 +17767,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 48
+      passes: 47
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 4
     - group: built-ins/DataView
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 519
+      passes: 518
       semanticFailures: 0
-      unsupportedProfileFeatures: 31
+      unsupportedProfileFeatures: 32
     - group: built-ins/Date
       expectedNegatives: 0
       harnessFailures: 0
@@ -17880,9 +17802,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 244
+      passes: 243
       semanticFailures: 0
-      unsupportedProfileFeatures: 86
+      unsupportedProfileFeatures: 87
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -17957,16 +17879,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 339
+      passes: 336
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 4
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3304
+      passes: 3303
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 20
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
@@ -17985,9 +17907,9 @@ summary:
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1209
+      passes: 1207
       semanticFailures: 0
-      unsupportedProfileFeatures: 477
+      unsupportedProfileFeatures: 479
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -18013,9 +17935,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 102
+      passes: 99
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 5
     - group: built-ins/String
       expectedNegatives: 0
       harnessFailures: 0
@@ -18107,13 +18029,6 @@ summary:
       passes: 31
       semanticFailures: 0
       unsupportedProfileFeatures: 0
-    - group: built-ins/global
-      expectedNegatives: 0
-      harnessFailures: 0
-      infrastructureFailures: 0
-      passes: 19
-      semanticFailures: 0
-      unsupportedProfileFeatures: 10
     - group: built-ins/isFinite
       expectedNegatives: 0
       harnessFailures: 0
@@ -18188,23 +18103,23 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1537
+      passes: 1473
       semanticFailures: 0
-      unsupportedProfileFeatures: 54
+      unsupportedProfileFeatures: 118
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1
+      passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - group: language/global-code
       expectedNegatives: 9
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 13
+      passes: 7
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 23
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
@@ -18237,9 +18152,9 @@ summary:
       expectedNegatives: 167
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 44
+      passes: 38
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 35
     - group: language/rest-parameters
       expectedNegatives: 1
       harnessFailures: 0
@@ -18255,9 +18170,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 633
+      expectedNegatives: 629
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1270
+      passes: 1225
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 71

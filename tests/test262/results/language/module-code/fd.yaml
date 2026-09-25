@@ -12,30 +12,14 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - module-linking
-    execution:
-      harnessIncludes:
-        - base.js
-      moduleGraph:
-        - dependencies:
-            - test/language/module-code/instn-iee-bndng-fun_FIXTURE.js
-          id: test/language/module-code/instn-iee-bndng-fun.js
-          sourceHash: fnv1a64:abdc5794c2fa6767
-        - dependencies:
-            - test/language/module-code/instn-iee-bndng-fun.js
-          id: test/language/module-code/instn-iee-bndng-fun_FIXTURE.js
-          sourceHash: fnv1a64:bbed2055569d1f5d
-      scheduler: deterministic-logical-clock
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/module-code/instn-iee-bndng-fun_FIXTURE.js:10:3:
+        error[OSEO1001]: Unknown binding 'A'."
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false

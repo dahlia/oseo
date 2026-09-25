@@ -43,7 +43,6 @@ import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
-import * as globalThisFixture from "./native/fixtures/globalthis-binding.ts";
 import * as eagerHelpers from "./native/fixtures/iterator-helpers-eager.ts";
 import * as lazyHelpers from "./native/fixtures/iterator-helpers-lazy.ts";
 import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
@@ -191,7 +190,6 @@ Object.defineProperty(globalThis, "console", {
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...globalRecord.globalObjectRecordFixtures,
-  ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
   ...objectOwnKeysFixtures,
   ...arrayBufferFixtures,
@@ -865,7 +863,6 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
-    fixture.name === "globalthis-binding" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
     fixture.name === "weak-collections" ||
@@ -999,7 +996,6 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-assignment" ||
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
-    fixture.name === "globalthis-binding" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -1091,7 +1087,6 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
-    fixture.name === "globalthis-binding" ||
     fixture.name === "symbols" ||
     fixture.name === "symbol-intrinsic" ||
     fixture.name === "string-prototype-access" ||
@@ -1239,7 +1234,6 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
-            fixture.name === "globalthis-binding" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-helpers-eager" ||
@@ -1497,10 +1491,9 @@ for (const fixture of selectedFixtures) {
             // observation excludes the allocations of their intrinsic
             // builds. The eleven concrete TypedArray constructors add
             // eleven property-name allocations, SharedArrayBuffer and
-            // Atomics add one each, WeakMap, WeakSet, WeakRef, and
-            // FinalizationRegistry add four more, and the global object's
-            // own `globalThis` property adds its name.
-            assert.equal(native.counters.allocations, 67);
+            // Atomics add one each, and WeakMap, WeakSet, WeakRef, and
+            // FinalizationRegistry add four more.
+            assert.equal(native.counters.allocations, 66);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

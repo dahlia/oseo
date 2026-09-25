@@ -48,10 +48,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Guru\
+        ng_Khema.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Gurung_Khema.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -70,10 +73,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Maka\
+        sar.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Makasar.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -92,10 +98,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Syri\
+        ac.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Syriac.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

@@ -239,22 +239,9 @@ test("keeps yield inside the generator body that owns it", () => {
     source: "function* outer() { function inner() { yield; } yield 1; }",
     sourceId: "nested-yield.js",
   });
-  // As an unresolved name it reads the realm global object's property.
-  assert.deepEqual(nested.diagnostics, []);
-  assert.ok(nested.hir != null);
-  assert.ok(nested.mir != null);
-  assert.match(
-    printHir(nested.hir),
-    /"yield" in %b\d+\(\*intrinsic global object\*\)/u,
-  );
-  const inner = nested.mir.functions.find(
-    (functionValue) => functionValue.name === "inner",
-  );
-  assert.ok(inner != null);
-  assert.notEqual(inner.generator, true);
-  assert.ok(
-    inner.blocks.every((block) => block.terminator.kind !== "generator-yield"),
-  );
+  assert.equal(nested.mir, undefined);
+  assert.equal(nested.diagnostics[0]?.code, "OSEO1001");
+  assert.match(nested.diagnostics[0]?.message ?? "", /Unknown binding/u);
   const arrow = compileSource(babelFrontend, {
     source: "function* outer() { const inner = () => yield 1; inner(); }",
     sourceId: "arrow-yield.js",

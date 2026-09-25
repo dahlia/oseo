@@ -51,10 +51,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Lisu\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Lisu.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -73,10 +76,14 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Imperial_Aramaic.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Imperial_Aramaic.js:140:22: error[OSEO1001]:
+        Unknown binding 'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

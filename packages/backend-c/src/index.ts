@@ -3758,25 +3758,12 @@ function emitMappedArgumentsCreate(
   );
 }
 
-/**
- * The ReferenceError message one unresolvable global reference reports.
- * The runtime renders a diagnostic message through an ASCII string, so a
- * name outside that range keeps the general wording rather than a
- * mis-decoded identifier.
- */
-function unresolvableReferenceMessage(name: string): string {
-  return /^[\u0020-\u007e]+$/u.test(name)
-    ? `${name} is not defined.`
-    : "Reference is not defined.";
-}
-
 function emitPrologue(
   state: EmitState,
   functionValue: MirFunction,
   bindingIdValues: readonly number[],
   totalBindingCount: number,
   temporarySlot: number,
-  unresolvableGlobals: ReadonlyMap<number, string>,
   globalLexicalNames: readonly MirGlobalLexicalName[],
   globalObjectBindings: readonly MirGlobalObjectBinding[],
 ): void {
@@ -3807,16 +3794,7 @@ function emitPrologue(
   line(state, renderC(emittedC.common.rootAssignResultValue, environmentSlot));
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   for (const bindingId of bindingIdValues) {
-    const unresolvable = unresolvableGlobals.get(bindingId);
-    line(
-      state,
-      unresolvable == null
-        ? renderC(emittedC.common.resultAssignOseoCellCreateContextOseo)
-        : renderC(
-            emittedC.prologue.resultAssignOseoUnresolvableCellCreate,
-            escapeCString(unresolvableReferenceMessage(unresolvable)),
-          ),
-    );
+    line(state, renderC(emittedC.common.resultAssignOseoCellCreateContextOseo));
     line(state, renderC(emittedC.common.rootAssignResultValue, temporarySlot));
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     line(
@@ -4090,7 +4068,6 @@ function emitFunction(
   functionRootCounts: ReadonlyMap<number, number>,
   totalBindingCount: number,
   observeSpecialization: boolean,
-  unresolvableGlobals: ReadonlyMap<number, string>,
   globalLexicalNames: readonly MirGlobalLexicalName[],
   globalObjectBindings: readonly MirGlobalObjectBinding[],
   fragmentUnit?: "harness" | "case",
@@ -4204,7 +4181,6 @@ function emitFunction(
     bindingIdValues,
     totalBindingCount,
     temporarySlot,
-    unresolvableGlobals,
     globalLexicalNames,
     globalObjectBindings,
   );
@@ -4381,14 +4357,6 @@ export const cBackend: NativeBackend = {
     for (const binding of input.globalObjectBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
-    // A hidden fallback binding stands for one unresolvable global
-    // reference, so its cell reports that ReferenceError instead of
-    // holding a value the program could ever read.
-    const unresolvableGlobals = new Map(
-      input.globalBindings
-        .filter((binding) => binding.unresolvableName != null)
-        .map((binding) => [binding.id, binding.unresolvableName ?? ""]),
-    );
     const declarations = functions
       .map(prototype)
       .join(renderC(emittedC.common.newline));
@@ -4409,7 +4377,6 @@ export const cBackend: NativeBackend = {
           functionRootCounts,
           totalBindingCount,
           input.observeSpecialization === true,
-          unresolvableGlobals,
           globalLexicalNames,
           globalObjectBindings,
         ),
@@ -4505,7 +4472,6 @@ function emitFragmentUnit(
       counts,
       fragment.nextBindingId,
       fragment.mir.observeSpecialization,
-      new Map(),
       [],
       globalObjects,
       unit,
@@ -4521,7 +4487,6 @@ function emitFragmentUnit(
         phaseCounts,
         fragment.nextBindingId,
         fragment.mir.observeSpecialization,
-        new Map(),
         [],
         globalObjects,
         unit,
@@ -4662,18 +4627,6 @@ export function emitScriptFragments(
       ),
     ),
   ];
-  // The launcher owns every Script cell, so it also creates the hidden
-  // cells that report an unresolvable reference, exactly as the
-  // whole-Script prologue does.
-  const unresolvableGlobals = new Map(
-    fragments.flatMap((fragment) =>
-      fragment.mir.globalBindings.flatMap((binding) =>
-        binding.unresolvableName == null
-          ? []
-          : [[binding.id, binding.unresolvableName] as const],
-      ),
-    ),
-  );
   const declarations = ["harness", "case"]
     .map(
       (unit) => `
@@ -4734,21 +4687,13 @@ static OseoResult oseo_function_script(${fragmentCallParameters}) {
     roots[0] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
 ${cells
-  .map((id) => {
-    const unresolvable = unresolvableGlobals.get(id);
-    return `    ${
-      unresolvable == null
-        ? renderC(emittedC.common.resultAssignOseoCellCreateContextOseo)
-        : renderC(
-            emittedC.prologue.resultAssignOseoUnresolvableCellCreate,
-            escapeCString(unresolvableReferenceMessage(unresolvable)),
-          )
-    }
+  .map(
+    (id) => `    result = oseo_cell_create(context, oseo_uninitialized());
     roots[1] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
     result = oseo_environment_set(context, roots[0], ${id}u, roots[1]);
-    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;`;
-  })
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;`,
+  )
   .join("\n")}
 ${lines.join("\n")}
 ${[

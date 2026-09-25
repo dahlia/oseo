@@ -79,10 +79,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Khar\
+        oshthi.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Kharoshthi.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -101,10 +104,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Reja\
+        ng.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Rejang.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -123,10 +129,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_Extens\
+        ions_-_Elymaic.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_Extensions_-_Elymaic.js:140:22: error[OSEO1001]: Unknown
+        binding 'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

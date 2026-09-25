@@ -151,24 +151,13 @@ test("reads the replaceable Number value through its global property", () => {
   assert.ok(deleted.hir != null);
   assert.match(printHir(deleted.hir), /delete .*\["Number"\]/u);
 
-  // A sloppy simple assignment whose object chain misses writes the
-  // global object's property, as PutValue on an unresolvable Reference
-  // does; a destructuring target stays outside the profile.
   const withWrite = compileSource(babelFrontend, {
     source: "with ({}) { Number = 1; }",
     sourceId: "with-number-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] Number = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [Number] = [1]; }",
-    sourceId: "with-number-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'Number' through a with fallback/u,
   );
 });
@@ -202,17 +191,9 @@ test("reads the replaceable Boolean value through its global property", () => {
     source: "with ({}) { Boolean = 1; }",
     sourceId: "with-boolean-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] Boolean = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [Boolean] = [1]; }",
-    sourceId: "with-boolean-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'Boolean' through a with fallback/u,
   );
 });
@@ -245,17 +226,9 @@ test("reads the replaceable Math value through its global property", () => {
     source: "with ({}) { Math = 1; }",
     sourceId: "with-math-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] Math = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [Math] = [1]; }",
-    sourceId: "with-math-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'Math' through a with fallback/u,
   );
 });
@@ -290,17 +263,9 @@ test("reads the Reflect namespace through its global property", () => {
     source: "with ({}) { Reflect = 1; }",
     sourceId: "with-reflect-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] Reflect = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [Reflect] = [1]; }",
-    sourceId: "with-reflect-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'Reflect' through a with fallback/u,
   );
 });
@@ -355,17 +320,9 @@ test("reads the four URI handling functions as global properties", () => {
     source: "with ({}) { encodeURI = 1; }",
     sourceId: "with-encode-uri-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] encodeURI = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [encodeURI] = [1]; }",
-    sourceId: "with-encode-uri-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'encodeURI' through a with fallback/u,
   );
 });
@@ -402,17 +359,9 @@ test("reads the four global numeric functions as global properties", () => {
     source: "with ({}) { parseFloat = 1; }",
     sourceId: "with-parse-float-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] parseFloat = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [parseFloat] = [1]; }",
-    sourceId: "with-parse-float-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'parseFloat' through a with fallback/u,
   );
 });
@@ -445,17 +394,9 @@ test("reads the replaceable Array value through its global property", () => {
     source: "with ({}) { Array = 1; }",
     sourceId: "with-array-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] Array = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [Array] = [1]; }",
-    sourceId: "with-array-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'Array' through a with fallback/u,
   );
 });
@@ -509,17 +450,9 @@ test("reads the replaceable String value through its global property", () => {
     source: "with ({}) { String = 1; }",
     sourceId: "with-string-write.ts",
   });
-  assert.deepEqual(withWrite.diagnostics, []);
-  assert.ok(withWrite.hir != null);
-  assert.match(printHir(withWrite.hir), /with\[%b\d+\] String = 1/u);
-
-  const withUpdate = compileSource(babelFrontend, {
-    source: "with ({}) { [String] = [1]; }",
-    sourceId: "with-string-update.ts",
-  });
-  assert.equal(withUpdate.mir, undefined);
+  assert.equal(withWrite.mir, undefined);
   assert.match(
-    withUpdate.diagnostics[0]?.message ?? "",
+    withWrite.diagnostics[0]?.message ?? "",
     /Assigning property-owned intrinsic 'String' through a with fallback/u,
   );
 });
@@ -554,10 +487,6 @@ test("writes the replaceable Number value through its global property", () => {
   const mir = printMir(result.mir);
   assert.equal(mir.match(/property-set property-set/gu)?.length, 5);
   assert.equal(mir.match(/property-get property-get/gu)?.length, 3);
-  // Each read and simple write tests the property for ResolveBinding and
-  // again for GetBindingValue or SetMutableBinding; each compound or
-  // update assignment tests it for all three.
-  assert.equal(mir.match(/binary in %\d+, %\d+/gu)?.length, 15);
 });
 
 test("writes Number assignment targets through its global property", () => {
@@ -578,11 +507,6 @@ test("writes Number assignment targets through its global property", () => {
   assert.equal(
     hir.match(/\*intrinsic global object\*\)\["Number"\]/gu)?.length,
     6,
-  );
-  // ResolveBinding and SetMutableBinding each test every target's property.
-  assert.equal(
-    printMir(result.mir).match(/binary in %\d+, %\d+/gu)?.length,
-    12,
   );
 });
 
@@ -753,32 +677,23 @@ test("binds arguments in every owning function form", () => {
   assert.ok(admitted.mir != null);
 
   // An arrow declares none of its own, so one with no enclosing owning
-  // form leaves the name unresolved, exactly as a top-level reference
-  // does: it reads the realm global object's property and reports the
-  // unresolvable reference when that property is absent.
-  const unresolvedSources = [
+  // form leaves the name unresolved, exactly as a top-level reference does.
+  const rejectedSources = [
     "const lexical = () => arguments;",
     "const asynchronousLexical = async () => arguments;",
     "const nested = () => () => arguments.length;",
     "arguments;",
   ];
-  for (const [index, source] of unresolvedSources.entries()) {
-    const unresolved = compileSource(babelFrontend, {
+  for (const [index, source] of rejectedSources.entries()) {
+    const rejected = compileSource(babelFrontend, {
       source,
-      sourceId: `unresolved-arguments-${index}.ts`,
+      sourceId: `unsupported-arguments-${index}.ts`,
     });
-    assert.deepEqual(unresolved.diagnostics, [], source);
-    assert.ok(unresolved.hir != null);
-    const hir = printHir(unresolved.hir);
+    assert.equal(rejected.mir, undefined);
     assert.match(
-      hir,
-      /"arguments" in %b\d+\(\*intrinsic global object\*\)/u,
-      source,
+      rejected.diagnostics[0]?.message ?? "",
+      /Unknown binding 'arguments'/u,
     );
-    assert.match(hir, /\*missing intrinsic:arguments\*/u, source);
-    for (const functionValue of unresolved.hir.functions) {
-      assert.equal(functionValue.argumentsBindingId, undefined, source);
-    }
   }
 });
 
@@ -1698,17 +1613,7 @@ test("converts every admitted delete operand to owned syntax", () => {
   ]);
   const hir = printHir(result.hir);
   assert.match(hir, /\n  false/u);
-  // An unresolved name deletes the realm global object's property.
-  assert.match(
-    hir,
-    new RegExp(
-      String.raw`\n  \(\("unresolved" in ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\) ` +
-        String.raw`\? delete %b\d+\(\*intrinsic global object\*\)` +
-        String.raw`\["unresolved"\] : true\)`,
-      "u",
-    ),
-  );
+  assert.match(hir, /\n  true/u);
   assert.match(hir, /delete value/u);
   assert.match(hir, /delete .*\?\./u);
   const mir = printMir(result.mir);
@@ -1716,7 +1621,7 @@ test("converts every admitted delete operand to owned syntax", () => {
   assert.match(mir, /join \?\./u);
 });
 
-test("deletes top-level arguments through the global object", () => {
+test("resolves top-level delete arguments as an unresolvable reference", () => {
   const result = compileSource(babelFrontend, {
     source: "delete arguments;",
     sourceId: "delete-top-level-arguments.js",
@@ -1725,36 +1630,18 @@ test("deletes top-level arguments through the global object", () => {
   assert.ok(result.syntax != null);
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
-  assert.match(
-    printHir(result.hir),
-    new RegExp(
-      String.raw`\n  \(\("arguments" in ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\) ` +
-        String.raw`\? delete %b\d+\(\*intrinsic global object\*\)` +
-        String.raw`\["arguments"\] : true\)`,
-      "u",
-    ),
-  );
+  assert.match(printHir(result.hir), /\n  true/u);
 
-  // An arrow with no enclosing owning form reaches the same global
-  // object property, while every owning form resolves its own binding
-  // and answers false without reading the cell.
+  // An arrow with no enclosing owning form reaches the same unresolvable
+  // reference, while every owning form resolves its own binding and
+  // answers false without reading the cell.
   const arrow = compileSource(babelFrontend, {
     source: "const read = () => delete arguments;\n",
     sourceId: "delete-arrow-arguments.js",
   });
   assert.deepEqual(arrow.diagnostics, []);
   assert.ok(arrow.hir != null);
-  assert.match(
-    printHir(arrow.hir),
-    new RegExp(
-      String.raw`\n {2}return \(\("arguments" in ` +
-        String.raw`%b\d+\(\*intrinsic global object\*\)\) ` +
-        String.raw`\? delete %b\d+\(\*intrinsic global object\*\)` +
-        String.raw`\["arguments"\] : true\)`,
-      "u",
-    ),
-  );
+  assert.match(printHir(arrow.hir), /\n {2}return true/u);
 
   const asynchronous = compileSource(babelFrontend, {
     source: "async function owner() { return delete arguments; }\n",
@@ -1783,9 +1670,9 @@ test("retains closed-world and early-error delete boundaries", () => {
       /outside the admitted global-object profile/u,
     ],
     [
-      "with ({}) { eval = 1; delete eval; }",
+      "with ({}) { unavailable = 1; delete unavailable; }",
       "OSEO1001",
-      /Deleting with fallback binding 'eval'/u,
+      /Deleting with fallback binding/u,
     ],
     [
       "const o = { m() { delete super.x; } };",
@@ -2224,14 +2111,8 @@ const outer = Named;`,
     source: "const Named = class Inner {};\nconst leaked = Inner;",
     sourceId: "class-name-escape.ts",
   });
-  // Outside the class body the name is unresolved, so it reads the realm
-  // global object's property instead of the class binding.
-  assert.deepEqual(escaped.diagnostics, []);
-  assert.ok(escaped.hir != null);
-  assert.match(
-    printHir(escaped.hir),
-    /leaked = \(\("Inner" in %b\d+\(\*intrinsic global object\*\)\)/u,
-  );
+  assert.equal(escaped.diagnostics[0]?.code, "OSEO1001");
+  assert.match(escaped.diagnostics[0]?.message ?? "", /Unknown binding/u);
 });
 
 test("rejects class elements outside the admitted profile", () => {

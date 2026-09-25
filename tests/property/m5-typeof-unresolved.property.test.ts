@@ -238,13 +238,11 @@ test(
           assert.deepEqual(compiled.diagnostics, []);
           assert.ok(compiled.mir != null);
           if (testCase.form === "direct" && testCase.target === "missing") {
-            // The unresolvable direct operand reads the realm global
-            // object's absent property, because a program can create that
-            // property at run time, and typeof then answers its undefined
-            // value without the ReferenceError an ordinary read owes.
+            // The unresolvable direct operand folds to its result string,
+            // so the lowered program holds no typeof operation at all.
             const mir = printMir(compiled.mir);
-            assert.match(mir, /read \*intrinsic global object\*/u);
-            assert.match(mir, /unary typeof/u);
+            assert.match(mir, /constant "undefined"/u);
+            assert.doesNotMatch(mir, /unary typeof/u);
           }
           process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           try {

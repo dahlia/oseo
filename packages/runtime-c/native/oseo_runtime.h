@@ -909,17 +909,6 @@ OseoResult oseo_environment_set(
     OseoValue value
 );
 OseoResult oseo_cell_create(OseoContext *context, OseoValue value);
-/*
- * A hidden cell standing for one unresolvable global reference. The
- * compiler emits it for a name no realm binding resolves, so reading the
- * cell throws exactly the ReferenceError GetValue produces for an
- * unresolvable Reference. `message` is a generated static string naming
- * that reference and must outlive the program; nothing writes the cell.
- */
-OseoResult oseo_unresolvable_cell_create(
-    OseoContext *context,
-    const char *message
-);
 OseoResult oseo_cell_get(OseoContext *context, OseoValue cell);
 OseoResult oseo_cell_initialize(
     OseoContext *context,
@@ -954,10 +943,9 @@ OseoResult oseo_module_namespace_create(
  * declarations so a failed global-record check reports the declaration it
  * rejected. Successive calls do not retain the Global Environment Record's
  * [[VarNames]] or declarative names, so multi-Script realm sequencing remains
- * outside this ABI. The realm also installs every admitted intrinsic global,
- * the standard `Infinity`, `NaN`, and `undefined` value properties, and the
- * writable, non-enumerable, configurable `globalThis` property that binds
- * the global object to itself.
+ * outside this ABI. The realm also installs every admitted intrinsic global
+ * and the standard `Infinity`, `NaN`, and `undefined` value properties here,
+ * but does not expose the global object through a `globalThis` binding.
  */
 OseoResult oseo_global_object_create(
     OseoContext *context,
@@ -1884,9 +1872,9 @@ OseoResult oseo_symbol_intrinsic(OseoContext *context);
  * rooted; any other receiver stands unchanged. Script top level reaches
  * the same value through its own undefined receiver, so one entry point
  * serves both positions. The value is an ordinary extensible object
- * whose own properties include the standard value properties, its own
- * `globalThis` self reference, and the var-scoped bindings
- * `oseo_global_object_create` installed for the running Script.
+ * whose own properties include the standard value properties and the
+ * var-scoped bindings `oseo_global_object_create` installed for the
+ * running Script. `globalThis` remains a later unit.
  */
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);

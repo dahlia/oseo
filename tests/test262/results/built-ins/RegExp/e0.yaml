@@ -19,10 +19,14 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString."
+      detail: "test/built-ins/RegExp/CharacterClassEscapes/character-class-wo\
+        rd-class-escape-positive-cases.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/CharacterClassEscapes/character-\
+        class-word-class-escape-positive-cases.js:173:13:
+        error[OSEO1001]: Unknown binding 'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false

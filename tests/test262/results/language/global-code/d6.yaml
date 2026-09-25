@@ -17,8 +17,11 @@ results:
       - dynamic-source
       - lexical-bindings
     observation:
-      detail: "Not executed: the case references the $262 host binding."
+      detail: "test/language/global-code/script-decl-lex-lex.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/global-code/script-decl-lex-lex.js:96:3:
+        error[OSEO1001]: Unknown binding '$262'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: host-binding
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

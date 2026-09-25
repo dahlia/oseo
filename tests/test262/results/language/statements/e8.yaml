@@ -318,27 +318,17 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: expected-negative
+    classification: unsupported-profile-feature
     dependencies:
       - classes
       - control-flow
       - lexical-bindings
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
-        - specialization: enabled
-          strictness: non-strict
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      errorType: ReferenceError
-      failedPhase: runtime
+      detail: "test/language/statements/switch/scope-lex-class.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/switch/scope-lex-class.js:97:\
+        1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
   - case:

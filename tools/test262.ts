@@ -290,15 +290,6 @@ export interface Test262Harnesses {
   readonly base: string;
   readonly done: string;
   readonly includes: ReadonlyMap<string, string>;
-  /**
-   * The upstream `defines` metadata of each reviewed include, keyed by
-   * include name. A reviewed include may deliberately omit an upstream
-   * definition, and comparing this list with the names the reviewed
-   * harness declares is what identifies that omission structurally. An
-   * absent map or entry records no upstream metadata, so no omission is
-   * inferred for it.
-   */
-  readonly upstreamDefinitions?: ReadonlyMap<string, readonly string[]>;
 }
 
 /** Marker the reviewed `$DONE` harness prints on asynchronous completion. */
@@ -403,25 +394,6 @@ export function parseTest262Case(
     },
     flags,
   };
-}
-
-/**
- * The global names one upstream harness file declares in its `defines`
- * frontmatter. A harness file without frontmatter or without the key
- * defines nothing the runner can compare.
- */
-export function parseHarnessDefinitions(
-  source: string,
-  name: string,
-): readonly string[] {
-  const match = source.match(/\/\*---([\s\S]*?)---\*\//u);
-  if (match?.[1] == null) return [];
-  // SAFETY: record and stringArray validate the frontmatter tree.
-  const metadata = record(
-    (parseYaml(match[1].replace(/\r\n?/gu, "\n")) ?? {}) as StructuredDataInput,
-    `${name} frontmatter`,
-  );
-  return stringArray(metadata.defines, `${name} defines`);
 }
 
 function classification(value: StructuredDataInput): Test262Classification {
@@ -645,57 +617,17 @@ function detail(
   );
 }
 
-/**
- * Host bindings the reviewed execution environment never installs. The
- * upstream corpus reaches them by name, and this profile resolves an
- * unresolved global reference through the realm global object, so such a
- * case observes a real unresolvable-reference ReferenceError instead of a
- * compile-time rejection. That is a host capability boundary, exactly
- * like an unavailable harness include, not a semantic disagreement.
- */
-const unavailableHostBindings = ["$262", "print"] as const;
-
-/**
- * The unavailable host binding one uncaught ReferenceError names, or
- * `undefined` for every other uncaught error. The match is the exact
- * unresolvable-reference message for one reviewed name, so an ordinary
- * ReferenceError, including one naming any other binding, stays a
- * semantic observation.
- */
-export function unavailableHostBinding(stderr: string): string | undefined {
-  if (unhandledErrorType(stderr) !== "ReferenceError") return undefined;
-  const message = runtimeDiagnostic(stderr);
-  if (message == null) return undefined;
-  return unavailableHostBindings.find(
-    (name) => message === `ReferenceError: ${name} is not defined.`,
-  );
-}
-
-/** The message of the outer, source-located runtime diagnostic line. */
-function runtimeDiagnostic(stderr: string): string | undefined {
-  return /^.+?:\d+:\d+: error\[OSEO2001\]: (.+)$/mu.exec(stderr)?.[1];
-}
-
 /** A runtime value can reach a reviewed, explicit profile boundary. */
 function unsupportedRuntimeCapability(stderr: string): string | undefined {
-  const diagnostic = runtimeDiagnostic(stderr);
-  // The runtime ends a program at the first rejection checkpoint that
-  // still holds an unhandled rejection. A case that needs the opposite
-  // host policy names that boundary instead of reporting a semantic
-  // failure, exactly as the unadmitted built-in diagnostics below do. The
-  // boundary keeps its own diagnostic even when the rejection reason is
-  // an intrinsic error instance, whose kind marker still follows it, so
-  // it is recognized before the uncaught-throw bail.
-  if (diagnostic === "Unhandled promise rejection.") {
-    return "unhandled-rejection-policy";
-  }
-  if (unavailableHostBinding(stderr) != null) return "host-binding";
   if (
     unhandledErrorType(stderr) != null ||
     stderr.includes(untypedThrowMessage)
   ) {
     return undefined;
   }
+  const diagnostic = /^.+?:\d+:\d+: error\[OSEO2001\]: (.+)$/mu.exec(
+    stderr,
+  )?.[1];
   if (diagnostic === "Primitive wrapper objects are not admitted yet.") {
     return "primitive-wrapper";
   }
@@ -763,6 +695,13 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   }
   if (diagnostic === "TypedArray static APIs are not admitted yet.") {
     return "typed-array-statics";
+  }
+  // The runtime ends a program at the first rejection checkpoint that
+  // still holds an unhandled rejection. A case that needs the opposite
+  // host policy names that boundary instead of reporting a semantic
+  // failure, exactly as the unadmitted built-in diagnostics above do.
+  if (diagnostic === "Unhandled promise rejection.") {
+    return "unhandled-rejection-policy";
   }
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"
@@ -918,515 +857,6 @@ function agentMemberRead(node: AgentSyntaxNode): boolean {
   return node.computed === true
     ? property?.type === "StringLiteral" && property.value === "agent"
     : property?.type === "Identifier" && property.name === "agent";
-}
-
-/**
- * A host binding or harness definition the reviewed environment does not
- * provide, decided before execution from the parsed case and the harness
- * metadata rather than from the source text. Only an unresolved reference
- * in the parsed syntax counts: a name inside a comment or a string, a
- * property key, a `typeof` operand, a name inside a `with` body, whose
- * object may provide it, and a name the case declares itself never
- * withhold execution, and a body that does not parse reads nothing and
- * executes as usual.
- *
- * `$262` outside `$262.agent` names the host object this profile never
- * installs. A harness definition is one an upstream include lists in its
- * `defines` metadata while no reviewed harness the case loads declares
- * it. Each stays an explicit unsupported result naming the missing
- * capability, never a pass and never a silently dropped path.
- */
-function unsupportedStructuralCapability(
-  source: string,
-  parsed: ParsedTest262Case,
-  harnesses: Test262Harnesses,
-): { readonly capability: string; readonly detail: string } | undefined {
-  const references = unresolvedReferenceNames(source, parsed.case.mode);
-  if (references.has("$262")) {
-    return {
-      capability: "host-binding",
-      detail: "the case references the $262 host binding.",
-    };
-  }
-  if (parsed.flags.includes("raw")) return undefined;
-  for (const include of parsed.case.includes) {
-    const omitted = omittedHarnessDefinitions(include, parsed, harnesses)
-      .filter((name) => references.has(name))
-      .toSorted();
-    if (omitted.length > 0) {
-      return {
-        capability: "harness-definition",
-        detail: `the reviewed harness ${include} omits ${omitted.join(", ")}.`,
-      };
-    }
-  }
-  return undefined;
-}
-
-/**
- * The upstream definitions of one include that no reviewed harness the
- * case loads declares at its top level. A definition moved to another
- * reviewed harness file the case also loads still counts as provided.
- */
-function omittedHarnessDefinitions(
-  include: string,
-  parsed: ParsedTest262Case,
-  harnesses: Test262Harnesses,
-): readonly string[] {
-  const definitions = harnesses.upstreamDefinitions?.get(include) ?? [];
-  if (definitions.length === 0) return [];
-  const provided = new Set<string>(harnessDeclaredNames(harnesses.base));
-  if (parsed.case.async) {
-    for (const name of harnessDeclaredNames(harnesses.done)) {
-      provided.add(name);
-    }
-  }
-  for (const loaded of parsed.case.includes) {
-    const text = harnesses.includes.get(loaded);
-    if (text == null) continue;
-    for (const name of harnessDeclaredNames(text)) provided.add(name);
-  }
-  return definitions.filter((name) => !provided.has(name));
-}
-
-const harnessDeclaredNameCache = new Map<string, ReadonlySet<string>>();
-
-/**
- * The names one reviewed harness Script declares at its top level:
- * function and class declarations and every binding of a `var`, `let`, or
- * `const` declaration. These are exactly the global names the assembled
- * harness makes available to the case.
- */
-function harnessDeclaredNames(source: string): ReadonlySet<string> {
-  const cached = harnessDeclaredNameCache.get(source);
-  if (cached != null) return cached;
-  const names = new Set<string>();
-  const program = agentSyntaxNode(parseBabel(source, { sourceType: "script" }));
-  const body = agentSyntaxNode(program?.program)?.body;
-  for (const statement of Array.isArray(body) ? body : []) {
-    const node = agentSyntaxNode(statement);
-    if (
-      node?.type === "FunctionDeclaration" ||
-      node?.type === "ClassDeclaration"
-    ) {
-      const id = agentSyntaxNode(node.id);
-      if (id?.type === "Identifier" && isString(id.name)) names.add(id.name);
-    } else if (node?.type === "VariableDeclaration") {
-      const declarations = node.declarations;
-      for (const declarator of Array.isArray(declarations)
-        ? declarations
-        : []) {
-        collectBoundNames(agentSyntaxNode(declarator)?.id, names);
-      }
-    }
-  }
-  harnessDeclaredNameCache.set(source, names);
-  return names;
-}
-
-function collectBoundNames(
-  pattern: StructuredDataValue | undefined,
-  names: Set<string>,
-): void {
-  const pending: (StructuredDataValue | undefined)[] = [pattern];
-  while (pending.length > 0) {
-    const value = pending.pop();
-    if (Array.isArray(value)) {
-      pending.push(...value);
-      continue;
-    }
-    const node = agentSyntaxNode(value);
-    if (node == null) continue;
-    switch (node.type) {
-      case "Identifier":
-        if (isString(node.name)) names.add(node.name);
-        break;
-      case "ObjectPattern":
-        pending.push(node.properties);
-        break;
-      case "ObjectProperty":
-        pending.push(node.value);
-        break;
-      case "ArrayPattern":
-        pending.push(node.elements);
-        break;
-      case "RestElement":
-        pending.push(node.argument);
-        break;
-      case "AssignmentPattern":
-        pending.push(node.left);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-/**
- * How the walk below treats one syntax field. A `reference` holds
- * expressions whose identifiers resolve through the scope chain, a
- * `binding` holds a declaration pattern whose identifiers the case
- * declares, and `skip` holds a name that is never a reference, such as a
- * non-computed property key or a label.
- */
-type ReferenceMode = "binding" | "reference" | "skip";
-
-/**
- * One scope the walk below passes through: the names a declarative scope
- * binds, or `"object"` for a `with` statement's object environment. Any
- * name may resolve through an object environment, since its bindings are
- * the properties the object and its prototype chain hold only at run time.
- */
-type ReferenceScope = ReadonlySet<string> | "object";
-
-const syntaxMetadataKeys = new Set([
-  "comments",
-  "end",
-  "errors",
-  "extra",
-  "innerComments",
-  "leadingComments",
-  "loc",
-  "range",
-  "start",
-  "tokens",
-  "trailingComments",
-]);
-
-/**
- * The names the parsed case references where no enclosing scope of the
- * reference declares them, so they can only resolve through the realm's
- * global object. Scopes follow the parsed syntax: the Script or Module, each
- * function with its parameters and hoisted `var` and function declarations,
- * each block, `switch`, `for` head, `catch` clause, and class name. A
- * `typeof` operand is left out, because `typeof` answers an unresolvable
- * reference without needing its binding, and so is every reference inside
- * a `with` body, because the object may provide the binding.
- */
-export function unresolvedReferenceNames(
-  source: string,
-  mode: Test262Case["mode"],
-): ReadonlySet<string> {
-  let program: unknown;
-  try {
-    program = parseBabel(source, {
-      sourceType: mode === "module" ? "module" : "script",
-    });
-  } catch {
-    return new Set();
-  }
-  const referenced = new Set<string>();
-  const pending: {
-    readonly mode: ReferenceMode;
-    readonly scopes: readonly ReferenceScope[];
-    readonly value: unknown;
-  }[] = [{ mode: "reference", scopes: [], value: program }];
-  while (pending.length > 0) {
-    const entry = pending.pop();
-    if (entry == null) break;
-    if (entry.mode === "skip") continue;
-    if (Array.isArray(entry.value)) {
-      for (const value of entry.value) {
-        pending.push({ ...entry, value });
-      }
-      continue;
-    }
-    const node = agentSyntaxNode(entry.value);
-    if (node == null) continue;
-    if (node.type === "Identifier") {
-      const name = node.name;
-      // A declaration position is collected by its scope instead.
-      if (entry.mode === "binding" || !isString(name)) continue;
-      if (
-        !entry.scopes.some((scope) => scope === "object" || scope.has(name))
-      ) {
-        referenced.add(name);
-      }
-      continue;
-    }
-    const scoped = scopedChildren(node);
-    for (const [key, value] of Object.entries(node)) {
-      if (syntaxMetadataKeys.has(key)) continue;
-      const declared = scoped?.(key) ?? [];
-      pending.push({
-        mode: referenceMode(node, key, entry.mode),
-        scopes:
-          declared.length === 0 ? entry.scopes : [...entry.scopes, ...declared],
-        value,
-      });
-    }
-  }
-  return referenced;
-}
-
-/**
- * The scopes one scope-creating node adds for each of its fields, or
- * `undefined` for a node that creates none. A field sees only the
- * declarations visible where it is evaluated: function parameters and
- * their defaults do not see the body's declarations, a computed method key
- * and a `switch` discriminant see neither the method's nor the cases'
- * declarations, a class name is visible to its heritage and body, and a
- * `with` object is evaluated outside the object environment its body
- * sees. Declaration positions are read here, so the walk above never
- * treats them as references.
- */
-function scopedChildren(
-  node: AgentSyntaxNode,
-): ((key: string) => readonly ReferenceScope[]) | undefined {
-  switch (node.type) {
-    case "Program": {
-      const names = new Set<string>();
-      collectHoistedNames(node.body, names);
-      collectLexicalNames(node.body, names);
-      return () => [names];
-    }
-    case "FunctionDeclaration":
-    case "FunctionExpression":
-    case "ArrowFunctionExpression":
-    case "ObjectMethod":
-    case "ClassMethod":
-    case "ClassPrivateMethod": {
-      const parameters = new Set<string>();
-      if (node.type === "FunctionExpression") {
-        collectBoundNames(node.id, parameters);
-      }
-      collectBoundNames(node.params, parameters);
-      const body = new Set<string>();
-      const block = agentSyntaxNode(node.body);
-      if (block?.type === "BlockStatement") {
-        collectHoistedNames(block.body, body);
-        collectLexicalNames(block.body, body);
-      }
-      return (key) =>
-        key === "params"
-          ? [parameters]
-          : key === "body"
-            ? [parameters, body]
-            : [];
-    }
-    case "BlockStatement": {
-      const names = new Set<string>();
-      collectLexicalNames(node.body, names);
-      return () => [names];
-    }
-    case "StaticBlock": {
-      // A class static block is its own var scope, like a function body.
-      const names = new Set<string>();
-      collectHoistedNames(node.body, names);
-      collectLexicalNames(node.body, names);
-      return () => [names];
-    }
-    case "SwitchStatement": {
-      const names = new Set<string>();
-      const cases = Array.isArray(node.cases) ? node.cases : [];
-      for (const switchCase of cases) {
-        collectLexicalNames(agentSyntaxNode(switchCase)?.consequent, names);
-      }
-      return (key) => (key === "cases" ? [names] : []);
-    }
-    case "ForStatement": {
-      const names = new Set<string>();
-      collectLexicalNames(node.init, names);
-      return () => [names];
-    }
-    case "ForInStatement":
-    case "ForOfStatement": {
-      const names = new Set<string>();
-      collectLexicalNames(node.left, names);
-      return () => [names];
-    }
-    case "CatchClause": {
-      const names = new Set<string>();
-      collectBoundNames(node.param, names);
-      return () => [names];
-    }
-    case "WithStatement":
-      return (key) => (key === "body" ? ["object"] : []);
-    case "ClassDeclaration":
-    case "ClassExpression": {
-      const names = new Set<string>();
-      collectBoundNames(node.id, names);
-      return (key) => (key === "id" ? [] : [names]);
-    }
-    default:
-      return undefined;
-  }
-}
-
-/**
- * The `let`, `const`, class, and function declarations directly in one
- * statement list, or in one statement such as a `for` head.
- */
-function collectLexicalNames(
-  statements: StructuredDataValue | undefined,
-  names: Set<string>,
-): void {
-  const list = Array.isArray(statements) ? statements : [statements];
-  for (const statement of list) {
-    const node = agentSyntaxNode(statement);
-    const declaration =
-      node?.type === "ExportNamedDeclaration" ||
-      node?.type === "ExportDefaultDeclaration"
-        ? agentSyntaxNode(node.declaration)
-        : node;
-    if (
-      declaration?.type === "FunctionDeclaration" ||
-      declaration?.type === "ClassDeclaration"
-    ) {
-      collectBoundNames(declaration.id, names);
-    } else if (declaration?.type === "VariableDeclaration") {
-      const declarators = declaration.declarations;
-      for (const declarator of Array.isArray(declarators) ? declarators : []) {
-        collectBoundNames(agentSyntaxNode(declarator)?.id, names);
-      }
-    } else if (
-      node?.type === "ImportDeclaration" &&
-      Array.isArray(node.specifiers)
-    ) {
-      for (const specifier of node.specifiers) {
-        collectBoundNames(agentSyntaxNode(specifier)?.local, names);
-      }
-    }
-  }
-}
-
-/**
- * The `var` declarations anywhere in one function or Script body, without
- * entering a nested function or class. A function declaration nested in a
- * block stays in that block's scope; the Annex B hoisting that sloppy code
- * would add is outside the claim, so such a case is withheld rather than
- * executed.
- */
-function collectHoistedNames(
-  statements: StructuredDataValue | undefined,
-  names: Set<string>,
-): void {
-  const pending: (StructuredDataValue | undefined)[] = [statements];
-  while (pending.length > 0) {
-    const value = pending.pop();
-    if (Array.isArray(value)) {
-      pending.push(...value);
-      continue;
-    }
-    const node = agentSyntaxNode(value);
-    if (node == null) continue;
-    switch (node.type) {
-      case "VariableDeclaration":
-        if (node.kind === "var") collectLexicalNames(value, names);
-        break;
-      case "ExportNamedDeclaration":
-        pending.push(node.declaration);
-        break;
-      case "BlockStatement":
-      case "LabeledStatement":
-      case "WithStatement":
-      case "WhileStatement":
-      case "DoWhileStatement":
-        pending.push(node.body);
-        break;
-      case "IfStatement":
-        pending.push(node.consequent, node.alternate);
-        break;
-      case "ForStatement":
-        pending.push(node.init, node.body);
-        break;
-      case "ForInStatement":
-      case "ForOfStatement":
-        pending.push(node.left, node.body);
-        break;
-      case "TryStatement":
-        pending.push(node.block, node.handler, node.finalizer);
-        break;
-      case "CatchClause":
-        pending.push(node.body);
-        break;
-      case "SwitchStatement":
-        pending.push(node.cases);
-        break;
-      case "SwitchCase":
-        pending.push(node.consequent);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-function referenceMode(
-  node: AgentSyntaxNode,
-  key: string,
-  mode: ReferenceMode,
-): ReferenceMode {
-  const nonComputedKey = node.computed === true ? "reference" : "skip";
-  if (mode === "binding") {
-    switch (node.type) {
-      case "ObjectProperty":
-        return key === "key" ? nonComputedKey : "binding";
-      case "AssignmentPattern":
-        return key === "left" ? "binding" : "reference";
-      case "ObjectPattern":
-      case "ArrayPattern":
-      case "RestElement":
-        return "binding";
-      default:
-        return "reference";
-    }
-  }
-  switch (node.type) {
-    case "VariableDeclarator":
-      return key === "id" ? "binding" : "reference";
-    case "FunctionDeclaration":
-    case "FunctionExpression":
-    case "ArrowFunctionExpression":
-    case "ObjectMethod":
-    case "ClassMethod":
-    case "ClassPrivateMethod":
-      if (key === "id" || key === "params") return "binding";
-      return key === "key" ? nonComputedKey : "reference";
-    case "ClassDeclaration":
-    case "ClassExpression":
-      return key === "id" ? "binding" : "reference";
-    case "CatchClause":
-      return key === "param" ? "binding" : "reference";
-    case "ImportSpecifier":
-    case "ImportDefaultSpecifier":
-    case "ImportNamespaceSpecifier":
-      return key === "local" ? "binding" : "skip";
-    case "ExportNamedDeclaration":
-      // A re-export's specifiers name another module's exports, not
-      // bindings of this module.
-      return key === "specifiers" && node.source != null ? "skip" : "reference";
-    case "ExportSpecifier":
-    case "ExportNamespaceSpecifier":
-    case "ExportDefaultSpecifier":
-      return key === "exported" ? "skip" : "reference";
-    case "MemberExpression":
-    case "OptionalMemberExpression":
-      if (key === "property") return nonComputedKey;
-      // `$262.agent` is the separate multi-agent capability.
-      return key === "object" && agentMemberRead(node) ? "skip" : "reference";
-    case "ObjectProperty":
-    case "ClassProperty":
-    case "ClassAccessorProperty":
-    case "ClassPrivateProperty":
-      return key === "key" ? nonComputedKey : "reference";
-    case "LabeledStatement":
-    case "BreakStatement":
-    case "ContinueStatement":
-      return key === "label" ? "skip" : "reference";
-    case "MetaProperty":
-    case "PrivateName":
-    case "ImportAttribute":
-      return "skip";
-    case "UnaryExpression":
-      return node.operator === "typeof" &&
-        key === "argument" &&
-        agentSyntaxNode(node.argument)?.type === "Identifier"
-        ? "skip"
-        : "reference";
-    default:
-      return "reference";
-  }
 }
 
 function unsupportedResult(
@@ -2311,23 +1741,6 @@ export async function executeTest262Case(
       evidence,
     );
   }
-  const structuralCapability = unsupportedStructuralCapability(
-    source,
-    parsed,
-    harnesses,
-  );
-  if (structuralCapability != null) {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail: `Not executed: ${structuralCapability.detail}`,
-        passed: false,
-        unsupportedCapability: structuralCapability.capability,
-      },
-      supportedFeatures,
-      evidence,
-    );
-  }
   if (parsed.case.mode === "module") {
     if (location == null) {
       return classifyTest262(
@@ -2466,20 +1879,7 @@ async function suiteRoot(revision: string): Promise<string> {
   return packageRoot;
 }
 
-async function readHarnesses(root: string): Promise<Test262Harnesses> {
-  const harnesses = await readReviewedHarnesses();
-  const upstreamDefinitions = new Map<string, readonly string[]>();
-  for (const include of harnesses.includes.keys()) {
-    const upstreamPath = join(root, "harness", include);
-    upstreamDefinitions.set(
-      include,
-      parseHarnessDefinitions(await readFile(upstreamPath, "utf8"), include),
-    );
-  }
-  return { ...harnesses, upstreamDefinitions };
-}
-
-async function readReviewedHarnesses(): Promise<Test262Harnesses> {
+async function readHarnesses(): Promise<Test262Harnesses> {
   return {
     base: await readFile(baseHarnessPath, "utf8"),
     done: await readFile(doneHarnessPath, "utf8"),
@@ -2938,7 +2338,7 @@ async function main(): Promise<void> {
     tests: selectTestShard(subset.tests, cliArguments.shard),
   };
   const root = await suiteRoot(subset.suiteRevision);
-  const harnesses = await readHarnesses(root);
+  const harnesses = await readHarnesses();
   const run = await createReviewedManifest(
     selectedSubset,
     root,

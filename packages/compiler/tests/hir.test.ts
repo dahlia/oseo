@@ -390,32 +390,14 @@ test("resolves delete identifiers without reading their bindings", () => {
   };
   const hir = buildHir(syntax).program;
   assert.ok(hir != null);
-  // A declarative binding folds to `false`. An unresolved name, including
-  // a top-level `arguments`, deletes the realm global object's property,
-  // because a program can create that property at run time; an absent
-  // property is an unresolvable reference, whose delete answers true.
-  const globalObject = String.raw`%b\d+\(\*intrinsic global object\*\)`;
-  assert.match(
-    printHir(hir),
-    new RegExp(
-      String.raw`\n  false[\s\S]*` +
-        String.raw`\n  \(\("absent" in ${globalObject}\) \? ` +
-        String.raw`delete ${globalObject}\["absent"\] : true\)[\s\S]*` +
-        String.raw`\n  \(\("arguments" in ${globalObject}\) \? ` +
-        String.raw`delete ${globalObject}\["arguments"\] : true\)`,
-      "u",
-    ),
-  );
+  assert.match(printHir(hir), /\n  false[\s\S]*\n  true[\s\S]*\n  true/u);
   const operations = buildMir(hir).script.blocks.flatMap(
     (block) => block.operations,
   );
-  // Only the captured global object is read, once for each presence test
-  // and once for each delete; no deleted binding is.
-  const reads = operations.filter((operation) => operation.kind === "read");
-  assert.equal(reads.length, 4);
-  for (const read of reads) {
-    assert.equal(read.detail, "*intrinsic global object*");
-  }
+  assert.equal(
+    operations.filter((operation) => operation.kind === "read").length,
+    0,
+  );
 });
 
 test("resolves delete arguments through every owning function form", () => {
@@ -494,8 +476,8 @@ test("resolves delete arguments through every owning function form", () => {
   }
 
   // An arrow declares none of its own, so `delete arguments` inside one
-  // with no enclosing function deletes the realm global object's
-  // property, exactly as a Script's own top level does.
+  // with no enclosing function is an unresolvable-reference delete and
+  // answers `true`, exactly as a Script's own top level does.
   const arrow = buildHir({
     body: [
       {
@@ -526,16 +508,9 @@ test("resolves delete arguments through every owning function form", () => {
   const arrowReturn = arrow.program?.functions[0]?.body[0];
   assert.equal(arrowReturn?.kind, "return");
   if (arrowReturn?.kind === "return") {
-    assert.equal(arrowReturn.expression?.kind, "conditional");
-    if (
-      arrowReturn.expression?.kind === "conditional" &&
-      arrowReturn.expression.consequent.kind === "property-delete"
-    ) {
-      assert.deepEqual(arrowReturn.expression.consequent.key, {
-        kind: "string",
-        range,
-        value: "arguments",
-      });
+    assert.equal(arrowReturn.expression?.kind, "boolean");
+    if (arrowReturn.expression?.kind === "boolean") {
+      assert.equal(arrowReturn.expression.value, true);
     }
   }
 });

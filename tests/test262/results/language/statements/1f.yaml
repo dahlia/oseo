@@ -127,21 +127,17 @@ results:
       strictness:
         - non-strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - control-flow
       - lexical-bindings
       - property-enumeration
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
-        - specialization: enabled
-          strictness: non-strict
     observation:
-      passed: true
+      detail: "test/language/statements/for-in/let-block-with-newline.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/for-in/let-block-with-newline\
+        .js:90:21: error[OSEO1001]: Unknown binding 'let'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -142,10 +142,13 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the reviewed harness regExpUtils.js omits
-        buildString, testPropertyEscapes."
+      detail: "test/built-ins/RegExp/property-escapes/generated/Script_-_Yezi\
+        di.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/property-escapes/generated/Scrip\
+        t_-_Yezidi.js:140:22: error[OSEO1001]: Unknown binding
+        'buildString'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
-      unsupportedCapability: harness-definition
     unsupportedFeatures: []
   - case:
       async: false
@@ -163,20 +166,12 @@ results:
     dependencies:
       - object-properties
       - regular-expressions
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
-      detail: 'test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js:91:15:
-        error[OSEO2001]: ReferenceError: print is not
-        defined.\nOSEO_THROWN ReferenceError\n"'
-      unsupportedCapability: host-binding
+      detail: "test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/RegExp/prototype/Symbol.replace/coerce-\
+        global.js:91:15: error[OSEO1001]: Unknown binding 'print'.\\n\""
+      unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
   - case:

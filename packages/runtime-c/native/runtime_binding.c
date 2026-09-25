@@ -100,21 +100,7 @@ OseoResult oseo_cell_create(OseoContext *context, OseoValue value) {
     cell->key = oseo_undefined();
     cell->object_environment = false;
     cell->writable = true;
-    cell->unresolvable_message = NULL;
     return oseo_internal_publish_heap(context, &cell->header, OSEO_HEAP_CELL);
-}
-
-OseoResult oseo_unresolvable_cell_create(
-    OseoContext *context,
-    const char *message
-) {
-    if (message == NULL) {
-        return failure(context, "OSEO2001", "Invalid unresolvable reference.");
-    }
-    OseoResult result = oseo_cell_create(context, oseo_uninitialized());
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    cell_object(result.value)->unresolvable_message = message;
-    return result;
 }
 
 /* Object Environment Record HasBinding uses [[HasProperty]], including
@@ -150,15 +136,6 @@ OseoResult oseo_cell_get(OseoContext *context, OseoValue cell_value) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
     OseoCell *cell = cell_object(cell_value);
-    /* GetValue on an unresolvable Reference throws before any binding or
-     * property lookup, and this cell exists only to reach that throw. */
-    if (cell->unresolvable_message != NULL) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_REFERENCE,
-            cell->unresolvable_message
-        );
-    }
     if (cell->object_environment) {
         if (!object_environment_has_property(cell->object, cell->key)) {
             return oseo_internal_throw_error(
@@ -522,23 +499,6 @@ static OseoResult global_this_object(OseoContext *context) {
             frame.slots[1],
             frame.slots[2],
             (OseoPropertyAttributes){false, false, false, false}
-        );
-    }
-    /* The global object binds itself as `globalThis`, a writable,
-     * non-enumerable, configurable data property. It is installed last so
-     * that a failed intrinsic installation leaves no realm holding a
-     * partially populated global object through its own name. */
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_ascii_string(context, "globalThis");
-        frame.slots[1] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
-            context,
-            frame.slots[0],
-            frame.slots[1],
-            frame.slots[0],
-            (OseoPropertyAttributes){true, false, true, false}
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {

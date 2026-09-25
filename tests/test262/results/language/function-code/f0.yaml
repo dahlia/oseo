@@ -12,21 +12,17 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - error-intrinsics
       - functions
       - lexical-bindings
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/function-code/block-decl-onlystrict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/function-code/block-decl-onlystrict.js:9\
+        7:5: error[OSEO1001]: Unknown binding 'f'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

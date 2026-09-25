@@ -67,12 +67,6 @@ export interface MirParameter {
 export interface MirGlobalBinding {
   readonly id: number;
   readonly name: string;
-  /**
-   * The source name whose unresolvable reference this hidden binding
-   * reports, carried from HIR so the backend can emit the cell that
-   * throws that exact ReferenceError.
-   */
-  readonly unresolvableName?: string;
 }
 
 /** One source-located Script lexical name checked against the global object. */

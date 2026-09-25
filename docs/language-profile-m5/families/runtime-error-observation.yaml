@@ -25,11 +25,9 @@ scope:
     reported by its own text rather than by the rejected value, so a
     rejected value with no intrinsic error identity leaves that path
     unchanged: the boundary text alone, with no identity read and no
-    marker. This node left a rejected intrinsic error instance with the
-    rendering and marker it already had, so it moved no reviewed row that
-    classifies on the rejection boundary; M5b node globalthis-binding later
-    gave that instance the same boundary text while keeping its intrinsic
-    kind marker."
+    marker. A rejected intrinsic error instance keeps the rendering and
+    marker it already had, so this node moves no reviewed row that
+    classifies on the rejection boundary."
   - "Reading the identity and converting the message run user JavaScript
     after the program's abrupt completion, so the throw or rejection site
     is restored around them and the thrown value stays collector-rooted.

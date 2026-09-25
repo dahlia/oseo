@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,341 reviewed cases: 18,161 passes, 1,560 expected negatives, and 1,620
+21,312 reviewed cases: 18,001 passes, 1,556 expected negatives, and 1,755
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 138 indexed records in the normative
+M5a is complete. The 137 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-18,161 passes across 21,341 paths, and the property inventory records 161
-domains, 161 seeds, and an ordinary case budget of 5,855.
+18,001 passes across 21,312 paths, and the property inventory records 160
+domains, 160 seeds, and an ordinary case budget of 5,839.
 
 
 M5a implementation history
@@ -6915,89 +6915,6 @@ to 136 families. The node adds no component, code ID, realm intrinsic,
 generated-code entry point, ABI change, or graph-state change; the suite
 revision, applicable inventory, classification vocabulary, target-parity
 policy, forced-collection policy, and zero-override policy are unchanged.
-
-Implemented M5b node `globalthis-binding` exposes the realm global object as
-the writable, non-enumerable, configurable `globalThis` property, installed
-after every admitted intrinsic so a failed installation leaves no partially
-populated object reachable through its own name. Known globals keep their
-property-backed cells. Every other unshadowed name that no declaration
-resolves, except the runtime-owned call targets and the two unadmitted
-standard globals `eval` and `Float16Array`, now resolves through the realm
-global object at run time: a read is ResolveBinding's `HasProperty`, then
-GetBindingValue's own `HasProperty` and `Get`, and an absent property reaches
-a hidden cell that throws the `ReferenceError` GetValue owes an unresolvable
-reference, naming it, while a property that disappears between the two tests
-reads as `undefined` in sloppy code and throws in strict code; `typeof`
-answers `"undefined"` for an unresolvable name without reading it; `delete`
-deletes a present property and answers `true` for an absent one; and a sloppy
-write creates or updates the property, while a strict write to an absent name
-throws. Each write and delete tests presence when its reference is resolved,
-before a right-hand side, iterator value, or loop body runs, and a write to a
-resolved reference repeats the test for SetMutableBinding before the store.
-Node.js and Deno perform only one of these tests on the global object's
-prototype chain, so fixed native tests check the specified order against the
-model alone, including a stateful Proxy prototype that answers each test
-differently. A
-non-strict all-miss `with` chain reaches the same property for simple,
-compound, logical, and update writes. Destructuring and loop-head targets and
-strict writes behind such a chain stay source-located rejections. The fragment
-launcher creates the same unresolvable-reference cells as the whole-Script
-prologue, which moves 32 of the 44 checked-in harness-fragment code-generation
-records.
-
-The node also applies the maintainer's standards-evidence decisions. The
-reviewed environment installs neither the `$262` nor the `print` host
-binding. An uncaught `ReferenceError` whose exact message names one of them
-classifies as `unsupported-profile-feature` with the `host-binding`
-capability, and every other `ReferenceError` stays an observed failure. The
-runner parses each case once and withholds, before execution, a case whose
-syntax references `$262` outside `$262.agent`, which covers the cases whose
-`assert.throws` would otherwise catch that `ReferenceError`. It also compares
-each upstream include's `defines` metadata with the names the reviewed
-include declares and withholds a case whose syntax references an omitted
-definition with the `harness-definition` capability. Both decisions read
-parsed syntax, never source text: a name inside a comment or string, a
-property key, a `typeof` operand, a name inside a `with` body, whose object
-may provide it, and a name the case declares itself never withhold execution.
-The reviewed *regExpUtils.js* still omits `buildString` and
-`testPropertyEscapes`. An unhandled rejection whose reason is an intrinsic
-error instance now reports the rejection boundary text and keeps its kind
-marker, so *Promise/race/invoke-resolve-error-close.js* classifies with the
-existing `unhandled-rejection-policy` capability exactly like its *Promise/all*
-sibling.
-
-Fixed native evidence and generated differential evidence at property seed
-`0x60007e00` cover absent, writable, accessor, non-writable, and inherited
-global properties observed by reads, `typeof`, `delete`, sloppy and strict
-assignment, compound assignment, update, `globalThis` property reads, and
-all-miss `with` reads and writes, together with `globalThis` identity,
-descriptor, replacement, deletion, and restoration, both specialization
-policies, false numeric hints, deliberate shape-guard misses, generic
-fallback, and collection forced at every safepoint. Node.js and Deno throw a
-`ReferenceError` for a strict assignment to a name found only on the global
-object's prototype, where ECMA-262 performs an ordinary `Set`; the generated
-suite compares that one combination with its specification model alone and
-keeps one fixed native observation of it. The fixture found and the node
-fixes a lowering defect in which a compound read behind an all-miss `with`
-chain overwrote the branch of its own global-object read.
-
-All 29 paths under *test/built-ins/global/* are reviewed: 19 pass and 10
-retain the dynamic-source boundary for `eval`. Outside the root, 141 reviewed
-paths move from `unsupported-profile-feature` to `pass`, including one module
-case, *module-code/top-level-await/dfs-invariant.js*, that only the newly
-supported `globalThis` feature gated, and the four
-_statements/switch/scope-lex-\*.js_ negative tests move to
-`expected-negative` because their unresolved read now throws the runtime
-`ReferenceError` they require, the direction the landed evidence policy
-admits. No reviewed path moves away from `pass`, and no path is removed. The
-manifest moves from 21,312 to 21,341 paths, from 18,001 to 18,161 passes, from
-1,556 to 1,560 expected negatives, and from 1,755 to 1,620 unsupported profile
-features with no semantic, harness, or infrastructure failures. The property
-ratchet moves from 160 to 161 domains and seeds and from 5,839 to 5,855
-ordinary cases, and the evidence inventory moves from 137 to 138 families.
-One generated-code entry point, `oseo_unresolvable_cell_create`, moves the
-ABI to `oseo-runtime-m5-122`; the node adds no component, code ID, realm
-intrinsic, or graph-state change.
 
 
 Ahead-of-time challenge boundary

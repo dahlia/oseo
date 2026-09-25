@@ -504,7 +504,3 @@ families:
     owner: tests/property/m5-typed-array-sort.property.test.ts
     start: 0x60007d00
     end: 0x60007dff
-  - family: m5-globalthis-binding
-    owner: tests/property/m5-globalthis-binding.property.test.ts
-    start: 0x60007e00
-    end: 0x60007eff

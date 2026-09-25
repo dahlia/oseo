@@ -15,27 +15,18 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - async-iteration
       - destructuring-bindings
-    execution:
-      harnessIncludes:
-        - base.js
-        - doneprintHandle.js
-      scheduler: deterministic-logical-clock
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
-        - specialization: enabled
-          strictness: non-strict
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/statements/async-generator/dstr/dflt-obj-ptrn-pr\
+        op-id-init.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/async-generator/dstr/dflt-obj\
+        -ptrn-prop-id-init.js:135:5: error[OSEO1001]: Unknown binding
+        'x'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -265,7 +256,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - async-functions
       - async-iteration
@@ -275,23 +266,15 @@ results:
       - lexical-bindings
       - object-properties
       - promise-settlement
-    execution:
-      harnessIncludes:
-        - base.js
-        - doneprintHandle.js
-      scheduler: deterministic-logical-clock
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
-        - specialization: enabled
-          strictness: non-strict
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/statements/for-await-of/async-gen-dstr-const-asy\
+        nc-obj-ptrn-prop-obj-init.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/statements/for-await-of/async-gen-dstr-c\
+        onst-async-obj-ptrn-prop-obj-init.js:163:7: error[OSEO1001]:
+        Unknown binding 'w'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false

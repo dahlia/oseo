@@ -37,34 +37,14 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - module-linking
       - top-level-await
-    execution:
-      harnessIncludes:
-        - base.js
-        - doneprintHandle.js
-      moduleGraph:
-        - dependencies:
-            - test/language/module-code/top-level-await/async-module-tla_FIXTURE.js
-            - test/language/module-code/top-level-await/async-module-sync_FIXTURE.js
-          id: test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js
-          sourceHash: fnv1a64:2b109a056302ead9
-        - dependencies: []
-          id: test/language/module-code/top-level-await/async-module-tla_FIXTURE.js
-          sourceHash: fnv1a64:2b1386b7819c2b3b
-        - dependencies: []
-          id: test/language/module-code/top-level-await/async-module-sync_FIXTURE.js
-          sourceHash: fnv1a64:8281cd37e4413319
-      scheduler: deterministic-logical-clock
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/module-code/top-level-await/async-module-tla_FIX\
+        TURE.js:4:1: error[OSEO1001]: Unknown binding 'globalThis'."
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -10,27 +10,6 @@ import {
 
 import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
-/**
- * The printed presence-checked global-object read that `typeof` of an
- * unresolved `name` performs, as a regular expression source.
- */
-/**
- * The printed HIR `typeof` operand of a global-object name: ResolveBinding's
- * presence test, then GetBindingValue's own test before the read, whose
- * miss is `undefined` in non-strict code and the missing cell in strict.
- */
-function typeofGlobalRead(name: string, strict = false): string {
-  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
-  const exists = String.raw`\("${name}" in ${object}\)`;
-  const missing = strict
-    ? String.raw`%b\d+\(\*missing intrinsic:${name}\*\)`
-    : "undefined";
-  return (
-    String.raw`\(${exists} \? \(${exists} \? ` +
-    String.raw`get ${object}\["${name}"\] : ${missing}\) : undefined\)`
-  );
-}
-
 test("converts labeled statements to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -773,17 +752,10 @@ test("admits direct typeof with an unresolvable name", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
-  // A program can create the property at run time, so both the bare and
-  // the parenthesized reference read it from the realm global object.
-  // An absent property answers the `undefined` the specification's
-  // unresolvable-reference step reports, without a hidden cell.
-  const printed = printHir(result.hir);
-  assert.equal(
-    printed.match(new RegExp(`typeof ${typeofGlobalRead("missing")}`, "gu"))
-      ?.length,
-    2,
-  );
-  assert.doesNotMatch(printed, /missing intrinsic|"undefined"/u);
+  // Both the bare and the parenthesized reference fold to the string the
+  // specification's unresolvable-reference step produces, without a
+  // binding read or a hidden cell.
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
 });
 
 test("admits direct typeof with an unresolvable name in a module", () => {
@@ -808,10 +780,7 @@ test("admits direct typeof with an unresolvable name in a module", () => {
   });
   assert.deepEqual(compiled.diagnostics, []);
   assert.ok(compiled.mir != null);
-  const mir = printMir(compiled.mir);
-  assert.match(mir, /read \*intrinsic global object\*/u);
-  assert.match(mir, /constant "missing"/u);
-  assert.doesNotMatch(mir, /constant "undefined"/u);
+  assert.match(printMir(compiled.mir), /constant "undefined"/u);
 });
 
 test("admits direct typeof with an unresolvable name in strict code", () => {
@@ -821,65 +790,24 @@ test("admits direct typeof with an unresolvable name in strict code", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
-  assert.match(
-    printHir(result.hir),
-    new RegExp(`typeof ${typeofGlobalRead("missing", true)}`, "u"),
-  );
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
 });
 
-test("resolves every non-typeof unresolved reference by lookup", () => {
-  // Every other reference reads the realm global object's property and
-  // falls back to the hidden cell whose read throws the ReferenceError
-  // GetValue owes an unresolvable Reference; a write sets the property.
-  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
-  const exists = String.raw`\("missing" in ${object}\)`;
-  const lookup = new RegExp(
-    String.raw`${exists} \? \(${exists} \? ` +
-      String.raw`get ${object}\["missing"\] : ` +
-      String.raw`undefined\) : %b\d+\(\*missing intrinsic:missing\*\)`,
-    "u",
-  );
+test("keeps every non-typeof unresolved reference rejected", () => {
   for (const source of [
     "console.log(missing);",
     "console.log(typeof missing.property);",
     "console.log(typeof (0, missing));",
+    "missing = 1;",
   ]) {
     const result = compileSource(babelFrontend, {
       source,
       sourceId: "unresolved-read.ts",
     });
-    assert.deepEqual(result.diagnostics, [], source);
-    assert.ok(result.hir != null, source);
-    assert.match(printHir(result.hir), lookup, source);
-  }
-  const write = compileSource(babelFrontend, {
-    source: "missing = 1;",
-    sourceId: "unresolved-write.ts",
-  });
-  assert.deepEqual(write.diagnostics, []);
-  assert.ok(write.hir != null);
-  assert.match(
-    printHir(write.hir),
-    /set %b\d+\(\*intrinsic global object\*\)\["missing"\] = 1/u,
-  );
-  // ResolveBinding tests the property before the right-hand side, and
-  // SetMutableBinding tests it again only for a found reference.
-  assert.ok(write.mir != null);
-  assert.match(
-    printMir(write.mir),
-    /binary in %\d+, %\d+[^]*constant 1[^]*branch && [^]*binary in /u,
-  );
-  // A standard global the profile has not admitted as a value is never
-  // unresolvable in a conforming realm, so it stays rejected.
-  for (const source of ["console.log(eval);", "eval = 1;"]) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "unadmitted-standard-read.ts",
-    });
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(
       result.diagnostics[0]?.message ?? "",
-      /Unknown binding 'eval'/u,
+      /Unknown binding 'missing'/u,
       source,
     );
   }
@@ -913,12 +841,13 @@ test("reads typeof of materialized intrinsics through properties", () => {
 
 test("rejects typeof of an unimplemented standard global name", () => {
   // ECMA-262 clause 19 requires every conforming realm to bind these
-  // names, so an absent property's "undefined" answer would misreport
-  // them; each stays a source-located rejection until the profile admits
-  // it as a value, inside and outside `with` alike.
+  // names, so the unresolvable fold's "undefined" answer would
+  // misreport them; each stays a source-located rejection until the
+  // profile admits it as a value, inside and outside `with` alike.
   for (const source of [
     "console.log(typeof Float16Array);",
     "console.log(typeof eval);",
+    "console.log(typeof globalThis);",
     "with ({}) { console.log(typeof Float16Array); }",
   ]) {
     const result = compileSource(babelFrontend, {
@@ -948,20 +877,16 @@ test("resolves typeof of a shadowed standard global to the binding", () => {
   }
 });
 
-test("reads typeof of names outside the pinned realm by lookup", () => {
+test("keeps the fold for names outside the pinned realm", () => {
   // Annex B additions are excluded from the claim, so an unshadowed
-  // `escape` is an ordinary unresolved name in this profile's realm and
-  // reads the global object's property like any other.
+  // `escape` is an ordinary unresolvable name in this profile's realm.
   const result = compileSource(babelFrontend, {
     source: "console.log(typeof escape);",
     sourceId: "typeof-annex-b.ts",
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
-  assert.match(
-    printHir(result.hir),
-    new RegExp(`typeof ${typeofGlobalRead("escape")}`, "u"),
-  );
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
 });
 
 test("resolves typeof of a shadowed intrinsic name to the binding", () => {
@@ -987,28 +912,21 @@ test("consults object environments before the typeof fallback", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   const printed = printHir(result.hir);
-  // A hit inspects the object environment's value; an all-miss chain
-  // reads the realm global object's property rather than a hidden
-  // uninitialized cell, so an absent name reports "undefined" instead of
+  // A hit inspects the object environment's value; a genuinely
+  // unresolvable miss falls back to the undefined value rather than a
+  // hidden uninitialized cell, so typeof reports "undefined" instead of
   // an uninitialized-cell error.
-  for (const name of ["present", "absent"]) {
-    assert.match(
-      printed,
-      new RegExp(
-        String.raw`typeof with\[%b\d+\] ${name} fallback ` +
-          typeofGlobalRead(name),
-        "u",
-      ),
-    );
-  }
+  assert.match(printed, /typeof with\[%b\d+\] present fallback undefined/u);
+  assert.match(printed, /typeof with\[%b\d+\] absent fallback undefined/u);
 });
 
-test("reads typeof of an assigned with name from the global object", () => {
-  // A sloppy all-miss assignment writes the realm global object's
-  // property, and every typeof of the same name reads that property, so
-  // the answer observes the materialized value in every source order and
-  // position, including a read outside the assigning region and an
-  // assignment only a later iteration or a nested closure performs.
+test("rejects typeof of an assigned with fallback name", () => {
+  // A hidden fallback cell an unresolved assignment can initialize at
+  // run time would make the folded "undefined" answer misreport the
+  // materialized value, so the combination stays rejected in every
+  // source order and position, including a direct fold outside the
+  // assigning region and an assignment only a later iteration or a
+  // nested closure performs.
   for (const source of [
     "with ({}) { missing = 1; console.log(typeof missing); }",
     "with ({}) { console.log(typeof missing); missing = 1; }",
@@ -1033,79 +951,55 @@ test("reads typeof of an assigned with name from the global object", () => {
       source,
       sourceId: "typeof-with-assigned.ts",
     });
-    assert.deepEqual(result.diagnostics, [], source);
-    assert.ok(result.hir != null, source);
-    const printed = printHir(result.hir);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(
-      printed,
-      new RegExp(
-        String.raw`typeof (?:with\[%b\d+\] missing fallback )?` +
-          typeofGlobalRead("missing"),
-        "u",
-      ),
+      result.diagnostics[0]?.message ?? "",
+      /typeof with fallback binding 'missing'/u,
       source,
     );
-    assert.doesNotMatch(printed, /"undefined"|missing intrinsic/u, source);
   }
 });
 
-test("reads read-first with fallback writes from the global object", () => {
+test("keeps the fold beside read-first with fallback operations", () => {
   // A compound or logical assignment and an update expression perform
-  // GetValue before their write. A non-strict all-miss chain reaches the
-  // realm global object, so the read is the global property, or the
-  // unresolvable reference's ReferenceError when it is absent, and the
-  // write updates that same property.
-  for (const operation of [
-    "missing++",
-    "--missing",
-    "missing += 1",
-    "missing ||= 1",
-    "missing ??= 1",
-  ]) {
-    const source =
-      "with ({}) {\n" +
-      `  try { ${operation}; } catch (c) {}\n` +
+  // GetValue before their write, so an all-miss chain throws
+  // ReferenceError on the uninitialized fallback cell and can never
+  // initialize it; a caught attempt leaves the name genuinely
+  // unresolvable and the fold stays admitted.
+  for (const source of [
+    "with ({}) {\n" +
+      "  try { missing++; } catch (c) {}\n" +
       "  console.log(typeof missing);\n" +
-      "}";
+      "}",
+    "with ({}) {\n" +
+      "  try { --missing; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing += 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ||= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ??= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
     const result = compileSource(babelFrontend, {
       source,
       sourceId: "typeof-with-read-first.ts",
     });
     assert.deepEqual(result.diagnostics, [], source);
-    assert.ok(result.hir != null);
-    const hir = printHir(result.hir);
-    assert.match(hir, /with\[[^\]]*\] missing/u, source);
-    assert.match(hir, /"missing" in %b\d+\(\*intrinsic global object\*\)/u);
-    assert.doesNotMatch(hir, /\*with fallback/u, source);
-  }
-  // Strict code keeps the all-miss write outside the profile, because a
-  // strict PutValue must throw when the property disappears in between.
-  const strict = compileSource(babelFrontend, {
-    source: "with ({}) { (function () { 'use strict'; missing += 1; })(); }",
-    sourceId: "strict-with-read-first.ts",
-  });
-  assert.match(
-    strict.diagnostics[0]?.message ?? "",
-    /Assigning global-object name 'missing' through a with fallback/u,
-  );
-  // A runtime-owned name still reads its hidden fallback cell, which
-  // throws before any write, so the same operations stay admitted.
-  for (const operation of ["console++", "--console", "console += 1"]) {
-    const source = `with ({}) { try { ${operation}; } catch (c) {} }`;
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "with-read-first-hidden-cell.ts",
-    });
-    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
   }
 });
 
-test("rejects destructuring or loop with fallback global targets", () => {
-  // These targets reach PutValue without a prior read. Only a simple
-  // assignment writes the realm global object's property on an all-miss
-  // chain, so these writes to the same property stay outside the
-  // profile rather than initializing a hidden cell no later reference
-  // would observe.
+test("rejects typeof of a destructuring or loop with fallback target", () => {
+  // These targets reach PutValue without a prior read, so they can
+  // initialize the hidden cell exactly like a simple assignment.
   for (const source of [
     "with ({}) { ({ missing } = {}); console.log(typeof missing); }",
     "with ({}) { [missing] = [1]; console.log(typeof missing); }",
@@ -1118,7 +1012,7 @@ test("rejects destructuring or loop with fallback global targets", () => {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(
       result.diagnostics[0]?.message ?? "",
-      /Assigning global-object name 'missing' through a with fallback/u,
+      /typeof with fallback binding 'missing'/u,
       source,
     );
   }
@@ -1127,19 +1021,25 @@ test("rejects destructuring or loop with fallback global targets", () => {
 test("rejects a strict write to a with fallback binding", () => {
   // A strict all-miss PutValue throws ReferenceError instead of
   // creating a sloppy global, while the profile's fallback lowering
-  // would initialize the hidden cell a runtime-owned name keeps, so the
-  // strict write itself stays rejected.
+  // would initialize the hidden cell, so the strict write itself stays
+  // rejected and never poisons the typeof fold.
   for (const source of [
     "with ({}) {\n" +
-      '  const f = () => { "use strict"; console = 1; };\n' +
+      '  const f = () => { "use strict"; missing = 1; };\n' +
+      "  console.log(typeof missing);\n" +
       "}",
     "with ({}) {\n" +
-      '  function f() { "use strict"; [console] = [1]; }\n' +
+      '  function f() { "use strict"; [missing] = [1]; }\n' +
+      "  console.log(typeof missing);\n" +
       "}",
     "with ({}) {\n" +
-      '  function f() { "use strict"; for (console of [1]) {} }\n' +
+      '  function f() { "use strict"; for (missing of [1]) {} }\n' +
+      "  console.log(typeof missing);\n" +
       "}",
-    "with ({}) {\n  class C { f = (console = 1); }\n}",
+    "with ({}) {\n" +
+      "  class C { f = (missing = 1); }\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
   ]) {
     const result = compileSource(babelFrontend, {
       source,
@@ -1148,37 +1048,24 @@ test("rejects a strict write to a with fallback binding", () => {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(
       result.diagnostics[0]?.message ?? "",
-      /Assigning with fallback binding 'console' in strict code/u,
+      /Assigning with fallback binding 'missing' in strict code/u,
       source,
     );
   }
-  // A global-object name has no hidden cell; its strict all-miss write
-  // would reach the global object's property, which stays outside the
-  // profile through a with fallback.
-  const global = compileSource(babelFrontend, {
-    source:
-      "with ({}) {\n" +
-      '  const f = () => { "use strict"; missing = 1; };\n' +
-      "}",
-    sourceId: "with-strict-global-write.ts",
-  });
-  assert.equal(global.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    global.diagnostics[0]?.message ?? "",
-    /Assigning global-object name 'missing' through a with fallback/u,
-  );
 });
 
 test("keeps strict read-first with fallback operations admitted", () => {
-  // A strict compound assignment or update of a runtime-owned name reads
-  // its hidden cell first and throws the same catchable ReferenceError
-  // the lowering already produces, so it stays admitted.
+  // A strict compound assignment or update reads first and throws the
+  // same catchable ReferenceError the lowering already produces, so it
+  // stays admitted and does not poison the fold.
   for (const source of [
     "with ({}) {\n" +
-      '  function f() { "use strict"; try { console += 1; } catch (c) {} }\n' +
+      '  function f() { "use strict"; try { missing += 1; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
       "}",
     "with ({}) {\n" +
-      '  function f() { "use strict"; try { console++; } catch (c) {} }\n' +
+      '  function f() { "use strict"; try { missing++; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
       "}",
   ]) {
     const result = compileSource(babelFrontend, {

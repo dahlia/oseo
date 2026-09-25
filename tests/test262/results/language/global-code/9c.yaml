@@ -12,21 +12,17 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: pass
+    classification: unsupported-profile-feature
     dependencies:
       - control-flow
       - error-intrinsics
       - functions
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: strict
-        - specialization: enabled
-          strictness: strict
     observation:
-      passed: true
+      detail: "test/language/global-code/switch-dflt-decl-strict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/global-code/switch-dflt-decl-strict.js:9\
+        2:3: error[OSEO1001]: Unknown binding 'f'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

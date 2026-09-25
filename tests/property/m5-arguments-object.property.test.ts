@@ -619,9 +619,8 @@ function unmappedExpected(testCase: UnmappedArgumentsCase): string {
 /**
  * The disjoint boundary the unit deliberately keeps: an arrow declares
  * no `arguments` of its own, so one with no enclosing function form
- * leaves the name unresolved. It then reads the realm global object's
- * property, falling back to the unresolvable-reference cell, instead of
- * silently reaching a Script-level binding or an arguments object.
+ * leaves the name unresolved with its own source-located diagnostic
+ * instead of silently reaching a Script-level binding.
  */
 function assertArrowBoundary(testCase: UnmappedArgumentsCase): void {
   const source = `const read = () => arguments[${testCase.writeIndex}];\n`;
@@ -629,16 +628,16 @@ function assertArrowBoundary(testCase: UnmappedArgumentsCase): void {
     source,
     sourceId: "generated-m5-arguments-arrow-boundary.js",
   });
-  assert.deepEqual(compiled.diagnostics, []);
-  assert.ok(compiled.hir != null);
-  const arrow = compiled.hir.functions[0];
-  assert.ok(arrow != null);
-  assert.equal(arrow.argumentsBindingId, undefined);
-  assert.ok(
-    compiled.hir.globalBindings?.some(
-      (binding) => binding.unresolvableName === "arguments",
-    ),
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.match(
+    compiled.diagnostics[0]?.message ?? "",
+    /Unknown binding 'arguments'\./u,
   );
+  assert.deepEqual(compiled.diagnostics[0]?.range.start, {
+    column: 20,
+    line: 1,
+  });
 }
 
 /**

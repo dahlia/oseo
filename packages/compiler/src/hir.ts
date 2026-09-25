@@ -39,54 +39,12 @@ export interface HirWithBindingReference {
 }
 
 /**
- * The hidden binding name of the realm global-object capture. It cannot
- * collide with a source name, and both HIR construction and MIR lowering
- * spell the same identity through it.
- */
-export const intrinsicGlobalObjectName = "*intrinsic global object*";
-
-/**
- * One realm global-object property fallback behind an ordered `with`
- * object chain. An all-miss non-strict PutValue reaches the global
- * object, where it creates or updates this property, so the fallback
- * names the hidden global-object capture and the property key instead
- * of a hidden cell no later reference to the same name would observe.
- */
-export interface HirWithGlobalObjectFallback {
-  readonly name: string;
-  readonly objectBindingId: number;
-  /**
-   * The GetValue a compound, logical, or update write performs first:
-   * the global object's property when it exists, and otherwise the
-   * hidden cell that throws the unresolvable reference's ReferenceError.
-   * A simple assignment never reads, so it carries none.
-   */
-  readonly read?: HirExpression;
-}
-
-/**
  * The uninitialized cell used when a strict global identifier write loses
  * its object property before PutValue.
  */
 export interface HirStrictGlobalFallback {
   readonly bindingId: number;
   readonly name: string;
-}
-
-/**
- * Marks a property reference as an identifier reference that the global
- * Environment Record resolves through the realm global object. Each
- * record operation tests the property with its own HasProperty, which a
- * Proxy on the global object's prototype chain can observe and answer
- * differently every time: ResolveBinding before the right-hand side,
- * GetBindingValue before a compound or update read, and
- * SetMutableBinding before the write. Only strict code turns a missing
- * property into the ReferenceError that `strictFallback` throws; a
- * non-strict GetBindingValue reads `undefined` and a non-strict PutValue
- * still writes.
- */
-export interface HirGlobalReference {
-  readonly strictFallback?: HirStrictGlobalFallback;
 }
 
 /** One resolved identifier read through active `with` environments. */
@@ -112,8 +70,8 @@ export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly object: HirExpression;
   /** Name used by named evaluation for a synthetic global target. */
   readonly inferredName?: string;
-  /** Present when the leaf is an identifier on the global object. */
-  readonly globalReference?: HirGlobalReference;
+  /** Missing-binding fallback for a strict global property reference. */
+  readonly strictGlobalFallback?: HirStrictGlobalFallback;
 }
 
 /** One resolved private reference used as an assignment-pattern leaf. */
@@ -229,7 +187,7 @@ export type HirForOfTarget =
       readonly kind: "property";
       readonly object: HirExpression;
       readonly range: SourceRange;
-      readonly globalReference?: HirGlobalReference;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     }
   | {
       readonly kind: "private";
@@ -436,7 +394,6 @@ export function intrinsicGlobalKind(
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
-    name === "globalThis" ||
     name === "isFinite" ||
     name === "isNaN" ||
     name === "parseFloat" ||
@@ -740,14 +697,14 @@ export type HirExpression =
       readonly prefix: boolean;
     })
   | (LocatedSyntax & {
-      readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      readonly fallback: HirWithBindingReference;
       readonly kind: "with-set";
       readonly name: string;
       readonly objectBindingIds: readonly number[];
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
-      readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      readonly fallback: HirWithBindingReference;
       readonly kind: "with-update";
       readonly name: string;
       readonly objectBindingIds: readonly number[];
@@ -755,7 +712,7 @@ export type HirExpression =
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
-      readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      readonly fallback: HirWithBindingReference;
       readonly kind: "with-step";
       readonly name: string;
       readonly objectBindingIds: readonly number[];
@@ -907,7 +864,7 @@ export type HirExpression =
       readonly key: HirExpression;
       readonly kind: "property-set";
       readonly object: HirExpression;
-      readonly globalReference?: HirGlobalReference;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -915,7 +872,7 @@ export type HirExpression =
       readonly kind: "property-update";
       readonly object: HirExpression;
       readonly operator: AssignmentOperator;
-      readonly globalReference?: HirGlobalReference;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
@@ -924,7 +881,7 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: "++" | "--";
       readonly prefix: boolean;
-      readonly globalReference?: HirGlobalReference;
+      readonly strictGlobalFallback?: HirStrictGlobalFallback;
     })
   | (LocatedSyntax & {
       /**
@@ -1250,13 +1207,6 @@ export interface HirFunction extends LocatedSyntax {
 export interface HirGlobalBinding {
   readonly id: number;
   readonly name: string;
-  /**
-   * The source name whose unresolvable reference this hidden binding
-   * reports. Present only on a fallback cell no code ever writes, so a
-   * read of it throws the ReferenceError GetValue owes an unresolvable
-   * Reference instead of returning the absent property's `undefined`.
-   */
-  readonly unresolvableName?: string;
 }
 
 /** One source-located Script lexical name checked against the global object. */
@@ -1362,6 +1312,17 @@ export interface ResolveState {
   nextFunctionId: number;
   readonly sourceId: string;
   /**
+   * Every `typeof` reference this program folded to the unresolvable
+   * `"undefined"` answer, directly or as a `with` chain's miss
+   * fallback. The set is checked against `withInitializingFallbackNames`
+   * after the whole program resolves, so the rejection does not depend
+   * on the source order of the fold and the assignment.
+   */
+  readonly foldedTypeofReferences: {
+    readonly located: LocatedSyntax;
+    readonly name: string;
+  }[];
+  /**
    * The effective strictness of the code currently being resolved. A
    * strict all-miss PutValue throws ReferenceError instead of creating
    * a sloppy global, so with-fallback write classification depends on
@@ -1371,14 +1332,11 @@ export interface ResolveState {
   /**
    * Names any non-strict `with` region of this program uses as an
    * unresolved assignment target whose all-miss path reaches PutValue
-   * without a prior read and still writes a hidden fallback cell: a
-   * simple assignment or a destructuring or loop assignment target
-   * naming a runtime-owned intrinsic or a standard global this profile
-   * has not admitted as a value. Every other such write reaches the
-   * realm global object's property instead. ECMA-262 models the write as
-   * creating a real global binding, which a separately compiled Script
-   * fragment would not observe through the hidden cell, so a fragment
-   * that initializes one falls back to whole-Script compilation. A
+   * without a prior read: a simple assignment or a destructuring or
+   * loop assignment target. Such a write can initialize its hidden
+   * fallback cell at run time, which ECMA-262 models as creating a real
+   * global binding, so a folded `typeof` answer for the same name
+   * anywhere in the program would misreport the materialized value. A
    * compound or logical assignment and an update expression read first
    * and throw before any write, so they never enter this set.
    */

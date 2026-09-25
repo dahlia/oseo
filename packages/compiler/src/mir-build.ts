@@ -1,5 +1,5 @@
 import { specializeAddition } from "./mir-specialize.ts";
-import { anonymousDefinition, intrinsicGlobalObjectName } from "./hir.ts";
+import { anonymousDefinition } from "./hir.ts";
 import type {
   HirArrayBindingPattern,
   HirArraySpreadElement,
@@ -11,7 +11,6 @@ import type {
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
-  HirGlobalReference,
   HirObjectBindingPattern,
   HirParameter,
   HirPrivateName,
@@ -20,7 +19,6 @@ import type {
   HirSpreadArgument,
   HirStatement,
   HirWithBindingReference,
-  HirWithGlobalObjectFallback,
   HirWithReference,
 } from "./hir.ts";
 import { declaredHirBindingIds, hirBindingIdentifiers } from "./hir-build.ts";
@@ -887,85 +885,26 @@ function lowerPropertyWrite(
 }
 
 /**
- * GetBindingValue of the global object's Object Environment Record for a
- * reference that ResolveBinding already found. The property is tested
- * again before the read, since a Proxy on the global object's prototype
- * chain can answer differently; a property gone by then reads as
- * `undefined` in non-strict code and throws the missing binding's
- * ReferenceError in strict code.
+ * Preserve strict global-environment PutValue semantics around an evaluated
+ * write value. The binding must exist both when the reference is formed and
+ * when the property write occurs.
  */
-function lowerGlobalBindingValue(
-  object: number,
-  key: number,
-  reference: HirGlobalReference,
-  range: SourceRange,
-  builder: MirBuilder,
-): number {
-  const exists = lowerBinaryValues(key, "in", object, range, builder);
-  const readBlock = createMirBlock(builder);
-  const missingBlock = createMirBlock(builder);
-  const joinBlock = createMirBlock(builder);
-  const result = builder.nextValue;
-  builder.nextValue += 1;
-  joinBlock.parameters = [result];
-  builder.current.terminator = {
-    kind: "branch",
-    test: exists,
-    whenFalse: missingBlock.id,
-    whenTrue: readBlock.id,
-  };
-  builder.current = readBlock;
-  const read = lowerPropertyRead(object, key, range, builder);
-  builder.current.terminator = {
-    kind: "jump",
-    target: joinBlock.id,
-    values: [read],
-  };
-  builder.current = missingBlock;
-  const fallback = reference.strictFallback;
-  const missing =
-    fallback == null
-      ? lowerSyntheticUndefined(range, builder)
-      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder);
-  builder.current.terminator = {
-    kind: "jump",
-    target: joinBlock.id,
-    values: [missing],
-  };
-  builder.current = joinBlock;
-  return recordRoot(builder, result, range);
-}
-
-/**
- * PutValue through an identifier reference that the global Environment
- * Record resolves through the realm global object. `resolved` is
- * ResolveBinding's HasProperty answer, taken before the value existed, or
- * `undefined` when an earlier GetValue of the same reference already
- * proved it resolvable. A resolvable reference reaches SetMutableBinding,
- * which tests the property once more before the write. Strict code
- * throws the missing binding's ReferenceError when either test fails;
- * non-strict code writes regardless, which creates the property for an
- * unresolvable reference.
- */
-function lowerGlobalReferenceWrite(
-  resolved: number | undefined,
+function lowerStrictGlobalPropertyWrite(
+  initialExists: number,
   object: number,
   key: number,
   value: number,
-  reference: HirGlobalReference,
+  fallback: { readonly bindingId: number; readonly name: string },
   range: SourceRange,
   builder: MirBuilder,
 ): number {
-  const stillExists = () =>
-    lowerBinaryValues(key, "in", object, range, builder);
-  const exists =
-    resolved == null
-      ? stillExists()
-      : lowerLogicalValue(resolved, "&&", stillExists, range, builder);
-  const fallback = reference.strictFallback;
-  if (fallback == null) {
-    return lowerPropertyWrite(object, key, value, range, builder);
-  }
+  const exists = lowerLogicalValue(
+    initialExists,
+    "&&",
+    () => lowerBinaryValues(key, "in", object, range, builder),
+    range,
+    builder,
+  );
   const writeBlock = createMirBlock(builder);
   const missingBlock = createMirBlock(builder);
   const joinBlock = createMirBlock(builder);
@@ -1006,12 +945,6 @@ interface LoweredWithReference {
   readonly object: number;
   /** An Oseo boolean naming whether `object` owns the selected reference. */
   readonly property: number;
-  /**
-   * ResolveBinding's HasProperty answer from the realm global object when
-   * every object environment missed, kept for a simple assignment's
-   * PutValue. It is meaningful only where `property` is false.
-   */
-  readonly globalResolved?: number;
 }
 
 /** Keep semantic `IsObject` distinct from a removable specialization guard. */
@@ -1040,7 +973,6 @@ function lowerIsObject(
 function lowerWithReference(
   reference: Pick<HirWithReference, "name" | "objectBindingIds" | "range">,
   builder: MirBuilder,
-  globalFallback?: HirWithGlobalObjectFallback,
 ): LoweredWithReference {
   const key = lowerPropertyKey(
     { kind: "string", range: reference.range, value: reference.name },
@@ -1051,12 +983,7 @@ function lowerWithReference(
   builder.nextValue += 1;
   const selectedProperty = builder.nextValue;
   builder.nextValue += 1;
-  const globalResolved = globalFallback == null ? undefined : builder.nextValue;
-  if (globalResolved != null) builder.nextValue += 1;
-  joinBlock.parameters =
-    globalResolved == null
-      ? [selectedObject, selectedProperty]
-      : [selectedObject, selectedProperty, globalResolved];
+  joinBlock.parameters = [selectedObject, selectedProperty];
   for (const bindingId of reference.objectBindingIds) {
     const object = lowerBindingRead(
       bindingId,
@@ -1130,28 +1057,10 @@ function lowerWithReference(
     selectedBlock.terminator = {
       kind: "jump",
       target: joinBlock.id,
-      values: globalResolved == null ? [object, found] : [object, found, found],
+      values: [object, found],
     };
     builder.current = nextBlock;
   }
-  // An all-miss chain continues to the global Environment Record, whose
-  // HasBinding tests the global object's property while the reference is
-  // resolved, before a write's right-hand side runs.
-  const globalFound =
-    globalFallback == null
-      ? undefined
-      : lowerBinaryValues(
-          key,
-          "in",
-          lowerBindingRead(
-            globalFallback.objectBindingId,
-            intrinsicGlobalObjectName,
-            reference.range,
-            builder,
-          ),
-          reference.range,
-          builder,
-        );
   const noObject = lowerSyntheticUndefined(reference.range, builder);
   const noProperty = lowerExpression(
     { kind: "boolean", range: reference.range, value: false },
@@ -1160,25 +1069,12 @@ function lowerWithReference(
   builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
-    values:
-      globalFound == null
-        ? [noObject, noProperty]
-        : [noObject, noProperty, globalFound],
+    values: [noObject, noProperty],
   };
   builder.current = joinBlock;
   recordRoot(builder, selectedObject, reference.range);
   recordRoot(builder, selectedProperty, reference.range);
-  if (globalResolved != null)
-    recordRoot(builder, globalResolved, reference.range);
-  return {
-    ...includePropertiesWhen(() => {
-      if (globalResolved == null) return undefined;
-      return { globalResolved };
-    }),
-    key,
-    object: selectedObject,
-    property: selectedProperty,
-  };
+  return { key, object: selectedObject, property: selectedProperty };
 }
 
 function lowerWithRead(
@@ -1283,14 +1179,10 @@ function lowerWithDelete(
 
 function lowerWithBindingRead(
   selected: LoweredWithReference,
-  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
+  fallback: HirWithBindingReference,
   range: SourceRange,
   builder: MirBuilder,
 ): number {
-  const globalRead = "objectBindingId" in fallback ? fallback.read : undefined;
-  if ("objectBindingId" in fallback && globalRead == null) {
-    throw new Error("A with global-object read fallback has no read.");
-  }
   const propertyBlock = createMirBlock(builder);
   const fallbackBlock = createMirBlock(builder);
   const joinBlock = createMirBlock(builder);
@@ -1316,19 +1208,13 @@ function lowerWithBindingRead(
     values: [propertyValue],
   };
   builder.current = fallbackBlock;
-  const fallbackValue =
-    globalRead != null
-      ? lowerExpression(globalRead, builder)
-      : "bindingId" in fallback
-        ? lowerBindingRead(fallback.bindingId, fallback.name, range, builder)
-        : undefined;
-  if (fallbackValue == null) {
-    throw new Error("A with read fallback has no source.");
-  }
-  // The global-object read is itself a conditional over the property's
-  // presence, so it can leave the builder in its own join block; the jump
-  // belongs to whichever block the read ended in.
-  builder.current.terminator = {
+  const fallbackValue = lowerBindingRead(
+    fallback.bindingId,
+    fallback.name,
+    range,
+    builder,
+  );
+  fallbackBlock.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [fallbackValue],
@@ -1337,44 +1223,9 @@ function lowerWithBindingRead(
   return recordRoot(builder, value, range);
 }
 
-/**
- * Write the realm global object's property behind an all-miss `with`
- * chain. Only non-strict code reaches it, so the write is the ordinary
- * non-throwing PutValue of a global identifier reference: `resolved` is
- * the chain's ResolveBinding answer, or `undefined` after a GetValue
- * already found the reference.
- */
-function lowerWithGlobalObjectWrite(
-  fallback: HirWithGlobalObjectFallback,
-  resolved: number | undefined,
-  value: number,
-  range: SourceRange,
-  builder: MirBuilder,
-): number {
-  const object = lowerBindingRead(
-    fallback.objectBindingId,
-    intrinsicGlobalObjectName,
-    range,
-    builder,
-  );
-  const key = lowerExpression(
-    { kind: "string", range, value: fallback.name },
-    builder,
-  );
-  return lowerGlobalReferenceWrite(
-    resolved,
-    object,
-    key,
-    value,
-    {},
-    range,
-    builder,
-  );
-}
-
 function lowerWithBindingWrite(
   selected: LoweredWithReference,
-  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
+  fallback: HirWithBindingReference,
   value: number,
   range: SourceRange,
   builder: MirBuilder,
@@ -1405,19 +1256,12 @@ function lowerWithBindingWrite(
     values: [propertyResult],
   };
   builder.current = fallbackBlock;
-  const fallbackResult =
-    "objectBindingId" in fallback
-      ? lowerWithGlobalObjectWrite(
-          fallback,
-          selected.globalResolved,
-          value,
-          range,
-          builder,
-        )
-      : lowerBindingWrite({ ...fallback, range }, value, builder);
-  // The global-object write branches on its binding tests, so the jump
-  // belongs to whichever block the write ended in.
-  builder.current.terminator = {
+  const fallbackResult = lowerBindingWrite(
+    { ...fallback, range },
+    value,
+    builder,
+  );
+  fallbackBlock.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [fallbackResult],
@@ -3637,13 +3481,7 @@ function lowerExpression(
     return lowerWithRead(expression, builder, false).value;
   }
   if (expression.kind === "with-set") {
-    const selected = lowerWithReference(
-      expression,
-      builder,
-      "objectBindingId" in expression.fallback
-        ? expression.fallback
-        : undefined,
-    );
+    const selected = lowerWithReference(expression, builder);
     const value = lowerExpression(expression.value, builder);
     return lowerWithBindingWrite(
       selected,
@@ -4595,23 +4433,21 @@ function lowerExpression(
       operand,
       builder,
     );
-    // ResolveBinding tests a global identifier's property before the
-    // right side runs.
-    const resolved =
-      expression.globalReference == null
+    const initialExists =
+      expression.strictGlobalFallback == null
         ? undefined
         : lowerBinaryValues(keyInput, "in", object, expression.range, builder);
     // PutValue converts the key, so an assignment holds the key
     // expression's raw value until the right side has been evaluated.
     const value = lowerExpression(expression.value, builder);
     const key = convertPropertyKey(keyInput, expression.key.range, builder);
-    if (expression.globalReference != null) {
-      return lowerGlobalReferenceWrite(
-        resolved,
+    if (initialExists != null && expression.strictGlobalFallback != null) {
+      return lowerStrictGlobalPropertyWrite(
+        initialExists,
         object,
         key,
         value,
-        expression.globalReference,
+        expression.strictGlobalFallback,
         expression.range,
         builder,
       );
@@ -4661,26 +4497,18 @@ function lowerExpression(
       operand,
       builder,
     );
-    // A global identifier reaches here only after ResolveBinding found
-    // it, so its read is GetBindingValue and its write SetMutableBinding.
-    const globalReference = expression.globalReference;
+    const initialExists =
+      expression.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(keyInput, "in", object, expression.range, builder);
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
-    const current =
-      globalReference == null
-        ? lowerPropertyRead(
-            object,
-            readKey,
-            expression.range,
-            builder,
-            superReceiver,
-          )
-        : lowerGlobalBindingValue(
-            object,
-            readKey,
-            globalReference,
-            expression.range,
-            builder,
-          );
+    const current = lowerPropertyRead(
+      object,
+      readKey,
+      expression.range,
+      builder,
+      superReceiver,
+    );
     return lowerAssignmentValue(
       current,
       expression.operator,
@@ -4691,13 +4519,13 @@ function lowerExpression(
           expression.key.range,
           builder,
         );
-        return globalReference != null
-          ? lowerGlobalReferenceWrite(
-              undefined,
+        return initialExists != null && expression.strictGlobalFallback != null
+          ? lowerStrictGlobalPropertyWrite(
+              initialExists,
               object,
               writeKey,
               value,
-              globalReference,
+              expression.strictGlobalFallback,
               expression.range,
               builder,
             )
@@ -4724,9 +4552,16 @@ function lowerExpression(
       operand,
       builder,
     );
-    // A global identifier reaches here only after ResolveBinding found
-    // it, so its read is GetBindingValue and its write SetMutableBinding.
-    const globalReference = expression.globalReference;
+    const initialExists =
+      expression.strictGlobalFallback == null
+        ? undefined
+        : lowerBinaryValues(
+            keyInput,
+            "in",
+            objectInput,
+            expression.range,
+            builder,
+          );
     // A `super` operand is the home object's prototype, which needs no
     // RequireObjectCoercible: a nullish one reports its own TypeError
     // from the read that follows, as the specified GetValue does.
@@ -4735,22 +4570,13 @@ function lowerExpression(
         ? lowerObjectCoercible(objectInput, expression.object.range, builder)
         : objectInput;
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
-    const current =
-      globalReference == null
-        ? lowerPropertyRead(
-            object,
-            readKey,
-            expression.range,
-            builder,
-            superReceiver,
-          )
-        : lowerGlobalBindingValue(
-            object,
-            readKey,
-            globalReference,
-            expression.range,
-            builder,
-          );
+    const current = lowerPropertyRead(
+      object,
+      readKey,
+      expression.range,
+      builder,
+      superReceiver,
+    );
     return lowerUpdateValue(
       current,
       expression.operator,
@@ -4761,13 +4587,13 @@ function lowerExpression(
           expression.key.range,
           builder,
         );
-        return globalReference != null
-          ? lowerGlobalReferenceWrite(
-              undefined,
+        return initialExists != null && expression.strictGlobalFallback != null
+          ? lowerStrictGlobalPropertyWrite(
+              initialExists,
               object,
               writeKey,
               value,
-              globalReference,
+              expression.strictGlobalFallback,
               expression.range,
               builder,
             )
@@ -5625,18 +5451,18 @@ function lowerForHeadTarget(
     operand,
     builder,
   );
-  const resolved =
-    target.globalReference == null
+  const initialExists =
+    target.strictGlobalFallback == null
       ? undefined
       : lowerBinaryValues(keyInput, "in", object, target.range, builder);
   const key = convertPropertyKey(keyInput, target.key.range, builder);
-  if (target.globalReference != null) {
-    lowerGlobalReferenceWrite(
-      resolved,
+  if (initialExists != null && target.strictGlobalFallback != null) {
+    lowerStrictGlobalPropertyWrite(
+      initialExists,
       object,
       key,
       value,
-      target.globalReference,
+      target.strictGlobalFallback,
       target.range,
       builder,
     );
@@ -6138,13 +5964,16 @@ function lowerBindingTarget(
         ? lowerObjectCoercible(prepared.object, pattern.object.range, builder)
         : prepared.object;
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
-    if (prepared.globalReference != null) {
-      lowerGlobalReferenceWrite(
-        prepared.resolved,
+    if (
+      prepared.initialExists != null &&
+      prepared.strictGlobalFallback != null
+    ) {
+      lowerStrictGlobalPropertyWrite(
+        prepared.initialExists,
         object,
         key,
         value,
-        prepared.globalReference,
+        prepared.strictGlobalFallback,
         pattern.range,
         builder,
       );
@@ -6286,9 +6115,11 @@ type LoweredAssignmentReference =
       readonly kind: "property";
       readonly object: number;
       readonly superReceiver?: number;
-      /** ResolveBinding's answer for a global identifier leaf. */
-      readonly resolved?: number;
-      readonly globalReference?: HirGlobalReference;
+      readonly initialExists?: number;
+      readonly strictGlobalFallback?: {
+        readonly bindingId: number;
+        readonly name: string;
+      };
     }
   | {
       readonly kind: "private";
@@ -6312,8 +6143,8 @@ function lowerAssignmentReference(
       operand,
       builder,
     );
-    const resolved =
-      pattern.globalReference == null
+    const initialExists =
+      pattern.strictGlobalFallback == null
         ? undefined
         : lowerBinaryValues(keyInput, "in", object, pattern.range, builder);
     return {
@@ -6327,15 +6158,15 @@ function lowerAssignmentReference(
         };
       }),
       ...includePropertiesWhen(() => {
-        if (resolved == null) return undefined;
+        if (initialExists == null) return undefined;
         return {
-          resolved,
+          initialExists,
         };
       }),
       ...includePropertiesWhen(() => {
-        if (pattern.globalReference == null) return undefined;
+        if (pattern.strictGlobalFallback == null) return undefined;
         return {
-          globalReference: pattern.globalReference,
+          strictGlobalFallback: pattern.strictGlobalFallback,
         };
       }),
     };

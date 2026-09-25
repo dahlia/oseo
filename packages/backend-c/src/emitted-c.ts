@@ -1069,10 +1069,6 @@ export const emittedC = {
       ["result = oseo_environment_create(context, "],
       ["u);"],
     ],
-    resultAssignOseoUnresolvableCellCreate: [
-      ["result = oseo_unresolvable_cell_create(context, ", '"'],
-      ['");'],
-    ],
     resultAssignOseoFunctionEnvironmentContext: [
       ["result = oseo_function_environment(context, call", "ee);"],
     ],
