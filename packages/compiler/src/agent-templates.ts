@@ -9,7 +9,7 @@ import type {
  * The global name of the test262 host object a Script compiled for the
  * test262 host reads.
  */
-const test262HostGlobalName = "$262";
+export const test262HostGlobalName = "$262";
 
 /**
  * One `$262.agent.start` source template found in a Script: the cooked

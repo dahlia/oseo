@@ -155,7 +155,14 @@ which the host object installed on the global object resolves; without the
 host it throws the ReferenceError of an unresolvable name. With the CLI's
 `--test262-host` option the compiler also compiles every
 `$262.agent.start` whose argument is a template literal or a string literal
-into an agent program linked beside the main unit. Each substitution becomes
+into an agent program linked beside the main unit. Only a call whose `$262`
+resolves to the global object's property, directly or through a Script-level
+`var` or function binding, counts; a call through a lexical binding or an
+intervening `with` object is an ordinary call whose argument is not agent
+source. Each agent program is a translation unit of its own that
+repeats the main unit's file-scope definitions, so `--emit-c`, which prints
+one unit, rejects a program with an agent template with `OSEO3001`; native
+execution builds and links every unit. Each substitution becomes
 a hole that the agent program reads through `oseo_agent_hole`. At run time
 `start` matches its source string against the templates: the literal runs
 must match exactly and each hole must hold a decimal integer literal without

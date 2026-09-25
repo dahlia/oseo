@@ -1228,28 +1228,38 @@ test("compiles agent programs beside a test262 host program", () => {
   // The repeated template compiles once, and the string literal is a
   // template without holes.
   assert.equal(mir.stdout.match(/agent-hole agent hole 0/gu)?.length, 1);
+  // Each agent program is a translation unit of its own that repeats the
+  // main unit's file-scope definitions, so one printed unit cannot hold
+  // them, and --emit-c rejects the program instead of printing C that
+  // defines the same names twice.
   const emitted = runCli({
     args: ["--test262-host", "--emit-c", "agents.js"],
     source: agentSource,
     sourceId: "agents.js",
     version: "0.0.0",
   });
-  assert.equal(emitted.exitStatus, 0, emitted.stderr);
-  assert.match(
-    emitted.stdout,
-    /oseo_test262_host_install\(\n {8}&context, oseo_agent_programs, 2u\)/u,
+  assert.equal(emitted.exitStatus, 1);
+  assert.equal(emitted.stdout, "");
+  assert.equal(
+    emitted.stderr,
+    "agents.js:1:1: error[OSEO3001]: The test262 host program links " +
+      "agent programs as separate translation units, which --emit-c " +
+      "cannot print as one; run it natively instead.\n",
   );
+  // A host program without an agent template is still one unit.
+  const agentless = runCli({
+    args: ["--test262-host", "--emit-c", "agentless.js"],
+    source: "console.log(typeof $262.agent.getReport);",
+    sourceId: "agentless.js",
+    version: "0.0.0",
+  });
+  assert.equal(agentless.exitStatus, 0, agentless.stderr);
   assert.match(
-    emitted.stdout,
-    /OseoResult oseo_agent_program_0\(OseoContext \*context\)/u,
+    agentless.stdout,
+    /oseo_test262_host_install\(\n {8}&context, NULL, 0u\)/u,
   );
-  assert.match(
-    emitted.stdout,
-    /OseoResult oseo_agent_program_1\(OseoContext \*context\)/u,
-  );
-  assert.match(emitted.stdout, /result = oseo_agent_hole\(context, 0u\);/u);
-  assert.match(emitted.stdout, /"agents\.js#agent-1", 17u\}/u);
-  assert.doesNotMatch(emitted.stdout, /oseo_agent_program_2/u);
+  assert.equal(agentless.stdout.match(/^int main\(/gmu)?.length, 1);
+  assert.doesNotMatch(agentless.stdout, /oseo_agent_program_0/u);
 
   const plain = runCli({
     args: ["--emit-c", "plain.js"],
@@ -1323,6 +1333,56 @@ test("rejects agent templates whose holes are not literal positions", () => {
   assert.match(escaped.stdout, /agent hole 0/u);
 });
 
+test("collects agent templates only through the host $262", () => {
+  // Each start call below goes through a `$262` that is not the host
+  // object, so its argument is ordinary data rather than agent source,
+  // and text that is not JavaScript must not become an agent program.
+  const notSource = '"this is ) not JavaScript"';
+  for (const source of [
+    `let $262 = { agent: { start() {} } };\n$262.agent.start(${notSource});`,
+    `function f($262) { $262.agent.start(${notSource}); }`,
+    `function f() { $262.agent.start(${notSource}); var $262; }`,
+    `function f() { const $262 = {}; { $262.agent.start(${notSource}); } }`,
+    `with ({}) { $262.agent.start(${notSource}); }`,
+  ]) {
+    const shadowed = runCli({
+      args: ["--test262-host", "--dump-mir", "shadowed.js"],
+      source,
+      sourceId: "shadowed.js",
+      version: "0.0.0",
+    });
+    assert.equal(shadowed.exitStatus, 0, `${source}\n${shadowed.stderr}`);
+    assert.doesNotMatch(shadowed.stdout, /shadowed\.js#agent-0/u, source);
+  }
+  // A Script-level `var` binding is the global object's property, which
+  // still holds the host object, so a call through it is the host call.
+  for (const source of [
+    'var $262;\n$262.agent.start("$262.agent.leaving();");',
+    'var $262;\nfunction f() { $262.agent.start("$262.agent.leaving();"); }',
+  ]) {
+    const global = runCli({
+      args: ["--test262-host", "--dump-mir", "global.js"],
+      source,
+      sourceId: "global.js",
+      version: "0.0.0",
+    });
+    assert.equal(global.exitStatus, 0, `${source}\n${global.stderr}`);
+    assert.match(global.stdout, /global\.js#agent-0/u, source);
+  }
+  // The host call beside a shadowed one is still an agent program.
+  const mixed = runCli({
+    args: ["--test262-host", "--dump-mir", "mixed.js"],
+    source:
+      `function f($262) { $262.agent.start(${notSource}); }\n` +
+      '$262.agent.start("$262.agent.leaving();");',
+    sourceId: "mixed.js",
+    version: "0.0.0",
+  });
+  assert.equal(mixed.exitStatus, 0, mixed.stderr);
+  assert.match(mixed.stdout, /mixed\.js#agent-0/u);
+  assert.doesNotMatch(mixed.stdout, /mixed\.js#agent-1/u);
+});
+
 test("links each agent unit beside the main unit", async () => {
   const writes = new Map<string, string>();
   const inputs: NativeBuildInput[] = [];
@@ -1362,7 +1422,25 @@ test("links each agent unit beside the main unit", async () => {
     "/work/agent-0.c",
     "/work/agent-1.c",
   ]);
-  assert.match(writes.get("/work/agent-1.c") ?? "", /oseo_agent_program_1/u);
+  const main = writes.get("/work/generated.c") ?? "";
+  assert.match(
+    main,
+    /oseo_test262_host_install\(\n {8}&context, oseo_agent_programs, 2u\)/u,
+  );
+  assert.match(main, /"agents\.js#agent-1", 17u\}/u);
+  assert.doesNotMatch(main, /oseo_agent_program_2/u);
+  assert.match(
+    writes.get("/work/agent-0.c") ?? "",
+    /OseoResult oseo_agent_program_0\(OseoContext \*context\)/u,
+  );
+  assert.match(
+    writes.get("/work/agent-0.c") ?? "",
+    /result = oseo_agent_hole\(context, 0u\);/u,
+  );
+  assert.match(
+    writes.get("/work/agent-1.c") ?? "",
+    /OseoResult oseo_agent_program_1\(OseoContext \*context\)/u,
+  );
   const moduleGoal = await runNativeCli(
     {
       args: ["--test262-host", "--module", "agents.js"],

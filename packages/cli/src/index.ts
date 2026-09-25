@@ -321,7 +321,7 @@ function compileCliSource(
       hostDiagnostic(sourceId, "The compiler did not produce MIR."),
     );
   }
-  // A test262 host program prints each agent program after the main one.
+  // A test262 host MIR dump prints each agent program after the main one.
   const programs = [compiled.mir, ...(compiled.agents ?? [])];
   if (mode === "dump-mir") {
     return {
@@ -331,12 +331,24 @@ function compileCliSource(
     };
   }
   if (mode === "emit-c") {
+    // `--emit-c` prints one translation unit that compiles on its own,
+    // while each agent program is a unit of its own whose file-scope
+    // definitions repeat the main unit's (ADR 0026), so no single unit
+    // can hold them; only native execution links them side by side.
+    if (programs.length > 1) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          "The test262 host program links agent programs as separate " +
+            "translation units, which --emit-c cannot print as one; " +
+            "run it natively instead.",
+        ),
+      );
+    }
     return {
       exitStatus: 0,
       stderr: "",
-      stdout: programs
-        .map((program) => defaultComponents.backend.emit(program).source)
-        .join("\n"),
+      stdout: defaultComponents.backend.emit(compiled.mir).source,
     };
   }
   return diagnosticResult(

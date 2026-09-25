@@ -1,6 +1,7 @@
 import {
   agentTemplateSegments,
   isAgentStartTarget,
+  test262HostGlobalName,
 } from "./agent-templates.ts";
 import {
   anonymousDefinition,
@@ -604,6 +605,26 @@ function callsDynamicFunctionConstructor(
   if (name !== "Function") return false;
   const resolution = resolveName(scopes, state, name);
   return resolution.binding == null && resolution.objectBindingIds.length === 0;
+}
+
+/**
+ * Whether `$262` here reads the global object's property, which the host
+ * object occupies unless the program replaces it. A Script-level `var` or
+ * function binding is that property, but a lexical binding or an
+ * intervening `with` object may hold any value, so a `start` call through
+ * one is an ordinary call whose argument is not agent source and must not
+ * be compiled as an agent program.
+ */
+function resolvesToHostGlobal(
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): boolean {
+  const resolution = resolveName(scopes, state, test262HostGlobalName);
+  return (
+    resolution.objectBindingIds.length === 0 &&
+    (resolution.binding == null ||
+      state.globalObjectBindingIds.has(resolution.binding.id))
+  );
 }
 
 /** Resolves one optional chain without inflating the recursive dispatcher. */
@@ -1620,7 +1641,11 @@ function resolveExpression(
     );
     return undefined;
   }
-  if (state.agentTemplates != null && isAgentStartTarget(expression.target)) {
+  if (
+    state.agentTemplates != null &&
+    isAgentStartTarget(expression.target) &&
+    resolvesToHostGlobal(scopes, state)
+  ) {
     const segments = agentTemplateSegments(expression.arguments[0]);
     const key = JSON.stringify(segments);
     if (segments != null && !state.agentTemplates.has(key)) {
