@@ -39,6 +39,11 @@ function includePropertiesWhen<const Properties extends object>(
 
 /** Result of the host-neutral compiler pipeline. */
 export interface CompilationResult {
+  /**
+   * The agent programs a Script compiled for the test262 host can start,
+   * each linked beside `mir` as a unit of its own.
+   */
+  readonly agents?: readonly MirProgram[];
   readonly diagnostics: readonly Diagnostic[];
   readonly hir?: HirProgram;
   readonly mir?: MirProgram;

@@ -1,5 +1,6 @@
+import type { AgentSourceTemplate } from "./agent-templates.ts";
 import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
-import type { Diagnostic, SourceRange } from "./source.ts";
+import type { ByteRange, Diagnostic, SourceRange } from "./source.ts";
 import type {
   AssignmentOperator,
   BinaryOperator,
@@ -848,6 +849,15 @@ export type HirExpression =
       readonly kind: "iterator-intrinsic";
     })
   | (LocatedSyntax & {
+      /**
+       * One numeric hole of an agent program compiled from a
+       * `$262.agent.start` source template: the Number the started
+       * agent's source text carried at this position.
+       */
+      readonly index: number;
+      readonly kind: "agent-hole";
+    })
+  | (LocatedSyntax & {
       readonly kind: "symbol-intrinsic";
     })
   | (LocatedSyntax & {
@@ -1295,6 +1305,11 @@ export interface HirGlobalObjectBinding extends HirGlobalBinding {
 
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
+  /**
+   * The distinct `$262.agent.start` source templates of a Script resolved
+   * for the test262 host, in the order resolution met them.
+   */
+  readonly agentTemplates?: readonly AgentSourceTemplate[];
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
@@ -1368,6 +1383,19 @@ export interface ResolveState {
     }
   >;
   readonly hirFunctions: HirFunction[];
+  /**
+   * The placeholder names an agent program's numeric holes use, mapped to
+   * each hole's index, the byte span of its inserted token, and the number
+   * of identifier reads resolved to it.
+   */
+  readonly agentHoles?:
+    | Map<string, { index: number; reads: number; readonly span: ByteRange }>
+    | undefined;
+  /**
+   * The `$262.agent.start` templates found so far, keyed by their runs,
+   * when this resolution collects them for the test262 host.
+   */
+  readonly agentTemplates?: Map<string, AgentSourceTemplate> | undefined;
   /** The hidden realm global-object cell used by mutable intrinsic reads. */
   intrinsicGlobalObjectBinding?: Binding | undefined;
   /**

@@ -1,0 +1,3 @@
+version: 1
+id: atomics-and-shared-memory
+record: docs/language-profile-m5/families/atomics-and-shared-memory.yaml

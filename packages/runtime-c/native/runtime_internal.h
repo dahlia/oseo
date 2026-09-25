@@ -10,6 +10,7 @@
 
 #include "oseo_runtime.h"
 
+#include <stdatomic.h>
 #include <string.h>
 
 #define OSEO_CANONICAL_NAN UINT64_C(0x7ff8000000000000)
@@ -978,6 +979,26 @@
 #define OSEO_BOOLEAN_VALUE_OF_CODE_ID \
     (OSEO_BOOLEAN_CODE_ID_RANGE_LAST - 2u)
 
+/*
+ * The test262 host's `$262.agent` functions. The main agent's object holds
+ * the first five and every other agent's object holds the last five, with
+ * `sleep` and `monotonicNow` in both.
+ */
+#define OSEO_AGENT_CODE_ID_RANGE_INDEX ((size_t)28u)
+#define OSEO_AGENT_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_AGENT_CODE_ID_RANGE_INDEX)
+#define OSEO_AGENT_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_AGENT_CODE_ID_RANGE_INDEX)
+#define OSEO_AGENT_START_CODE_ID OSEO_AGENT_CODE_ID_RANGE_LAST
+#define OSEO_AGENT_BROADCAST_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_AGENT_GET_REPORT_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_AGENT_SLEEP_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_AGENT_MONOTONIC_NOW_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_AGENT_RECEIVE_BROADCAST_CODE_ID \
+    (OSEO_AGENT_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_AGENT_REPORT_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_AGENT_LEAVING_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 7u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1646,6 +1667,30 @@ typedef struct {
 } OseoPromise;
 
 /*
+ * One Shared Data Block. Unlike an ArrayBuffer's block it has no single
+ * owner: every SharedArrayBuffer object that views it, in whichever agent
+ * of the cluster created or received it, holds one reference, and the last
+ * release frees it. `byte_length` is the block's own
+ * [[ArrayBufferByteLengthData]], so a grow in one agent is the length every
+ * other agent's buffer object reads, and `growable` and `max_byte_length`
+ * let an agent that receives the block recreate the same buffer shape. The
+ * bytes follow the header in the same allocation, reserved at the growable
+ * maximum, so the block never moves. Agents of one cluster take turns on
+ * one executing thread, and every read and write of the header or the
+ * bytes happens on the thread that holds that turn, so the handoff's lock
+ * orders them; the reference count is atomic only so that no release ever
+ * depends on that argument.
+ */
+typedef struct {
+    _Atomic size_t references;
+    size_t byte_length;
+    /* [[ArrayBufferMaxByteLength]] of a growable block, else 0. */
+    size_t max_byte_length;
+    bool growable;
+    uint8_t bytes[];
+} OseoSharedBlock;
+
+/*
  * One ArrayBuffer. The Data Block lives outside the traced heap because
  * it holds bytes rather than values, so `data` is plain host memory that
  * exactly one buffer owns for the whole of its life: nothing else stores
@@ -1661,7 +1706,9 @@ typedef struct {
  * `byte_length` is [[ArrayBufferByteLength]] and is 0 once detached. A
  * resizable buffer allocates `max_byte_length` bytes up front, as
  * AllocateArrayBuffer specifies, so `resize` moves `byte_length` inside
- * one stable block and never reallocates.
+ * one stable block and never reallocates. A SharedArrayBuffer is the one
+ * exception to the single owner: its bytes belong to the referenced
+ * OseoSharedBlock above, which outlives any one buffer object.
  */
 typedef struct {
     OseoOrdinaryObject ordinary;
@@ -1674,11 +1721,14 @@ typedef struct {
     /*
      * IsSharedArrayBuffer. A shared buffer is a SharedArrayBuffer: its
      * block is a Shared Data Block, `resizable` means growable, it is
-     * never detached, and `byte_length` only grows. One agent owns the
-     * whole agent cluster, so no second agent can ever reach the block,
-     * and ownership follows the same single-owner rule as above.
+     * never detached, and its length only grows. `block` is the shared
+     * block this object references, and `data` points at its bytes, or
+     * is NULL for an empty block. The block, not this object, owns the
+     * length: read it through `array_buffer_current_length`,
+     * because another agent's buffer object may have grown it.
      */
     bool shared;
+    OseoSharedBlock *block;
 } OseoArrayBuffer;
 
 /*
@@ -2011,16 +2061,18 @@ typedef enum {
 } OseoAtomicsOperation;
 
 /*
- * One Waiter Record of an `Atomics.waitAsync` call. The single agent owns
- * the whole agent cluster, so the WaiterList store is one FIFO list on the
- * context and a waiter's WaiterList is the pair of its `buffer` identity
- * and `byte_index`: no second agent can alias a Shared Data Block, so the
- * buffer object names its block exactly. The list roots every waiter it
- * holds, and a waiter roots its buffer, its promise, and the timeout job
- * in `timer`, which is undefined for an infinite timeout. `listed` is
- * whether the waiter is still in its list, which the timeout job reads.
- * `Atomics.wait` never creates one: a waiting agent is suspended, so no
- * code in this agent can run to notify it.
+ * One Waiter Record of an `Atomics.waitAsync` call. A waiter's WaiterList
+ * is the pair of its Shared Data Block and `byte_index`. The context's
+ * FIFO list roots every pending waiter of this agent, and a waiter roots
+ * its buffer, which keeps the block alive, its promise, and the timeout
+ * job in `timer`, which is undefined for an infinite timeout. `listed` is
+ * whether the waiter is still pending, which the timeout job reads.
+ *
+ * In an ordinary program this agent is the whole cluster, the context
+ * list is the WaiterList store, and `Atomics.wait` never creates a
+ * waiter: a waiting agent is suspended, so no code in the cluster can run
+ * to notify it. In a multi-agent cluster the store is the cluster's, and
+ * `record` is this waiter's entry there, which runtime_agent.c owns.
  */
 typedef struct {
     OseoHeapObject header;
@@ -2028,6 +2080,8 @@ typedef struct {
     OseoValue buffer;
     OseoValue promise;
     OseoValue timer;
+    const OseoSharedBlock *block;
+    void *record;
     size_t byte_index;
     bool listed;
 } OseoAtomicsWaiter;
@@ -2400,6 +2454,17 @@ static inline bool is_array_buffer(OseoValue value) {
 }
 static inline OseoArrayBuffer *array_buffer_object(OseoValue value) {
     return (OseoArrayBuffer *)heap_object(value);
+}
+/*
+ * [[ArrayBufferByteLength]]. A shared buffer reads it from its Shared Data
+ * Block, which every agent's buffer object for that block observes.
+ */
+static inline size_t array_buffer_current_length(
+    const OseoArrayBuffer *buffer
+) {
+    return buffer->block != NULL
+        ? buffer->block->byte_length
+        : buffer->byte_length;
 }
 static inline bool is_data_view(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -2852,6 +2917,104 @@ OseoResult oseo_internal_atomics_timeout_enqueue(
 OseoResult oseo_internal_atomics_waiter_timeout(
     OseoContext *context,
     OseoValue waiter
+);
+/*
+ * Resolves one pending waitAsync waiter of this agent to "ok" after
+ * another agent's `Atomics.notify` removed it from the cluster store: the
+ * waiter leaves the context list and its timeout job is canceled.
+ */
+OseoResult oseo_internal_atomics_waiter_notified(
+    OseoContext *context,
+    OseoValue waiter
+);
+
+/* Shared Data Block references, owned by runtime_array_buffer.c. */
+void oseo_internal_shared_block_retain(OseoSharedBlock *block);
+void oseo_internal_shared_block_release(OseoSharedBlock *block);
+/*
+ * A new %SharedArrayBuffer.prototype%-prototyped buffer of this realm
+ * over an existing block, which it references.
+ */
+OseoResult oseo_internal_shared_array_buffer_from_block(
+    OseoContext *context,
+    OseoSharedBlock *block
+);
+
+/*
+ * Agent cluster operations, owned by runtime_agent.c. Every one of them
+ * is a no-op or reports "nothing to do" for a context whose `agent` is
+ * NULL, which is the single agent of an ordinary program.
+ *
+ * Agents of one cluster take turns on one executing thread: exactly one
+ * agent evaluates at a time, and the turn passes only at the points below.
+ * `yield` offers the turn to the next ready agent and returns once this
+ * agent holds it again.
+ */
+OseoResult oseo_internal_agent_yield(OseoContext *context);
+/*
+ * Atomics.wait for an agent of a multi-agent cluster: lists a blocking
+ * waiter on the block and index, suspends the agent until a notification
+ * or the timeout in milliseconds, and reports which ended it.
+ */
+OseoResult oseo_internal_agent_suspend(
+    OseoContext *context,
+    const OseoSharedBlock *block,
+    size_t byte_index,
+    double timeout,
+    bool *notified
+);
+/* Lists one new waitAsync waiter of this agent in the cluster store. */
+OseoResult oseo_internal_agent_list_waiter(
+    OseoContext *context,
+    OseoValue waiter
+);
+/*
+ * Removes one waitAsync waiter of this agent from the cluster store on
+ * timeout, reporting false when a notification already removed it.
+ */
+bool oseo_internal_agent_unlist_waiter(OseoContext *context, OseoValue waiter);
+/*
+ * Removes the first waiter on the block and index from the cluster store,
+ * reporting whether there was one. A blocking waiter wakes and another
+ * agent's waitAsync waiter resolves in that agent later; this agent's own
+ * waitAsync waiter is returned in `own_waiter` for synchronous resolution.
+ */
+bool oseo_internal_agent_notify_one(
+    OseoContext *context,
+    const OseoSharedBlock *block,
+    size_t byte_index,
+    OseoValue *own_waiter
+);
+/*
+ * Takes this agent's incoming work: a broadcast becomes a due timer
+ * callback task, and each waiter another agent notified resolves to "ok".
+ * `ran` reports whether anything arrived.
+ */
+OseoResult oseo_internal_agent_receive(OseoContext *context, bool *ran);
+/* Whether an agent's event loop with no due work must keep waiting. */
+bool oseo_internal_agent_keeps_alive(OseoContext *context);
+/*
+ * Gives up the turn until incoming work arrives or, when `has_deadline`
+ * is set, the monotonic `deadline` in whole milliseconds passes.
+ */
+OseoResult oseo_internal_agent_idle(
+    OseoContext *context,
+    bool has_deadline,
+    uint64_t deadline
+);
+/*
+ * The cluster's part of destroying a realm. The main agent keeps the turn
+ * for good, so no other agent evaluates while the process exits.
+ */
+void oseo_internal_agent_context_destroy(OseoContext *context);
+OseoResult oseo_internal_agent_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
 );
 /* Materializes %Set%, %Set.prototype%, and %SetIteratorPrototype%. */
 OseoResult oseo_internal_set_intrinsic(OseoContext *context);

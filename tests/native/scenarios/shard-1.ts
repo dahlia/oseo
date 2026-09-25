@@ -5,6 +5,7 @@ import process from "node:process";
 
 import { runNativeCli } from "../../native-cli.ts";
 import type { NativeScenarioContext } from "../scenario.ts";
+import { runAgentScenarios } from "./agents.ts";
 
 /**
  * A global Script whose top-level declarations are observed through its
@@ -1215,4 +1216,6 @@ throw boom;
   assert.equal(allocationFailure.exitStatus, 1);
   assert.equal(allocationFailure.stdout, "");
   assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+
+  await runAgentScenarios(context);
 }

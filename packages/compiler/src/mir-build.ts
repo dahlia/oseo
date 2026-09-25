@@ -4213,6 +4213,34 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "agent-hole") {
+    // A BigInt hole allocates its value from the literal's digits.
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "agent hole allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      agentHole: expression.index,
+      arguments: [],
+      detail: `agent hole ${expression.index}`,
+      id,
+      kind: "agent-hole",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "iterator-intrinsic") {
     appendMirMetadata(
       builder,

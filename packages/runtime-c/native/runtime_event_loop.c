@@ -208,10 +208,31 @@ static OseoResult wait_for_due_timer(OseoContext *context) {
             context->clock_milliseconds = now;
             break;
         }
-        result = oseo_internal_clock_wait_until(context, timer->deadline);
+        /* An agent of a multi-agent cluster gives up its turn while it
+         * waits, so the other agents keep running. */
+        result = context->agent != NULL
+            ? oseo_internal_agent_idle(context, true, timer->deadline)
+            : oseo_internal_clock_wait_until(context, timer->deadline);
         if (result.status != OSEO_STATUS_NORMAL) return result;
     }
     return normal(oseo_undefined());
+}
+
+/*
+ * Unlinks canceled timers at the head and reports the earliest live
+ * deadline, or false when no live timer remains.
+ */
+static bool next_timer_deadline(OseoContext *context, uint64_t *deadline) {
+    while (tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
+        OseoTimer *timer = timer_object(context->timer_head);
+        if (!timer->canceled) {
+            *deadline = timer->deadline;
+            return true;
+        }
+        context->timer_head = timer->next;
+        timer->next = oseo_undefined();
+    }
+    return false;
 }
 
 /*
@@ -508,6 +529,53 @@ static OseoResult entry_promise_completion(
     return (OseoResult){OSEO_STATUS_THROW, promise->result};
 }
 
+/*
+ * One step of the event loop of an agent in a multi-agent cluster.
+ * Incoming work from other agents comes first: a waitAsync waiter another
+ * agent notified resolves, and a retrieved broadcast becomes a due timer
+ * callback. Then a due timer runs as usual. With nothing due, the agent
+ * gives up its turn until its next deadline or incoming work, and with no
+ * timer left it keeps waiting only while the cluster could still hand it
+ * work; otherwise `finished` reports that the loop is over.
+ */
+static OseoResult run_agent_turn(
+    OseoContext *context,
+    OseoValue entry,
+    bool *finished
+) {
+    bool ran = false;
+    OseoResult result = oseo_internal_agent_receive(context, &ran);
+    if (result.status == OSEO_STATUS_NORMAL && ran) {
+        result = oseo_jobs_drain(context);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_rejection_checkpoint(context);
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        uint64_t deadline = 0u;
+        uint64_t now = 0u;
+        if (next_timer_deadline(context, &deadline)) {
+            result = oseo_internal_clock_now(context, &now);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = now >= deadline
+                    ? run_timer_turn(context, oseo_undefined())
+                    : oseo_internal_agent_idle(context, true, deadline);
+            }
+        } else if (oseo_internal_agent_keeps_alive(context)) {
+            result = oseo_internal_agent_idle(context, false, 0u);
+        } else {
+            *finished = true;
+            return normal(oseo_undefined());
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = run_finalization_turns(context, oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = entry_promise_completion(context, entry);
+    }
+    return result;
+}
+
 OseoResult oseo_event_loop_run(
     OseoContext *context,
     OseoValue entry_promise
@@ -529,6 +597,10 @@ OseoResult oseo_event_loop_run(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = entry_promise_completion(context, frame.slots[0]);
+    }
+    bool finished = context->agent == NULL;
+    while (result.status == OSEO_STATUS_NORMAL && !finished) {
+        result = run_agent_turn(context, frame.slots[0], &finished);
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {

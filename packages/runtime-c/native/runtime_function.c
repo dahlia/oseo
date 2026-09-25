@@ -193,6 +193,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_BOOLEAN_CODE_ID_RANGE_FIRST,
      OSEO_BOOLEAN_CODE_ID_RANGE_LAST,
      oseo_internal_boolean_builtin_dispatch},
+    {OSEO_AGENT_CODE_ID_RANGE_FIRST,
+     OSEO_AGENT_CODE_ID_RANGE_LAST,
+     oseo_internal_agent_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {

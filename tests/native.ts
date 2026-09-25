@@ -28,6 +28,7 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
@@ -59,6 +60,7 @@ import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
+import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 
 const { typedArrayIterativeFixtures } =
@@ -209,6 +211,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrays.typedArrayConstructorFixtures,
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
+  ...agentFixtures.atomicsAndSharedMemoryFixtures,
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
   ...typedArrayMutationFixtures,
@@ -621,7 +624,12 @@ async function references(fixture: Fixture): Promise<
       : fixture.nonStrictScript
         ? `new Function(${JSON.stringify(fixture.source)})();\n`
         : fixture.source;
-    await host.writeTextFile(path, referencePrelude + source);
+    await host.writeTextFile(
+      path,
+      referencePrelude +
+        (fixture.test262Host === true ? agentReferencePrelude : "") +
+        source,
+    );
     return [
       await requireSuccess(process.execPath, [path]),
       await requireSuccess("deno", ["run", "--quiet", path]),
@@ -788,13 +796,14 @@ const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
+  const test262Host = fixture.test262Host === true;
   const disabledCompilation = compileSource(
     defaultComponents.frontend,
     {
       source: fixture.source,
       sourceId: `${fixture.name}.ts`,
     },
-    { observeSpecialization: true, specialization: "disabled" },
+    { observeSpecialization: true, specialization: "disabled", test262Host },
   );
   const enabledCompilation = compileSource(
     defaultComponents.frontend,
@@ -802,7 +811,7 @@ for (const fixture of selectedFixtures) {
       source: fixture.source,
       sourceId: `${fixture.name}.ts`,
     },
-    { observeSpecialization: true, specialization: "enabled" },
+    { observeSpecialization: true, specialization: "enabled", test262Host },
   );
   assert.deepEqual(disabledCompilation.diagnostics, [], fixture.name);
   assert.deepEqual(enabledCompilation.diagnostics, [], fixture.name);
@@ -853,6 +862,11 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-cluster-broadcast" ||
+    fixture.name === "agent-wait-notify" ||
+    fixture.name === "agent-wait-async" ||
+    fixture.name === "agent-shared-growth" ||
+    fixture.name === "agent-contention" ||
     fixture.name === "typed-array-iterative" ||
     fixture.name === "typed-array-search-and-join" ||
     fixture.name === "typed-array-mutation" ||
@@ -971,6 +985,11 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-cluster-broadcast" ||
+    fixture.name === "agent-wait-notify" ||
+    fixture.name === "agent-wait-async" ||
+    fixture.name === "agent-shared-growth" ||
+    fixture.name === "agent-contention" ||
     fixture.name === "closures-and-methods" ||
     fixture.name === "function-prototype" ||
     fixture.name === "iterator-helpers-eager" ||
@@ -1149,12 +1168,13 @@ for (const fixture of selectedFixtures) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
   try {
-    for (const [mode, compilation] of [
-      ["disabled", disabledMir],
-      ["enabled", enabledMir],
+    for (const [mode, compilation, agents] of [
+      ["disabled", disabledMir, disabledCompilation.agents],
+      ["enabled", enabledMir, enabledCompilation.agents],
     ] as const) {
       await withNativeFixture(
         {
+          agents: agents ?? [],
           backend: cBackend,
           host,
           input: compilation,
@@ -1290,6 +1310,17 @@ for (const fixture of selectedFixtures) {
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
+          if (fixture.test262Host === true) {
+            // Collection forced at every safepoint reaches the main
+            // realm and every agent realm, whose agent units the build
+            // linked beside the main unit.
+            assert.ok(native.counters.collections > 0);
+            assert.match(native.emittedC, /oseo_test262_host_install/u);
+            if (fixture.name === "agent-contention" && mode === "enabled") {
+              assert.ok(native.counters.guardHits > 0);
               assert.ok(native.counters.guardMisses > 0);
             }
           }
@@ -1523,10 +1554,16 @@ for (const fixture of selectedFixtures) {
   }
 
   const crossCompilations =
-    fixture.specialization == null ? [enabledMir] : [disabledMir, enabledMir];
-  for (const compilation of hostCcLane ? [] : crossCompilations) {
+    fixture.specialization == null
+      ? ([[enabledMir, enabledCompilation.agents]] as const)
+      : ([
+          [disabledMir, disabledCompilation.agents],
+          [enabledMir, enabledCompilation.agents],
+        ] as const);
+  for (const [compilation, agents] of hostCcLane ? [] : crossCompilations) {
     await withNativeFixture(
       {
+        agents: agents ?? [],
         backend: cBackend,
         host,
         input: compilation,

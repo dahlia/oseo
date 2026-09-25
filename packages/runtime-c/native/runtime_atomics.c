@@ -8,16 +8,22 @@
  * store, compareExchange, isLockFree, wait, waitAsync, and notify, over
  * integer TypedArray views of ArrayBuffer and SharedArrayBuffer storage.
  *
- * This realm is the only agent of its agent cluster, and the agent can
- * suspend. Every atomic step therefore runs without interference, a
- * critical section is never contended, and the WaiterList store is the
- * context-owned FIFO of `Atomics.waitAsync` waiters. `Atomics.wait` never
- * enters that store: once the agent suspends, no code in the cluster can
- * run to notify it, so it can only time out. A notification or timeout
- * in this agent resolves the waiter's promise synchronously, as
- * NotifyWaiter specifies for a waiter of the surrounding agent. The
- * `$262.agent` capability that would add a second agent is outside this
- * component.
+ * Every agent can suspend. Agents of one cluster take turns on one
+ * executing thread (runtime_agent.c), so every atomic step runs without
+ * interference and a critical section is never contended; each operation
+ * offers the turn to another ready agent once its step is complete.
+ *
+ * In an ordinary program this realm is the only agent of its cluster, and
+ * the WaiterList store is the context-owned FIFO of `Atomics.waitAsync`
+ * waiters. `Atomics.wait` never enters that store: once the agent
+ * suspends, no code in the cluster can run to notify it. In a multi-agent
+ * cluster the store is the cluster's: blocking waiters of every agent and
+ * each agent's waitAsync waiters share one FIFO per Shared Data Block and
+ * byte index, while the context list still roots this agent's own pending
+ * waiters. A notification or timeout in this agent resolves its own
+ * waiter's promise synchronously, as NotifyWaiter specifies for a waiter
+ * of the surrounding agent, and another agent's waiter resolves in that
+ * agent as a task of its own.
  */
 
 typedef struct {
@@ -315,6 +321,26 @@ static OseoResult atomics_operand(
 }
 
 /*
+ * Offers the turn to another ready agent once a completed operation's
+ * value is in hand, keeping that value rooted in the operation's first
+ * spare slot while other agents run. An abrupt completion is returned
+ * unchanged, and a single-agent realm returns at once.
+ */
+static OseoResult atomics_offer_turn(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    OseoResult completion
+) {
+    if (context->agent == NULL || completion.status != OSEO_STATUS_NORMAL) {
+        return completion;
+    }
+    frame->slots[frame->slot_count - 1u] = completion.value;
+    OseoResult result = oseo_internal_agent_yield(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(frame->slots[frame->slot_count - 1u]);
+}
+
+/*
  * AtomicReadModifyWrite together with store and load, selected by
  * `operation`. The view validates and the index converts first, then the
  * value converts, and the view revalidates before any byte is read, so a
@@ -395,6 +421,7 @@ static OseoResult atomics_read_modify_write(
             ? normal(frame.slots[1])
             : atomics_decode(context, kind, previous & mask);
     }
+    result = atomics_offer_turn(context, &frame, result);
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -458,6 +485,7 @@ static OseoResult atomics_compare_exchange(
         }
         result = atomics_decode(context, kind, previous & mask);
     }
+    result = atomics_offer_turn(context, &frame, result);
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -543,17 +571,39 @@ OseoResult oseo_internal_atomics_waiter_timeout(
 ) {
     OseoAtomicsWaiter *record = atomics_waiter_object(waiter);
     if (!record->listed) return normal(oseo_undefined());
+    /*
+     * In a multi-agent cluster another agent's notification may already
+     * have removed the waiter from the store; its "ok" is then on the way
+     * to this agent as a task, and the timeout job does nothing.
+     */
+    if (context->agent != NULL &&
+        !oseo_internal_agent_unlist_waiter(context, waiter)) {
+        return normal(oseo_undefined());
+    }
     /* The job is running, so the waiter no longer owns a pending timer. */
     record->timer = oseo_undefined();
     atomics_unlink_waiter(context, waiter);
     return atomics_resolve_waiter(context, waiter, "timed-out");
 }
 
+OseoResult oseo_internal_atomics_waiter_notified(
+    OseoContext *context,
+    OseoValue waiter
+) {
+    if (!atomics_waiter_object(waiter)->listed) {
+        return normal(oseo_undefined());
+    }
+    atomics_unlink_waiter(context, waiter);
+    return atomics_resolve_waiter(context, waiter, "ok");
+}
+
 /*
  * Atomics.notify. A buffer that is not shared has no waiters and reports
  * zero after the validation and conversions. Otherwise the first `count`
- * waiters on the same block and byte index leave the store in FIFO order,
- * each resolving to "ok" as it leaves.
+ * waiters on the same block and byte index leave the store in FIFO order:
+ * this agent's own waitAsync waiter resolves to "ok" as it leaves, a
+ * blocking waiter of another agent wakes, and another agent's waitAsync
+ * waiter resolves in that agent.
  */
 static OseoResult atomics_notify(
     OseoContext *context,
@@ -589,27 +639,45 @@ static OseoResult atomics_notify(
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         array_buffer_object(frame.slots[1])->shared) {
+        const OseoSharedBlock *block =
+            array_buffer_object(frame.slots[1])->block;
         while (result.status == OSEO_STATUS_NORMAL && notified < count) {
-            OseoValue current = context->atomics_waiter_head;
-            while (tag_of(current) != OSEO_TAG_UNDEFINED) {
-                const OseoAtomicsWaiter *record =
-                    atomics_waiter_object(current);
-                if (record->buffer == frame.slots[1] &&
-                    record->byte_index == byte_index) {
+            OseoValue current = oseo_undefined();
+            if (context->agent != NULL) {
+                if (!oseo_internal_agent_notify_one(
+                        context,
+                        block,
+                        byte_index,
+                        &current
+                    )) {
                     break;
                 }
-                current = record->next;
+                notified += 1.0;
+                /* Only this agent's own waitAsync waiter resolves here. */
+                if (tag_of(current) == OSEO_TAG_UNDEFINED) continue;
+            } else {
+                current = context->atomics_waiter_head;
+                while (tag_of(current) != OSEO_TAG_UNDEFINED) {
+                    const OseoAtomicsWaiter *record =
+                        atomics_waiter_object(current);
+                    if (record->block == block &&
+                        record->byte_index == byte_index) {
+                        break;
+                    }
+                    current = record->next;
+                }
+                if (tag_of(current) == OSEO_TAG_UNDEFINED) break;
+                notified += 1.0;
             }
-            if (tag_of(current) == OSEO_TAG_UNDEFINED) break;
             frame.slots[2] = current;
             atomics_unlink_waiter(context, frame.slots[2]);
             result = atomics_resolve_waiter(context, frame.slots[2], "ok");
-            notified += 1.0;
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_number(notified));
     }
+    result = atomics_offer_turn(context, &frame, result);
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -685,11 +753,33 @@ static uint64_t atomics_deadline(uint64_t base, double timeout) {
 }
 
 /*
- * SuspendThisAgent for a waiter no other agent can notify: the agent
- * blocks through the clock adapter until the deadline passes, or forever
- * for an infinite timeout, and the wait always ends "timed-out".
+ * SuspendThisAgent. In a multi-agent cluster the agent lists a blocking
+ * waiter and gives up the turn until a notification or its timeout ends
+ * the wait. Otherwise no other agent can notify it: the agent blocks
+ * through the clock adapter until the deadline passes, or forever for an
+ * infinite timeout, and the wait always ends "timed-out".
  */
-static OseoResult atomics_suspend(OseoContext *context, double timeout) {
+static OseoResult atomics_suspend(
+    OseoContext *context,
+    const OseoSharedBlock *block,
+    size_t byte_index,
+    double timeout
+) {
+    if (context->agent != NULL) {
+        bool notified = false;
+        OseoResult suspended = oseo_internal_agent_suspend(
+            context,
+            block,
+            byte_index,
+            timeout,
+            &notified
+        );
+        if (suspended.status != OSEO_STATUS_NORMAL) return suspended;
+        return oseo_internal_ascii_string(
+            context,
+            notified ? "ok" : "timed-out"
+        );
+    }
     OseoResult result = oseo_internal_clock_start(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     uint64_t deadline = UINT64_MAX;
@@ -733,6 +823,13 @@ static OseoResult atomics_add_waiter(
         result = oseo_internal_clock_now(context, &now);
         deadline = atomics_deadline(now, timeout);
     }
+    if (context->agent != NULL && isfinite(timeout) &&
+        result.status == OSEO_STATUS_NORMAL && deadline < UINT64_MAX) {
+        /* Another agent can measure the wait, so the current whole
+         * millisecond counts as already started, as a blocking wait's
+         * deadline in a cluster does. */
+        deadline += 1u;
+    }
     OseoAtomicsWaiter *waiter = NULL;
     if (result.status == OSEO_STATUS_NORMAL) {
         waiter = oseo_internal_allocate_heap_bytes(context, sizeof(*waiter));
@@ -749,6 +846,8 @@ static OseoResult atomics_add_waiter(
         waiter->buffer = slots[0];
         waiter->promise = slots[1];
         waiter->timer = oseo_undefined();
+        waiter->block = array_buffer_object(slots[0])->block;
+        waiter->record = NULL;
         waiter->byte_index = byte_index;
         waiter->listed = true;
         result = oseo_internal_publish_heap(
@@ -766,7 +865,13 @@ static OseoResult atomics_add_waiter(
                 slots[2];
         }
         context->atomics_waiter_tail = slots[2];
-        if (isfinite(timeout)) {
+        if (context->agent != NULL) {
+            result = oseo_internal_agent_list_waiter(context, slots[2]);
+            if (result.status != OSEO_STATUS_NORMAL) {
+                atomics_unlink_waiter(context, slots[2]);
+            }
+        }
+        if (result.status == OSEO_STATUS_NORMAL && isfinite(timeout)) {
             result = oseo_internal_atomics_timeout_enqueue(
                 context,
                 slots[2],
@@ -775,6 +880,12 @@ static OseoResult atomics_add_waiter(
             if (result.status == OSEO_STATUS_NORMAL) {
                 atomics_waiter_object(slots[2])->timer = result.value;
             } else {
+                if (context->agent != NULL) {
+                    (void)oseo_internal_agent_unlist_waiter(
+                        context,
+                        slots[2]
+                    );
+                }
                 atomics_unlink_waiter(context, slots[2]);
             }
         }
@@ -876,7 +987,12 @@ static OseoResult atomics_wait(
             result = atomics_wait_result(context, false, result.value);
         }
     } else if (!asynchronous) {
-        result = atomics_suspend(context, timeout);
+        result = atomics_suspend(
+            context,
+            array_buffer_object(frame.slots[1])->block,
+            byte_index,
+            timeout
+        );
     } else {
         result = oseo_internal_promise_create(context);
         frame.slots[2] = result.value;
@@ -893,6 +1009,7 @@ static OseoResult atomics_wait(
             result = atomics_wait_result(context, true, frame.slots[2]);
         }
     }
+    result = atomics_offer_turn(context, &frame, result);
     oseo_roots_release(context, &frame);
     return result;
 }

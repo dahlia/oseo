@@ -46,6 +46,11 @@ export interface RuntimeObservationCounters {
 
 /** Injected components and options for one native fixture. */
 export interface NativeFixtureOptions {
+  /**
+   * Agent programs of a test262 host program, each emitted as a unit of
+   * its own and linked beside `input`.
+   */
+  readonly agents?: readonly MirProgram[];
   readonly backend: NativeBackend;
   readonly host: CompilerHost;
   readonly input: MirProgram;
@@ -93,6 +98,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "async-functions",
   "async-iteration",
   "atomics-single-agent",
+  "atomics-and-shared-memory",
   "bigint-primitive",
   "classes",
   "control-flow",
@@ -456,6 +462,22 @@ export async function withNativeFixture<T>(
     }
     const generatedSourcePath = join(directory, emitted.sourceName);
     await options.host.writeTextFile(generatedSourcePath, emitted.source);
+    const additionalGeneratedSourcePaths: string[] = [];
+    for (const agent of options.agents ?? []) {
+      const unit = options.backend.emit(agent);
+      if (
+        assetNames.has(unit.sourceName.toLowerCase()) ||
+        unit.sourceName === emitted.sourceName
+      ) {
+        throw new Error(
+          `An agent unit collides with another source: ${unit.sourceName}.`,
+        );
+      }
+      const path = join(directory, unit.sourceName);
+      // eslint-disable-next-line no-await-in-loop -- Ordered unit staging.
+      await options.host.writeTextFile(path, unit.source);
+      additionalGeneratedSourcePaths.push(path);
+    }
 
     const loadedAssets = await Promise.all(
       runtimeInput.assets.map(async (asset) => ({
@@ -545,6 +567,10 @@ export async function withNativeFixture<T>(
         };
       }),
       generatedSourcePath,
+      ...includePropertiesWhen(() => {
+        if (additionalGeneratedSourcePaths.length === 0) return undefined;
+        return { additionalGeneratedSourcePaths };
+      }),
       ...includePropertiesWhen(() => {
         if (cachedArchivePath == null) return undefined;
         return {

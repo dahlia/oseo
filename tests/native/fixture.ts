@@ -4,6 +4,11 @@ export interface Fixture {
   readonly name: string;
   readonly nonStrictScript?: boolean;
   readonly source: string;
+  /**
+   * Compile with the test262 host and link its agent programs; the
+   * references run with the worker-based `$262.agent` prelude.
+   */
+  readonly test262Host?: true;
   readonly specialization?: {
     readonly genericCallsDisabled: number;
     readonly genericCallsEnabled: number;

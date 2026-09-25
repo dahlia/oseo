@@ -109,6 +109,16 @@ const runtimeArchiveReuseParser = withDefault(
   "enabled" as const,
 );
 
+const test262HostParser = withDefault(
+  map(
+    flag("--test262-host", {
+      description: message`Provide the test262 host object and its agents.`,
+    }),
+    () => true,
+  ),
+  false,
+);
+
 const moduleParser = withDefault(
   map(
     flag("--module", {
@@ -142,6 +152,7 @@ const cliParser = object({
   }),
   specialization: specializationParser,
   target: targetParser,
+  test262Host: test262HostParser,
 });
 
 const cliProgram = defineProgram({
@@ -293,6 +304,7 @@ function compileCliSource(
   source: string,
   sourceId: string,
   specialization: CliInvocation["specialization"],
+  test262Host: boolean,
 ): CliResult {
   const compiled = compileSource(
     defaultComponents.frontend,
@@ -300,7 +312,7 @@ function compileCliSource(
       source,
       sourceId,
     },
-    { specialization },
+    { specialization, test262Host },
   );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
@@ -309,10 +321,30 @@ function compileCliSource(
       hostDiagnostic(sourceId, "The compiler did not produce MIR."),
     );
   }
+  // A test262 host MIR dump prints each agent program after the main one.
+  const programs = [compiled.mir, ...(compiled.agents ?? [])];
   if (mode === "dump-mir") {
-    return { exitStatus: 0, stderr: "", stdout: printMir(compiled.mir) };
+    return {
+      exitStatus: 0,
+      stderr: "",
+      stdout: programs.map((program) => printMir(program)).join("\n"),
+    };
   }
   if (mode === "emit-c") {
+    // `--emit-c` prints one translation unit that compiles on its own,
+    // while each agent program is a unit of its own whose file-scope
+    // definitions repeat the main unit's (ADR 0026), so no single unit
+    // can hold them; only native execution links them side by side.
+    if (programs.length > 1) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          "The test262 host program links agent programs as separate " +
+            "translation units, which --emit-c cannot print as one; " +
+            "run it natively instead.",
+        ),
+      );
+    }
     return {
       exitStatus: 0,
       stderr: "",
@@ -470,6 +502,7 @@ export function runCli(request: CliRequest): CliResult {
     request.source ?? "",
     request.sourceId ?? parsed.value.sourceId,
     parsed.value.specialization,
+    parsed.value.test262Host,
   );
 }
 
@@ -928,11 +961,19 @@ export async function runNativeCli(
       hostDiagnostic(sourceId, "The source file could not be read."),
     );
   }
-  let mir: MirProgram;
-  if (
+  let mir: MirProgram | NativeUnits;
+  const moduleGoal =
     parsed.value.module ||
-    isModuleSource(source, sourceId, parsed.value.sourceId)
-  ) {
+    isModuleSource(source, sourceId, parsed.value.sourceId);
+  if (moduleGoal && parsed.value.test262Host) {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The --test262-host option applies only to Scripts.",
+      ),
+    );
+  }
+  if (moduleGoal) {
     const compiled = await compileCliModuleGraph(
       host,
       parsed.value.sourceId,
@@ -952,6 +993,7 @@ export async function runNativeCli(
       source,
       sourceId,
       parsed.value.specialization,
+      parsed.value.test262Host,
     );
   } else {
     const compiled = compileSource(
@@ -960,7 +1002,10 @@ export async function runNativeCli(
         source,
         sourceId,
       },
-      { specialization: parsed.value.specialization },
+      {
+        specialization: parsed.value.specialization,
+        test262Host: parsed.value.test262Host,
+      },
     );
     const diagnostic = compiled.diagnostics[0];
     if (diagnostic != null) return diagnosticResult(diagnostic);
@@ -969,7 +1014,16 @@ export async function runNativeCli(
         hostDiagnostic(sourceId, "The compiler did not produce MIR."),
       );
     }
-    mir = compiled.mir;
+    // Each agent program is a generated unit of its own, linked beside
+    // the main program whose table names its entry.
+    mir = parsed.value.test262Host
+      ? {
+          prebuiltObjectPaths: [],
+          sources: [compiled.mir, ...(compiled.agents ?? [])].map((program) =>
+            defaultComponents.backend.emit(program),
+          ),
+        }
+      : compiled.mir;
   }
   let directory: string;
   try {

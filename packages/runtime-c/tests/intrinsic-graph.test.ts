@@ -2535,8 +2535,12 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one
-  // representation while every prototype member checks the brand.
-  assert.match(internalHeader, /bool shared;\s*\} OseoArrayBuffer;/u);
+  // representation while every prototype member checks the brand. Its
+  // bytes belong to the reference-counted Shared Data Block it names.
+  assert.match(
+    internalHeader,
+    /bool shared;\s*OseoSharedBlock \*block;\s*\} OseoArrayBuffer;/u,
+  );
   assert.match(
     bufferSource,
     /array_buffer_receiver[\s\S]*array_buffer_object\(receiver\)->shared/u,
@@ -2599,4 +2603,59 @@ test("populates the single-agent shared memory clusters", () => {
       "u",
     ),
   );
+});
+
+test("shares Shared Data Blocks and waiters across an agent cluster", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const agentSource = sources.get("runtime_agent.c") ?? "";
+  const atomicsSource = sources.get("runtime_atomics.c") ?? "";
+  const bufferSource = sources.get("runtime_array_buffer.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  // The block, not a buffer object, owns the bytes, the length every
+  // agent reads, and the reference count the last release drops.
+  assert.match(
+    internalHeader,
+    new RegExp(
+      String.raw`_Atomic size_t references;\s*size_t byte_length;` +
+        String.raw`[\s\S]*\} OseoSharedBlock;`,
+      "u",
+    ),
+  );
+  assert.match(
+    internalHeader,
+    /array_buffer_current_length[\s\S]*buffer->block->byte_length/u,
+  );
+  assert.match(bufferSource, /buffer->block->byte_length = length;/u);
+  assert.match(bufferSource, /oseo_internal_shared_block_release/u);
+  // The host object and its entry points are generated-code ABI, and the
+  // context roots the broadcast callback the agent registered.
+  assert.match(header, /OseoResult oseo_test262_host_install\(/u);
+  assert.match(header, /OseoResult oseo_agent_hole\(/u);
+  assert.match(
+    header,
+    /void \*agent;\s*\/\*[^*]*\*\/\s*OseoValue agent_broadcast_callback;/u,
+  );
+  assert.match(
+    memorySource,
+    /mark_value\(context->agent_broadcast_callback, &worklist\)/u,
+  );
+  for (const name of [
+    "start",
+    "broadcast",
+    "getReport",
+    "sleep",
+    "monotonicNow",
+    "receiveBroadcast",
+    "report",
+    "leaving",
+  ]) {
+    assert.match(agentSource, new RegExp(`\\{"${name}", OSEO_AGENT_`, "u"));
+  }
+  // A waiter's WaiterList is its block and byte index, and in a cluster
+  // Atomics reaches the cluster store for notification and suspension.
+  assert.match(atomicsSource, /record->block == block/u);
+  assert.match(atomicsSource, /oseo_internal_agent_notify_one\(/u);
+  assert.match(atomicsSource, /oseo_internal_agent_suspend\(/u);
+  assert.match(atomicsSource, /oseo_internal_agent_yield\(context\)/u);
 });

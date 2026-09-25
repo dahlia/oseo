@@ -51,6 +51,27 @@ export type SpecializationMode = "disabled" | "enabled";
 export interface CompilerOptions {
   readonly observeSpecialization?: boolean;
   readonly specialization?: SpecializationMode;
+  /**
+   * Compile the Script for the test262 host: `$262` reads the host object
+   * the runtime installs, and every `$262.agent.start` source template the
+   * Script contains becomes an agent program compiled beside it.
+   */
+  readonly test262Host?: boolean;
+}
+
+/**
+ * One `$262.agent.start` source template: the cooked literal text around
+ * each numeric hole, and the source identity its agent program reports.
+ */
+export interface MirAgentTemplate {
+  readonly segments: readonly string[];
+  readonly sourceId: string;
+}
+
+/** The test262 host a main program installs before its Script runs. */
+export interface MirTest262Host {
+  /** Agent program templates, indexed as each agent program's entry. */
+  readonly agents: readonly MirAgentTemplate[];
 }
 
 /** One MIR-owned function parameter and its specialization hints. */
@@ -109,6 +130,8 @@ export interface MirOperation {
   readonly accessorKind?: "get" | "set";
   readonly argumentListId?: number;
   readonly arguments: readonly number[];
+  /** The hole an `agent-hole` operation reads. */
+  readonly agentHole?: number;
   readonly arrayLength?: number;
   readonly bindingId?: number;
   readonly cacheId?: number;
@@ -153,6 +176,7 @@ export interface MirOperation {
     | "symbol-intrinsic"
     | "function-intrinsic"
     | "iterator-intrinsic"
+    | "agent-hole"
     | "template-object"
     | "regexp-literal"
     | "count-guard-hit"
@@ -236,6 +260,16 @@ export interface MirOperation {
   readonly functionLength?: number;
   readonly functionName?: string;
   readonly functionSource?: string;
+  /**
+   * An agent program's `functionSource` split at its numeric holes: the
+   * literal runs around each hole and the hole each gap reads. The source
+   * a started agent reflects holds the literal text its start source had
+   * at each hole, not the placeholder the compiler resolved.
+   */
+  readonly functionSourceHoles?: {
+    readonly holes: readonly number[];
+    readonly runs: readonly string[];
+  };
   readonly functionNameBinding?: boolean;
   readonly importedBinding?: boolean;
   readonly hint?: MirHint;
@@ -474,6 +508,13 @@ export interface MirProgram {
   readonly sourceId: string;
   readonly specialization: SpecializationMode;
   readonly observeSpecialization: boolean;
+  /** Present on a main program compiled for the test262 host. */
+  readonly test262Host?: MirTest262Host;
+  /**
+   * Present on an agent program: its index in the main program's agent
+   * table, which names its generated entry.
+   */
+  readonly agentProgram?: number;
 }
 
 export interface MutableMirBlock {

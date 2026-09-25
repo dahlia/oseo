@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,341 reviewed cases: 18,161 passes, 1,560 expected negatives, and 1,620
+21,341 reviewed cases: 18,273 passes, 1,560 expected negatives, and 1,508
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 138 indexed records in the normative
+M5a is complete. The 139 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-18,161 passes across 21,341 paths, and the property inventory records 161
-domains, 161 seeds, and an ordinary case budget of 5,855.
+18,273 passes across 21,341 paths, and the property inventory records 162
+domains, 162 seeds, and an ordinary case budget of 5,861.
 
 
 M5a implementation history
@@ -7012,6 +7012,49 @@ ordinary cases, and the evidence inventory moves from 137 to 138 families.
 One generated-code entry point, `oseo_unresolvable_cell_create`, moves the
 ABI to `oseo-runtime-m5-122`; the node adds no component, code ID, realm
 intrinsic, or graph-state change.
+
+Implemented M5b node `atomics-and-shared-memory` admits agent clusters,
+cross-agent shared memory, and the `$262.agent` harness capability under
+[ADR 0026](./docs/adr/0026-agent-clusters-and-shared-memory.md). The new
+*runtime\_agent.c* component runs each started agent on a POSIX thread of its
+own with its own realm, heap, clock adapter, and event loop, and the agents of
+one cluster take turns on one executing thread, so exactly one evaluates at a
+time and no two threads ever touch a Shared Data Block at once. A Shared Data
+Block is now a reference-counted record that owns the bytes and the length
+every agent observes, and the WaiterList store becomes the cluster's, so
+`Atomics.notify` wakes another agent's blocking waiter and resolves another
+agent's `waitAsync` promise as a task in that agent. `$262.agent.start` runs
+agent programs the compiler builds ahead of time from each start template,
+with one numeric or BigInt hole per substitution; any other source text stays
+behind the ADR 0016 boundary.
+
+Fixed native differential fixtures run five clusters through Node.js and Deno,
+using a worker-based reference `$262.agent`, and through both native
+specialization policies with collection forced at every safepoint in every
+agent and a false numeric hint that deliberately misses its guard. The
+generated property suite at seed `0x60007f00` compares one to three agents'
+commutative updates and gated waits against an interleaving-independent
+model, and native-only checks pin cross-agent FIFO notification order, the
+rejected template and source shapes, an agent's uncaught throw, the stalled
+cluster, and a main agent that ends while another waits.
+
+The reviewed runner builds and executes every case that reads `$262.agent`
+with the test262 host, recording no `scheduler` value for it because its
+agents run under the real-clock cluster; ADR 0013 and ADR 0025 record that
+boundary without changing the manifest schema or classification vocabulary.
+The reviewed harness gains *atomicsHelper.js*, and the dependency vocabulary
+gains `atomics-and-shared-memory`. The node declares no inventory roots. Of
+the 112 reviewed paths that name `$262.agent`, all move to `pass`. The
+manifest keeps 21,341 paths and
+1,560 expected negatives and moves from 18,161 to 18,273 passes and from
+1,620 to 1,508 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property ratchet moves from 161 to 162 domains
+and seeds and from 5,855 to 5,861 ordinary cases, and the evidence inventory
+moves from 138 to 139 families. The runtime ABI moves to
+`oseo-runtime-m5-123` with code range index 28 for the eight `$262.agent`
+functions, the context's agent record and broadcast callback root, and the
+generated-code entry points `oseo_test262_host_install` and
+`oseo_agent_hole`, without changing the graph's orchestration state.
 
 
 Ahead-of-time challenge boundary

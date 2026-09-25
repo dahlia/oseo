@@ -137,6 +137,8 @@ export type { MirBlock } from "./mir.ts";
 export type { MirSpecialization } from "./mir.ts";
 export type { MirFunction } from "./mir.ts";
 export type { MirProgram } from "./mir.ts";
+export type { MirAgentTemplate } from "./mir.ts";
+export type { MirTest262Host } from "./mir.ts";
 export { buildMir } from "./mir-build.ts";
 export { printMir } from "./mir-print.ts";
 export type { CompilationResult } from "./module-compile.ts";

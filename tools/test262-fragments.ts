@@ -255,6 +255,9 @@ export function createTest262FragmentExecutor(
         return await fallback("bypass");
       }
       if (request.mode === "module") return await fallback("module");
+      // Agent programs are generated units of their own beside the whole
+      // Script, which the split harness and body units do not provide.
+      if (request.test262Host === true) return await fallback("agents");
       const input = request.fragment;
       if (input == null) return await fallback("metadata");
       if (input.raw) return await fallback("raw");

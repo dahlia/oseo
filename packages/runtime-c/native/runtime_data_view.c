@@ -247,7 +247,7 @@ static OseoResult data_view_receiver(
 static bool data_view_out_of_bounds(const OseoDataView *view) {
     const OseoArrayBuffer *buffer = array_buffer_object(view->buffer);
     if (buffer->detached) return true;
-    size_t length = buffer->byte_length;
+    size_t length = array_buffer_current_length(buffer);
     if (view->byte_offset > length) return true;
     if (view->track_length) return false;
     return view->byte_length > length - view->byte_offset;
@@ -260,7 +260,8 @@ static bool data_view_out_of_bounds(const OseoDataView *view) {
  */
 static size_t data_view_length(const OseoDataView *view) {
     if (!view->track_length) return view->byte_length;
-    return array_buffer_object(view->buffer)->byte_length - view->byte_offset;
+    return array_buffer_current_length(array_buffer_object(view->buffer)) -
+        view->byte_offset;
 }
 
 /*
@@ -430,7 +431,9 @@ static OseoResult data_view_construct(
     }
     double buffer_length = 0.0;
     if (result.status == OSEO_STATUS_NORMAL) {
-        buffer_length = (double)array_buffer_object(slots[1])->byte_length;
+        buffer_length = (double)array_buffer_current_length(
+            array_buffer_object(slots[1])
+        );
         if (offset > buffer_length) {
             result = oseo_internal_throw_error(
                 context,
@@ -488,7 +491,9 @@ static OseoResult data_view_construct(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        double current = (double)array_buffer_object(slots[1])->byte_length;
+        double current = (double)array_buffer_current_length(
+            array_buffer_object(slots[1])
+        );
         if (offset > current) {
             result = oseo_internal_throw_error(
                 context,

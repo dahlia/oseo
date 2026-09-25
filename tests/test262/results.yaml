@@ -17458,9 +17458,9 @@ summary:
   expectedNegatives: 1560
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 18161
+  passes: 18273
   semanticFailures: 0
-  unsupportedProfileFeatures: 1620
+  unsupportedProfileFeatures: 1508
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17490,13 +17490,20 @@ summary:
       passes: 1268
       semanticFailures: 0
       unsupportedProfileFeatures: 19
+    - dependency: atomics-and-shared-memory
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 112
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: atomics-single-agent
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 359
+      passes: 471
       semanticFailures: 0
-      unsupportedProfileFeatures: 120
+      unsupportedProfileFeatures: 8
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
@@ -17831,9 +17838,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 257
+      passes: 369
       semanticFailures: 0
-      unsupportedProfileFeatures: 118
+      unsupportedProfileFeatures: 6
     - group: built-ins/BigInt
       expectedNegatives: 0
       harnessFailures: 0

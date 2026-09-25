@@ -7,6 +7,7 @@ import type {
   MirConstant,
   MirFunction,
   MirGlobalLexicalName,
+  MirAgentTemplate,
   MirGlobalObjectBinding,
   MirOperation,
   MirProgram,
@@ -2091,6 +2092,57 @@ function emitUpdatePropertyCache(
   );
 }
 
+/*
+ * An agent program's function source with holes: the runtime joins the
+ * literal runs with the text the started agent's source held at each hole.
+ */
+function emitAgentFunctionSource(
+  state: EmitState,
+  id: number,
+  split: NonNullable<MirOperation["functionSourceHoles"]>,
+): void {
+  const entries: string[] = [];
+  for (const [index, run] of split.runs.entries()) {
+    const units = utf16Units(run);
+    line(
+      state,
+      renderC(
+        emittedC.agent.sourceRunUnits,
+        id,
+        index,
+        units.length === 0
+          ? "0"
+          : units.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    entries.push(
+      renderC(emittedC.agent.sourceRunEntry, id, index, units.length),
+    );
+  }
+  line(
+    state,
+    renderC(
+      emittedC.agent.sourceRuns,
+      id,
+      entries.join(renderC(emittedC.common.commaSpace)),
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.agent.sourceHoles,
+      id,
+      split.holes
+        .map((hole) => renderC(emittedC.agent.holeIndex, hole))
+        .join(renderC(emittedC.common.commaSpace)),
+    ),
+  );
+  line(state, renderC(emittedC.common.statusNormalOpen));
+  line(state, renderC(emittedC.agent.setSource, id, id, split.runs.length, id));
+  line(state, renderC(emittedC.common.rootAssignResultValue, id));
+  line(state, renderC(emittedC.common.closeBlock));
+}
+
 function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
   if (operation.functionId == null) {
     throw new Error(`MIR function-create %${operation.id} has no code id.`);
@@ -2169,7 +2221,9 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
       renderC(emittedC.common.callSuffix, namePrefix),
   );
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
-  if (operation.functionSource != null) {
+  if (operation.functionSourceHoles != null) {
+    emitAgentFunctionSource(state, operation.id, operation.functionSourceHoles);
+  } else if (operation.functionSource != null) {
     const sourceUnits = utf16Units(operation.functionSource);
     const sourceName = renderC(
       emittedC.functionCreate.functionSourceUnits,
@@ -2803,6 +2857,15 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     location(state, operation.range);
     state.usesAbrupt = true;
     line(state, renderC(emittedC.functionIntrinsic.resultAssign));
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+  } else if (operation.kind === "agent-hole") {
+    const hole = operation.agentHole;
+    if (hole == null) {
+      throw new Error(`MIR agent-hole %${operation.id} has no hole index.`);
+    }
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(state, renderC(emittedC.agent.holeStatement, hole));
     line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "iterator-intrinsic") {
     location(state, operation.range);
@@ -4335,6 +4398,52 @@ function emitFunctionDispatcher(
 }
 
 /** Deterministic C11 lowering whose only semantic input is MIR. */
+/*
+ * The static agent program table of a main program compiled for the
+ * test262 host: each template's UTF-16 literal runs, and the entry each
+ * agent unit defines. C has no empty array, so an empty run is one unit
+ * with a recorded length of zero.
+ */
+function emitAgentTables(agents: readonly MirAgentTemplate[]): string {
+  const newline = renderC(emittedC.common.newline);
+  let text = newline;
+  const entries: string[] = [];
+  for (const [index, agent] of agents.entries()) {
+    text += renderC(emittedC.agent.entryPrototype, index);
+    const segments: string[] = [];
+    for (const [position, segment] of agent.segments.entries()) {
+      const units: number[] = [];
+      for (let unit = 0; unit < segment.length; unit += 1) {
+        units.push(segment.charCodeAt(unit));
+      }
+      text += renderC(
+        emittedC.agent.segmentUnits,
+        index,
+        position,
+        units.length === 0 ? "0" : units.join(", "),
+      );
+      segments.push(
+        renderC(emittedC.agent.segmentEntry, index, position, units.length),
+      );
+    }
+    text += renderC(emittedC.agent.segmentTable, index, segments.join(", "));
+    entries.push(
+      renderC(
+        emittedC.agent.programEntry,
+        index,
+        agent.segments.length,
+        index,
+        escapeCString(agent.sourceId),
+        new TextEncoder().encode(agent.sourceId).length,
+      ),
+    );
+  }
+  if (entries.length > 0) {
+    text += renderC(emittedC.agent.programTable, entries.join(", "));
+  }
+  return text;
+}
+
 export const cBackend: NativeBackend = {
   emit(input) {
     const declaredFunctions = reachableFunctions(input);
@@ -4440,6 +4549,43 @@ export const cBackend: NativeBackend = {
       input.observeSpecialization === true
         ? renderC(emittedC.program.oseoContextPrintObservationsAddressContext)
         : empty;
+    if (input.agentProgram != null) {
+      const agentGeneratorRegistration =
+        generatorDispatcher == null
+          ? empty
+          : renderC(emittedC.agent.generatorRegistrationLine);
+      return {
+        source: renderC(
+          emittedC.agent.source,
+          functionEntryType,
+          declarations,
+          dispatcher,
+          generatorDispatcherSection,
+          definitions,
+          input.agentProgram,
+          functionReferences,
+          functionReferences === empty
+            ? empty
+            : renderC(emittedC.common.newline),
+          agentGeneratorRegistration,
+          scriptRootCount,
+          scriptRootCount,
+        ),
+        sourceName: `agent-${input.agentProgram}.c`,
+      };
+    }
+    const host = input.test262Host;
+    const hostTables = host == null ? empty : emitAgentTables(host.agents);
+    const hostInstall =
+      host == null
+        ? empty
+        : renderC(
+            emittedC.agent.installLine,
+            host.agents.length === 0
+              ? renderC(emittedC.agent.noProgramsValue)
+              : renderC(emittedC.agent.programsValue),
+            host.agents.length,
+          );
     return {
       source: renderC(
         emittedC.program.source,
@@ -4447,13 +4593,13 @@ export const cBackend: NativeBackend = {
         declarations,
         dispatcher,
         generatorDispatcherSection,
-        definitions,
+        definitions + hostTables,
         functionReferences,
         functionReferences === empty ? empty : renderC(emittedC.common.newline),
         sourceId,
         sourceIdByteLength,
         generatorRegistration,
-        specializationObservation,
+        specializationObservation + hostInstall,
         scriptRootCount,
         scriptRootCount,
         observations,
