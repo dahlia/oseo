@@ -554,6 +554,15 @@ struct OseoContext {
      */
     OseoValue atomics_waiter_head;
     OseoValue atomics_waiter_tail;
+    /*
+     * This realm's agent record when `oseo_test262_host_install` or an
+     * agent start made it one agent of a multi-agent cluster, and NULL
+     * for the only agent of an ordinary program. The private layout stays
+     * behind this public generated-code boundary.
+     */
+    void *agent;
+    /* The callback `$262.agent.receiveBroadcast` registered, rooted. */
+    OseoValue agent_broadcast_callback;
     /* Collector-owned FIFO of finalization cells ready for a later runtime
      * checkpoint. Collection queues records but never invokes user code. */
     OseoValue finalization_head;
@@ -2078,6 +2087,69 @@ OseoResult oseo_entry_task_checkpoint(
 OseoResult oseo_event_loop_run(
     OseoContext *context,
     OseoValue entry_promise
+);
+
+/*
+ * One literal run of an agent source template. The units are the cooked
+ * UTF-16 text between two numeric holes.
+ */
+typedef struct {
+    const uint16_t *units;
+    size_t length;
+} OseoAgentSegment;
+
+/*
+ * The generated evaluation of one agent Script: it installs the program's
+ * dispatchers on an agent realm the runtime already initialized, evaluates
+ * the Script, and runs that agent's event loop, returning the completion.
+ */
+typedef OseoResult (*OseoAgentEntry)(OseoContext *context);
+
+/*
+ * One agent program compiled ahead of time from a `$262.agent.start`
+ * source template. `segments` holds `segment_count` literal runs with one
+ * numeric hole between each adjacent pair; `$262.agent.start` evaluates
+ * this program when its source text is exactly those runs around decimal
+ * integer or BigInt literals, and each hole's value is what
+ * `oseo_agent_hole` reads.
+ */
+typedef struct {
+    const OseoAgentSegment *segments;
+    size_t segment_count;
+    OseoAgentEntry entry;
+    const char *source_id;
+    size_t source_id_length;
+} OseoAgentProgram;
+
+/*
+ * Makes this realm the main agent of a new agent cluster and installs the
+ * test262 host object `$262`, whose `agent` property starts the listed
+ * agent programs. Generated code calls it once, after the dispatchers are
+ * set and before the Script evaluates. The table is static generated data
+ * that must outlive the process's agents.
+ */
+OseoResult oseo_test262_host_install(
+    OseoContext *context,
+    const OseoAgentProgram *programs,
+    size_t program_count
+);
+/*
+ * The value of one numeric hole of the running agent program: the Number
+ * or, for a literal with the `n` suffix, the BigInt its source text held.
+ */
+OseoResult oseo_agent_hole(OseoContext *context, size_t index);
+/*
+ * Sets an agent program function's source text: `run_count` literal runs
+ * with, between each adjacent pair, the literal text the running agent's
+ * start source held at hole `holes[i]`, so reflection reads the source the
+ * agent was started with.
+ */
+OseoResult oseo_agent_function_set_source(
+    OseoContext *context,
+    OseoValue function_value,
+    const OseoAgentSegment *runs,
+    size_t run_count,
+    const size_t *holes
 );
 
 #endif

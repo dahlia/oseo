@@ -232,8 +232,12 @@ Consequences
     The deterministic adapter shows the order the contract implies for any
     scripted lateness.
  -  The reviewed test262 manifest keeps its `deterministic-logical-clock`
-    scheduler value. No reviewed case or harness include schedules a timer, so
-    no reviewed execution opens the adapter, and a test keeps that true.
+    scheduler value. No execution recorded with that value schedules a timer
+    or loads a harness include that does, so none of them opens the adapter,
+    and a test reads the recorded executions to keep that true. Since
+    [ADR 0026](./0026-agent-clusters-and-shared-memory.md), a case built with
+    the native test262 host runs under the real-clock agent cluster, records
+    no scheduler value, and may schedule timers through *atomicsHelper.js*.
  -  `OseoContext` gains the adapter pointer, its state, the origin, the
     restriction bits, and a started flag; *oseo\_runtime.h* gains the adapter
     types and six entry points; the runtime input gains two sources; and
@@ -257,8 +261,9 @@ Failure modes and replacement triggers
  -  The socket checkpoint may replace the wait facility with the completion
     source it selects, provided the wakeup, fallback, and liveness evidence
     here still passes.
- -  A reviewed test262 case that schedules a timer requires revisiting the
-    manifest scheduler record before it enters the subset.
+ -  A reviewed test262 case outside the agent host that schedules a timer
+    requires revisiting the manifest scheduler record before it enters the
+    subset.
 
 
 Links
@@ -268,4 +273,5 @@ Links
  -  [ADR 0012](./0012-native-event-loop.md)
  -  [ADR 0013](./0013-m5-edition-and-manifest.md)
  -  [ADR 0022](./0022-async-context-boundary.md)
+ -  [ADR 0026](./0026-agent-clusters-and-shared-memory.md)
  -  [*docs/runtime-components.md*](../runtime-components.md)

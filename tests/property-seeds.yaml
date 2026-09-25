@@ -508,3 +508,7 @@ families:
     owner: tests/property/m5-globalthis-binding.property.test.ts
     start: 0x60007e00
     end: 0x60007eff
+  - family: m5-atomics-and-shared-memory
+    owner: tests/property/m5-atomics-and-shared-memory.property.test.ts
+    start: 0x60007f00
+    end: 0x60007fff

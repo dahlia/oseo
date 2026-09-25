@@ -77,6 +77,8 @@ void oseo_context_init(
     context->timer_head = oseo_undefined();
     context->atomics_waiter_head = oseo_undefined();
     context->atomics_waiter_tail = oseo_undefined();
+    context->agent = NULL;
+    context->agent_broadcast_callback = oseo_undefined();
     context->finalization_head = oseo_undefined();
     context->finalization_tail = oseo_undefined();
     context->next_finalization_order = 0u;
@@ -156,6 +158,7 @@ void oseo_context_clear_language_error(OseoContext *context) {
 }
 
 void oseo_context_destroy(OseoContext *context) {
+    oseo_internal_agent_context_destroy(context);
     context->roots = NULL;
     context->async_call_capability = oseo_undefined();
     context->microtask_head = oseo_undefined();
@@ -187,6 +190,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->timer_head = oseo_undefined();
     context->atomics_waiter_head = oseo_undefined();
     context->atomics_waiter_tail = oseo_undefined();
+    context->agent_broadcast_callback = oseo_undefined();
     context->finalization_head = oseo_undefined();
     context->finalization_tail = oseo_undefined();
     context->finalization_pending_count = 0u;

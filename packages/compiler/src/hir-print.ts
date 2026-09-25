@@ -196,6 +196,9 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "iterator-intrinsic") {
     return "intrinsic Iterator";
   }
+  if (expression.kind === "agent-hole") {
+    return `agent hole ${expression.index}`;
+  }
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }

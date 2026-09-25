@@ -1,0 +1,86 @@
+version: 1
+id: atomics-and-shared-memory
+title: "Agent clusters and cross-agent shared memory"
+scope:
+  - "The test262 host object $262 of a Script built with --test262-host:
+    start, broadcast, getReport, sleep, and monotonicNow in the main agent
+    and receiveBroadcast, report, leaving, sleep, and monotonicNow in every
+    started agent, each agent with its own realm, heap, collector, clock
+    adapter, and event loop on a thread of its own."
+  - "Shared Data Blocks across agents: a broadcast buffer with a Number or
+    BigInt id that every agent receives as a SharedArrayBuffer of its own
+    realm, the block-owned length that a grow in one agent changes for all,
+    and reports, sleeps, and cluster-wide monotonic time."
+  - "The cluster WaiterList: blocking and waitAsync waiters of every agent in
+    one FIFO per block and byte index, notification that wakes another
+    agent's blocking waiter, resolves its own agent's waitAsync promise
+    synchronously and another agent's promise as a task in that agent, and
+    timeouts that a notification already settled."
+  - "The shared executing thread with its turn handoff, event-loop liveness,
+    the process ending with the main agent, an agent's uncaught throw ending
+    the process, and the stalled-cluster diagnostic."
+  - "Agent programs compiled ahead of time from $262.agent.start templates
+    with numeric and BigInt holes, the compile-time rejection of a hole that
+    is not one literal token position, and the dynamic source boundary for
+    any other start source."
+  - "Reviewed standards coverage is the 112 upstream paths that name
+    $262.agent, built with the test262 host and executed without a
+    deterministic scheduler record through the reviewed atomicsHelper.js
+    harness; all 112 pass."
+owners:
+  - PLAN-M5.md
+  - docs/adr/0026-agent-clusters-and-shared-memory.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-and-shared-memory.ts
+      - tests/native/agent-reference.ts
+      - tests/property/m5-atomics-and-shared-memory.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-and-shared-memory.ts
+      - tests/native.ts
+      - tests/native/scenarios/agents.ts
+      - packages/cli/tests/index.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-and-shared-memory.ts
+      - tests/property/m5-atomics-and-shared-memory.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-atomics-and-shared-memory.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-and-shared-memory.ts
+      - tests/property/m5-atomics-and-shared-memory.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/atomics-and-shared-memory.ts
+      - tests/property/m5-atomics-and-shared-memory.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/atomicsHelper.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tools/test262.ts
+      - tests/test262-runner.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_agent.c
+      - packages/runtime-c/native/runtime_atomics.c
+      - packages/runtime-c/native/runtime_array_buffer.c
+      - packages/runtime-c/native/runtime_event_loop.c
+      - packages/compiler/src/agent-programs.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts

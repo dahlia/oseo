@@ -19,7 +19,7 @@
  */
 
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import process from "node:process";
@@ -33,6 +33,10 @@ import {
   runClockScheduler,
 } from "../../tools/native-io/clock.ts";
 import { needsTest262Agent, parseTest262Case } from "../../tools/test262.ts";
+import {
+  parseReviewedManifest,
+  reviewedManifestPartitionPaths,
+} from "../../tools/test262-manifest.ts";
 import type {
   ClockBuild,
   ClockProbeConfiguration,
@@ -453,49 +457,74 @@ test(
 );
 
 /*
- * The reviewed test262 manifest records its asynchronous executions under
- * the `deterministic-logical-clock` scheduler value of ADR 0013. That value
- * stays exact after ADR 0025 only because no reviewed execution schedules a
- * timer, so none ever opens the clock adapter or waits. A reviewed case that
- * would schedule one, and any reviewed harness include, needs that record
- * revisited before it enters the subset. A case that needs the `$262.agent`
- * capability is never executed, so the timers behind that capability cannot
- * reach the scheduler; the reviewed Atomics rows that call
- * `$262.agent.setTimeout` are exactly those.
+ * The reviewed test262 manifest records its ordinary asynchronous and
+ * module executions under the `deterministic-logical-clock` scheduler
+ * value of ADR 0013. That value stays exact after ADR 0025 only because
+ * none of those executions schedules a timer, so none ever opens the clock
+ * adapter or waits. A case built with the native test262 host runs under
+ * the real-clock agent cluster of ADR 0026 instead and records no
+ * scheduler value, so its timers, and the atomicsHelper.js include only
+ * such a case loads, are outside this invariant. Every recorded
+ * deterministic execution, its upstream source, and each harness include
+ * it lists must stay free of timers.
  */
-test("no reviewed test262 execution schedules a timer", async () => {
+test("no deterministic test262 execution schedules a timer", async () => {
   const repository = join(dirname(fileURLToPath(import.meta.url)), "../..");
   const upstream = dirname(
     fileURLToPath(import.meta.resolve("test262/package.json")),
   );
-  const subset = await readFile(
-    join(repository, "tests/test262/subset.yaml"),
-    "utf8",
+  const resultsDirectory = join(repository, "tests/test262");
+  const index = await readFile(join(resultsDirectory, "results.yaml"), "utf8");
+  const partitions = new Map<string, string>();
+  for (const path of reviewedManifestPartitionPaths(index)) {
+    // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
+    partitions.set(path, await readFile(join(resultsDirectory, path), "utf8"));
+  }
+  const manifest = parseReviewedManifest(
+    index,
+    (path) => partitions.get(path) ?? "",
   );
-  const revision = /^suiteRevision: (\S+)$/mu.exec(subset)?.[1] ?? "";
-  assert.notEqual(revision, "");
-  const paths = [...subset.matchAll(/^\s*(?:-\s+)?path: (test\/\S+)$/gmu)].map(
-    (match) => match[1] ?? "",
+  const timerPattern = /\b(?:setTimeout|clearTimeout)\b/u;
+  const deterministic = manifest.results.filter(
+    (result) => result.execution?.scheduler === "deterministic-logical-clock",
   );
-  assert.ok(paths.length > 0);
-  const harness = join(repository, "tests/test262/harness");
-  const includes = (await readdir(harness)).map((name) => join(harness, name));
+  assert.ok(deterministic.length > 0);
+  const timers: string[] = [];
+  const includes = new Set<string>();
   // The corpus holds thousands of files, so they are read one at a time:
   // opening them all at once exhausts the descriptor limit on Windows.
-  const timers: string[] = [];
-  for (const path of paths) {
+  for (const result of deterministic) {
+    const path = result.case.path;
     // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
     const text = await readFile(join(upstream, path), "utf8");
-    if (!/\b(?:setTimeout|clearTimeout)\b/u.test(text)) continue;
-    if (needsTest262Agent(text, parseTest262Case(text, path, revision))) {
-      continue;
+    if (timerPattern.test(text)) timers.push(path);
+    for (const include of result.execution?.harnessIncludes ?? []) {
+      includes.add(include);
     }
-    timers.push(path);
   }
+  assert.ok(!includes.has("atomicsHelper.js"));
   for (const include of includes) {
     // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
-    const text = await readFile(include, "utf8");
-    if (/\b(?:setTimeout|clearTimeout)\b/u.test(text)) timers.push(include);
+    const text = await readFile(
+      join(repository, "tests/test262/harness", include),
+      "utf8",
+    );
+    if (timerPattern.test(text)) timers.push(include);
   }
   assert.deepEqual(timers, []);
+  // An agent case never carries the deterministic value, whatever else it
+  // schedules; the runner decides that from the same predicate.
+  const subset = await readFile(join(resultsDirectory, "subset.yaml"), "utf8");
+  const revision = /^suiteRevision: (\S+)$/mu.exec(subset)?.[1] ?? "";
+  for (const result of deterministic) {
+    // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
+    const text = await readFile(join(upstream, result.case.path), "utf8");
+    assert.ok(
+      !needsTest262Agent(
+        text,
+        parseTest262Case(text, result.case.path, revision),
+      ),
+      result.case.path,
+    );
+  }
 });

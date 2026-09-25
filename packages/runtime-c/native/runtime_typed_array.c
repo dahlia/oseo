@@ -169,12 +169,13 @@ static bool typed_array_out_of_bounds(const OseoTypedArray *view) {
     if (!is_array_buffer(view->viewed_buffer)) return true;
     const OseoArrayBuffer *buffer =
         array_buffer_object(view->viewed_buffer);
-    if (buffer->detached || view->byte_offset > buffer->byte_length) {
+    size_t buffer_length = array_buffer_current_length(buffer);
+    if (buffer->detached || view->byte_offset > buffer_length) {
         return true;
     }
     if (view->array_length == SIZE_MAX) return false;
     return view->array_length >
-        (buffer->byte_length - view->byte_offset) /
+        (buffer_length - view->byte_offset) /
             typed_array_bytes[view->element_kind];
 }
 
@@ -184,7 +185,8 @@ static size_t typed_array_length(const OseoTypedArray *view) {
         array_buffer_object(view->viewed_buffer);
     if (view->array_length == SIZE_MAX) {
         size_t bytes = typed_array_bytes[view->element_kind];
-        return (buffer->byte_length - view->byte_offset) / bytes;
+        return (array_buffer_current_length(buffer) - view->byte_offset) /
+            bytes;
     }
     return view->array_length;
 }
@@ -741,7 +743,9 @@ bool oseo_internal_typed_array_out_of_bounds(
     bool out_of_bounds = typed_array_out_of_bounds(typed);
     *buffer_byte_length = out_of_bounds
         ? 0u
-        : array_buffer_object(typed->viewed_buffer)->byte_length;
+        : array_buffer_current_length(
+            array_buffer_object(typed->viewed_buffer)
+        );
     return out_of_bounds;
 }
 
@@ -860,7 +864,7 @@ static OseoResult typed_array_from_buffer(
             );
         }
         if (result.status == OSEO_STATUS_NORMAL &&
-            offset > buffer->byte_length) {
+            offset > array_buffer_current_length(buffer)) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_RANGE,
@@ -868,7 +872,8 @@ static OseoResult typed_array_from_buffer(
             );
         }
         if (result.status == OSEO_STATUS_NORMAL &&
-            (length > (buffer->byte_length - offset) / bytes)) {
+            (length >
+                (array_buffer_current_length(buffer) - offset) / bytes)) {
             result = oseo_internal_throw_error(
                 context,
                 OSEO_ERROR_RANGE,
@@ -882,14 +887,14 @@ static OseoResult typed_array_from_buffer(
             "Cannot construct a TypedArray over a detached buffer."
         );
     } else if (result.status == OSEO_STATUS_NORMAL &&
-               offset > buffer->byte_length) {
+               offset > array_buffer_current_length(buffer)) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_RANGE,
             "TypedArray byte offset exceeds the buffer."
         );
     } else if (result.status == OSEO_STATUS_NORMAL && !buffer->resizable) {
-        size_t remaining = buffer->byte_length - offset;
+        size_t remaining = array_buffer_current_length(buffer) - offset;
         if (remaining % bytes != 0u) {
             result = oseo_internal_throw_error(
                 context,
@@ -963,11 +968,13 @@ static void typed_array_clone_bytes(
     const OseoArrayBuffer *from =
         array_buffer_object(source_view->viewed_buffer);
     OseoArrayBuffer *to = array_buffer_object(target_view->viewed_buffer);
-    size_t available = from->byte_length > source_view->byte_offset
-        ? from->byte_length - source_view->byte_offset
+    size_t from_length = array_buffer_current_length(from);
+    size_t to_length = array_buffer_current_length(to);
+    size_t available = from_length > source_view->byte_offset
+        ? from_length - source_view->byte_offset
         : 0u;
-    size_t room = to->byte_length > target_view->byte_offset
-        ? to->byte_length - target_view->byte_offset
+    size_t room = to_length > target_view->byte_offset
+        ? to_length - target_view->byte_offset
         : 0u;
     if (byte_length > available) byte_length = available;
     if (byte_length > room) byte_length = room;
@@ -1492,7 +1499,15 @@ static OseoResult typed_array_set_from_typed_array(
         return normal(oseo_undefined());
     }
     uint8_t *snapshot = NULL;
-    if (target_view->viewed_buffer == source_view->viewed_buffer) {
+    /* SetTypedArrayFromTypedArray also treats two SharedArrayBuffer
+     * objects over one Shared Data Block as the same buffer, which an
+     * agent that received one block twice can hold. */
+    const OseoSharedBlock *target_block =
+        array_buffer_object(target_view->viewed_buffer)->block;
+    if (target_view->viewed_buffer == source_view->viewed_buffer ||
+        (target_block != NULL &&
+         target_block ==
+             array_buffer_object(source_view->viewed_buffer)->block)) {
         snapshot = malloc(source_byte_length);
         if (snapshot == NULL) {
             return failure(

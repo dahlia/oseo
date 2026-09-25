@@ -643,6 +643,7 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->timer_head, &worklist);
     mark_value(context->atomics_waiter_head, &worklist);
     mark_value(context->atomics_waiter_tail, &worklist);
+    mark_value(context->agent_broadcast_callback, &worklist);
     mark_value(context->finalization_head, &worklist);
     mark_value(context->finalization_tail, &worklist);
     OseoValue *kept_objects = context->kept_objects;

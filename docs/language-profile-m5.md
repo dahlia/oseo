@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 138
+M5a is complete. The normative family records described below inventory 139
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,312 reviewed cases: 18,001 passes, 1,556
-expected negatives, and 1,755 unsupported profile features. It records no
+The current manifest contains 21,341 reviewed cases: 18,273 passes, 1,560
+expected negatives, and 1,508 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -7238,34 +7238,131 @@ pending, answers `isLockFree` for an unconverted fractional size, and throws
 a `TypeError` instead of the specified `RangeError` when revalidation finds a
 byte index past a shrunk buffer under an in-bounds length-tracking view.
 
-Every case that needs a second agent keeps an explicit capability boundary.
-The reviewed runner classifies a case that includes *atomicsHelper.js* or
-names `$262.agent` as unsupported with the `test262-agent` capability without
-executing it, and a `CanBlockIsFalse` case as unsupported with the
-`non-blocking-agent` capability, because every native agent of this profile
-can suspend. The reviewed harness gains *testAtomics.js*, unchanged in
-behavior; its non-view value list constructs a Boolean wrapper, so the cases
-that include it keep the unadmitted `Boolean` binding boundary. The reviewed
-feature list gains `Atomics`, `Atomics.waitAsync`, and `SharedArrayBuffer`,
-and the dependency vocabulary gains `atomics-single-agent`. All 479 paths
-under the node's two inventory roots are reviewed: 304 pass, 112 need
-`$262.agent`, 52 need the `Boolean` binding through *testAtomics.js*, two
-need an agent that cannot block, three reference an unresolvable upstream
-identifier this profile rejects at compile time, five need concrete
-TypedArray feature gates, and one needs a second realm. Forty-eight already
-reviewed paths outside the roots move to pass: 38 DataView cases, nine
-ArrayBuffer brand-check cases, and one `Object.seal` case; the remaining
-eight shared-buffer paths keep their TypedArray method, `Float16Array`, or
-realm boundaries. No reviewed path moves away from `pass`. The manifest moves
-from 19,291 to 19,770 cases and from 15,792 to 16,144 passes, keeps 1,556
-expected negatives, and moves from 1,943 to 2,070 unsupported profile
-features with no semantic, harness, or infrastructure failures. The property
-inventory reaches 148 domains and seeds with a 5,695-case ordinary budget, and
-the evidence inventory reaches 126 families. The runtime ABI moves to
-`oseo-runtime-m5-111`: the ArrayBuffer range gains seven SharedArrayBuffer
-code IDs, code range index 25 holds the thirteen Atomics functions, the
-public intrinsic table gains four slots, the heap gains the Atomics waiter
-kind, and the context gains the WaiterList store roots.
+Every case that needs a second agent kept an explicit capability boundary
+at this node: the reviewed runner classified a case that includes
+*atomicsHelper.js* or names `$262.agent` as unsupported with the
+`test262-agent` capability without executing it, until the agent cluster
+section below admitted that capability. A `CanBlockIsFalse` case stays
+unsupported with the `non-blocking-agent` capability, because every native
+agent of this profile can suspend. The reviewed harness gains *testAtomics.js*,
+unchanged in behavior; its non-view value list constructs a Boolean wrapper, so
+the cases that include it keep the unadmitted `Boolean` binding boundary. The
+reviewed feature list gains `Atomics`, `Atomics.waitAsync`, and
+`SharedArrayBuffer`, and the dependency vocabulary gains
+`atomics-single-agent`. All 479 paths under the node's two inventory roots are
+reviewed: 304 pass, 112 need `$262.agent`, 52 need the `Boolean` binding
+through *testAtomics.js*, two need an agent that cannot block, three reference
+an unresolvable upstream identifier this profile rejects at compile time, five
+need concrete TypedArray feature gates, and one needs a second realm.
+Forty-eight already reviewed paths outside the roots move to pass: 38 DataView
+cases, nine ArrayBuffer brand-check cases, and one `Object.seal` case; the
+remaining eight shared-buffer paths keep their TypedArray method,
+`Float16Array`, or realm boundaries. No reviewed path moves away from `pass`.
+The manifest moves from 19,291 to 19,770 cases and from 15,792 to 16,144
+passes, keeps 1,556 expected negatives, and moves from 1,943 to 2,070
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property inventory reaches 148 domains and seeds with a
+5,695-case ordinary budget, and the evidence inventory reaches 126 families.
+The runtime ABI moves to `oseo-runtime-m5-111`: the ArrayBuffer range gains
+seven SharedArrayBuffer code IDs, code range index 25 holds the thirteen
+Atomics functions, the public intrinsic table gains four slots, the heap gains
+the Atomics waiter kind, and the context gains the WaiterList store roots.
+
+
+Agent clusters and cross-agent shared memory
+--------------------------------------------
+
+M5b node `atomics-and-shared-memory` admits agent clusters and the
+`$262.agent` harness capability under
+[ADR 0026](./adr/0026-agent-clusters-and-shared-memory.md). A Script built
+with the CLI's `--test262-host` option has a `$262` global whose `agent`
+object provides `start`, `broadcast`, `getReport`, `sleep`, and
+`monotonicNow` in the main agent and `receiveBroadcast`, `report`,
+`leaving`, `sleep`, and `monotonicNow` in every agent it starts; in an
+ordinary program the name is unresolvable and a read of it throws a
+`ReferenceError`. Each agent has its own
+realm, heap, collector, clock adapter, and event loop on a POSIX thread of its
+own, and heap values never cross agents.
+
+Agents share memory through Shared Data Blocks. `broadcast` gives every agent
+still evaluating a SharedArrayBuffer of its own realm over the same block,
+passes a Number or BigInt64 id beside it, and returns once each of them has
+retrieved it, which an agent does once it has registered a callback; the
+callback then runs as a timer callback task. A block's length belongs to the
+block, so a `grow` in one agent is the `byteLength` every agent's buffer and
+length-tracking view observes. TypedArray `set` treats two buffer objects of
+one agent over one block as the same buffer. Reports are copied strings that
+`getReport` returns in order, or `null` when none is waiting. `sleep` blocks
+the calling agent for at least the requested milliseconds, and
+`monotonicNow` returns milliseconds since one cluster-wide origin.
+
+The WaiterList store belongs to the cluster: blocking waiters of every agent
+and each agent's `waitAsync` waiters share one FIFO per block and byte index.
+`Atomics.notify` wakes a blocking waiter of another agent, resolves its own
+agent's `waitAsync` promise synchronously, and resolves another agent's
+promise in that agent as a task, as NotifyWaiter specifies; a timeout job
+whose waiter a notification already removed does nothing. A wait with a
+finite timeout lasts at least that timeout as another agent measures it.
+
+Agents of one cluster share one executing thread, as ECMA-262's forward
+progress clause permits: exactly one agent evaluates at a time, and the turn
+passes when that agent suspends in `Atomics.wait`, `sleep`, `broadcast`,
+`start`, or an idle event loop, when it finishes, and at every `Atomics`
+operation and `getReport`, where the longest-ready agent takes it. `start`
+returns once the new agent has run to its first suspension. An agent's event
+loop keeps waiting while it has incoming work, timers, pending `waitAsync`
+waiters, or a broadcast callback it has not left with `leaving()`, and the
+main agent keeps waiting for its own pending waiters only while another agent
+can still make progress. When the main agent's event loop ends the process
+ends, and an agent that still waits never evaluates again. An agent's uncaught
+throw prints that agent's error and ends the process with status 1, and a
+cluster whose every agent waits without a deadline while the main agent is
+blocked reports `OSEO3001` “The agent cluster cannot make progress.”
+
+`$262.agent.start` runs only agent programs compiled ahead of time. The
+compiler turns every `$262.agent.start` whose argument is a template literal
+or a string literal into an agent program, with one numeric hole per
+substitution, and rejects a template whose holes are not each one
+PrimaryExpression token position read exactly once. `start` matches its
+source string against those templates, and each hole must hold a decimal
+integer literal without a leading zero, optionally with the BigInt suffix
+`n`; any other source reaches the owned `OSEO2001` boundary “Agent source
+text outside the ahead-of-time agent programs is not admitted.” of
+[ADR 0016](./adr/0016-dynamic-source-boundary.md).
+
+Fixed native differential fixtures run five clusters through Node.js and Deno,
+whose worker-based reference `$262.agent` shares memory through the same
+Shared Data Blocks, and through both native specialization policies with
+collection forced at every safepoint in every agent: broadcasts with Number,
+BigInt, and empty buffers, cross-agent wait, not-equal, timeout, and
+notification counts, cross-agent waitAsync settlement in both directions,
+cross-agent growth, and contended read-modify-write and compareExchange
+updates, with a false numeric hint that misses its guard and reaches the
+generic fallback. Every printed observation is one that any interleaving
+produces. The generated property suite at seed `0x60007f00` builds one to
+three agents whose templates pass their operands as literal text or as Number
+and BigInt holes, applies commutative update families to Int32Array and
+BigInt64Array cells, ends each agent at a notified wait, a notified
+waitAsync, a not-equal wait, or a timed-out wait, and compares both
+references and both native policies against an interleaving-independent
+model. Native-only checks pin FIFO notification order across agents, which
+the parallel references cannot, the BigInt hole, every rejected template and
+source shape, an agent's uncaught throw, the stalled cluster, and a main
+agent that ends while another agent waits.
+
+The reviewed runner builds every case that reads `$262.agent` with the test262
+host and executes it. Its execution records no `scheduler` value, because it
+runs under this real-clock cluster rather than the deterministic logical
+clock, while every other module and asynchronous execution keeps that value.
+The reviewed harness gains *atomicsHelper.js*, the upstream helper except that
+`$262.agent.setTimeout` forwards to the host timer, which this profile reaches
+only as a call target. The dependency vocabulary gains
+`atomics-and-shared-memory`, and the node declares no inventory roots. Of the
+112 reviewed paths that name `$262.agent`, all move to `pass`.
+The runtime ABI moves to `oseo-runtime-m5-123` with code range index 28 for
+the eight `$262.agent` functions, the reference-counted Shared Data Block, the
+context's agent record and broadcast callback root, and the generated-code
+entry points `oseo_test262_host_install` and `oseo_agent_hole`.
 
 
 Weak collections
@@ -7772,12 +7869,14 @@ complete. The remaining gaps retain their existing owners.
     Reviewed cases that need them carry the `dynamic-source` dependency
     tag, and no release uses an unqualified conformance label while this
     boundary stands.
- -  Realm creation beyond the initial realm and agent clusters need runtime
-    and harness capabilities that do not exist yet; affected tests name the
-    missing `$262` capability. Shared memory as one agent observes it is
-    admitted by the `atomics-single-agent` node as recorded above, and the
-    `atomics-and-shared-memory` node owns agent clusters, cross-agent
-    shared-memory execution, and the `$262.agent` capability.
+ -  Realm creation beyond the initial realm needs runtime and harness
+    capabilities that do not exist yet; affected tests name the missing
+    `$262` capability. Agent clusters, cross-agent shared memory, and the
+    `$262.agent` capability are admitted as recorded above, except that an
+    agent whose [[CanBlock]] is false stays unsupported with the
+    `non-blocking-agent` capability, and an agent source that no
+    ahead-of-time template describes stays behind the dynamic source
+    boundary.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *nans.js*, *nativeFunctionMatcher.js*, *promiseHelper.js*, and

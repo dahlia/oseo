@@ -46,7 +46,8 @@ The runtime input now lists forty-six reviewed assets in this order:
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
 *runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
-*runtime\_proxy.c*, *runtime\_json.c*, and *runtime\_atomics.c*. The M5
+*runtime\_proxy.c*, *runtime\_json.c*, *runtime\_atomics.c*, and
+*runtime\_agent.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
@@ -55,8 +56,8 @@ map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
 RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions, Boolean-intrinsic,
 Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
-Set-intrinsic, TypedArray-constructor, single-agent Atomics, and
-weak-collections units each
+Set-intrinsic, TypedArray-constructor, single-agent Atomics,
+weak-collections, and agent-cluster units each
 added one
 component the same
 way. The M5b
@@ -152,7 +153,13 @@ Ownership follows the plan's target layout:
     validation and revalidation, the read-modify-write functions over raw
     element bits, `compareExchange`, `isLockFree`, the suspending `wait`,
     and the realm-owned WaiterList store that `waitAsync` fills and
-    `notify` and waiter timeout jobs drain;
+    `notify` and waiter timeout jobs drain, or the cluster's store when the
+    realm is one agent of a multi-agent cluster;
+ -  *runtime\_agent.c*: agent clusters, the POSIX threads their agents run
+    on, the turn that lets exactly one agent evaluate at a time, the
+    cluster WaiterList, broadcasts, reports, cluster liveness and stall
+    detection, the ahead-of-time agent program table and its source
+    matching, and the test262 host object `$262` with its `agent` functions;
  -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
     `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
     and flag validation, immutable matcher artifact, `Symbol.species`,
@@ -605,6 +612,20 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_install_atomics_global`              | *runtime\_atomics.c*          |
 | `oseo_internal_atomics_waiter_timeout`              | *runtime\_atomics.c*          |
 | `oseo_internal_atomics_timeout_enqueue`             | *runtime\_event\_loop.c*      |
+| `oseo_internal_atomics_waiter_notified`             | *runtime\_atomics.c*          |
+| `oseo_internal_shared_block_retain`                 | *runtime\_array\_buffer.c*    |
+| `oseo_internal_shared_block_release`                | *runtime\_array\_buffer.c*    |
+| `oseo_internal_shared_array_buffer_from_block`      | *runtime\_array\_buffer.c*    |
+| `oseo_internal_agent_yield`                         | *runtime\_agent.c*            |
+| `oseo_internal_agent_suspend`                       | *runtime\_agent.c*            |
+| `oseo_internal_agent_list_waiter`                   | *runtime\_agent.c*            |
+| `oseo_internal_agent_unlist_waiter`                 | *runtime\_agent.c*            |
+| `oseo_internal_agent_notify_one`                    | *runtime\_agent.c*            |
+| `oseo_internal_agent_receive`                       | *runtime\_agent.c*            |
+| `oseo_internal_agent_keeps_alive`                   | *runtime\_agent.c*            |
+| `oseo_internal_agent_idle`                          | *runtime\_agent.c*            |
+| `oseo_internal_agent_context_destroy`               | *runtime\_agent.c*            |
+| `oseo_internal_agent_builtin_dispatch`              | *runtime\_agent.c*            |
 | `oseo_internal_typed_array_validate`                | *runtime\_typed\_array.c*     |
 | `oseo_internal_typed_array_out_of_bounds`           | *runtime\_typed\_array.c*     |
 | `oseo_internal_typed_array_element_size`            | *runtime\_typed\_array.c*     |
@@ -664,7 +685,17 @@ and *runtime\_enumeration.c*.
     timer turn that reaches that job calls
     `oseo_internal_atomics_waiter_timeout`, because the timer queue owns the
     host timeout job and the Atomics component owns the WaiterList whose
-    membership decides whether the job times the waiter out.
+    membership decides whether the job times the waiter out;
+ -  Atomics and agents: in a multi-agent cluster *runtime\_atomics.c* lists,
+    notifies, and suspends waiters through the cluster store in
+    *runtime\_agent.c*, while the agent component resolves a waiter another
+    agent notified through `oseo_internal_atomics_waiter_notified`, because
+    the cluster owns the shared store and the Atomics component owns each
+    agent's heap waiter and its promise;
+ -  event loop and agents: an agent's event loop takes incoming work through
+    `oseo_internal_agent_receive` and gives up its turn through
+    `oseo_internal_agent_idle`, while the agent component turns a retrieved
+    broadcast into a due timer callback through `oseo_set_timeout`.
 
 The event-loop component is a one-way dependent: timer turns drain jobs
 through `oseo_internal_jobs_drain_until` and
@@ -1594,6 +1625,31 @@ Four public intrinsic slots hold `%SharedArrayBuffer.prototype%`,
 `%SharedArrayBuffer%`, its species marker, and `%Atomics%`. The component
 moves `abiVersion` to `m5-111`; the value representation and the
 generated-code entry points are unchanged.
+
+### Agent cluster evidence
+
+M5b node `atomics-and-shared-memory` adds *runtime\_agent.c* under
+[ADR 0026](./adr/0026-agent-clusters-and-shared-memory.md). A Shared Data
+Block becomes a reference-counted record, `OseoSharedBlock`, that holds its
+bytes, its current length, and its growable maximum, and a SharedArrayBuffer
+object references it instead of owning it; every read of a shared buffer's
+length goes through the block, so a grow in one agent is the length every
+agent observes. The TypedArray, DataView, and ArrayBuffer components read the
+length through the one inline accessor, and TypedArray `set` treats two
+objects over one block as the same buffer.
+
+The component takes built-in code range index 28 for the eight `$262.agent`
+functions and is the second translation unit that asks for operating-system
+interfaces beyond C11: it creates one POSIX thread per started agent and
+guards every cluster state change with one mutex. Exactly one agent holds
+the turn at a time, so no two threads touch a block, a heap, or cluster
+state at once. A blocked agent waits in its own clock adapter, and the agent
+that makes it ready wakes that adapter through `oseo_clock_wake`. The
+context gains the agent record and the collector-rooted broadcast callback,
+the Atomics waiter record gains its block and cluster entry, the runtime input
+gains one source, and *oseo\_runtime.h* gains the agent program table and two
+generated-code entry points, `oseo_test262_host_install` and
+`oseo_agent_hole`. The component moves `abiVersion` to `m5-123`.
 
 ### TypedArray iterative methods evidence
 

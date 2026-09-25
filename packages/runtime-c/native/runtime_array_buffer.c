@@ -70,61 +70,41 @@ static OseoResult array_buffer_receiver(
 
 void oseo_internal_array_buffer_release(OseoHeapObject *object) {
     OseoArrayBuffer *buffer = (OseoArrayBuffer *)object;
-    free(buffer->data);
+    if (buffer->block != NULL) {
+        oseo_internal_shared_block_release(buffer->block);
+        buffer->block = NULL;
+    } else {
+        free(buffer->data);
+    }
     buffer->data = NULL;
     buffer->byte_length = 0u;
     buffer->detached = true;
 }
 
+void oseo_internal_shared_block_retain(OseoSharedBlock *block) {
+    atomic_fetch_add_explicit(&block->references, 1u, memory_order_relaxed);
+}
+
+void oseo_internal_shared_block_release(OseoSharedBlock *block) {
+    if (atomic_fetch_sub_explicit(
+            &block->references,
+            1u,
+            memory_order_acq_rel
+        ) == 1u) {
+        free(block);
+    }
+}
+
 /*
- * AllocateArrayBuffer(constructor, byteLength, maxByteLength). The
- * object exists before its Data Block does, so a block the host refuses
- * leaves an already-created instance behind exactly as the specification
- * describes. A resizable buffer reserves its whole maximum up front, so
- * `resize` never moves the block and no pointer into it can go stale.
+ * Initializes one fresh buffer record around `prototype`, with no block.
+ * The caller publishes it.
  */
-static OseoResult array_buffer_allocate(
+static void array_buffer_initialize(
     OseoContext *context,
-    OseoValue prototype,
-    double byte_length,
-    double max_byte_length,
-    bool resizable,
-    bool shared
+    OseoArrayBuffer *buffer,
+    OseoValue prototype
 ) {
-    if (resizable && byte_length > max_byte_length) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_RANGE,
-            "ArrayBuffer length exceeds its maximum byte length."
-        );
-    }
-    double requested = resizable ? max_byte_length : byte_length;
-    size_t allocation = 0u;
-    size_t length = 0u;
-    size_t maximum = 0u;
-    if (!array_buffer_size(requested, &allocation) ||
-        !array_buffer_size(byte_length, &length) ||
-        (resizable && !array_buffer_size(max_byte_length, &maximum))) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_RANGE,
-            "ArrayBuffer data block is too large."
-        );
-    }
-    OseoValue slot = prototype;
-    OseoRootFrame frame = {NULL, &slot, 1u};
-    oseo_roots_push(context, &frame);
-    OseoArrayBuffer *buffer =
-        oseo_internal_allocate_heap_bytes(context, sizeof(*buffer));
-    if (buffer == NULL) {
-        oseo_roots_pop(context, &frame);
-        return failure(
-            context,
-            "OSEO2001",
-            "ArrayBuffer allocation failed."
-        );
-    }
-    buffer->ordinary.prototype = slot;
+    buffer->ordinary.prototype = prototype;
     buffer->ordinary.properties = NULL;
     buffer->ordinary.property_capacity = 0u;
     buffer->ordinary.property_count = 0u;
@@ -169,9 +149,67 @@ static OseoResult array_buffer_allocate(
     buffer->ordinary.mapped_arguments = false;
     buffer->data = NULL;
     buffer->byte_length = 0u;
+    buffer->max_byte_length = 0u;
+    buffer->resizable = false;
+    buffer->detached = false;
+    buffer->shared = false;
+    buffer->block = NULL;
+}
+
+/*
+ * AllocateArrayBuffer(constructor, byteLength, maxByteLength). The
+ * object exists before its Data Block does, so a block the host refuses
+ * leaves an already-created instance behind exactly as the specification
+ * describes. A resizable buffer reserves its whole maximum up front, so
+ * `resize` never moves the block and no pointer into it can go stale.
+ * AllocateSharedArrayBuffer takes the same steps, and its Shared Data
+ * Block carries a reference count and the length every agent reads, so
+ * even an empty shared buffer has a block to name its identity.
+ */
+static OseoResult array_buffer_allocate(
+    OseoContext *context,
+    OseoValue prototype,
+    double byte_length,
+    double max_byte_length,
+    bool resizable,
+    bool shared
+) {
+    if (resizable && byte_length > max_byte_length) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "ArrayBuffer length exceeds its maximum byte length."
+        );
+    }
+    double requested = resizable ? max_byte_length : byte_length;
+    size_t allocation = 0u;
+    size_t length = 0u;
+    size_t maximum = 0u;
+    if (!array_buffer_size(requested, &allocation) ||
+        !array_buffer_size(byte_length, &length) ||
+        (resizable && !array_buffer_size(max_byte_length, &maximum))) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "ArrayBuffer data block is too large."
+        );
+    }
+    OseoValue slot = prototype;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    OseoArrayBuffer *buffer =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*buffer));
+    if (buffer == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "ArrayBuffer allocation failed."
+        );
+    }
+    array_buffer_initialize(context, buffer, slot);
     buffer->max_byte_length = maximum;
     buffer->resizable = resizable;
-    buffer->detached = false;
     buffer->shared = shared;
     OseoResult published = oseo_internal_publish_heap(
         context,
@@ -180,13 +218,23 @@ static OseoResult array_buffer_allocate(
     );
     oseo_roots_pop(context, &frame);
     if (published.status != OSEO_STATUS_NORMAL) return published;
-    if (allocation == 0u) return published;
+    if (allocation == 0u && !shared) return published;
+    if (shared && allocation > SIZE_MAX - sizeof(OseoSharedBlock)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "ArrayBuffer data block is too large."
+        );
+    }
     OseoValue created = published.value;
     OseoRootFrame created_frame = {NULL, &created, 1u};
     oseo_roots_push(context, &created_frame);
     /* A safepoint, so the block is requested while the instance is
      * rooted and the record is reacquired from that root afterwards. */
-    void *block = oseo_internal_allocate_heap_bytes(context, allocation);
+    void *block = oseo_internal_allocate_heap_bytes(
+        context,
+        shared ? sizeof(OseoSharedBlock) + allocation : allocation
+    );
     oseo_roots_pop(context, &created_frame);
     if (block == NULL) {
         return oseo_internal_throw_error(
@@ -195,11 +243,68 @@ static OseoResult array_buffer_allocate(
             "ArrayBuffer data block allocation failed."
         );
     }
-    memset(block, 0, allocation);
     buffer = array_buffer_object(created);
-    buffer->data = block;
+    if (shared) {
+        OseoSharedBlock *shared_block = block;
+        atomic_init(&shared_block->references, 1u);
+        shared_block->byte_length = length;
+        shared_block->max_byte_length = maximum;
+        shared_block->growable = resizable;
+        memset(shared_block->bytes, 0, allocation);
+        buffer->block = shared_block;
+        buffer->data = allocation == 0u ? NULL : shared_block->bytes;
+    } else {
+        memset(block, 0, allocation);
+        buffer->data = block;
+    }
     buffer->byte_length = length;
     return normal(created);
+}
+
+OseoResult oseo_internal_shared_array_buffer_from_block(
+    OseoContext *context,
+    OseoSharedBlock *block
+) {
+    OseoResult result = oseo_internal_intrinsic(
+        context,
+        OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slot = result.value;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    OseoArrayBuffer *buffer =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*buffer));
+    if (buffer == NULL) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "SharedArrayBuffer allocation failed."
+        );
+    }
+    array_buffer_initialize(context, buffer, slot);
+    buffer->max_byte_length = block->max_byte_length;
+    buffer->resizable = block->growable;
+    buffer->shared = true;
+    buffer->byte_length = block->byte_length;
+    uint8_t *data = block->growable
+        ? (block->max_byte_length == 0u ? NULL : block->bytes)
+        : (block->byte_length == 0u ? NULL : block->bytes);
+    result = oseo_internal_publish_heap(
+        context,
+        &buffer->ordinary.header,
+        OSEO_HEAP_ARRAY_BUFFER
+    );
+    oseo_roots_pop(context, &frame);
+    /* The reference is taken only once the record is published, because
+     * a refused publication frees the record without releasing it. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        oseo_internal_shared_block_retain(block);
+        buffer->block = block;
+        buffer->data = data;
+    }
+    return result;
 }
 
 /* One fresh %ArrayBuffer%-prototyped buffer, which is what
@@ -587,11 +692,14 @@ static OseoResult shared_array_buffer_receiver(
 /*
  * SharedArrayBuffer.prototype.grow(newLength). Only a growable shared
  * buffer carries [[ArrayBufferMaxByteLength]] together with a shared
- * block, so both brand checks throw before the length converts. One agent
- * is the whole cluster, so the compare-and-exchange loop the
- * specification describes never observes a racing grow and reduces to one
- * comparison against the current length. The block was reserved at its
- * maximum and cleared at creation, so the grown bytes already read zero.
+ * block, so both brand checks throw before the length converts. Agents of
+ * one cluster take turns on one executing thread, and the conversion is
+ * the last point that can hand the turn to another agent, so the
+ * compare-and-exchange loop the specification describes never observes a
+ * racing grow and reduces to one comparison against the block's current
+ * length, which is also where another agent's grow is visible. The block
+ * was reserved at its maximum and cleared at creation, so the grown bytes
+ * already read zero.
  */
 static OseoResult shared_array_buffer_grow(
     OseoContext *context,
@@ -621,10 +729,11 @@ static OseoResult shared_array_buffer_grow(
     );
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoArrayBuffer *buffer = array_buffer_object(slot);
+        size_t current = array_buffer_current_length(buffer);
         size_t length = 0u;
-        if (requested == (double)buffer->byte_length) {
+        if (requested == (double)current) {
             result = normal(oseo_undefined());
-        } else if (requested < (double)buffer->byte_length ||
+        } else if (requested < (double)current ||
                    !array_buffer_size(requested, &length) ||
                    length > buffer->max_byte_length) {
             result = oseo_internal_throw_error(
@@ -635,6 +744,7 @@ static OseoResult shared_array_buffer_grow(
             );
         } else {
             buffer->byte_length = length;
+            buffer->block->byte_length = length;
             result = normal(oseo_undefined());
         }
     }
@@ -671,7 +781,7 @@ static OseoResult shared_array_buffer_member(
     if (checked.status != OSEO_STATUS_NORMAL) return checked;
     const OseoArrayBuffer *buffer = array_buffer_object(receiver);
     if (code_id == OSEO_SHARED_ARRAY_BUFFER_BYTE_LENGTH_CODE_ID) {
-        return normal(oseo_number((double)buffer->byte_length));
+        return normal(oseo_number((double)array_buffer_current_length(buffer)));
     }
     if (code_id == OSEO_SHARED_ARRAY_BUFFER_GROWABLE_CODE_ID) {
         return normal(oseo_boolean(buffer->resizable));
@@ -679,7 +789,7 @@ static OseoResult shared_array_buffer_member(
     if (code_id == OSEO_SHARED_ARRAY_BUFFER_MAX_BYTE_LENGTH_CODE_ID) {
         return normal(oseo_number(
             (double)(buffer->resizable ? buffer->max_byte_length
-                                       : buffer->byte_length)
+                                       : array_buffer_current_length(buffer))
         ));
     }
     return oseo_unknown_function(context, code_id);
@@ -808,7 +918,9 @@ static OseoResult array_buffer_slice(
     OseoValue slots[3] = {receiver, oseo_undefined(), oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    double length = (double)array_buffer_object(slots[0])->byte_length;
+    double length = (double)array_buffer_current_length(
+        array_buffer_object(slots[0])
+    );
     OseoResult result = oseo_internal_to_number(
         context,
         argument_count == 0u ? oseo_undefined() : arguments[0]
@@ -883,7 +995,14 @@ static OseoResult array_buffer_slice(
             "The ArrayBuffer species returned a detached ArrayBuffer."
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL && slots[2] == slots[0]) {
+    /* SharedArrayBuffer.prototype.slice compares [[ArrayBufferData]],
+     * which two buffer objects of one agent share when one Shared Data
+     * Block was broadcast to it twice. */
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (slots[2] == slots[0] ||
+         (shared &&
+          array_buffer_object(slots[2])->block ==
+              array_buffer_object(slots[0])->block))) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -891,7 +1010,8 @@ static OseoResult array_buffer_slice(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        (double)array_buffer_object(slots[2])->byte_length < new_length) {
+        (double)array_buffer_current_length(array_buffer_object(slots[2])) <
+            new_length) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -920,8 +1040,8 @@ static OseoResult array_buffer_slice(
          * either way, and the clamp keeps the read in bounds without
          * depending on the reservation policy.
          */
-        size_t available = from->byte_length > start
-            ? from->byte_length - start
+        size_t available = array_buffer_current_length(from) > start
+            ? array_buffer_current_length(from) - start
             : 0u;
         if (copied > available) copied = available;
         if (copied > 0u && from->data != NULL && to->data != NULL) {

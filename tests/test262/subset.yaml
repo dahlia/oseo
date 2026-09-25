@@ -10371,8 +10371,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/bigint/notify-all-on-loc.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/bigint/null-bufferdata-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10380,11 +10380,11 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/count-defaults-to-infinity-missing.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/count-defaults-to-infinity-undefined.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/count-from-nans.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10404,8 +10404,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/negative-count.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/negative-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10440,38 +10440,38 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/notify-all-on-loc.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-all.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-in-order-one-time.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-in-order.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-nan.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-one.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-renotify-noop.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-two.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-with-no-agents-waiting.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-with-no-matching-agents-waiting.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/notify-zero.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/null-bufferdata-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10494,8 +10494,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/undefined-index-defaults-to-zero.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/notify/validate-arraytype-before-count-coercion.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10656,50 +10656,50 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/false-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/false-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/nan-for-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/negative-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/negative-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/negative-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-no-operation.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-add.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-and.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-compareExchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-exchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-or.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-store.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-sub.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/no-spurious-wakeup-on-xor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/non-bigint64-typedarray-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10713,17 +10713,17 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/value-not-equal.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/waiterlist-block-indexedposition-wake.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/waiterlist-order-of-operations-is-fifo.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/bigint/was-woken-before-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/cannot-suspend-throws.js
     expectedClassification: unsupported-profile-feature
     dependencies: [atomics-single-agent]
@@ -10731,14 +10731,14 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/false-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/false-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/good-views.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/length.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10746,44 +10746,44 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/nan-for-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/negative-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/negative-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/negative-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-no-operation.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-add.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-and.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-compareExchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-exchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-or.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-store.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-sub.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/no-spurious-wakeup-on-xor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/non-int32-typedarray-throws.js
     expectedClassification: unsupported-profile-feature
     dependencies: [atomics-single-agent]
@@ -10800,14 +10800,14 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/null-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/null-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/object-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/object-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10815,8 +10815,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/poisoned-object-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/poisoned-object-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10824,35 +10824,35 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/symbol-for-index-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/symbol-for-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/symbol-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/symbol-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/symbol-for-value-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/symbol-for-value-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/true-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/true-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/undefined-for-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/undefined-index-defaults-to-zero.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/validate-arraytype-before-index-coercion.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10863,20 +10863,20 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/value-not-equal.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/wait-index-value-not-equal.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/waiterlist-block-indexedposition-wake.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/waiterlist-order-of-operations-is-fifo.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/was-woken-before-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bad-range.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10884,53 +10884,53 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/false-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/false-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/good-views.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/nan-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/negative-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/negative-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/negative-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-no-operation.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-add.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-and.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-compareExchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-exchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-or.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-store.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-sub.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-xor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js
     expectedClassification: unsupported-profile-feature
     dependencies: [atomics-single-agent]
@@ -10947,14 +10947,14 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/null-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/null-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/object-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/object-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -10962,68 +10962,68 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/poisoned-object-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/poisoned-object-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-index-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-value-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/symbol-for-value-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/true-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/true-for-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/undefined-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/undefined-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/undefined-index-defaults-to-zero-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/value-not-equal-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/value-not-equal.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/waiterlist-block-indexedposition-wake.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/was-woken-before-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/descriptor.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/false-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/false-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/good-views.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/implicit-infinity-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -11037,44 +11037,44 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/nan-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/negative-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/negative-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/negative-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-no-operation.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-add.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-and.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-compareExchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-exchange.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-or.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-store.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-sub.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-xor.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/non-int32-typedarray-throws.js
     expectedClassification: unsupported-profile-feature
     dependencies: [atomics-single-agent]
@@ -11091,14 +11091,14 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/null-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/null-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/object-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/object-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -11106,8 +11106,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/poisoned-object-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/poisoned-object-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -11118,8 +11118,8 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-promise-resolves-to-timed-out.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/returns-result-object-value-is-string-not-equal.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -11127,38 +11127,38 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-index-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-index-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-timeout-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-timeout-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-value-throws-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/symbol-for-value-throws.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/true-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/true-for-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/undefined-for-timeout-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/undefined-for-timeout.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/undefined-index-defaults-to-zero-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/validate-arraytype-before-index-coercion.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
@@ -11169,17 +11169,17 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/value-not-equal-agent.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/value-not-equal.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/waiterlist-block-indexedposition-wake.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/was-woken-before-timeout.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [atomics-single-agent]
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/xor/bad-range.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]

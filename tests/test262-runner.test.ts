@@ -10,6 +10,7 @@ import { summarizeTest262 } from "../packages/testkit/src/index.ts";
 import type { Test262Case } from "../packages/testkit/src/index.ts";
 import {
   assembleTest262Source,
+  asyncCompletionMarker,
   createReviewedManifest,
   executeTest262Case,
   parseTest262Arguments,
@@ -1786,50 +1787,100 @@ includes: [${include}]
   );
 });
 
-test("names the agent capabilities a single agent cannot provide", async () => {
+test("builds a case that reads $262.agent with the test262 host", async () => {
+  const agentHarnesses = {
+    ...harnesses,
+    includes: new Map([
+      ...harnesses.includes,
+      ["atomicsHelper.js", "$262.agent.timeouts = {};"],
+    ]),
+  };
   const cases = [
-    ["/*---\nincludes: [atomicsHelper.js]\n---*/\n", "test262-agent"],
-    [
-      "/*---\nfeatures: [Atomics]\n---*/\n$262.agent.start('');\n",
-      "test262-agent",
-    ],
-    [
-      '/*---\nfeatures: [Atomics]\n---*/\n$262["agent"].sleep(1);\n',
-      "test262-agent",
-    ],
-    ["/*---\nfeatures: [Atomics]\n---*/\n$262.agent ??= 1;\n", "test262-agent"],
-    [
-      "/*---\nfeatures: [Atomics]\n---*/\n[x = $262.agent] = [];\n",
-      "test262-agent",
-    ],
-    [
-      "/*---\nflags: [CanBlockIsFalse]\n---*/\nAtomics.wait;\n",
-      "non-blocking-agent",
-    ],
+    "/*---\nincludes: [atomicsHelper.js]\n---*/\n",
+    "/*---\nfeatures: [Atomics]\n---*/\n$262.agent.start('');\n",
+    '/*---\nfeatures: [Atomics]\n---*/\n$262["agent"].sleep(1);\n',
+    "/*---\nfeatures: [Atomics]\n---*/\n$262.agent ??= 1;\n",
+    "/*---\nfeatures: [Atomics]\n---*/\n[x = $262.agent] = [];\n",
   ] as const;
   await Promise.all(
-    cases.map(async ([source, capability]) => {
-      const parsed = parseTest262Case(source, "test/agent-gap.js", revision);
+    cases.map(async (source) => {
+      const parsed = parseTest262Case(source, "test/agent-case.js", revision);
+      const hosts: (boolean | undefined)[] = [];
       const result = await executeTest262Case(
         source,
         parsed,
         new Set(["Atomics"]),
-        harnesses,
+        agentHarnesses,
         {
-          async execute() {
-            return assert.fail("an agent capability case must not execute");
+          async execute(request) {
+            hosts.push(request.test262Host);
+            return successfulResult();
           },
         },
-        ["atomics-single-agent"],
+        ["atomics-single-agent", "atomics-and-shared-memory"],
       );
-      assert.equal(result.classification, "unsupported-profile-feature");
-      assert.equal(result.observation.unsupportedCapability, capability);
-      assert.equal(result.observation.passed, false);
+      assert.equal(result.classification, "pass");
+      assert.ok(hosts.length > 0);
+      assert.ok(hosts.every((host) => host === true));
     }),
   );
 });
 
-test("executes a case that only mentions $262.agent in text", async () => {
+test("records a deterministic scheduler outside the agent host", async () => {
+  const cases = [
+    ["/*---\nflags: [async]\n---*/\n$DONE();\n", "deterministic-logical-clock"],
+    [
+      "/*---\nflags: [async]\n---*/\n$262.agent.sleep(1);\n$DONE();\n",
+      undefined,
+    ],
+  ] as const;
+  for (const [source, scheduler] of cases) {
+    const parsed = parseTest262Case(source, "test/async-case.js", revision);
+    // eslint-disable-next-line no-await-in-loop -- Cases run in order.
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set(),
+      harnesses,
+      {
+        async execute() {
+          return {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `${asyncCompletionMarker}\n`,
+          };
+        },
+      },
+      ["atomics-and-shared-memory"],
+    );
+    assert.equal(result.classification, "pass");
+    assert.ok(result.execution != null);
+    assert.equal(result.execution.scheduler, scheduler);
+    assert.equal("scheduler" in result.execution, scheduler != null);
+  }
+});
+
+test("names the agent capability no native agent can provide", async () => {
+  const source = "/*---\nflags: [CanBlockIsFalse]\n---*/\nAtomics.wait;\n";
+  const parsed = parseTest262Case(source, "test/agent-gap.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set(["Atomics"]),
+    harnesses,
+    {
+      async execute() {
+        return assert.fail("an agent capability case must not execute");
+      },
+    },
+    ["atomics-single-agent"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(result.observation.unsupportedCapability, "non-blocking-agent");
+  assert.equal(result.observation.passed, false);
+});
+
+test("builds a case that only names $262.agent in text plainly", async () => {
   const source =
     "/*---\nfeatures: [Atomics]\n---*/\n" +
     "// $262.agent is not read here.\n" +
@@ -1847,8 +1898,9 @@ test("executes a case that only mentions $262.agent in text", async () => {
     new Set(["Atomics"]),
     harnesses,
     {
-      async execute() {
+      async execute(request) {
         executions += 1;
+        assert.equal(request.test262Host, undefined);
         return { exitStatus: 0, stderr: "", stdout: "" };
       },
     },
@@ -1898,11 +1950,9 @@ test("withholds a case that references the $262 host binding", async () => {
         ["functions"],
       );
       assert.equal(result.classification, "unsupported-profile-feature");
-      // `$262.agent` keeps its own, earlier capability.
-      assert.equal(
-        result.observation.unsupportedCapability,
-        body.includes("agent") ? "test262-agent" : "host-binding",
-      );
+      // The native test262 host provides only `$262.agent`, so a case that
+      // also reads another member is withheld as well.
+      assert.equal(result.observation.unsupportedCapability, "host-binding");
     }),
   );
 });

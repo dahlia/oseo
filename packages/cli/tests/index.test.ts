@@ -1205,3 +1205,174 @@ test("native unit setup and cleanup failures match the CLI", async () => {
     }),
   );
 });
+
+const agentSource = [
+  "for (let i = 0; i < 2; i++) {",
+  "  $262.agent.start(`$262.agent.report(${i} + 1);`);",
+  "}",
+  '$262.agent.start("$262.agent.leaving();");',
+  "$262.agent.start(`$262.agent.report(${1} + 1);`);",
+  "console.log(typeof $262.agent.getReport);",
+].join("\n");
+
+test("compiles agent programs beside a test262 host program", () => {
+  const help = runCli({ args: ["--help"], version: "0.0.0" });
+  assert.ok(help.stdout.includes("--test262-host"));
+  const mir = runCli({
+    args: ["--test262-host", "--dump-mir", "agents.js"],
+    source: agentSource,
+    sourceId: "agents.js",
+    version: "0.0.0",
+  });
+  assert.equal(mir.exitStatus, 0, mir.stderr);
+  // The repeated template compiles once, and the string literal is a
+  // template without holes.
+  assert.equal(mir.stdout.match(/agent-hole agent hole 0/gu)?.length, 1);
+  const emitted = runCli({
+    args: ["--test262-host", "--emit-c", "agents.js"],
+    source: agentSource,
+    sourceId: "agents.js",
+    version: "0.0.0",
+  });
+  assert.equal(emitted.exitStatus, 0, emitted.stderr);
+  assert.match(
+    emitted.stdout,
+    /oseo_test262_host_install\(\n {8}&context, oseo_agent_programs, 2u\)/u,
+  );
+  assert.match(
+    emitted.stdout,
+    /OseoResult oseo_agent_program_0\(OseoContext \*context\)/u,
+  );
+  assert.match(
+    emitted.stdout,
+    /OseoResult oseo_agent_program_1\(OseoContext \*context\)/u,
+  );
+  assert.match(emitted.stdout, /result = oseo_agent_hole\(context, 0u\);/u);
+  assert.match(emitted.stdout, /"agents\.js#agent-1", 17u\}/u);
+  assert.doesNotMatch(emitted.stdout, /oseo_agent_program_2/u);
+
+  const plain = runCli({
+    args: ["--emit-c", "plain.js"],
+    source: "console.log(1);",
+    sourceId: "plain.js",
+    version: "0.0.0",
+  });
+  assert.doesNotMatch(plain.stdout, /oseo_test262_host_install/u);
+  // Without the host, `$262` is an ordinary global reference, and the
+  // program installs no host object and links no agent program.
+  const unhosted = runCli({
+    args: ["--emit-c", "unhosted.js"],
+    source: agentSource,
+    sourceId: "unhosted.js",
+    version: "0.0.0",
+  });
+  assert.equal(unhosted.exitStatus, 0, unhosted.stderr);
+  assert.doesNotMatch(unhosted.stdout, /oseo_test262_host_install/u);
+  assert.doesNotMatch(unhosted.stdout, /oseo_agent_program_0/u);
+});
+
+test("rejects agent templates whose holes are not literal positions", () => {
+  for (const [template, message] of [
+    ["`let x = ${1}2;`", /hole 0 is not delimited as one numeric literal/u],
+    ["`let x = a${1};`", /hole 0 is not delimited as one numeric literal/u],
+    ["`let x = Math.${1};`", /hole 0 is not delimited as one numeric literal/u],
+    ["`let x = ${1}.5;`", /hole 0 is not delimited as one numeric literal/u],
+    ["`let x = '${1}';`", /hole 0 \(\$262AgentHole0\) is not one numeric/u],
+    ["`// ${1}\n`", /hole 0 \(\$262AgentHole0\) is not one numeric/u],
+    ["`let x = { ${1} };`", /OSEO0001/u],
+    ["`${1} => 1;`", /OSEO0001/u],
+    ["`let x; x = ${1} = 2;`", /OSEO0001/u],
+    ["`with ({}) { ${1}; }`", /is not one numeric literal position/u],
+    ["`delete ${1};`", /is not one numeric literal position/u],
+    // An escaped spelling of a placeholder is not the hole's token.
+    [
+      "`// ${42}\n$262.agent.report($262AgentHole\\\\u0030);`",
+      /is not one numeric literal position|Unknown binding/u,
+    ],
+  ] as const) {
+    const rejected = runCli({
+      args: ["--test262-host", "--dump-mir", "template.js"],
+      source: `$262.agent.start(${template});`,
+      sourceId: "template.js",
+      version: "0.0.0",
+    });
+    assert.equal(rejected.exitStatus, 1, template);
+    assert.match(rejected.stderr, message, template);
+  }
+  // A hole the Script reads twice, through typeof and a plain read, is
+  // still one placeholder per substitution.
+  const accepted = runCli({
+    args: ["--test262-host", "--dump-mir", "template.js"],
+    source: "$262.agent.start(`let x = typeof ${1} + ${2};`);",
+    sourceId: "template.js",
+    version: "0.0.0",
+  });
+  assert.equal(accepted.exitStatus, 0, accepted.stderr);
+  assert.match(accepted.stdout, /agent hole 1/u);
+  // An escaped identifier that decodes to a placeholder name moves the
+  // placeholder instead of shadowing the hole.
+  const escaped = runCli({
+    args: ["--test262-host", "--dump-mir", "template.js"],
+    source:
+      "$262.agent.start(`let $262AgentHol\\\\u{65}0 = 1; " +
+      "$262.agent.report(${1} + $262AgentHol\\\\u{65}0);`);",
+    sourceId: "template.js",
+    version: "0.0.0",
+  });
+  assert.equal(escaped.exitStatus, 0, escaped.stderr);
+  assert.match(escaped.stdout, /agent hole 0/u);
+});
+
+test("links each agent unit beside the main unit", async () => {
+  const writes = new Map<string, string>();
+  const inputs: NativeBuildInput[] = [];
+  const host: CompilerHost = {
+    executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+    makeTemporaryDirectory: async () => "/work",
+    readTextFile: async () => "runtime asset",
+    writeTextFile: async (path, source) => {
+      writes.set(path, source);
+    },
+    remove: async () => undefined,
+    run: async () => ({ exitStatus: 0, stderr: "", stdout: "" }),
+  };
+  const toolchain: NativeToolchain = {
+    createBuildPlan(input) {
+      inputs.push(input);
+      return {
+        executablePath: "/work/program",
+        requests: [],
+        target: input.target,
+      };
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--test262-host", "agents.js"],
+      source: agentSource,
+      sourceId: "agents.js",
+      version: "0.0.0",
+    },
+    host,
+    toolchain,
+  );
+  assert.equal(result.exitStatus, 0, result.stderr);
+  assert.equal(inputs[0]?.generatedSourcePath, "/work/generated.c");
+  assert.deepEqual(inputs[0]?.additionalGeneratedSourcePaths, [
+    "/work/agent-0.c",
+    "/work/agent-1.c",
+  ]);
+  assert.match(writes.get("/work/agent-1.c") ?? "", /oseo_agent_program_1/u);
+  const moduleGoal = await runNativeCli(
+    {
+      args: ["--test262-host", "--module", "agents.js"],
+      source: "export {};",
+      sourceId: "agents.js",
+      version: "0.0.0",
+    },
+    host,
+    toolchain,
+  );
+  assert.equal(moduleGoal.exitStatus, 1);
+  assert.match(moduleGoal.stderr, /applies only to Scripts/u);
+});

@@ -149,7 +149,7 @@ results:
     execution:            # omitted when nothing executed
       harnessIncludes: [base.js, doneprintHandle.js, compareArray.js]
       target: linux-x86_64-gnu
-      scheduler: deterministic-logical-clock   # module and async cases
+      scheduler: deterministic-logical-clock   # module, async; no agent host
       variants:           # every executed combination, in order
         - { strictness: strict, specialization: disabled }
         - { strictness: strict, specialization: enabled }
@@ -518,6 +518,30 @@ ordering and whose indexed collection preserves holes, and from
 reviewed rows under the node's two inventory roots carry it, and an already
 reviewed row outside those roots may only move to pass when this was its last
 unmet prerequisite.
+
+The M5b `atomics-and-shared-memory` node extends the vocabulary with
+`atomics-and-shared-memory`. The tag identifies the `$262.agent` harness
+capability and the agent cluster behind it, as
+[ADR 0026](./0026-agent-clusters-and-shared-memory.md) decides: starting an
+agent from an ahead-of-time agent program, broadcasting a Shared Data Block,
+reports, sleeps, and monotonic time, and the cross-agent WaiterList that
+wakes a blocking waiter of another agent and resolves another agent's
+`waitAsync` promise in that agent. One tag covers the capability because
+every member reaches the same cluster and turn handoff. The tag is distinct
+from `atomics-single-agent`, which names the `SharedArrayBuffer` and
+`Atomics` surface one agent observes, and which the tagged rows keep. The
+node declares no inventory roots. The 112 reviewed rows that name
+`$262.agent` carry the tag, now execute, and all move to `pass`. Admitting
+the tag changes no classification value.
+
+The same node narrows when an execution records the `scheduler` field. A
+module or asynchronous case built with the native test262 host runs its
+agents under the real-clock agent cluster of ADR 0026, whose timers, waits,
+and sleeps take monotonic time, so its `execution` omits `scheduler` rather
+than claiming `deterministic-logical-clock`. Every other module or
+asynchronous execution still records `deterministic-logical-clock`. The
+field stays optional with its one value, so the schema and the
+classification vocabulary are unchanged.
 
 
 Alternatives considered

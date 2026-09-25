@@ -105,6 +105,10 @@ const proxyTrapsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/proxyTrapsHelper.js",
 );
+const atomicsHelperHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/atomicsHelper.js",
+);
 const asyncHelpersHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/asyncHelpers.js",
@@ -277,6 +281,11 @@ export interface Test262ExecutionRequest {
   /** Absolute upstream path; module imports resolve against it. */
   readonly sourcePath?: string;
   readonly specialization: SpecializationMode;
+  /**
+   * The case reads `$262.agent`, so the program is built with the native
+   * test262 host and its agent programs.
+   */
+  readonly test262Host?: boolean;
 }
 
 /** Native execution boundary used by the repository runner and unit tests. */
@@ -770,24 +779,16 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
 }
 
 /**
- * A harness or agent capability that the single native agent cannot
- * provide, decided before execution. `$262.agent` starts further agents
- * that share memory with this one, and the atomicsHelper.js include
- * builds on it at load time. A `CanBlockIsFalse` case needs an agent whose
+ * A harness or agent capability that no native agent can provide, decided
+ * before execution. A `CanBlockIsFalse` case needs an agent whose
  * [[CanBlock]] is false, while every native agent of this profile can
- * suspend. Each stays an explicit unsupported result naming the missing
- * capability, never a pass and never a silently dropped path.
+ * suspend. It stays an explicit unsupported result naming the missing
+ * capability, never a pass and never a silently dropped path. A case that
+ * needs `$262.agent` runs against the native test262 host instead.
  */
 function unsupportedHostCapability(
-  source: string,
   parsed: ParsedTest262Case,
 ): { readonly capability: string; readonly detail: string } | undefined {
-  if (needsTest262Agent(source, parsed)) {
-    return {
-      capability: "test262-agent",
-      detail: "the case needs the $262.agent multi-agent capability.",
-    };
-  }
   if (parsed.flags.includes("CanBlockIsFalse")) {
     return {
       capability: "non-blocking-agent",
@@ -799,7 +800,10 @@ function unsupportedHostCapability(
 
 /**
  * Whether the case needs the `$262.agent` multi-agent capability, so the
- * reviewed runner never executes it. A case reads that capability through
+ * reviewed runner builds it with the native test262 host, whose agent
+ * programs are compiled from the case's `$262.agent.start` templates. A
+ * case that reads nothing of `$262` keeps an ordinary build, where the
+ * name stays unresolvable. A case reads that capability through
  * the atomicsHelper.js include, which builds on it at load time, or as a
  * `$262.agent` property of its own. The property is found in the parsed
  * syntax rather than in the text, so the name inside a comment or a string
@@ -1874,7 +1878,16 @@ async function executedResult(
   rootPath?: string,
 ): Promise<Test262Result> {
   const testCase = parsed.case;
-  const scheduled = testCase.mode === "module" || testCase.async;
+  const test262Host = needsTest262Agent(source, parsed);
+  /*
+   * An ordinary module or asynchronous case runs under the deterministic
+   * logical clock ADR 0013 records. A case built with the native test262
+   * host instead runs its agents under the real-clock agent cluster of
+   * ADR 0026, whose timers, waits, and sleeps take monotonic time, so its
+   * execution records no scheduler value at all.
+   */
+  const scheduled =
+    (testCase.mode === "module" || testCase.async) && !test262Host;
   const expectRuntimeNegative = testCase.expectedFailurePhase === "runtime";
   const variants: Test262Variant[] = [];
   let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
@@ -2002,6 +2015,10 @@ async function executedResult(
       };
     }),
     specialization: variant.specialization,
+    ...includePropertiesWhen(() => {
+      if (!test262Host) return undefined;
+      return { test262Host };
+    }),
   });
   /*
    * ADR 0013 requires every executed combination to be listed and
@@ -2279,7 +2296,7 @@ export async function executeTest262Case(
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
-  const hostCapability = unsupportedHostCapability(source, parsed);
+  const hostCapability = unsupportedHostCapability(parsed);
   if (hostCapability != null) {
     return classifyTest262(
       parsed.case,
@@ -2485,6 +2502,7 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
     done: await readFile(doneHarnessPath, "utf8"),
     includes: new Map([
       ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
+      ["atomicsHelper.js", await readFile(atomicsHelperHarnessPath, "utf8")],
       [
         "byteConversionValues.js",
         await readFile(byteConversionHarnessPath, "utf8"),
@@ -2543,6 +2561,7 @@ const nativeExecutor: Test262Executor = {
         : request.sourceId;
     const args = [
       ...(request.mode === "module" ? ["--module"] : []),
+      ...(request.test262Host === true ? ["--test262-host"] : []),
       ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
       ...(runtimeArchiveReuse === "disabled"
         ? ["--no-runtime-archive-reuse"]

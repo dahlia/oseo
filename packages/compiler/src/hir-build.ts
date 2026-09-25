@@ -1,4 +1,8 @@
 import {
+  agentTemplateSegments,
+  isAgentStartTarget,
+} from "./agent-templates.ts";
+import {
   anonymousDefinition,
   errorIntrinsicName,
   intrinsicGlobalObjectName,
@@ -37,7 +41,7 @@ import type {
   HirSwitchCase,
   ResolveState,
 } from "./hir.ts";
-import type { Diagnostic, SourceRange } from "./source.ts";
+import type { ByteRange, Diagnostic, SourceRange } from "./source.ts";
 import type {
   BindingPatternMode,
   LocatedSyntax,
@@ -269,6 +273,27 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
  * property behind it, and a standard global this realm does not install
  * yet would answer an absent property where ECMA-262 requires a value.
  */
+/*
+ * The agent program hole an unresolved identifier read occupies: its name
+ * is a hole's placeholder and its bytes are exactly where the compiler
+ * inserted that placeholder.
+ */
+function agentHoleAt(
+  identifier: Extract<SyntaxExpression, { readonly kind: "identifier" }>,
+  state: ResolveState,
+): { index: number; reads: number } | undefined {
+  const hole = state.agentHoles?.get(identifier.name);
+  if (
+    hole == null ||
+    identifier.byteRange == null ||
+    identifier.byteRange.start !== hole.span.start ||
+    identifier.byteRange.end !== hole.span.end
+  ) {
+    return undefined;
+  }
+  return hole;
+}
+
 function isGlobalObjectResolvedName(name: string): boolean {
   if (isPropertyOwnedIntrinsicName(name)) return true;
   if (isRuntimeOwnedIntrinsicName(name)) return false;
@@ -790,6 +815,14 @@ function resolveTypeofIdentifier(
       ...expression,
       argument: resolved,
     };
+  }
+  if (
+    resolution.binding == null &&
+    resolution.objectBindingIds.length === 0 &&
+    agentHoleAt(argument, state) != null
+  ) {
+    const resolved = resolveExpression(argument, scopes, state);
+    return resolved == null ? undefined : { ...expression, argument: resolved };
   }
   if (isGlobalObjectResolvedName(argument.name) && resolution.binding == null) {
     // ResolveBinding's HasProperty decides resolvability, and `typeof`
@@ -1327,6 +1360,18 @@ function resolveExpression(
           value: expression.name === "NaN" ? NaN : Infinity,
         };
       }
+      // Only the token inserted at a hole reads it, ahead of the global
+      // object: an escaped spelling of the placeholder elsewhere is an
+      // ordinary global reference.
+      const hole = agentHoleAt(expression, state);
+      if (hole != null) {
+        hole.reads += 1;
+        return {
+          index: hole.index,
+          kind: "agent-hole",
+          range: expression.range,
+        };
+      }
       if (isGlobalObjectResolvedName(expression.name)) {
         return intrinsicGlobalIdentifierRead(
           expression.name,
@@ -1574,6 +1619,13 @@ function resolveExpression(
       ),
     );
     return undefined;
+  }
+  if (state.agentTemplates != null && isAgentStartTarget(expression.target)) {
+    const segments = agentTemplateSegments(expression.arguments[0]);
+    const key = JSON.stringify(segments);
+    if (segments != null && !state.agentTemplates.has(key)) {
+      state.agentTemplates.set(key, { range: expression.range, segments });
+    }
   }
   const argumentValues: HirCallArgument[] = [];
   for (const argument of expression.arguments) {
@@ -4136,7 +4188,28 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
-interface HirSeed {
+/** One agent program hole's placeholder and where the source holds it. */
+export interface AgentHolePlaceholder {
+  readonly name: string;
+  readonly span: ByteRange;
+}
+
+/**
+ * Resolution options for a Script compiled for the test262 host: whether
+ * to collect its `$262.agent.start` templates, and for an agent program
+ * the placeholders of its numeric holes in hole order.
+ */
+export interface HirHostOptions {
+  /**
+   * Each hole's placeholder name and the UTF-8 byte span the placeholder
+   * occupies in the agent source, in hole order.
+   */
+  readonly agentHoles?: readonly AgentHolePlaceholder[];
+  /** Record every `$262.agent.start` template the Script contains. */
+  readonly collectAgentTemplates?: boolean;
+}
+
+interface HirSeed extends HirHostOptions {
   readonly fragmentMetadata?: true;
   /** Record actual Script/global lookups without traversing lowered IR. */
   readonly globalReferences?: Set<string>;
@@ -4175,6 +4248,16 @@ export function buildSeededHir(
     scriptScope,
     functionInfo: new Map(),
     hirFunctions: [],
+    agentHoles:
+      seed.agentHoles == null
+        ? undefined
+        : new Map(
+            seed.agentHoles.map((hole, index) => [
+              hole.name,
+              { index, reads: 0, span: hole.span },
+            ]),
+          ),
+    agentTemplates: seed.collectAgentTemplates === true ? new Map() : undefined,
     intrinsicGlobalObjectBinding: undefined,
     intrinsicReadFallbacks: new Map(),
     labels: [],
@@ -4203,6 +4286,20 @@ export function buildSeededHir(
     false,
     scriptScope,
   );
+  // An agent program is only equivalent to the source text it matches
+  // when every hole is exactly one identifier read, the position where a
+  // decimal literal parses to the same PrimaryExpression.
+  for (const [name, hole] of state.agentHoles ?? []) {
+    if (hole.reads === 1) continue;
+    diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        program,
+        `Agent source template hole ${hole.index} (${name}) is not one ` +
+          "numeric literal position.",
+      ),
+    );
+  }
   if (diagnostics.length > 0) {
     return {
       diagnostics,
@@ -4249,6 +4346,10 @@ export function buildSeededHir(
       };
     }),
     program: {
+      ...includePropertiesWhen(() => {
+        if (state.agentTemplates == null) return undefined;
+        return { agentTemplates: [...state.agentTemplates.values()] };
+      }),
       body:
         state.intrinsicGlobalObjectBinding == null
           ? body
@@ -4300,6 +4401,9 @@ export function buildSeededHir(
 }
 
 /** Validate owned syntax and resolve all lexical and function identities. */
-export function buildHir(program: SyntaxProgram): HirResult {
-  return buildSeededHir(program);
+export function buildHir(
+  program: SyntaxProgram,
+  options: HirHostOptions = {},
+): HirResult {
+  return buildSeededHir(program, options);
 }
