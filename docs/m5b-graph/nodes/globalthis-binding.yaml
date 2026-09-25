@@ -12,5 +12,5 @@ dependencies:
   - global-object-record
   - reviewed-evidence-direction-policy
   - runtime-error-observation
-landed: false
+landed: true
 status: ready
