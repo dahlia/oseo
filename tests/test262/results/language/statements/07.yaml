@@ -332,17 +332,21 @@ results:
       strictness:
         - non-strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - error-intrinsics
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/with/12.10-2-4.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/language/statements/with/12.10-2-4.js:88:96:
-        error[OSEO1001]: Unknown binding 'x'.\\n\""
-      unsupportedCapability: profile-syntax
-      passed: false
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -22,7 +22,6 @@ results:
       detail: "Not executed: the frontmatter needs an unsupported feature."
       passed: false
     unsupportedFeatures:
-      - globalThis
       - iterator-helpers
   - case:
       async: false

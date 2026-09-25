@@ -1,6 +1,7 @@
 import {
   anonymousDefinition,
   errorIntrinsicName,
+  intrinsicGlobalObjectName,
   isStandardGlobalName,
   isTypedArrayIntrinsicName,
 } from "./hir.ts";
@@ -31,8 +32,8 @@ import type {
   HirPrivateName,
   HirPrivateNameKey,
   HirResult,
+  HirGlobalReference,
   HirStatement,
-  HirStrictGlobalFallback,
   HirSwitchCase,
   ResolveState,
 } from "./hir.ts";
@@ -116,14 +117,15 @@ function resolveName(
 
 /**
  * Allocate the uninitialized fallback behind an unresolved `with` name.
- * An `initializing` use is one whose all-miss path reaches PutValue
- * without a prior GetValue, so it can actually write the hidden cell: a
- * simple assignment or a destructuring or loop assignment target. A
- * compound or logical assignment and an update expression read first
- * and throw ReferenceError on the uninitialized cell before any write,
- * so they never initialize it. Recording the initializing names lets
- * the program reject a folded `typeof` of the same name instead of
- * misreporting the materialized value as `"undefined"`.
+ * Only a name the realm global object never resolves reaches it, which
+ * this profile limits to a runtime-owned call-target intrinsic and a
+ * standard global it has not admitted as a value. Every other all-miss
+ * path reaches the global object's property instead, so no hidden cell
+ * can shadow a real global property. An `initializing` use is one whose
+ * all-miss path reaches PutValue without a prior GetValue, so it can
+ * actually write the hidden cell: a simple assignment or a destructuring
+ * or loop assignment target. Recording those names lets a separately
+ * compiled Script fragment fall back instead of hiding the write.
  */
 function withFallbackBinding(
   name: string,
@@ -173,21 +175,27 @@ function rejectStrictWithFallbackWrite(
 }
 
 /**
- * Reject a `with` fallback write that would bypass a mutable intrinsic's
- * global property. Object-environment hits remain admitted, but the compiler
- * cannot let an all-miss path create a separate hidden cell for the same name.
+ * Reject a `with` fallback write that would bypass the realm global
+ * object's property for the same name. Object-environment hits remain
+ * admitted, but an all-miss PutValue reaches the global object, where a
+ * non-strict write creates or updates a real property; the compiler
+ * cannot let that path create a separate hidden cell instead, because a
+ * later reference to the name reads the global object.
  */
-function rejectPropertyOwnedIntrinsicWithFallbackWrite(
+function rejectGlobalObjectWithFallbackWrite(
   name: string,
   located: LocatedSyntax,
   state: ResolveState,
 ): boolean {
-  if (!isPropertyOwnedIntrinsicName(name)) return false;
+  if (!isGlobalObjectResolvedName(name)) return false;
+  const subject = isPropertyOwnedIntrinsicName(name)
+    ? "property-owned intrinsic"
+    : "global-object name";
   state.diagnostics.push(
     sourceDiagnostic(
       state.sourceId,
       located,
-      `Assigning property-owned intrinsic '${name}' through a with ` +
+      `Assigning ${subject} '${name}' through a with ` +
         "fallback is outside the admitted global-object profile.",
     ),
   );
@@ -231,6 +239,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "globalThis" ||
     name === "isFinite" ||
     name === "isNaN" ||
     name === "parseFloat" ||
@@ -246,6 +255,26 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
   );
 }
 
+/**
+ * Whether an unshadowed reference to `name` resolves through the realm's
+ * global object rather than through a compiled binding.
+ *
+ * A property-owned intrinsic always does: its value lives in the global
+ * object property the realm installed. Every other name that ECMA-262
+ * does not require a conforming realm to bind does too, because a
+ * program can create such a property at run time through `globalThis`,
+ * so no closed-world analysis can decide the reference statically. The
+ * two exclusions keep names this profile has not admitted as values
+ * reportable: a runtime-owned intrinsic is a call target with no global
+ * property behind it, and a standard global this realm does not install
+ * yet would answer an absent property where ECMA-262 requires a value.
+ */
+function isGlobalObjectResolvedName(name: string): boolean {
+  if (isPropertyOwnedIntrinsicName(name)) return true;
+  if (isRuntimeOwnedIntrinsicName(name)) return false;
+  return !isStandardGlobalName(name);
+}
+
 function bindingExpression(
   binding: Binding,
   range: SourceRange,
@@ -258,22 +287,27 @@ function bindingExpression(
   };
 }
 
-/** Read the realm global object captured before the source body executes. */
-function intrinsicGlobalObjectRead(
-  range: SourceRange,
-  state: ResolveState,
-): HirExpression {
+/** The realm global object captured before the source body executes. */
+function intrinsicGlobalObjectBinding(state: ResolveState): Binding {
   let binding = state.intrinsicGlobalObjectBinding;
   if (binding == null) {
     binding = {
       id: state.nextBindingId,
       mutable: false,
-      name: "*intrinsic global object*",
+      name: intrinsicGlobalObjectName,
     };
     state.nextBindingId += 1;
     state.intrinsicGlobalObjectBinding = binding;
   }
-  return bindingExpression(binding, range);
+  return binding;
+}
+
+/** Read the realm global object captured before the source body executes. */
+function intrinsicGlobalObjectRead(
+  range: SourceRange,
+  state: ResolveState,
+): HirExpression {
+  return bindingExpression(intrinsicGlobalObjectBinding(state), range);
 }
 
 /** Read one mutable intrinsic through the realm's global object property. */
@@ -329,14 +363,19 @@ function missingIntrinsicRead(
   return bindingExpression(missingIntrinsicBinding(name, state), range);
 }
 
-/** Return the missing-binding check required by a strict global write. */
-function strictIntrinsicGlobalFallback(
+/**
+ * Mark one global-object property reference as an identifier reference,
+ * so MIR lowering performs the global Environment Record's own
+ * HasProperty tests around it. Only strict code needs the hidden cell
+ * whose read throws the missing binding's ReferenceError.
+ */
+function intrinsicGlobalReference(
   name: string,
   state: ResolveState,
-): HirStrictGlobalFallback | undefined {
-  if (!state.strict) return undefined;
+): HirGlobalReference {
+  if (!state.strict) return {};
   const fallback = missingIntrinsicBinding(name, state);
-  return { bindingId: fallback.id, name: fallback.name };
+  return { strictFallback: { bindingId: fallback.id, name: fallback.name } };
 }
 
 /** Resolve one assignment-pattern leaf to a mutable intrinsic property. */
@@ -346,7 +385,6 @@ function intrinsicGlobalPatternTarget(
   state: ResolveState,
 ): HirAssignmentMemberTarget {
   const reference = intrinsicGlobalPropertyRead(name, located.range, state);
-  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
   return {
     ...includePropertiesWhen(() => {
       if (located.byteRange == null) return undefined;
@@ -354,17 +392,12 @@ function intrinsicGlobalPatternTarget(
         byteRange: located.byteRange,
       };
     }),
+    globalReference: intrinsicGlobalReference(name, state),
     inferredName: name,
     key: reference.key,
     kind: "assignment-member",
     object: reference.object,
     range: located.range,
-    ...includePropertiesWhen(() => {
-      if (strictGlobalFallback == null) return undefined;
-      return {
-        strictGlobalFallback,
-      };
-    }),
   };
 }
 
@@ -375,38 +408,37 @@ function intrinsicGlobalLoopTarget(
   state: ResolveState,
 ): Extract<HirForOfTarget, { readonly kind: "property" }> {
   const reference = intrinsicGlobalPropertyRead(name, range, state);
-  const strictGlobalFallback = strictIntrinsicGlobalFallback(name, state);
   return {
+    globalReference: intrinsicGlobalReference(name, state),
     key: reference.key,
     kind: "property",
     object: reference.object,
     range,
-    ...includePropertiesWhen(() => {
-      if (strictGlobalFallback == null) return undefined;
-      return {
-        strictGlobalFallback,
-      };
-    }),
   };
 }
 
 /**
- * Read a mutable intrinsic global with ordinary identifier semantics.
- * The property owns the value, while an absent property reaches one hidden
- * uninitialized cell so GetValue throws ReferenceError instead of returning
- * the `undefined` that an ordinary property read would produce.
+ * Read a global-object name with ordinary identifier semantics:
+ * ResolveBinding's HasProperty, then GetBindingValue's own HasProperty
+ * and Get, which MIR lowering performs over one shared evaluation of the
+ * global object and the key. `unresolvable` answers an absent property at
+ * the first test; an identifier read reaches the hidden uninitialized
+ * cell, whose read throws ReferenceError instead of returning the
+ * `undefined` an ordinary property read would produce.
  */
 function intrinsicGlobalIdentifierRead(
   name: string,
   range: SourceRange,
   state: ResolveState,
+  unresolvable: HirExpression = missingIntrinsicRead(name, range, state),
 ): HirExpression {
   return {
-    alternate: missingIntrinsicRead(name, range, state),
-    consequent: intrinsicGlobalPropertyRead(name, range, state),
-    kind: "conditional",
+    globalReference: intrinsicGlobalReference(name, state),
+    kind: "global-read",
+    name,
+    object: intrinsicGlobalObjectRead(range, state),
     range,
-    test: intrinsicGlobalPropertyExists(name, range, state),
+    unresolvable,
   };
 }
 
@@ -430,7 +462,7 @@ function identifierFallback(
       value: name === "NaN" ? NaN : Infinity,
     };
   }
-  if (isPropertyOwnedIntrinsicName(name)) {
+  if (isGlobalObjectResolvedName(name)) {
     return intrinsicGlobalIdentifierRead(name, range, state);
   }
   return bindingExpression(withFallbackBinding(name, state, false), range);
@@ -621,10 +653,12 @@ function isRuntimeOwnedIntrinsicName(name: string): boolean {
 }
 
 /**
- * Resolve an identifier delete without reading the selected binding. The
- * closed-world profile can decide declarative and unresolvable references
- * statically. Property-owned intrinsic globals delete the same configurable
- * property that their later identifier reads observe.
+ * Resolve an identifier delete without reading the selected binding. A
+ * declarative binding is decided statically, and every global-object
+ * name deletes the same property that its later identifier reads
+ * observe. The remaining constant `true` answers the standard globals
+ * this profile has not admitted as values: this realm binds no property
+ * for them, and deleting an unresolvable reference is true.
  */
 function resolveIdentifierDelete(
   expression: Extract<SyntaxExpression, { readonly kind: "delete" }>,
@@ -660,12 +694,20 @@ function resolveIdentifierDelete(
       range: expression.range,
       value: false,
     };
-  } else if (isPropertyOwnedIntrinsicName(argument.name)) {
+  } else if (isGlobalObjectResolvedName(argument.name)) {
+    // An absent property is an unresolvable reference, whose delete
+    // answers true; only a resolved one reaches [[Delete]].
     fallback = {
-      key: { kind: "string", range: argument.range, value: argument.name },
-      kind: "property-delete",
-      object: intrinsicGlobalObjectRead(argument.range, state),
+      alternate: { kind: "boolean", range: expression.range, value: true },
+      consequent: {
+        key: { kind: "string", range: argument.range, value: argument.name },
+        kind: "property-delete",
+        object: intrinsicGlobalObjectRead(argument.range, state),
+        range: expression.range,
+      },
+      kind: "conditional",
       range: expression.range,
+      test: intrinsicGlobalPropertyExists(argument.name, argument.range, state),
     };
   } else if (isRuntimeOwnedIntrinsicName(argument.name)) {
     state.diagnostics.push(
@@ -709,15 +751,14 @@ function resolveIdentifierDelete(
 
 /**
  * Resolve a direct `typeof` applied to an identifier. ECMA-262 answers
- * `"undefined"` for an unresolvable reference instead of throwing, and the
- * closed-world profile can decide resolvability statically the same way
- * `resolveIdentifierDelete` does, so a name with no binding, no admitted
- * intrinsic value, and no enclosing object environment folds to that
- * string without reading or creating any binding. Every other expression
- * keeps the ordinary unresolved-name rejection. Runtime-owned call-target
- * intrinsics stay rejected: ECMA-262 resolves them to real global values
- * this profile does not admit as values, so `"undefined"` would misreport
- * them.
+ * `"undefined"` for an unresolvable reference instead of throwing, which
+ * is what an ordinary property read of the realm global object already
+ * produces for an absent name, so every global-object-resolved name uses
+ * that read instead of the uninitialized cell an ordinary reference needs
+ * for its ReferenceError. Runtime-owned call-target intrinsics and the
+ * standard globals this profile has not admitted as values stay rejected:
+ * ECMA-262 resolves them to real global values, so answering `"undefined"`
+ * for them would misreport the realm.
  */
 function resolveTypeofIdentifier(
   expression: Extract<SyntaxExpression, { readonly kind: "unary" }>,
@@ -750,14 +791,16 @@ function resolveTypeofIdentifier(
       argument: resolved,
     };
   }
-  if (
-    isPropertyOwnedIntrinsicName(argument.name) &&
-    resolution.binding == null
-  ) {
-    const fallback = intrinsicGlobalPropertyRead(
+  if (isGlobalObjectResolvedName(argument.name) && resolution.binding == null) {
+    // ResolveBinding's HasProperty decides resolvability, and `typeof`
+    // answers an unresolvable name without reading it. GetBindingValue
+    // then tests the property again, so a Proxy on the global object's
+    // prototype chain observes two `has` calls before any `get`.
+    const fallback = intrinsicGlobalIdentifierRead(
       argument.name,
       argument.range,
       state,
+      { kind: "undefined", range: argument.range },
     );
     const resolved =
       resolution.objectBindingIds.length === 0
@@ -792,47 +835,19 @@ function resolveTypeofIdentifier(
     return undefined;
   }
   // A clause 19 standard global is never unresolvable in a conforming
-  // realm of the pinned edition, so folding it to "undefined" would
+  // realm of the pinned edition, so answering `"undefined"` would
   // misreport a required global value this profile has simply not
   // admitted yet. Annex B additions stay excluded from the claim and
-  // remain ordinary unresolvable names.
-  if (isStandardGlobalName(argument.name)) {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        argument,
-        `typeof standard global binding '${argument.name}' is outside ` +
-          "the admitted global-object profile.",
-      ),
-    );
-    return undefined;
-  }
-  // Both folded shapes are re-checked against the program's unresolved
-  // `with` assignment targets after resolution completes, because a
-  // hidden fallback cell such an assignment initializes at run time
-  // would make the folded answer misreport the materialized value.
-  state.foldedTypeofReferences.push({
-    located: locatedOf(argument),
-    name: argument.name,
-  });
-  if (resolution.objectBindingIds.length > 0) {
-    // Every active object environment is consulted first; when all of
-    // them miss, the reference is unresolvable, so the fallback is the
-    // `undefined` value `typeof` reports rather than the hidden
-    // uninitialized cell an ordinary read preserves for its
-    // ReferenceError.
-    return {
-      ...expression,
-      argument: {
-        ...locatedOf(argument),
-        fallback: { kind: "undefined", range: argument.range },
-        kind: "with-get",
-        name: argument.name,
-        objectBindingIds: resolution.objectBindingIds,
-      },
-    };
-  }
-  return { kind: "string", range: expression.range, value: "undefined" };
+  // reach the global-object read above as ordinary names.
+  state.diagnostics.push(
+    sourceDiagnostic(
+      state.sourceId,
+      argument,
+      `typeof standard global binding '${argument.name}' is outside ` +
+        "the admitted global-object profile.",
+    ),
+  );
+  return undefined;
 }
 
 function resolveExpression(
@@ -865,7 +880,7 @@ function resolveExpression(
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
-      isPropertyOwnedIntrinsicName(expression.name) &&
+      isGlobalObjectResolvedName(expression.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -882,42 +897,24 @@ function resolveExpression(
         expression.range,
         state,
       );
-      const strictGlobalFallback = state.strict
-        ? missingIntrinsicBinding(expression.name, state)
-        : undefined;
+      const globalReference = intrinsicGlobalReference(expression.name, state);
       const write: HirExpression =
         expression.kind === "binding-set"
           ? {
               ...locatedOf(expression),
+              globalReference,
               key: reference.key,
               kind: "property-set",
               object: reference.object,
-              ...includePropertiesWhen(() => {
-                if (strictGlobalFallback == null) return undefined;
-                return {
-                  strictGlobalFallback: {
-                    bindingId: strictGlobalFallback.id,
-                    name: strictGlobalFallback.name,
-                  },
-                };
-              }),
               value: inferred,
             }
           : {
               ...locatedOf(expression),
+              globalReference,
               key: reference.key,
               kind: "property-update",
               object: reference.object,
               operator: expression.operator,
-              ...includePropertiesWhen(() => {
-                if (strictGlobalFallback == null) return undefined;
-                return {
-                  strictGlobalFallback: {
-                    bindingId: strictGlobalFallback.id,
-                    name: strictGlobalFallback.name,
-                  },
-                };
-              }),
               value: inferred,
             };
       if (expression.kind === "binding-set") return write;
@@ -951,14 +948,55 @@ function resolveExpression(
       return undefined;
     }
     if (value == null) return undefined;
+    // A non-strict all-miss `with` write reaches the realm global
+    // object the way ECMA-262's sloppy global reference does: a simple
+    // assignment creates or updates the property, and a compound or
+    // logical assignment first reads the property, or throws the
+    // unresolvable reference's ReferenceError when it is absent. A
+    // strict all-miss write stays rejected below.
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      rejectPropertyOwnedIntrinsicWithFallbackWrite(
-        expression.name,
-        expression,
-        state,
-      )
+      !state.strict &&
+      isGlobalObjectResolvedName(expression.name)
+    ) {
+      const fallback = {
+        name: expression.name,
+        objectBindingId: intrinsicGlobalObjectBinding(state).id,
+      };
+      if (expression.kind === "binding-set") {
+        return {
+          ...expression,
+          fallback,
+          kind: "with-set",
+          objectBindingIds: resolution.objectBindingIds,
+          value: inferFunctionName(value, expression.name),
+        };
+      }
+      return {
+        ...expression,
+        fallback: {
+          ...fallback,
+          read: intrinsicGlobalIdentifierRead(
+            expression.name,
+            expression.range,
+            state,
+          ),
+        },
+        kind: "with-update",
+        objectBindingIds: resolution.objectBindingIds,
+        value:
+          expression.operator === "&&" ||
+          expression.operator === "??" ||
+          expression.operator === "||"
+            ? inferFunctionName(value, expression.name)
+            : value,
+      };
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectGlobalObjectWithFallbackWrite(expression.name, expression, state)
     ) {
       return undefined;
     }
@@ -970,11 +1008,6 @@ function resolveExpression(
       rejectStrictWithFallbackWrite(expression.name, expression, state);
       return undefined;
     }
-    // Only a non-strict simple assignment reaches PutValue on an
-    // all-miss chain; a compound or logical assignment performs
-    // GetValue first, which throws ReferenceError on the uninitialized
-    // fallback cell before any write, so it can never initialize the
-    // hidden cell.
     const binding =
       resolution.binding ??
       withFallbackBinding(
@@ -1046,7 +1079,7 @@ function resolveExpression(
   if (expression.kind === "binding-step") {
     const resolution = resolveName(scopes, state, expression.name);
     if (
-      isPropertyOwnedIntrinsicName(expression.name) &&
+      isGlobalObjectResolvedName(expression.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -1055,25 +1088,14 @@ function resolveExpression(
         expression.range,
         state,
       );
-      const strictGlobalFallback = state.strict
-        ? missingIntrinsicBinding(expression.name, state)
-        : undefined;
       const step: HirExpression = {
         ...locatedOf(expression),
+        globalReference: intrinsicGlobalReference(expression.name, state),
         key: reference.key,
         kind: "property-step",
         object: reference.object,
         operator: expression.operator,
         prefix: expression.prefix,
-        ...includePropertiesWhen(() => {
-          if (strictGlobalFallback == null) return undefined;
-          return {
-            strictGlobalFallback: {
-              bindingId: strictGlobalFallback.id,
-              name: strictGlobalFallback.name,
-            },
-          };
-        }),
       };
       return {
         alternate: missingIntrinsicRead(
@@ -1104,14 +1126,34 @@ function resolveExpression(
       );
       return undefined;
     }
+    // A non-strict all-miss update reads and then writes the realm
+    // global object's property, exactly as an update of an unshadowed
+    // global name does.
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      rejectPropertyOwnedIntrinsicWithFallbackWrite(
-        expression.name,
-        expression,
-        state,
-      )
+      !state.strict &&
+      isGlobalObjectResolvedName(expression.name)
+    ) {
+      return {
+        ...expression,
+        fallback: {
+          name: expression.name,
+          objectBindingId: intrinsicGlobalObjectBinding(state).id,
+          read: intrinsicGlobalIdentifierRead(
+            expression.name,
+            expression.range,
+            state,
+          ),
+        },
+        kind: "with-step",
+        objectBindingIds: resolution.objectBindingIds,
+      };
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      rejectGlobalObjectWithFallbackWrite(expression.name, expression, state)
     ) {
       return undefined;
     }
@@ -1285,7 +1327,7 @@ function resolveExpression(
           value: expression.name === "NaN" ? NaN : Infinity,
         };
       }
-      if (isPropertyOwnedIntrinsicName(expression.name)) {
+      if (isGlobalObjectResolvedName(expression.name)) {
         return intrinsicGlobalIdentifierRead(
           expression.name,
           expression.range,
@@ -2939,7 +2981,7 @@ function resolveBindingPattern(
         : resolveName(scopes, state, pattern.name);
     if (
       mode === "write" &&
-      isPropertyOwnedIntrinsicName(pattern.name) &&
+      isGlobalObjectResolvedName(pattern.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -2948,11 +2990,7 @@ function resolveBindingPattern(
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      rejectPropertyOwnedIntrinsicWithFallbackWrite(
-        pattern.name,
-        pattern,
-        state,
-      )
+      rejectGlobalObjectWithFallbackWrite(pattern.name, pattern, state)
     ) {
       return undefined;
     }
@@ -3218,7 +3256,7 @@ function resolveForInTarget(
   if (target.kind === "binding") {
     const resolution = resolveName(scopes, state, target.name);
     if (
-      isPropertyOwnedIntrinsicName(target.name) &&
+      isGlobalObjectResolvedName(target.name) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -3227,7 +3265,7 @@ function resolveForInTarget(
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      rejectPropertyOwnedIntrinsicWithFallbackWrite(target.name, target, state)
+      rejectGlobalObjectWithFallbackWrite(target.name, target, state)
     ) {
       return undefined;
     }
@@ -3859,7 +3897,7 @@ function resolveStatement(
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
       if (
-        isPropertyOwnedIntrinsicName(statement.target.name) &&
+        isGlobalObjectResolvedName(statement.target.name) &&
         resolution.binding == null &&
         resolution.objectBindingIds.length === 0
       ) {
@@ -3871,7 +3909,7 @@ function resolveStatement(
       } else if (
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
-        rejectPropertyOwnedIntrinsicWithFallbackWrite(
+        rejectGlobalObjectWithFallbackWrite(
           statement.target.name,
           statement.target,
           state,
@@ -4132,7 +4170,6 @@ export function buildSeededHir(
   const scriptScope = new Map(seed.bindings);
   const state: ResolveState = {
     diagnostics,
-    foldedTypeofReferences: [],
     globalObjectBindingIds: new Set(seed.globalObjectBindingIds),
     globalReferences: seed.globalReferences,
     scriptScope,
@@ -4166,23 +4203,6 @@ export function buildSeededHir(
     false,
     scriptScope,
   );
-  // A hidden fallback cell an unresolved `with` assignment initializes
-  // at run time materializes its name the way ECMA-262's sloppy global
-  // write does, so every `typeof` the program folded to "undefined" for
-  // such a name is rejected rather than misreported. The check runs
-  // after the whole program resolves, so it holds regardless of where
-  // the assignment and the fold occur relative to each other.
-  for (const reference of state.foldedTypeofReferences) {
-    if (!state.withInitializingFallbackNames.has(reference.name)) continue;
-    diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        reference.located,
-        `typeof with fallback binding '${reference.name}' is outside ` +
-          "the admitted global-object profile.",
-      ),
-    );
-  }
   if (diagnostics.length > 0) {
     return {
       diagnostics,
@@ -4256,7 +4276,13 @@ export function buildSeededHir(
         ...(state.intrinsicGlobalObjectBinding == null
           ? []
           : [state.intrinsicGlobalObjectBinding]),
-        ...state.intrinsicReadFallbacks.values(),
+        ...[...state.intrinsicReadFallbacks].map(
+          ([unresolvableName, binding]) => ({
+            id: binding.id,
+            name: binding.name,
+            unresolvableName,
+          }),
+        ),
       ],
       globalObjectBindings,
       ...includePropertiesWhen(() => {

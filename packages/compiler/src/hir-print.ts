@@ -1,11 +1,15 @@
+import { intrinsicGlobalObjectName } from "./hir.ts";
 import type {
   HirBindingPattern,
   HirCallArgument,
   HirClassField,
   HirExpression,
+  HirGlobalRead,
   HirPrivateName,
   HirProgram,
   HirStatement,
+  HirWithBindingReference,
+  HirWithGlobalObjectFallback,
 } from "./hir.ts";
 import type { SourceRange } from "./source.ts";
 import type { Hint } from "./syntax.ts";
@@ -48,6 +52,56 @@ function withObjectText(objectBindingIds: readonly number[]): string {
   return objectBindingIds.map((bindingId) => `%b${bindingId}`).join(" -> ");
 }
 
+/**
+ * The realm global-object fallback of an all-miss `with` write, or the
+ * empty string for a hidden-cell fallback, which prints nothing.
+ */
+function withGlobalFallbackText(
+  fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
+): string {
+  if (!("objectBindingId" in fallback)) return "";
+  const target = `%b${fallback.objectBindingId}(${intrinsicGlobalObjectName})`;
+  return (
+    ` fallback ${target}[${JSON.stringify(fallback.name)}]` +
+    (fallback.read == null ? "" : ` read ${printHirExpression(fallback.read)}`)
+  );
+}
+
+/**
+ * Spell a global identifier read as the record operations it performs, in
+ * order: ResolveBinding's HasProperty, then GetBindingValue's HasProperty
+ * and Get. Lowering evaluates the object and key once for all three, which
+ * the printed conditional leaves out because no step can observe it.
+ */
+function globalReadSteps(expression: HirGlobalRead): HirExpression {
+  const { object, range } = expression;
+  const key: HirExpression = { kind: "string", range, value: expression.name };
+  const exists: HirExpression = {
+    kind: "binary",
+    left: key,
+    operator: "in",
+    range,
+    right: object,
+  };
+  const fallback = expression.globalReference.strictFallback;
+  return {
+    alternate: expression.unresolvable,
+    consequent: {
+      alternate:
+        fallback == null
+          ? { kind: "undefined", range }
+          : { ...fallback, kind: "binding", range },
+      consequent: { key, kind: "property-get", object, range },
+      kind: "conditional",
+      range,
+      test: exists,
+    },
+    kind: "conditional",
+    range,
+    test: exists,
+  };
+}
+
 function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding-set") {
     return (
@@ -73,15 +127,19 @@ function printHirExpression(expression: HirExpression): string {
     return (
       `with[${withObjectText(expression.objectBindingIds)}] ` +
       `${expression.name} ${operator} ` +
-      printHirExpression(expression.value)
+      printHirExpression(expression.value) +
+      withGlobalFallbackText(expression.fallback)
     );
   }
   if (expression.kind === "with-step") {
     const target =
       `with[${withObjectText(expression.objectBindingIds)}] ` + expression.name;
-    return expression.prefix
-      ? `${expression.operator}${target}`
-      : `${target}${expression.operator}`;
+    return (
+      (expression.prefix
+        ? `${expression.operator}${target}`
+        : `${target}${expression.operator}`) +
+      withGlobalFallbackText(expression.fallback)
+    );
   }
   if (expression.kind === "destructuring-set") {
     return (
@@ -184,6 +242,9 @@ function printHirExpression(expression: HirExpression): string {
     const consequent = printHirExpression(expression.consequent);
     const alternate = printHirExpression(expression.alternate);
     return `(${test} ? ${consequent} : ${alternate})`;
+  }
+  if (expression.kind === "global-read") {
+    return printHirExpression(globalReadSteps(expression));
   }
   if (expression.kind === "sequence") {
     return `(${expression.expressions.map(printHirExpression).join(", ")})`;

@@ -4,6 +4,7 @@ import test from "node:test";
 import { buildHir, buildMir, printHir, printMir } from "../src/index.ts";
 import type {
   Hint,
+  MirOperation,
   SourceRange,
   SyntaxProgram,
   SyntaxStatement,
@@ -13,6 +14,27 @@ const range: SourceRange = {
   end: { column: 2, line: 1 },
   start: { column: 1, line: 1 },
 };
+
+/**
+ * The printed presence-checked global-object read that `typeof` of an
+ * unresolved `name` performs, as a regular expression source.
+ */
+/**
+ * The printed HIR `typeof` operand of a global-object name: ResolveBinding's
+ * presence test, then GetBindingValue's own test before the read, whose
+ * miss is `undefined` in non-strict code and the missing cell in strict.
+ */
+function typeofGlobalRead(name: string, strict = false): string {
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("${name}" in ${object}\)`;
+  const missing = strict
+    ? String.raw`%b\d+\(\*missing intrinsic:${name}\*\)`
+    : "undefined";
+  return (
+    String.raw`\(${exists} \? \(${exists} \? ` +
+    String.raw`get ${object}\["${name}"\] : ${missing}\) : undefined\)`
+  );
+}
 
 test("prints distinct non-finite MIR constants", () => {
   const syntax: SyntaxProgram = {
@@ -507,6 +529,53 @@ test("resolves unshadowed Symbol through its global property", () => {
     operations.some((operation) => operation.kind === "symbol-intrinsic"),
     false,
   );
+});
+
+test("allocates one key for each global-object name read", () => {
+  // ResolveBinding's test, GetBindingValue's test, and the Get share one
+  // key, including a specialized read's shape-guard miss.
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "Symbol", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "symbol-key-sharing.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const program = buildMir(hirResult.program, { specialization });
+    const operations: readonly MirOperation[] = program.script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const keys = operations.filter(
+      (operation) =>
+        operation.kind === "constant" &&
+        operation.constant?.kind === "string" &&
+        operation.constant.value === "Symbol",
+    );
+    assert.equal(keys.length, 2, specialization);
+    const tests = operations.filter(
+      (operation) => operation.kind === "binary" && operation.detail === "in",
+    );
+    assert.equal(tests.length, 4, specialization);
+  }
 });
 
 test("keeps a shadowed Symbol an ordinary binding", () => {
@@ -1215,7 +1284,7 @@ test("keeps do-while bodies ahead of their condition", () => {
   assert.match(printMir(buildMir(hir)), /join do-while bb/u);
 });
 
-test("folds typeof with an unresolvable name to its undefined string", () => {
+test("reads typeof of an unresolved name from the global object", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -1236,14 +1305,19 @@ test("folds typeof with an unresolvable name to its undefined string", () => {
   const result = buildHir(syntax);
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.program != null);
-  // The fold is the resolved value itself: no binding is read or
-  // created, so the lowered program holds one string constant and no
-  // typeof operation.
-  assert.match(printHir(result.program), /"undefined"/u);
+  // A program can create the property at run time, so typeof reads it
+  // from the realm global object. An absent property answers
+  // `undefined`, which typeof reports without the ReferenceError an
+  // ordinary unresolvable read owes, so no fallback cell is created.
+  assert.match(
+    printHir(result.program),
+    new RegExp(`typeof ${typeofGlobalRead("missing")}`, "u"),
+  );
   const mir = printMir(buildMir(result.program));
-  assert.match(mir, /constant "undefined"/u);
-  assert.doesNotMatch(mir, /unary typeof/u);
-  assert.doesNotMatch(mir, /read/u);
+  assert.match(mir, /read \*intrinsic global object\*/u);
+  assert.match(mir, /unary typeof/u);
+  assert.doesNotMatch(mir, /missing intrinsic/u);
+  assert.doesNotMatch(mir, /constant "undefined"/u);
 });
 
 test("rejects typeof of a runtime-owned intrinsic global name", () => {

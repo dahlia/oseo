@@ -30,6 +30,12 @@
 #define OSEO_SMI_MIN INT64_C(-140737488355328)
 #define OSEO_SMI_MAX INT64_C(140737488355327)
 #define OSEO_UNHANDLED_THROW_MESSAGE "Unhandled JavaScript throw."
+/*
+ * The rejection checkpoint's host-policy diagnostic. The exit reporter
+ * keeps it for every rejection reason, so an unhandled rejection reads
+ * the same whether its reason is an error instance or any other value.
+ */
+#define OSEO_UNHANDLED_REJECTION_MESSAGE "Unhandled promise rejection."
 
 /*
  * Runtime-owned functions use disjoint, fixed-width code ranges. A
@@ -1115,6 +1121,13 @@ typedef struct {
      * assignment path as well.
      */
     bool writable;
+    /*
+     * Non-NULL only for a cell that stands for one unresolvable global
+     * reference. Reading it throws that ReferenceError; nothing ever
+     * writes it. The pointer is a generated static string, so it
+     * outlives every cell that carries it and needs no tracing.
+     */
+    const char *unresolvable_message;
 } OseoCell;
 
 typedef struct {

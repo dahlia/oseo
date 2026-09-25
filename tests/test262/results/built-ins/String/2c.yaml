@@ -213,8 +213,7 @@ results:
       detail: "test/built-ins/String/prototype/split/checking-by-using-eval.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/String/prototype/split/checking-by-usin\
-        g-eval.js:99:3: error[OSEO1001]: Unknown binding
-        'toString'.\\n\""
+        g-eval.js:108:23: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
