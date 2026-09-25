@@ -1025,6 +1025,17 @@ allocates a same-kind result before collecting elements and does not consult
 existing TypedArray range; no intrinsic slot, heap kind, public layout, or
 generated-code entry point is added.
 
+The `m5-122` ABI adds `oseo_unresolvable_cell_create`, which creates the
+hidden cell standing for one unresolvable global reference. Reading that cell
+throws a catchable `ReferenceError` whose message is a generated static string
+naming the reference; nothing writes it, and the string needs no tracing.
+`oseo_global_object_create` now also installs the global object's own
+writable, non-enumerable, configurable `globalThis` property after every
+admitted intrinsic. `oseo_context_print_thrown` reports an unhandled
+rejection whose reason is an intrinsic error instance with the rejection
+boundary text and that instance's kind marker. No built-in code ID, intrinsic
+slot, or heap kind is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

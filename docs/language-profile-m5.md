@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 137
+M5a is complete. The normative family records described below inventory 138
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -147,53 +147,34 @@ current evidence assessment. Those live only in the indexed records above.
     cases cover the three operators.
  -  `typeof` applied directly to an unresolvable name evaluates to
     `"undefined"`, as ECMA-262's unresolvable-reference step requires.
-    M5a Unit 8.5i decides resolvability ahead of time the same way the
-    Unit 8.1b identifier delete does, so the result folds to the string
-    constant without reading or creating any binding, and every other
-    unresolved reference keeps its source-located rejection, including a
-    member access, a sequence operand, and an assignment target. Inside
-    `with`, every active object environment is consulted first: a hit
-    inspects the supplied value through the ordinary property read, a
-    resolved lexical fallback performs the ordinary binding read
-    including its temporal dead zone error, and a genuinely unresolvable
-    fallback produces `"undefined"` rather than an uninitialized-cell
-    error. A folded `typeof`, direct or through `with`, of a name any
-    `with` region of the same program uses as an unresolved assignment
-    target stays a source-located rejection regardless of source order
-    or position, since ECMA-262 models that sloppy assignment as
-    creating a real global binding whose value the folded answer would
-    misreport, the same hidden-fallback boundary the Unit 8.1b delete
-    records. Only an operation that reaches PutValue on an all-miss
-    chain records the name: a non-strict simple assignment or a
-    non-strict destructuring or loop assignment target. A compound or
-    logical assignment and an update expression read first and throw
-    ReferenceError on the uninitialized cell before any write, so a
-    caught attempt leaves the name genuinely unresolvable and keeps the
-    fold admitted in either mode. A strict fallback write, whose
-    all-miss PutValue ECMA-262 makes throw instead of creating a
-    global, is itself a source-located rejection until that strict
-    throw is lowered, so it neither runs with sloppy semantics nor
-    poisons the fold.
+    M5a Unit 8.5i first admitted it as a constant decided ahead of time.
+    M5b node `globalthis-binding` replaces that constant: an unshadowed
+    name that no declaration resolves reads the realm global object's
+    property, which answers `"undefined"` while the property is absent and
+    the type of its value once a program creates it at run time, directly
+    or through `globalThis`. Inside `with`, every active object environment
+    is consulted first: a hit inspects the supplied value through the
+    ordinary property read, a resolved lexical fallback performs the
+    ordinary binding read including its temporal dead zone error, and an
+    all-miss chain reads the global object's property the same way.
+    Because every such name reaches the global object, a sloppy all-miss
+    `with` assignment of the same name no longer needs a rejection: it
+    creates the property the later `typeof` observes.
     `typeof` of an unshadowed runtime-owned intrinsic name the profile
     still admits only as a call target, such as `console`, stays a
     source-located rejection: the realm binds that name to a real
     value, so `"undefined"` would misreport it, the same boundary
     the Unit 8.1b identifier delete records. A name the profile has
     since materialized, such as `Object`, `Number`, `Promise`, `String`,
-    `Math`, or `encodeURI`, reads the realm global object's property
-    instead. The same
-    rule covers every
-    other global name ECMA-262 clause 19 requires of the pinned
-    ECMAScript 2025 realm, such as `JSON`, `Array`, `eval`, and
-    `globalThis`: an unshadowed `typeof` of one stays a source-located
-    rejection until the profile admits the name as a value, so the fold
-    answers `"undefined"` only for a name no conforming realm of the
-    pinned edition is required to bind; Annex B additions such as
-    `escape` stay excluded from the claim and remain ordinary
-    unresolvable names. HIR and MIR structural
-    tests, a fixed native differential fixture, a generated property
-    suite with seed `0x60002d00`, and the reviewed test262
-    unresolvable-reference case cover the boundary.
+    `Math`, `encodeURI`, or `globalThis`, reads the realm global object's
+    property instead. The same rejection covers the two other global
+    names ECMA-262 clause 19 requires of the pinned ECMAScript 2025 realm
+    that this profile has not admitted as values, `eval` and
+    `Float16Array`; Annex B additions such as `escape` stay excluded from
+    the claim and remain ordinary unresolvable names. HIR and MIR
+    structural tests, fixed native differential fixtures, generated
+    property suites with seeds `0x60002d00` and `0x60007e00`, and the
+    reviewed test262 unresolvable-reference case cover the boundary.
  -  The `&&` and `||` logical operators and the conditional `?:` operator,
     lowered through explicit MIR branches and a parameterized join block.
     The untaken operand never evaluates, the produced value is the operand
@@ -506,9 +487,9 @@ current evidence assessment. Those live only in the indexed records above.
     module top level and found all of them admitted, so the stale
     rejection is removed rather than reworded. A top-level Script `var`
     binding is also a cell-backed own property of the realm's global this
-    value, as M5a Unit 8.1d records below. `globalThis` and the complete global
-    object remain outside the profile, and that gap entry owns the remaining
-    Global Environment Record behavior.
+    value, as M5a Unit 8.1d records below. M5b node `globalthis-binding`
+    exposes that object as `globalThis`, and the global binding gap entry
+    owns the remaining Global Environment Record behavior.
  -  The `==` and `!=` loose equality operators, implementing
     `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
     nullish operand compared with anything else is unequal without
@@ -802,8 +783,10 @@ current evidence assessment. Those live only in the indexed records above.
     reported by its own text rather than by the rejected value, so a
     rejected value with no intrinsic error identity leaves that path
     unchanged: the boundary text alone, with no identity read and no
-    marker. A rejected intrinsic error instance keeps the rendering and
-    marker it already had.
+    marker. Since M5b node `globalthis-binding`, a rejected intrinsic error
+    instance reports the same boundary text and keeps only its intrinsic
+    kind marker, so the boundary reads alike for every rejection reason
+    while the rejected value stays observable.
     Fixed native evidence under both specialization policies with
     collection forced at every safepoint covers every named shape: a
     reachable, an empty, and an absent message, a null-prototype, a
@@ -1378,8 +1361,10 @@ current evidence assessment. Those live only in the indexed records above.
     *optional-catch-binding-parens.js*, *S12.14\_A16\_T6.js*, and
     *block/12.1-2.js* are expected parse negatives that keep `catch ()` and a
     catch-less `try {};` rejected; and *optional-catch-binding-lexical.js*
-    stays `unsupported-profile-feature` because its final assertion reads an
-    unresolved global name, which the global binding model gap below owns.
+    stayed `unsupported-profile-feature` because its final assertion reads an
+    unresolved global name, until M5b node `globalthis-binding` gave that
+    read the runtime `ReferenceError` it expects and moved the case to
+    `pass`.
  -  Catch parameter and `var` coexistence. M5a Unit 8.5c admits a simple catch
     parameter sharing its name with a var-scoped declaration in the enclosing
     function, Script, or module. The outer var cell is hoisted and initialized
@@ -2732,11 +2717,11 @@ instantiations in the same realm, so cross-Script declaration collisions are
 outside this unit even though the runtime entry point can be called more than
 once for storage-level tests.
 
-This object is still not exposed by a `globalThis` binding. Indirect `eval`,
-dynamic `Function` construction, dynamically created global names, and the
-standard global values owned by later intrinsic nodes remain outside this
-static record. Those boundaries preserve closed-world name resolution rather
-than turning the global object into an implicit runtime name table.
+M5b node `globalthis-binding` exposes this object as `globalThis` and gives a
+dynamically created global property the runtime lookup path recorded in that
+node's section below; known names keep their compiled property-backed cells.
+Indirect `eval`, dynamic `Function` construction, and the standard global
+values owned by later intrinsic nodes remain outside this static record.
 
 Two further boundaries are worth naming. Annex B's block-level function
 hoisting is not implemented, so a function declared in a block at Script top
@@ -7522,6 +7507,77 @@ without adding a generated-code entry point. The graph's orchestration state
 remains coordinator-owned.
 
 
+globalThis binding
+------------------
+
+M5b node `globalthis-binding` exposes the realm global object as the writable,
+non-enumerable, configurable `globalThis` property. Known globals keep their
+property-backed cells. Every other unshadowed name that no declaration
+resolves, except the runtime-owned call targets `console`, `setTimeout`, and
+`clearTimeout` and the unadmitted standard globals `eval` and `Float16Array`,
+resolves through the realm global object at run time. ResolveBinding,
+GetBindingValue, and SetMutableBinding each perform their own `HasProperty`,
+so a Proxy on the global object's prototype chain observes every test and
+may answer each one differently. A read tests the property to resolve the
+reference, and an absent property reaches a hidden cell that throws the
+`ReferenceError` naming the unresolvable reference; a found reference tests
+it again before `Get`, and a property gone by then reads as `undefined` in
+non-strict code and throws `ReferenceError` in strict code. `typeof` answers
+`"undefined"` for an unresolvable name without reading it and otherwise reads
+through the same second test. `delete` deletes a present property and answers
+`true` for an absent one, a sloppy write creates or updates the property, and
+a strict write to an absent name throws `ReferenceError`. Each write and
+delete tests the property's presence when its reference is resolved, before
+a right-hand side, iterator value, or loop body runs, and a write to a
+resolved reference tests it once more before the store, where only strict
+code throws for a missing property. Node.js and Deno perform one test per
+reference and skip the others on the global object's prototype chain, so
+fixed native evidence checks the specified order against the model alone. A
+property
+a program creates at run time, directly, through `globalThis`, or through
+`Object.defineProperty`, is therefore visible to every later reference,
+including accessors and inherited properties. A non-strict all-miss `with`
+chain reaches the same property for simple, compound, logical, and update
+writes; destructuring and loop-head targets and strict writes behind such a
+chain remain source-located rejections. An unhandled rejection whose reason is
+an intrinsic error instance reports the rejection boundary text and keeps the
+reason's kind marker.
+
+The reviewed test262 environment installs neither the `$262` nor the `print`
+host binding. The runner classifies an uncaught `ReferenceError` whose exact
+message names one of them as unsupported with the `host-binding` capability.
+Before execution, it withholds a case whose parsed syntax references `$262`
+outside `$262.agent`, and a case whose parsed syntax references a definition
+that an upstream include's `defines` metadata lists but the reviewed include
+does not declare, with the `harness-definition` capability. A name inside a
+comment or string, a property key, a `typeof` operand, and a name the case
+declares itself never withhold execution.
+
+Fixed Node.js, Deno, and native differential evidence and generated evidence
+at seed `0x60007e00` cover absent, writable, accessor, non-writable, and
+inherited global properties under reads, `typeof`, `delete`, sloppy and strict
+assignment, compound assignment, update, `globalThis` property reads, and
+all-miss `with` reads and writes, plus `globalThis` identity, descriptor,
+replacement, deletion, and restoration, both specialization policies, false
+numeric hints, deliberate shape-guard misses, generic fallback, and
+collection forced at every safepoint. Node.js and Deno throw `ReferenceError`
+for a strict assignment to a name found only on the global object's prototype,
+where ECMA-262 performs an ordinary `Set`, so that one generated combination
+compares native execution with the specification model alone. All 29 paths
+under *test/built-ins/global/* are reviewed: 19 pass and 10 retain the
+dynamic-source boundary. Another 141 reviewed paths outside the root move from
+`unsupported-profile-feature` to `pass`, four switch lexical-scope negative
+tests move to `expected-negative`, and no reviewed path moves away from
+`pass`. The manifest moves from 21,312 to 21,341 paths, from 18,001 to 18,161
+passes, from 1,556 to 1,560 expected negatives, and from 1,755 to 1,620
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 160 to 161 domains and seeds and
+from 5,839 to 5,855 ordinary cases, and the evidence inventory moves from 137
+to 138 families. The new `oseo_unresolvable_cell_create` entry point moves
+the ABI to `oseo-runtime-m5-122`. The graph's orchestration state remains
+coordinator-owned.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -7640,33 +7696,30 @@ complete. The remaining gaps retain their existing owners.
     ASCII identifier shape, still classifies as unsupported with the
     `runtime-error-observation` capability named. Owner: the intrinsics
     and built-in objects stream.
- -  The `globalThis` binding does not exist. M5a Unit 8.1d gives Script
-    top-level `this` and every non-strict nullish receiver one realm-wide
-    global object. M5b `global-object-record` completes its static declaration
-    model and installs `Infinity`, `NaN`, and `undefined` alongside the
-    admitted `ArrayBuffer`, `BigInt`, `DataView`, `Map`, `Object`, `Number`,
-    `Promise`, `Set`, `String`, concrete TypedArray, and weak collection
-    identities. The
-    `uri-handling-functions` node adds `decodeURI`, `decodeURIComponent`,
-    `encodeURI`, and `encodeURIComponent` as four more replaceable
-    properties of the same object, the `global-numeric-functions` node
-    adds `isFinite`, `isNaN`, `parseFloat`, and `parseInt` the same way,
-    and the `reflect-namespace` node adds `Reflect`. Because this realm
-    still binds none of the other unadmitted clause 19 standard globals, a
-    Script
-    top-level `var` declaration of such a name creates the fresh
-    undefined-initialized property GlobalDeclarationInstantiation
-    prescribes for an absent name, exactly as reviewed passes such as
-    *for-of/dstr/obj-id-init-simple-no-strict.js* rely on; the window
-    before its first assignment, where a conforming realm would still expose
-    another standard intrinsic value, is part of this gap, and a case that
-    observes it surfaces as a semantic failure at manifest review rather
-    than entering silently. The remaining standard constructors still need to
-    become real values. Dynamically created global bindings require the owned
-    architecture decision on how a mutable global object meets closed-world
-    name resolution. Two interactions sit outside this unit for different
-    reasons. Annex B block-level function hoisting is
-    outside the candidate claim under
+ -  The global binding model is complete only for names the realm admits as
+    values. M5a Unit 8.1d gives Script top-level `this` and every non-strict
+    nullish receiver one realm-wide global object, M5b `global-object-record`
+    completes its static declaration model, the intrinsic nodes install the
+    admitted standard globals as replaceable properties of the same object,
+    and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
+    other unresolved global reference through it at run time. Three
+    boundaries remain. First, the realm still binds neither `eval` nor
+    `Float16Array`, the two clause 19 standard globals this profile has not
+    admitted as values, so a reference to either stays a source-located
+    rejection, and a Script top-level `var` declaration of either creates the
+    fresh undefined-initialized property GlobalDeclarationInstantiation
+    prescribes for an absent name; the window before its first assignment,
+    where a conforming realm would still expose the standard value, is part
+    of this gap. The runtime-owned call targets `console`, `setTimeout`, and
+    `clearTimeout` likewise keep hidden cells rather than global properties,
+    so `typeof` and `delete` of them stay rejected. Second, an all-miss
+    `with` chain admits a non-strict simple, compound, logical, or update
+    write to the global object, but a destructuring, `for-in`, or `for-of`
+    target and every strict write through such a chain stay source-located
+    rejections. Third, the record validates one independently compiled
+    Script at a time and does not retain `[[VarNames]]` across Scripts.
+    Two interactions sit outside this unit for different reasons. Annex B
+    block-level function hoisting is outside the candidate claim under
     [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Indirect `eval` var
     bindings stay inside that claim and outside this profile, because
     [ADR 0016](./adr/0016-dynamic-source-boundary.md) keeps the dynamic
@@ -7674,32 +7727,14 @@ complete. The remaining gaps retain their existing owners.
     [ADR 0019](./adr/0019-m5-claim-closure.md) authorizes that exclusion
     for M5 completion while leaving the conformance label to its own later
     gate. A case that depends on either classifies unsupported under the
-    record that owns it instead of blocking this unit. The reviewed
-    *test/language/global-code/* directory is now reviewed, with its
-    dynamic-source and unresolved-name cases retaining those explicit
-    boundaries. The reviewed
-    *test/language/statements/with/12.10-2-4.js* and
-    *test/language/statements/with/12.10-2-5.js* cases each contain a
-    failure-only read of the unresolved global `x` outside the `with`
-    environment. Their intended nullish `TypeError` path has fixed native
-    evidence, but the complete upstream source remains
-    `unsupported-profile-feature` until this global binding model lands. The
-    reviewed *test/language/statements/try/optional-catch-binding-lexical.js*
-    case stays `unsupported-profile-feature` for the same reason: its final
-    assertion reads the unresolved global `y` through
-    `assert.throws(ReferenceError, ...)`, while the optional catch clauses it
-    contains are admitted by M5a Unit 8.5b. Strict writes to an unresolved name
-    also stop at the source-located boundary recorded above instead of
-    producing a runtime `ReferenceError`. The reviewed
-    *function-code/block-decl-onlystrict.js* and
-    *global-code/block-decl-strict.js* cases and four of the reviewed
-    _statements/switch/scope-lex-\*.js_ cases expose the same boundary. Their
-    block or switch binding is correctly absent outside its lexical scope, but
-    the remaining read receives the compile-stage `Unknown binding` diagnostic
-    instead of the runtime `ReferenceError` a dynamic global name-resolution
-    path produces. Owner: `globalthis-binding` and the dynamic-source boundary;
-    the
-    surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
+    record that owns it instead of blocking this unit. Reviewed test262
+    cases that reach the `$262` or `print` host bindings, which the reviewed
+    environment never installs, classify as unsupported with the
+    `host-binding` capability named, and cases that call a definition the
+    reviewed *regExpUtils.js* omits classify with the `harness-definition`
+    capability, as the `globalthis-binding` section records. Owner: the
+    intrinsics and built-in objects stream and the dynamic-source boundary;
+    the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding
     property name, or an array or object binding default is admitted by M5a
     Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as
@@ -7755,8 +7790,9 @@ complete. The remaining gaps retain their existing owners.
     function inventory that need *wellKnownIntrinsicObjects.js* classify
     as unsupported until that include has a reviewed implementation. The
     reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
-    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`,
-    because this profile does not admit `globalThis`. Its
+    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
+    choice kept from before M5b node `globalthis-binding` admitted
+    `globalThis`. Its
     `assert.throwsAsync` reports a constructor mismatch without composing a
     message from the observed value, so a rejection whose `constructor` is
     missing or exotic cannot replace the mismatch report with a thrown

@@ -60,13 +60,43 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
       - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/dfs-invariant-direct-1_FIXTURE.js
+            - test/language/module-code/top-level-await/dfs-invariant-direct-2_FIXTURE.js
+            - test/language/module-code/top-level-await/dfs-invariant-indirect_FIXTURE.js
+          id: test/language/module-code/top-level-await/dfs-invariant.js
+          sourceHash: fnv1a64:5a7cbd6e6649b121
+        - dependencies:
+            - test/language/module-code/top-level-await/dfs-invariant-async_FIXTURE.js
+          id: test/language/module-code/top-level-await/dfs-invariant-direct-1_FIXTURE.js
+          sourceHash: fnv1a64:3e4158a615d98e2b
+        - dependencies: []
+          id: test/language/module-code/top-level-await/dfs-invariant-async_FIXTURE.js
+          sourceHash: fnv1a64:cd7634f9a7262201
+        - dependencies:
+            - test/language/module-code/top-level-await/dfs-invariant-async_FIXTURE.js
+          id: test/language/module-code/top-level-await/dfs-invariant-direct-2_FIXTURE.js
+          sourceHash: fnv1a64:45ef668be398ede0
+        - dependencies:
+            - test/language/module-code/top-level-await/dfs-invariant-direct-1_FIXTURE.js
+          id: test/language/module-code/top-level-await/dfs-invariant-indirect_FIXTURE.js
+          sourceHash: fnv1a64:6dae4af0edb7eb77
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - globalThis
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

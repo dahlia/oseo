@@ -1,0 +1,62 @@
+version: 1
+id: globalthis-binding
+title: "globalThis binding and global-object name resolution"
+scope:
+  - "The realm global object exposed as its own writable, non-enumerable,
+    configurable globalThis property."
+  - "Known globals keep their property-backed cells; every other unresolved
+    global reference resolves through the realm global object at run time,
+    including typeof, delete, sloppy and strict writes, and all-miss with
+    reads and non-strict writes."
+  - "The unresolvable-reference ReferenceError, the rejection boundary for an
+    intrinsic error reason, and the test262 host-binding and
+    harness-definition capability classifications."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/globalthis-binding.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/globalthis-binding.ts
+      - tests/native/scenarios/shard-1.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/globalthis-binding.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-globalthis-binding.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/globalthis-binding.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/globalthis-binding.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262-runner.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/hir.test.ts
+      - packages/compiler/tests/mir.test.ts
+      - packages/parser-babel/tests/basics.test.ts
+      - tests/harness-fragments.test.ts

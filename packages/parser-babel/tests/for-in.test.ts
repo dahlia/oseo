@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource, printHir, printMir } from "@oseo/compiler";
+import {
+  compileHarnessFragment,
+  compileSource,
+  printHir,
+  printMir,
+} from "@oseo/compiler";
 import type { MirOperation, MirProgram } from "@oseo/compiler";
 
 import { babelFrontend } from "../src/index.ts";
@@ -18,6 +23,27 @@ function compiled(source: string, sourceId: string): MirProgram {
 function operationsOf(program: MirProgram): readonly MirOperation[] {
   return [program.script, ...program.functions].flatMap((item) =>
     item.blocks.flatMap((block) => block.operations),
+  );
+}
+
+/**
+ * The printed presence-checked global-object read that `typeof` of an
+ * unresolved `name` performs, as a regular expression source.
+ */
+/**
+ * The printed HIR `typeof` operand of a global-object name: ResolveBinding's
+ * presence test, then GetBindingValue's own test before the read, whose
+ * miss is `undefined` in non-strict code and the missing cell in strict.
+ */
+function typeofGlobalRead(name: string, strict = false): string {
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("${name}" in ${object}\)`;
+  const missing = strict
+    ? String.raw`%b\d+\(\*missing intrinsic:${name}\*\)`
+    : "undefined";
+  return (
+    String.raw`\(${exists} \? \(${exists} \? ` +
+    String.raw`get ${object}\["${name}"\] : ${missing}\) : undefined\)`
   );
 }
 
@@ -214,14 +240,22 @@ test("keeps every for-in head this unit does not admit rejected", () => {
       "for (var a = 1 in {}) {}",
       /for-in declaration needs one uninitialized binding/u,
     ],
-    ["for (missing in {}) {}", /Unknown binding 'missing'/u],
+    ["for (console in {}) {}", /Unknown binding 'console'/u],
     [
       "function outer() {\n" +
         "  with ({}) {\n" +
         "    (function () { 'use strict'; for (fresh in {}) {} })();\n" +
         "  }\n" +
         "}\n",
-      /Assigning with fallback binding 'fresh' in strict code/u,
+      /Assigning global-object name 'fresh' through a with fallback/u,
+    ],
+    [
+      "function outer() {\n" +
+        "  with ({}) {\n" +
+        "    (function () { 'use strict'; for (console in {}) {} })();\n" +
+        "  }\n" +
+        "}\n",
+      /Assigning with fallback binding 'console' in strict code/u,
     ],
   ];
   for (const [source, message] of cases) {
@@ -236,24 +270,53 @@ test("keeps every for-in head this unit does not admit rejected", () => {
 });
 
 test("records a for-in with fallback target as an initializing name", () => {
-  // Unit 8.5i folds `typeof` of an unresolvable name to "undefined". A
-  // non-strict for-in head target reaches PutValue on an all-miss chain,
-  // which ECMA-262 models as creating a global binding, so the fold must
-  // stay rejected for that name.
-  const result = compileSource(babelFrontend, {
+  // Outside `with`, an unresolved head target writes the realm global
+  // object's property, which a later `typeof` reads.
+  const global = compileSource(babelFrontend, {
+    source: "for (fresh in { a: 1 }) {}\nconsole.log(typeof fresh);\n",
+    sourceId: "for-in-global-target.ts",
+  });
+  assert.deepEqual(global.diagnostics, []);
+  assert.ok(global.hir != null);
+  assert.match(
+    printHir(global.hir),
+    new RegExp(`typeof ${typeofGlobalRead("fresh")}`, "u"),
+  );
+  // Inside `with`, the all-miss head write to the same property is
+  // outside the profile rather than a hidden cell no later reference
+  // would observe.
+  const globalFallback = compileSource(babelFrontend, {
     source:
       "function scope() {\n" +
       "  with ({}) { for (fresh in { a: 1 }) {} }\n" +
-      "}\n" +
-      "scope();\n" +
-      "console.log(typeof fresh);\n",
+      "}\n",
+    sourceId: "for-in-with-global-fallback.ts",
+  });
+  assert.equal(globalFallback.mir, undefined);
+  assert.match(
+    globalFallback.diagnostics[0]?.message ?? "",
+    /Assigning global-object name 'fresh' through a with fallback/u,
+  );
+  // A runtime-owned name still owns a hidden fallback cell. A non-strict
+  // head target reaches PutValue on an all-miss chain, which ECMA-262
+  // models as creating a global binding, so a separately compiled
+  // harness fragment that writes it falls back to the whole Script.
+  const source =
+    "function scope() {\n" +
+    "  with ({}) { for (console in { a: 1 }) {} }\n" +
+    "}\n";
+  const result = compileSource(babelFrontend, {
+    source,
     sourceId: "for-in-with-fallback.ts",
   });
-  assert.equal(result.mir, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /typeof with fallback binding 'fresh'/u,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  const fragment = compileHarnessFragment(babelFrontend, [
+    { source, sourceId: "for-in-with-fallback.ts" },
+  ]);
+  assert.equal(fragment.kind, "fallback");
+  if (fragment.kind === "fallback") {
+    assert.deepEqual(fragment.diagnostics, []);
+  }
 });
 
 test("converts every admitted object pattern for-in head to syntax", () => {
@@ -506,30 +569,45 @@ test("admits every for-in array pattern position", () => {
 
 test("records an object pattern fallback leaf as an initializing name", () => {
   // A non-strict pattern leaf that resolves through `with` reaches
-  // PutValue on an all-miss chain exactly as a direct head target does,
-  // so the Unit 8.5i `typeof` fold stays rejected for that name and a
-  // strict fallback write keeps its own rejection.
-  const nonStrict = compileSource(babelFrontend, {
+  // PutValue on an all-miss chain exactly as a direct head target does:
+  // a global-object name stays outside the profile, a hidden-cell name
+  // is recorded so a harness fragment falls back, and a strict fallback
+  // write keeps its own rejection.
+  const globalFallback = compileSource(babelFrontend, {
     source:
       "function scope() {\n" +
       "  with ({}) { for ({ length: fresh } in { a: 1 }) {} }\n" +
-      "}\n" +
-      "scope();\n" +
-      "console.log(typeof fresh);\n",
+      "}\n",
+    sourceId: "for-in-object-pattern-global-fallback.ts",
+  });
+  assert.equal(globalFallback.mir, undefined);
+  assert.match(
+    globalFallback.diagnostics[0]?.message ?? "",
+    /Assigning global-object name 'fresh' through a with fallback/u,
+  );
+  const source =
+    "function scope() {\n" +
+    "  with ({}) { for ({ length: console } in { a: 1 }) {} }\n" +
+    "}\n";
+  const nonStrict = compileSource(babelFrontend, {
+    source,
     sourceId: "for-in-object-pattern-fallback.ts",
   });
-  assert.equal(nonStrict.mir, undefined);
-  assert.match(
-    nonStrict.diagnostics[0]?.message ?? "",
-    /typeof with fallback binding 'fresh'/u,
-  );
+  assert.deepEqual(nonStrict.diagnostics, []);
+  const fragment = compileHarnessFragment(babelFrontend, [
+    { source, sourceId: "for-in-object-pattern-fallback.ts" },
+  ]);
+  assert.equal(fragment.kind, "fallback");
+  if (fragment.kind === "fallback") {
+    assert.deepEqual(fragment.diagnostics, []);
+  }
   const strict = compileSource(babelFrontend, {
     source:
       "function outer() {\n" +
       "  with ({}) {\n" +
       "    (function () {\n" +
       "      'use strict';\n" +
-      "      for ({ length: fresh } in {}) {}\n" +
+      "      for ({ length: console } in {}) {}\n" +
       "    })();\n" +
       "  }\n" +
       "}\n",
@@ -538,6 +616,6 @@ test("records an object pattern fallback leaf as an initializing name", () => {
   assert.equal(strict.mir, undefined);
   assert.match(
     strict.diagnostics[0]?.message ?? "",
-    /Assigning with fallback binding 'fresh' in strict code/u,
+    /Assigning with fallback binding 'console' in strict code/u,
   );
 });
