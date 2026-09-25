@@ -248,7 +248,10 @@ the realm global object instead of a hidden cell, and `typeof`, writes, and
 deletes of a global-object name check the property's presence first. The
 same node's review correction moved the same 32 records again, because
 ResolveBinding, GetBindingValue, and SetMutableBinding now each test a
-global-object name's property separately.
+global-object name's property separately. A third regeneration moved the
+same 32 records when a global-object name's read began evaluating the
+global object and key once for those tests and joining every outcome in one
+block.
 
 
 Stage 2 interfaces and ownership

@@ -4,6 +4,7 @@ import type {
   HirCallArgument,
   HirClassField,
   HirExpression,
+  HirGlobalRead,
   HirPrivateName,
   HirProgram,
   HirStatement,
@@ -64,6 +65,41 @@ function withGlobalFallbackText(
     ` fallback ${target}[${JSON.stringify(fallback.name)}]` +
     (fallback.read == null ? "" : ` read ${printHirExpression(fallback.read)}`)
   );
+}
+
+/**
+ * Spell a global identifier read as the record operations it performs, in
+ * order: ResolveBinding's HasProperty, then GetBindingValue's HasProperty
+ * and Get. Lowering evaluates the object and key once for all three, which
+ * the printed conditional leaves out because no step can observe it.
+ */
+function globalReadSteps(expression: HirGlobalRead): HirExpression {
+  const { object, range } = expression;
+  const key: HirExpression = { kind: "string", range, value: expression.name };
+  const exists: HirExpression = {
+    kind: "binary",
+    left: key,
+    operator: "in",
+    range,
+    right: object,
+  };
+  const fallback = expression.globalReference.strictFallback;
+  return {
+    alternate: expression.unresolvable,
+    consequent: {
+      alternate:
+        fallback == null
+          ? { kind: "undefined", range }
+          : { ...fallback, kind: "binding", range },
+      consequent: { key, kind: "property-get", object, range },
+      kind: "conditional",
+      range,
+      test: exists,
+    },
+    kind: "conditional",
+    range,
+    test: exists,
+  };
 }
 
 function printHirExpression(expression: HirExpression): string {
@@ -206,6 +242,9 @@ function printHirExpression(expression: HirExpression): string {
     const consequent = printHirExpression(expression.consequent);
     const alternate = printHirExpression(expression.alternate);
     return `(${test} ? ${consequent} : ${alternate})`;
+  }
+  if (expression.kind === "global-read") {
+    return printHirExpression(globalReadSteps(expression));
   }
   if (expression.kind === "sequence") {
     return `(${expression.expressions.map(printHirExpression).join(", ")})`;

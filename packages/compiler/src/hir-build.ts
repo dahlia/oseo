@@ -418,47 +418,27 @@ function intrinsicGlobalLoopTarget(
 }
 
 /**
- * GetBindingValue of the global object's Object Environment Record for a
- * reference ResolveBinding already found. It tests the property again
- * before reading it, because the answer can change between the two
- * tests; a property gone by then reads as `undefined` in non-strict code
- * and throws the missing binding's ReferenceError in strict code.
- */
-function intrinsicGlobalBindingValue(
-  name: string,
-  range: SourceRange,
-  state: ResolveState,
-): HirExpression {
-  return {
-    alternate: state.strict
-      ? missingIntrinsicRead(name, range, state)
-      : { kind: "undefined", range },
-    consequent: intrinsicGlobalPropertyRead(name, range, state),
-    kind: "conditional",
-    range,
-    test: intrinsicGlobalPropertyExists(name, range, state),
-  };
-}
-
-/**
- * Read a global-object name with ordinary identifier semantics. The
- * first test is ResolveBinding's, and an absent property is an
- * unresolvable reference, so it reaches one hidden uninitialized cell
- * whose read throws ReferenceError instead of returning the `undefined`
- * an ordinary property read would produce. A found reference then reads
- * through GetBindingValue, which performs its own test.
+ * Read a global-object name with ordinary identifier semantics:
+ * ResolveBinding's HasProperty, then GetBindingValue's own HasProperty
+ * and Get, which MIR lowering performs over one shared evaluation of the
+ * global object and the key. `unresolvable` answers an absent property at
+ * the first test; an identifier read reaches the hidden uninitialized
+ * cell, whose read throws ReferenceError instead of returning the
+ * `undefined` an ordinary property read would produce.
  */
 function intrinsicGlobalIdentifierRead(
   name: string,
   range: SourceRange,
   state: ResolveState,
+  unresolvable: HirExpression = missingIntrinsicRead(name, range, state),
 ): HirExpression {
   return {
-    alternate: missingIntrinsicRead(name, range, state),
-    consequent: intrinsicGlobalBindingValue(name, range, state),
-    kind: "conditional",
+    globalReference: intrinsicGlobalReference(name, state),
+    kind: "global-read",
+    name,
+    object: intrinsicGlobalObjectRead(range, state),
     range,
-    test: intrinsicGlobalPropertyExists(name, range, state),
+    unresolvable,
   };
 }
 
@@ -816,17 +796,12 @@ function resolveTypeofIdentifier(
     // answers an unresolvable name without reading it. GetBindingValue
     // then tests the property again, so a Proxy on the global object's
     // prototype chain observes two `has` calls before any `get`.
-    const fallback: HirExpression = {
-      alternate: { kind: "undefined", range: argument.range },
-      consequent: intrinsicGlobalBindingValue(
-        argument.name,
-        argument.range,
-        state,
-      ),
-      kind: "conditional",
-      range: argument.range,
-      test: intrinsicGlobalPropertyExists(argument.name, argument.range, state),
-    };
+    const fallback = intrinsicGlobalIdentifierRead(
+      argument.name,
+      argument.range,
+      state,
+      { kind: "undefined", range: argument.range },
+    );
     const resolved =
       resolution.objectBindingIds.length === 0
         ? fallback

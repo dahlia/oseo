@@ -89,6 +89,23 @@ export interface HirGlobalReference {
   readonly strictFallback?: HirStrictGlobalFallback;
 }
 
+/**
+ * GetValue of an identifier reference that the global Environment Record
+ * resolves through the realm global object: ResolveBinding's HasProperty,
+ * then GetBindingValue's own HasProperty and Get. The three steps share
+ * one evaluation of `object` and of the `name` key, because neither can
+ * change between them; only the property can, so each test still runs.
+ * An absent property at the first test is an unresolvable reference,
+ * whose `unresolvable` read throws its ReferenceError.
+ */
+export interface HirGlobalRead extends LocatedSyntax {
+  readonly globalReference: HirGlobalReference;
+  readonly kind: "global-read";
+  readonly name: string;
+  readonly object: HirExpression;
+  readonly unresolvable: HirExpression;
+}
+
 /** One resolved identifier read through active `with` environments. */
 export interface HirWithReference extends LocatedSyntax {
   readonly fallback: HirExpression;
@@ -793,6 +810,7 @@ export type HirExpression =
       readonly kind: "conditional";
       readonly test: HirExpression;
     })
+  | HirGlobalRead
   | (LocatedSyntax & {
       readonly kind: "logical";
       readonly left: HirExpression;

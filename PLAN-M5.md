@@ -6981,6 +6981,20 @@ keeps one fixed native observation of it. The fixture found and the node
 fixes a lowering defect in which a compound read behind an all-miss `with`
 chain overwrote the branch of its own global-object read.
 
+The node's first landing was reverted after GitHub Actions interrupted the
+unchanged *m5-object-own-keys.property.test.ts* suite at its time limit
+four times. Each read of a global-object name had re-evaluated the global
+object and allocated its key for each of its three steps, in two nested
+conditionals. That program reads `Object`, `Symbol`, `String`, and
+`TypeError` 142 times, so its generated C grew by 6,709 lines and 426
+blocks, and the Zig sanitizer build dominates each case. A read now
+evaluates the object and key once and joins every outcome in one block.
+The steps and their order are unchanged, the read allocates fewer values
+than the first landing did, and it adds two blocks per read over the lowering
+before the node instead of three. Locally, the whole suite took 135.7 seconds
+before the node, 151.7 seconds with the first landing, and 129.4 seconds after
+the correction.
+
 All 29 paths under *test/built-ins/global/* are reviewed: 19 pass and 10
 retain the dynamic-source boundary for `eval`. Outside the root, 141 reviewed
 paths move from `unsupported-profile-feature` to `pass`, including one module

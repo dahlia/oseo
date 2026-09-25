@@ -11,6 +11,7 @@ import type {
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
+  HirGlobalRead,
   HirGlobalReference,
   HirObjectBindingPattern,
   HirParameter,
@@ -198,12 +199,18 @@ function lowerReferenceObject(
   return { keyInput, object: lowerSuperBase(operand, builder) };
 }
 
+/**
+ * `evaluatedKey`, when present, is the property key an enclosing reference
+ * already evaluated and rooted, which the generic fallback reuses instead
+ * of evaluating `keyExpression` again.
+ */
 function lowerSpecializedPropertyGet(
   object: number,
   keyExpression: HirExpression,
   range: SourceRange,
   builder: MirBuilder,
   superReceiver?: number,
+  evaluatedKey?: number,
 ): number {
   const cacheBlock = createMirBlock(builder);
   const hitBlock = createMirBlock(builder);
@@ -265,7 +272,7 @@ function lowerSpecializedPropertyGet(
 
   builder.current = genericBlock;
   appendMirMetadata(builder, "count-guard-miss", "property read", [], range);
-  const key = lowerPropertyKey(keyExpression, builder);
+  const key = evaluatedKey ?? lowerPropertyKey(keyExpression, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -932,6 +939,84 @@ function lowerGlobalBindingValue(
     target: joinBlock.id,
     values: [missing],
   };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, range);
+}
+
+/**
+ * GetValue of an identifier reference that the global Environment Record
+ * resolves through the realm global object: ResolveBinding's HasProperty,
+ * then GetBindingValue's own HasProperty before the Get. The global object
+ * and the key are evaluated once for all three steps, and every outcome
+ * joins one block, so each reference allocates one key and adds as few
+ * blocks as the two tests allow. A literal key keeps the specialized
+ * property read when specialization is enabled, as an ordinary global
+ * property read does.
+ */
+function lowerGlobalRead(
+  expression: HirGlobalRead,
+  builder: MirBuilder,
+): number {
+  const range = expression.range;
+  const object = lowerExpression(expression.object, builder);
+  const literalKey = {
+    kind: "string" as const,
+    range,
+    value: expression.name,
+  };
+  const key = lowerExpression(literalKey, builder);
+  const resolved = lowerBinaryValues(key, "in", object, range, builder);
+  const bindingBlock = createMirBlock(builder);
+  const unresolvableBlock = createMirBlock(builder);
+  const readBlock = createMirBlock(builder);
+  const missingBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: resolved,
+    whenFalse: unresolvableBlock.id,
+    whenTrue: bindingBlock.id,
+  };
+  builder.current = bindingBlock;
+  const exists = lowerBinaryValues(key, "in", object, range, builder);
+  builder.current.terminator = {
+    kind: "branch",
+    test: exists,
+    whenFalse: missingBlock.id,
+    whenTrue: readBlock.id,
+  };
+  const join = (value: number) => {
+    builder.current.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [value],
+    };
+  };
+  builder.current = readBlock;
+  join(
+    builder.specialization === "enabled"
+      ? lowerSpecializedPropertyGet(
+          object,
+          literalKey,
+          range,
+          builder,
+          undefined,
+          key,
+        )
+      : lowerPropertyRead(object, key, range, builder),
+  );
+  builder.current = missingBlock;
+  const fallback = expression.globalReference.strictFallback;
+  join(
+    fallback == null
+      ? lowerSyntheticUndefined(range, builder)
+      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder),
+  );
+  builder.current = unresolvableBlock;
+  join(lowerExpression(expression.unresolvable, builder));
   builder.current = joinBlock;
   return recordRoot(builder, result, range);
 }
@@ -4304,6 +4389,9 @@ function lowerExpression(
       throw new Error("A sequence expression has no expressions.");
     }
     return last;
+  }
+  if (expression.kind === "global-read") {
+    return lowerGlobalRead(expression, builder);
   }
   if (expression.kind === "conditional") {
     const test = lowerExpression(expression.test, builder);

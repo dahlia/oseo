@@ -4,6 +4,7 @@ import test from "node:test";
 import { buildHir, buildMir, printHir, printMir } from "../src/index.ts";
 import type {
   Hint,
+  MirOperation,
   SourceRange,
   SyntaxProgram,
   SyntaxStatement,
@@ -528,6 +529,53 @@ test("resolves unshadowed Symbol through its global property", () => {
     operations.some((operation) => operation.kind === "symbol-intrinsic"),
     false,
   );
+});
+
+test("allocates one key for each global-object name read", () => {
+  // ResolveBinding's test, GetBindingValue's test, and the Get share one
+  // key, including a specialized read's shape-guard miss.
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "Symbol", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "symbol-key-sharing.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const program = buildMir(hirResult.program, { specialization });
+    const operations: readonly MirOperation[] = program.script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const keys = operations.filter(
+      (operation) =>
+        operation.kind === "constant" &&
+        operation.constant?.kind === "string" &&
+        operation.constant.value === "Symbol",
+    );
+    assert.equal(keys.length, 2, specialization);
+    const tests = operations.filter(
+      (operation) => operation.kind === "binary" && operation.detail === "in",
+    );
+    assert.equal(tests.length, 4, specialization);
+  }
 });
 
 test("keeps a shadowed Symbol an ordinary binding", () => {
