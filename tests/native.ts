@@ -915,6 +915,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "symbol-intrinsic" ||
     fixture.name === "generic-string-coercion" ||
     fixture.name === "function-intrinsic-chains" ||
+    fixture.name === "super-without-extends" ||
+    fixture.name === "super-without-extends-receivers" ||
     fixture.name === "number-prototype"
   ) {
     const enabledText = printMir(enabledMir);
@@ -1051,6 +1053,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-inheritance" ||
     fixture.name === "class-super-binding" ||
     fixture.name === "class-super-property" ||
+    fixture.name === "super-without-extends" ||
+    fixture.name === "super-without-extends-receivers" ||
     fixture.name === "class-super-assignment" ||
     fixture.name === "class-super-computed" ||
     fixture.name === "class-super-delete" ||

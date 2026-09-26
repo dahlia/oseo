@@ -1787,11 +1787,6 @@ test("retains closed-world and early-error delete boundaries", () => {
       "OSEO1001",
       /Deleting with fallback binding 'eval'/u,
     ],
-    [
-      "const o = { m() { delete super.x; } };",
-      "OSEO1001",
-      /only valid in the body of a class element whose class has an/u,
-    ],
   ];
   for (const [source, code, message] of cases) {
     const result = compileSource(babelFrontend, {
@@ -2342,6 +2337,54 @@ console.log(new Derived().describe(), Derived.of());
   assert.match(mir, /home-object-bind home object/u);
 });
 
+test("lowers super properties from extends-free home objects", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Plain {
+  constructor() { this.constructed = super.toString; }
+  field = super.toString;
+  method() { return super.toString; }
+  async asyncMethod() { await 0; return super.toString; }
+  *generator() { yield super.toString; }
+  async *asyncGenerator() { await 0; yield super.toString; }
+  static field = super.toString;
+  static method() { return super.toString; }
+  static { this.block = super.toString; }
+}
+const object = {
+  method() { return super.toString; },
+  async asyncMethod() { await 0; return super.toString; },
+  *generator() { yield super.toString; },
+  async *asyncGenerator() { await 0; yield super.toString; },
+  get value() { return super.toString; },
+};
+console.log(new Plain().method(), Plain.method(), object.method());
+`,
+    sourceId: "super-without-extends.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /super-base home object prototype/u);
+  assert.equal(mir.match(/home-object-bind home object/gu)?.length, 14);
+});
+
+test("keeps the lexical receiver mode of object super properties", () => {
+  const result = compileSource(babelFrontend, {
+    source: `const object = {
+  sloppy() { return (() => super.value)(); },
+  strict() { "use strict"; return super.value; },
+};
+class Plain { read() { return super.value; } }
+`,
+    sourceId: "super-without-extends-receivers.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /get super -> this global\["value"\]/u);
+  assert.equal(hir.match(/get super -> this strict\["value"\]/gu)?.length, 2);
+});
+
 test("lowers lexical super and new.target through arrows", () => {
   const result = compileSource(babelFrontend, {
     source: `class Base {
@@ -2574,41 +2617,34 @@ test("locates the early errors a private name reports at parse time", () => {
   }
 });
 
-test("rejects super outside its lexical class context", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "class A { m() { return super.m; } }",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "const o = { m() { return super.m; } };",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "class A { m() { [super.m] = [1]; } }",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "const o = { m(it) { for (super.m of it) {} } };",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "class A { m() { delete super.m; } }",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
+test("admits super in every extends-free home-object context", () => {
+  const cases: readonly string[] = [
+    "class A { m() { return super.m; } }",
+    "const o = { m() { return super.m; } };",
+    "class A { m() { [super.m] = [1]; } }",
+    "const o = { m(it) { for (super.m of it) {} } };",
+    "class A { m() { delete super.m; } }",
+    "function key() { return 'm'; } " +
       "const o = { m() { delete super[key()]; } };",
-      /only valid in the body of a class element whose class has an/u,
-    ],
   ];
-  for (const [source, message] of cases) {
+  for (const source of cases) {
     const result = compileSource(babelFrontend, {
       source,
-      sourceId: "super-rejection.ts",
+      sourceId: "super-without-extends.ts",
     });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const operations = result.mir.functions.flatMap((functionValue) =>
+      functionValue.blocks.flatMap((block) => block.operations),
+    );
+    assert.ok(
+      operations.some(
+        (operation) =>
+          operation.kind === "super-base" ||
+          operation.kind === "super-property-delete",
+      ),
+      source,
+    );
   }
 });
 
@@ -2983,31 +3019,26 @@ test("orders a super for-of head's reference after each iterator step", () => {
   }
 });
 
-test("keeps every super target composition this unit does not admit", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    // A class body without `extends` and an object literal method have no
-    // home object prototype this runtime can reach.
-    [
-      "class A { m() { ({ p: super.x } = {}); } }",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "const o = { m() { [...super.x] = [1]; } };",
-      /only valid in the body of a class element whose class has an/u,
-    ],
-    [
-      "class A { static m(it) { for (super.x of it) {} } }",
-      /only valid in the body of a class element whose class has an/u,
-    ],
+test("admits super targets from extends-free home objects", () => {
+  const cases: readonly string[] = [
+    "class A { m() { ({ p: super.x } = {}); } }",
+    "const o = { m() { [...super.x] = [1]; } };",
+    "class A { static m(it) { for (super.x of it) {} } }",
   ];
-  for (const [source, message] of cases) {
+  for (const source of cases) {
     const result = compileSource(babelFrontend, {
       source,
-      sourceId: "super-target-boundary.ts",
+      sourceId: "super-target-without-extends.ts",
     });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const operations = result.mir.functions.flatMap((functionValue) =>
+      functionValue.blocks.flatMap((block) => block.operations),
+    );
+    assert.ok(
+      operations.some((operation) => operation.kind === "property-set"),
+      source,
+    );
   }
   const admittedForIn = compileSource(babelFrontend, {
     source:

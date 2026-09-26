@@ -575,27 +575,26 @@ current evidence assessment. Those live only in the indexed records above.
     deleted, whether or not the parent owns the named property. The lowered
     program holds one rejection operation with no `super-base`,
     `delete-object-coercible`, or key-conversion operation, and both
-    specialization policies emit it unchanged. Deliberate boundaries: a class
-    body without `extends` and an object literal method keep the
-    source-located `super` rejection recorded below, a destructuring
-    assignment target and a `for` head keep theirs, private-member deletion
-    stays an early error, and an optional chain whose base is a `super`
-    property still deletes its final ordinary reference. Both reference hosts
-    evaluate the key before the receiver in a derived constructor, which
-    test262 rejects; frontend structural tests and the reviewed subset pin
-    the specified order, while the fixed *class-super-delete* native
-    differential fixture and the generated property with seed `0x60000e00`
-    keep the derived-constructor case to keys with no observable evaluation
-    so their Node.js and Deno comparisons stay exact. The fixture and the
-    property cover every element form carrying a home object, static, pure
-    computed, side-effecting, abrupt, and poisoned keys, an awaited and a
-    yielded key whose traced suspension the evaluated receiver survives,
-    present and absent parent properties, both specialization policies, and
-    forced collection.
-    This unit advances the runtime ABI to `oseo-runtime-m5-42` with
-    `oseo_super_property_delete`. Five reviewed test262 cases are added: two
-    pass and three record the `Object` heritage, extends-free class body, and
-    object literal `super` boundaries this unit does not change.
+    specialization policies emit it unchanged. Deliberate boundaries: a
+    destructuring assignment target and a `for` head keep their
+    source-located rejection at this unit,
+    private-member deletion stays an early error, and an optional chain whose
+    base is a `super` property still deletes its final ordinary reference. Both
+    reference hosts evaluate the key before the receiver in a derived
+    constructor, which test262 rejects; frontend structural tests and the
+    reviewed subset pin the specified order, while the fixed
+    *class-super-delete* native differential fixture and the generated property
+    with seed `0x60000e00` keep the derived-constructor case to keys with no
+    observable evaluation so their Node.js and Deno comparisons stay exact. The
+    fixture and the property cover every element form carrying a home object,
+    static, pure computed, side-effecting, abrupt, and poisoned keys, an
+    awaited and a yielded key whose traced suspension the evaluated receiver
+    survives, present and absent parent properties, both specialization
+    policies, and forced collection. This unit advances the runtime ABI to
+    `oseo-runtime-m5-42` with `oseo_super_property_delete`. Five reviewed
+    test262 cases are added: two pass and three record the `Object` heritage,
+    extends-free class body, and object literal `super` boundaries this unit
+    does not change.
  -  `super.property` and `super[expression]` as an assignment target,
     admitted by M5a Unit 8.5k wherever a `super` property reference itself
     is admitted. The target positions are every destructuring assignment
@@ -632,9 +631,8 @@ current evidence assessment. Those live only in the indexed records above.
     Both stores lower to the ordinary `super` property set operation with
     its receiver argument, so the profile adds no operation, no runtime
     entry point, and no ABI change, and both specialization policies emit
-    the same store. Deliberate boundaries: a class body without `extends`
-    and an object literal method keep the source-located `super` rejection
-    recorded below, a private name on `super` stays an early error,
+    the same store. Deliberate boundaries: a private name on `super` stays an
+    early error,
     `super?.x` and a declaration pattern such as
     `for (const [super.x] of it)` stay parse errors the bootstrap parser
     reports. M5a Unit 8.5l admits the same target in a for-in head and
@@ -1962,11 +1960,14 @@ current evidence assessment. Those live only in the indexed records above.
     Arrows capture the enclosing class element's home object, and asynchronous
     class elements carry it through their synthesized execution function. An
     optional call such as `super.m?.()` guards the looked-up value and calls a
-    present method with the same derived receiver. Deliberate boundaries: a
-    `super` property reference is rejected with a source-located diagnostic in
-    a class body without `extends` and in an object literal method. The
-    materialized `%Object.prototype%` now supplies the lookup root, but the
-    separate `super-without-extends` graph node still owns this syntax.
+    present method with the same derived receiver. An extends-free class and
+    an object literal now supply the home object too. An instance method, base
+    constructor, instance field initializer, or object-literal method starts
+    at `%Object.prototype%`. A static class element first reaches
+    `%Function.prototype%` and continues to the same object prototype root.
+    Object-literal methods and accessors record the newly allocated literal as
+    their home object, so a later prototype replacement changes the next
+    `super` lookup without changing its receiver.
     M5a Unit 8.5j
     later admits the `delete` operand position, recorded above, which carries
     no receiver anywhere because ECMA-262 rejects the evaluated reference
@@ -2805,9 +2806,11 @@ load would hand generated code the binding cell instead of the value it holds,
 the property cache excludes cell-backed slots individually; the global object's
 ordinary properties keep the cache.
 
-ToObject boxing of a primitive receiver in a non-strict function is not
-reachable in this profile, because no admitted primitive prototype supplies a
-callable that could receive one.
+ToObject boxing of a primitive receiver in a non-strict function remains
+unsupported and produces a source-located diagnostic. A borrowed object
+method can reach this boundary through `Function.prototype.call`; its
+nullish receiver instead resolves to the global this value. Strict methods
+retain primitive and nullish receivers unchanged.
 
 The reviewed test262 subset adds twelve directly applicable cases: the three
 positive top-level `this` cases this unit admits and the nine parse negatives
@@ -7877,11 +7880,6 @@ complete. The remaining gaps retain their existing owners.
     `export-star-as-namespace-from-module` classify
     `unsupported-profile-feature`. Owner: the modules and asynchronous
     execution stream.
- -  A `super` property reference in a class body without `extends` and in an
-    object literal method stays rejected until the `super-without-extends`
-    graph node lands. The object prototype root is now populated, but that
-    does not admit the separate language surface. Owner: the intrinsics and
-    built-in objects stream.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that

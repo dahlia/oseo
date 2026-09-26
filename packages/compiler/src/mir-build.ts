@@ -2588,13 +2588,16 @@ function lowerYieldDelegation(
 }
 
 /**
- * Records the object a class element resolves `super.x` against. A
- * `static` element and the constructor take the constructor itself and
- * the class prototype object respectively, matching the two chains
+ * Records the object a class or object-literal element resolves `super.x`
+ * against. A `static` element takes the constructor itself, while an
+ * instance element or constructor takes the class prototype, matching
+ * the two chains
  * `class-heritage` links, so an instance reference reads through the
  * parent's `prototype` and a static one through the parent constructor.
  * Every element carries the object whether or not the class is derived,
  * because the binding describes the function rather than the reference.
+ * An object-literal method or accessor instead takes the new literal as
+ * its home, retaining it even when the function is borrowed by a caller.
  */
 function lowerHomeObjectBind(
   functionValue: number,
@@ -4566,6 +4569,18 @@ function lowerExpression(
         anonymousDefinition(property.value) ? key : undefined,
         property.accessorKind,
       );
+      // Async and generator kinds also represent method definitions. A
+      // colon-form function of these kinds cannot reference super, while an
+      // arrow must retain the home inherited from its enclosing element.
+      if (
+        property.value.kind === "function" &&
+        (property.value.functionKind === "method" ||
+          property.value.functionKind === "async" ||
+          property.value.functionKind === "generator" ||
+          property.value.functionKind === "async-generator")
+      ) {
+        lowerHomeObjectBind(value, id, property.value.range, builder);
+      }
       appendMirMetadata(
         builder,
         "safepoint",

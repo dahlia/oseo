@@ -1,0 +1,3 @@
+version: 1
+id: super-without-extends
+record: docs/language-profile-m5/families/super-without-extends.yaml

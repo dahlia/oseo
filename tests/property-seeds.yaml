@@ -516,3 +516,7 @@ families:
     owner: tests/property/m5-typed-array-statics.property.test.ts
     start: 0x60008000
     end: 0x600080ff
+  - family: m5-super-without-extends
+    owner: tests/property/m5-super-without-extends.property.test.ts
+    start: 0x60008100
+    end: 0x600081ff

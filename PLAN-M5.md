@@ -635,42 +635,41 @@ that only the receiver's own chain would find. A computed reference reads its
 receiver before its key, so `super[key()]` inside a derived constructor throws
 the uninitialized-`this` `ReferenceError` before `key` runs, and reads the home
 object's `[[Prototype]]` after that key, so a key expression that replaces the
-prototype is observed by the very reference it precedes. A reference stays
-rejected with a source-located diagnostic in a class body without `extends`
-and in an object literal method, because this runtime has no
-`Object.prototype` object for that lookup to reach, and as the operand of
-`delete`, a destructuring assignment target, or a `for` head. Arrows capture
-the enclosing class element's home object, and asynchronous class elements
-carry it through their synthesized execution function. An optional call such
-as `super.m?.()` guards the looked-up method value and calls a present method
-with the same derived receiver. Fixed native
+prototype is observed by the very reference it precedes. At this checkpoint, a
+reference stays rejected in a class body without `extends` and in an object
+literal method; M5b `super-without-extends` subsequently admits those home
+objects through `%Object.prototype%`. The operand of `delete`, a destructuring
+assignment target, and a `for` head remain boundaries that later M5a units
+admit. Arrows capture the enclosing class element's home object, and
+asynchronous class elements carry it through their synthesized execution
+function. An optional call such as `super.m?.()` guards the looked-up method
+value and calls a present method with the same derived receiver. Fixed native
 fixtures cover a read, a method call, and a detached method value through
 two-level and three-level chains, an override reached from the parent through
-the derived receiver, an accessor read and its receiver, a write that reaches
-a parent setter, a write that shadows a receiver accessor without running it,
-a write that creates an own data property and its descriptor, a compound
-assignment and both update forms reading the parent and writing the receiver,
-a write to a read-only parent property, computed references over a string,
+the derived receiver, an accessor read and its receiver, a write that reaches a
+parent setter, a write that shadows a receiver accessor without running it, a
+write that creates an own data property and its descriptor, a compound
+assignment and both update forms reading the parent and writing the receiver, a
+write to a read-only parent property, computed references over a string,
 symbol, and index key, computed-key evaluation order against the `this`
 temporal dead zone, a reference inside a derived constructor before and after
-`super()`, static method, getter, and setter references through the
-constructor chain, a nested class taking its own home object, and cached,
-inherited, and accessor reads with their guard hit and miss counts. The
-generated class property suite now draws a reading body that returns a base
-member reached through `super` and a setter clause that stores through
-`super`, on the prototype and on the constructor. Unit 6.6 adds a directly
-generated lexical-arrow domain, and Unit 8.2 adds a separate present-and-absent
+`super()`, static method, getter, and setter references through the constructor
+chain, a nested class taking its own home object, and cached, inherited, and
+accessor reads with their guard hit and miss counts. The generated class
+property suite now draws a reading body that returns a base member reached
+through `super` and a setter clause that stores through `super`, on the
+prototype and on the constructor. Unit 6.6 adds a directly generated
+lexical-arrow domain, and Unit 8.2 adds a separate present-and-absent
 optional-call domain without changing that reviewed property. Eighteen reviewed
-test262
-cases newly pass, fifteen of them newly reviewed and three leaving the
+test262 cases newly pass, fifteen of them newly reviewed and three leaving the
 unsupported list, covering the `prop-dot` and `prop-expr` value, receiver,
 null-prototype, and uninitialized-`this` families, the `super` in-method and
-in-accessor cases, and the `new.target` value read through a `super`
-property. Thirty-three new unsupported cases record the unit's boundaries and
-the `Object.freeze`, `Object.setPrototypeOf` ordering, `Object` heritage, and
+in-accessor cases, and the `new.target` value read through a `super` property.
+Thirty-three new unsupported cases record the unit's boundaries and the
+`Object.freeze`, `Object.setPrototypeOf` ordering, `Object` heritage, and
 `Test262Error` observations the remaining cases need. The manifest moves to
-1034 passes, 382 expected negatives, and 199 unsupported profile features
-with no semantic or harness failures.
+1034 passes, 382 expected negatives, and 199 unsupported profile features with
+no semantic or harness failures.
 
 Public instance class fields are now admitted, the seventh unit of the
 functions and executable syntax stream. A `field = expression` element pairs
@@ -1765,8 +1764,9 @@ receiver and installs a private element. The reviewed optional-super-call
 test262 case moves from unsupported to pass. The manifest stays at 4,215 cases
 and moves to 2,482 passes, 1,179 expected negatives, and 554 unsupported
 profile features with no semantic or harness failures. A `super` property
-reference in a class without `extends` or an object-literal method remains M5b
-work because its lookup needs a materialized `Object.prototype`.
+reference in a class without `extends` or an object-literal method remained
+M5b work at this checkpoint; `super-without-extends` subsequently admits it
+through the materialized `%Object.prototype%`.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive
@@ -2981,10 +2981,10 @@ policies lower and emit the same operation. The prepared reference is
 the shape M5a Unit 8.5l reuses for a for-in head, which this unit does
 not admit.
 
-Every existing `super` boundary is unchanged. A class body without
-`extends` and an object literal method keep the source-located rejection
-the `super` property unit records, because this runtime still has no
-`Object.prototype` object for such a home object to reach. A private
+This unit retains the existing `super` home-object boundaries. M5b
+`super-without-extends` subsequently admits class bodies without `extends`
+and object-literal methods through the materialized `%Object.prototype%`.
+A private
 member in a target position stays an early error, and `super?.x` and a
 declaration pattern such as `for (const [super.x] of it)` stay parse
 errors the bootstrap parser reports. Both reference hosts agree with
@@ -5939,6 +5939,53 @@ Array range, and adds no generated-code entry point, realm intrinsic slot, or
 graph-state change. The reviewed test262 revision, 41,091-path applicable
 inventory, ADR 0013 vocabulary, inventory policy, forced-collection policy,
 and zero-override policy are unchanged.
+
+Implemented M5b node `super-without-extends` admits `super` property
+references from every class element without an `extends` clause and from
+object-literal methods and accessors. The existing home-object operation now
+binds an object-literal method to the literal under construction, and the
+frontend admits the home object independently from class heritage. An
+instance method, base constructor, instance field initializer, or object
+literal therefore starts lookup at `%Object.prototype%`. A static class
+element starts at `%Function.prototype%` and continues through the same
+object prototype root. Reads, calls, writes, updates, assignment targets, and
+evaluated delete references retain the receiver and evaluation-order rules of
+the admitted `super` property machinery.
+
+Fixed native evidence covers a base constructor, instance and static fields,
+methods, a static block, lexical arrows, object-literal methods and accessors,
+including async, generator, and async-generator methods across suspension,
+computed reads, borrowed calls and arrows, updates, destructuring and loop
+assignment targets, evaluated delete references, a setter receiver, a false
+numeric hint, both specialization
+policies, collection forced at every safepoint, and home-object prototype
+replacements that deliberately miss the shape guard and reach the generic
+fallback. Generated differential evidence at seed `0x60008100` draws class
+and object-literal homes with ordinary, async, generator, and async-generator
+methods, literal and computed keys, bounded values, absent,
+truthful, and false numeric hints, and a replacement prototype against an
+independent addition model under Node.js, Deno, both native specialization
+policies, forced collection, and deliberate guard misses.
+
+The new object-literal home bindings also change 12 whole-Script baseline
+hashes in *tests/harness-fragment-baseline.json* under both specialization
+policies: MIR now emits `home-object-bind` for methods and accessors.
+All 44 baseline records retain their identity, order, and fixture source.
+
+The node has no inventory root, adds no reviewed path, and accepts only
+existing outside-root promotions to `pass`. Regeneration promotes 33 existing
+paths: passes grow from 18,310 to 18,343, and unsupported classifications
+fall from 1,513 to 1,480 for that reason. The 21,383 reviewed paths and 1,560
+expected negatives remain unchanged, with no failures. The fixed native
+differential
+corpus grows from 262 to 264 fixtures. The property ratchet moves from
+164 to 165 domains and seeds and from 5,893 to 5,905 ordinary cases, while the
+evidence inventory moves from 140 to 141 families. The admitted runtime
+checkpoint moves the ABI to `oseo-runtime-m5-126` without adding a runtime
+component, code ID, realm intrinsic, or generated-code entry point, and does
+not change the graph's orchestration state. The reviewed test262 revision,
+applicable inventory, ADR 0013 vocabulary, inventory policy,
+forced-collection policy, and zero-override policy are unchanged.
 
 Implemented M5b node `regexp-matcher-backend-probes` builds the five probes
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) delivery item 8 requires and records one

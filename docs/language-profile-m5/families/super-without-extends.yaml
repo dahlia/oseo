@@ -1,0 +1,64 @@
+version: 1
+id: super-without-extends
+title: "Super properties without class heritage"
+scope:
+  - "Super property reads, calls, writes, updates, assignment targets, and
+    evaluated delete references in extends-free class elements and object
+    literal methods and accessors, including ordinary, async, generator, and
+    async-generator methods. Instance class elements and object
+    literals start lookup at %Object.prototype%; static class elements first
+    reach %Function.prototype% and continue through the same object prototype
+    root. Every operation keeps the element receiver distinct from that
+    lookup object. Sloppy object methods resolve nullish receivers to the
+    global this value; strict methods retain their call-site receiver.
+    Primitive boxing in sloppy methods retains the existing unsupported
+    diagnostic."
+  - "Every object-literal method and accessor records the newly allocated
+    literal as its home object. Replacing that object's prototype, or an
+    extends-free class prototype's prototype, is therefore observed by the
+    next reference. Lexical arrows inherit the same home object while an
+    ordinary nested function stops the lexical lookup."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/classes.ts
+      - tests/property/m5-super-without-extends.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/classes.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-super-without-extends.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-super-without-extends.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/classes.ts
+      - tests/property/m5-super-without-extends.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/classes.ts
+      - tests/property/m5-super-without-extends.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - tests/native.ts

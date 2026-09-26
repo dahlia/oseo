@@ -55,9 +55,9 @@ export type ReceiverKind =
 
 /**
  * How the innermost enclosing function reaches a `super.x` reference.
- * A class element with `extends` supplies the home object, and every
- * arrow nested in that element inherits it. Other functions stop the
- * lexical lookup.
+ * A class or object-literal element supplies the home object, and every
+ * arrow nested in that element inherits it. Other functions stop the lexical
+ * lookup.
  */
 export type SuperPropertyContext = "admitted" | "none";
 

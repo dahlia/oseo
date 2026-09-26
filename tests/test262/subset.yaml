@@ -51718,13 +51718,13 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/assignment/target-super-computed-reference-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, error-intrinsics, object-properties]
   - path: test/language/expressions/assignment/target-super-computed-reference.js
     expectedClassification: pass
     dependencies: [classes, error-intrinsics, expression-operators]
   - path: test/language/expressions/assignment/target-super-identifier-reference-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, error-intrinsics, object-properties]
   - path: test/language/expressions/assignmenttargettype/direct-identifierreference-arguments-strict.js
     expectedClassification: expected-negative
@@ -54598,7 +54598,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/super-access-from-arrow-func-on-field.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/delete/field-delete-covered-err-delete-call-expression-private-method-accessor-get.js
     expectedClassification: expected-negative
@@ -55621,10 +55621,10 @@ tests:
     expectedClassification: pass
     dependencies: [classes, error-intrinsics, expression-operators]
   - path: test/language/expressions/delete/super-property-null-base.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators, object-properties]
   - path: test/language/expressions/delete/super-property-topropertykey.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators, object-literals]
   - path: test/language/expressions/delete/super-property-uninitialized-this.js
     expectedClassification: pass
@@ -57408,7 +57408,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/member-expression.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators, generators]
   - path: test/language/expressions/optional-chaining/new-target-optional-call.js
     expectedClassification: pass
@@ -57696,7 +57696,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-dot-cls-ref-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-dot-cls-ref-this.js
     expectedClassification: pass
@@ -57714,37 +57714,37 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-dot-obj-null-proto.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-ref-non-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-ref-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-ref-this.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-val-from-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-val-from-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-dot-obj-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-cls-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-key-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-null-proto.js
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-ref-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-ref-this.js
     expectedClassification: pass
@@ -57753,7 +57753,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-unresolvable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-val-from-arrow.js
     expectedClassification: pass
@@ -57765,46 +57765,46 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-key-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-null-proto.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-ref-non-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-ref-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-ref-this.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-unresolvable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-val-from-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-val-from-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-obj-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/super/prop-expr-uninitialized-this-getvalue.js
     expectedClassification: pass
@@ -57819,7 +57819,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-poisoned-underscore-proto.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/tagged-template/cache-different-functions-same-site.js
     expectedClassification: pass
@@ -61181,7 +61181,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/super-access-from-arrow-func-on-field.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, object-properties]
   - path: test/language/statements/class/elements/super-access-inside-a-private-getter.js
     expectedClassification: pass
@@ -62116,7 +62116,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/syntax/class-body-method-definition-super-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/syntax/class-declaration-computed-method-definition.js
     expectedClassification: pass

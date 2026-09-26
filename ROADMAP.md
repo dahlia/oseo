@@ -1014,8 +1014,9 @@ The remaining queue is:
     capture lexical `super()` and `new.target`, asynchronous class elements
     retain `super` property context, each `super()` call performs a fresh
     `Construct`, and optional calls through `super` properties are admitted.
-    Class bodies without `extends` and object-literal methods still wait for
-    the M5b `super-without-extends` node. Unit 8.3 admits `await` inside an
+    Class bodies without `extends` and object-literal methods are admitted
+    by M5b `super-without-extends` through `%Object.prototype%`.
+    Unit 8.3 admits `await` inside an
     assignment target's computed member, a computed binding property name, and
     an array or object binding default in every body that owns a traced
     suspension frame; module top level keeps that rejection under the modules
