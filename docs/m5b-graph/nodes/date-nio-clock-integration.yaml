@@ -7,5 +7,5 @@ delivers: "Replaces the Date family's initial clock boundary with the
 dependencies:
   - date-family
   - nio-clock-wakeup-checkpoint
-landed: false
+landed: true
 status: ready
