@@ -3,13 +3,15 @@ import type { Fixture } from "../fixture.ts";
 /*
  * The reference hosts run with `TZ=UTC`, which tests/native.ts sets for
  * every fixture, because Oseo's realm reports UTC as its local time zone
- * until the PLAN-NIO clock and wakeup checkpoint supplies a host one.
- * Every observation below is therefore a real differential comparison of
- * the local-time paths rather than a UTC-only one.
+ * and the PLAN-NIO clock adapter supplies no host one. Every observation
+ * below is therefore a real differential comparison of the local-time
+ * paths rather than a UTC-only one.
  *
  * Nothing here prints a current time, an ECMA-402 locale text, or an
  * Annex B Date method: the first is not reproducible, and the reference
- * hosts own the other two while this profile admits neither.
+ * hosts own the other two while this profile admits neither. The
+ * `date-real-time-clock` fixture prints only relations between current
+ * times and the timer waits between them, which every host answers alike.
  */
 export const dateFamilyFixtures: readonly Fixture[] = [
   {
@@ -514,5 +516,59 @@ console.log("global delete", delete this.Date, typeof originalDate);
 this.Date = originalDate;
 console.log("global reinstall", this.Date === Date);
 `,
+  },
+  {
+    // Date reads epoch real time while timers wait monotonic time. Each
+    // lower bound is a few milliseconds under the delay it follows, which
+    // allows the readings' millisecond rounding and a reference host's
+    // early timer. The hinted additions hit their guard four times and
+    // reach the generic fallback twice at the end. The other ten misses
+    // are property-read guards whose sites run only once.
+    name: "date-real-time-clock",
+    source: `
+function after(base: number, step: number) {
+  return base + step;
+}
+const start = Date.now();
+const called = Date.parse(Date());
+const constructed = new Date().getTime();
+// Date() reads between the other two, so its whole second lies between
+// theirs even when the reads cross a second boundary.
+console.log(
+  "entry",
+  Number.isInteger(start),
+  constructed >= start && constructed - start < 1000,
+  called >= start - (start % 1000) && called <= constructed,
+  called % 1000,
+);
+setTimeout(function first() {
+  const reached = Date.now();
+  console.log(
+    "first",
+    reached >= after(start, 20),
+    reached < after(start, 60000),
+  );
+  Promise.resolve(reached).then(function checkpoint(value) {
+    console.log("microtask", Date.now() >= value);
+  });
+  setTimeout(function second() {
+    const later = new Date().getTime();
+    console.log(
+      "second",
+      later >= after(reached, 20),
+      later >= after(start, 45),
+    );
+    console.log("fallback", typeof after(String(later), "ms"), after("a", "b"));
+  }, 25);
+}, 25);
+console.log("scheduled");
+`,
+    specialization: {
+      genericCallsDisabled: 6,
+      genericCallsEnabled: 2,
+      hits: 4,
+      misses: 12,
+      overflowMisses: 0,
+    },
   },
 ];

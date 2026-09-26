@@ -1157,6 +1157,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "boolean-intrinsic" ||
     fixture.name === "data-view" ||
     fixture.name === "date-family" ||
+    fixture.name === "date-real-time-clock" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
@@ -1244,6 +1245,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "boolean-intrinsic" ||
             fixture.name === "data-view" ||
             fixture.name === "date-family" ||
+            fixture.name === "date-real-time-clock" ||
             fixture.name === "monotonic-timer-wakeups" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||

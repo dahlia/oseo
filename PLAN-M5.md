@@ -3509,8 +3509,8 @@ replaces the initial boundary with that adapter. `Date.now()` and Date
 operations that obtain the current time then read real time, while elapsed
 scheduling uses monotonic time. Tests inject both clock domains explicitly.
 The clock and wakeup checkpoint is implemented by
-[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md); the Date integration
-unit remains.
+[ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md), and the Date
+integration unit `date-nio-clock-integration` is implemented as well.
 
 The global object enters through this stream in dependency order:
 standard constructors become real intrinsic values first, the global
@@ -7099,6 +7099,43 @@ semantic, harness, or infrastructure failures. The property ratchet moves from
 162 to 163 domains and seeds and from 5,861 to 5,873 ordinary cases, the
 evidence inventory moves from 139 to 140 families, and the runtime ABI moves
 to `m5-124`.
+
+Implemented M5b node `date-nio-clock-integration` completes the sequence
+`date-family` and `nio-clock-wakeup-checkpoint` began. *runtime\_date.c* no
+longer reads a host clock: `Date.now()`, an argumentless construction, and
+`Date()` read the realm's epoch real-time capability through
+`oseo_clock_real_time`, round the reading down to its millisecond, and apply
+`TimeClip`. Reading the current time opens the realm's clock adapter when
+nothing has yet, but it never takes the monotonic origin that the first timer
+takes, so production timers keep waiting monotonic elapsed time from the
+scheduler time each task cached, and a wall-clock adjustment reaches later
+`Date` readings without moving a deadline. An adapter without real time
+reports `OSEO2001` “The host real-time clock is unavailable.” instead of the
+earlier direct read's “The host clock is unavailable.”, and a missing
+monotonic clock leaves `Date` working. The clock adapter supplies no time
+zone, so the realm keeps its UTC local time zone; no PLAN-NIO item schedules
+a host zone.
+
+The scheduler harness of ADR 0025 gains a `date` action that calls the
+realm's own `%Date%`, and its traces now print real time exactly, which lets
+fixed and generated schedules inject fractional readings. Fixed native
+evidence pins a deterministic trace with a read before the first timer, a
+reading just before the epoch, a wall-clock jump inside a wait, and both ends
+of the time-value range, with and without collection at every safepoint, plus
+absent real-time and monotonic capabilities and platform-adapter readings
+checked against the host clock, across a 30 ms timer, and under the
+whole-second `time` fallback. Generated evidence adds seed `0x60007002` to
+the clock family's block with 20 ordinary cases compared against an
+independent model under both collection modes. The differential fixture
+`date-real-time-clock` compares Node.js, Deno, and both native specialization
+policies with a deliberate guard miss and collection forced at every
+safepoint. The node has no inventory roots and moves no reviewed row: the
+manifest keeps 21,383 paths, 18,310 passes, 1,560 expected negatives, and
+1,513 unsupported profile features. The property ratchet moves from 163 to
+164 domains and seeds and from 5,873 to 5,893 ordinary cases, and the evidence
+inventory stays at 140 families. The behavior change moves the runtime ABI to
+`oseo-runtime-m5-125`; the node adds no component, code ID, realm intrinsic,
+heap kind, or graph-state change.
 
 
 Ahead-of-time challenge boundary

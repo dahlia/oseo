@@ -20,6 +20,7 @@
  *   do NODE cancel TARGET             clearTimeout on TARGET's handle
  *   do NODE micro CHILD               queue CHILD as a promise reaction
  *   do NODE real                      read epoch real time
+ *   do NODE date                      Date.now(), new Date(), and Date()
  *   do NODE wake                      request a wakeup on this thread
  *   do NODE advance NS                deterministic monotonic advance
  *   do NODE set-real MS               deterministic real-time jump
@@ -27,6 +28,11 @@
  *
  * Node 0 is the entry task; every other node runs when the timer or
  * microtask that names it runs.
+ *
+ * A `date` action calls the realm's own %Date% intrinsic, so the trace
+ * shows what JavaScript observes through the real-time capability:
+ * `Date.now()`, `new Date().getTime()`, and `Date.parse(Date())`, each of
+ * which reads the adapter once.
  */
 #if defined(__linux__)
 #define _GNU_SOURCE
@@ -39,6 +45,7 @@
 
 #include <dirent.h>
 #include <inttypes.h>
+#include <math.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +63,7 @@ typedef enum {
     ACTION_CANCEL,
     ACTION_MICRO,
     ACTION_REAL,
+    ACTION_DATE,
     ACTION_WAKE,
     ACTION_ADVANCE,
     ACTION_SET_REAL,
@@ -142,6 +150,8 @@ static void parse_do(char *line, const char *original) {
         action.target = parse_node(strtok(NULL, delimiters), original);
     } else if (strcmp(verb, "real") == 0) {
         action.kind = ACTION_REAL;
+    } else if (strcmp(verb, "date") == 0) {
+        action.kind = ACTION_DATE;
     } else if (strcmp(verb, "wake") == 0) {
         action.kind = ACTION_WAKE;
     } else if (strcmp(verb, "advance") == 0) {
@@ -232,6 +242,115 @@ static OseoResult create_function(OseoContext *context, size_t node) {
     );
 }
 
+static OseoResult ascii_string(OseoContext *context, const char *text) {
+    uint16_t units[16];
+    size_t length = strlen(text);
+    if (length > sizeof(units) / sizeof(units[0])) abort();
+    for (size_t index = 0u; index < length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)text[index];
+    }
+    return oseo_string_from_units(context, units, length);
+}
+
+/* Reads `object[name]`, where `name` is an ASCII property key. */
+static OseoResult member(
+    OseoContext *context,
+    OseoValue *slots,
+    size_t object,
+    const char *name
+) {
+    OseoResult result = ascii_string(context, name);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    slots[3] = result.value;
+    return oseo_object_get(context, slots[object], slots[3]);
+}
+
+static double number_of(OseoValue value) {
+    if (oseo_value_is_smi(value)) return (double)oseo_value_unbox_smi(value);
+    double number = 0.0;
+    memcpy(&number, &value, sizeof(number));
+    return number;
+}
+
+static void print_time_value(OseoValue value) {
+    double number = number_of(value);
+    if (isnan(number)) {
+        (void)fputs(" NaN", stdout);
+    } else {
+        (void)printf(" %.0f", number);
+    }
+}
+
+/*
+ * Calls Date.now(), new Date().getTime(), and Date.parse(Date()) through
+ * the realm's %Date% and prints the three time values on one line. Every
+ * intermediate stays rooted, so a collection at any safepoint is safe.
+ */
+static OseoResult observe_date(OseoContext *context, size_t node) {
+    OseoValue slots[5] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoValue values[3] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoResult result = oseo_intrinsic(context, OSEO_INTRINSIC_DATE);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = member(context, slots, 0u, "now");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = oseo_call_function(
+            context, slots[1], slots[0], 0u, NULL, oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        values[0] = result.value;
+        result = oseo_call_function(
+            context, slots[0], oseo_undefined(), 0u, NULL, slots[0]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[2] = result.value;
+        result = member(context, slots, 2u, "getTime");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = oseo_call_function(
+            context, slots[1], slots[2], 0u, NULL, oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        values[1] = result.value;
+        result = oseo_call_function(
+            context, slots[0], oseo_undefined(), 0u, NULL, oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[4] = result.value;
+        result = member(context, slots, 0u, "parse");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = oseo_call_function(
+            context, slots[1], slots[0], 1u, &slots[4], oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        values[2] = result.value;
+        (void)printf("date %zu", node);
+        for (size_t index = 0u; index < 3u; index += 1u) {
+            print_time_value(values[index]);
+        }
+        (void)putchar('\n');
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult run_node(OseoContext *context, size_t node) {
     (void)printf("run %zu %" PRIu64 "\n", node, context->clock_milliseconds);
     OseoValue slots[2] = {oseo_undefined(), oseo_undefined()};
@@ -274,12 +393,15 @@ static OseoResult run_node(OseoContext *context, size_t node) {
         case ACTION_REAL: {
             double real_time = 0.0;
             if (oseo_clock_real_time(context, &real_time)) {
-                (void)printf("real %zu %.0f\n", node, real_time);
+                (void)printf("real %zu %.17g\n", node, real_time);
             } else {
                 (void)printf("real %zu unavailable\n", node);
             }
             break;
         }
+        case ACTION_DATE:
+            result = observe_date(context, node);
+            break;
         case ACTION_WAKE:
             (void)printf("wake %zu %d\n", node, oseo_clock_wake(context));
             break;

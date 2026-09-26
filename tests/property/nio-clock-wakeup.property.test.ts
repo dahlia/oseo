@@ -22,9 +22,21 @@
  * a failed wait ends the run with the owned diagnostic, and the adapter is
  * closed exactly once at shutdown.
  *
+ * A third domain adds `Date` observations. The harness calls the realm's
+ * own `Date.now()`, `new Date().getTime()`, and `Date.parse(Date())`, and
+ * the model predicts them from the injected real time alone: the reading
+ * rounded down to a whole millisecond, then TimeClip, with the string
+ * round trip at whole seconds. Real time there takes fractional values
+ * and crosses both ends of the time-value range and the epoch. A `Date`
+ * read never takes the monotonic origin, a missing real-time capability
+ * ends the run with the owned diagnostic, and a missing monotonic clock
+ * leaves `Date` working until the first timer.
+ *
  * Specialization policies do not apply: no compiled JavaScript runs, and
- * the fixed differential fixture `monotonic-timer-wakeups` in
- * *tests/native/fixtures/async.ts* covers both policies and a guard miss.
+ * the fixed differential fixtures `monotonic-timer-wakeups` in
+ * *tests/native/fixtures/async.ts* and `date-real-time-clock` in
+ * *tests/native/fixtures/date-family.ts* cover both policies and a guard
+ * miss.
  * Platform timing is not generated either, because a loaded host's late
  * wakeup is not a replayable input; *tests/native-io/clock-wakeup.test.ts*
  * retains that evidence.
@@ -60,6 +72,7 @@ type ActionTemplate =
   | { readonly kind: "cancel"; readonly target: number }
   | { readonly kind: "micro" }
   | { readonly kind: "real" }
+  | { readonly kind: "date" }
   | { readonly kind: "wake" }
   | { readonly kind: "advance"; readonly nanoseconds: number }
   | { readonly kind: "set-real"; readonly milliseconds: number };
@@ -70,6 +83,7 @@ type Action =
   | { readonly kind: "cancel"; readonly target: number }
   | { readonly child: number; readonly kind: "micro" }
   | { readonly kind: "real" }
+  | { readonly kind: "date" }
   | { readonly kind: "wake" }
   | { readonly kind: "advance"; readonly nanoseconds: number }
   | { readonly kind: "set-real"; readonly milliseconds: number };
@@ -106,6 +120,49 @@ const maximumActions = large ? 6 : 4;
 
 /* Small delay sets make equal deadlines common. */
 const delayArbitrary = fc.constantFrom(0, 0, 1, 2, 5, 5, 10, 25);
+
+/** The largest magnitude TimeClip keeps, 8.64e15 milliseconds. */
+const timeValueLimit = 8_640_000_000_000_000;
+
+/*
+ * Real time for the `Date` domain in quarter milliseconds, which an adapter
+ * may report and which the traces print exactly: readings within ten
+ * seconds of the epoch, where rounding down and truncating differ before
+ * it, readings across a wider range, both ends of the time-value range and
+ * the first reading past each, and fractions just before and after the
+ * epoch. Wait jumps then carry a reading across those edges.
+ */
+const dateRealTimeArbitrary = fc.oneof(
+  fc.integer({ max: 40_000, min: -40_000 }).map((quarters) => quarters / 4),
+  fc
+    .integer({ max: 16_000_000_000_000, min: -4_000_000_000_000 })
+    .map((quarters) => quarters / 4),
+  fc.constantFrom(
+    -timeValueLimit - 1,
+    -timeValueLimit,
+    -1,
+    -0.25,
+    0,
+    0.75,
+    timeValueLimit,
+    timeValueLimit + 1,
+  ),
+);
+
+/** The `Date` domain's actions: the clock actions plus `Date` reads. */
+function dateActionTemplateArbitrary(): fc.Arbitrary<ActionTemplate> {
+  return fc.oneof(
+    { arbitrary: actionTemplateArbitrary(false), weight: 4 },
+    { arbitrary: fc.record({ kind: fc.constant("date" as const) }), weight: 3 },
+    {
+      arbitrary: fc.record({
+        kind: fc.constant("set-real" as const),
+        milliseconds: dateRealTimeArbitrary,
+      }),
+      weight: 1,
+    },
+  );
+}
 
 function actionTemplateArbitrary(
   failures: boolean,
@@ -177,6 +234,30 @@ function scheduleArbitrary(failures: boolean): fc.Arbitrary<ScheduleTemplate> {
     unavailable: failures
       ? fc.constantFrom("none" as const, "monotonic" as const, "real" as const)
       : fc.constant("none" as const),
+  });
+}
+
+/**
+ * `Date` schedules never fail a wait, but either capability may be absent:
+ * without real time the first `Date` read ends the run, and without a
+ * monotonic clock `Date` keeps working until the first timer.
+ */
+function dateScheduleArbitrary(): fc.Arbitrary<ScheduleTemplate> {
+  return fc.record({
+    monotonic: fc.integer({ max: 1_000_000_000, min: 0 }),
+    nodes: fc.array(
+      fc.array(dateActionTemplateArbitrary(), { maxLength: maximumActions }),
+      { maxLength: maximumNodes, minLength: 1 },
+    ),
+    realTime: dateRealTimeArbitrary,
+    steps: fc.array(stepArbitrary(false), { maxLength: large ? 24 : 12 }),
+    unavailable: fc.constantFrom(
+      "none" as const,
+      "none" as const,
+      "none" as const,
+      "monotonic" as const,
+      "real" as const,
+    ),
   });
 }
 
@@ -257,6 +338,7 @@ function printSchedule(schedule: Schedule): string {
           lines.push(`do ${node} set-real ${action.milliseconds}`);
           break;
         case "real":
+        case "date":
         case "wake":
           lines.push(`do ${node} ${action.kind}`);
           break;
@@ -276,6 +358,23 @@ interface ModelTimer {
 
 /** Thrown inside the model when the run ends with the owned diagnostic. */
 class OwnedFailure extends Error {}
+
+/**
+ * The time value a `Date` read designates for one epoch real-time reading:
+ * the millisecond that contains it, then TimeClip, 21.4.1.31.
+ */
+function currentTimeValue(realTime: number): number {
+  const value = Math.floor(realTime);
+  return Math.abs(value) > timeValueLimit ? Number.NaN : value + 0;
+}
+
+/**
+ * `Date()` prints the time value to the second, and `Date.parse` recovers
+ * this realm's own text, so the round trip is the containing second.
+ */
+function secondOf(value: number): number {
+  return Number.isNaN(value) ? value : Math.floor(value / 1000) * 1000;
+}
 
 /** Predict the harness trace from the scheduler contract alone. */
 function expectedTrace(schedule: Schedule): string {
@@ -372,6 +471,12 @@ function expectedTrace(schedule: Schedule): string {
               : `real ${node} ${realTime}`,
           );
           break;
+        case "date": {
+          if (schedule.unavailable === "real") throw new OwnedFailure();
+          const value = currentTimeValue(realTime);
+          lines.push(`date ${node} ${value} ${value} ${secondOf(value)}`);
+          break;
+        }
         case "wake":
           pendingWakeup = true;
           lines.push(`wake ${node} 1`);
@@ -492,6 +597,26 @@ test(
           numRuns: 15,
           profile: "PLAN-NIO clock and wakeup checkpoint",
           seed: 0x6000_7001,
+          sizeLimit: large
+            ? "48 nodes, 6 actions per node, and 24 wait steps"
+            : "20 nodes, 4 actions per node, and 12 wait steps",
+          timeLimitMilliseconds: 180_000,
+        },
+      );
+      await assertAsyncProperty(
+        "Date reads follow injected real time and never move deadlines",
+        fc.asyncProperty(dateScheduleArbitrary(), async (template) => {
+          assertTrace(build, assignChildren(template));
+        }),
+        {
+          context,
+          domain:
+            "Date.now, new Date, and Date() reads across timer turns, " +
+            "wall-clock jumps, time-value range edges, and absent " +
+            "real-time or monotonic capabilities",
+          numRuns: 20,
+          profile: "M5 Date family over the PLAN-NIO real-time capability",
+          seed: 0x6000_7002,
           sizeLimit: large
             ? "48 nodes, 6 actions per node, and 24 wait steps"
             : "20 nodes, 4 actions per node, and 12 wait steps",

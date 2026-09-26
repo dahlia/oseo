@@ -31,8 +31,9 @@ deterministic adapter under *tests/native-io/* reproduces the logical clock as
 the test oracle. `mise run probe:native-io:clock` reproduces the measurements.
 The Linux AMD64 measurements are recorded; macOS AArch64 execution evidence
 comes from that host's native test gate rather than from the recorded run.
-`Date` still reads its own clock until `date-nio-clock-integration` consumes
-the real-time capability.
+M5b node `date-nio-clock-integration` then moved `Date` onto the real-time
+capability, so `Date.now()` and the other current-time reads no longer read a
+host clock directly and never take the monotonic origin.
 
 The initial production consumers are M5's `Date` family and M6's standardized
 clock work. `fetch()` is the first network consumer. Later consumers include

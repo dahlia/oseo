@@ -7,7 +7,10 @@
  * an absent monotonic clock. The scheduler harness then runs the runtime's
  * own timer queue against the platform adapter, where waits take real
  * monotonic time, and against the deterministic adapter, where the trace
- * is exact. Generated schedules live in
+ * is exact. `Date` then reads the realm's real-time capability through
+ * both adapters: exactly against injected readings, and within loose
+ * bounds of the host's own clock and its whole-second fallback. Generated
+ * schedules live in
  * *tests/property/nio-clock-wakeup.property.test.ts*; what stays here is
  * what a generated observation cannot prove: the host facilities, their
  * CPU cost while idle, descriptor and thread lifetime, and the AArch64
@@ -426,6 +429,156 @@ test(
   },
 );
 
+/*
+ * `Date` reads through the realm's %Date% intrinsic. The first read comes
+ * before any timer and after a monotonic advance, so the wait deadline
+ * shows that the scheduler took its origin at the timer and not at the
+ * read. Real time starts a quarter millisecond before the epoch, which
+ * rounds down to -1, and a wall-clock jump inside the wait reaches the
+ * next read without moving the deadline. The time-value limit is kept and
+ * the next millisecond clips to NaN on both sides.
+ */
+const dateSchedule = [
+  "mode deterministic",
+  "clock 7000000 -0.25",
+  "step 0 86400000 0 0",
+  "do 0 date",
+  "do 0 advance 5000000",
+  "do 0 timer 1 3",
+  "do 1 date",
+  "do 1 set-real 8640000000000000",
+  "do 1 date",
+  "do 1 set-real 8640000000000001",
+  "do 1 date",
+  "do 1 timer 2 0",
+  "do 2 set-real -8640000000000000",
+  "do 2 date",
+  "do 2 set-real -8640000000000001",
+  "do 2 date",
+  "",
+].join("\n");
+
+const dateTrace = [
+  "run 0 0",
+  "date 0 -1 -1 -1000",
+  "wait 15000000 deadline 15000000 86399999.75",
+  "run 1 3",
+  "date 1 86399999 86399999 86399000",
+  "date 1 8640000000000000 8640000000000000 8640000000000000",
+  "date 1 NaN NaN NaN",
+  "run 2 3",
+  "date 2 -8640000000000000 -8640000000000000 -8640000000000000",
+  "date 2 NaN NaN NaN",
+  "exit 0 none",
+  "close",
+  "",
+].join("\n");
+
+test(
+  "Date reads the deterministic real-time capability",
+  { skip },
+  async () => {
+    await withBuild("scheduler", (build) => {
+      for (const environment of [{}, { OSEO_GC_EVERY_SAFEPOINT: "1" }]) {
+        const run = runClockScheduler(build, dateSchedule, environment);
+        assert.equal(run.stderr, "");
+        assert.equal(run.status, 0);
+        assert.equal(run.stdout, dateTrace);
+      }
+
+      const noRealTime = runClockScheduler(
+        build,
+        "mode deterministic\nunavailable real\ndo 0 timer 1 2\n" +
+          "do 1 date\ndo 1 real\n",
+      );
+      assert.equal(noRealTime.status, 1);
+      assert.equal(
+        noRealTime.stdout,
+        "run 0 0\nwait 2000000 deadline 2000000 0\nrun 1 2\n" +
+          "exit 1 OSEO2001\nclose\n",
+      );
+
+      const noMonotonic = runClockScheduler(
+        build,
+        "mode deterministic\nunavailable monotonic\nclock 0 1000.5\n" +
+          "do 0 date\ndo 0 timer 1 0\ndo 1 date\n",
+      );
+      assert.equal(noMonotonic.status, 1);
+      assert.equal(
+        noMonotonic.stdout,
+        "run 0 0\ndate 0 1000 1000 1000\nexit 1 OSEO2001\nclose\n",
+      );
+    });
+  },
+);
+
+function dateLine(stdout: string, node: number): readonly number[] {
+  const line = stdout
+    .split("\n")
+    .find((entry) => entry.startsWith(`date ${node} `));
+  assert.ok(line != null, `date ${node}`);
+  return line.split(" ").slice(2).map(Number);
+}
+
+test(
+  "Date reads the platform real-time capability and its fallback",
+  { skip },
+  async () => {
+    await withBuild("scheduler", (build) => {
+      const before = Date.now();
+      const run = runClockScheduler(
+        build,
+        [
+          "mode platform",
+          "measure",
+          "do 0 date",
+          "do 0 timer 1 30",
+          "do 1 date",
+          "",
+        ].join("\n"),
+      );
+      const after = Date.now();
+      assert.equal(run.status, 0, run.stderr);
+      assert.equal(run.stderr, "");
+      const [now, constructed, called] = dateLine(run.stdout, 0);
+      assert.ok(now != null && constructed != null && called != null);
+      assert.ok(Number.isInteger(now));
+      assert.ok(now >= before - 1000 && now <= after + 1000, `${now}`);
+      assert.ok(constructed >= now && constructed - now < 1000);
+      // Date() reads after the construction, so its whole second can be
+      // the next one but never an earlier one.
+      assert.equal(called % 1000, 0);
+      assert.ok(called >= constructed - (constructed % 1000));
+      assert.ok(called <= after + 1000, `${called}`);
+      // The timer waits 30 ms of monotonic time after the first read, so
+      // an undisturbed wall clock has moved at least that far, less the
+      // two readings' millisecond rounding and a loose slew allowance.
+      const [later] = dateLine(run.stdout, 1);
+      assert.ok(later != null && later <= after + 1000, `${later}`);
+      assert.ok(later - now >= 25, `${later - now}`);
+      assert.match(
+        run.stdout,
+        new RegExp(
+          `^capabilities ${primary.backend} \\S+ ` +
+            "clock_gettime\\(CLOCK_REALTIME\\) ",
+          "mu",
+        ),
+      );
+      if (linux) assert.match(run.stdout, /^threads 1$/mu);
+
+      const fallback = runClockScheduler(
+        build,
+        "mode platform\nmeasure\nrestrict 2\ndo 0 date\n",
+      );
+      assert.equal(fallback.status, 0, fallback.stderr);
+      const [whole] = dateLine(fallback.stdout, 0);
+      assert.ok(whole != null && whole % 1000 === 0, `${whole}`);
+      assert.ok(Math.abs(whole - Date.now()) < 5000, `${whole}`);
+      assert.match(fallback.stdout, /^capabilities \S+ \S+ time /mu);
+    });
+  },
+);
+
 test(
   "AArch64 Linux links the clock probe and harness with the Linux adapter",
   { skip },
@@ -460,8 +613,10 @@ test(
  * The reviewed test262 manifest records its ordinary asynchronous and
  * module executions under the `deterministic-logical-clock` scheduler
  * value of ADR 0013. That value stays exact after ADR 0025 only because
- * none of those executions schedules a timer, so none ever opens the clock
- * adapter or waits. A case built with the native test262 host runs under
+ * none of those executions schedules a timer, so none ever starts the
+ * monotonic scheduler clock or waits. A reviewed `Date` case opens the
+ * adapter only to read real time, which schedules nothing and cannot
+ * change task order. A case built with the native test262 host runs under
  * the real-clock agent cluster of ADR 0026 instead and records no
  * scheduler value, so its timers, and the atomicsHelper.js include only
  * such a case loads, are outside this invariant. Every recorded
