@@ -1036,6 +1036,20 @@ rejection whose reason is an intrinsic error instance with the rejection
 boundary text and that instance's kind marker. No built-in code ID, intrinsic
 slot, or heap kind is added.
 
+The `m5-124` ABI adds `%TypedArray%.from` and `%TypedArray%.of`. Both require
+a constructor receiver and construct through TypedArrayCreateFromConstructor,
+which `subarray`, `map`, `filter`, and `slice` now share through
+TypedArraySpeciesCreate: Construct, ValidateTypedArray, and a minimum-length
+check for one Number argument. `from` checks its mapper before reading the
+source's `Symbol.iterator` method, drains an iterable source into a rooted
+argument list before construction, and reads an array-like source one index
+at a time after construction; `of` stores its arguments in order. Every value
+goes through TypedArraySetElement. The TypedArray deferred-surface
+diagnostics and the lookup, deletion, and own-key checks that consulted them
+are removed. Two code IDs are allocated inside the existing TypedArray range;
+no intrinsic slot, heap kind, public layout, or generated-code entry point is
+added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

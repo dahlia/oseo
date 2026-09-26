@@ -512,3 +512,7 @@ families:
     owner: tests/property/m5-atomics-and-shared-memory.property.test.ts
     start: 0x60007f00
     end: 0x60007fff
+  - family: m5-typed-array-statics
+    owner: tests/property/m5-typed-array-statics.property.test.ts
+    start: 0x60008000
+    end: 0x600080ff

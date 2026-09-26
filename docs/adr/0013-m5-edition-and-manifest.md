@@ -543,6 +543,24 @@ asynchronous execution still records `deterministic-logical-clock`. The
 field stays optional with its one value, so the schema and the
 classification vocabulary are unchanged.
 
+The M5b `typed-array-statics` node extends the vocabulary with
+`typed-array-statics`. The tag identifies `%TypedArray%.from`,
+`%TypedArray%.of`, and the `%TypedArray%[Symbol.species]` getter as the
+constructor-side surface of the TypedArray family: receiver and mapper
+validation, iterable and array-like source collection, construction through
+TypedArrayCreateFromConstructor, per-element TypedArraySetElement stores, and
+the completed own-key reflection of `%TypedArray%` and
+`%TypedArray.prototype%`, together with the root cases that reflect on
+`%TypedArray%` itself. One tag covers these because they all act on
+constructors rather than on a view receiver. It is distinct from
+`typed-array-constructors`, which names the concrete construction paths,
+from `typed-array-core`, whose `subarray` also reaches the species getter
+through TypedArraySpeciesCreate. `Array.from` and `Array.of` keep their
+existing tags, because they build ordinary arrays with CreateDataProperty
+rather than storing into a validated view. The reviewed rows
+under the node's four inventory roots carry it, and no reviewed row outside
+those roots gains or loses a tag.
+
 
 Alternatives considered
 -----------------------

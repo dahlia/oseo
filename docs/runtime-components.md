@@ -1859,6 +1859,42 @@ results, both specialization policies, collection forced at every safepoint,
 a deliberate false-hint guard miss, and an independent model. The node reviews
 all 47 paths under its two inventory roots.
 
+### TypedArray statics evidence
+
+M5b node `typed-array-statics` adds `%TypedArray%.from` and `%TypedArray%.of`
+to *runtime\_typed\_array.c*, the last members of that component. It gains
+five file-static helpers and no `oseo_internal_` entry: the two static method
+bodies, TypedArrayCreateFromConstructor, which TypedArraySpeciesCreate now
+calls instead of repeating Construct, ValidateTypedArray, and the
+minimum-length check, an IteratorToList helper that the iterable construction
+path shares, and a LengthOfArrayLike helper that the array-like construction
+path wraps with its allocation-size check. `from` validates its receiver and
+mapper before the `Symbol.iterator` lookup, collects an iterable source into
+a rooted argument list before construction, reacquires that list's view for
+each element because mapper calls and conversions can collect, and reads an
+array-like source one index at a time after construction. Both statics store
+through TypedArraySetElement, so a detached, shrunk, or grown result only
+changes which writes land.
+
+The component also retires its two deferred-surface queries,
+`oseo_internal_typed_array_deferred_diagnostic` and
+`oseo_internal_typed_array_deferred_own_keys_diagnostic`, and the calls in
+*runtime\_property.c*, *runtime\_primitive.c*, *runtime\_descriptor.c*, and
+*runtime\_object\_builtin.c* that stopped lookup, `in`, own-property tests,
+descriptor queries, deletion, and own-key walks at them. The methods take two
+code IDs from the TypedArray range and add no intrinsic slot, heap kind,
+component, or generated-code entry point; the component moves `abiVersion` to
+`m5-124`.
+
+Fixed and generated native differential evidence at seed `0x60008000` covers
+array, array-like, iterable, and TypedArray sources, plain and converting `of`
+arguments, four element kinds, no, scaling, and converting mappers, intrinsic,
+derived, longer, shorter, and resizable receivers, detach, shrink, and grow of
+the result during the first mapper call or conversion, both specialization
+policies, collection forced at every safepoint, a deliberate false-hint guard
+miss, and an independent model of stored values and event order. The node
+reviews all 42 paths under its four inventory roots.
+
 ### Function prototype evidence
 
 M5b node `function-prototype` completes the callable realm root in

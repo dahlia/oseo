@@ -136,6 +136,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "typed-array-mutation",
   "typed-array-search-and-join",
   "typed-array-sort",
+  "typed-array-statics",
   "var-bindings",
   "weak-collections",
 ]);

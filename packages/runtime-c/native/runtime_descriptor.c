@@ -885,16 +885,6 @@ OseoResult oseo_object_delete(
         }
         if (numeric) return normal(oseo_boolean(true));
     }
-    /* Deletion observes the deferred TypedArray surface exactly as a
-     * lookup does, so it stops at the same owning boundary before any
-     * mutation. Without this, deleting an absent deferred property would
-     * report success while the next lookup still reports the boundary. */
-    const char *typed_array_deferred =
-        oseo_internal_typed_array_deferred_diagnostic(
-            context, object_value, key);
-    if (typed_array_deferred != NULL) {
-        return failure(context, "OSEO2001", typed_array_deferred);
-    }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         return strict

@@ -1,0 +1,72 @@
+version: 1
+id: typed-array-statics
+title: "TypedArray statics"
+scope:
+  - "The %TypedArray%.from and %TypedArray%.of methods inherited by every
+    concrete constructor: IsConstructor on the receiver, mapper
+    callability before the source's Symbol.iterator lookup, IteratorToList
+    before construction for an iterable source, LengthOfArrayLike and
+    per-index reads for an array-like source, and mapper calls with the
+    supplied this argument and two arguments."
+  - "TypedArrayCreateFromConstructor, shared with TypedArraySpeciesCreate:
+    Construct through intrinsic, derived, bound, Proxy, and ordinary
+    function constructors, ValidateTypedArray on the result, and the
+    minimum-length check for one Number argument, without a content-type
+    check."
+  - "TypedArraySetElement for each stored value, so conversion runs before
+    the index test and a mapper or conversion that detaches, shrinks, or
+    grows the result changes only which later writes land."
+  - "The %TypedArray%[Symbol.species] getter's own reviewed metadata and
+    result, and the completed own-key reflection of %TypedArray% and
+    %TypedArray.prototype% with no remaining deferred lookup, deletion, or
+    own-key boundary."
+  - "Reviewed standards coverage is every upstream path under the node's
+    four inventory roots: the TypedArray root files, Symbol.species, from,
+    and of. Paths that need an unreviewed harness include retain explicit
+    boundaries."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-statics.ts
+      - tests/property/m5-typed-array-statics.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/typed-array-statics.ts
+      - tests/native.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-statics.ts
+      - tests/property/m5-typed-array-statics.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-typed-array-statics.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-statics.ts
+      - tests/property/m5-typed-array-statics.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/typed-array-statics.ts
+      - tests/property/m5-typed-array-statics.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_typed_array.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

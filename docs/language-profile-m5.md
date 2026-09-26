@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 139
+M5a is complete. The normative family records described below inventory 140
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -6082,11 +6082,12 @@ content types cannot mix. Integer conversions use modulo arithmetic,
 specified precision, and the BigInt arrays apply signed or unsigned modulo
 `2^64`. `ArrayBuffer.isView` recognizes every resulting view. The
 `typed-array-core` section below admits the integer-indexed descriptor surface
-and the core prototype; the remaining TypedArray prototype and static methods
-retain their later M5b graph owners. Lookups that reach those deferred
-prototype or static properties report the owning boundary instead of silently
-observing an absent property, and deletion aimed at a deferred property stops
-at the same boundary before any mutation.
+and the core prototype, and later TypedArray nodes add the remaining prototype
+methods and the statics. Until the `typed-array-statics` node completed that
+surface, a lookup that reached a deferred prototype or static property
+reported the owning boundary instead of silently observing an absent
+property, and deletion aimed at one stopped at the same boundary before any
+mutation.
 
 Fixed native and generated differential evidence at property seed
 `0x60006e00` covers all eleven element kinds, length, buffer, iterable,
@@ -6742,10 +6743,10 @@ exhausting the iterator.
 function object, recorded when `%Array.prototype%` materializes. This node
 also materializes the `%TypedArray%[Symbol.species]` getter, because
 `subarray` cannot construct its default result without that lookup; the
-`typed-array-statics` node reuses it and still owns `from` and `of`. That
-last node in the shared runtime component also owns the final reflection
-step for both `%TypedArray%` and `%TypedArray.prototype%`, so their own-key
-lists keep an explicit boundary until it lands.
+`typed-array-statics` node reuses it and adds `from` and `of`. That last node
+in the shared runtime component also completes the final reflection step for
+both `%TypedArray%` and `%TypedArray.prototype%`, whose own-key lists kept an
+explicit boundary until it landed.
 
 Fixed native and generated differential evidence at property seed
 `0x60007100` covers all eleven element kinds over fixed and length-tracking
@@ -7081,6 +7082,76 @@ failures. No reviewed path moves away from pass. The property
 inventory reaches 160 domains and seeds with a 5,839-case ordinary budget,
 the evidence inventory reaches 137 families, and the runtime ABI moves to
 `m5-121`.
+
+
+TypedArray statics
+------------------
+
+M5b node `typed-array-statics` adds `from` and `of` to `%TypedArray%`, so every
+concrete constructor inherits them rather than owning copies. They are
+distinct ordinary non-constructible functions of lengths one and zero with
+writable, non-enumerable, configurable descriptors. Each first requires its
+`this` value to be a constructor and throws a `TypeError` otherwise; `from`
+then requires a supplied mapper to be callable, and only after both checks does
+it read the source's `Symbol.iterator` method. A nullish method selects the
+array-like path and any other non-callable value throws a `TypeError`.
+
+An iterable source is drained completely by IteratorToList before the result
+exists: the list's length is the argument to the constructor, and the mapper
+runs afterward, once per collected value, with the supplied `this` argument,
+the value, and its index. An array-like source is converted with ToObject, its
+`length` passes through ToLength, and the constructor receives that length
+before each index is read, mapped, and stored in turn, so a mapper observes
+later source elements as they are when they are read. `of` constructs a result
+of its argument count and stores the arguments in order.
+
+Both statics and TypedArraySpeciesCreate share one
+TypedArrayCreateFromConstructor: Construct through the receiver, which may be
+an intrinsic, derived, bound, Proxy, or ordinary function constructor, then
+ValidateTypedArray on the result, and, for the one Number argument both
+statics pass, a `TypeError` when the result holds fewer elements. Unlike a
+species result, a statics result never has its content type checked, so a
+constructor may answer with a BigInt view whose later Number stores throw.
+Each value is stored through TypedArraySetElement, which converts it before
+testing the index, so a mapper or conversion that detaches or shrinks the
+result still converts every later value but drops its write, and a grown
+length-tracking result keeps its new trailing elements.
+
+With `from` and `of` present, the shared component has no deferred surface
+left. Property lookup, `in`, `hasOwnProperty`, descriptor queries, deletion,
+and own-key reflection on `%TypedArray%` and `%TypedArray.prototype%` are now
+ordinary, and the reviewed classifier's two TypedArray boundary diagnostics
+are retired. The `%TypedArray%[Symbol.species]` getter that the core node
+materialized is unchanged; this node reviews its metadata and result.
+
+Fixed native and generated differential evidence at property seed
+`0x60008000` covers `from` over array, array-like, iterable, and TypedArray
+sources and `of` over plain and converting arguments; `Int16Array`,
+`Uint8ClampedArray`, `Float64Array`, and `BigInt64Array` with bounded integer,
+`NaN`, signed-zero, fractional, infinite, and BigInt elements; no, scaling,
+and converting mappers with a `this` argument; intrinsic, derived, longer,
+shorter, and resizable receivers; and detach, shrink, and grow of the result
+during the first mapper call or conversion. Node.js, Deno, and both native
+specialization policies agree with collection forced at every safepoint, a
+false numeric hint deliberately misses its guard and reaches the compiled
+generic fallback, and an independent model predicts every stored value and
+the order of source reads, iterator steps, constructor calls, mapper calls,
+and conversions. The fixed fixture also pins metadata and identities through
+the concrete constructors, own-key reflection, the species getter, receiver
+and mapper validation order, every abrupt iterator step, non-TypedArray,
+detached, too-short, bound, and Proxy constructor results, content-type
+mismatches, and deletion and restoration of `from`.
+
+The dependency vocabulary gains `typed-array-statics`, and all 42 paths under
+the node's four inventory roots enter the reviewed subset: 37 pass, while five
+retain the unreviewed *resizableArrayBufferUtils.js* harness prerequisite. No
+reviewed path outside the roots changes classification, and none moves away
+from pass. The manifest moves from 21,341 to 21,383 paths and from 18,273 to
+18,310 passes, keeps 1,560 expected negatives, and moves from 1,508 to 1,513
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property inventory reaches 163 domains and seeds with a
+5,873-case ordinary budget, the evidence inventory reaches 140 families, and
+the runtime ABI moves to `m5-124`.
 
 
 Set composition methods

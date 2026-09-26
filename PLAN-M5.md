@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,341 reviewed cases: 18,273 passes, 1,560 expected negatives, and 1,508
+21,383 reviewed cases: 18,310 passes, 1,560 expected negatives, and 1,513
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +27,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 139 indexed records in the normative
+M5a is complete. The 140 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
 the M5b and M5c dependency order below. The reviewed manifest now records
-18,273 passes across 21,341 paths, and the property inventory records 162
-domains, 162 seeds, and an ordinary case budget of 5,861.
+18,310 passes across 21,383 paths, and the property inventory records 163
+domains, 163 seeds, and an ordinary case budget of 5,873.
 
 
 M5a implementation history
@@ -7055,6 +7055,50 @@ moves from 138 to 139 families. The runtime ABI moves to
 functions, the context's agent record and broadcast callback root, and the
 generated-code entry points `oseo_test262_host_install` and
 `oseo_agent_hole`, without changing the graph's orchestration state.
+
+Implemented M5b node `typed-array-statics` adds `%TypedArray%.from` and
+`%TypedArray%.of`, inherited by every concrete constructor, as distinct
+non-constructible functions of lengths one and zero. Each requires a
+constructor receiver, and `from` then requires a callable mapper before it
+reads the source's `Symbol.iterator` method. An iterable source is drained
+into a list before the result is constructed from its count, while an
+array-like source is constructed from its ToLength-converted `length` and then
+read one index at a time. The mapper receives the supplied `this` argument,
+the value, and its index. Both statics construct through the
+TypedArrayCreateFromConstructor step that TypedArraySpeciesCreate now shares:
+Construct, ValidateTypedArray, and a minimum-length check, but no content-type
+check. Every value is stored through TypedArraySetElement, so a mapper or
+conversion that detaches, shrinks, or grows the result changes only which
+later writes land. The `%TypedArray%[Symbol.species]` getter from the core
+node is reused unchanged. With the statics in place the shared component has
+no deferred surface: the runtime's TypedArray lookup, deletion, and own-key
+boundaries and the reviewed classifier's two matching diagnostics are
+retired. The methods take two code IDs in the TypedArray range and add no
+realm intrinsic slot, heap kind, component, or generated-code entry point.
+
+Fixed native and generated differential evidence at seed `0x60008000` covers
+array, array-like, iterable, and TypedArray sources, plain and converting
+`of` arguments, four element kinds with bounded integer, `NaN`, signed-zero,
+fractional, infinite, and BigInt elements, no, scaling, and converting
+mappers, intrinsic, derived, longer, shorter, and resizable receivers, and
+detach, shrink, and grow of the result during the first mapper call or
+conversion, with both specialization policies, collection forced at every
+safepoint, one deliberate numeric-hint guard miss, and an independent model
+of every stored value and the order of reads, iterator steps, constructor and
+mapper calls, and conversions. All 42 edition paths under the node's four
+inventory roots enter the reviewed subset: 37 pass, while five retain the
+unreviewed *resizableArrayBufferUtils.js* harness prerequisite. No reviewed
+path outside the roots changes classification. The 86 unreviewed
+_TypedArrayConstructors/from/_ and _TypedArrayConstructors/of/_ paths belong
+to the constructors node's inventory and stay outside the subset; a focused
+run of them on this node observed 84 passes and two cases held by the
+unsupported `immutable-arraybuffer` feature. The manifest moves from 21,341 to
+21,383 paths and from 18,273 to 18,310 passes, keeps 1,560 expected
+negatives, and moves from 1,508 to 1,513 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property ratchet moves from
+162 to 163 domains and seeds and from 5,861 to 5,873 ordinary cases, the
+evidence inventory moves from 139 to 140 families, and the runtime ABI moves
+to `m5-124`.
 
 
 Ahead-of-time challenge boundary

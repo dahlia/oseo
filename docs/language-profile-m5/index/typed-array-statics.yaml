@@ -1,0 +1,3 @@
+version: 1
+id: typed-array-statics
+record: docs/language-profile-m5/families/typed-array-statics.yaml

@@ -16,11 +16,10 @@ scope:
     same-buffer copies, species construction, content-type checks, and the
     TypedArray step of %ArrayIteratorPrototype%.next."
   - "The %TypedArray.prototype%.toString identity with Array.prototype.toString
-    and the %TypedArray%[Symbol.species] getter subarray needs. The
-    sorting prototype methods and the from and of statics keep explicit
-    runtime boundaries owned by later M5b nodes. The typed-array-statics node
-    owns the final shared-component reflection step for the constructor and
-    prototype."
+    and the %TypedArray%[Symbol.species] getter subarray needs. The sorting
+    prototype methods, the from and of statics, and the final own-key
+    reflection step for the constructor and prototype belong to later M5b
+    nodes, which the typed-array-statics node completes."
   - "Reviewed standards coverage is all 337 upstream paths under the node's
     thirteen inventory roots, through the reviewed testTypedArray.js
     harness. Paths that need resizableArrayBufferUtils.js or

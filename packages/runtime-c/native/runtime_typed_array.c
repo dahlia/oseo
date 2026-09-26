@@ -12,9 +12,8 @@
  * This component owns construction, element conversion, the
  * integer-indexed exotic element operations the generic property paths
  * delegate to, the prototype accessors, at, set, subarray, and the
- * iterator methods, and the iterative, search and join, mutation and
- * copying, and sorting prototype methods. The from and of statics remain
- * later graph nodes.
+ * iterator methods, the iterative, search and join, mutation and
+ * copying, and sorting prototype methods, and the from and of statics.
  */
 
 #define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
@@ -1042,11 +1041,13 @@ static OseoResult typed_array_from_typed_array(
     return result;
 }
 
-static OseoResult typed_array_array_like_length(
+/* LengthOfArrayLike: ToLength of the source's `length` property. */
+static OseoResult typed_array_length_of_array_like(
     OseoContext *context,
     OseoValue source,
-    size_t *length
+    double *length
 ) {
+    *length = 0.0;
     OseoValue slots[2] = {source, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -1063,18 +1064,30 @@ static OseoResult typed_array_array_like_length(
         double integer = isnan(number) || number <= 0.0
             ? 0.0
             : isfinite(number) ? trunc(number) : TYPED_ARRAY_INDEX_LIMIT;
-        if (integer > TYPED_ARRAY_INDEX_LIMIT) {
-            integer = TYPED_ARRAY_INDEX_LIMIT;
-        }
-        if (!typed_array_size(integer, length)) {
-            result = oseo_internal_throw_error(
-                context,
-                OSEO_ERROR_RANGE,
-                "TypedArray source length is too large."
-            );
-        }
+        *length = integer > TYPED_ARRAY_INDEX_LIMIT
+            ? TYPED_ARRAY_INDEX_LIMIT
+            : integer;
     }
     oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult typed_array_array_like_length(
+    OseoContext *context,
+    OseoValue source,
+    size_t *length
+) {
+    double integer = 0.0;
+    OseoResult result =
+        typed_array_length_of_array_like(context, source, &integer);
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !typed_array_size(integer, length)) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "TypedArray source length is too large."
+        );
+    }
     return result;
 }
 
@@ -1106,28 +1119,32 @@ static OseoResult typed_array_from_array_like(
     return result;
 }
 
-static OseoResult typed_array_from_iterable(
+/*
+ * IteratorToList over GetIteratorFromMethod. Every step value lands in a
+ * rooted argument list, which is the result, before the caller converts,
+ * maps, or stores any of them, so user code that runs later never observes
+ * a partially drained iterator.
+ */
+static OseoResult typed_array_iterator_to_list(
     OseoContext *context,
-    OseoValue target,
     OseoValue source,
     OseoValue method
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = target;
-    frame.slots[1] = source;
-    frame.slots[2] = method;
+    frame.slots[0] = source;
+    frame.slots[1] = method;
     result = oseo_call_function(
         context,
-        frame.slots[2],
         frame.slots[1],
+        frame.slots[0],
         0u,
         NULL,
         oseo_undefined()
     );
-    frame.slots[3] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[3])) {
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[2])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -1136,14 +1153,14 @@ static OseoResult typed_array_from_iterable(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_ascii_string(context, "next");
-        frame.slots[4] = result.value;
+        frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, frame.slots[3], frame.slots[4]);
-        frame.slots[4] = result.value;
+        result = oseo_object_get(context, frame.slots[2], frame.slots[3]);
+        frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        !is_callable(frame.slots[4])) {
+        !is_callable(frame.slots[3])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -1152,51 +1169,67 @@ static OseoResult typed_array_from_iterable(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_argument_list_create(context);
-        frame.slots[5] = result.value;
+        frame.slots[4] = result.value;
     }
     bool done = false;
     while (result.status == OSEO_STATUS_NORMAL && !done) {
         result = oseo_iterator_next(
             context,
+            frame.slots[2],
             frame.slots[3],
-            frame.slots[4],
-            &frame.slots[6],
+            &frame.slots[5],
             &done
         );
         if (result.status == OSEO_STATUS_NORMAL && !done) {
             result = oseo_argument_list_append(
                 context,
-                frame.slots[5],
-                frame.slots[6]
+                frame.slots[4],
+                frame.slots[5]
             );
         }
     }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[4];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult typed_array_from_iterable(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source,
+    OseoValue method
+) {
+    OseoValue slots[2] = {target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        typed_array_iterator_to_list(context, source, method);
+    slots[1] = result.value;
     size_t length = 0u;
     const OseoValue *values = NULL;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_argument_list_view(
-            context,
-            frame.slots[5],
-            &length,
-            &values
-        );
+        result = oseo_argument_list_view(context, slots[1], &length, &values);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = typed_array_allocate_buffer(context, frame.slots[0], length);
-        frame.slots[0] = result.value;
+        result = typed_array_allocate_buffer(context, slots[0], length);
+        slots[0] = result.value;
     }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < length;
          index += 1u) {
-        result = typed_array_store(
-            context,
-            frame.slots[0],
-            index,
-            values[index]
-        );
+        /* A conversion can collect, so the list view is reacquired. */
+        result = oseo_argument_list_view(context, slots[1], &length, &values);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_store(
+                context,
+                slots[0],
+                index,
+                values[index]
+            );
+        }
     }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
-    oseo_roots_release(context, &frame);
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[0];
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -1690,9 +1723,44 @@ static OseoResult typed_array_construct_with(
 }
 
 /*
- * TypedArraySpeciesCreate with SpeciesConstructor and
- * TypedArrayCreateFromConstructor. `arguments` must already
- * be rooted by the caller.
+ * TypedArrayCreateFromConstructor: Construct, then ValidateTypedArray, and,
+ * for one Number argument, the check that the result holds at least that
+ * many elements. The constructor may be any constructible value, so a
+ * derived class, bound function, or Proxy can answer with an object that
+ * is not a view at all. `arguments` must already be rooted by the caller.
+ */
+static OseoResult typed_array_create_from_constructor(
+    OseoContext *context,
+    OseoValue constructor,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = typed_array_construct_with(
+        context,
+        constructor,
+        argument_count,
+        arguments
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_validate(context, result.value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && argument_count == 1u &&
+        is_number(arguments[0]) &&
+        (double)typed_array_length(typed_array_object(result.value)) <
+            number_value(arguments[0])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The constructed TypedArray is too short."
+        );
+    }
+    return result;
+}
+
+/*
+ * TypedArraySpeciesCreate: SpeciesConstructor, then
+ * TypedArrayCreateFromConstructor and the content-type check. `arguments`
+ * must already be rooted by the caller.
  */
 static OseoResult typed_array_species_create(
     OseoContext *context,
@@ -1750,26 +1818,13 @@ static OseoResult typed_array_species_create(
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = typed_array_construct_with(
+        result = typed_array_create_from_constructor(
             context,
             slots[1],
             argument_count,
             arguments
         );
         slots[2] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = typed_array_validate(context, slots[2]);
-    }
-    if (result.status == OSEO_STATUS_NORMAL && argument_count == 1u &&
-        is_number(arguments[0]) &&
-        (double)typed_array_length(typed_array_object(slots[2])) <
-            number_value(arguments[0])) {
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "TypedArray species result is too short."
-        );
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         typed_array_bigint_kind(typed_array_object(slots[2])->element_kind) !=
@@ -3248,6 +3303,212 @@ static OseoResult typed_array_sorting(
     return result;
 }
 
+/*
+ * %TypedArray%.from. The receiver must be a constructor before the mapper
+ * is checked, and both checks precede the source's Symbol.iterator lookup.
+ * An iterable source is drained into a list before the result is
+ * constructed from its count. An array-like source is constructed from its
+ * converted length and then read one index at a time, so a mapper observes
+ * later source elements as they are when they are read. Each value is
+ * stored through TypedArraySetElement, which converts it first and drops
+ * the write when a mapper or a conversion detached or shrank the result.
+ */
+static OseoResult typed_array_static_from(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!function_is_constructible(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray.from receiver is not a constructor."
+        );
+    }
+    OseoValue mapper = typed_array_argument(argument_count, arguments, 1u);
+    bool mapping = tag_of(mapper) != OSEO_TAG_UNDEFINED;
+    if (mapping && !is_callable(mapper)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray.from mapper is not callable."
+        );
+    }
+    /* 0 receiver, 1 source, 2 mapper, 3 thisArg, 4 iterator method or
+     * element key, 5 value list or array-like object, 6 result, 7 length,
+     * and the adjacent mapper arguments 8 value and 9 index. */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 10u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = typed_array_argument(argument_count, arguments, 0u);
+    frame.slots[2] = mapper;
+    frame.slots[3] = typed_array_argument(argument_count, arguments, 2u);
+    result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ITERATOR
+    );
+    frame.slots[4] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[1], frame.slots[4]);
+        frame.slots[4] = is_nullish(result.value)
+            ? oseo_undefined()
+            : result.value;
+    }
+    bool iterable = result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[4]) != OSEO_TAG_UNDEFINED;
+    if (iterable && !is_callable(frame.slots[4])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray.from source iterator is not callable."
+        );
+    }
+    size_t count = 0u;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL && iterable) {
+        result = typed_array_iterator_to_list(
+            context,
+            frame.slots[1],
+            frame.slots[4]
+        );
+        frame.slots[5] = result.value;
+        const OseoValue *values = NULL;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_view(
+                context,
+                frame.slots[5],
+                &count,
+                &values
+            );
+        }
+        length = (double)count;
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_object(context, frame.slots[1]);
+        frame.slots[5] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_length_of_array_like(
+                context,
+                frame.slots[5],
+                &length
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[7] = oseo_number(length);
+        result = typed_array_create_from_constructor(
+            context,
+            frame.slots[0],
+            1u,
+            &frame.slots[7]
+        );
+        frame.slots[6] = result.value;
+    }
+    /* A result at least `length` elements long exists, so every index
+     * below `length` fits in size_t. */
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && (double)index < length;
+         index += 1u) {
+        if (iterable) {
+            /* The mapper and conversions can collect, so the view of the
+             * rooted list is reacquired for each element. */
+            const OseoValue *values = NULL;
+            result = oseo_argument_list_view(
+                context,
+                frame.slots[5],
+                &count,
+                &values
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                frame.slots[8] = values[index];
+            }
+        } else {
+            result = oseo_property_key(context, oseo_number((double)index));
+            frame.slots[4] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(
+                    context,
+                    frame.slots[5],
+                    frame.slots[4]
+                );
+                frame.slots[8] = result.value;
+            }
+        }
+        if (result.status == OSEO_STATUS_NORMAL && mapping) {
+            frame.slots[9] = oseo_number((double)index);
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                frame.slots[3],
+                2u,
+                &frame.slots[8],
+                oseo_undefined()
+            );
+            frame.slots[8] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_store(
+                context,
+                frame.slots[6],
+                index,
+                frame.slots[8]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[6];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * %TypedArray%.of. The receiver constructs a result of the argument count,
+ * and each argument is stored in order through TypedArraySetElement, so an
+ * argument whose conversion detaches or shrinks the result only loses its
+ * own and later writes.
+ */
+static OseoResult typed_array_static_of(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!function_is_constructible(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray.of receiver is not a constructor."
+        );
+    }
+    OseoValue slots[3] = {
+        receiver,
+        oseo_number((double)argument_count),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = typed_array_create_from_constructor(
+        context,
+        slots[0],
+        1u,
+        &slots[1]
+    );
+    slots[2] = result.value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = typed_array_store(
+            context,
+            slots[2],
+            index,
+            arguments[index]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[2];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -3266,6 +3527,22 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
         return typed_array_accessor(context, code_id, receiver);
     }
     if (code_id == OSEO_TYPED_ARRAY_SPECIES_CODE_ID) return normal(receiver);
+    if (code_id == OSEO_TYPED_ARRAY_FROM_CODE_ID) {
+        return typed_array_static_from(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_TYPED_ARRAY_OF_CODE_ID) {
+        return typed_array_static_of(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_TYPED_ARRAY_AT_CODE_ID) {
         return typed_array_at(context, receiver, argument_count, arguments);
     }
@@ -3464,13 +3741,11 @@ static OseoResult define_typed_array_property(
 }
 
 /*
- * Installs the core %TypedArray.prototype% surface and the
- * %TypedArray%[Symbol.species] getter subarray's species lookup needs.
- * `toString` is the original %Array.prototype.toString% function object,
- * read from its realm slot so a program that replaced the Array method
- * before this cluster materialized cannot change the identity. The
- * remaining prototype methods and the `from` and `of` statics stay with
- * their later graph owners.
+ * Installs the %TypedArray.prototype% surface, the `from` and `of` statics,
+ * and the %TypedArray%[Symbol.species] getter. `toString` is the original
+ * %Array.prototype.toString% function object, read from its realm slot so a
+ * program that replaced the Array method before this cluster materialized
+ * cannot change the identity.
  */
 static OseoResult typed_array_install_core(
     OseoContext *context,
@@ -3791,6 +4066,34 @@ static OseoResult typed_array_install_core(
             accessor
         );
     }
+    static const size_t static_codes[] = {
+        OSEO_TYPED_ARRAY_OF_CODE_ID,
+        OSEO_TYPED_ARRAY_FROM_CODE_ID,
+    };
+    static const char *const static_names[] = {"of", "from"};
+    static const size_t static_lengths[] = {0u, 1u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            static_codes[index],
+            static_names[index],
+            static_lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                slots[1],
+                static_names[index],
+                slots[2],
+                method
+            );
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = create_typed_array_builtin(
             context,
@@ -3958,36 +4261,6 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
 
 OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context) {
     return typed_array_intrinsic_build(context);
-}
-
-const char *oseo_internal_typed_array_deferred_diagnostic(
-    OseoContext *context,
-    OseoValue object,
-    OseoValue key
-) {
-    if (object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]) {
-        if (oseo_internal_string_is_ascii(key, "from") ||
-            oseo_internal_string_is_ascii(key, "of")) {
-            return "TypedArray static APIs are not admitted yet.";
-        }
-        return NULL;
-    }
-    return NULL;
-}
-
-const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
-    OseoContext *context,
-    OseoValue object
-) {
-    /* The statics node owns the final shared-component reflection step for
-     * both the prototype and constructor after it adds from and of. */
-    if (object ==
-        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE]) {
-        return "TypedArray prototype own-key reflection is not admitted yet.";
-    }
-    return object == context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY]
-        ? "TypedArray static APIs are not admitted yet."
-        : NULL;
 }
 
 OseoResult oseo_internal_install_typed_array_globals(

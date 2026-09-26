@@ -1512,6 +1512,79 @@ test("populates TypedArray sorting with stable numeric snapshots", () => {
   assert.match(sorting, /oseo_internal_typed_array_set_index/u);
 });
 
+test("populates the TypedArray statics over one constructor path", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const typedArrays = sources.get("runtime_typed_array.c") ?? "";
+  const definition = (name: string): string => {
+    const opening = `static OseoResult ${name}(`;
+    const begin = typedArrays.indexOf(opening);
+    assert.ok(begin >= 0, `${name} needs one definition`);
+    const next = typedArrays.indexOf("\nstatic ", begin + opening.length);
+    return typedArrays.slice(begin, next < 0 ? undefined : next);
+  };
+
+  for (const code of ["FROM", "OF"]) {
+    assert.match(
+      internalHeader,
+      new RegExp(`OSEO_TYPED_ARRAY_${code}_CODE_ID`, "u"),
+    );
+  }
+  // The statics complete the shared component, so no TypedArray lookup,
+  // deletion, or own-key walk stops at a deferred boundary any more.
+  assert.doesNotMatch(internalHeader, /typed_array_deferred/u);
+  for (const [name, source] of sources) {
+    assert.doesNotMatch(source, /typed_array_deferred/u, name);
+    assert.doesNotMatch(source, /TypedArray static APIs/u, name);
+    assert.doesNotMatch(source, /own-key reflection is not admitted/u, name);
+  }
+  const install = definition("typed_array_install_core");
+  assert.match(install, /"of", "from"/u);
+  assert.match(install, /static_lengths\[\] = \{0u, 1u\}/u);
+
+  // Species creation and the statics share TypedArrayCreateFromConstructor.
+  const create = definition("typed_array_create_from_constructor");
+  assert.match(create, /typed_array_construct_with/u);
+  assert.match(create, /typed_array_validate/u);
+  assert.match(create, /is_number\(arguments\[0\]\)/u);
+  assert.match(
+    definition("typed_array_species_create"),
+    /typed_array_create_from_constructor/u,
+  );
+
+  const from = definition("typed_array_static_from");
+  const order = [
+    "function_is_constructible(receiver)",
+    "!is_callable(mapper)",
+    "OSEO_WELL_KNOWN_ITERATOR",
+    "typed_array_iterator_to_list",
+    "oseo_internal_to_object",
+    "typed_array_length_of_array_like",
+    "typed_array_create_from_constructor",
+    "oseo_call_function",
+    "typed_array_store",
+  ].map((step) => {
+    const index = from.indexOf(step);
+    assert.ok(index >= 0, `from needs ${step}`);
+    return index;
+  });
+  assert.deepEqual(
+    order,
+    order.toSorted((left, right) => left - right),
+    "from must validate, collect, construct, map, and store in order",
+  );
+  assert.doesNotMatch(from, /typed_array_species_create/u);
+
+  const of = definition("typed_array_static_of");
+  assert.ok(
+    of.indexOf("function_is_constructible(receiver)") <
+      of.indexOf("typed_array_create_from_constructor"),
+  );
+  assert.ok(
+    of.indexOf("typed_array_create_from_constructor") <
+      of.indexOf("typed_array_store"),
+  );
+});
+
 test("populates the realm-owned ArrayBuffer intrinsic cluster", () => {
   const header = sources.get("oseo_runtime.h") ?? "";
   const internalHeader = sources.get("runtime_internal.h") ?? "";
