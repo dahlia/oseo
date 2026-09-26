@@ -6,5 +6,5 @@ delivers: "Admits a super property reference in a class body without extends
   %Object.prototype%."
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready
