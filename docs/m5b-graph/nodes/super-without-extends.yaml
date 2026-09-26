@@ -7,4 +7,8 @@ delivers: "Admits a super property reference in a class body without extends
 dependencies:
   - object-prototype
 landed: false
-status: ready
+status: parked
+reason: "Waiting for additional review authorization. The fifth Fable 5.1
+  review was clean, but the full check then found two no-runtime-typeof
+  violations in the property test. A behavior-preserving tagged-domain repair
+  is preserved and needs at least one fresh read-only review and all gates."
