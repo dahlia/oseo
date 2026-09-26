@@ -1422,6 +1422,156 @@ function super_free() {
 `,
   },
   {
+    name: "super-without-extends",
+    source: `
+// Every home object in an extends-free class and an object literal reaches
+// Object.prototype through its ordinary prototype chain.
+Object.prototype.m5SuperValue = "object-root";
+Object.defineProperty(Object.prototype, "m5SuperSetter", {
+  configurable: true,
+  set(value) {
+    this.setterValue = value;
+  },
+});
+class Plain {
+  constructor() {
+    this.constructed = super["m5SuperValue"];
+  }
+  field = super.m5SuperValue;
+  method() {
+    return super.m5SuperValue;
+  }
+  arrow() {
+    return (() => super.m5SuperValue)();
+  }
+  async asyncMethod() {
+    await 0;
+    return (() => super.m5SuperValue)();
+  }
+  *generator() {
+    yield (() => super.m5SuperValue)();
+  }
+  async *asyncGenerator() {
+    await 0;
+    yield (() => super.m5SuperValue)();
+  }
+  write(value: number) {
+    super.m5SuperSetter = value;
+    return this.setterValue + 1;
+  }
+  static field = super.m5SuperValue;
+  static method() {
+    return super.m5SuperValue;
+  }
+  static {
+    this.block = super.m5SuperValue;
+  }
+}
+const plain = new Plain();
+console.log(plain.constructed, plain.field, plain.method(), plain.arrow());
+console.log(plain.write("false"), plain.setterValue);
+console.log(Plain.field, Plain.method(), Plain.block);
+const object = {
+  method() {
+    return super.m5SuperValue;
+  },
+  async asyncMethod() {
+    await 0;
+    return (() => super.m5SuperValue)();
+  },
+  *generator() {
+    yield (() => super.m5SuperValue)();
+  },
+  async *asyncGenerator() {
+    await 0;
+    yield (() => super.m5SuperValue)();
+  },
+  get value() {
+    return super.m5SuperValue;
+  },
+  set value(next) {
+    super.m5SuperSetter = next;
+  },
+};
+console.log(object.method(), object.value);
+object.value = 7;
+console.log(object.setterValue);
+// Replacing each home object's prototype invalidates the shape guard and the
+// compiled generic fallback observes the replacement.
+const replacement = { m5SuperValue: "replacement" };
+Object.setPrototypeOf(Plain.prototype, replacement);
+Object.setPrototypeOf(object, replacement);
+console.log(plain.method(), object.method());
+console.log(plain.generator().next().value, object.generator().next().value);
+async function observeSuspendedHomes() {
+  console.log(await plain.asyncMethod(), await object.asyncMethod());
+  console.log((await plain.asyncGenerator().next()).value,
+    (await object.asyncGenerator().next()).value);
+}
+observeSuspendedHomes();
+
+// A borrowed method retains its literal's home while using the caller's this.
+Object.prototype.m5SuperCall = function () { return this.marker; };
+Object.prototype.m5SuperNumber = 2;
+const operations = {
+  call() { return super.m5SuperCall(); },
+  arrow() { return (() => super.m5SuperCall())(); },
+  update() { return super.m5SuperNumber++; },
+  targets() {
+    ({ value: super.m5SuperNumber } = { value: 5 });
+    for (super.m5SuperNumber of [6, 7]) {}
+    return this.m5SuperNumber;
+  },
+  remove() {
+    let evaluated = 0;
+    function key() { evaluated++; return "m5SuperNumber"; }
+    try { delete super[key()]; } catch (error) {
+      return evaluated + ":" + error.name;
+    }
+  },
+};
+const borrower = { marker: "borrowed" };
+console.log(operations.call.call(borrower), operations.arrow.call(borrower));
+console.log(operations.update(), operations.m5SuperNumber);
+console.log(operations.targets(), Object.prototype.m5SuperNumber);
+console.log(operations.remove(), Object.prototype.m5SuperNumber);
+`,
+  },
+  {
+    name: "super-without-extends-receivers",
+    nonStrictScript: true,
+    source: `
+Object.defineProperty(Object.prototype, "m5SuperReceiver", {
+  configurable: true,
+  get() { "use strict"; return this; },
+});
+const object = {
+  read() { return super.m5SuperReceiver; },
+  arrow() { return (() => super.m5SuperReceiver)(); },
+  strict() { "use strict"; return super.m5SuperReceiver; },
+  async readAsync() { await 0; return super.m5SuperReceiver; },
+  *readGenerator() { yield super.m5SuperReceiver; },
+  async *readAsyncGenerator() { await 0; yield super.m5SuperReceiver; },
+};
+class Plain {
+  read() { return super.m5SuperReceiver; }
+}
+console.log(object.read.call(null) === globalThis);
+console.log(object.arrow.call(undefined) === globalThis);
+console.log(typeof object.strict.call(3), object.strict.call(3));
+console.log(object.strict.call(null), object.strict.call(undefined));
+console.log(Plain.prototype.read.call(null));
+console.log(typeof Plain.prototype.read.call(3));
+console.log(object.readGenerator.call(null).next().value === globalThis);
+async function observeReceivers() {
+  console.log(await object.readAsync.call(null) === globalThis);
+  console.log((await object.readAsyncGenerator.call(null).next()).value
+    === globalThis);
+}
+observeReceivers();
+`,
+  },
+  {
     name: "class-super-assignment",
     source: `
 // A super assignment looks the key up through the home object's

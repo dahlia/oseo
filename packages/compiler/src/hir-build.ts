@@ -1314,9 +1314,12 @@ function resolveExpression(
     // inside a derived constructor reads the binding `super()`
     // initializes and observes its temporal dead zone before then.
     const receiver = resolveExpression(
-      // Every admitted `super` property reference sits in a class body,
-      // which is strict code, so its receiver is the call-site receiver.
-      { kind: "this", range: expression.range, thisMode: "strict" },
+      // Object methods may be sloppy; arrows inherit that receiver mode.
+      {
+        kind: "this",
+        range: expression.range,
+        thisMode: expression.thisMode,
+      },
       scopes,
       state,
     );

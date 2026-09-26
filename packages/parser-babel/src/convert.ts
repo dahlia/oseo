@@ -402,7 +402,7 @@ export function callTarget(
 
 /**
  * Converts the `super` operand of a property reference. The reference is
- * admitted where a class element with `extends` supplies a home object.
+ * admitted where a class or object-literal element supplies a home object.
  * An arrow inherits that object from its enclosing element.
  */
 function superBase(
@@ -411,13 +411,17 @@ function superBase(
 ): SyntaxExpression | undefined {
   const superProperty = context.receiverStack.at(-1)?.superProperty;
   if (superProperty === "admitted") {
-    return { ...location(context, value), kind: "super-base" };
+    return {
+      ...location(context, value),
+      kind: "super-base",
+      thisMode: currentThisMode(context),
+    };
   }
   return unsupported(
     context,
     value,
-    "Property access through super is only valid in the body of a " +
-      "class element whose class has an extends clause.",
+    "Property access through super is only valid in a method or class " +
+      "element body.",
   );
 }
 
@@ -3365,10 +3369,10 @@ export function functionDeclaration(
       : enclosingReceiver == null || enclosingReceiver.kind === "arrow"
         ? "arrow"
         : "arrow-in-function";
-  // A class element supplies the home object, and arrows inherit that
-  // context until an ordinary nested function stops it.
+  // A class or object-literal element supplies the home object, and arrows
+  // inherit that context until an ordinary nested function stops it.
   const superProperty: SuperPropertyContext = functionProvidesThis
-    ? derivedConstructor !== true && !derivedElement
+    ? memberKind == null && derivedConstructor !== true && !derivedElement
       ? "none"
       : "admitted"
     : (enclosingReceiver?.superProperty ?? "none");
@@ -3797,7 +3801,6 @@ function implicitDerivedConstructor(
 function classField(
   context: ConvertContext,
   element: BabelNode,
-  derived: boolean,
 ): SyntaxClassField | undefined {
   const staticPlacement = element.static === true;
   if (
@@ -3830,7 +3833,7 @@ function classField(
   context.thisModeStack.push("strict");
   context.receiverStack.push({
     kind: "function",
-    superProperty: derived ? "admitted" : "none",
+    superProperty: "admitted",
   });
   const initializer = expression(context, valueNode);
   context.receiverStack.pop();
@@ -3946,7 +3949,7 @@ export function classExpression(
       element.type === "ClassProperty" ||
       element.type === "ClassPrivateProperty"
     ) {
-      const field = classField(context, element, derived);
+      const field = classField(context, element);
       if (field == null) break;
       elements.push(field);
       continue;

@@ -610,6 +610,8 @@ export type SyntaxExpression =
        * receiver read and key evaluation happen.
        */
       readonly kind: "super-base";
+      /** The lexical receiver mode, including sloppy object methods. */
+      readonly thisMode: SyntaxThisMode;
     })
   | (LocatedSyntax & {
       readonly kind: "new-target";
