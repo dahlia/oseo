@@ -5,5 +5,5 @@ delivers: "Adds agent clusters, cross-agent shared-memory execution, and the
   $262.agent harness capability required by the remaining Atomics paths."
 dependencies:
   - atomics-single-agent
-landed: false
+landed: true
 status: ready
