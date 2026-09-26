@@ -7,4 +7,8 @@ delivers: "Admits a super property reference in a class body without extends
 dependencies:
   - object-prototype
 landed: false
-status: ready
+status: parked
+reason: "Three Codex worker starts timed out at Orca agent_readiness before
+  implementation, review, or gates could resume. Preserve the dirty
+  m5b-super-without-extends worktree; the failure is in worker startup rather
+  than the node implementation."
