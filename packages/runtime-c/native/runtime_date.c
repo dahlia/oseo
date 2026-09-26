@@ -3,7 +3,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 /*
  * The Date family: the %Date% constructor with its call and construct
@@ -12,12 +11,15 @@
  *
  * The realm's local time zone is UTC, so LocalTZA is +0 for every time
  * value and LocalTime and UTC are identities on a finite operand. That
- * is a host choice ECMA-262 permits, and it is the deliberate boundary
- * PLAN-M5.md gives this landing: the clock and wakeup checkpoint in
- * PLAN-NIO.md owns the host time-zone and real-time adapter, and a later
- * integration unit replaces both boundaries at once. Until then the only
- * host facility this component reads is the current epoch time, through
- * `date_current_time_value` alone.
+ * is a host choice ECMA-262 permits; the clock adapter of ADR 0025 has
+ * no time-zone capability, so no host zone reaches this component.
+ *
+ * The current time is the realm's epoch real-time capability, read
+ * through `oseo_clock_real_time` in `date_current_time_value` alone. This
+ * component never reads a host clock itself and never touches the
+ * monotonic domain: reading the current time neither opens the
+ * scheduler's monotonic origin nor moves a timer deadline, and a
+ * wall-clock adjustment changes later readings and nothing else.
  */
 
 /*
@@ -353,28 +355,28 @@ static double date_make_full_year(double year) {
 }
 
 /*
- * The host's current epoch time in integral milliseconds, the single
- * clock boundary of this component. C11's `timespec_get` with `TIME_UTC`
- * is the primary read; `time` is the fallback for a host that reports no
- * time base for it. A host that answers neither has no clock, and the
- * caller reports that as an owned non-catchable diagnostic rather than
- * inventing a time value.
+ * The current time value, 21.4.2.1 step 1 and 21.4.3.1: the realm's epoch
+ * real-time capability rounded down to a whole millisecond, then
+ * TimeClip. An adapter may report a fraction, and the millisecond that
+ * contains the instant is the one its time value designates, including
+ * before the epoch. A reading past the time-value range clips to NaN as
+ * any other time value would. An adapter without real time reports the
+ * owned non-catchable diagnostic rather than an invented time value.
  */
-static bool date_current_time_value(double *value) {
-    struct timespec now;
-    if (timespec_get(&now, TIME_UTC) == TIME_UTC) {
-        *value = (double)now.tv_sec * OSEO_MS_PER_SECOND +
-            floor((double)now.tv_nsec / 1e6);
-        return isfinite(*value);
+static OseoResult date_current_time_value(
+    OseoContext *context,
+    double *value
+) {
+    double milliseconds = 0.0;
+    if (!oseo_clock_real_time(context, &milliseconds)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The host real-time clock is unavailable."
+        );
     }
-    time_t seconds = time(NULL);
-    if (seconds == (time_t)-1) return false;
-    *value = (double)seconds * OSEO_MS_PER_SECOND;
-    return isfinite(*value);
-}
-
-static OseoResult date_clock_failure(OseoContext *context) {
-    return failure(context, "OSEO2001", "The host clock is unavailable.");
+    *value = date_time_clip(floor(milliseconds));
+    return normal(oseo_undefined());
 }
 
 /* thisTimeValue(value), 21.4.4.1's RequireInternalSlot. */
@@ -1395,9 +1397,10 @@ static OseoResult date_construct(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = new_target;
     if (argument_count == 0u) {
-        if (!date_current_time_value(&time_value)) {
+        result = date_current_time_value(context, &time_value);
+        if (result.status != OSEO_STATUS_NORMAL) {
             oseo_roots_release(context, &frame);
-            return date_clock_failure(context);
+            return result;
         }
     } else if (argument_count == 1u) {
         frame.slots[1] = arguments[0];
@@ -1476,23 +1479,17 @@ static OseoResult date_construct(
  * argument. */
 static OseoResult date_call(OseoContext *context) {
     double time_value = 0.0;
-    if (!date_current_time_value(&time_value)) {
-        return date_clock_failure(context);
-    }
-    return date_to_date_string(
-        context,
-        date_time_clip(time_value),
-        OSEO_DATE_TO_STRING
-    );
+    OseoResult result = date_current_time_value(context, &time_value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return date_to_date_string(context, time_value, OSEO_DATE_TO_STRING);
 }
 
 /* Date.now(), 21.4.3.1. */
 static OseoResult date_now(OseoContext *context) {
     double time_value = 0.0;
-    if (!date_current_time_value(&time_value)) {
-        return date_clock_failure(context);
-    }
-    return normal(oseo_number(date_time_clip(time_value)));
+    OseoResult result = date_current_time_value(context, &time_value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_number(time_value));
 }
 
 /* Date.parse(string), 21.4.3.2. */

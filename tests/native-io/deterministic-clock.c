@@ -65,7 +65,7 @@ static OseoClockWaitResult deterministic_wait(
     if (clock->trace != NULL) {
         (void)fprintf(
             clock->trace,
-            "wait %" PRIu64 " %s %" PRIu64 " %.0f\n",
+            "wait %" PRIu64 " %s %" PRIu64 " %.17g\n",
             deadline,
             wait_name(result),
             clock->monotonic,

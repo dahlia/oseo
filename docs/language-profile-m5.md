@@ -6365,13 +6365,21 @@ The realm's local time zone is UTC. `LocalTZA` is the constant +0, so
 `getTimezoneOffset` reports +0, `TimeZoneString` is
 `+0000 (Coordinated Universal Time)`, and every local getter agrees with its
 UTC counterpart. ECMA-262 leaves the local time zone to the host, so this is a
-host choice rather than a gap inside the claim. It is the deliberate boundary
-[*PLAN-M5.md*](../PLAN-M5.md) gives this landing: the clock and wakeup
-checkpoint in [*PLAN-NIO.md*](../PLAN-NIO.md) owns the host time-zone and
-real-time adapter, and a later integration unit replaces both boundaries at
-once. The host clock is read in exactly one place, through C11's `timespec_get`
-with a `time` fallback, and a host that answers neither reports the owned
-non-catchable `OSEO2001` diagnostic. ECMA-402 is outside the claim, so
+host choice rather than a gap inside the claim. The clock adapter of
+[ADR 0025](./adr/0025-native-clock-and-wakeup.md) has no time-zone capability,
+so no host zone reaches the realm.
+
+The current time that `Date.now()`, an argumentless construction, and `Date()`
+observe is the realm's epoch real-time capability from that adapter, read once
+per operation. The reading is rounded down to the millisecond that contains it,
+including before the epoch, and then passes through `TimeClip`, so a reading
+past either end of the time-value range is NaN. Reading the current time never
+takes the scheduler's monotonic origin and never moves a timer deadline, and a
+wall-clock adjustment changes later readings and nothing else. An adapter
+without real time makes those three operations report the owned non-catchable
+`OSEO2001` diagnostic “The host real-time clock is unavailable.”; a missing
+monotonic clock leaves them working. The Date component reads no host clock
+itself. ECMA-402 is outside the claim, so
 `toLocaleString`, `toLocaleDateString`, and `toLocaleTimeString` report the
 text of the operation each localizes, and Annex B's `getYear`, `setYear`, and
 `toGMTString` stay outside the claim under
@@ -6426,6 +6434,33 @@ and seeds and from 5,518 to 5,530 ordinary cases. The normative family index
 moves from 116 to 117 records. The suite revision, 41,091-path inventory,
 manifest schema, classification vocabulary, and zero-override policy remain
 unchanged.
+
+M5b node `date-nio-clock-integration` replaced the family's direct C11 clock
+read with the real-time capability above; the time-value, parsing, and
+formatting semantics are unchanged. The scheduler harness of ADR 0025 calls
+the realm's own `Date.now()`, `new Date().getTime()`, and
+`Date.parse(Date())` against both adapters. Fixed evidence in
+*tests/native-io/clock-wakeup.test.ts* pins a deterministic trace in which a
+read before the first timer leaves the monotonic origin to that timer, a
+quarter millisecond before the epoch reads as -1, a wall-clock jump inside a
+wait reaches the next read without moving the deadline, and both ends of the
+time-value range and the first reading past each clip as `TimeClip` requires,
+with and without collection at every safepoint. It also covers an absent
+real-time or monotonic capability, the platform adapter's agreement with the
+host clock and its advance across a 30 ms monotonic wait, and the
+whole-second `time` fallback. Generated evidence at seed `0x60007002`, the
+third slot of the clock family's block `0x60007000` through `0x600070ff`,
+compares 20 ordinary cases of timer and microtask trees with `Date` reads,
+fractional and range-edge real time, wall-clock jumps, and absent
+capabilities against an independent model, with and without collection at
+every safepoint. The differential fixture `date-real-time-clock` compares
+Node.js, Deno, and both native specialization policies on relations between
+`Date` readings and the timer waits between them, with a deliberate guard
+miss that reaches the generic fallback and collection forced at every
+safepoint. The node has no inventory roots, and no reviewed row moves. The
+property ratchet moves from 163 to 164 domains and seeds and from 5,873 to
+5,893 ordinary cases, the evidence inventory stays at 140 families, and the
+runtime ABI moves to `oseo-runtime-m5-125`.
 
 
 String iteration

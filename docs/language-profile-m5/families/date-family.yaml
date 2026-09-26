@@ -80,21 +80,30 @@ scope:
     `getTimezoneOffset` reports +0, `TimeZoneString` is `+0000
     (Coordinated Universal Time)`, and every local getter agrees with its
     UTC counterpart. ECMA-262 leaves the local time zone to the host, so
-    this is a host choice rather than a gap in the claim; it is the
-    deliberate boundary PLAN-M5.md gives this landing, and the clock and
-    wakeup checkpoint in PLAN-NIO.md owns the adapter that replaces it.
-    The reviewed differential corpus therefore runs its reference hosts
-    in that zone, which makes the local-time observations differential
-    rather than machine-dependent."
-  - "The host clock is read in exactly one place, through C11's
-    `timespec_get` with a `time` fallback, and a host that answers
-    neither reports the owned non-catchable OSEO2001 diagnostic. That
-    read is the direct boundary PLAN-M5.md schedules for replacement by
-    the PLAN-NIO real-time capability. Because no fixed expectation can
-    name a current time, the evidence for `Date.now`, an argumentless
-    construction, and `Date()` is direct native observation that all
-    three agree to the second and report a time value in the reviewed
-    range."
+    this is a host choice rather than a gap in the claim, and the clock
+    adapter of ADR 0025 has no time-zone capability, so no host zone
+    reaches the realm. The reviewed differential corpus therefore runs
+    its reference hosts in that zone, which makes the local-time
+    observations differential rather than machine-dependent."
+  - "The current time that `Date.now`, an argumentless construction, and
+    `Date()` observe is the realm's epoch real-time capability from the
+    PLAN-NIO clock adapter of ADR 0025, read once per operation, rounded
+    down to the millisecond that contains it, including before the
+    epoch, and then passed through `TimeClip`, so a reading past either
+    end of the time-value range is NaN. Reading the current time never
+    takes the scheduler's monotonic origin or moves a timer deadline,
+    and a wall-clock adjustment changes later readings and nothing else.
+    An adapter without real time reports the owned non-catchable
+    OSEO2001 diagnostic, while a missing monotonic clock leaves the three
+    operations working. The Date component reads no host clock itself.
+    The deterministic adapter makes those readings exact fixed and
+    generated evidence through the scheduler harness, which calls the
+    realm's own `%Date%`. Against the platform adapter no expectation can
+    name a current time, so that evidence is direct native observation
+    that the three agree to the second, stay near the host clock, advance
+    across a monotonic timer wait, and report whole seconds under the
+    `time` fallback, plus a differential fixture comparing only relations
+    between readings and the timer waits between them."
   - "ECMA-402 is outside the claim, so `toLocaleString`,
     `toLocaleDateString`, and `toLocaleTimeString` report the text of the
     operation each localizes. Both reference hosts implement ECMA-402, so
@@ -121,20 +130,25 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/native-io/clock-scheduler.c
+      - tests/native-io/clock-wakeup.test.ts
       - tests/native.ts
       - tests/native/fixtures/date-family.ts
       - tests/native/scenarios/shard-0.ts
   forced-collection:
     status: covered
     references:
+      - tests/native-io/clock-wakeup.test.ts
       - tests/native.ts
       - tests/native/fixtures/date-family.ts
       - tests/property/m5-date-family.property.test.ts
+      - tests/property/nio-clock-wakeup.property.test.ts
   generated:
     status: covered
     references:
       - tests/property-seeds.yaml
       - tests/property/m5-date-family.property.test.ts
+      - tests/property/nio-clock-wakeup.property.test.ts
   guard-fallback:
     status: covered
     references:
@@ -155,6 +169,7 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/runtime-c/native/runtime_clock.c
       - packages/runtime-c/native/runtime_date.c
       - packages/runtime-c/native/runtime_internal.h
       - packages/runtime-c/tests/builtin-code-registry.test.ts

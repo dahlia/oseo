@@ -233,8 +233,11 @@ Consequences
     scripted lateness.
  -  The reviewed test262 manifest keeps its `deterministic-logical-clock`
     scheduler value. No execution recorded with that value schedules a timer
-    or loads a harness include that does, so none of them opens the adapter,
-    and a test reads the recorded executions to keep that true. Since
+    or loads a harness include that does, so none of them starts the
+    monotonic scheduler clock or waits, and a test reads the recorded
+    executions to keep that true. Since `date-nio-clock-integration`, such an
+    execution that reads the current time through `Date` opens the adapter
+    for that real-time reading alone, which schedules nothing. Since
     [ADR 0026](./0026-agent-clusters-and-shared-memory.md), a case built with
     the native test262 host runs under the real-clock agent cluster, records
     no scheduler value, and may schedule timers through *atomicsHelper.js*.
@@ -242,8 +245,9 @@ Consequences
     restriction bits, and a started flag; *oseo\_runtime.h* gains the adapter
     types and six entry points; the runtime input gains two sources; and
     `abiVersion` moves to `m5-108`. Generated C is unchanged.
- -  `Date` still reads the host clock directly until
-    `date-nio-clock-integration`.
+ -  `Date` read the host clock directly until
+    `date-nio-clock-integration`, which moved it onto
+    `oseo_clock_real_time` without changing this contract.
  -  The operation, completion, cancellation, buffer, and referenced-operation
     liveness contracts, the versioned trace loader, and socket and resolver
     probes remain later PLAN-NIO work.

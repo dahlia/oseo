@@ -183,8 +183,8 @@ Windows to the supported target set by itself.
 
 M5 first exposes its `Date` family through a deliberately direct clock
 boundary. The native clock checkpoint then supplies epoch real time and moves
-existing production timer waits to monotonic elapsed time, after which a
-separate Date integration unit adopts that contract before M5 completes. M6
+existing production timer waits to monotonic elapsed time, and a separate
+Date integration unit has since moved `Date` onto that real-time capability. M6
 can begin its pure-data API groups earlier; its timer and performance work
 standardizes the APIs over that clock contract. `fetch()`
 waits for accepted and implemented socket and name-resolution backends plus an

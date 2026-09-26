@@ -310,11 +310,10 @@ Ownership follows the plan's target layout:
     `%Date.prototype%` with its forty-four own methods, and the
     time-value arithmetic of 21.4.1, including the Date Time String
     Format parser and the `ToDateString`, `toUTCString`, and
-    `toISOString` writers. It still reads the host's current time
-    directly, through a single `timespec_get` call with a `time` fallback,
-    until `date-nio-clock-integration` moves that read to the clock
-    component, and its `LocalTZA` is the constant +0 that the later host
-    time-zone adapter replaces.
+    `toISOString` writers. It reads no host clock: the current time comes
+    from the clock component's epoch real-time capability, which never
+    takes the monotonic origin, and its `LocalTZA` is the constant +0
+    because the clock adapter has no time-zone capability.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in

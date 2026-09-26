@@ -2467,14 +2467,21 @@ test("populates the realm-owned Date intrinsic cluster", () => {
   );
   assert.doesNotMatch(dateSource, /\bfree\s*\(/u);
   // The realm's local time zone is UTC, and every LocalTime and UTC call
-  // routes through the one adjustment the later host adapter replaces.
+  // routes through one adjustment, because the clock adapter supplies no
+  // time zone.
   assert.match(
     dateSource,
     /static double date_local_time_zone_adjustment\(void\) \{\s*return 0\.0;/u,
   );
-  // The clock is read in exactly one place, and no other host facility
-  // reaches this component.
-  assert.equal(dateSource.match(/timespec_get\(/gu)?.length, 1);
+  // The current time is the clock component's real-time capability, read
+  // in exactly one place. The component reads no host clock of its own,
+  // never starts the scheduler's monotonic clock, and reaches no other
+  // host facility.
+  assert.equal(dateSource.match(/oseo_clock_real_time\(/gu)?.length, 1);
+  assert.doesNotMatch(
+    dateSource,
+    /timespec_get|clock_gettime|\btime\(|oseo_internal_clock_|<time\.h>/u,
+  );
   assert.doesNotMatch(dateSource, /localtime|mktime|gmtime|tzset/u);
   // Object.prototype.toString reports the Date builtinTag, the global
   // property is installed from the binding record, and @@toPrimitive

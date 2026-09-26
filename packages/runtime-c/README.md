@@ -832,12 +832,13 @@ new target's `prototype`. `%Date.prototype%` is an ordinary object with no
 The realm's local time zone is UTC. `LocalTZA` is the constant +0, so
 `LocalTime` and `UTC` are identities on a finite time value,
 `getTimezoneOffset` reports +0, and every local getter agrees with its UTC
-counterpart. That is a host choice ECMA-262 permits and the deliberate
-boundary *PLAN-M5.md* gives this landing; the clock and wakeup checkpoint
-in *PLAN-NIO.md* owns the host time-zone and real-time adapter that
-replaces it. The component reads the host clock in exactly one place,
-through C11's `timespec_get` with a `time` fallback, and reports an owned
-`OSEO2001` diagnostic when the host answers neither.
+counterpart. That is a host choice ECMA-262 permits; the clock adapter has
+no time-zone capability. The component reads no host clock: the current time is
+the realm's epoch real-time capability through `oseo_clock_real_time`, rounded
+down to its millisecond and passed through `TimeClip`, and an adapter without
+real time reports the owned `OSEO2001` diagnostic “The host real-time clock is
+unavailable.” Reading it opens the realm's clock adapter if nothing has yet but
+never takes the scheduler's monotonic origin.
 
 The forty-four prototype methods cover the eighteen getters, the fifteen
 setters, `toDateString`, `toISOString`, `toJSON`, the three locale methods,
@@ -1049,6 +1050,12 @@ diagnostics and the lookup, deletion, and own-key checks that consulted them
 are removed. Two code IDs are allocated inside the existing TypedArray range;
 no intrinsic slot, heap kind, public layout, or generated-code entry point is
 added.
+
+The `m5-125` ABI moves `Date.now()`, argumentless `Date` construction, and
+`Date()` from the Date component's own C11 clock read onto
+`oseo_clock_real_time`. Their unavailable-clock diagnostic now reads “The host
+real-time clock is unavailable.” No entry point, built-in code ID, intrinsic
+slot, heap kind, or public layout is added.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
