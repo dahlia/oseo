@@ -919,6 +919,10 @@
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 46u)
 #define OSEO_TYPED_ARRAY_TO_SORTED_CODE_ID \
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 47u)
+#define OSEO_TYPED_ARRAY_FROM_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 48u)
+#define OSEO_TYPED_ARRAY_OF_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 49u)
 
 #define OSEO_ATOMICS_CODE_ID_RANGE_INDEX ((size_t)25u)
 #define OSEO_ATOMICS_CODE_ID_RANGE_FIRST \
@@ -3069,15 +3073,6 @@ OseoResult oseo_internal_typed_array_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_typed_array_globals(
     OseoContext *context,
     OseoValue global
-);
-const char *oseo_internal_typed_array_deferred_diagnostic(
-    OseoContext *context,
-    OseoValue object,
-    OseoValue key
-);
-const char *oseo_internal_typed_array_deferred_own_keys_diagnostic(
-    OseoContext *context,
-    OseoValue object
 );
 /*
  * CanonicalNumericIndexString for a TypedArray property key.

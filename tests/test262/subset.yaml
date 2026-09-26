@@ -44115,6 +44115,126 @@ tests:
   - path: test/built-ins/ThrowTypeError/unique-per-realm-unmapped-args.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/built-ins/TypedArray/Symbol.species/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/Symbol.species/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/Symbol.species/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/Symbol.species/result.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/arylk-get-length-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/arylk-to-length-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-array-mapper-detaches-result.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-array-mapper-makes-result-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-typedarray-into-itself-mapper-detaches-result.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-typedarray-into-itself-mapper-makes-result-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-typedarray-mapper-detaches-result.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/from-typedarray-mapper-makes-result-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/iter-access-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/iter-invoke-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/iter-next-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/iter-next-value-error.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/iterated-array-changed-by-tonumber.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/mapfn-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/from/this-is-not-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/invoked.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/invoked-as-func.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/invoked-as-method.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/length.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/name.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/prop-desc.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/resized-with-out-of-bounds-and-in-bounds-indices.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/of/this-is-not-constructor.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/out-of-bounds-get-and-set.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/out-of-bounds-has.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/prototype.js
+    expectedClassification: pass
+    dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/prototype/Symbol.iterator.js
     expectedClassification: pass
     dependencies: [typed-array-core]
@@ -48303,6 +48423,12 @@ tests:
   - path: test/built-ins/TypedArray/prototype/with/value-throw-completion.js
     expectedClassification: pass
     dependencies: [typed-array-mutation]
+  - path: test/built-ins/TypedArray/resizable-buffer-length-tracking-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-statics]
+  - path: test/built-ins/TypedArray/resizable-buffer-length-tracking-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/BYTES_PER_ELEMENT.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]

@@ -175,12 +175,6 @@ static OseoResult object_get(
             }
             return normal(value);
         }
-        const char *deferred =
-            oseo_internal_typed_array_deferred_diagnostic(
-                context, current, key);
-        if (deferred != NULL) {
-            return failure(context, "OSEO2001", deferred);
-        }
         current = object->prototype;
     }
     return normal(oseo_undefined());
@@ -271,10 +265,6 @@ OseoResult oseo_object_has_own(
         &setter
     );
     if (exists) return normal(oseo_boolean(true));
-    const char *deferred =
-        oseo_internal_typed_array_deferred_diagnostic(
-            context, object_value, key);
-    if (deferred != NULL) return failure(context, "OSEO2001", deferred);
     return normal(oseo_boolean(false));
 }
 

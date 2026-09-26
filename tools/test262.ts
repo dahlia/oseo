@@ -751,14 +751,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   ) {
     return "regexp-string-dispatch";
   }
-  // The prototype's own-key list completes only after every remaining
-  // prototype method node lands, so no single graph node owns it.
-  if (
-    diagnostic ===
-    "TypedArray prototype own-key reflection is not admitted yet."
-  ) {
-    return "typed-array-prototype-methods";
-  }
   if (diagnostic === "TypedArray iterative methods are not admitted yet.") {
     return "typed-array-iterative";
   }
@@ -769,9 +761,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
     diagnostic === "TypedArray search and join methods are not admitted yet."
   ) {
     return "typed-array-search-and-join";
-  }
-  if (diagnostic === "TypedArray static APIs are not admitted yet.") {
-    return "typed-array-statics";
   }
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"

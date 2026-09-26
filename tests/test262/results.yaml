@@ -17458,9 +17458,9 @@ summary:
   expectedNegatives: 1560
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 18273
+  passes: 18310
   semanticFailures: 0
-  unsupportedProfileFeatures: 1508
+  unsupportedProfileFeatures: 1513
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17756,6 +17756,13 @@ summary:
       passes: 43
       semanticFailures: 0
       unsupportedProfileFeatures: 4
+    - dependency: typed-array-statics
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 37
+      semanticFailures: 0
+      unsupportedProfileFeatures: 5
     - dependency: var-bindings
       expectedNegatives: 69
       harnessFailures: 0
@@ -18055,9 +18062,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1299
+      passes: 1336
       semanticFailures: 0
-      unsupportedProfileFeatures: 97
+      unsupportedProfileFeatures: 102
     - group: built-ins/TypedArrayConstructors
       expectedNegatives: 0
       harnessFailures: 0
