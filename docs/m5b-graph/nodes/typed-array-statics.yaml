@@ -12,5 +12,5 @@ inventory:
     - test/built-ins/TypedArray/of/
 dependencies:
   - typed-array-constructors
-landed: false
+landed: true
 status: ready
