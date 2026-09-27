@@ -1,0 +1,41 @@
+import fc from "fast-check";
+import {
+  propertyParameters,
+  propertySize,
+} from "./packages/testkit/tests/property-support.ts";
+
+const suite = {
+  domain: "audit",
+  numRuns: 12,
+  profile: "audit",
+  seed: 0x60001200,
+  sizeLimit: "audit",
+  timeLimitMilliseconds: 5000,
+};
+const configurations = {
+  ordinary: {},
+  extendedNative: {
+    OSEO_PROPERTY_RUN_SCALE: "10",
+    OSEO_PROPERTY_SEED: "1592590339",
+    OSEO_PROPERTY_SIZE: "large",
+  },
+  extendedPackage: {
+    OSEO_PROPERTY_RUN_SCALE: "10",
+    OSEO_PROPERTY_SEED: "1592590337",
+    OSEO_PROPERTY_SIZE: "large",
+  },
+};
+for (const [name, environment] of Object.entries(configurations)) {
+  const parameters = propertyParameters(suite, environment);
+  const cases = [];
+  fc.assert(fc.property(fc.integer(), (value) => {
+    cases.push(value);
+  }), parameters);
+  console.log(JSON.stringify({
+    name,
+    seed: parameters.seed,
+    numRuns: parameters.numRuns,
+    size: propertySize(environment),
+    firstCases: cases.slice(0, 4),
+  }));
+}
