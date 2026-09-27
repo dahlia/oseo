@@ -1,0 +1,6654 @@
+{
+  "sourceRun": "36312192623",
+  "headSha": "af9bb68c5216ed300cbeed52ac7c77682e7fd54a",
+  "jobs": [
+    {
+      "name": "host C sanitizers (macOS, native)",
+      "id": 108600171306,
+      "start": "2026-09-27T10:20:14Z",
+      "end": "2026-09-27T11:00:38Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:14Z",
+          "end": "2026-09-27T10:20:16Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:16Z",
+          "end": "2026-09-27T10:20:19Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:19Z",
+          "end": "2026-09-27T10:21:27Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:21:27Z",
+          "end": "2026-09-27T10:21:39Z"
+        },
+        {
+          "name": "Run mise run test:sanitizer:self",
+          "start": "2026-09-27T10:21:39Z",
+          "end": "2026-09-27T10:21:49Z"
+        },
+        {
+          "name": "Run mise run test:sanitizer:runtime",
+          "start": "2026-09-27T10:21:49Z",
+          "end": "2026-09-27T10:27:13Z"
+        },
+        {
+          "name": "Run mise run test:sanitizer:native",
+          "start": "2026-09-27T10:27:13Z",
+          "end": "2026-09-27T11:00:30Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:00:30Z",
+          "end": "2026-09-27T11:00:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:00:32Z",
+          "end": "2026-09-27T11:00:33Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:00:33Z",
+          "end": "2026-09-27T11:00:35Z"
+        }
+      ]
+    },
+    {
+      "name": "native (macos-aarch64, 2/3)",
+      "id": 108600171338,
+      "start": "2026-09-27T10:20:13Z",
+      "end": "2026-09-27T10:34:19Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:14Z",
+          "end": "2026-09-27T10:20:15Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:15Z",
+          "end": "2026-09-27T10:20:19Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:19Z",
+          "end": "2026-09-27T10:21:06Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:21:06Z",
+          "end": "2026-09-27T10:21:09Z"
+        },
+        {
+          "name": "Run mise run test:native --shard 2/3",
+          "start": "2026-09-27T10:21:09Z",
+          "end": "2026-09-27T10:34:15Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:34:15Z",
+          "end": "2026-09-27T10:34:16Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:34:16Z",
+          "end": "2026-09-27T10:34:16Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:34:16Z",
+          "end": "2026-09-27T10:34:17Z"
+        }
+      ]
+    },
+    {
+      "name": "native (macos-aarch64, 1/3)",
+      "id": 108600171355,
+      "start": "2026-09-27T11:14:22Z",
+      "end": "2026-09-27T11:29:33Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:14:23Z",
+          "end": "2026-09-27T11:14:25Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:14:25Z",
+          "end": "2026-09-27T11:14:29Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:14:29Z",
+          "end": "2026-09-27T11:15:08Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:15:08Z",
+          "end": "2026-09-27T11:15:14Z"
+        },
+        {
+          "name": "Run mise run test:native --shard 1/3",
+          "start": "2026-09-27T11:15:14Z",
+          "end": "2026-09-27T11:29:28Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:29:28Z",
+          "end": "2026-09-27T11:29:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:29:28Z",
+          "end": "2026-09-27T11:29:29Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:29:29Z",
+          "end": "2026-09-27T11:29:30Z"
+        }
+      ]
+    },
+    {
+      "name": "test (macos-latest, deno)",
+      "id": 108600171356,
+      "start": "2026-09-27T10:20:16Z",
+      "end": "2026-09-27T10:22:47Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:17Z",
+          "end": "2026-09-27T10:20:18Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:18Z",
+          "end": "2026-09-27T10:20:21Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:21Z",
+          "end": "2026-09-27T10:21:31Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:21:31Z",
+          "end": "2026-09-27T10:21:39Z"
+        },
+        {
+          "name": "Run mise run test:deno",
+          "start": "2026-09-27T10:21:39Z",
+          "end": "2026-09-27T10:22:41Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:22:41Z",
+          "end": "2026-09-27T10:22:42Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:22:42Z",
+          "end": "2026-09-27T10:22:43Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:22:43Z",
+          "end": "2026-09-27T10:22:44Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 9/10)",
+      "id": 108600171379,
+      "start": "2026-09-27T10:22:54Z",
+      "end": "2026-09-27T10:49:58Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:22:54Z",
+          "end": "2026-09-27T10:22:56Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:22:56Z",
+          "end": "2026-09-27T10:23:00Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:23:00Z",
+          "end": "2026-09-27T10:23:26Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:23:26Z",
+          "end": "2026-09-27T10:23:29Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 9/10",
+          "start": "2026-09-27T10:23:29Z",
+          "end": "2026-09-27T10:49:54Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:49:54Z",
+          "end": "2026-09-27T10:49:55Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:49:55Z",
+          "end": "2026-09-27T10:49:56Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:49:56Z",
+          "end": "2026-09-27T10:49:57Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 6/10)",
+      "id": 108600171389,
+      "start": "2026-09-27T10:20:15Z",
+      "end": "2026-09-27T10:54:45Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:16Z",
+          "end": "2026-09-27T10:20:18Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:18Z",
+          "end": "2026-09-27T10:20:21Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:21Z",
+          "end": "2026-09-27T10:21:19Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:21:19Z",
+          "end": "2026-09-27T10:21:24Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 6/10",
+          "start": "2026-09-27T10:21:24Z",
+          "end": "2026-09-27T10:54:40Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:54:40Z",
+          "end": "2026-09-27T10:54:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:54:41Z",
+          "end": "2026-09-27T10:54:42Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:54:42Z",
+          "end": "2026-09-27T10:54:42Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 5/10)",
+      "id": 108600171391,
+      "start": "2026-09-27T10:20:12Z",
+      "end": "2026-09-27T10:46:33Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:13Z",
+          "end": "2026-09-27T10:20:14Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:14Z",
+          "end": "2026-09-27T10:20:18Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:18Z",
+          "end": "2026-09-27T10:21:08Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:21:08Z",
+          "end": "2026-09-27T10:21:11Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 5/10",
+          "start": "2026-09-27T10:21:11Z",
+          "end": "2026-09-27T10:46:28Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:46:28Z",
+          "end": "2026-09-27T10:46:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:46:28Z",
+          "end": "2026-09-27T10:46:29Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:46:29Z",
+          "end": "2026-09-27T10:46:32Z"
+        }
+      ]
+    },
+    {
+      "name": "host C sanitizers (macOS, property)",
+      "id": 108600171396,
+      "start": "2026-09-27T12:00:09Z",
+      "end": "2026-09-27T12:32:50Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:00:09Z",
+          "end": "2026-09-27T12:00:10Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:00:10Z",
+          "end": "2026-09-27T12:00:13Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:00:13Z",
+          "end": "2026-09-27T12:00:48Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:00:48Z",
+          "end": "2026-09-27T12:00:56Z"
+        },
+        {
+          "name": "Run mise run test:sanitizer:self",
+          "start": "2026-09-27T12:00:56Z",
+          "end": "2026-09-27T12:01:00Z"
+        },
+        {
+          "name": "Run mise run test:sanitizer:property",
+          "start": "2026-09-27T12:01:00Z",
+          "end": "2026-09-27T12:32:46Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:32:46Z",
+          "end": "2026-09-27T12:32:46Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:32:46Z",
+          "end": "2026-09-27T12:32:47Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:32:47Z",
+          "end": "2026-09-27T12:32:49Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 3/10)",
+      "id": 108600171403,
+      "start": "2026-09-27T10:54:52Z",
+      "end": "2026-09-27T11:29:15Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:54:52Z",
+          "end": "2026-09-27T10:54:54Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:54:54Z",
+          "end": "2026-09-27T10:54:58Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:54:58Z",
+          "end": "2026-09-27T10:55:35Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:55:35Z",
+          "end": "2026-09-27T10:55:40Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 3/10",
+          "start": "2026-09-27T10:55:40Z",
+          "end": "2026-09-27T11:29:11Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:29:11Z",
+          "end": "2026-09-27T11:29:11Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:29:11Z",
+          "end": "2026-09-27T11:29:12Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:29:12Z",
+          "end": "2026-09-27T11:29:13Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 7/10)",
+      "id": 108600171410,
+      "start": "2026-09-27T11:29:22Z",
+      "end": "2026-09-27T12:00:03Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:29:23Z",
+          "end": "2026-09-27T11:29:24Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:29:24Z",
+          "end": "2026-09-27T11:29:28Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:29:28Z",
+          "end": "2026-09-27T11:30:08Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:30:08Z",
+          "end": "2026-09-27T11:30:13Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 7/10",
+          "start": "2026-09-27T11:30:13Z",
+          "end": "2026-09-27T11:59:58Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:59:58Z",
+          "end": "2026-09-27T11:59:58Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:59:58Z",
+          "end": "2026-09-27T11:59:59Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:59:59Z",
+          "end": "2026-09-27T12:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "native (macos-aarch64, 3/3)",
+      "id": 108600171412,
+      "start": "2026-09-27T10:34:27Z",
+      "end": "2026-09-27T10:54:18Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:34:28Z",
+          "end": "2026-09-27T10:34:30Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:34:30Z",
+          "end": "2026-09-27T10:34:35Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:34:35Z",
+          "end": "2026-09-27T10:35:15Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:35:15Z",
+          "end": "2026-09-27T10:35:21Z"
+        },
+        {
+          "name": "Run mise run test:native --shard 3/3",
+          "start": "2026-09-27T10:35:21Z",
+          "end": "2026-09-27T10:54:14Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:54:14Z",
+          "end": "2026-09-27T10:54:15Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:54:15Z",
+          "end": "2026-09-27T10:54:16Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:54:16Z",
+          "end": "2026-09-27T10:54:17Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 8/10)",
+      "id": 108600171420,
+      "start": "2026-09-27T10:54:25Z",
+      "end": "2026-09-27T11:24:24Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:54:26Z",
+          "end": "2026-09-27T10:54:28Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:54:28Z",
+          "end": "2026-09-27T10:54:32Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:54:32Z",
+          "end": "2026-09-27T10:55:14Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:55:14Z",
+          "end": "2026-09-27T10:55:20Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 8/10",
+          "start": "2026-09-27T10:55:20Z",
+          "end": "2026-09-27T11:24:19Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:24:19Z",
+          "end": "2026-09-27T11:24:20Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:24:20Z",
+          "end": "2026-09-27T11:24:20Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:24:20Z",
+          "end": "2026-09-27T11:24:21Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 10/10)",
+      "id": 108600171425,
+      "start": "2026-09-27T10:46:39Z",
+      "end": "2026-09-27T11:14:15Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:46:39Z",
+          "end": "2026-09-27T10:46:40Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:46:40Z",
+          "end": "2026-09-27T10:46:44Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:46:44Z",
+          "end": "2026-09-27T10:47:16Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:47:16Z",
+          "end": "2026-09-27T10:47:21Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 10/10",
+          "start": "2026-09-27T10:47:21Z",
+          "end": "2026-09-27T11:14:09Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:14:09Z",
+          "end": "2026-09-27T11:14:09Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:14:09Z",
+          "end": "2026-09-27T11:14:10Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:14:10Z",
+          "end": "2026-09-27T11:14:13Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 2/10)",
+      "id": 108600171451,
+      "start": "2026-09-27T11:24:31Z",
+      "end": "2026-09-27T11:50:34Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:24:32Z",
+          "end": "2026-09-27T11:24:34Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:24:34Z",
+          "end": "2026-09-27T11:24:38Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:24:38Z",
+          "end": "2026-09-27T11:25:14Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:25:14Z",
+          "end": "2026-09-27T11:25:20Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 2/10",
+          "start": "2026-09-27T11:25:20Z",
+          "end": "2026-09-27T11:50:29Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:50:29Z",
+          "end": "2026-09-27T11:50:29Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:50:29Z",
+          "end": "2026-09-27T11:50:30Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:50:30Z",
+          "end": "2026-09-27T11:50:32Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 1/10)",
+      "id": 108600171460,
+      "start": "2026-09-27T12:00:50Z",
+      "end": "2026-09-27T12:28:37Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:00:51Z",
+          "end": "2026-09-27T12:00:53Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:00:53Z",
+          "end": "2026-09-27T12:00:56Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:00:56Z",
+          "end": "2026-09-27T12:01:32Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:01:32Z",
+          "end": "2026-09-27T12:01:37Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 1/10",
+          "start": "2026-09-27T12:01:37Z",
+          "end": "2026-09-27T12:28:32Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:28:32Z",
+          "end": "2026-09-27T12:28:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:28:32Z",
+          "end": "2026-09-27T12:28:33Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:28:33Z",
+          "end": "2026-09-27T12:28:35Z"
+        }
+      ]
+    },
+    {
+      "name": "test (ubuntu-latest, node)",
+      "id": 108600171491,
+      "start": "2026-09-27T10:20:09Z",
+      "end": "2026-09-27T10:56:46Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:20:09Z",
+          "end": "2026-09-27T10:20:10Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:20:10Z",
+          "end": "2026-09-27T10:20:12Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:20:12Z",
+          "end": "2026-09-27T10:20:49Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:20:49Z",
+          "end": "2026-09-27T10:20:52Z"
+        },
+        {
+          "name": "Run mise run test:node",
+          "start": "2026-09-27T10:20:52Z",
+          "end": "2026-09-27T10:56:44Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:56:44Z",
+          "end": "2026-09-27T10:56:44Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T10:56:44Z",
+          "end": "2026-09-27T10:56:44Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T10:56:44Z",
+          "end": "2026-09-27T10:56:44Z"
+        }
+      ],
+      "files": [
+        {
+          "path": "packages/backend-c/tests/fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            4.650603
+          ]
+        },
+        {
+          "path": "packages/backend-c/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            5.955346,
+            1.391176,
+            0.559288,
+            0.945,
+            1.303171,
+            1.005583,
+            0.548919,
+            1.044256,
+            0.696886,
+            0.649086,
+            0.543678,
+            2.79094,
+            1.261884,
+            0.48608,
+            195.261575,
+            77.143818,
+            2.818029,
+            2.406038,
+            0.857136,
+            0.806962
+          ]
+        },
+        {
+          "path": "packages/cli/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            63.291941,
+            14.915873,
+            20.481169,
+            14.080548,
+            16.799076,
+            1.330302,
+            3.081263,
+            4.512704,
+            2.837906,
+            2.759279,
+            8.453547,
+            2.251117,
+            9.711143,
+            1.135377,
+            4.044747,
+            12.73509,
+            6.260398,
+            2.838317,
+            2.585674,
+            80.345688,
+            13.090142,
+            7.124096,
+            1.274999,
+            1.1373,
+            3.555779,
+            1.125388,
+            7.076389,
+            0.922508,
+            2.893541,
+            49.046792,
+            34.533844,
+            21.155382,
+            24.1705
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            8.944166,
+            2.027859,
+            0.279834
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/hir.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            15.026149,
+            0.746959,
+            0.986959,
+            0.577222,
+            1.961134,
+            0.233337,
+            0.919262,
+            0.253285,
+            1.773963,
+            0.459571,
+            3.76841,
+            0.82209,
+            0.683169,
+            0.564688,
+            0.968775,
+            0.665988,
+            0.553687,
+            1.361841,
+            0.368,
+            0.157475,
+            0.514454,
+            0.243616,
+            1.583466,
+            0.248205,
+            0.318908,
+            0.241292,
+            0.358442,
+            2.003002,
+            0.467275,
+            0.456455,
+            0.236894,
+            0.242604,
+            1.116732,
+            0.33115,
+            0.319188,
+            0.642103,
+            0.198772,
+            0.166001,
+            0.310833
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/mir.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            12.825832,
+            0.689281,
+            0.386083,
+            0.782175,
+            0.578224,
+            0.731951,
+            0.718866,
+            0.452398,
+            1.237388,
+            0.504776,
+            0.400951,
+            8.944036,
+            0.363321,
+            0.896139,
+            1.983155,
+            0.755295,
+            0.285986,
+            0.495969,
+            0.454481,
+            1.269729,
+            0.657532,
+            0.28314,
+            0.438572,
+            1.08875,
+            0.756157,
+            1.94834,
+            1.098598,
+            1.226888,
+            0.523701,
+            0.697186,
+            0.196157,
+            0.807913,
+            1.121301,
+            1.853802,
+            1.091785,
+            1.135617
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/modules.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            3.703928,
+            0.901579,
+            0.526045,
+            2.611953,
+            0.813564,
+            115.592837,
+            3.126106,
+            16.186754,
+            4.628782,
+            1.605407,
+            6.739856,
+            0.955139,
+            1.24428,
+            2.536933,
+            1.524837,
+            0.718526,
+            0.597369
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/native-fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            21.57926
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/regexp-matcher.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            6.525757,
+            1.148511,
+            1.840798,
+            0.550482,
+            0.799007,
+            1.24895,
+            1.448263,
+            1.228371,
+            1.948851,
+            1.507544,
+            0.650339,
+            0.653183,
+            0.866393,
+            0.799327,
+            0.933609,
+            1.756009,
+            1.201561,
+            1.220176,
+            2.03893,
+            1.891243,
+            1.562096,
+            0.360496,
+            0.590627,
+            0.38954,
+            0.315681,
+            13.07402,
+            0.95027,
+            1.057641,
+            101.335207,
+            153.86277,
+            3.346709,
+            104.914204
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/regexp.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            4.328008,
+            0.29884,
+            1.254019,
+            1.05192,
+            0.382587,
+            0.521427,
+            0.644087,
+            0.266349,
+            0.655017,
+            0.797073,
+            1.01959,
+            0.295224,
+            2.282125,
+            0.916427,
+            0.525624,
+            2.851952,
+            1.154914,
+            0.904404,
+            1.290959,
+            0.600495,
+            0.222056,
+            0.247083,
+            0.440846,
+            0.296115,
+            0.490769,
+            0.343784,
+            1.722066,
+            0.425147,
+            1.063463,
+            0.482013,
+            0.167083,
+            0.292248,
+            0.487263,
+            0.465131,
+            0.532618,
+            9.675105,
+            0.351157
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/source.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.396857,
+            0.617056,
+            0.887382,
+            0.931225,
+            0.310723
+          ]
+        },
+        {
+          "path": "packages/host/tests/cache-files.test.ts",
+          "category": "unclear",
+          "cases": [
+            12.158898,
+            1.232869,
+            0.388358,
+            0.367699,
+            22.218273,
+            0.529472
+          ]
+        },
+        {
+          "path": "packages/host/tests/index.test.ts",
+          "category": "unclear",
+          "cases": [
+            2.872111,
+            41.78098,
+            0.651611,
+            0.283151,
+            9.337072,
+            3.849561,
+            105.186602,
+            9.489528,
+            1030.32855,
+            503.068909,
+            108.913191,
+            0.398637,
+            0.256661,
+            0.268162,
+            47.071751,
+            0.359444,
+            0.436758,
+            0.304781,
+            0.285505,
+            0.577401,
+            0.283912,
+            0.584445,
+            0.423323,
+            0.143289
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/async-generators.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            39.434104,
+            1.717417,
+            1.181453,
+            2.732321,
+            2.686183,
+            5.032297,
+            16.116322,
+            0.986418,
+            6.518239
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/async.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            40.763563,
+            7.182788,
+            4.811924,
+            4.767441,
+            5.359069,
+            4.409691,
+            2.564314,
+            1.062651,
+            1.711036,
+            2.185765
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/basics.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            7.362773,
+            24.356779,
+            1.907153,
+            4.192565,
+            6.070723,
+            6.692427,
+            2.772714,
+            3.843477,
+            3.580157,
+            3.0906,
+            3.987991,
+            2.542603,
+            2.509694,
+            1.183517,
+            1.504979,
+            2.681333,
+            5.942472,
+            5.88767,
+            2.628714,
+            1.733097,
+            1.529245,
+            1.227309,
+            0.353983,
+            1.129967,
+            4.734239,
+            4.568889,
+            1.733899,
+            2.87203,
+            0.843019,
+            2.717048,
+            0.769812,
+            1.957417,
+            2.245526,
+            0.839653,
+            0.518752,
+            1.912623,
+            0.687559,
+            0.723205,
+            2.704296,
+            0.636112,
+            0.67772,
+            2.578068,
+            1.634743,
+            2.605612,
+            0.622576,
+            2.440271,
+            9.656921,
+            0.583743,
+            0.692257,
+            1.026313,
+            0.798416,
+            0.723065,
+            0.937085,
+            0.465853,
+            1.669978,
+            0.728264,
+            2.545709,
+            2.599003,
+            1.090443,
+            0.777687,
+            1.191883,
+            0.451946,
+            1.282412,
+            1.097136,
+            0.844111,
+            0.483426,
+            0.962833,
+            0.651461,
+            1.086906,
+            0.438682,
+            0.696385,
+            1.546106,
+            0.596808,
+            0.620853,
+            1.028586,
+            0.932066,
+            0.874407,
+            1.516401,
+            0.695634,
+            0.569948,
+            1.232098,
+            0.682238,
+            1.436571,
+            4.026302,
+            0.674834,
+            2.097349,
+            1.546357,
+            1.941214,
+            5.536041,
+            1.231738,
+            7.423106,
+            13.593716,
+            0.8539,
+            16.960204,
+            8.24202,
+            0.625362,
+            1.290898,
+            1.679035,
+            1.28634,
+            2.387102,
+            0.675112,
+            0.636061,
+            1.654991,
+            1.095632,
+            1.658798,
+            1.538301,
+            1.880473
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/bindings.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            25.065246,
+            13.37155,
+            2.147543,
+            1.991241,
+            0.849101,
+            1.55338,
+            6.163446,
+            1.773923,
+            2.28482,
+            1.513465,
+            3.110908,
+            1.810491,
+            2.574894,
+            0.820276,
+            1.756431,
+            0.396403,
+            0.393577,
+            1.789262,
+            0.732832,
+            1.658377,
+            0.9023,
+            0.66735,
+            0.666388,
+            0.529472,
+            0.471753,
+            0.637384,
+            1.001346,
+            1.114848,
+            1.210027,
+            1.525058,
+            0.464651,
+            0.311865,
+            1.085794,
+            4.705305,
+            5.989981,
+            2.031887,
+            2.667066,
+            1.618262,
+            1.714812,
+            2.675272,
+            1.962366,
+            0.705562,
+            1.261413,
+            4.281731,
+            1.744528,
+            1.306206,
+            3.409738,
+            2.062474,
+            1.183857,
+            3.320371,
+            1.119046,
+            0.87521,
+            1.347053,
+            0.68318,
+            0.892362,
+            1.068782,
+            0.603741,
+            0.621033,
+            0.644828,
+            0.305703,
+            1.2493,
+            0.416741,
+            1.510339,
+            1.497906,
+            0.658012,
+            1.846158,
+            1.172767,
+            0.734836,
+            0.745847,
+            1.495682
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/for-in.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            26.007,
+            10.151678,
+            3.083766,
+            1.590639,
+            7.728257,
+            2.576437,
+            10.351873,
+            14.092311,
+            7.620566,
+            3.405289,
+            3.83304,
+            1.737926,
+            1.551947,
+            0.656841,
+            5.009835,
+            2.716189
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/generators.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            28.15275,
+            2.918617,
+            2.593729,
+            1.14247,
+            2.807149,
+            1.331534,
+            5.404194,
+            4.201561,
+            4.641795
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/modules.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            24.170971,
+            0.844763,
+            3.973604,
+            14.570907,
+            2.82359,
+            1.41463,
+            4.14212,
+            4.130288,
+            2.202536,
+            3.652414,
+            1.708671,
+            1.728028,
+            1.525578,
+            1.310364,
+            1.463822,
+            2.037718,
+            514.339643,
+            7.397018
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/regexp-literal.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            18.406422,
+            2.437817,
+            1.210638,
+            2.389496,
+            0.765013,
+            1.628822,
+            1.648718,
+            0.566341,
+            1.256955,
+            0.648755,
+            0.78491,
+            0.469981,
+            0.440355,
+            4.497227
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/statements.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            34.394138,
+            1.584278,
+            4.066398,
+            16.202786,
+            0.729687,
+            2.083464,
+            1.323379,
+            2.26852,
+            1.364576,
+            2.61075,
+            1.408238,
+            3.576851,
+            4.924335,
+            1.928012,
+            3.300302,
+            3.744996,
+            2.981015,
+            0.632505,
+            7.480605,
+            1.406946,
+            1.461749,
+            4.497605,
+            2.266285,
+            2.918087,
+            0.798656,
+            0.403426,
+            3.945481,
+            0.981839,
+            1.608223,
+            0.552996,
+            1.365237,
+            0.57646,
+            1.919746,
+            1.02509,
+            1.235093,
+            0.810078,
+            3.317805,
+            0.32031,
+            1.098007,
+            0.650258,
+            0.506028,
+            0.386604,
+            0.303648,
+            1.300596,
+            4.602299,
+            4.825199,
+            2.771182,
+            2.435994,
+            1.032955,
+            0.68307,
+            0.404918,
+            0.720781,
+            0.575598,
+            0.574416,
+            0.264676,
+            0.226273,
+            0.30933,
+            0.204243,
+            0.302817,
+            150.040692,
+            937.343386
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/builtin-code-registry.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            5.843985,
+            1.768524
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/date-fp-contract.test.ts",
+          "category": "macos-only",
+          "cases": [
+            4026.212277,
+            1366.352032
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.581092
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/intrinsic-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.704066,
+            0.728685,
+            0.364723,
+            0.35781,
+            0.38391,
+            3.205545,
+            0.784529,
+            0.617326,
+            0.765404,
+            1.72985,
+            0.510196,
+            0.615863,
+            1.137721,
+            0.663714,
+            1.477217,
+            1.885362,
+            0.9612,
+            1.237007,
+            0.364523,
+            0.478306,
+            0.49113,
+            0.355406,
+            0.337332,
+            0.600906,
+            0.366417,
+            0.216997,
+            0.34668,
+            0.393608,
+            0.483566,
+            0.294201,
+            2.218305,
+            0.388828,
+            0.717634,
+            0.344556,
+            0.535944,
+            0.564237,
+            0.330989,
+            1.081696,
+            1.091585,
+            0.604342,
+            6.742721,
+            0.706312,
+            1.179723,
+            0.580999,
+            0.281758,
+            0.584926,
+            0.649446,
+            0.377137,
+            3.695903,
+            7.39312,
+            2.782472,
+            0.576039,
+            0.467836,
+            0.52798,
+            0.817161,
+            0.911708,
+            1.725733,
+            1.112475,
+            1.575722,
+            1.32905
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/symbols.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.022579,
+            2.403873,
+            16.442974
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/typed-array-clone.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "packages/testkit/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            3.539459,
+            0.327104,
+            0.700955,
+            0.482355,
+            0.511569,
+            0.54933,
+            1.507725,
+            1.129769,
+            0.425548,
+            0.484158,
+            0.372899,
+            0.408035,
+            0.648366,
+            0.16531,
+            0.142588,
+            0.14365,
+            0.262062,
+            0.196408
+          ]
+        },
+        {
+          "path": "packages/testkit/tests/module-graph.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            121.438993
+          ]
+        },
+        {
+          "path": "packages/testkit/tests/property-runner.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            15.85456,
+            0.28798,
+            0.167905,
+            1.065068,
+            0.555111
+          ]
+        },
+        {
+          "path": "packages/toolchain-host-cc/tests/index.test.ts",
+          "category": "unclear",
+          "cases": [
+            2.084861,
+            0.470252,
+            8.541071,
+            0.345338,
+            0.655088
+          ]
+        },
+        {
+          "path": "packages/toolchain-zig/tests/index.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.856663,
+            2.031842,
+            1.029,
+            0.419827,
+            0.447279,
+            1.911696,
+            0.481233,
+            0.46424,
+            0.745188,
+            0.418405,
+            93.113625,
+            0.575169,
+            0.384622,
+            0.269446,
+            0.214763,
+            10.216213,
+            2.10054,
+            0.409939
+          ]
+        },
+        {
+          "path": "packages/toolchain-zig/tests/sanitizer-activity.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "packages/unicode/tests/tables.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.862489,
+            0.285736,
+            7.978275,
+            0.343564,
+            18.489713,
+            0.283322,
+            26.200201,
+            26.263976,
+            0.640482,
+            0.964158,
+            16.274187,
+            2.983276,
+            5.406862,
+            0.673062,
+            0.472576,
+            51.075808,
+            0.236073,
+            0.718808,
+            0.325851
+          ]
+        },
+        {
+          "path": "tests/anti-slop.test.ts",
+          "category": "unclear",
+          "cases": [
+            223.626011,
+            216.097751,
+            214.521074,
+            219.934985,
+            222.843823,
+            256.775724,
+            250.478923,
+            240.650541,
+            224.077467,
+            269.634885,
+            275.938207,
+            240.369882,
+            273.676175,
+            249.336324,
+            262.498967,
+            228.475787
+          ]
+        },
+        {
+          "path": "tests/boundaries.test.ts",
+          "category": "unclear",
+          "cases": [
+            23.455173,
+            7.343589,
+            6.836253,
+            9.639697,
+            5.627088,
+            7.52674,
+            5.306064,
+            7.742148,
+            5.985574
+          ]
+        },
+        {
+          "path": "tests/check-commit-message.test.ts",
+          "category": "unclear",
+          "cases": [
+            11.010005,
+            4.254465,
+            3.538979,
+            3.037976,
+            3.168913,
+            7.538795,
+            3.254804,
+            4.071651,
+            3.055189,
+            5.796376,
+            2.997549,
+            2.877594,
+            2.846546,
+            2.861795,
+            2.919594,
+            2.879698,
+            2.90605,
+            0.253978,
+            3.206904,
+            3.03447,
+            3.437168,
+            2.778999,
+            2.988133,
+            2.777827,
+            0.197121,
+            5.839465,
+            5.521619,
+            5.42636,
+            5.523042,
+            6.600259,
+            5.412534,
+            6.032082,
+            5.571343,
+            5.505819,
+            5.39967,
+            5.34655,
+            5.393778,
+            5.428724,
+            5.361227,
+            5.707248,
+            5.409777,
+            5.350948,
+            2.907991,
+            3.069225,
+            2.84357,
+            2.702936,
+            2.753501,
+            2.887112,
+            5.305533,
+            21.829764,
+            8.058182,
+            151.342531,
+            82.574701,
+            810.847478,
+            720.583334,
+            26.481966,
+            49.768534
+          ]
+        },
+        {
+          "path": "tests/compatibility-ratchet.test.ts",
+          "category": "unclear",
+          "cases": [
+            161.489114,
+            52.015643,
+            29.413856,
+            0.553748,
+            0.444562,
+            0.314329,
+            0.449662,
+            1.925297,
+            1.934786,
+            0.246392,
+            16.402135,
+            10.68974,
+            9.879933,
+            11.71864,
+            9.759778,
+            7.240117,
+            2.036566,
+            1.338589,
+            0.691235,
+            0.472705,
+            0.616996,
+            1.523646,
+            0.446196,
+            0.313838,
+            0.393738,
+            10.237524,
+            21.16005,
+            4.171256,
+            0.148007,
+            0.42683
+          ]
+        },
+        {
+          "path": "tests/evidence-lanes.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            11.202872,
+            4.859706,
+            4.457553,
+            2.057124,
+            3.776888,
+            3.554571,
+            1.690548,
+            0.215243,
+            2.191146,
+            0.703979
+          ]
+        },
+        {
+          "path": "tests/harness-fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            463.472581,
+            282.449386,
+            336.280994,
+            259.940629,
+            11.896592,
+            0.907059,
+            1.048404,
+            19.6289,
+            705.832808,
+            2.177671,
+            1.658557,
+            0.733084,
+            1.066919,
+            1.737716
+          ]
+        },
+        {
+          "path": "tests/harness-native.test.ts",
+          "category": "macos-only",
+          "cases": [
+            302993.631412
+          ]
+        },
+        {
+          "path": "tests/harness-resource.test.ts",
+          "category": "macos-only",
+          "cases": [
+            34065.575091
+          ]
+        },
+        {
+          "path": "tests/host-cc-sanitizer.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "tests/host-cc-selection.test.ts",
+          "category": "unclear",
+          "cases": [
+            350.319643,
+            367.641567,
+            357.033403
+          ]
+        },
+        {
+          "path": "tests/m5b-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            12.900368,
+            2.003206,
+            2.099817,
+            1.713203,
+            0.853369,
+            1.457393,
+            0.787486,
+            1.601132,
+            4.232676,
+            0.353483,
+            0.226274,
+            0.154139,
+            0.194115,
+            1043.100357
+          ]
+        },
+        {
+          "path": "tests/m5b-node-scope.test.ts",
+          "category": "unclear",
+          "cases": [
+            11.595168,
+            1.076438,
+            1.001117,
+            1.18979,
+            1.00244,
+            0.685956,
+            0.537127,
+            15.407758,
+            0.510887,
+            0.576411,
+            0.411071,
+            0.426279,
+            1.760531,
+            0.884007,
+            0.180308
+          ]
+        },
+        {
+          "path": "tests/m5c-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            12.2618,
+            3.597935,
+            1.629014,
+            1.427967,
+            2.121718,
+            3.502126,
+            1.725285,
+            1.456811,
+            0.712336,
+            1.572899,
+            1.552201,
+            0.598692,
+            0.336521,
+            0.219632,
+            10089.731275
+          ]
+        },
+        {
+          "path": "tests/native-fixture.test.ts",
+          "category": "unclear",
+          "cases": [
+            109.680892,
+            1090.152242,
+            85.337644,
+            124.281724,
+            115.063662,
+            107.031992
+          ]
+        },
+        {
+          "path": "tests/native-host-guards.test.ts",
+          "category": "unclear",
+          "cases": [
+            16.198805,
+            2.824653,
+            3.043282,
+            2.1187,
+            2.943065,
+            9.054176,
+            5.802293,
+            5.013925,
+            5.299811,
+            6.524004,
+            3.946916,
+            3.786465,
+            3.82613,
+            5.446746,
+            5.561251,
+            6.879952,
+            5.550752,
+            5.221755,
+            4.136255,
+            2.759822,
+            4.632391,
+            4.615459,
+            1.865126,
+            1.527812,
+            1.468803,
+            1.216619,
+            1.759277,
+            1.807948,
+            2.445162,
+            1.372162,
+            1.132492,
+            1.573418,
+            2.473823,
+            1.71875,
+            1.798049,
+            1.708882,
+            2.051103,
+            1.060106,
+            1.184059,
+            2.45994,
+            4.34357,
+            32.347557,
+            110.012034,
+            36.177063,
+            75.244943,
+            14.70691,
+            10.512069,
+            67.353234,
+            59.054653,
+            2.306802,
+            3.048823,
+            15.491489,
+            1.725974
+          ]
+        },
+        {
+          "path": "tests/native-io/clock-wakeup.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30639.544317,
+            30029.850975,
+            626.341674,
+            629.010401,
+            357.51911,
+            63761.245871,
+            19074.963601
+          ]
+        },
+        {
+          "path": "tests/native-runtime-archive-cache.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1797.999122
+          ]
+        },
+        {
+          "path": "tests/native-test-workers.test.ts",
+          "category": "unclear",
+          "cases": [
+            0.945802,
+            0.263784,
+            176.660227,
+            185.936235,
+            185.766875,
+            166.342466
+          ]
+        },
+        {
+          "path": "tests/native-toolchains.test.ts",
+          "category": "unclear",
+          "cases": [
+            2.711201,
+            6.240303,
+            1.074864,
+            0.501349,
+            2666.129299,
+            0.577412,
+            0.549941,
+            2.142885,
+            2.20434,
+            0.313477
+          ]
+        },
+        {
+          "path": "tests/node-built.test.ts",
+          "category": "unclear",
+          "cases": [
+            26.499451,
+            259.906632,
+            225.110751
+          ]
+        },
+        {
+          "path": "tests/property/m4-async.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25004.642268
+          ]
+        },
+        {
+          "path": "tests/property/m5-aggregate-error.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.904014,
+            21165.754694
+          ]
+        },
+        {
+          "path": "tests/property/m5-arguments-object.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.482528,
+            10637.473328,
+            14915.734756,
+            20124.296005
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.444822,
+            17332.503883
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-buffer.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46599.35447
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-constructor.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            42020.503305
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-change-by-copy.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            36349.86346
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-copying.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28309.473753
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-index-search.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33844.741853
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-iterative.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            36627.268149
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-iterators.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30689.368296
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-mutation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33581.666596
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-predicate-search.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            35107.276093
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-reduction.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30475.178746
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-sort.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            29325.019736
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-species-mapping.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            43827.276178
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-spread.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            18685.361459
+          ]
+        },
+        {
+          "path": "tests/property/m5-async-await.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            23764.191803
+          ]
+        },
+        {
+          "path": "tests/property/m5-async-generator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17883.72999
+          ]
+        },
+        {
+          "path": "tests/property/m5-atomics-and-shared-memory.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            34777.844831
+          ]
+        },
+        {
+          "path": "tests/property/m5-atomics-single-agent.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            36262.404564
+          ]
+        },
+        {
+          "path": "tests/property/m5-bigint-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46308.181859
+          ]
+        },
+        {
+          "path": "tests/property/m5-bigint.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            81.458121,
+            62.214971,
+            69.760448,
+            4419.766532
+          ]
+        },
+        {
+          "path": "tests/property/m5-boolean-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            32371.368324
+          ]
+        },
+        {
+          "path": "tests/property/m5-call-spread.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            19416.741684
+          ]
+        },
+        {
+          "path": "tests/property/m5-catch-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.261053,
+            12875.653714
+          ]
+        },
+        {
+          "path": "tests/property/m5-class.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.83845,
+            1.442534,
+            0.255659,
+            0.375454,
+            0.360756,
+            0.414487,
+            0.438031,
+            0.37848,
+            0.343384,
+            0.509445,
+            0.371997,
+            0.293349,
+            0.242845,
+            33768.63569,
+            15193.343139,
+            14622.865433
+          ]
+        },
+        {
+          "path": "tests/property/m5-compound-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.805678,
+            13646.895398
+          ]
+        },
+        {
+          "path": "tests/property/m5-data-view.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46420.017447
+          ]
+        },
+        {
+          "path": "tests/property/m5-date-family.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            49278.756702
+          ]
+        },
+        {
+          "path": "tests/property/m5-default-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12198.374372
+          ]
+        },
+        {
+          "path": "tests/property/m5-delete-super.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.406597,
+            36371.667108
+          ]
+        },
+        {
+          "path": "tests/property/m5-delete.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.467689,
+            26015.578195
+          ]
+        },
+        {
+          "path": "tests/property/m5-destructuring-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.757944,
+            14610.516587
+          ]
+        },
+        {
+          "path": "tests/property/m5-ephemeron-tracing.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            8896.284169
+          ]
+        },
+        {
+          "path": "tests/property/m5-export-default-class.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            3692.554798
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-await-of.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17516.797636,
+            21360.311739,
+            28494.760988,
+            19936.725126
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.479332,
+            18194.913562
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-in-object-pattern.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.132293,
+            58023.335754
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-in.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.226559,
+            49443.163926
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.923134,
+            19635.672894
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.508347,
+            16064.965026
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            16197.871206
+          ]
+        },
+        {
+          "path": "tests/property/m5-function-intrinsic-chains.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            42874.62497
+          ]
+        },
+        {
+          "path": "tests/property/m5-function-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30707.804393
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            4256.873602
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.943723,
+            16580.522686
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-throw.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            3938.721194
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.459556,
+            0.58168,
+            1.081057,
+            0.325009,
+            28108.538877
+          ]
+        },
+        {
+          "path": "tests/property/m5-generic-string-coercion.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27785.053202
+          ]
+        },
+        {
+          "path": "tests/property/m5-global-numeric-functions.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            60513.899563
+          ]
+        },
+        {
+          "path": "tests/property/m5-global-object-record.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33089.404853
+          ]
+        },
+        {
+          "path": "tests/property/m5-globalthis-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.818459,
+            41674.967876,
+            2533.551611,
+            3687.928553,
+            5626.629527
+          ]
+        },
+        {
+          "path": "tests/property/m5-harness-native-function-matcher.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            13762.749606,
+            68629.967846
+          ]
+        },
+        {
+          "path": "tests/property/m5-harness-promise-helper.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            6779.173741,
+            48970.839196
+          ]
+        },
+        {
+          "path": "tests/property/m5-intrinsic-graph-root.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26020.554734
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-helpers-eager.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26860.131329
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-helpers-lazy.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            24817.930982
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            31261.607561
+          ]
+        },
+        {
+          "path": "tests/property/m5-json-parse.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30176.42484
+          ]
+        },
+        {
+          "path": "tests/property/m5-json-stringify.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27756.434272
+          ]
+        },
+        {
+          "path": "tests/property/m5-lexical-declaration-list.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.299996,
+            42818.862461
+          ]
+        },
+        {
+          "path": "tests/property/m5-lexical-super.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            21741.579003,
+            20265.457784
+          ]
+        },
+        {
+          "path": "tests/property/m5-map-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            29480.652837
+          ]
+        },
+        {
+          "path": "tests/property/m5-math-namespace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            92444.51037
+          ]
+        },
+        {
+          "path": "tests/property/m5-module-continuation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17420.468423
+          ]
+        },
+        {
+          "path": "tests/property/m5-number-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            87419.784372
+          ]
+        },
+        {
+          "path": "tests/property/m5-number-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            56002.509934
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.132216,
+            12571.458776
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-constructor.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            105728.147489
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-create.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            34692.650109
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-define-properties.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            35615.262063
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-define-property.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33585.669083
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-descriptor-queries.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            40458.099503
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-integrity-levels.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            51888.66252
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-literal.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.159683,
+            0.522158,
+            20052.216998,
+            1.046201,
+            53058.525317,
+            7.352832
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-own-keys.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            316172.21123
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26501.850453
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-rest.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.899816,
+            17007.032023
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-catch-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.444407,
+            13073.533377
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-chaining.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.483841,
+            16508.901005
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-private.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.468723,
+            19805.408432
+          ]
+        },
+        {
+          "path": "tests/property/m5-parameter-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.917303,
+            13387.654613
+          ]
+        },
+        {
+          "path": "tests/property/m5-parameter-var.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12554.862474
+          ]
+        },
+        {
+          "path": "tests/property/m5-pattern-await.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.475755,
+            39594.552105
+          ]
+        },
+        {
+          "path": "tests/property/m5-promise-combine.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46004.095566,
+            27135.52705,
+            30526.696745
+          ]
+        },
+        {
+          "path": "tests/property/m5-promise-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            58581.650093,
+            28733.381423,
+            27176.096341
+          ]
+        },
+        {
+          "path": "tests/property/m5-proxy-exotic-object.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            132601.137714,
+            12792.444798
+          ]
+        },
+        {
+          "path": "tests/property/m5-reflect-namespace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            99504.963608,
+            58096.460831,
+            35479.475507
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            23870.653198,
+            4486.140821
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-literal-aot.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26771.39626,
+            14225.848184,
+            39.169924
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-matcher.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            242.835138,
+            128.944833
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-pattern-extensions.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            108.471943
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-pattern.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            79.617542,
+            37.102178
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-prototype-and-exec.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22761.695173,
+            13987.214302,
+            11108.025889,
+            1249.245475
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-symbol-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28463.017552,
+            18936.650149,
+            14569.929827
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-unicode-property-escapes.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            85.346936,
+            84.072351,
+            5.072718
+          ]
+        },
+        {
+          "path": "tests/property/m5-rest-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            11710.352626
+          ]
+        },
+        {
+          "path": "tests/property/m5-runtime-error-observation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.172237,
+            30601.38412
+          ]
+        },
+        {
+          "path": "tests/property/m5-set-composition-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            37044.73946
+          ]
+        },
+        {
+          "path": "tests/property/m5-set-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30622.761132
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            65845.222607
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-iterator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            34411.755379
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-access.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            48170.508238
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-case.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25523.358989,
+            6529.494077
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-match-and-split.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            53864.029542,
+            28968.312513
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-pad.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28994.787883
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-replace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            45660.289258,
+            26457.746416
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-search-and-slice.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            45807.809436
+          ]
+        },
+        {
+          "path": "tests/property/m5-super-targets.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.202024,
+            43736.505317
+          ]
+        },
+        {
+          "path": "tests/property/m5-super-without-extends.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25724.467441
+          ]
+        },
+        {
+          "path": "tests/property/m5-symbol-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            43726.167996
+          ]
+        },
+        {
+          "path": "tests/property/m5-tagged-template.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.372993,
+            13208.740475
+          ]
+        },
+        {
+          "path": "tests/property/m5-top-level-this.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.33144,
+            0.26126,
+            62091.136476
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-constructors.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46559.840495
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-core.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33533.11922
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-iterative.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26981.106544,
+            8904.580777
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-mutation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28397.547249,
+            17816.746108
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-search-and-join.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25907.817528,
+            13009.45449
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-sort.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30388.161361
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-statics.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            35211.424257
+          ]
+        },
+        {
+          "path": "tests/property/m5-typeof-unresolved.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.166816,
+            31431.096434
+          ]
+        },
+        {
+          "path": "tests/property/m5-update-expression.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.448389,
+            14317.447208
+          ]
+        },
+        {
+          "path": "tests/property/m5-uri-handling-functions.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            67550.546759
+          ]
+        },
+        {
+          "path": "tests/property/m5-weak-collections.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            40844.210263
+          ]
+        },
+        {
+          "path": "tests/property/m5-well-known-symbols.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.002349,
+            39492.628806
+          ]
+        },
+        {
+          "path": "tests/property/nio-clock-wakeup.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            13815.062672
+          ]
+        },
+        {
+          "path": "tests/property/unicode-tables.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            16.718132,
+            17.720432,
+            40.198152
+          ]
+        },
+        {
+          "path": "tests/regexp-literal-aot.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            50.844264,
+            8.629053,
+            2.252322,
+            30.858495,
+            2.910875,
+            1.822545,
+            1.543323,
+            7.006442
+          ]
+        },
+        {
+          "path": "tests/regexp-matcher.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            215.208196,
+            811.640435,
+            69.649773,
+            12.141726,
+            2.623847,
+            6.67481,
+            115.855543,
+            8.342957,
+            1.002078,
+            23.726549,
+            7.807062,
+            31.847219,
+            163.472777,
+            0.660559,
+            22.407667
+          ]
+        },
+        {
+          "path": "tests/regexp-probes.test.ts",
+          "category": "unclear",
+          "cases": [
+            62.429648,
+            12.454756,
+            292.044732,
+            4608.737247,
+            16.997488,
+            30211.289651,
+            4311.803879,
+            13331.86176,
+            16050.029199,
+            15726.318586,
+            8527.688423,
+            23178.532496,
+            350.676294
+          ]
+        },
+        {
+          "path": "tests/runtime-archive-cache.test.ts",
+          "category": "unclear",
+          "cases": [
+            15.468932,
+            1.189299,
+            0.269415
+          ]
+        },
+        {
+          "path": "tests/runtime-ephemeron.test.ts",
+          "category": "macos-only",
+          "cases": [
+            14023.589832
+          ]
+        },
+        {
+          "path": "tests/runtime-heap.test.ts",
+          "category": "macos-only",
+          "cases": [
+            233346.473882
+          ]
+        },
+        {
+          "path": "tests/runtime-promises.test.ts",
+          "category": "macos-only",
+          "cases": [
+            13289.492334
+          ]
+        },
+        {
+          "path": "tests/runtime-symbol-registry.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30592.701336
+          ]
+        },
+        {
+          "path": "tests/runtime-typed-array-clone.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "tests/runtime-weak-collection.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12660.058529
+          ]
+        },
+        {
+          "path": "tests/shard.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.284492,
+            1.107957,
+            0.439463
+          ]
+        },
+        {
+          "path": "tests/structured-data.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.017938,
+            0.42663,
+            0.275376
+          ]
+        },
+        {
+          "path": "tests/test262-fragments.test.ts",
+          "category": "macos-only",
+          "cases": [
+            9.272189,
+            20.483431,
+            5980.514497,
+            199.513744,
+            0.780974,
+            153.053859,
+            3487.936024,
+            3575.738793,
+            0.589996
+          ]
+        },
+        {
+          "path": "tests/test262-inventory.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.516122,
+            0.206127,
+            0.21908,
+            0.513682,
+            0.414988
+          ]
+        },
+        {
+          "path": "tests/test262-runner.test.ts",
+          "category": "unclear",
+          "cases": [
+            10.47339,
+            1.169892,
+            0.965349,
+            1.828567,
+            2.57694,
+            3.352694,
+            0.244088,
+            0.280235,
+            0.310743,
+            1.299316,
+            0.411061,
+            25.975204,
+            2.25165,
+            3.072098,
+            2.009977,
+            2.212313,
+            1.997233,
+            3.881467,
+            1.944925,
+            3.004471,
+            0.48579,
+            0.673071,
+            0.497192,
+            0.55496,
+            0.544431,
+            0.609162,
+            0.475802,
+            0.604783,
+            0.946825,
+            5.803938,
+            0.237595,
+            4.474676,
+            3.776939,
+            1.909859,
+            2.347008,
+            1.231067,
+            0.500087,
+            0.457147,
+            4.027038,
+            2.645659,
+            0.526758,
+            0.384481,
+            0.51197,
+            4.453066,
+            1.427125,
+            0.372699,
+            4.516365,
+            8.821103,
+            2.017742,
+            2.450002,
+            31.901071,
+            4.267038,
+            0.548478,
+            0.331792,
+            0.45372,
+            1.991182,
+            3.051088,
+            5.171683,
+            14.008646,
+            3.164,
+            8.08324,
+            16990.694284,
+            2.151723,
+            0.675917,
+            1.434408,
+            20.945016,
+            7.986819
+          ]
+        },
+        {
+          "path": "tests/unicode-property-escapes.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            215.559527
+          ]
+        },
+        {
+          "path": "tests/unicode-tables.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            12.568015,
+            1.125229,
+            1.197244,
+            1.700037,
+            1.351763,
+            1.229785,
+            2.359852,
+            1.543533,
+            1.550406,
+            0.571642,
+            1.360098,
+            0.835165,
+            0.347271,
+            0.373771,
+            0.505557,
+            0.327424,
+            0.390732,
+            0.351609,
+            0.318627,
+            1.487407,
+            898.504488,
+            363.095927,
+            323.021385
+          ]
+        },
+        {
+          "path": "tests/versions.test.ts",
+          "category": "unclear",
+          "cases": [
+            40.404921,
+            37.06565,
+            22.312316,
+            26.871454,
+            12.839043,
+            9.443119,
+            14.440775,
+            7.257192
+          ]
+        }
+      ],
+      "unmatchedCases": [
+        0.465101,
+        0.305803,
+        0.226404,
+        0.312345,
+        0.855773,
+        0.486642,
+        0.439633,
+        0.939329,
+        3.931355,
+        0.264295,
+        0.303799,
+        0.380152,
+        0.313757,
+        0.530334,
+        2.291142,
+        1.147359,
+        0.347842,
+        23529.088403,
+        296.597352,
+        303.833443,
+        12.069627,
+        1.262455,
+        0.596859,
+        0.562404,
+        0.669655,
+        0.508092,
+        0.610925,
+        0.550752
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 2/12)",
+      "id": 108600171496,
+      "start": "2026-09-27T11:42:44Z",
+      "end": "2026-09-27T12:05:44Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:42:45Z",
+          "end": "2026-09-27T11:42:47Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:42:47Z",
+          "end": "2026-09-27T11:42:51Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:42:51Z",
+          "end": "2026-09-27T11:43:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:43:28Z",
+          "end": "2026-09-27T11:43:34Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=2/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:43:34Z",
+          "end": "2026-09-27T12:05:40Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:05:40Z",
+          "end": "2026-09-27T12:05:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:05:41Z",
+          "end": "2026-09-27T12:05:41Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:05:41Z",
+          "end": "2026-09-27T12:05:42Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 4/12)",
+      "id": 108600171516,
+      "start": "2026-09-27T11:00:45Z",
+      "end": "2026-09-27T11:31:51Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:00:46Z",
+          "end": "2026-09-27T11:00:47Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:00:47Z",
+          "end": "2026-09-27T11:00:51Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:00:51Z",
+          "end": "2026-09-27T11:01:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:01:28Z",
+          "end": "2026-09-27T11:01:34Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=4/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:01:34Z",
+          "end": "2026-09-27T11:31:45Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:31:45Z",
+          "end": "2026-09-27T11:31:46Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:31:46Z",
+          "end": "2026-09-27T11:31:46Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:31:46Z",
+          "end": "2026-09-27T11:31:49Z"
+        }
+      ]
+    },
+    {
+      "name": "test262 (macos-aarch64, 4/10)",
+      "id": 108600171517,
+      "start": "2026-09-27T12:25:33Z",
+      "end": "2026-09-27T12:57:50Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:25:33Z",
+          "end": "2026-09-27T12:25:35Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:25:35Z",
+          "end": "2026-09-27T12:25:38Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:25:38Z",
+          "end": "2026-09-27T12:26:06Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:26:06Z",
+          "end": "2026-09-27T12:26:11Z"
+        },
+        {
+          "name": "Run mise run test:test262 --shard 4/10",
+          "start": "2026-09-27T12:26:11Z",
+          "end": "2026-09-27T12:57:46Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:57:46Z",
+          "end": "2026-09-27T12:57:47Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:57:47Z",
+          "end": "2026-09-27T12:57:48Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:57:48Z",
+          "end": "2026-09-27T12:57:48Z"
+        }
+      ]
+    },
+    {
+      "name": "test (macos-latest, node)",
+      "id": 108600171522,
+      "start": "2026-09-27T10:50:04Z",
+      "end": "2026-09-27T11:39:50Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T10:50:03Z",
+          "end": "2026-09-27T10:50:05Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T10:50:05Z",
+          "end": "2026-09-27T10:50:08Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T10:50:08Z",
+          "end": "2026-09-27T10:50:39Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T10:50:39Z",
+          "end": "2026-09-27T10:50:42Z"
+        },
+        {
+          "name": "Run mise run test:node",
+          "start": "2026-09-27T10:50:42Z",
+          "end": "2026-09-27T11:39:45Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:39:45Z",
+          "end": "2026-09-27T11:39:46Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:39:46Z",
+          "end": "2026-09-27T11:39:47Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:39:47Z",
+          "end": "2026-09-27T11:39:49Z"
+        }
+      ],
+      "files": [
+        {
+          "path": "packages/backend-c/tests/fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.993583
+          ]
+        },
+        {
+          "path": "packages/backend-c/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.298875,
+            0.629833,
+            0.317375,
+            1.226209,
+            0.675834,
+            0.407208,
+            0.389917,
+            0.492833,
+            0.519709,
+            0.282833,
+            0.192916,
+            0.624083,
+            0.323291,
+            0.17775,
+            78.493083,
+            29.274959,
+            0.234458,
+            0.418666,
+            0.224916,
+            0.268541
+          ]
+        },
+        {
+          "path": "packages/cli/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            51.86275,
+            8.102292,
+            8.119666,
+            5.256708,
+            13.747833,
+            0.662333,
+            0.759709,
+            1.98325,
+            1.073458,
+            1.229625,
+            3.258958,
+            1.03425,
+            3.613292,
+            0.549958,
+            1.431125,
+            5.886333,
+            2.039125,
+            1.227083,
+            1.135541,
+            27.280417,
+            4.475167,
+            2.115459,
+            0.715667,
+            0.637041,
+            1.59725,
+            0.60025,
+            4.827709,
+            0.43,
+            1.462834,
+            15.922792,
+            47.34075,
+            14.500083,
+            7.859125
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            3.232167,
+            0.718958,
+            0.0885
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/hir.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            4.836666,
+            1.067917,
+            0.5465,
+            0.331875,
+            0.449959,
+            0.109125,
+            0.259708,
+            0.077875,
+            0.2105,
+            0.232541,
+            0.990875,
+            0.260875,
+            0.175916,
+            0.186958,
+            0.167333,
+            0.27775,
+            0.149125,
+            0.568,
+            0.102834,
+            0.055625,
+            0.24825,
+            0.070292,
+            0.288834,
+            0.065792,
+            0.117292,
+            0.1365,
+            0.697667,
+            0.288667,
+            0.192042,
+            0.178917,
+            0.078167,
+            0.091083,
+            0.366917,
+            0.116042,
+            0.102917,
+            0.109417,
+            0.065625,
+            0.053167,
+            0.089708
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/mir.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            14.126792,
+            0.318625,
+            0.141917,
+            0.256667,
+            0.188208,
+            0.363417,
+            0.25825,
+            0.180541,
+            0.482958,
+            0.182959,
+            0.15725,
+            4.492208,
+            0.120625,
+            0.195917,
+            0.703709,
+            0.11825,
+            0.082,
+            0.167167,
+            0.122458,
+            0.474959,
+            3.091583,
+            0.111875,
+            0.154042,
+            0.367084,
+            0.264167,
+            0.502125,
+            0.389167,
+            0.425291,
+            0.141375,
+            0.267834,
+            0.053292,
+            0.227333,
+            0.282334,
+            1.383917,
+            0.338458,
+            0.291
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/modules.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.490833,
+            1.0275,
+            0.214417,
+            1.293959,
+            0.232,
+            40.061875,
+            0.974791,
+            6.621084,
+            0.589375,
+            0.421541,
+            1.605542,
+            0.233042,
+            0.239,
+            0.283292,
+            0.309,
+            0.195291,
+            0.120417
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/native-fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            6.230208
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/regexp-matcher.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            3.770417,
+            0.8115,
+            0.738541,
+            0.224209,
+            0.35625,
+            0.416458,
+            0.287375,
+            0.500208,
+            0.727792,
+            0.609708,
+            0.151916,
+            0.304708,
+            0.141167,
+            0.258125,
+            0.342666,
+            0.588916,
+            0.2775,
+            0.377958,
+            0.295833,
+            0.894875,
+            0.363875,
+            0.1025,
+            0.34775,
+            0.160042,
+            0.102959,
+            5.44575,
+            0.2545,
+            0.4545,
+            23.076375,
+            76.787625,
+            0.540875,
+            70.845459
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/regexp.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            2.014375,
+            0.144666,
+            0.458167,
+            0.350125,
+            0.118834,
+            0.905042,
+            0.203459,
+            0.067916,
+            0.327834,
+            0.251167,
+            0.372667,
+            0.093084,
+            0.309,
+            0.27625,
+            0.165833,
+            0.573459,
+            4.652708,
+            0.316042,
+            0.554125,
+            0.558834,
+            0.098167,
+            0.105792,
+            0.196834,
+            0.102667,
+            0.634583,
+            0.102542,
+            0.101833,
+            0.126584,
+            0.37325,
+            0.084417,
+            0.046666,
+            0.075333,
+            0.168958,
+            0.158375,
+            0.169084,
+            3.643042,
+            0.162458
+          ]
+        },
+        {
+          "path": "packages/compiler/tests/source.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            0.488541,
+            0.200583,
+            0.313583,
+            0.300917,
+            0.112417
+          ]
+        },
+        {
+          "path": "packages/host/tests/cache-files.test.ts",
+          "category": "unclear",
+          "cases": [
+            13.008875,
+            0.468834,
+            0.139875,
+            0.096083,
+            5.331708,
+            0.202958
+          ]
+        },
+        {
+          "path": "packages/host/tests/index.test.ts",
+          "category": "unclear",
+          "cases": [
+            1.022,
+            53.580917,
+            0.192583,
+            0.085625,
+            2.948916,
+            0.169791,
+            88.435083,
+            3.430417,
+            1039.344958,
+            526.63775,
+            83.792625,
+            0.204042,
+            0.094625,
+            0.095625,
+            22.988958,
+            0.172125,
+            0.250792,
+            0.088,
+            0.098458,
+            0.359125,
+            0.118416,
+            0.383542,
+            0.214958,
+            0.047166
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/async-generators.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            16.959416,
+            1.182167,
+            0.535959,
+            0.804834,
+            0.97375,
+            1.936959,
+            5.066959,
+            0.349542,
+            2.289291
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/async.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            15.073625,
+            3.141792,
+            1.773417,
+            1.699083,
+            2.093792,
+            1.689084,
+            1.008917,
+            0.497459,
+            0.77325,
+            1.0105
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/basics.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            3.793667,
+            9.750375,
+            0.848167,
+            1.600041,
+            2.225875,
+            2.179167,
+            1.004291,
+            1.247666,
+            1.1545,
+            0.575333,
+            2.059667,
+            1.295833,
+            0.904541,
+            0.628375,
+            0.908584,
+            1.513708,
+            3.069375,
+            2.742542,
+            1.388791,
+            0.700625,
+            0.724834,
+            0.801333,
+            0.229583,
+            0.616166,
+            2.700583,
+            2.453209,
+            1.047167,
+            1.515208,
+            0.390958,
+            1.442042,
+            0.427209,
+            0.893791,
+            2.984375,
+            0.518125,
+            0.38375,
+            1.079875,
+            0.612792,
+            0.328708,
+            1.253833,
+            0.421417,
+            0.318209,
+            1.533875,
+            1.012875,
+            1.292125,
+            0.531125,
+            1.904916,
+            2.464958,
+            0.487709,
+            0.2645,
+            0.491875,
+            0.302209,
+            0.244583,
+            0.519083,
+            0.166083,
+            0.597375,
+            0.239083,
+            0.866417,
+            1.007042,
+            0.461834,
+            0.331458,
+            0.995167,
+            0.253917,
+            0.4555,
+            0.6525,
+            0.342875,
+            0.200167,
+            0.39525,
+            0.286792,
+            0.394542,
+            0.170542,
+            0.216708,
+            0.559458,
+            0.201167,
+            0.32,
+            0.556167,
+            0.534125,
+            0.366917,
+            0.834084,
+            0.311375,
+            0.228708,
+            0.554,
+            0.300459,
+            0.737375,
+            2.014333,
+            0.35125,
+            1.058417,
+            0.706959,
+            0.74525,
+            2.070083,
+            0.463375,
+            0.975042,
+            5.191209,
+            0.533916,
+            8.262291,
+            4.512416,
+            0.510583,
+            0.769708,
+            0.673625,
+            0.624708,
+            1.3115,
+            0.379,
+            0.5035,
+            0.644291,
+            0.687041,
+            0.635292,
+            0.637042,
+            0.556583
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/bindings.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            11.609667,
+            6.335125,
+            0.572834,
+            1.002666,
+            0.413584,
+            0.754458,
+            2.238958,
+            0.722625,
+            1.016167,
+            0.798041,
+            1.389584,
+            0.753375,
+            0.810375,
+            0.249291,
+            0.881792,
+            0.176417,
+            0.146875,
+            0.942625,
+            0.329208,
+            0.808167,
+            0.326583,
+            0.309042,
+            0.237167,
+            0.21575,
+            0.186792,
+            0.258583,
+            0.820958,
+            0.268167,
+            0.657333,
+            0.584,
+            0.2735,
+            0.132416,
+            0.572833,
+            0.817708,
+            0.665208,
+            0.738125,
+            0.979625,
+            0.541125,
+            0.530459,
+            0.856834,
+            0.585167,
+            0.230458,
+            0.391,
+            1.748,
+            0.941208,
+            0.646666,
+            1.701833,
+            0.831542,
+            0.509625,
+            1.625959,
+            0.567542,
+            0.426541,
+            0.671959,
+            0.363708,
+            0.586167,
+            0.587041,
+            0.278125,
+            0.279125,
+            0.254333,
+            0.125166,
+            0.650208,
+            0.226041,
+            0.573542,
+            0.412042,
+            0.33,
+            1.036042,
+            1.889542,
+            0.248792,
+            0.369667,
+            0.53275
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/for-in.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            12.126292,
+            3.93675,
+            1.4445,
+            0.762958,
+            2.089833,
+            0.986291,
+            1.634209,
+            2.324875,
+            2.566,
+            1.11225,
+            1.1615,
+            0.566875,
+            0.431583,
+            0.248875,
+            1.609209,
+            2.023375
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/generators.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            13.329083,
+            1.137541,
+            0.945667,
+            0.47175,
+            1.258833,
+            0.471125,
+            2.013125,
+            1.888708,
+            2.134792
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/modules.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            8.900625,
+            0.3815,
+            1.466833,
+            5.28925,
+            1.188667,
+            0.549292,
+            1.661458,
+            1.9765,
+            0.865708,
+            1.632208,
+            0.753917,
+            0.600875,
+            0.53725,
+            0.5,
+            0.614084,
+            0.912125,
+            192.603875,
+            2.315583
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/regexp-literal.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            8.245291,
+            0.989041,
+            0.599958,
+            1.414,
+            0.289917,
+            0.621167,
+            0.907875,
+            0.275083,
+            0.715541,
+            0.267958,
+            0.324917,
+            0.245875,
+            0.174208,
+            2.003292
+          ]
+        },
+        {
+          "path": "packages/parser-babel/tests/statements.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            12.803459,
+            0.627417,
+            1.322875,
+            6.440334,
+            0.439708,
+            0.436958,
+            0.203417,
+            0.669583,
+            0.458959,
+            0.642167,
+            0.544959,
+            1.061292,
+            2.143125,
+            0.60825,
+            0.853833,
+            2.012667,
+            0.468,
+            0.200625,
+            2.829167,
+            0.597083,
+            0.762125,
+            1.731958,
+            0.975,
+            1.437042,
+            0.468167,
+            0.162541,
+            0.449792,
+            0.490583,
+            0.504709,
+            0.195333,
+            0.523292,
+            0.239792,
+            0.918375,
+            0.50625,
+            0.423167,
+            0.294292,
+            1.392667,
+            0.116417,
+            0.38375,
+            0.263792,
+            0.268958,
+            0.180208,
+            0.13525,
+            0.677958,
+            2.331333,
+            2.113666,
+            0.816958,
+            0.909041,
+            0.456375,
+            0.331375,
+            0.221041,
+            0.254,
+            0.177875,
+            0.201958,
+            0.097833,
+            0.075375,
+            0.125708,
+            0.064292,
+            0.1095,
+            50.151416,
+            437.356583
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/builtin-code-registry.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.9285,
+            0.949667
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/date-fp-contract.test.ts",
+          "category": "macos-only",
+          "cases": [
+            3869.740834,
+            2438.322042
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            0.651667
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/intrinsic-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.134,
+            0.518167,
+            0.250167,
+            0.232792,
+            0.181958,
+            1.952458,
+            0.424458,
+            0.347167,
+            0.462084,
+            1.183125,
+            0.298625,
+            0.354458,
+            0.842375,
+            0.448917,
+            1.08925,
+            1.713583,
+            0.732625,
+            1.136833,
+            0.229916,
+            0.39775,
+            0.238667,
+            0.232667,
+            0.177417,
+            0.383,
+            0.219958,
+            0.075333,
+            0.208917,
+            0.208875,
+            0.369375,
+            0.147792,
+            0.235833,
+            0.202333,
+            0.322833,
+            0.219416,
+            0.334917,
+            0.407875,
+            0.181042,
+            0.757834,
+            0.889834,
+            0.391584,
+            4.632917,
+            0.427166,
+            0.494041,
+            0.447042,
+            0.129709,
+            0.425375,
+            0.393917,
+            0.2175,
+            0.409208,
+            3.9415,
+            0.713916,
+            0.395292,
+            0.370875,
+            0.353292,
+            0.535292,
+            0.742209,
+            1.660083,
+            0.955833,
+            1.092292,
+            0.993875
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/symbols.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            0.848167,
+            1.539542,
+            8.720708
+          ]
+        },
+        {
+          "path": "packages/runtime-c/tests/typed-array-clone.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "packages/testkit/tests/index.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.742083,
+            0.140125,
+            0.324,
+            0.20575,
+            0.172291,
+            0.213875,
+            0.536958,
+            0.488042,
+            0.365042,
+            0.155,
+            0.104791,
+            0.167,
+            0.301666,
+            0.050167,
+            0.048833,
+            0.055541,
+            0.062375,
+            0.050958
+          ]
+        },
+        {
+          "path": "packages/testkit/tests/module-graph.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            81.863542
+          ]
+        },
+        {
+          "path": "packages/testkit/tests/property-runner.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            10.006333,
+            0.136334,
+            0.073375,
+            0.565625,
+            0.280458
+          ]
+        },
+        {
+          "path": "packages/toolchain-host-cc/tests/index.test.ts",
+          "category": "unclear",
+          "cases": [
+            4.485,
+            0.325875,
+            14.185958,
+            0.231334,
+            0.195833
+          ]
+        },
+        {
+          "path": "packages/toolchain-zig/tests/index.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.6775,
+            0.705708,
+            0.371584,
+            0.165208,
+            0.18325,
+            0.556208,
+            0.158459,
+            0.142375,
+            0.449834,
+            0.127042,
+            554.310292,
+            0.178708,
+            0.192667,
+            0.102833,
+            0.065334,
+            3.668333,
+            0.730333,
+            0.174333
+          ]
+        },
+        {
+          "path": "packages/toolchain-zig/tests/sanitizer-activity.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "packages/unicode/tests/tables.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.190583,
+            0.236625,
+            3.725583,
+            0.141291,
+            21.048834,
+            0.163416,
+            21.962875,
+            21.555,
+            0.588709,
+            0.737958,
+            12.937208,
+            1.784625,
+            4.913542,
+            2.734209,
+            0.879416,
+            118.564667,
+            4.203833,
+            1.737625,
+            0.966833
+          ]
+        },
+        {
+          "path": "tests/anti-slop.test.ts",
+          "category": "unclear",
+          "cases": [
+            318.827792,
+            165.016416,
+            161.318875,
+            157.790375,
+            188.757042,
+            169.446,
+            185.733167,
+            167.946667,
+            176.602292,
+            181.407917,
+            175.579875,
+            217.28,
+            583.181583,
+            273.812291,
+            256.460334,
+            277.669167
+          ]
+        },
+        {
+          "path": "tests/boundaries.test.ts",
+          "category": "unclear",
+          "cases": [
+            14.250833,
+            5.755875,
+            4.835083,
+            7.15375,
+            5.2215,
+            5.553667,
+            3.30825,
+            3.037,
+            4.457167
+          ]
+        },
+        {
+          "path": "tests/check-commit-message.test.ts",
+          "category": "unclear",
+          "cases": [
+            37.693958,
+            6.810417,
+            7.147792,
+            8.283208,
+            9.059708,
+            13.652458,
+            6.913583,
+            8.510333,
+            7.50425,
+            14.019458,
+            7.225166,
+            6.483833,
+            6.032042,
+            6.842,
+            25.388334,
+            24.718584,
+            24.572333,
+            0.329667,
+            13.446459,
+            10.506292,
+            6.015083,
+            5.764916,
+            7.251583,
+            6.861916,
+            0.116584,
+            12.811958,
+            12.703458,
+            12.625625,
+            30.702709,
+            58.964875,
+            49.232167,
+            34.075834,
+            15.62525,
+            13.3465,
+            14.482125,
+            17.229291,
+            13.60075,
+            15.97425,
+            13.585,
+            14.187375,
+            13.305333,
+            13.012625,
+            6.556333,
+            6.485792,
+            7.234125,
+            7.178041,
+            7.027833,
+            7.010458,
+            13.237292,
+            48.8945,
+            19.2735,
+            387.89875,
+            177.54075,
+            654.150542,
+            962.966917,
+            66.708666,
+            129.65075
+          ]
+        },
+        {
+          "path": "tests/compatibility-ratchet.test.ts",
+          "category": "unclear",
+          "cases": [
+            114.839125,
+            34.5045,
+            31.002834,
+            0.364166,
+            0.25925,
+            0.196,
+            0.261917,
+            0.96975,
+            0.968959,
+            0.138458,
+            24.189959,
+            6.908875,
+            14.662,
+            9.646375,
+            5.340875,
+            4.422583,
+            2.273667,
+            0.540417,
+            0.281667,
+            0.201875,
+            0.303666,
+            1.525917,
+            0.2895,
+            0.172,
+            0.169208,
+            9.914167,
+            9.830584,
+            3.022042,
+            0.085291,
+            0.2305
+          ]
+        },
+        {
+          "path": "tests/evidence-lanes.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            6.247542,
+            3.064416,
+            6.411416,
+            1.097292,
+            3.392166,
+            1.65575,
+            0.704,
+            0.106083,
+            1.700625,
+            0.254292
+          ]
+        },
+        {
+          "path": "tests/harness-fragments.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            338.180458,
+            156.130333,
+            171.122667,
+            152.239333,
+            6.241375,
+            0.459584,
+            0.563708,
+            10.653292,
+            484.334958,
+            1.539375,
+            0.89325,
+            0.270542,
+            0.3725,
+            0.6515
+          ]
+        },
+        {
+          "path": "tests/harness-native.test.ts",
+          "category": "macos-only",
+          "cases": [
+            311986.20725
+          ]
+        },
+        {
+          "path": "tests/harness-resource.test.ts",
+          "category": "macos-only",
+          "cases": [
+            20723.838041
+          ]
+        },
+        {
+          "path": "tests/host-cc-sanitizer.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "tests/host-cc-selection.test.ts",
+          "category": "unclear",
+          "cases": [
+            210.222541,
+            256.4765,
+            197.90375
+          ]
+        },
+        {
+          "path": "tests/m5b-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            8.148375,
+            1.2445,
+            0.968667,
+            0.918333,
+            1.091791,
+            0.690708,
+            0.421042,
+            0.537042,
+            0.995167,
+            0.151792,
+            0.068666,
+            0.068208,
+            0.095167,
+            746.378333
+          ]
+        },
+        {
+          "path": "tests/m5b-node-scope.test.ts",
+          "category": "unclear",
+          "cases": [
+            4.295833,
+            0.460666,
+            0.373208,
+            0.32025,
+            0.359167,
+            0.2445,
+            0.233584,
+            8.133875,
+            0.27075,
+            0.217584,
+            0.492792,
+            0.229834,
+            0.899625,
+            0.397125,
+            0.552167
+          ]
+        },
+        {
+          "path": "tests/m5c-graph.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            5.887291,
+            1.933333,
+            0.671542,
+            0.57625,
+            0.562,
+            1.442,
+            0.668125,
+            0.482167,
+            0.279375,
+            0.51225,
+            0.6665,
+            0.290541,
+            0.112834,
+            0.068042,
+            7390.414625
+          ]
+        },
+        {
+          "path": "tests/native-fixture.test.ts",
+          "category": "unclear",
+          "cases": [
+            113.655458,
+            2390.773334,
+            67.387375,
+            1245.842542,
+            1257.648833,
+            102.826334
+          ]
+        },
+        {
+          "path": "tests/native-host-guards.test.ts",
+          "category": "unclear",
+          "cases": [
+            9.353208,
+            1.962583,
+            1.246125,
+            1.236625,
+            1.048333,
+            4.643875,
+            4.145292,
+            4.083,
+            2.315208,
+            2.434208,
+            1.955625,
+            1.805166,
+            1.595333,
+            1.957584,
+            1.971959,
+            2.61525,
+            2.528584,
+            2.061458,
+            1.748208,
+            1.720209,
+            2.68125,
+            3.023,
+            0.826208,
+            0.764833,
+            0.726916,
+            0.691416,
+            1.256416,
+            1.0565,
+            0.690791,
+            1.259625,
+            1.433333,
+            1.413291,
+            1.46925,
+            1.216041,
+            0.871208,
+            0.550375,
+            0.812375,
+            0.743292,
+            1.4945,
+            1.40125,
+            2.958625,
+            22.293292,
+            69.795375,
+            18.192666,
+            37.523708,
+            8.459625,
+            6.71,
+            38.647417,
+            35.792,
+            1.324541,
+            1.048708,
+            9.522542,
+            1.13575
+          ]
+        },
+        {
+          "path": "tests/native-io/clock-wakeup.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22556.8535,
+            19264.88275,
+            546.740708,
+            463.6995,
+            317.745416,
+            90041.768208,
+            16294.911083
+          ]
+        },
+        {
+          "path": "tests/native-runtime-archive-cache.test.ts",
+          "category": "macos-only",
+          "cases": [
+            5937.750625
+          ]
+        },
+        {
+          "path": "tests/native-test-workers.test.ts",
+          "category": "unclear",
+          "cases": [
+            0.566209,
+            0.137333,
+            193.623416,
+            189.651916,
+            195.257125,
+            184.572375
+          ]
+        },
+        {
+          "path": "tests/native-toolchains.test.ts",
+          "category": "unclear",
+          "cases": [
+            1.265792,
+            2.991959,
+            0.408334,
+            0.188167,
+            2720.089625,
+            0.459042,
+            0.564208,
+            0.554,
+            0.197042,
+            0.118166
+          ]
+        },
+        {
+          "path": "tests/node-built.test.ts",
+          "category": "unclear",
+          "cases": [
+            16.562542,
+            213.744583,
+            134.356084
+          ]
+        },
+        {
+          "path": "tests/property/m4-async.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25688.829208
+          ]
+        },
+        {
+          "path": "tests/property/m5-aggregate-error.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.546666,
+            19665.9485
+          ]
+        },
+        {
+          "path": "tests/property/m5-arguments-object.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.169125,
+            13695.698791,
+            28873.28925,
+            19307.128333
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.991041,
+            15904.162083
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-buffer.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            42068.641041
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-constructor.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            35859.072083
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-change-by-copy.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            31244.5925
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-copying.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27275.501875
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-index-search.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30653.277959
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-iterative.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33893.179083
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-iterators.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27227.103084
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-mutation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            29541.182792
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-predicate-search.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            31091.482709
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-reduction.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26970.43475
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-sort.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26704.537167
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-prototype-species-mapping.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            39376.979625
+          ]
+        },
+        {
+          "path": "tests/property/m5-array-spread.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            19268.676458
+          ]
+        },
+        {
+          "path": "tests/property/m5-async-await.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25048.95625
+          ]
+        },
+        {
+          "path": "tests/property/m5-async-generator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            18011.014542
+          ]
+        },
+        {
+          "path": "tests/property/m5-atomics-and-shared-memory.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            31507.166917
+          ]
+        },
+        {
+          "path": "tests/property/m5-atomics-single-agent.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30434.868625
+          ]
+        },
+        {
+          "path": "tests/property/m5-bigint-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            40470.0235
+          ]
+        },
+        {
+          "path": "tests/property/m5-bigint.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            92.430417,
+            83.800875,
+            77.435875,
+            8654.048625
+          ]
+        },
+        {
+          "path": "tests/property/m5-boolean-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30436.13575
+          ]
+        },
+        {
+          "path": "tests/property/m5-call-spread.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            21369.588042
+          ]
+        },
+        {
+          "path": "tests/property/m5-catch-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.849792,
+            15307.388416
+          ]
+        },
+        {
+          "path": "tests/property/m5-class.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.98925,
+            0.662875,
+            0.384583,
+            0.611708,
+            0.954459,
+            0.664875,
+            0.681333,
+            0.575583,
+            0.732958,
+            0.84175,
+            0.368584,
+            0.112792,
+            0.181334,
+            33480.358833,
+            15001.853583,
+            15150.734416
+          ]
+        },
+        {
+          "path": "tests/property/m5-compound-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.884917,
+            13857.826667
+          ]
+        },
+        {
+          "path": "tests/property/m5-data-view.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            41302.985125
+          ]
+        },
+        {
+          "path": "tests/property/m5-date-family.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            51123.723209
+          ]
+        },
+        {
+          "path": "tests/property/m5-default-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12700.036666
+          ]
+        },
+        {
+          "path": "tests/property/m5-delete-super.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.452166,
+            38333.278833
+          ]
+        },
+        {
+          "path": "tests/property/m5-delete.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.837667,
+            24898.384667
+          ]
+        },
+        {
+          "path": "tests/property/m5-destructuring-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.844125,
+            15021.461208
+          ]
+        },
+        {
+          "path": "tests/property/m5-ephemeron-tracing.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            13250.642833
+          ]
+        },
+        {
+          "path": "tests/property/m5-export-default-class.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            4868.860583
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-await-of.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17693.765875,
+            19553.306583,
+            25434.174292,
+            23578.216666
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.842166,
+            18688.620958
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-in-object-pattern.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.038834,
+            58507.826333
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-in.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.30875,
+            47809.378959
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of-assignment.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.523959,
+            20433.102833
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.044042,
+            17690.832042
+          ]
+        },
+        {
+          "path": "tests/property/m5-for-of.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            15459.102625
+          ]
+        },
+        {
+          "path": "tests/property/m5-function-intrinsic-chains.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33774.890917
+          ]
+        },
+        {
+          "path": "tests/property/m5-function-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            24795.72825
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            5819.565459
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.880584,
+            15743.831125
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator-throw.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            6203.674125
+          ]
+        },
+        {
+          "path": "tests/property/m5-generator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.478125,
+            0.532084,
+            1.830208,
+            0.32025,
+            26470.827208
+          ]
+        },
+        {
+          "path": "tests/property/m5-generic-string-coercion.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            23542.071375
+          ]
+        },
+        {
+          "path": "tests/property/m5-global-numeric-functions.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            59082.994875
+          ]
+        },
+        {
+          "path": "tests/property/m5-global-object-record.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33023.34275
+          ]
+        },
+        {
+          "path": "tests/property/m5-globalthis-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.842708,
+            46108.364458,
+            2208.939167,
+            3242.268959,
+            5833.150542
+          ]
+        },
+        {
+          "path": "tests/property/m5-harness-native-function-matcher.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            11320.152083,
+            60069.972833
+          ]
+        },
+        {
+          "path": "tests/property/m5-harness-promise-helper.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            4992.672625,
+            44378.698041
+          ]
+        },
+        {
+          "path": "tests/property/m5-intrinsic-graph-root.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            29603.625583
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-helpers-eager.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33022.415042
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-helpers-lazy.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27759.838042
+          ]
+        },
+        {
+          "path": "tests/property/m5-iterator-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            29037.69725
+          ]
+        },
+        {
+          "path": "tests/property/m5-json-parse.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28691.055708
+          ]
+        },
+        {
+          "path": "tests/property/m5-json-stringify.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27562.472958
+          ]
+        },
+        {
+          "path": "tests/property/m5-lexical-declaration-list.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.668083,
+            40137.731167
+          ]
+        },
+        {
+          "path": "tests/property/m5-lexical-super.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22216.620666,
+            20801.653083
+          ]
+        },
+        {
+          "path": "tests/property/m5-map-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28784.891
+          ]
+        },
+        {
+          "path": "tests/property/m5-math-namespace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            100206.059709
+          ]
+        },
+        {
+          "path": "tests/property/m5-module-continuation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17424.486958
+          ]
+        },
+        {
+          "path": "tests/property/m5-number-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            92546.63225
+          ]
+        },
+        {
+          "path": "tests/property/m5-number-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            58497.225833
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            2.861333,
+            14837.100792
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-constructor.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            111747.849084
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-create.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33897.8795
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-define-properties.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            38680.696167
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-define-property.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            33537.9535
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-descriptor-queries.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            38710.109625
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-integrity-levels.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            64016.085416
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-literal.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.924541,
+            0.361125,
+            28826.41825,
+            1.261125,
+            70807.643542,
+            10.629833
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-own-keys.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            355884.925042
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-prototype.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            28399.122166
+          ]
+        },
+        {
+          "path": "tests/property/m5-object-rest.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.876667,
+            20107.828042
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-catch-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.048208,
+            17959.675
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-chaining.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.927791,
+            21808.388083
+          ]
+        },
+        {
+          "path": "tests/property/m5-optional-private.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.119333,
+            24914.442125
+          ]
+        },
+        {
+          "path": "tests/property/m5-parameter-binding.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            1.006959,
+            21630.102875
+          ]
+        },
+        {
+          "path": "tests/property/m5-parameter-var.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            16058.119084
+          ]
+        },
+        {
+          "path": "tests/property/m5-pattern-await.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.75875,
+            53891.823041
+          ]
+        },
+        {
+          "path": "tests/property/m5-promise-combine.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46596.502708,
+            25027.559875,
+            32296.327875
+          ]
+        },
+        {
+          "path": "tests/property/m5-promise-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            57673.829,
+            30980.820625,
+            30154.005667
+          ]
+        },
+        {
+          "path": "tests/property/m5-proxy-exotic-object.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            121945.473959,
+            16492.198625
+          ]
+        },
+        {
+          "path": "tests/property/m5-reflect-namespace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            101787.9425,
+            44914.223416,
+            30144.383625
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            20186.390584,
+            7117.741625
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-literal-aot.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            26004.353958,
+            11330.501625,
+            22.584292
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-matcher.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            158.334333,
+            98.903083
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-pattern-extensions.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            70.5995
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-pattern.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            41.737,
+            20.413333
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-prototype-and-exec.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            17366.953542,
+            12354.92225,
+            9706.335625,
+            1974.875667
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-symbol-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            21600.642666,
+            15359.569417,
+            11805.386833
+          ]
+        },
+        {
+          "path": "tests/property/m5-regexp-unicode-property-escapes.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            54.77275,
+            57.546917,
+            2.563375
+          ]
+        },
+        {
+          "path": "tests/property/m5-rest-parameter.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12034.029333
+          ]
+        },
+        {
+          "path": "tests/property/m5-runtime-error-observation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.519959,
+            27208.665791
+          ]
+        },
+        {
+          "path": "tests/property/m5-set-composition-methods.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            30316.300625
+          ]
+        },
+        {
+          "path": "tests/property/m5-set-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25160.021375
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            60568.145958
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-iterator.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27288.968459
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-access.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            41789.096041
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-case.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22816.235917,
+            4931.685792
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-match-and-split.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46952.990416,
+            24414.283875
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-pad.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            24739.131333
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-replace.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            37429.962208,
+            21816.019584
+          ]
+        },
+        {
+          "path": "tests/property/m5-string-prototype-search-and-slice.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            36491.159333
+          ]
+        },
+        {
+          "path": "tests/property/m5-super-targets.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.447541,
+            33859.280625
+          ]
+        },
+        {
+          "path": "tests/property/m5-super-without-extends.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            21927.528708
+          ]
+        },
+        {
+          "path": "tests/property/m5-symbol-intrinsic.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            38422.886333
+          ]
+        },
+        {
+          "path": "tests/property/m5-tagged-template.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.603,
+            16167.448292
+          ]
+        },
+        {
+          "path": "tests/property/m5-top-level-this.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.559083,
+            0.119375,
+            53472.12325
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-constructors.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            38139.588875
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-core.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            24521.456667
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-iterative.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            18966.923666,
+            7115.478792
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-mutation.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22997.973084,
+            12874.0055
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-search-and-join.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            21746.252708,
+            10070.293166
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-sort.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            23074.549583
+          ]
+        },
+        {
+          "path": "tests/property/m5-typed-array-statics.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            25863.623291
+          ]
+        },
+        {
+          "path": "tests/property/m5-typeof-unresolved.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.46725,
+            23339.477583
+          ]
+        },
+        {
+          "path": "tests/property/m5-update-expression.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.787375,
+            11368.098083
+          ]
+        },
+        {
+          "path": "tests/property/m5-uri-handling-functions.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            46025.79875
+          ]
+        },
+        {
+          "path": "tests/property/m5-weak-collections.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            27651.885708
+          ]
+        },
+        {
+          "path": "tests/property/m5-well-known-symbols.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            0.667,
+            28267.7785
+          ]
+        },
+        {
+          "path": "tests/property/nio-clock-wakeup.property.test.ts",
+          "category": "macos-only",
+          "cases": [
+            9850.15975
+          ]
+        },
+        {
+          "path": "tests/property/unicode-tables.property.test.ts",
+          "category": "timing-verdict",
+          "cases": [
+            8.609416,
+            9.101166,
+            14.678333
+          ]
+        },
+        {
+          "path": "tests/regexp-literal-aot.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            33.189708,
+            2.990167,
+            0.936209,
+            7.6415,
+            1.113084,
+            0.607208,
+            0.591667,
+            3.127042
+          ]
+        },
+        {
+          "path": "tests/regexp-matcher.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            68.285209,
+            282.942959,
+            28.641834,
+            2.953167,
+            0.701958,
+            2.777958,
+            47.325084,
+            2.828666,
+            2.546625,
+            7.804792,
+            4.699542,
+            18.111917,
+            69.086583,
+            0.3605,
+            12.249708
+          ]
+        },
+        {
+          "path": "tests/regexp-probes.test.ts",
+          "category": "unclear",
+          "cases": [
+            42.979292,
+            15.577834,
+            145.783,
+            2850.189417,
+            4.621833,
+            15228.567583,
+            2149.903792,
+            7184.966625,
+            8300.007875,
+            7804.613084,
+            4748.915625,
+            10368.772459,
+            354.628125
+          ]
+        },
+        {
+          "path": "tests/runtime-archive-cache.test.ts",
+          "category": "unclear",
+          "cases": [
+            7.273416,
+            0.464042,
+            0.110084
+          ]
+        },
+        {
+          "path": "tests/runtime-ephemeron.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12402.146834
+          ]
+        },
+        {
+          "path": "tests/runtime-heap.test.ts",
+          "category": "macos-only",
+          "cases": [
+            166198.941041
+          ]
+        },
+        {
+          "path": "tests/runtime-promises.test.ts",
+          "category": "macos-only",
+          "cases": [
+            11810.029417
+          ]
+        },
+        {
+          "path": "tests/runtime-symbol-registry.test.ts",
+          "category": "macos-only",
+          "cases": [
+            22185.942208
+          ]
+        },
+        {
+          "path": "tests/runtime-typed-array-clone.test.ts",
+          "category": "macos-only",
+          "cases": []
+        },
+        {
+          "path": "tests/runtime-weak-collection.test.ts",
+          "category": "macos-only",
+          "cases": [
+            12904.448583
+          ]
+        },
+        {
+          "path": "tests/shard.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            1.358417,
+            0.460458,
+            0.222083
+          ]
+        },
+        {
+          "path": "tests/structured-data.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            0.503917,
+            0.208,
+            0.104833
+          ]
+        },
+        {
+          "path": "tests/test262-fragments.test.ts",
+          "category": "macos-only",
+          "cases": [
+            4.253916,
+            13.655625,
+            8281.201792,
+            217.606542,
+            0.409959,
+            65.885583,
+            4328.405625,
+            6388.404625,
+            0.788958
+          ]
+        },
+        {
+          "path": "tests/test262-inventory.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            0.79375,
+            0.0975,
+            0.083166,
+            0.282542,
+            0.195333
+          ]
+        },
+        {
+          "path": "tests/test262-runner.test.ts",
+          "category": "unclear",
+          "cases": [
+            4.786583,
+            0.401,
+            0.422416,
+            0.727041,
+            0.975375,
+            1.369542,
+            0.103166,
+            0.088084,
+            0.108875,
+            0.58075,
+            0.130375,
+            10.418916,
+            1.516458,
+            1.64975,
+            1.172,
+            1.294,
+            1.107792,
+            1.795,
+            1.046125,
+            1.529583,
+            0.25375,
+            0.360292,
+            0.209375,
+            0.232042,
+            0.212875,
+            0.217709,
+            0.184375,
+            0.189416,
+            0.443041,
+            1.921542,
+            0.076333,
+            4.614708,
+            2.216458,
+            0.81,
+            1.045333,
+            0.625,
+            0.376125,
+            0.208875,
+            1.580083,
+            0.900292,
+            0.143292,
+            0.146792,
+            0.206167,
+            1.487833,
+            0.569792,
+            0.169542,
+            1.741875,
+            3.685709,
+            0.791083,
+            0.777125,
+            15.0705,
+            1.832959,
+            0.206667,
+            0.122834,
+            0.201166,
+            0.967542,
+            1.457708,
+            2.513167,
+            5.532583,
+            1.285291,
+            2.803083,
+            9910.103417,
+            1.565667,
+            0.445042,
+            0.549833,
+            14.004791,
+            3.718125
+          ]
+        },
+        {
+          "path": "tests/unicode-property-escapes.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            305.777875
+          ]
+        },
+        {
+          "path": "tests/unicode-tables.test.ts",
+          "category": "independent-linux",
+          "cases": [
+            6.905792,
+            0.533709,
+            0.6505,
+            0.90725,
+            0.511333,
+            0.393041,
+            1.149125,
+            0.551708,
+            0.663667,
+            0.240792,
+            0.443458,
+            0.314834,
+            0.149833,
+            0.144041,
+            0.211708,
+            0.095,
+            0.23,
+            0.135833,
+            0.112167,
+            0.597625,
+            445.525208,
+            181.619834,
+            167.313083
+          ]
+        },
+        {
+          "path": "tests/versions.test.ts",
+          "category": "unclear",
+          "cases": [
+            25.865208,
+            21.851959,
+            13.756541,
+            16.223042,
+            9.046542,
+            8.070083,
+            11.575542,
+            6.248709
+          ]
+        }
+      ],
+      "unmatchedCases": [
+        0.221166,
+        0.11975,
+        0.095292,
+        0.115666,
+        0.2785,
+        0.185083,
+        0.114292,
+        0.196208,
+        0.160417,
+        0.098917,
+        0.086084,
+        0.175375,
+        0.13225,
+        0.138708,
+        0.500791,
+        0.358709,
+        0.076,
+        21391.895,
+        348.814792,
+        411.127292,
+        6.40375,
+        0.53175,
+        0.262167,
+        0.326792,
+        0.21675,
+        0.186167,
+        0.211,
+        0.174792
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 8/12)",
+      "id": 108600171537,
+      "start": "2026-09-27T11:39:58Z",
+      "end": "2026-09-27T12:00:44Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:39:58Z",
+          "end": "2026-09-27T11:39:59Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:39:59Z",
+          "end": "2026-09-27T11:40:03Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:40:03Z",
+          "end": "2026-09-27T11:40:40Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:40:40Z",
+          "end": "2026-09-27T11:40:47Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=8/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:40:47Z",
+          "end": "2026-09-27T12:00:38Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:00:38Z",
+          "end": "2026-09-27T12:00:39Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:00:39Z",
+          "end": "2026-09-27T12:00:40Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:00:40Z",
+          "end": "2026-09-27T12:00:41Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 3/12)",
+      "id": 108600171561,
+      "start": "2026-09-27T12:39:37Z",
+      "end": "2026-09-27T13:13:13Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:39:37Z",
+          "end": "2026-09-27T12:39:39Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:39:39Z",
+          "end": "2026-09-27T12:39:42Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:39:42Z",
+          "end": "2026-09-27T12:40:11Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:40:11Z",
+          "end": "2026-09-27T12:40:14Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=3/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T12:40:14Z",
+          "end": "2026-09-27T13:13:02Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T13:13:02Z",
+          "end": "2026-09-27T13:13:03Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T13:13:03Z",
+          "end": "2026-09-27T13:13:04Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T13:13:04Z",
+          "end": "2026-09-27T13:13:12Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 11/12)",
+      "id": 108600171562,
+      "start": "2026-09-27T11:52:31Z",
+      "end": "2026-09-27T12:10:16Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:52:31Z",
+          "end": "2026-09-27T11:52:33Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:52:33Z",
+          "end": "2026-09-27T11:52:36Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:52:36Z",
+          "end": "2026-09-27T11:53:18Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:53:18Z",
+          "end": "2026-09-27T11:53:25Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=11/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:53:25Z",
+          "end": "2026-09-27T12:10:10Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:10:10Z",
+          "end": "2026-09-27T12:10:11Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:10:11Z",
+          "end": "2026-09-27T12:10:11Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:10:11Z",
+          "end": "2026-09-27T12:10:13Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 9/12)",
+      "id": 108600171579,
+      "start": "2026-09-27T11:29:39Z",
+      "end": "2026-09-27T11:42:36Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:29:39Z",
+          "end": "2026-09-27T11:29:41Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:29:41Z",
+          "end": "2026-09-27T11:29:45Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:29:45Z",
+          "end": "2026-09-27T11:30:14Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:30:14Z",
+          "end": "2026-09-27T11:30:18Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=9/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:30:18Z",
+          "end": "2026-09-27T11:42:32Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:42:32Z",
+          "end": "2026-09-27T11:42:33Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:42:33Z",
+          "end": "2026-09-27T11:42:33Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:42:33Z",
+          "end": "2026-09-27T11:42:35Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 5/12)",
+      "id": 108600171581,
+      "start": "2026-09-27T11:50:39Z",
+      "end": "2026-09-27T12:42:05Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:50:39Z",
+          "end": "2026-09-27T11:50:41Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:50:41Z",
+          "end": "2026-09-27T11:50:44Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:50:44Z",
+          "end": "2026-09-27T11:51:07Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:51:07Z",
+          "end": "2026-09-27T11:51:10Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=5/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:51:10Z",
+          "end": "2026-09-27T12:42:01Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:42:01Z",
+          "end": "2026-09-27T12:42:02Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:42:02Z",
+          "end": "2026-09-27T12:42:02Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:42:02Z",
+          "end": "2026-09-27T12:42:02Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 1/12)",
+      "id": 108600171591,
+      "start": "2026-09-27T12:05:51Z",
+      "end": "2026-09-27T12:25:27Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:05:51Z",
+          "end": "2026-09-27T12:05:53Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:05:53Z",
+          "end": "2026-09-27T12:05:55Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:05:55Z",
+          "end": "2026-09-27T12:06:27Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:06:27Z",
+          "end": "2026-09-27T12:06:31Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:package",
+          "start": "2026-09-27T12:06:31Z",
+          "end": "2026-09-27T12:06:41Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=1/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T12:06:41Z",
+          "end": "2026-09-27T12:25:22Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:25:22Z",
+          "end": "2026-09-27T12:25:22Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:25:22Z",
+          "end": "2026-09-27T12:25:24Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:25:24Z",
+          "end": "2026-09-27T12:25:24Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 7/12)",
+      "id": 108600171617,
+      "start": "2026-09-27T11:31:57Z",
+      "end": "2026-09-27T11:52:23Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T11:31:57Z",
+          "end": "2026-09-27T11:31:59Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T11:31:59Z",
+          "end": "2026-09-27T11:32:02Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T11:32:02Z",
+          "end": "2026-09-27T11:32:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:32:30Z",
+          "end": "2026-09-27T11:32:35Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=7/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T11:32:35Z",
+          "end": "2026-09-27T11:52:20Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T11:52:20Z",
+          "end": "2026-09-27T11:52:20Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T11:52:20Z",
+          "end": "2026-09-27T11:52:21Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T11:52:21Z",
+          "end": "2026-09-27T11:52:22Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 10/12)",
+      "id": 108600171619,
+      "start": "2026-09-27T12:32:58Z",
+      "end": "2026-09-27T12:57:19Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:32:58Z",
+          "end": "2026-09-27T12:33:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:33:00Z",
+          "end": "2026-09-27T12:33:03Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:33:03Z",
+          "end": "2026-09-27T12:33:46Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:33:46Z",
+          "end": "2026-09-27T12:33:52Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=10/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T12:33:52Z",
+          "end": "2026-09-27T12:57:14Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:57:14Z",
+          "end": "2026-09-27T12:57:15Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:57:15Z",
+          "end": "2026-09-27T12:57:16Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:57:16Z",
+          "end": "2026-09-27T12:57:17Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 12/12)",
+      "id": 108600171632,
+      "start": "2026-09-27T12:10:26Z",
+      "end": "2026-09-27T12:39:32Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:10:27Z",
+          "end": "2026-09-27T12:10:28Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:10:28Z",
+          "end": "2026-09-27T12:10:34Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:10:34Z",
+          "end": "2026-09-27T12:11:21Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:11:21Z",
+          "end": "2026-09-27T12:11:30Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=12/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T12:11:30Z",
+          "end": "2026-09-27T12:39:23Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:39:23Z",
+          "end": "2026-09-27T12:39:24Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:39:24Z",
+          "end": "2026-09-27T12:39:26Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:39:26Z",
+          "end": "2026-09-27T12:39:29Z"
+        }
+      ]
+    },
+    {
+      "name": "native support (macos-aarch64, 6/12)",
+      "id": 108600171866,
+      "start": "2026-09-27T12:28:46Z",
+      "end": "2026-09-27T12:51:37Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "start": "2026-09-27T12:28:47Z",
+          "end": "2026-09-27T12:28:48Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "start": "2026-09-27T12:28:48Z",
+          "end": "2026-09-27T12:28:52Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "start": "2026-09-27T12:28:52Z",
+          "end": "2026-09-27T12:29:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:29:30Z",
+          "end": "2026-09-27T12:29:36Z"
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=6/12 tests/property/*.property.test.ts",
+          "start": "2026-09-27T12:29:36Z",
+          "end": "2026-09-27T12:51:34Z"
+        },
+        {
+          "name": "Post Run ./.github/actions/runtime-archive-cache",
+          "start": "2026-09-27T12:51:34Z",
+          "end": "2026-09-27T12:51:35Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "start": "2026-09-27T12:51:35Z",
+          "end": "2026-09-27T12:51:35Z"
+        },
+        {
+          "name": "Complete job",
+          "start": "2026-09-27T12:51:35Z",
+          "end": "2026-09-27T12:51:36Z"
+        }
+      ]
+    }
+  ]
+}
