@@ -642,9 +642,10 @@ The projection model is:
  -  every other family is held at its measured value, because its input
     inventory is the property file set, the native fixture set, or the
     sanitizer suites, and the reviewed corpus selects none of them;
- -  each macOS job keeps one job fixed cost, taken from the baseline's derived
-    mean F, which is 59.82 s for run 36243816479 and 56.81 s for run
-    36261458909; and
+ -  each projected test262 job keeps one job fixed cost, taken from the
+    baseline's derived mean F, which is 59.82 s for run 36243816479 and 56.81 s
+    for run 36261458909, while a held family keeps whatever fixed cost is
+    already inside its measured minutes; and
  -  the shard totals stay at their measured current values, test262 10 and
     native support 12.
 
@@ -743,11 +744,17 @@ Derived macOS workload at 41,091 paths against the 628-minute ceiling:
 
 | Scenario                   | Derived test262 min | Derived held families min | Derived total min | Derived gap min | Derived test262 share |
 | -------------------------- | ------------------- | ------------------------- | ----------------- | --------------- | --------------------- |
-| 0.629, run 35456667007 set | 440.24              | 403.25                    | 843.49            | +215.49         | 52.2%                 |
+| 0.629, run 35456667007 set | 440.74              | 403.25                    | 843.99            | +215.99         | 52.2%                 |
 | 0.629, run 36261458909 set | 440.24              | 443.71                    | 883.95            | +255.95         | 49.8%                 |
 | 0.741, run 36261458909 set | 516.94              | 443.71                    | 960.65            | +332.65         | 53.8%                 |
 | 0.874, run 36261458909 set | 608.03              | 443.71                    | 1051.74           | +423.74         | 57.8%                 |
 | 0.886, run 36243816479 set | 616.75              | 469.37                    | 1086.12           | +458.12         | 56.8%                 |
+
+Run 35456667007 has no F measurement of its own, so its scenario uses run
+36243816479's derived mean F, the A column above, for its projected test262
+jobs, and the same mean stands in for the unmeasured F inside its held families'
+minutes. That is the same F the recovery stack below uses, so one fixed-cost
+assumption holds across a scenario and the stack built on it.
 
 The derived comparison points, from measured job timestamps, are 629.52 min at
 20,841 paths, 764.12 min at 21,383 paths for run 36261458909, and 795.45 min at
@@ -757,7 +764,10 @@ construction.
 
 The derived total macOS job fixed cost is small. With 29 macOS jobs across the
 five families, the derived mean F values give 28.91 min for run 36243816479 and
-27.46 min for run 36261458909, a derived 1 min or so for each job. The two
+27.46 min for run 36261458909, a derived 1 min or so for each job. Those are the
+measured runs' totals; a projected scenario embeds a slightly different amount,
+because its ten test262 jobs carry 10 times the mean F in place of their own
+derived F, and U3 below gives each scenario's value. The two
 components of F that a cross-job cache could plausibly remove, the measured aube
 dependency interval D and the derived build interval B, give a derived 13.97 min
 and 12.56 min respectively. The rest of F is checkout, mise cache restore,
@@ -771,7 +781,7 @@ workload divided by five, and never less than its longest single job.
 
 | Scenario                   | Derived workload min | Derived workload / 5 min | Longest job min | Longest job             |
 | -------------------------- | -------------------- | ------------------------ | --------------- | ----------------------- |
-| 0.629, run 35456667007 set | 843.49               | 168.70                   | 58.55           | native support, derived |
+| 0.629, run 35456667007 set | 843.99               | 168.80                   | 58.55           | native support, derived |
 | 0.741, run 36261458909 set | 960.65               | 192.13                   | 51.71           | test262 shard, derived  |
 | 0.874, run 36261458909 set | 1051.74              | 210.35                   | 60.82           | test262 shard, derived  |
 | 0.886, run 36243816479 set | 1086.12              | 217.22                   | 68.13           | native support, derived |
@@ -811,7 +821,7 @@ At 41,091 paths `test262` becomes the dominant macOS family in every scenario,
 at a derived 49.8 to 57.8 percent of the projected workload. That is a change
 from the present, where the derived test262 total of 320.40 to 326.08 min and
 the derived native support total of 284.85 to 310.20 min are comparable. The
-derived gap against the 628-minute ceiling is +215.49 min in the most favorable
+derived gap against the 628-minute ceiling is +215.99 min in the most favorable
 scenario and +458.12 min in the least favorable one, a factor of 1.34 to 1.73.
 
 The recovery figures below are estimates, not measurements. Each names the
@@ -820,14 +830,19 @@ estimate. They are attributed first to the measured cost component they act on
 and then to the plan unit that owns that component. Every subtraction is an
 estimated ceiling unless it says otherwise.
 
-Job fixed cost, U3. The derived ceiling is the whole macOS job fixed cost,
-28.91 min for run 36243816479 or 27.46 min for run 36261458909, and the derived
-figure for the dependency and build components alone is 13.97 min or 12.56 min.
-Even the ceiling is 13.4 percent of the smallest derived gap and 6.3 percent of
-the largest. U3 cannot close this gap; its value is that it is cheap,
-measurable, and does not touch coverage. Raising a shard total under U6 adds
-a derived 1 min or so of fixed cost for each added macOS job, which works
-against this same budget.
+Job fixed cost, U3. The derived ceiling is the whole macOS job fixed cost that
+a scenario embeds, and the derived figure for the dependency and build
+components alone is 13.97 min or 12.56 min of the measured runs' 28.91 min and
+27.46 min. A scenario embeds 10 times the derived mean F for its projected
+test262 jobs, 9.97 min at run 36243816479's mean, plus the F inside its 19
+held-family jobs. That held sum is a derived 18.09 min in run 36243816479, so
+the least favorable scenario's ceiling is 28.06 min. Run 35456667007 has no
+per-job F, so its held families are assumed at the same mean and the most
+favorable scenario's ceiling is the full 28.91 min. Even the ceiling is 13.4
+percent of the smallest derived gap and 6.1 percent of the largest. U3 cannot
+close this gap; its value is that it is cheap, measurable, and does not touch
+coverage. Raising a shard total under U6 adds a derived 1 min or so of fixed
+cost for each added macOS job, which works against this same budget.
 
 test262 per-path execution, U4 and U10. U10 is the only lever whose estimated
 magnitude can be put against the gap from the evidence available. U4 acts on the
@@ -860,9 +875,9 @@ that.
 The unmeasured input is k, the number of distinct harness objects one macOS
 test262 shard builds. At the derived 0.78 s for each object, ten shards recover
 an estimated 0.13k min: 4.67 min at k equal to the locally observed 36, 12.98
-min at 100, 64.88 min at 500, and 190.10 min at 1,465. That last value is what
+min at 100, 64.88 min at 500, and 190.11 min at 1,465. That last value is what
 extrapolating the local sample's observed ratio of 36 objects over 101 paths to
-4,110 paths would give, and it exceeds the k of about 1,149 that would close the
+4,110 paths would give, and it exceeds the k of about 1,154 that would close the
 residual in the most favorable stack below. Whether k grows with path count that
 way or saturates once a shard has covered the harness corpus is exactly what is
 unmeasured, so this projection draws no conclusion about U4's magnitude in
@@ -908,10 +923,16 @@ host independent. Their ceilings overlap and are not additive; together they
 are bounded by that family's derived value in the run a scenario uses, which is
 39.30 min for run 35456667007, 41.85 min for run 36243816479, and 46.18 min for
 run 36261458909. When stacked after U3 they must be taken net of the fixed cost
-U3 already removed from the same two jobs, a derived 1.77 min of F for run
-36243816479 and 3.15 min for run 36261458909; otherwise that fixed cost is
-subtracted twice. Neither unit can move `test262` or `native support` off
-macOS, because both execute native code on `macos-aarch64` and macOS native
+U3 already removed from the same two jobs; otherwise that fixed cost is
+subtracted twice. Where a scenario's held families come from a run the baseline
+decomposes job by job, that share is those two jobs' own derived F: 52.00 s and
+54.46 s in run 36243816479, a 1.77 min sum, and 135.00 s and 53.70 s in run
+36261458909, a 3.15 min sum. Taking twice the mean there would substitute an
+average for a quantity the baseline measures directly. Run 35456667007 has no
+such decomposition, so its share is twice the derived mean F, 1.99 min at run
+36243816479's mean.
+Neither unit can move `test262` or `native support` off macOS, because both
+execute native code on `macos-aarch64` and macOS native
 execution is proven only there. The Apple Clang sanitizer coverage the
 milestone also protects belongs to the separate `host C sanitizers` family, not
 to these two.
@@ -924,24 +945,25 @@ held families stay fixed rather than moving with the scenario. Neither stack
 subtracts U4, whose magnitude is unmeasured, so the residual each leaves is the
 residual before U4.
 
-The most favorable scenario is 843.49 derived min at 0.629 s/path with run
+The most favorable scenario is 843.99 derived min at 0.629 s/path with run
 35456667007's held families, in which U10 is already recovered. Removing the
-whole derived macOS job fixed cost that U3 could reach leaves 814.58 min.
-Removing the whole macOS `test` family that U7 and U8 act inside, net of the
-fixed cost U3 already took from its two jobs, leaves an estimated 777.05 min, or
-+149.05 min against the ceiling.
+28.91 min of embedded macOS job fixed cost that U3 could reach leaves 815.08
+min. Removing the whole macOS `test` family that U7 and U8 act inside, net of
+the 1.99 min U3 already took from its two jobs, leaves an estimated 777.77 min,
+or +149.77 min against the ceiling.
 
 The least favorable scenario is 1086.12 derived min at 0.886 s/path with run
 36243816479's held families. Recovering the rise to 0.629 under U10 leaves
-910.11 min, U3 leaves 881.20 min, and U7 with U8 net of that fixed cost leave an
-estimated 841.12 min, or +213.12 min against the ceiling. U5 and U6 recover no
+910.11 min, the 28.06 min U3 could reach leaves 882.05 min, and U7 with U8 net
+of the 1.77 min of derived F U3 already took from those two jobs leave an
+estimated 841.97 min, or +213.97 min against the ceiling. U5 and U6 recover no
 runner minutes at all.
 
-So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.8
-percent of the excess in the most favorable scenario and 53.5 percent in the
-least favorable one, roughly a third to a half, and leave 149 to 213 min before
+So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.7
+percent of the excess in the most favorable scenario and 53.3 percent in the
+least favorable one, roughly a third to a half, and leave 150 to 214 min before
 U4. Closing the most favorable scenario's residual through U4 alone would need k
-of about 1,149 distinct harness objects for each shard. That figure is a lower
+of about 1,154 distinct harness objects for each shard. That figure is a lower
 objects-per-path ratio than the local sample observed, so it is not excluded by
 the local evidence; it is also not supported by it, because no measurement
 establishes how k grows with shard size on macOS. Reachability therefore turns
@@ -966,7 +988,7 @@ rather than omitted evidence.
 
 The explicit statement this projection owes its plan is therefore narrower than
 a verdict. No coverage-lossless projection here reaches 628 min on measured
-evidence, and the only lever that could close the remaining 149 to 213 min is
+evidence, and the only lever that could close the remaining 150 to 214 min is
 U4 at an object count nothing has measured. Until that measurement exists, the
 alternatives are a lever this plan has not yet identified or a maintainer
 decision that the ceiling itself moves. This projection makes neither and does
