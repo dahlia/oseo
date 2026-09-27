@@ -1,7 +1,7 @@
 Evidence gate cost baseline
 ===========================
 
-Current CI baseline (observed 2026-09-26)
+Current CI baseline (observed 2026-09-27)
 -----------------------------------------
 
 The current baseline uses successful main runs [36243816479] and
@@ -16,21 +16,28 @@ All current wall times are measured from GitHub job or step timestamps.
 Sums, maxima, means, spreads, ratios, fixed-cost allocations, and normalized
 rates are derived from those measurements. Table captions identify their
 source runs; each row in the detailed tables identifies its source job.
-Times exclude queue waiting, include job setup and cleanup, and are elapsed
-runner minutes rather than billing-rounded minutes. No CI run was triggered.
+Job times exclude queue waiting, include setup and cleanup, and are elapsed
+runner minutes rather than billing-rounded minutes. The execution series
+below uses step times, which exclude job setup and cleanup. No CI run was
+triggered.
 
-The M5CI planning ceiling is a user-supplied budget of 628 macOS minutes,
-an unsourced planning input within this repository rather than a newly
-measured CI cost. The brief attributes it to an earlier run at `32ece7f4`;
-that commit's measured reviewed count is 20,841 using the count command below,
-but this lane has no preserved source run ID for its reported timing.
+The coordinator's M5CI planning brief for this measurement task specifies a
+ceiling of 628 macOS minutes and identifies its baseline source as main run
+[35456667007] at `32ece7f4`. That commit's measured reviewed count is
+20,841 using the count command below. The brief itself is not checked into
+this repository. The baseline run's derived macOS family total is 629.52 min
+from measured job timestamps, or 629 min when the aggregate is floored.
+The brief's 628-minute ceiling is retained as the planning budget; its exact
+value is not reproduced by rounding or flooring the preserved timestamps.
+The measured source is preserved in the family table below.
 The target is the measured inventory of 41,091 applicable paths recorded in
 [*PLAN-M5C.md*](../PLAN-M5C.md) and reported by
-`mise run check:test262-inventory`. Against the supplied budget, neither
+`mise run check:test262-inventory`. Against that planning ceiling, neither
 current run fits even at its measured smaller workload. Scaling test262
 alone by path count would ignore fixed cost, classifications, runner spread,
 and the separately measured property bottleneck.
 
+[35456667007]: https://github.com/dahlia/oseo/actions/runs/35456667007
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 
@@ -42,6 +49,28 @@ Each platform total sums only its listed families; Linux's separate `check`
 and the platform-independent aggregation job are excluded. Windows is outside
 this measurement. The `native support` family is the extended native property
 file shards, plus extended package properties on its first shard.
+
+Run 35456667007 at `32ece7f4`, derived minutes from its measured job
+timestamps (20,841 measured reviewed paths):
+
+| Host  | Family            | Jobs | Sum min | Max min | Max/mean |
+| ----- | ----------------- | ---- | ------- | ------- | -------- |
+| macOS | host C sanitizers | 2    | 63.65   | 34.35   | 1.08     |
+| macOS | native            | 3    | 37.48   | 12.65   | 1.01     |
+| macOS | native support    | 12   | 262.82  | 58.55   | 2.67     |
+| macOS | test              | 2    | 39.30   | 37.05   | 1.89     |
+| macOS | test262           | 10   | 226.27  | 25.12   | 1.11     |
+| Linux | host C sanitizers | 1    | 63.02   | 63.02   | 1.00     |
+| Linux | native            | 3    | 40.98   | 14.63   | 1.07     |
+| Linux | native support    | 4    | 223.53  | 78.42   | 1.40     |
+| Linux | test              | 2    | 33.45   | 32.42   | 1.94     |
+| Linux | test262           | 10   | 140.78  | 18.08   | 1.28     |
+
+Derived platform totals: macOS 629.52 min, Linux 501.77 min. Flooring each
+macOS family's sum and maximum gives host C sanitizers 63/34 min, native
+37/12 min, native support 262/58 min, test 39/37 min, and test262 226/25 min.
+The sum of those floored family sums is 627 min; flooring the aggregate
+separately gives 629 min.
 
 Run 36243816479, derived minutes from its measured job timestamps:
 
@@ -76,6 +105,83 @@ Run 36261458909, derived minutes from its measured job timestamps:
 | Linux | native            | 3    | 44.22   | 15.87   | 1.08     |
 
 Derived platform totals: macOS 764.12 min, Linux 578.80 min.
+
+### macOS test262 execution series
+
+The measured series below covers every main workflow run from `32ece7f4`
+through `6b435b4f`, including failed and cancelled runs. Sources are the
+linked runs' measured step `startedAt`/`completedAt` timestamps from
+`gh run view RUN --repo dahlia/oseo --json headSha,jobs`. Execution seconds
+are the derived sum across all ten macOS shards of the step named
+`Run mise run test:test262 --shard N/10`. They exclude job setup and cleanup,
+but retain any startup and builds inside that execution step. Reviewed paths
+are measured from each commit's manifest with the count command below;
+seconds per path are derived by dividing the execution sum by that count.
+Each commit was measured once, with no same-commit repeated sample.
+
+| Commit     | Source run    | Measured paths | Derived execution s | Derived s/path | Observed run result |
+| ---------- | ------------- | -------------- | ------------------- | -------------- | ------------------- |
+| `32ece7f4` | [35456667007] | 20,841         | 13103               | 0.629          | success             |
+| `e99620d5` | [35463308291] | 20,898         | 14123               | 0.676          | success             |
+| `aff3ade3` | [35493049199] | 21,156         | 16096               | 0.761          | success             |
+| `c56ef034` | [35744754987] | 21,156         | 16605               | 0.785          | success             |
+| `09587080` | [35767988349] | 21,214         | 16428               | 0.774          | success             |
+| `475dfbad` | [35865767695] | 21,265         | 15761               | 0.741          | success             |
+| `970d6207` | [35928647398] | 21,265         | 16590               | 0.780          | success             |
+| `5255312d` | [35956640498] | 21,265         | 16873               | 0.793          | success             |
+| `a7b3ba2b` | [36009350844] | 21,312         | 15895               | 0.746          | success             |
+| `890bb6dd` | [36083917728] | 21,341         | 16956               | 0.795          | failure             |
+| `18e860a0` | [36111689857] | 21,312         | incomplete          | not comparable | cancelled           |
+| `c8188414` | [36115335755] | 21,312         | 18666               | 0.876          | success             |
+| `d6742c11` | [36134286493] | 21,341         | 16724               | 0.784          | success             |
+| `97022608` | [36199093039] | 21,341         | 16290               | 0.763          | success             |
+| `1ca8353a` | [36226406621] | 21,383         | 16159               | 0.756          | success             |
+| `00153abe` | [36243816479] | 21,383         | 18935               | 0.886          | success             |
+| `c9b3cc80` | [36261458909] | 21,383         | 18686               | 0.874          | success             |
+| `6b435b4f` | [36300567111] | 21,383         | 17678               | 0.827          | failure             |
+
+The cancelled run at `18e860a0` completed only shards 4/10, 7/10, and 8/10;
+it has no complete execution sum or comparable per-path rate. All ten macOS
+test262 execution steps succeeded in each other listed run, including the
+failed runs. Run 36083917728 failed its Linux Node test job, and run
+36300567111 failed its macOS Node test job; those failures are outside the
+measured test262 steps.
+
+The derived step-level per-path cost rose from 0.629-0.676 s/path in the
+first two runs to an observed 0.741-0.886 s/path band from `aff3ade3` onward.
+The measured path count grew from 20,841 to 21,383, a derived increase of
+about 2.6%. The 0.741-0.886 band is the observed run-to-run spread, not a
+trend within that band. The cause of the higher per-path cost is not yet
+identified; runner variance and Zig cache hits are not improvements.
+
+Against run 35456667007, run 36243816479 adds a derived 99.82 min of macOS
+test262 job time, of which 97.20 min is inside the measured execution steps
+(`(18935 - 13103) / 60`). Holding the older step rate constant while adding
+542 paths accounts for only a derived 5.68 min
+(`13103 * 542 / 20841 / 60`). Run 36261458909 similarly adds a derived
+94.13 min of job time and 93.05 min of execution-step time. Thus most of the
+increase in macOS test262 minutes relative to the 226.27-minute test262
+family in the brief's baseline source run is per-path execution cost, rather
+than corpus size or job fixed cost. The 628-minute ceiling covers all five
+macOS families; this decomposition applies only to its test262 family. This is
+a workload-normalized observation, not an attribution to a particular
+implementation change or a measured isolated speedup.
+
+[35463308291]: https://github.com/dahlia/oseo/actions/runs/35463308291
+[35493049199]: https://github.com/dahlia/oseo/actions/runs/35493049199
+[35744754987]: https://github.com/dahlia/oseo/actions/runs/35744754987
+[35767988349]: https://github.com/dahlia/oseo/actions/runs/35767988349
+[35865767695]: https://github.com/dahlia/oseo/actions/runs/35865767695
+[35928647398]: https://github.com/dahlia/oseo/actions/runs/35928647398
+[35956640498]: https://github.com/dahlia/oseo/actions/runs/35956640498
+[36009350844]: https://github.com/dahlia/oseo/actions/runs/36009350844
+[36083917728]: https://github.com/dahlia/oseo/actions/runs/36083917728
+[36111689857]: https://github.com/dahlia/oseo/actions/runs/36111689857
+[36115335755]: https://github.com/dahlia/oseo/actions/runs/36115335755
+[36134286493]: https://github.com/dahlia/oseo/actions/runs/36134286493
+[36199093039]: https://github.com/dahlia/oseo/actions/runs/36199093039
+[36226406621]: https://github.com/dahlia/oseo/actions/runs/36226406621
+[36300567111]: https://github.com/dahlia/oseo/actions/runs/36300567111
 
 ### Fixed cost and cache evidence
 
@@ -430,11 +536,12 @@ shards. They do not establish a speedup between these commits.
 
 ### Reproducing the CI measurements
 
-Retrieve successful main runs before choosing samples, and read the reviewed
-count from each commit rather than using the current checkout:
+Retrieve main runs, retaining failed and cancelled runs when reproducing the
+execution series, and read the reviewed count from each commit rather than
+using the current checkout:
 
 ~~~~ sh
-gh run list --repo dahlia/oseo --branch main --status success
+gh run list --repo dahlia/oseo --branch main --limit 100
 run_id=36261458909
 sha=$(gh run view "$run_id" --repo dahlia/oseo --json headSha \
   --jq .headSha)
