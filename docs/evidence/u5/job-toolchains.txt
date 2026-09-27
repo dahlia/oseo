@@ -1,0 +1,71 @@
+U5 toolchain inventory of run 36312192623
+=========================================
+
+Job names measured with:
+  gh run view 36312192623 --repo dahlia/oseo --json jobs --jq '.jobs[].name'
+
+The toolchain each job selects is read from .github/workflows/main.yaml
+and the mise task definitions at af9bb68c. The host C sanitizer jobs pass
+toolchain: host-cc to the runtime archive action and their
+test:sanitizer:* tasks set OSEO_NATIVE_TOOLCHAIN=host-cc, so Zig is not
+their compiler. Every other test-family job uses the default Zig
+toolchain.
+
+The Linux-only check job, the platform-independent native aggregation job
+and the Windows jobs are excluded, matching the family tables at the start
+of gate-cost-baseline.md. Counts: macOS 29 jobs of which 27 select Zig;
+Linux 20 jobs of which 19 select Zig.
+
+excluded | check                                    | not a test-family job
+Linux    | host C sanitizers (Linux)                | host-cc (no Zig)
+macOS    | host C sanitizers (macOS, native)        | host-cc (no Zig)
+macOS    | host C sanitizers (macOS, property)      | host-cc (no Zig)
+excluded | native                                   | not a test-family job
+Linux    | native (linux-x86_64-gnu, 1/3)           | zig
+Linux    | native (linux-x86_64-gnu, 2/3)           | zig
+Linux    | native (linux-x86_64-gnu, 3/3)           | zig
+macOS    | native (macos-aarch64, 1/3)              | zig
+macOS    | native (macos-aarch64, 2/3)              | zig
+macOS    | native (macos-aarch64, 3/3)              | zig
+Linux    | native support (linux-x86_64-gnu, 1/4)   | zig
+Linux    | native support (linux-x86_64-gnu, 2/4)   | zig
+Linux    | native support (linux-x86_64-gnu, 3/4)   | zig
+Linux    | native support (linux-x86_64-gnu, 4/4)   | zig
+macOS    | native support (macos-aarch64, 10/12)    | zig
+macOS    | native support (macos-aarch64, 11/12)    | zig
+macOS    | native support (macos-aarch64, 1/12)     | zig
+macOS    | native support (macos-aarch64, 12/12)    | zig
+macOS    | native support (macos-aarch64, 2/12)     | zig
+macOS    | native support (macos-aarch64, 3/12)     | zig
+macOS    | native support (macos-aarch64, 4/12)     | zig
+macOS    | native support (macos-aarch64, 5/12)     | zig
+macOS    | native support (macos-aarch64, 6/12)     | zig
+macOS    | native support (macos-aarch64, 7/12)     | zig
+macOS    | native support (macos-aarch64, 8/12)     | zig
+macOS    | native support (macos-aarch64, 9/12)     | zig
+Linux    | test262 (linux-x86_64-gnu, 10/10)        | zig
+Linux    | test262 (linux-x86_64-gnu, 1/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 2/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 3/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 4/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 5/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 6/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 7/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 8/10)         | zig
+Linux    | test262 (linux-x86_64-gnu, 9/10)         | zig
+macOS    | test262 (macos-aarch64, 10/10)           | zig
+macOS    | test262 (macos-aarch64, 1/10)            | zig
+macOS    | test262 (macos-aarch64, 2/10)            | zig
+macOS    | test262 (macos-aarch64, 3/10)            | zig
+macOS    | test262 (macos-aarch64, 4/10)            | zig
+macOS    | test262 (macos-aarch64, 5/10)            | zig
+macOS    | test262 (macos-aarch64, 6/10)            | zig
+macOS    | test262 (macos-aarch64, 7/10)            | zig
+macOS    | test262 (macos-aarch64, 8/10)            | zig
+macOS    | test262 (macos-aarch64, 9/10)            | zig
+macOS    | test (macos-latest, deno)                | zig
+macOS    | test (macos-latest, node)                | zig
+Linux    | test (ubuntu-latest, deno)               | zig
+Linux    | test (ubuntu-latest, node)               | zig
+excluded | test (windows-latest, deno)              | Windows, out of scope
+excluded | test (windows-latest, node)              | Windows, out of scope
