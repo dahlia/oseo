@@ -201,22 +201,18 @@ function modelArbitrary(
       negated: fc.boolean(),
       set: fc.constantFrom<ClassSet>("digit", "space", "word"),
     })
-    .map(
-      (record): ClassEscapeModel => ({
-        kind: "class-escape",
-        negated: record.negated,
-        set: record.set,
-      }),
-    );
+    .map((record): ClassEscapeModel => ({
+      kind: "class-escape",
+      negated: record.negated,
+      set: record.set,
+    }));
   const range = fc
     .tuple(fc.constantFrom(...pool), fc.constantFrom(...pool))
-    .map(
-      ([first, second]): RangeModel => ({
-        from: Math.min(first, second),
-        kind: "range",
-        to: Math.max(first, second),
-      }),
-    );
+    .map(([first, second]): RangeModel => ({
+      from: Math.min(first, second),
+      kind: "range",
+      to: Math.max(first, second),
+    }));
   const classModel = fc
     .record({
       items: fc.array(fc.oneof(character, classEscape, range), {
@@ -224,13 +220,11 @@ function modelArbitrary(
       }),
       negated: fc.boolean(),
     })
-    .map(
-      (record): ClassModel => ({
-        items: record.items,
-        kind: "class",
-        negated: record.negated,
-      }),
-    );
+    .map((record): ClassModel => ({
+      items: record.items,
+      kind: "class",
+      negated: record.negated,
+    }));
   const assertion = fc
     .constantFrom<AssertionKind>(
       "end",
@@ -241,13 +235,11 @@ function modelArbitrary(
     .map((value): AssertionModel => ({ assertion: value, kind: "assert" }));
   const reference = fc
     .record({ named: fc.boolean(), slot: fc.nat({ max: 7 }) })
-    .map(
-      (record): ReferenceModel => ({
-        kind: "reference",
-        named: record.named,
-        slot: record.slot,
-      }),
-    );
+    .map((record): ReferenceModel => ({
+      kind: "reference",
+      named: record.named,
+      slot: record.slot,
+    }));
   const { term } = fc.letrec<{
     alternatives: readonly (readonly TermModel[])[];
     atom: TermModel;
@@ -274,14 +266,12 @@ function modelArbitrary(
           capturing: fc.boolean(),
           named: fc.boolean(),
         })
-        .map(
-          (record): GroupModel => ({
-            body: record.body,
-            capturing: record.capturing,
-            kind: "group",
-            named: record.capturing && record.named,
-          }),
-        ),
+        .map((record): GroupModel => ({
+          body: record.body,
+          capturing: record.capturing,
+          kind: "group",
+          named: record.capturing && record.named,
+        })),
     ),
     term: fc.oneof(
       {
@@ -297,14 +287,12 @@ function modelArbitrary(
           body: tie("alternatives"),
           negated: fc.boolean(),
         })
-        .map(
-          (record): LookaroundModel => ({
-            behind: record.behind,
-            body: record.body,
-            kind: "look",
-            negated: record.negated,
-          }),
-        ),
+        .map((record): LookaroundModel => ({
+          behind: record.behind,
+          body: record.body,
+          kind: "look",
+          negated: record.negated,
+        })),
       fc
         .record({
           atom: tie("atom"),
@@ -312,18 +300,16 @@ function modelArbitrary(
           minimum: fc.nat({ max: 3 }),
           span: fc.oneof(fc.nat({ max: 3 }), fc.constant(-1)),
         })
-        .map(
-          (record): RepeatModel => ({
-            atom: record.atom,
-            greedy: record.greedy,
-            kind: "repeat",
-            maximum:
-              record.span < 0
-                ? Number.POSITIVE_INFINITY
-                : record.minimum + record.span,
-            minimum: record.minimum,
-          }),
-        ),
+        .map((record): RepeatModel => ({
+          atom: record.atom,
+          greedy: record.greedy,
+          kind: "repeat",
+          maximum:
+            record.span < 0
+              ? Number.POSITIVE_INFINITY
+              : record.minimum + record.span,
+          minimum: record.minimum,
+        })),
     ),
   }));
   return fc

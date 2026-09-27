@@ -108,30 +108,26 @@ function lazyKeyed<T>(build: (key: string) => T): (key: string) => T {
   };
 }
 
-const categoryPartition = lazy(
-  (): CodePointPartition =>
-    decodeCodePointPartition(
-      encodedGeneralCategoryPartition,
-      generalCategoryNames.length,
-    ),
+const categoryPartition = lazy((): CodePointPartition =>
+  decodeCodePointPartition(
+    encodedGeneralCategoryPartition,
+    generalCategoryNames.length,
+  ),
 );
-const combiningPartition = lazy(
-  (): CodePointPartition =>
-    decodeCodePointPartition(
-      encodedCombiningClassPartition,
-      combiningClassValues.length,
-    ),
+const combiningPartition = lazy((): CodePointPartition =>
+  decodeCodePointPartition(
+    encodedCombiningClassPartition,
+    combiningClassValues.length,
+  ),
 );
-const scriptPartitionTable = lazy(
-  (): CodePointPartition =>
-    decodeCodePointPartition(encodedScriptPartition, scriptNames.length),
+const scriptPartitionTable = lazy((): CodePointPartition =>
+  decodeCodePointPartition(encodedScriptPartition, scriptNames.length),
 );
-const scriptExtensionsPartitionTable = lazy(
-  (): CodePointPartition =>
-    decodeCodePointPartition(
-      encodedScriptExtensionsPartition,
-      scriptExtensionsGroups.length,
-    ),
+const scriptExtensionsPartitionTable = lazy((): CodePointPartition =>
+  decodeCodePointPartition(
+    encodedScriptExtensionsPartition,
+    scriptExtensionsGroups.length,
+  ),
 );
 const scriptExtensionsGroupIndices = lazy((): readonly (readonly number[])[] =>
   scriptExtensionsGroups.map((group) =>
@@ -297,9 +293,8 @@ export function ecma262UnicodePropertySet(
   return undefined;
 }
 
-const binaryPropertySetFor = lazyKeyed(
-  (name: string): CodePointSet =>
-    decodeCodePointSet(binaryPropertySets[name] ?? ""),
+const binaryPropertySetFor = lazyKeyed((name: string): CodePointSet =>
+  decodeCodePointSet(binaryPropertySets[name] ?? ""),
 );
 
 /**
@@ -334,9 +329,8 @@ export function generalCategorySet(value: string): CodePointSet | undefined {
   return generalCategorySetFor(value);
 }
 
-const scriptSetFor = lazyKeyed(
-  (value: string): CodePointSet =>
-    partitionSet(scriptPartitionTable(), new Set([scriptNames.indexOf(value)])),
+const scriptSetFor = lazyKeyed((value: string): CodePointSet =>
+  partitionSet(scriptPartitionTable(), new Set([scriptNames.indexOf(value)])),
 );
 
 /** The code points whose Script is one canonical value, or `undefined`. */
@@ -399,34 +393,29 @@ export function scriptExtensionsOf(codePoint: number): readonly string[] {
   return indices.map((index) => scriptNames[index] ?? "Unknown");
 }
 
-const simpleCaseFoldingTable = lazy(
-  (): ReadonlyMap<number, number> =>
-    decodeCodePointMap(encodedSimpleCaseFolding),
+const simpleCaseFoldingTable = lazy((): ReadonlyMap<number, number> =>
+  decodeCodePointMap(encodedSimpleCaseFolding),
 );
-const fullCaseFoldingTable = lazy(
-  (): ReadonlyMap<number, readonly number[]> =>
-    decodeSequenceMap(encodedFullCaseFolding),
+const fullCaseFoldingTable = lazy((): ReadonlyMap<number, readonly number[]> =>
+  decodeSequenceMap(encodedFullCaseFolding),
 );
-const simpleLowercaseTable = lazy(
-  (): ReadonlyMap<number, number> => decodeCodePointMap(encodedSimpleLowercase),
+const simpleLowercaseTable = lazy((): ReadonlyMap<number, number> =>
+  decodeCodePointMap(encodedSimpleLowercase),
 );
-const simpleUppercaseTable = lazy(
-  (): ReadonlyMap<number, number> => decodeCodePointMap(encodedSimpleUppercase),
+const simpleUppercaseTable = lazy((): ReadonlyMap<number, number> =>
+  decodeCodePointMap(encodedSimpleUppercase),
 );
-const simpleTitlecaseTable = lazy(
-  (): ReadonlyMap<number, number> => decodeCodePointMap(encodedSimpleTitlecase),
+const simpleTitlecaseTable = lazy((): ReadonlyMap<number, number> =>
+  decodeCodePointMap(encodedSimpleTitlecase),
 );
-const fullLowercaseTable = lazy(
-  (): ReadonlyMap<number, readonly number[]> =>
-    decodeSequenceMap(encodedFullLowercase),
+const fullLowercaseTable = lazy((): ReadonlyMap<number, readonly number[]> =>
+  decodeSequenceMap(encodedFullLowercase),
 );
-const fullUppercaseTable = lazy(
-  (): ReadonlyMap<number, readonly number[]> =>
-    decodeSequenceMap(encodedFullUppercase),
+const fullUppercaseTable = lazy((): ReadonlyMap<number, readonly number[]> =>
+  decodeSequenceMap(encodedFullUppercase),
 );
-const fullTitlecaseTable = lazy(
-  (): ReadonlyMap<number, readonly number[]> =>
-    decodeSequenceMap(encodedFullTitlecase),
+const fullTitlecaseTable = lazy((): ReadonlyMap<number, readonly number[]> =>
+  decodeSequenceMap(encodedFullTitlecase),
 );
 
 /**
@@ -494,11 +483,11 @@ export function fullTitlecase(codePoint: number): readonly number[] {
   return fullTitlecaseTable().get(codePoint) ?? [simpleTitlecase(codePoint)];
 }
 
-const wordCharacterSet = lazy(
-  (): CodePointSet => decodeCodePointSet(encodedWordCharacters),
+const wordCharacterSet = lazy((): CodePointSet =>
+  decodeCodePointSet(encodedWordCharacters),
 );
-const caseInsensitiveWordCharacterSet = lazy(
-  (): CodePointSet => decodeCodePointSet(encodedCaseInsensitiveWordCharacters),
+const caseInsensitiveWordCharacterSet = lazy((): CodePointSet =>
+  decodeCodePointSet(encodedCaseInsensitiveWordCharacters),
 );
 
 /** The ECMAScript word characters of a pattern without `i` and `u` or `v`. */

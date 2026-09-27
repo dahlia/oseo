@@ -166,13 +166,11 @@ const propertyExpressionArbitrary = fc.oneof(
       property: fc.constantFrom(...generalCategoryPropertyNames),
       value: fc.constantFrom(...generalCategoryValueAliases),
     })
-    .map(
-      ({ property, value }): PropertyExpression => ({
-        oracle: "host",
-        property,
-        value,
-      }),
-    ),
+    .map(({ property, value }): PropertyExpression => ({
+      oracle: "host",
+      property,
+      value,
+    })),
   fc
     .record({
       property: fc.constantFrom(
@@ -181,13 +179,11 @@ const propertyExpressionArbitrary = fc.oneof(
       ),
       value: fc.constantFrom(...hostScriptValueAliases),
     })
-    .map(
-      ({ property, value }): PropertyExpression => ({
-        oracle: "host",
-        property,
-        value,
-      }),
-    ),
+    .map(({ property, value }): PropertyExpression => ({
+      oracle: "host",
+      property,
+      value,
+    })),
   fc
     .record({
       property: fc.constantFrom(
@@ -196,13 +192,11 @@ const propertyExpressionArbitrary = fc.oneof(
       ),
       value: fc.constantFrom(...emptyScriptValueAliases),
     })
-    .map(
-      ({ property, value }): PropertyExpression => ({
-        oracle: "empty-set",
-        property,
-        value,
-      }),
-    ),
+    .map(({ property, value }): PropertyExpression => ({
+      oracle: "empty-set",
+      property,
+      value,
+    })),
 );
 
 test("generated Unicode property escapes follow independent oracles", () => {

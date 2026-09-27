@@ -592,12 +592,10 @@ test("the rendered module is a pure function of its tables", async () => {
   );
   const contents = new Map(
     await Promise.all(
-      manifest.files.map(
-        async (input): Promise<readonly [string, string]> => [
-          input.name,
-          await readFile(join(packageRoot, input.path), "utf8"),
-        ],
-      ),
+      manifest.files.map(async (input): Promise<readonly [string, string]> => [
+        input.name,
+        await readFile(join(packageRoot, input.path), "utf8"),
+      ]),
     ),
   );
   const tables = buildUnicodeTables(manifest, contents);

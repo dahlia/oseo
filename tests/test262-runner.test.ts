@@ -212,13 +212,11 @@ function reviewedSubset(paths: readonly string[]): ReviewedTest262Subset {
   return {
     suiteRevision: revision,
     supportedFeatures: [],
-    tests: paths.map(
-      (path): ReviewedTest262Entry => ({
-        dependencies: ["functions"],
-        expectedClassification: "pass",
-        path,
-      }),
-    ),
+    tests: paths.map((path): ReviewedTest262Entry => ({
+      dependencies: ["functions"],
+      expectedClassification: "pass",
+      path,
+    })),
   };
 }
 

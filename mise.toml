@@ -8,12 +8,12 @@ postinstall = "mise run install-hooks"
 
 [tools]
 "aqua:dahlia/hongdown" = "0.5.3"
-"aqua:nushell/nushell" = "0.114.1"
+"aqua:nushell/nushell" = "0.116.0"
 actionlint = "1.7.12"
-aube = "1.26.0"
-deno = "2.9.2"
-node = "24.18.0"
-oxfmt = "0.59.0"
+aube = "2.5.0"
+deno = "2.9.7"
+node = "24.21.0"
+oxfmt = "0.70.0"
 shellcheck = "0.11.0"
 zig = "0.16.0"
 

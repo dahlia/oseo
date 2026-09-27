@@ -5,7 +5,12 @@ Status
 ------
 
 Accepted. The execution-target portion is superseded by
-[ADR 0014](./0014-native-target-support.md).
+[ADR 0014](./0014-native-target-support.md). The recorded host and tool pins
+have since moved in [*mise.toml*](../../mise.toml); a superseding record that
+names the current pins and their evidence is pending in
+[issue #1].
+
+[issue #1]: https://github.com/dahlia/oseo/issues/1
 
 
 Context

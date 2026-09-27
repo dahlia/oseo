@@ -110,13 +110,11 @@ function atomArbitrary(depth: number): fc.Arbitrary<Atom> {
         member: fc.constantFrom(...patternCharacters),
         negated: fc.boolean(),
       })
-      .map(
-        (record): Atom => ({
-          kind: "class",
-          member: record.member,
-          negated: record.negated,
-        }),
-      ),
+      .map((record): Atom => ({
+        kind: "class",
+        member: record.member,
+        negated: record.negated,
+      })),
     fc.constant<Atom>({ kind: "dot" }),
   ];
   if (depth === 0) return fc.oneof(...leaves);
@@ -127,13 +125,11 @@ function atomArbitrary(depth: number): fc.Arbitrary<Atom> {
         body: disjunctionArbitrary(depth - 1),
         name: fc.constantFrom<string | undefined>(undefined, "g"),
       })
-      .map(
-        (record): Atom => ({
-          body: record.body,
-          kind: "group",
-          name: record.name,
-        }),
-      ),
+      .map((record): Atom => ({
+        body: record.body,
+        kind: "group",
+        name: record.name,
+      })),
   );
 }
 
