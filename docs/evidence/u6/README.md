@@ -12,6 +12,26 @@ main runs [36243816479] at `00153abe` and [36261458909] at `c9b3cc80`.
 The measured reviewed count is 21,383 in each run. Native property inventories
 are measured at 127 and 128 files, respectively. No manifest is regenerated.
 
+*ci-36343919872-linux-1.json.txt* retains the interrupted branch job's measured
+case durations, conclusion, counts, reported command/marker/failure timestamps,
+and reported interruption-example count. Its scope is that one failed Linux
+job, not the whole run. The historical compact inputs were regenerated with the
+same extractor schema, including native counts and package-to-native intervals;
+their case durations and the checked-in scheduling weights are unchanged.
+
+The single-job input was produced from run metadata filtered to completed job
+`108689202335`, retaining `headSha`. Its log was fetched with:
+
+~~~~ sh
+gh api --allow-escape-sequences \
+  repos/dahlia/oseo/actions/jobs/108689202335/logs > job.log
+~~~~
+
+It was packaged as ZIP member *1\_native support (linux-x86\_64-gnu, 1\_4).txt*;
+the extractor received that filtered metadata and single-entry archive with run
+ID `36343919872` and the registration index for `e98edd15`. This avoids
+requesting unfinished jobs or the unavailable run-level archive.
+
 Fetch the source API and log archive with:
 
 ~~~~ sh
@@ -59,7 +79,8 @@ The observed `objectsBuilt` counter is 96 to 128 per ten-way test262 shard
 in every retained run, with a derived sum of 1,117 per target per run.
 Every counter is in the compact inputs. This measures current harness-object
 preparation counts, not their macOS wall cost or their growth at 41,091 paths.
-The after run will retain these counters too, so repeated preparation from
+The first branch run retains these counters too: the derived target sum
+is 1,312, an increase of 195 objects per target. Repeated preparation from
 raising totals stays visible instead of being treated as fixed setup alone.
 
 This additional replay estimates macOS execution max/sum at 50.81/295.62
@@ -97,6 +118,14 @@ Within each shard expensive files start first. Cost-sharded execution uses
 Node's `run({ files })` API, because its CLI sorts file arguments again.
 The wrapper logs the selected files and actual worker count for CI audits.
 Every input appears once.
+
+The first branch experiment interrupted Linux own-key at its unchanged
+property deadline. The [failed-run analysis](./failed-branch-run.md) preserves
+its measured durations, incomplete budget, and concurrent-file placement.
+The corrected Linux candidate reserves a singleton first shard for own-key
+when the total exceeds one and raises CI's total from four to five; four
+cost-batched shards still execute every remaining file. A singleton uses one
+file worker. macOS assignment and totals remain unchanged by the correction.
 
 The positional replay estimates macOS tails of 67.13/50.73 minutes versus
 observed job elapsed times of 68.13/51.58 minutes in the two source runs.
@@ -166,11 +195,12 @@ leaves a derived 33.22-minute margin against the 120-minute timeout, so U6
 raises the total to twelve for more margin as the corpus doubles. The least
 favorable derived twelve-shard estimate leaves 47.53 minutes, an increase of
 14.31 minutes of margin for 1.89 minutes of fixed cost from run 36261458909.
-The selected combination is batch native assignment at unchanged totals plus
-twelve test262 shards on each target. The estimated native execution saving
-offsets the added macOS fixed cost. Extra harness preparation and cache effects
-are unmeasured; the single CI run must compare combined native/test262 workload
-to verify the few-minute limit.
+The initial combination was batch native assignment at unchanged totals plus
+twelve test262 shards on each target. The Linux correction above supersedes
+that platform's native total; it adds no macOS job. The estimated macOS native
+execution saving offsets the added macOS fixed cost. Extra harness preparation
+and cache effects are unmeasured; the single CI run must compare combined
+native/test262 workload to verify the few-minute limit.
 
 Across all macOS families, the measured baseline's derived sums are
 795.45/764.12 minutes at the current count and the plan projects
@@ -195,16 +225,32 @@ from input order. The test262 checked-in manifest test does the same union and
 disjointness checks at CI's raised total twelve. Empty native partitions never
 launch Node's default discovery, which would otherwise repeat the full suite.
 
-Local validation passed with
-`ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-shard-sizing MISE_JOBS=1`:
-`mise run check` passed; `mise run test` observed 1,394 Node passes, zero
-failures, five skips and two
-existing sanitizer TODOs, alongside complete execution of 21,383 test262
-paths; `mise run test:property:extended` observed 224 native passes with zero
-failures, skips or TODOs. These are correctness gates, not cold/warm timing
-experiments or evidence of performance improvement. The single branch CI
-experiment is pending. CI comparison
-must retain every shard, compare each source job's archive cold/warm state,
-and separate fixed setup from execution. One after run cannot separate runner
-variance from improvement; the two historical runs also differ in source and
-archive state, so their spread is not a pure hardware-variance measurement.
+Local correctness gates used
+`ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-shard-sizing MISE_JOBS=1`.
+At the first commit, `mise run check` passed, `mise run test` observed
+1,394 Node passes, zero failures, five skips, two existing sanitizer TODOs,
+and 21,383/21,383 test262 paths, and `mise run test:property:extended`
+observed 224 native passes. After the Linux correction, the extended gate
+again observed 224 passes, zero failures/skips/TODOs in 3,138.99 seconds.
+The focused
+`node --test tests/native-shard.test.ts tests/native-test-workers.test.ts`
+command observed fourteen passes, including the wrapper's generated signal
+tests. The corrected full `mise run test` exited zero in 5,668.60 seconds: Node
+reported 1,403 tests, 1,396 passes, zero failures, five skips and the same two
+TODOs; native fixtures matched 264/264 outputs and 265 cross-target builds
+passed; test262 reported 21,383/21,383 paths with the unchanged
+classifications, pool eight, and zero retries. Its local test262 objects were
+reused (172 reused, zero built). These timings and cache observations are
+correctness-gate context, not isolated scheduling improvements. Final
+`mise run check` passed in 65.87 seconds. Review and the explicitly authorized
+second branch CI run remain pending. The first branch experiment 36343919872
+failed its Linux property deadline and has incomplete generated work. Every
+native-support/test262 CI shard and its archive state is retained below.
+
+The completed failed experiment's full retained input is
+*ci-36343919872.json.txt*. *first-branch-comparison.md* retains every native
+support/test262 shard on both hosts against the closest before run, plus the
+other macOS job durations and full-workload lower bound. Reproduce its tables
+with *compare-ci.py* and the two compact inputs; all aggregates are derived
+from measured durations/counters. The first-run Linux interruption prevents a
+complete verdict, despite unchanged selected-file unions and path counts.

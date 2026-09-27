@@ -329,19 +329,23 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 4
+            total: 5
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 4
+            total: 5
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 4
+            total: 5
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 4
+            total: 5
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 5
+            total: 5
           - os: macos-15
             target: macos-aarch64
             shard: 1

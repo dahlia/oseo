@@ -6,7 +6,7 @@ import { nativeTestArguments } from "./native-shard.ts";
 
 import { nativeTestWorkers } from "./native-test-workers.ts";
 
-const workers = nativeTestWorkers(
+const workerLimit = nativeTestWorkers(
   availableParallelism(),
   process.env.GITHUB_ACTIONS === "true",
 );
@@ -15,6 +15,7 @@ const sharded = input.some(
   (arg) => arg === "--shard" || arg.startsWith("--shard="),
 );
 const args = nativeTestArguments(input, process.platform);
+const workers = sharded ? Math.min(workerLimit, args.length) : workerLimit;
 if (sharded)
   console.log(`native-shard ${JSON.stringify({ workers, files: args })}`);
 if (args.length === 0 && process.argv.length > 2) process.exit(0);

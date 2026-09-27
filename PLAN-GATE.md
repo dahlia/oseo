@@ -620,6 +620,9 @@ Projected cost at the M5c edition denominator
 The tables below preserve the measured ten-shard baseline. U6 raises current
 CI test262 totals to twelve; its tail, fixed-cost, and combined-workload
 comparison is in [U6 evidence](./docs/evidence/u6/README.md).
+The corrected Linux native-support total is five, including a singleton
+own-key shard; the historical rates and tables below retain their source
+run totals.
 
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured

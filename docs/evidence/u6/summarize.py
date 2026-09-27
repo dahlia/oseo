@@ -88,3 +88,13 @@ for run in runs:
                           round(old['jobSeconds'] / 60, 2),
                           round(completion(old['files'], costs, width) / 60, 2),
                           round(after[i - 1], 2))
+        if host == 'linux-x86_64-gnu':
+            isolated = 'tests/property/m5-object-own-keys.property.test.ts'
+            remaining = {path: cost for path, cost in costs.items()
+                         if path != isolated}
+            parts = [[isolated]] + partition(
+                remaining, table, width, len(jobs), True)
+            after = [completion(part, costs, width) / 60 for part in parts]
+            print('singleton + batch', len(parts), 'max/sum/delta:',
+                  round(max(after), 2), round(sum(after), 2),
+                  round(sum(after) - sum(before), 2))

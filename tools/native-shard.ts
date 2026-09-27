@@ -24,6 +24,7 @@ export function nativeShardModel(platform: string): NativeShardModel {
  * Start expensive files first, and assign each batch to the shortest modeled
  * shard. Model widths come from CI, never local CPU availability. Unknown
  * files use the table's median weight; ties use path order then shard index.
+ * Linux own-key uses a singleton first shard when the total exceeds one.
  */
 export function selectNativeTestShard(
   files: readonly string[],
@@ -32,6 +33,18 @@ export function selectNativeTestShard(
 ): readonly string[] {
   if (new Set(files).size !== files.length) {
     throw new Error("Native shard file arguments must be unique.");
+  }
+  // This property approached its deadline in two historical Linux runs and
+  // exceeded it when cost batching put other heavyweight files beside it.
+  // Reserve a singleton shard whenever a partition can provide one.
+  const isolated = "tests/property/m5-object-own-keys.property.test.ts";
+  if (platform === "linux" && shard.total > 1 && files.includes(isolated)) {
+    if (shard.index === 1) return [isolated];
+    return selectNativeTestShard(
+      files.filter((path) => path !== isolated),
+      { index: shard.index - 1, total: shard.total - 1 },
+      platform,
+    );
   }
   const { costs, width } = nativeShardModel(platform);
   // Larger totals have one batch per populated shard; later indices are empty.

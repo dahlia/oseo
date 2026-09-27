@@ -33,6 +33,7 @@ shard 3 observed job / old model / new model: 38.85 38.37 55.44
 shard 4 observed job / old model / new model: 60.98 60.36 55.04
 batch 5 max/sum/delta: 54.77 239.61 6.25
 batch 6 max/sum/delta: 54.77 240.91 7.54
+singleton + batch 5 max/sum/delta: 54.77 261.53 28.16
 
 Run 36261458909
 macos-aarch64 native support job/runner/outside-runner sum: 284.85 274.18 10.67
@@ -67,6 +68,7 @@ shard 3 observed job / old model / new model: 42.38 41.92 56.95
 shard 4 observed job / old model / new model: 55.03 54.47 58.37
 batch 5 max/sum/delta: 55.43 250.77 5.32
 batch 6 max/sum/delta: 55.43 251.58 6.13
+singleton + batch 5 max/sum/delta: 55.43 271.02 25.58
 
 Run 36312192623
 macos-aarch64 native support job/runner/outside-runner sum: 306.93 295.97 10.96
@@ -101,3 +103,4 @@ shard 3 observed job / old model / new model: 62.33 61.94 53.82
 shard 4 observed job / old model / new model: 49.27 48.67 58.58
 batch 5 max/sum/delta: 51.08 224.49 -2.48
 batch 6 max/sum/delta: 39.08 224.37 -2.6
+singleton + batch 5 max/sum/delta: 54.85 241.35 14.38

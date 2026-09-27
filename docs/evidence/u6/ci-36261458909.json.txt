@@ -5,8 +5,10 @@
     {
       "name": "native support (linux-x86_64-gnu, 2/4)",
       "id": 108457960740,
+      "conclusion": "success",
       "jobSeconds": 3795.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:23.6598440Z",
       "files": {
         "tests/property/m5-aggregate-error.property.test.ts": [
           1.509165,
@@ -124,13 +126,24 @@
           354325.654931
         ]
       },
-      "nativeRunnerMilliseconds": 3770707.985606
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 51,
+        "pass": 51,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 3770707.985606,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 4/12)",
       "id": 108457960741,
+      "conclusion": "success",
       "jobSeconds": 1723.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:09:02.9718410Z",
       "files": {
         "tests/property/m5-array-binding.property.test.ts": [
           1.822042,
@@ -175,13 +188,25 @@
           537150.959917
         ]
       },
-      "nativeRunnerMilliseconds": 1664842.147583
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 20,
+        "pass": 20,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1664842.147583,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (linux-x86_64-gnu, 1/4)",
       "id": 108457960742,
+      "conclusion": "success",
       "jobSeconds": 5221.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:38.1236491Z",
+      "packageBeforeNativeSeconds": 12.3911,
       "files": {
         "tests/property/m4-async.property.test.ts": [
           462721.63453
@@ -303,13 +328,24 @@
           468490.332107
         ]
       },
-      "nativeRunnerMilliseconds": 5181992.112289
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 55,
+        "pass": 55,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 5181992.112289,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 2/12)",
       "id": 108457960753,
+      "conclusion": "success",
       "jobSeconds": 1319.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:33:05.7904790Z",
       "files": {
         "tests/property/m5-aggregate-error.property.test.ts": [
           1.082667,
@@ -353,13 +389,24 @@
           289470.510291
         ]
       },
-      "nativeRunnerMilliseconds": 1263124.19075
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1263124.19075,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 7/12)",
       "id": 108457960758,
+      "conclusion": "success",
       "jobSeconds": 1283.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:58.6203510Z",
       "files": {
         "tests/property/m5-array-prototype-change-by-copy.property.test.ts": [
           358936.856292
@@ -399,13 +446,25 @@
           154264.886459
         ]
       },
-      "nativeRunnerMilliseconds": 1227575.036834
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1227575.036834,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 1/12)",
       "id": 108457960760,
+      "conclusion": "success",
       "jobSeconds": 1242.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:30:13.4639990Z",
+      "packageBeforeNativeSeconds": 9.29136,
       "files": {
         "tests/property/m4-async.property.test.ts": [
           282436.989917
@@ -451,13 +510,24 @@
           279253.929417
         ]
       },
-      "nativeRunnerMilliseconds": 1185242.966083
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 21,
+        "pass": 21,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1185242.966083,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (linux-x86_64-gnu, 4/4)",
       "id": 108457960764,
+      "conclusion": "success",
       "jobSeconds": 3302.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:29.6485673Z",
       "files": {
         "tests/property/m5-array-binding.property.test.ts": [
           2.091788,
@@ -573,13 +643,24 @@
           78.698446
         ]
       },
-      "nativeRunnerMilliseconds": 3272167.227957
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 49,
+        "pass": 49,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 3272167.227957,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 5/12)",
       "id": 108457960771,
+      "conclusion": "success",
       "jobSeconds": 3095.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:51.7234890Z",
       "files": {
         "tests/property/m5-array-buffer.property.test.ts": [
           465229.644375
@@ -623,13 +704,24 @@
           330278.096541
         ]
       },
-      "nativeRunnerMilliseconds": 3044821.495083
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 3044821.495083,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 3/12)",
       "id": 108457960772,
+      "conclusion": "success",
       "jobSeconds": 2341.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T18:30:29.9821500Z",
       "files": {
         "tests/property/m5-arguments-object.property.test.ts": [
           1.125875,
@@ -689,11 +781,21 @@
           136625.319292
         ]
       },
-      "nativeRunnerMilliseconds": 2285029.636708
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 35,
+        "pass": 35,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2285029.636708,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (macos-aarch64, 10/10)",
       "id": 108457960777,
+      "conclusion": "success",
       "jobSeconds": 1752.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1834 expected-negative=159 unsupported=145 duration=1679457.63ms pool=3 retries=0",
@@ -720,8 +822,10 @@
     {
       "name": "native support (linux-x86_64-gnu, 3/4)",
       "id": 108457960789,
+      "conclusion": "success",
       "jobSeconds": 2543.0,
       "archive": "cold",
+      "nativeCommandReportedAt": "2026-09-26T18:08:23.0337529Z",
       "files": {
         "tests/property/m5-arguments-object.property.test.ts": [
           0.931724,
@@ -857,11 +961,21 @@
           137687.522942
         ]
       },
-      "nativeRunnerMilliseconds": 2520236.165903
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 69,
+        "pass": 69,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2520236.165903,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (macos-aarch64, 3/10)",
       "id": 108457960799,
+      "conclusion": "success",
       "jobSeconds": 2750.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1826 expected-negative=164 unsupported=149 duration=2660499.33ms pool=3 retries=0",
@@ -888,6 +1002,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 6/10)",
       "id": 108457960807,
+      "conclusion": "success",
       "jobSeconds": 1495.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1837 expected-negative=153 unsupported=148 duration=1453312.97ms pool=4 retries=0",
@@ -914,6 +1029,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 3/10)",
       "id": 108457960808,
+      "conclusion": "success",
       "jobSeconds": 1498.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1826 expected-negative=164 unsupported=149 duration=1461415.31ms pool=4 retries=0",
@@ -940,8 +1056,10 @@
     {
       "name": "native support (macos-aarch64, 9/12)",
       "id": 108457960811,
+      "conclusion": "success",
       "jobSeconds": 764.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:42:03.4035100Z",
       "files": {
         "tests/property/m5-array-prototype-index-search.property.test.ts": [
           275303.576125
@@ -979,13 +1097,24 @@
           6115.664416
         ]
       },
-      "nativeRunnerMilliseconds": 722355.177959
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 722355.177959,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 6/12)",
       "id": 108457960812,
+      "conclusion": "success",
       "jobSeconds": 1130.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:36:03.9692350Z",
       "files": {
         "tests/property/m5-array-constructor.property.test.ts": [
           296771.3185
@@ -1027,13 +1156,24 @@
           307319.5385
         ]
       },
-      "nativeRunnerMilliseconds": 1082670.402417
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1082670.402417,
+      "interruptedExampleCounts": []
     },
     {
       "name": "native support (macos-aarch64, 12/12)",
       "id": 108457960818,
+      "conclusion": "success",
       "jobSeconds": 1116.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T18:37:43.3816620Z",
       "files": {
         "tests/property/m5-array-prototype-mutation.property.test.ts": [
           293807.123709
@@ -1069,11 +1209,21 @@
           265529.936791
         ]
       },
-      "nativeRunnerMilliseconds": 1066679.914417
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 13,
+        "pass": 13,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1066679.914417,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (macos-aarch64, 8/10)",
       "id": 108457960821,
+      "conclusion": "success",
       "jobSeconds": 2257.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1858 expected-negative=141 unsupported=139 duration=2182816.57ms pool=3 retries=0",
@@ -1100,8 +1250,10 @@
     {
       "name": "native support (macos-aarch64, 11/12)",
       "id": 108457960824,
+      "conclusion": "success",
       "jobSeconds": 722.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:23:56.2082940Z",
       "files": {
         "tests/property/m5-array-prototype-iterators.property.test.ts": [
           250335.177958
@@ -1143,11 +1295,21 @@
           8838.790875
         ]
       },
-      "nativeRunnerMilliseconds": 671650.465583
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 671650.465583,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (linux-x86_64-gnu, 7/10)",
       "id": 108457960834,
+      "conclusion": "success",
       "jobSeconds": 920.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1837 expected-negative=149 unsupported=152 duration=871860.08ms pool=4 retries=0",
@@ -1174,6 +1336,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 4/10)",
       "id": 108457960843,
+      "conclusion": "success",
       "jobSeconds": 1494.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1823 expected-negative=161 unsupported=154 duration=1456951.62ms pool=4 retries=0",
@@ -1200,8 +1363,10 @@
     {
       "name": "native support (macos-aarch64, 8/12)",
       "id": 108457960845,
+      "conclusion": "success",
       "jobSeconds": 958.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:26:09.6795000Z",
       "files": {
         "tests/property/m5-array-prototype-copying.property.test.ts": [
           243341.220917
@@ -1242,11 +1407,21 @@
           22.01125
         ]
       },
-      "nativeRunnerMilliseconds": 905299.860791
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 905299.860791,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (linux-x86_64-gnu, 1/10)",
       "id": 108457960854,
+      "conclusion": "success",
       "jobSeconds": 1170.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=1129607.95ms pool=4 retries=0",
@@ -1273,6 +1448,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 2/10)",
       "id": 108457960861,
+      "conclusion": "success",
       "jobSeconds": 922.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1834 expected-negative=159 unsupported=146 duration=884103.67ms pool=4 retries=0",
@@ -1299,8 +1475,10 @@
     {
       "name": "native support (macos-aarch64, 10/12)",
       "id": 108457960871,
+      "conclusion": "success",
       "jobSeconds": 1398.0,
       "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-26T19:09:51.1752100Z",
       "files": {
         "tests/property/m5-array-prototype-iterative.property.test.ts": [
           375453.671083
@@ -1338,11 +1516,21 @@
           13522.141917
         ]
       },
-      "nativeRunnerMilliseconds": 1331632.0375
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1331632.0375,
+      "interruptedExampleCounts": []
     },
     {
       "name": "test262 (linux-x86_64-gnu, 10/10)",
       "id": 108457960874,
+      "conclusion": "success",
       "jobSeconds": 909.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1834 expected-negative=159 unsupported=145 duration=871693ms pool=4 retries=0",
@@ -1369,6 +1557,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 5/10)",
       "id": 108457960878,
+      "conclusion": "success",
       "jobSeconds": 1189.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1822 expected-negative=161 unsupported=155 duration=1151389.91ms pool=4 retries=0",
@@ -1395,6 +1584,7 @@
     {
       "name": "test262 (macos-aarch64, 9/10)",
       "id": 108457960879,
+      "conclusion": "success",
       "jobSeconds": 1926.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1841 expected-negative=151 unsupported=146 duration=1863462.2ms pool=3 retries=0",
@@ -1421,6 +1611,7 @@
     {
       "name": "test262 (macos-aarch64, 7/10)",
       "id": 108457960899,
+      "conclusion": "success",
       "jobSeconds": 1808.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1837 expected-negative=149 unsupported=152 duration=1740140.08ms pool=3 retries=0",
@@ -1447,6 +1638,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 9/10)",
       "id": 108457960903,
+      "conclusion": "success",
       "jobSeconds": 715.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1841 expected-negative=151 unsupported=146 duration=683375.43ms pool=4 retries=0",
@@ -1473,6 +1665,7 @@
     {
       "name": "test262 (macos-aarch64, 5/10)",
       "id": 108457960913,
+      "conclusion": "success",
       "jobSeconds": 1644.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1822 expected-negative=161 unsupported=155 duration=1593283.23ms pool=3 retries=0",
@@ -1499,6 +1692,7 @@
     {
       "name": "test262 (macos-aarch64, 2/10)",
       "id": 108457960923,
+      "conclusion": "success",
       "jobSeconds": 1701.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1834 expected-negative=159 unsupported=146 duration=1617851.51ms pool=3 retries=0",
@@ -1525,6 +1719,7 @@
     {
       "name": "test262 (linux-x86_64-gnu, 8/10)",
       "id": 108457960951,
+      "conclusion": "success",
       "jobSeconds": 1225.0,
       "archive": "cold",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2138/21383 pass=1858 expected-negative=141 unsupported=139 duration=1189123.73ms pool=4 retries=0",
@@ -1551,6 +1746,7 @@
     {
       "name": "test262 (macos-aarch64, 4/10)",
       "id": 108457960954,
+      "conclusion": "success",
       "jobSeconds": 1802.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1823 expected-negative=161 unsupported=154 duration=1737489.55ms pool=3 retries=0",
@@ -1577,6 +1773,7 @@
     {
       "name": "test262 (macos-aarch64, 1/10)",
       "id": 108457960962,
+      "conclusion": "success",
       "jobSeconds": 1954.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=1890224.59ms pool=3 retries=0",
@@ -1603,6 +1800,7 @@
     {
       "name": "test262 (macos-aarch64, 6/10)",
       "id": 108457960977,
+      "conclusion": "success",
       "jobSeconds": 1630.0,
       "archive": "warm",
       "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2138/21383 pass=1837 expected-negative=153 unsupported=148 duration=1562347.41ms pool=3 retries=0",

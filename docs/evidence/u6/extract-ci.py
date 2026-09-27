@@ -34,6 +34,7 @@ with zipfile.ZipFile(logs_path) as archive:
         rows = [re.sub(r'\x1b\[[0-9;]*m', '', row)
                 for row in archive.read(entry).decode().splitlines()]
         item = {'name': name, 'id': job['databaseId'],
+                'conclusion': job['conclusion'],
                 'jobSeconds': seconds(job['startedAt'], job['completedAt']),
                 'archive': 'cold' if any('Cache not found for input keys: '
                                         'oseo-runtime' in row for row in rows)
@@ -48,31 +49,48 @@ with zipfile.ZipFile(logs_path) as archive:
         else:
             command = next(row for row in rows
                            if '$ node tools/run-native-tests.ts' in row)
+            item['nativeCommandReportedAt'] = command.split('Z ', 1)[0] + 'Z'
+            package = next((row for row in rows if
+                            'property:extended:package] $' in row), None)
+            if package is not None:
+                item['packageBeforeNativeSeconds'] = seconds(
+                    package.split('Z ', 1)[0] + 'Z',
+                    item['nativeCommandReportedAt'])
             files = re.findall(r'tests/property/[\w.-]+\.ts', command)
-            marker = next((row.split('native-shard ', 1)[1] for row in rows
+            marker = next((row for row in rows
                            if 'native-shard {' in row), None)
             if marker is None:
                 index, total = map(int, re.search(
                     r'--test-shard=(\d+)/(\d+)', command).groups())
                 selected = files[index - 1::total]
             else:
-                metadata = json.loads(marker)
+                metadata = json.loads(marker.split('native-shard ', 1)[1])
                 selected = metadata['files']
                 item['workers'] = metadata['workers']
+                item['shardReportedAt'] = marker.split('Z ', 1)[0] + 'Z'
             item['files'] = {path: [] for path in selected}
+            item['caseFailures'] = []
+            item['nativeCounts'] = {}
             active = False
             for row in rows:
                 if row == command:
                     active = True
                 if not active:
                     continue
+                if '✖ failing tests:' in row:
+                    break  # Detailed failures repeat durations already seen.
+                count = re.search(
+                    r'ℹ (tests|pass|fail|skipped|todo) (\d+)', row)
+                if count is not None:
+                    item['nativeCounts'][count[1]] = int(count[2])
                 summary = re.search(r'ℹ duration_ms ([\d.]+)', row)
                 if summary is not None:
                     item['nativeRunnerMilliseconds'] = float(summary[1])
-                case = re.search(r'✔ (.+) \(([\d.]+)ms\)', row)
+                case = re.search(
+                    r'([✔✖]) (.+) \(([\d.]+)ms\)', row)
                 if case is None:
                     continue
-                title, duration = case.groups()
+                outcome, title, duration = case.groups()
                 matches = {path for path, pattern in patterns
                            if path in selected and pattern.fullmatch(title)}
                 if not matches:
@@ -82,7 +100,17 @@ with zipfile.ZipFile(logs_path) as archive:
                                    for pattern in entry['literals'])}
                 if len(matches) != 1:
                     raise ValueError(f'Cannot map {name}: {title}: {matches}')
-                item['files'][matches.pop()].append(float(duration))
+                path = matches.pop()
+                item['files'][path].append(float(duration))
+                if outcome == '✖':
+                    item['caseFailures'].append({
+                        'path': path, 'title': title,
+                        'reportedAt': row.split('Z ', 1)[0] + 'Z'})
+            item['interruptedExampleCounts'] = sorted({
+                int(match[1]) for row in rows
+                if (match := re.search(
+                    r'Property interrupted after (\d+) tests', row))
+            })
             if any(not cases for cases in item['files'].values()):
                 raise ValueError(f'Missing file cases: {name}')
         output['jobs'].append(item)

@@ -439,7 +439,8 @@ standards tasks inside the ordinary gate execute the matching host target and
 retain the AArch64 Linux cross-link; do not replace a required execution with a
 blanket skip.
 
-CI partitions the native and test262 suites with `--shard INDEX/TOTAL`, for
+CI partitions the `test:native` fixture and test262 suites with
+`--shard INDEX/TOTAL`, for
 example `mise run test:native --shard 1/3` or
 `mise run test:test262 --shard 1/3`. Each shard selects a deterministic
 round-robin partition of the reviewed input order.
@@ -463,9 +464,14 @@ The wrapper's `--shard INDEX/TOTAL` uses the checked-in measured weights in
 ties by path, and groups them in batches of three on macOS and four on Linux.
 Each batch goes to the shard with the shortest modeled completion time, with
 ties going to the lowest index. Each shard starts its expensive files first.
+On Linux, totals greater than one reserve index one exclusively for
+*tests/property/m5-object-own-keys.property.test.ts* when it is present; the
+other indices partition the remaining files by the same cost rule. CI uses
+five Linux shards so four still carry the remaining files. The singleton
+executes with one file worker to preserve the property's deadline margin.
 These model widths are fixed independently of local CPU availability, so every
 index of a total selects disjoint files from the same complete input set.
-Unknown files use the measured table's median weight. Empty shards execute
+Unknown files use the measured table's upper median weight. Empty shards execute
 nothing. Node.js's own `--test-shard` still assigns files by position; CI uses
 the wrapper flag instead.
 

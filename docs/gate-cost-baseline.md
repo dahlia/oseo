@@ -111,9 +111,21 @@ Derived platform totals: macOS 764.12 min, Linux 578.80 min.
 U6's [cost distribution and option analysis](./evidence/u6/README.md) retains
 native case costs and test262 shard durations from runs 36243816479 and
 36261458909. It selects a deterministic cost-based native file partition at
-unchanged totals, with estimated tail reduction and no estimated macOS
+unchanged macOS totals, with estimated tail reduction and no estimated macOS
 workload increase. The estimates replay concurrent case durations and do not
-establish an improvement: branch CI validation is pending. Test262 keeps its
+establish an improvement. Branch run 36343919872 failed Linux own-key at the
+unchanged 3,600-second property deadline after a reported 149 examples;
+its generated budget is incomplete. The
+[failed-run analysis](./evidence/u6/failed-branch-run.md) records measured
+costs and scheduling assumptions. Its
+[full per-shard comparison](./evidence/u6/first-branch-comparison.md) records
+a one-run measured macOS native job maximum of 46.10 minutes versus 51.43
+in run 36312192623, and test262 maximum of 35.23 versus 34.50 minutes.
+Their derived combined job sum differs by -20.70 macOS minutes; runner
+variance is not separated, and runtime-archive conditions differ. The
+correction isolates Linux own-key in its first shard and raises Linux native
+support from four to five, retaining four shards for all remaining files; its
+explicitly authorized second branch validation is pending. Test262 keeps its
 round-robin assignment and raises the total from ten to twelve. Using run
 36261458909's derived slowest residual rate, the estimate leaves 47.53 minutes
 against the 120-minute timeout, up from 33.22, at a derived 1.89 minutes of
