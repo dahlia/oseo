@@ -1,0 +1,1476 @@
+{
+  "sourceRun": "36243816479",
+  "headSha": "00153abee217ce97699a0f29d4384545adc56810",
+  "jobs": [
+    {
+      "coldExtractProgress": [],
+      "name": "test (ubuntu-latest, deno)",
+      "id": 108409155475,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.8070948Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.2470385Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.3871740Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:19.7405614Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:19.8124867Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 7ms",
+      "aubeSummary": "2026-09-26T13:02:27.9527404Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 8.1s",
+      "linking": "2026-09-26T13:02:25.8469432Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "host C sanitizers (macOS, property)",
+      "id": 108409155477,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:17Z",
+          "completedAt": "2026-09-26T13:02:20Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:20Z",
+          "completedAt": "2026-09-26T13:02:59Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:59Z",
+          "completedAt": "2026-09-26T13:03:08Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:16.2145590Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:20.2718700Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:20.4972110Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:34.7874910Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:34.9292970Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 17ms",
+      "aubeSummary": "2026-09-26T13:02:59.5421170Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 24.5s",
+      "linking": "2026-09-26T13:02:49.3421190Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test (ubuntu-latest, node)",
+      "id": 108409155494,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:27Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:27Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.9120106Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.6163585Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.7508193Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.4378342Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.4958381Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:27.4778847Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 7.0s",
+      "linking": "2026-09-26T13:02:26.5269084Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "host C sanitizers (macOS, native)",
+      "id": 108409155499,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:00:11Z",
+          "completedAt": "2026-09-26T14:00:16Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:00:16Z",
+          "completedAt": "2026-09-26T14:01:10Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:01:10Z",
+          "completedAt": "2026-09-26T14:01:25Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:00:10.9442290Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:00:16.3169750Z   cache: true",
+      "restoreStart": "2026-09-26T14:00:16.5565530Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:00:39.6063960Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:00:39.7388740Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 25ms",
+      "aubeSummary": "2026-09-26T14:01:09.7666050Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 29.9s",
+      "linking": "2026-09-26T14:00:54.5597020Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 4/12)",
+      "id": 108409155507,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:24Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:03:09Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:03:09Z",
+          "completedAt": "2026-09-26T13:03:15Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:24.2571720Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:28.4555280Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:28.6587760Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:41.9480370Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:42.0407200Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 15ms",
+      "aubeSummary": "2026-09-26T13:03:09.2768050Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.1s",
+      "linking": "2026-09-26T13:02:56.2980160Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 3/10)",
+      "id": 108409155512,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:24:18Z",
+          "completedAt": "2026-09-26T13:24:23Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:24:23Z",
+          "completedAt": "2026-09-26T13:25:10Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:25:10Z",
+          "completedAt": "2026-09-26T13:25:16Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:24:17.8909100Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:24:23.2906100Z   cache: true",
+      "restoreStart": "2026-09-26T13:24:23.4671620Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:24:39.6017210Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:24:39.7275650Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 14ms",
+      "aubeSummary": "2026-09-26T13:25:10.4384070Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 30.6s",
+      "linking": "2026-09-26T13:24:58.3858170Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 2/12)",
+      "id": 108409155515,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:21Z",
+          "completedAt": "2026-09-26T13:02:26Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:26Z",
+          "completedAt": "2026-09-26T13:03:12Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:03:12Z",
+          "completedAt": "2026-09-26T13:03:19Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:20.6092270Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:26.4925640Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:26.7340690Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:41.6320520Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:41.7587620Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 18ms",
+      "aubeSummary": "2026-09-26T13:03:11.7483680Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 29.9s",
+      "linking": "2026-09-26T13:02:56.5127300Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "host C sanitizers (Linux)",
+      "id": 108409155518,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:02:35Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.2441479Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.1432788Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:15.2729682Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:21.9821338Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:22.0289566Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:28.2209774Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 6.2s",
+      "linking": "2026-09-26T13:02:28.0606219Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (macos-aarch64, 1/3)",
+      "id": 108409155521,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:56:27Z",
+          "completedAt": "2026-09-26T13:56:30Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:56:30Z",
+          "completedAt": "2026-09-26T13:57:07Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:57:07Z",
+          "completedAt": "2026-09-26T13:57:13Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:56:26.4535770Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:56:30.3123460Z   cache: true",
+      "restoreStart": "2026-09-26T13:56:30.4724510Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:56:41.4698250Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:56:41.5764130Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 14ms",
+      "aubeSummary": "2026-09-26T13:57:07.5269040Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 25.8s",
+      "linking": "2026-09-26T13:56:56.2753650Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (linux-x86_64-gnu, 1/3)",
+      "id": 108409155524,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:30Z",
+          "completedAt": "2026-09-26T13:02:33Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.4021316Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.2628145Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:15.3697229Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.9950633Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:21.0419480Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 5ms",
+      "aubeSummary": "2026-09-26T13:02:30.2748832Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 9.2s",
+      "linking": "2026-09-26T13:02:29.0761963Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 7/12)",
+      "id": 108409155527,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:17Z",
+          "completedAt": "2026-09-26T13:02:20Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:20Z",
+          "completedAt": "2026-09-26T13:02:51Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:51Z",
+          "completedAt": "2026-09-26T13:02:54Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:15.9406800Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:20.2756970Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:20.3885930Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:29.0937530Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:29.1871950Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 12ms",
+      "aubeSummary": "2026-09-26T13:02:51.4703520Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 22.2s",
+      "linking": "2026-09-26T13:02:41.7207970Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (linux-x86_64-gnu, 2/4)",
+      "id": 108409155530,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:31Z",
+          "completedAt": "2026-09-26T13:02:35Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.4235792Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.5256826Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.6456215Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:19.6216770Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:19.6680474Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 5ms",
+      "aubeSummary": "2026-09-26T13:02:31.0749395Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 11.4s",
+      "linking": "2026-09-26T13:02:29.7020736Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (linux-x86_64-gnu, 4/4)",
+      "id": 108409155531,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:16Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:16Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:31Z",
+          "completedAt": "2026-09-26T13:02:35Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.3740613Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:16.6507345Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.7777351Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:24.0570609Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:24.1104469Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:31.5931127Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 7.5s",
+      "linking": null
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test (macos-latest, deno)",
+      "id": 108409155533,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:22:40Z",
+          "completedAt": "2026-09-26T13:22:43Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:22:43Z",
+          "completedAt": "2026-09-26T13:23:22Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:23:22Z",
+          "completedAt": "2026-09-26T13:23:25Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:22:39.7877370Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:22:43.4774550Z   cache: true",
+      "restoreStart": "2026-09-26T13:22:43.6465690Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:22:54.3788930Z mise cache restored from key: mise-v1-macos-arm64-macos26-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:22:54.4760070Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 14ms",
+      "aubeSummary": "2026-09-26T13:23:21.8627610Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.3s",
+      "linking": "2026-09-26T13:23:12.8177180Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (macos-aarch64, 2/3)",
+      "id": 108409155536,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:26:36Z",
+          "completedAt": "2026-09-26T13:26:39Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:26:39Z",
+          "completedAt": "2026-09-26T13:27:15Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:27:15Z",
+          "completedAt": "2026-09-26T13:27:21Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:26:35.9757480Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:26:39.7675740Z   cache: true",
+      "restoreStart": "2026-09-26T13:26:39.9481760Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:26:50.3168800Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:26:50.4077370Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 12ms",
+      "aubeSummary": "2026-09-26T13:27:15.4614860Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 25.0s",
+      "linking": "2026-09-26T13:27:06.8520520Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 9/12)",
+      "id": 108409155541,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:19Z",
+          "completedAt": "2026-09-26T13:02:23Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:23Z",
+          "completedAt": "2026-09-26T13:03:06Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:03:06Z",
+          "completedAt": "2026-09-26T13:03:11Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:18.8181870Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:23.4415270Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:23.7168070Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:38.7194580Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:38.8389770Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 24ms",
+      "aubeSummary": "2026-09-26T13:03:06.4074250Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.4s",
+      "linking": "2026-09-26T13:02:53.2461520Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (linux-x86_64-gnu, 1/4)",
+      "id": 108409155547,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:16Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:16Z",
+          "completedAt": "2026-09-26T13:02:29Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:29Z",
+          "completedAt": "2026-09-26T13:02:32Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.9522054Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:16.1334933Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.2633553Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:23.7519112Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:23.8117858Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 8ms",
+      "aubeSummary": "2026-09-26T13:02:29.0439140Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 5.2s",
+      "linking": "2026-09-26T13:02:27.8431995Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 8/12)",
+      "id": 108409155548,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:37:19Z",
+          "completedAt": "2026-09-26T13:37:23Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:37:23Z",
+          "completedAt": "2026-09-26T13:38:01Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:38:01Z",
+          "completedAt": "2026-09-26T13:38:06Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:37:19.0449390Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:37:23.6745900Z   cache: true",
+      "restoreStart": "2026-09-26T13:37:23.8114040Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:37:38.1837180Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:37:38.2686080Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 12ms",
+      "aubeSummary": "2026-09-26T13:38:00.6428280Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 22.3s",
+      "linking": "2026-09-26T13:37:50.8886950Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test (macos-latest, node)",
+      "id": 108409155552,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:19:37Z",
+          "completedAt": "2026-09-26T13:19:41Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:19:41Z",
+          "completedAt": "2026-09-26T13:20:20Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:20:20Z",
+          "completedAt": "2026-09-26T13:20:24Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:19:37.1275330Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:19:41.6493910Z   cache: true",
+      "restoreStart": "2026-09-26T13:19:41.9524680Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:19:52.4273230Z mise cache restored from key: mise-v1-macos-arm64-macos26-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:19:52.6240240Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 49ms",
+      "aubeSummary": "2026-09-26T13:20:20.1383550Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.4s",
+      "linking": "2026-09-26T13:20:08.9498670Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 3/12)",
+      "id": 108409155559,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:38:46Z",
+          "completedAt": "2026-09-26T13:38:49Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:38:49Z",
+          "completedAt": "2026-09-26T13:39:19Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:39:19Z",
+          "completedAt": "2026-09-26T13:39:22Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:38:45.2654350Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:38:49.7658650Z   cache: true",
+      "restoreStart": "2026-09-26T13:38:49.8657070Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:38:56.8367030Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:38:56.8997970Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 10ms",
+      "aubeSummary": "2026-09-26T13:39:19.6979560Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 22.7s",
+      "linking": "2026-09-26T13:39:11.4156290Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 10/10)",
+      "id": 108409155570,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:16Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:16Z",
+          "completedAt": "2026-09-26T13:02:29Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:29Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.4235600Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:16.6378971Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.7116697Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:21.8596497Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:21.8965749Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 4ms",
+      "aubeSummary": "2026-09-26T13:02:29.2005273Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 7.3s",
+      "linking": "2026-09-26T13:02:27.9188898Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 2/10)",
+      "id": 108409155571,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:26Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:26Z",
+          "completedAt": "2026-09-26T13:02:29Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.4651906Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.9337765Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.0586470Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:21.8609473Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:21.9030237Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:26.6525183Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 4.7s",
+      "linking": "2026-09-26T13:02:25.9285115Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 1/12)",
+      "id": 108409155577,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:13:31Z",
+          "completedAt": "2026-09-26T14:13:39Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:13:39Z",
+          "completedAt": "2026-09-26T14:14:15Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:14:15Z",
+          "completedAt": "2026-09-26T14:14:22Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:13:30.5734970Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:13:39.1191850Z   cache: true",
+      "restoreStart": "2026-09-26T14:13:39.3380910Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:13:50.7025120Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:13:50.7849670Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 13ms",
+      "aubeSummary": "2026-09-26T14:14:15.4480440Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 24.6s",
+      "linking": "2026-09-26T14:14:05.2194500Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 3/10)",
+      "id": 108409155579,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.8000594Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.3576113Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.4903274Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.0912189Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.1477976Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 7ms",
+      "aubeSummary": "2026-09-26T13:02:28.2540631Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 8.1s",
+      "linking": "2026-09-26T13:02:26.1838464Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (linux-x86_64-gnu, 3/3)",
+      "id": 108409155580,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:27Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:27Z",
+          "completedAt": "2026-09-26T13:02:29Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.8457859Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.3324161Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.4599380Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:19.9952483Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.0540253Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 7ms",
+      "aubeSummary": "2026-09-26T13:02:26.8929166Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 6.8s",
+      "linking": "2026-09-26T13:02:26.0848258Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 5/12)",
+      "id": 108409155582,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:24:49Z",
+          "completedAt": "2026-09-26T14:24:53Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:24:53Z",
+          "completedAt": "2026-09-26T14:25:31Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:25:31Z",
+          "completedAt": "2026-09-26T14:25:35Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:24:47.4738180Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:24:53.3353810Z   cache: true",
+      "restoreStart": "2026-09-26T14:24:53.5159540Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:25:04.0319810Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:25:04.1344900Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 16ms",
+      "aubeSummary": "2026-09-26T14:25:30.9217080Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 26.7s",
+      "linking": "2026-09-26T14:25:18.5194010Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 4/10)",
+      "id": 108409155583,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:32Z",
+          "completedAt": "2026-09-26T13:02:34Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:34Z",
+          "completedAt": "2026-09-26T13:02:50Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:50Z",
+          "completedAt": "2026-09-26T13:02:53Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:32.1202359Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:34.3943986Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:34.5264661Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:42.8290585Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:42.8837313Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:49.9097864Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 7.0s",
+      "linking": "2026-09-26T13:02:48.9141985Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 7/10)",
+      "id": 108409155585,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:47Z",
+          "completedAt": "2026-09-26T13:02:49Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:49Z",
+          "completedAt": "2026-09-26T13:03:00Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:03:00Z",
+          "completedAt": "2026-09-26T13:03:03Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:47.3885759Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:49.0595119Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:49.1842142Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:54.0269374Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:54.0841308Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:03:00.1666566Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 6.1s",
+      "linking": "2026-09-26T13:02:58.1138912Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 12/12)",
+      "id": 108409155587,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:06:09Z",
+          "completedAt": "2026-09-26T14:06:12Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:06:12Z",
+          "completedAt": "2026-09-26T14:06:52Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:06:52Z",
+          "completedAt": "2026-09-26T14:06:56Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:06:07.9324040Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:06:12.8525870Z   cache: true",
+      "restoreStart": "2026-09-26T14:06:13.0013210Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:06:23.4242900Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:06:23.5100970Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 15ms",
+      "aubeSummary": "2026-09-26T14:06:51.7209530Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 28.1s",
+      "linking": "2026-09-26T14:06:37.8973630Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 5/10)",
+      "id": 108409155592,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:16Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:16Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:30Z",
+          "completedAt": "2026-09-26T13:02:33Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:13.2709182Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:16.5515954Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.6812105Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:23.0980462Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:23.1555338Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 6ms",
+      "aubeSummary": "2026-09-26T13:02:30.5075791Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 7.3s",
+      "linking": "2026-09-26T13:02:29.1849591Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 10/12)",
+      "id": 108409155596,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:34:43Z",
+          "completedAt": "2026-09-26T13:34:47Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:34:47Z",
+          "completedAt": "2026-09-26T13:35:25Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:35:25Z",
+          "completedAt": "2026-09-26T13:35:30Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:34:42.6752450Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:34:47.1788070Z   cache: true",
+      "restoreStart": "2026-09-26T13:34:47.3038160Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:34:57.7688810Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:34:57.8617320Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 13ms",
+      "aubeSummary": "2026-09-26T13:35:25.1101140Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.1s",
+      "linking": "2026-09-26T13:35:12.2090600Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 6/12)",
+      "id": 108409155597,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:10:30Z",
+          "completedAt": "2026-09-26T14:10:35Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:10:35Z",
+          "completedAt": "2026-09-26T14:11:18Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:11:18Z",
+          "completedAt": "2026-09-26T14:11:24Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:10:29.3555840Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:10:35.8120820Z   cache: true",
+      "restoreStart": "2026-09-26T14:10:36.0152830Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:10:50.2695220Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:10:50.3792220Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 13ms",
+      "aubeSummary": "2026-09-26T14:11:18.0987390Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.6s",
+      "linking": "2026-09-26T14:11:04.8757510Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (macos-aarch64, 3/3)",
+      "id": 108409155599,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:56:35Z",
+          "completedAt": "2026-09-26T13:56:39Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:56:39Z",
+          "completedAt": "2026-09-26T13:57:15Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:57:15Z",
+          "completedAt": "2026-09-26T13:57:19Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:56:34.3097420Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:56:39.1601580Z   cache: true",
+      "restoreStart": "2026-09-26T13:56:39.3161540Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:56:47.9349670Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:56:48.0566860Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 14ms",
+      "aubeSummary": "2026-09-26T13:57:14.9124580Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 26.7s",
+      "linking": "2026-09-26T13:57:02.7687850Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native (linux-x86_64-gnu, 2/3)",
+      "id": 108409155604,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:30Z",
+          "completedAt": "2026-09-26T13:02:33Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.3187538Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.2105584Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:15.3306127Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.8529668Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.8987490Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 5ms",
+      "aubeSummary": "2026-09-26T13:02:30.6866879Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 9.8s",
+      "linking": null
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 9/10)",
+      "id": 108409155610,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:30Z",
+          "completedAt": "2026-09-26T13:02:34Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.5234613Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.5562254Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:15.6631600Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.9258722Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.9982488Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 4ms",
+      "aubeSummary": "2026-09-26T13:02:30.6613193Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 9.6s",
+      "linking": "2026-09-26T13:02:27.0286210Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (linux-x86_64-gnu, 3/4)",
+      "id": 108409155623,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.7873212Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.6603270Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.7395562Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:19.2706028Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:19.3127080Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 4ms",
+      "aubeSummary": "2026-09-26T13:02:28.1792537Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 8.8s",
+      "linking": "2026-09-26T13:02:27.3377474Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 6/10)",
+      "id": 108409155642,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:55:34Z",
+          "completedAt": "2026-09-26T13:55:39Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:55:39Z",
+          "completedAt": "2026-09-26T13:56:20Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:56:20Z",
+          "completedAt": "2026-09-26T13:56:25Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:55:34.2994240Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:55:39.0377110Z   cache: true",
+      "restoreStart": "2026-09-26T13:55:39.1901260Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:55:56.1560950Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:55:56.2637510Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 11ms",
+      "aubeSummary": "2026-09-26T13:56:20.5079810Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 24.2s",
+      "linking": "2026-09-26T13:56:10.4389520Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "native support (macos-aarch64, 11/12)",
+      "id": 108409155646,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:29:04Z",
+          "completedAt": "2026-09-26T14:29:07Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:29:07Z",
+          "completedAt": "2026-09-26T14:29:36Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:29:36Z",
+          "completedAt": "2026-09-26T14:29:42Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:29:04.1576580Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:29:07.6274270Z   cache: true",
+      "restoreStart": "2026-09-26T14:29:07.7400180Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:29:17.5428610Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:29:17.6048320Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 10ms",
+      "aubeSummary": "2026-09-26T14:29:36.6895010Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 19.0s",
+      "linking": "2026-09-26T14:29:27.8622390Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 8/10)",
+      "id": 108409155652,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:30Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:30Z",
+          "completedAt": "2026-09-26T13:02:33Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.6169485Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.7784986Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:15.9204368Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:23.2049454Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:23.2698997Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 8ms",
+      "aubeSummary": "2026-09-26T13:02:29.8897196Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 6.6s",
+      "linking": "2026-09-26T13:02:29.3023563Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 1/10)",
+      "id": 108409155660,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:40:24Z",
+          "completedAt": "2026-09-26T14:40:29Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:40:29Z",
+          "completedAt": "2026-09-26T14:41:16Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:41:16Z",
+          "completedAt": "2026-09-26T14:41:22Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:40:24.0281800Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:40:29.2220890Z   cache: true",
+      "restoreStart": "2026-09-26T14:40:29.4245560Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:40:46.3596590Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:40:46.5208410Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 31ms",
+      "aubeSummary": "2026-09-26T14:41:15.7775480Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 29.1s",
+      "linking": "2026-09-26T14:40:59.0594720Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 8/10)",
+      "id": 108409155661,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:44:26Z",
+          "completedAt": "2026-09-26T14:44:29Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:44:29Z",
+          "completedAt": "2026-09-26T14:45:07Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:45:07Z",
+          "completedAt": "2026-09-26T14:45:13Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:44:25.8937890Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:44:29.7844450Z   cache: true",
+      "restoreStart": "2026-09-26T14:44:29.9260750Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:44:41.9676580Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:44:42.0609810Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 18ms",
+      "aubeSummary": "2026-09-26T14:45:06.9039050Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 24.7s",
+      "linking": "2026-09-26T14:44:54.4264760Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 10/10)",
+      "id": 108409155669,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:36:24Z",
+          "completedAt": "2026-09-26T14:36:27Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:36:27Z",
+          "completedAt": "2026-09-26T14:36:59Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:36:59Z",
+          "completedAt": "2026-09-26T14:37:04Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:36:23.5572000Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:36:27.2021390Z   cache: true",
+      "restoreStart": "2026-09-26T14:36:27.3603610Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:36:37.8758140Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:36:37.9652960Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 12ms",
+      "aubeSummary": "2026-09-26T14:36:59.2723770Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 21.2s",
+      "linking": "2026-09-26T14:36:48.2051840Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 6/10)",
+      "id": 108409155670,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:13Z",
+          "completedAt": "2026-09-26T13:02:15Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:15Z",
+          "completedAt": "2026-09-26T13:02:28Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:28Z",
+          "completedAt": "2026-09-26T13:02:31Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:12.4340070Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:15.9207150Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:16.0444841Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:22.1822752Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:22.2293635Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 5ms",
+      "aubeSummary": "2026-09-26T13:02:27.9753124Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 5.7s",
+      "linking": null
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (linux-x86_64-gnu, 1/10)",
+      "id": 108409155674,
+      "host": "linux",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T13:02:12Z",
+          "completedAt": "2026-09-26T13:02:14Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T13:02:14Z",
+          "completedAt": "2026-09-26T13:02:27Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T13:02:27Z",
+          "completedAt": "2026-09-26T13:02:29Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T13:02:11.8322836Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T13:02:14.3227910Z   cache: true",
+      "restoreStart": "2026-09-26T13:02:14.4472968Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T13:02:20.0027506Z mise cache restored from key: mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T13:02:20.0687352Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 8ms",
+      "aubeSummary": "2026-09-26T13:02:26.9949529Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (33.0 MB) in 6.9s",
+      "linking": "2026-09-26T13:02:26.0997965Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 5/10)",
+      "id": 108409155679,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T14:35:25Z",
+          "completedAt": "2026-09-26T14:35:31Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T14:35:31Z",
+          "completedAt": "2026-09-26T14:36:29Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T14:36:29Z",
+          "completedAt": "2026-09-26T14:36:38Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T14:35:24.8029880Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T14:35:31.3830660Z   cache: true",
+      "restoreStart": "2026-09-26T14:35:31.7431860Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T14:35:51.3519330Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T14:35:51.5625870Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 26ms",
+      "aubeSummary": "2026-09-26T14:36:29.1051900Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 37.4s",
+      "linking": "2026-09-26T14:36:10.4386360Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 4/10)",
+      "id": 108409155693,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T15:17:00Z",
+          "completedAt": "2026-09-26T15:17:05Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T15:17:05Z",
+          "completedAt": "2026-09-26T15:17:48Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T15:17:48Z",
+          "completedAt": "2026-09-26T15:17:54Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T15:16:59.2856730Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T15:17:05.1714740Z   cache: true",
+      "restoreStart": "2026-09-26T15:17:05.3378610Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T15:17:19.4937060Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T15:17:19.7196690Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 19ms",
+      "aubeSummary": "2026-09-26T15:17:47.7910020Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 27.8s",
+      "linking": "2026-09-26T15:17:34.2452230Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 9/10)",
+      "id": 108409155696,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T15:19:28Z",
+          "completedAt": "2026-09-26T15:19:32Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T15:19:32Z",
+          "completedAt": "2026-09-26T15:20:15Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T15:20:15Z",
+          "completedAt": "2026-09-26T15:20:23Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T15:19:27.9611060Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T15:19:32.3281280Z   cache: true",
+      "restoreStart": "2026-09-26T15:19:32.5167870Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T15:19:48.3701250Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T15:19:48.5484040Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 35ms",
+      "aubeSummary": "2026-09-26T15:20:15.2303520Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 26.5s",
+      "linking": "2026-09-26T15:20:02.8618690Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 7/10)",
+      "id": 108409155700,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T15:03:49Z",
+          "completedAt": "2026-09-26T15:03:53Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T15:03:53Z",
+          "completedAt": "2026-09-26T15:04:38Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T15:04:38Z",
+          "completedAt": "2026-09-26T15:04:45Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T15:03:48.8846510Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T15:03:53.4672590Z   cache: true",
+      "restoreStart": "2026-09-26T15:03:53.6939380Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T15:04:08.3551760Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T15:04:08.4425630Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 15ms",
+      "aubeSummary": "2026-09-26T15:04:37.7893710Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 29.2s",
+      "linking": "2026-09-26T15:04:25.0615460Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    },
+    {
+      "coldExtractProgress": [],
+      "name": "test262 (macos-aarch64, 2/10)",
+      "id": 108409155714,
+      "host": "macos",
+      "steps": [
+        {
+          "name": "Run actions/checkout@v7",
+          "startedAt": "2026-09-26T15:09:18Z",
+          "completedAt": "2026-09-26T15:09:21Z"
+        },
+        {
+          "name": "Run jdx/mise-action@v4",
+          "startedAt": "2026-09-26T15:09:21Z",
+          "completedAt": "2026-09-26T15:10:04Z"
+        },
+        {
+          "name": "Run ./.github/actions/runtime-archive-cache",
+          "startedAt": "2026-09-26T15:10:04Z",
+          "completedAt": "2026-09-26T15:10:09Z"
+        }
+      ],
+      "miseActionRevision": "2026-09-26T15:09:17.1132790Z Download action repository 'jdx/mise-action@v4' (SHA:c2a87611a18de5b3828c5652fe268e992400cb5c)",
+      "cacheInput": "2026-09-26T15:09:21.6552290Z   cache: true",
+      "restoreStart": "2026-09-26T15:09:21.8035040Z ##[group]Restoring mise cache",
+      "restoreEnd": "2026-09-26T15:09:36.7109480Z mise cache restored from key: mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433",
+      "toolSummary": "2026-09-26T15:09:36.8079500Z mise \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 9/9 \u00b7 installed 0 tools \u00b7 9 already installed in 15ms",
+      "aubeSummary": "2026-09-26T15:10:03.6903150Z [deps.aube] \u2713 resolved 62 \u00b7 reused 1 \u00b7 downloaded 61 (30.9 MB) in 26.8s",
+      "linking": "2026-09-26T15:09:51.0281010Z [deps.aube] \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591   62/62 pkgs \u00b7 linking"
+    }
+  ]
+}

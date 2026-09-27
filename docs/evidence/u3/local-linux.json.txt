@@ -1,0 +1,47 @@
+{
+  "root": "/tmp/u3-linux-install",
+  "aube": "/home/dahlia/.local/share/mise/installs/aube/2.5.0/.mise-bins/aube",
+  "node": "/home/dahlia/.local/share/mise/installs/node/24.21.0/bin/node",
+  "runs": [
+    {
+      "label": "cold-install",
+      "seconds": 2.9932048859773204
+    },
+    {
+      "label": "save-tar",
+      "seconds": 0.6623903689906001
+    },
+    {
+      "label": "restore-0",
+      "seconds": 1.4116685329936445
+    },
+    {
+      "label": "warm-install-0",
+      "seconds": 1.1992927700048313
+    },
+    {
+      "label": "restore-1",
+      "seconds": 1.375595922989305
+    },
+    {
+      "label": "warm-install-1",
+      "seconds": 1.2193648400134407
+    }
+  ],
+  "freshStore": {
+    "sha256": "ee130b59f525e1d452b513d3a37254aa3b9b66ba1a5df9ad0e8c40516ba7311c",
+    "files": 58812,
+    "bytes": 198987020
+  },
+  "tarBytes": 244357120,
+  "restoredStore0": {
+    "sha256": "ee130b59f525e1d452b513d3a37254aa3b9b66ba1a5df9ad0e8c40516ba7311c",
+    "files": 58812,
+    "bytes": 198987020
+  },
+  "restoredStore1": {
+    "sha256": "ee130b59f525e1d452b513d3a37254aa3b9b66ba1a5df9ad0e8c40516ba7311c",
+    "files": 58812,
+    "bytes": 198987020
+  }
+}

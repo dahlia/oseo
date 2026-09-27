@@ -1,0 +1,61 @@
+aube 2.5.0 by jdx.dev
+░░░░░░░░░░░░░░░    0/62 pkgs
+warn: Unsupported engine
+warn:   oseo-workspace: wanted node 24.18.0, got 24.21.0
+██████████████░   62/62 pkgs · linking
+███████████████   62/62 pkgs
+✓ resolved 62 · reused 1 · downloaded 61 (30.9 MB) in 10.9s
+oseo-workspace:
+devDependencies:
++ @arethetypeswrong/core@0.18.5
++ @babel/parser@8.0.4
++ @oxlint/plugins@1.79.0
++ @types/node@24.13.3
++ fast-check@4.9.0
++ oxlint@1.79.0
++ publint@0.3.21
++ test262@0.0.0
++ tsdown@0.22.7
++ typescript@7.0.2
++ yaml@2.9.0
+
+@oseo/backend-c:
+dependencies:
++ @oseo/compiler@?
+
+@oseo/cli:
+dependencies:
++ @optique/core@1.1.1
++ @oseo/backend-c@?
++ @oseo/compiler@?
++ @oseo/host@?
++ @oseo/parser-babel@?
++ @oseo/runtime-c@?
++ @oseo/toolchain-zig@?
++ @oseo/unicode@?
+
+@oseo/host:
+dependencies:
++ @oseo/compiler@?
+
+@oseo/parser-babel:
+dependencies:
++ @babel/parser@8.0.4
++ @oseo/compiler@?
+
+@oseo/runtime-c:
+dependencies:
++ @oseo/compiler@?
+
+@oseo/testkit:
+dependencies:
++ @oseo/compiler@?
+
+@oseo/toolchain-host-cc:
+dependencies:
++ @oseo/compiler@?
+
+@oseo/toolchain-zig:
+dependencies:
++ @oseo/compiler@?
+

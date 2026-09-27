@@ -1,0 +1,30 @@
+import os,sys,subprocess,time,pathlib,json,hashlib,shutil
+root=pathlib.Path(sys.argv[1]); aube=sys.argv[2]; node=sys.argv[3]
+store=root/'probe-store'; cache=root/'probe-cache'
+env=dict(os.environ,CI='true',AUBE_STORE_DIR=str(store),AUBE_CACHE_DIR=str(cache),ZIG_GLOBAL_CACHE_DIR='/data/zig-cache/m5ci-job-fixed-cost',PATH=str(pathlib.Path(node).parent)+':'+os.environ['PATH'])
+results={'root':str(root),'aube':aube,'node':node,'runs':[]}
+def timed(command,label):
+ start=time.perf_counter()
+ with open(root/(label+'.log'),'w') as log: subprocess.run(command,cwd=root,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
+ seconds=time.perf_counter()-start; results['runs'].append({'label':label,'seconds':seconds});print(label,seconds,flush=True)
+def fingerprint():
+ h=hashlib.sha256();files=0;size=0
+ for path in sorted(store.rglob('*')):
+  if path.is_file():
+   content=path.read_bytes();h.update(str(path.relative_to(store)).encode()+b'\0'+hashlib.sha256(content).digest());files+=1;size+=len(content)
+ return {'sha256':h.hexdigest(),'files':files,'bytes':size}
+def clear_modules():
+ for path in [root/'node_modules',*root.glob('packages/*/node_modules')]:
+  if path.exists(): shutil.rmtree(path)
+clear_modules()
+timed([aube,'install','--frozen-lockfile'],'cold-install')
+results['freshStore']=fingerprint()
+timed(['tar','-cf',str(root/'store.tar'),'-C',str(root),'probe-store'],'save-tar')
+results['tarBytes']=(root/'store.tar').stat().st_size
+for i in range(2):
+ shutil.rmtree(store);clear_modules();shutil.rmtree(cache,ignore_errors=True)
+ timed(['tar','-xf',str(root/'store.tar'),'-C',str(root)],'restore-'+str(i))
+ results['restoredStore'+str(i)]=fingerprint()
+ timed([aube,'install','--frozen-lockfile'],'warm-install-'+str(i))
+(root/'probe-result.json').write_text(json.dumps(results,indent=2)+'\n')
+print(json.dumps(results,indent=2),flush=True)
