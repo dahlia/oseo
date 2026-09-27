@@ -1,0 +1,74 @@
+// Shard signature scan. Counts the distinct harness source signatures and
+// variant keys the reviewed subset's round-robin shards select, which is the
+// ceiling the measured object counts approach. Preserved verbatim from the U4
+// session except for two edits: an unused root binding is removed, and the
+// absolute base URL is resolved from the working directory. Run it from the
+// repository root, through standard input so that the workspace's yaml package
+// resolves; saturation.log gives the exact command. It reads
+// tests/test262/subset.yaml and tests/test262/results/ and writes nothing.
+import { readFile, readdir } from "node:fs/promises";
+import { parse as parseYaml } from "yaml";
+import { pathToFileURL } from "node:url";
+
+const base = new URL("tests/test262/", pathToFileURL(`${process.cwd()}/`));
+
+const subset = parseYaml(await readFile(new URL("subset.yaml", base), "utf8"));
+const order: string[] = subset.tests.map((t: { path: string }) => t.path);
+
+// Load every reviewed case's metadata.
+const meta = new Map<string, { async: boolean; includes: string[]; mode: string; flags: string[]; strictness: string[] }>();
+const dir = new URL("results/", base);
+const entries = await readdir(dir, { recursive: true });
+for (const entry of entries) {
+  if (!entry.endsWith(".yaml")) continue;
+  const doc = parseYaml(await readFile(new URL(entry, dir), "utf8"));
+  for (const r of doc.results ?? []) {
+    const c = r.case;
+    meta.set(c.path, {
+      async: c.async === true,
+      includes: c.includes ?? [],
+      mode: c.mode,
+      flags: c.flags ?? [],
+      strictness: c.strictness ?? [],
+    });
+  }
+}
+
+console.log(`subset order: ${order.length}, reviewed metadata: ${meta.size}`);
+
+function signatures(total: number, index: number) {
+  const selected = order.filter((_, p) => p % total === index - 1);
+  const sigs = new Set<string>();
+  const sigsVariants = new Set<string>();
+  let split = 0;
+  let fallback = 0;
+  for (const path of selected) {
+    const m = meta.get(path);
+    if (m == null) { fallback += 1; continue; }
+    if (m.mode !== "script") { fallback += 1; continue; }
+    if (m.flags.includes("raw")) { fallback += 1; continue; }
+    split += 1;
+    const sources = ["base.js", ...(m.async ? ["doneprintHandle.js"] : []), ...m.includes];
+    const sig = JSON.stringify(sources);
+    sigs.add(sig);
+    for (const s of m.strictness) {
+      for (const spec of ["disabled", "enabled"]) {
+        sigsVariants.add(JSON.stringify([sig, s, spec]));
+      }
+    }
+  }
+  return { selected: selected.length, split, fallback, sigs: sigs.size, variants: sigsVariants.size };
+}
+
+for (const total of [1, 2, 5, 10, 20, 50, 100, 200]) {
+  const r = signatures(total, 1);
+  console.log(`total=${total} shard=1 paths=${r.selected} split=${r.split} fallback=${r.fallback} distinctSources=${r.sigs} distinctVariantKeys=${r.variants}`);
+}
+console.log("--- all 10 shards at total=10 ---");
+let sum = 0, sumV = 0;
+for (let i = 1; i <= 10; i++) {
+  const r = signatures(10, i);
+  sum += r.sigs; sumV += r.variants;
+  console.log(`shard ${i}/10 paths=${r.selected} split=${r.split} distinctSources=${r.sigs} distinctVariantKeys=${r.variants}`);
+}
+console.log(`sum distinctSources over 10 shards = ${sum}; sum variant keys = ${sumV}`);

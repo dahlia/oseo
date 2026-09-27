@@ -596,6 +596,17 @@ runtime archive and Zig cache, 432.98 s on Linux at pool 8 and 1,649 s on macOS
 at pool 8; the macOS warm-up was 49 s faster than the table's cold run despite
 starting colder, which is the spread these hosts show.
 
+Both hosts ran the source of `e76e235b`, the commit this branch started from;
+the macOS clone carried one patch, an explicit pool-size override, and nothing
+else. Every run's log lines, the two hosts' environments, that patch, the
+drivers, and the revision check are preserved under
+[*docs/evidence/u4/*](./evidence/u4/README.md), along with the saturation and
+key-churn scans below. `python3 docs/evidence/u4/summarize.py` recomputes this
+table, the differences and per-object rates that follow it, and the two
+projections built on them, from those logs; the object counts, the 300-key
+ceiling, and the input-stability proportion it applies are constants sourced
+elsewhere in this section rather than recomputed.
+
 | Host               | Pool | Harness cache | Wall seconds           | Mean   |
 | ------------------ | ---- | ------------- | ---------------------- | ------ |
 | Linux, Ryzen 7700X | 8    | cold          | 410.40, 414.95         | 412.68 |
@@ -675,23 +686,34 @@ not visible to other branches.
 
 Object bytes were measured on the same shard; the transfer cost around them is
 an estimate built from other caches. The 96 objects occupy a measured 239.4
-MB, with a mean of 2.49 MB and a maximum of 6.47 MB, and compress to 35.5 MB
-with `tar | zstd -3`; the largest shard's 128 objects scale that to a derived
-47 MB. The M column above measures restoring the 306 MB macOS mise cache in
-10.52 to 19.61 s, a derived 15.6 to 29.1 MB/s, which puts a 47 MB restore at a
-derived 1.6 to 3.0 s of transfer. Assuming publication costs twice a restore
-and that the action overhead resembles the 2 s the R column shows for the
-runtime archive, a hit costs a derived 4 to 5 s and a miss, which restores
-nothing but still publishes, a derived 5 to 8 s; one complete run is then a
-derived 0.7 to 1.3 macOS min either way. Those assumptions are not measured
-here, and a branch run measuring the action itself would replace them. Scaling
-the compressed 35.5 MB by the measured 1,117 objects of the ten shards and by
-the two targets, which assumes macOS objects compress like these Linux ones,
-gives a derived 826 MB for each distinct key, against a measured 3.78 GB of
-the 10 GB repository limit already held in 69 entries, four of them mise tool
-caches of 306 to 425 MB. Whether that pressure evicts those entries, and what
-the resulting reinstalls would cost, is an unquantified risk rather than a
-measured cost.
+MiB, with a mean of 2.49 MiB and a maximum of 6.47 MiB, and compress to 35.5
+MiB with `tar | zstd -3`; the largest shard's 128 objects scale that to a
+derived 47 MiB, or 49.6 MB. The M column above measures restoring the 306 MB
+macOS mise cache in 10.52 to 19.61 s, a derived 15.6 to 29.1 MB/s, which puts
+that 49.6 MB restore at a derived 1.7 to 3.2 s of transfer. Assuming
+publication costs twice a restore and that the action overhead resembles the 2
+s the R column shows for the runtime archive, a hit costs a derived 4 to 5 s
+and a miss, which restores nothing but still publishes, a derived 5 to 8 s; ten
+shards are then a derived 0.6 to 1.4 macOS min either way, aggregated before
+rounding rather than from those whole seconds. Those assumptions are not
+measured here, and a branch run measuring the action itself would replace
+them. Scaling the compressed 35.5 MiB by the measured 1,117
+objects of the ten shards and by the two targets, which assumes macOS objects
+compress like these Linux ones, gives a derived 825 MiB, or 865 MB, for each
+distinct key, against a measured 4.06 GB, a derived 3.78 GiB, of the 10 GB
+repository limit already held in 69 entries, twelve of them mise tool caches of
+297 to 425 MB. Whether that pressure evicts those entries, and what the
+resulting reinstalls would cost, is an unquantified risk rather than a measured
+cost.
+
+The object byte measurement, with the exact compression invocation behind the
+35.5 MiB, and the cache occupancy listing are preserved in
+[*object-sizes.log*](./evidence/u4/object-sizes.log) and
+[*cache-usage.log*](./evidence/u4/cache-usage.log). The objects measured are
+`linux-x86_64-gnu`; no macOS object bytes were measured. The entry counts come
+from a complete listing of the same cache state, which reports byte-for-byte
+the same usage as the original observation; an earlier truncated listing of 8
+of the 69 entries is why this paragraph previously named four mise caches.
 
 Reproducing these observations:
 
@@ -724,7 +746,7 @@ nothing in the checked-in runner sets an explicit pool on macOS.
 The derived recovery for U4 at the current workload is therefore 12.2 macOS
 min for a complete run on its most favorable assumptions, a derived 7.9 min if
 the 64.6 percent input-stability proportion is taken as a hit rate, less a
-derived 0.7 to 1.3 min of transfer paid on every run. Two of the four measured
+derived 0.6 to 1.4 min of transfer paid on every run. Two of the four measured
 configurations, including the one at the macOS runner's own pool size, show no
 saving at all. That is below the 15 macOS min the unit set as its threshold, so
 no cross-job harness object cache was implemented. The derived 32.8 min bound

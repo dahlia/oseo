@@ -1,0 +1,123 @@
+# The U4 measurement drivers from the macOS host, an Apple M4 Mac mini,
+# concatenated with one header per original file. They are verbatim from
+# ~/Desktop/ on that host. They operate only on the throwaway clone at
+# ~/Desktop/oseo-m5ci, never on its ~/Projects/dahlia/oseo checkout.
+#
+# setup-oseo.sh installs mise, deps, and the build in the clone. run-shard.sh
+# runs one reviewed shard, removing ~/Library/Caches/oseo/harness-objects
+# first for a cold run; XDG_CACHE_HOME does not redirect that directory on
+# macOS. mac-series.sh ran the pool=8 series under caffeinate so the host would
+# not sleep. pool3-supervisor.sh stopped that series after its warm run,
+# applied the tools/test262.ts pool override preserved in pool3.patch.txt, and
+# started the pool=3 runs; its heredoc ran inside a single-quoted ssh command,
+# which is why some $ are escaped. mac-pool3-series.sh re-ran the four pool=3
+# runs from a clean start after the supervisor's own P3 logs were discarded,
+# and it is the script that produced the preserved P3 logs. pool3b.sh is the
+# continuation the supervisor path would have used and did not run to
+# completion.
+
+# ===== setup-oseo.sh
+#!/bin/bash
+set -uo pipefail
+LOG=~/Desktop/setup-oseo.log
+exec >"$LOG" 2>&1
+echo "=== start $(date -Iseconds)"
+if ! command -v mise >/dev/null 2>&1 && [ ! -x ~/.local/bin/mise ]; then
+  curl -fsSL https://mise.run | sh
+fi
+export PATH="$HOME/.local/bin:$PATH"
+mise --version
+cd ~/Desktop/oseo-m5ci
+mise trust
+mise install
+echo "=== mise install done $(date -Iseconds) rc=$?"
+mise deps
+echo "=== deps done $(date -Iseconds) rc=$?"
+mise run build
+echo "=== build done $(date -Iseconds) rc=$?"
+
+# ===== run-shard.sh
+#!/bin/bash
+# $1 = label, $2 = shard, $3 = cold|warm
+set -u
+export PATH="$HOME/.local/bin:$PATH"
+cd ~/Desktop/oseo-m5ci
+D=~/Desktop/m5ci-results
+mkdir -p "$D"
+if [ "$3" = "cold" ]; then rm -rf ~/Library/Caches/oseo/harness-objects; fi
+echo "=== $1 shard=$2 harness=$3 start $(date -Iseconds)" > "$D/$1.log"
+S=$(date +%s)
+mise run test:test262 --shard "$2" >> "$D/$1.log" 2>&1
+RC=$?
+E=$(date +%s)
+echo "WALL $((E-S)) s" >> "$D/$1.log"
+echo "=== exit $RC end $(date -Iseconds)" >> "$D/$1.log"
+
+# ===== mac-series.sh
+#!/bin/bash
+set -u
+caffeinate -dimsu -t 36000 &
+CAF=$!
+for run in A-warmup B-cold1 C-warm1 D-cold2 E-warm2; do
+  case "$run" in *warmup*|*cold*) mode=cold;; *) mode=warm;; esac
+  ~/Desktop/run-shard.sh "$run" 1/10 "$mode"
+done
+kill $CAF 2>/dev/null
+echo ALLDONE > ~/Desktop/m5ci-results/mac-series.done
+
+# ===== pool3-supervisor.sh
+#!/bin/bash
+set -u
+R=~/Desktop/m5ci-results
+# Wait for the pool=8 warm run to finish, then stop the remaining series.
+until grep -qa "=== exit" "$R/C-warm1.log" 2>/dev/null; do sleep 30; done
+pkill -f mac-series.sh
+sleep 2
+pkill -f "tools/test262.ts"
+sleep 5
+# Emulate the CI runner pool of three workers in this throwaway clone only.
+cd ~/Desktop/oseo-m5ci
+python3 - <<PY
+import re, pathlib
+p = pathlib.Path("tools/test262.ts")
+s = p.read_text()
+old = """const reviewedExecutionPoolLimit = Math.min(
+  measuredExecutionPoolLimit,
+  availableParallelism(),
+);"""
+new = """const reviewedExecutionPoolLimit = Math.min(
+  measuredExecutionPoolLimit,
+  process.env.OSEO_TEST262_POOL == null
+    ? availableParallelism()
+    : Number(process.env.OSEO_TEST262_POOL),
+);"""
+assert old in s, "pool pattern not found"
+p.write_text(s.replace(old, new))
+print("patched")
+PY
+export OSEO_TEST262_POOL=3
+for run in P3-cold1 P3-warm1; do
+  case "\$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  OSEO_TEST262_POOL=3 ~/Desktop/run-shard.sh "\$run" 1/10 "\$mode"
+done
+echo ALLDONE > "\$R/mac-pool3.done"
+
+# ===== pool3b.sh
+#!/bin/bash
+set -u
+until [ -f ~/Desktop/m5ci-results/mac-pool3.done ]; do sleep 60; done
+for run in P3-cold2 P3-warm2; do
+  case "$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  OSEO_TEST262_POOL=3 ~/Desktop/run-shard.sh "$run" 1/10 "$mode"
+done
+echo ALLDONE > ~/Desktop/m5ci-results/mac-pool3b.done
+
+# ===== mac-pool3-series.sh
+#!/bin/bash
+set -u
+caffeinate -dimsu -t 36000 &
+for run in P3-cold1 P3-warm1 P3-cold2 P3-warm2; do
+  case "$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  OSEO_TEST262_POOL=3 ~/Desktop/run-shard.sh "$run" 1/10 "$mode"
+done
+echo ALLDONE > ~/Desktop/m5ci-results/mac-pool3.done

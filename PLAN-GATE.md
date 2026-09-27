@@ -903,7 +903,7 @@ its sample's spread. Taking the largest per-object wall saving anyway, 0.656
 s, applied to the measured 1,117 objects of the ten macOS shards, gives a
 derived 12.2 min for one complete run at the current workload, and a derived
 7.9 min if the derived 64.6 percent of main steps that leave the key inputs
-unchanged is taken as a hit rate, less a derived 0.7 to 1.3 min of restore and
+unchanged is taken as a hit rate, less a derived 0.6 to 1.4 min of restore and
 publication that every run pays whether it hits or misses. The two baseline
 runs establish no improvement of this size either way: each job was measured
 once per commit and the derived same-job spread for a macOS test262 shard
@@ -913,7 +913,9 @@ derived bound, 32.8 min, because a shard's 300-key ceiling times ten shards
 bounds it at 3,000 objects; that bound, not the current-workload figure, is
 what would justify revisiting the unit. The measurement, its hosts, and the
 cache-key and storage costs are recorded in
-[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). U4 was therefore
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), and their
+preserved sources in
+[*docs/evidence/u4/*](./docs/evidence/u4/README.md). U4 was therefore
 not implemented, and this projection subtracts nothing for it.
 
 The harness split landed at `f131a798` and `30c9f690` on 2026-09-17, before
