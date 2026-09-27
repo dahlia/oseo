@@ -1,0 +1,12 @@
+version: 1
+id: m5-exit-audit
+title: Audit the M5 exit condition
+delivers: "Verifies that the manifest covers all 41,091 applicable paths, that
+  failures and unowned unsupported results are zero, that authorized
+  exclusions are bounded, and that the reproducible coverage report and all
+  required gates pass without claiming unqualified ECMA-262 conformance."
+dependencies:
+  - authorized-exclusion-audit
+  - remediation-work-graph
+landed: false
+status: blocked

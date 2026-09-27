@@ -4,10 +4,11 @@ M5 plan for measured ECMAScript compatibility
 Status
 ------
 
-Implementation status: active. M4 established closed native module graphs,
-live bindings, promises, asynchronous continuations, top-level await, and a
-deterministic native scheduler. M5 expands that documented subset through
-measured compatibility work rather than treating ECMAScript as one feature.
+Implementation status: active at M5c. M4 established closed native module
+graphs, live bindings, promises, asynchronous continuations, top-level await,
+and a deterministic native scheduler. M5 expands that documented subset
+through measured compatibility work rather than treating ECMAScript as one
+feature.
 
 The first four delivery items are complete.
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
@@ -18,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,383 reviewed cases: 18,310 passes, 1,560 expected negatives, and 1,513
+21,383 reviewed cases: 18,343 passes, 1,560 expected negatives, and 1,480
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -27,12 +28,13 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 140 indexed records in the normative
+M5a and M5b are complete. The 141 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
-for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records
-18,310 passes across 21,383 paths, and the property inventory records 163
-domains, 163 seeds, and an ordinary case budget of 5,873.
+for admitted families and their evidence assessments. M5c is the remaining
+checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
+graph. The reviewed manifest records 18,343 passes across 21,383 paths, and
+the property inventory records 165 domains, 165 seeds, and an ordinary case
+budget of 5,905.
 
 
 M5a implementation history
@@ -3550,6 +3552,12 @@ boundary.
 
 M5b work graph
 --------------
+
+M5b is complete. Ninety of its 92 nodes landed. The two parked nodes are the
+`eval-dynamic-source` and `function-constructor-dynamic-source` boundaries that
+ADR 0016 keeps unsupported and ADR 0019 authorizes for M5 completion. The graph
+is retained as the implementation and orchestration record; new closure work
+belongs to [*PLAN-M5C.md*](./PLAN-M5C.md) and the M5c graph.
 
 The M5b queue is checked in as a machine-readable graph rather than a
 hand-drawn phase scheme, so an implementation session can take any work item
@@ -7335,7 +7343,7 @@ Exit criteria
 
 M5 is reported as the three checkpoints recorded in
 [*ROADMAP.md*](./ROADMAP.md). M5a admits the core language apart from the
-dynamic source family that ADR 0016 excludes, M5b adds the built-in families,
+dynamic source family that ADR 0016 excludes, M5b added the built-in families,
 and M5c closes against the applicable-test inventory.
 
 M5 is complete only when:

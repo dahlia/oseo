@@ -1,0 +1,12 @@
+version: 1
+id: remediation-work-graph
+title: Expand the measured remediation graph
+delivers: "Replaces the measured unknown tail with bounded implementation,
+  harness, review, or evidence nodes, records their collisions and
+  serialization points, and makes every terminal node a prerequisite of the
+  M5 exit audit."
+dependencies:
+  - observation-batch-plan
+  - unsupported-ownership-audit
+landed: false
+status: blocked

@@ -1,0 +1,10 @@
+version: 1
+id: authorized-exclusion-audit
+title: Verify authorized exclusions
+delivers: "Proves that every proposed M5 exclusion cites an accepted record,
+  stays within its bounded surface, and retains a concrete reopening trigger;
+  dynamic source remains owned only by ADR 0016 and ADR 0019."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

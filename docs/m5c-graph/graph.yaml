@@ -1,0 +1,49 @@
+version: 1
+checkpoint: M5c
+usage: "Take a node whose status is ready and whose landed field is false.
+  The graph begins with measurement and ownership work, not one node for all
+  19,708 unreviewed paths. The remediation-work-graph node replaces that
+  unknown tail with bounded semantic, harness, or evidence nodes and adds each
+  new terminal prerequisite to m5-exit-audit. Update baseline whenever the
+  checked-in reviewed manifest changes; check:m5c-graph rejects stale counts."
+baseline:
+  suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+  inventoryPaths: 41091
+  reviewedPaths: 21383
+  unreviewedPaths: 19708
+  passes: 18343
+  expectedNegatives: 1560
+  unsupportedProfileFeatures: 1480
+  semanticFailures: 0
+  harnessFailures: 0
+  infrastructureFailures: 0
+summary:
+  nodes: 7
+  ready: 2
+  blocked: 5
+  parked: 0
+  landed: 1
+serializationPoints:
+  - path: docs/m5c-graph/graph.yaml
+    note: "Every landing updates node state and the evidence baseline. Merge
+      graph changes one at a time."
+  - path: docs/m5c-closure/ledger.yaml
+    note: "The closure ledger will assign one state and one owner to every
+      applicable inventory path. Ownership audits and batch planning may both
+      need to extend it."
+  - path: tests/test262/subset.yaml
+    note: "Every newly reviewed path enters the reviewed subset before its
+      observation can appear in the result manifest."
+  - path: tests/test262/results.yaml
+    note: "The manifest index and partitions are regenerated as one canonical
+      observation set, so two lanes never regenerate them concurrently."
+  - path: docs/language-profile-m5.md
+    note: "Semantic remediation updates the normative profile and its family
+      evidence records in the same change."
+collisions:
+  - path: docs/m5c-closure/ledger.yaml
+    nodes:
+      - observation-batch-plan
+      - unsupported-ownership-audit
+    note: "Both nodes classify paths after the ledger lands. Run their
+      analysis concurrently if useful, but serialize their ledger edits."

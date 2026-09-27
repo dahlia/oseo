@@ -13,9 +13,10 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
-M5a is complete. The normative
-[*M5 language profile*](./docs/language-profile-m5.md) records all 140 admitted
-families and their evidence assessments. M5b and M5c remain open.
+M5a and M5b are complete. The normative
+[*M5 language profile*](./docs/language-profile-m5.md) records all 141 admitted
+families and their evidence assessments. M5c remains open under
+[*PLAN-M5C.md*](./PLAN-M5C.md).
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
@@ -649,13 +650,13 @@ included paths comprise 22,998 language tests and 18,093 built-in tests.
 The separate compact index records the denominator without duplicating the
 result manifest's observations.
 
-M5b adds the intrinsic graph, the global object, and the built-in families,
+M5b added the intrinsic graph, the global object, and the built-in families,
 including the BigInt intrinsic owned by
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md), the regular expression family owned by
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), and the `Date` family followed by the
-clock gate and Date integration in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c closes
-the remaining results
-in the inventory or covers them with a record that authorizes the exclusion.
+clock gate and Date integration in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c now
+follows [*PLAN-M5C.md*](./PLAN-M5C.md) to close the remaining results in the
+inventory or cover them with a record that authorizes the exclusion.
 
 The reviewed evidence gates grow with the corpus these checkpoints admit.
 [*PLAN-GATE.md*](./PLAN-GATE.md) owns that cost and is a prerequisite of M5b
@@ -849,8 +850,9 @@ track.
 
 The normative [*M5 language profile*](./docs/language-profile-m5.md), rather
 than this queue, records current admitted behavior and per-family evidence.
-The next M5 work adds M5b built-ins in dependency order, then closes or
-authorizes every M5c inventory result under ADR 0019.
+The next M5 work closes or authorizes every inventory result under ADR 0019.
+[*PLAN-M5C.md*](./PLAN-M5C.md) and its machine-validated graph begin with an
+exact closure ledger, ownership audit, and bounded observation batches.
 
 
 M5 implementation history

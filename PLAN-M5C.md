@@ -1,0 +1,180 @@
+M5c inventory closure plan
+==========================
+
+Status
+------
+
+Implementation status: active. M5a fixed the applicable ECMA-262 16th edition
+inventory and M5b completed the built-in and intrinsic dependency graph. M5c
+closes every path in that inventory by observation, remediation, or an
+explicitly authorized exclusion. It does not reopen M5b or turn the remaining
+19,708 unreviewed paths into one implementation unit.
+
+The checked-in starting point is 41,091 applicable paths at test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The reviewed manifest covers
+21,383 paths: 18,343 passes, 1,560 expected negatives, and 1,480 unsupported
+profile features. Semantic, harness, and infrastructure failures are zero.
+The remaining 19,708 paths are unreviewed, not presumed failures or passes.
+
+[*docs/m5c-graph/graph.yaml*](./docs/m5c-graph/graph.yaml) is the source of
+truth for M5c work. `mise run check:m5c-graph` derives the current baseline
+from the inventory and partitioned reviewed manifest, rejects stale graph
+counts, and validates the dependency and terminal-exit structure.
+
+
+Goal
+----
+
+M5c produces a complete, reproducible closure account for the fixed applicable
+inventory. Every included path ends in exactly one of these states:
+
+ -  a reviewed pass;
+ -  a reviewed expected negative;
+ -  a reviewed unsupported profile feature whose remediation is still active;
+ -  a reviewed unsupported profile feature covered by an accepted record that
+    explicitly authorizes an M5 exclusion and bounds its surface; or
+ -  unreviewed, which is allowed only while M5c remains active.
+
+M5 completes only when the last state is empty, all semantic, harness, and
+infrastructure failure counts are zero, and no unsupported result lacks either
+active remediation or an accepted exclusion. At the exit audit, active
+remediation is also empty.
+
+Coverage reporting keeps the reviewed count, inventory size, classifications,
+and authorized-exclusion count separate. A percentage always uses the 41,091
+path inventory as its denominator.
+
+
+Non-goals
+---------
+
+This plan does not change the edition, optional-section policy, inventory
+policy, reviewed Test262 revision, manifest schema, or classification
+vocabulary fixed by [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) and
+[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md).
+
+It does not reopen the dynamic source boundary in
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Dynamic source may
+remain unsupported for M5 only through the authorization rule in
+[ADR 0019](./docs/adr/0019-m5-claim-closure.md). An unqualified ECMA-262
+conformance label remains a separate later gate.
+
+It does not weaken gates, lower property budgets, delete reviewed paths, turn a
+failure into an expected result, or add compatibility-ratchet overrides to
+make a batch close.
+
+
+Closure ledger
+--------------
+
+The first active node creates a canonical path-indexed ledger over all 41,091
+included inventory paths. The inventory supplies membership and the reviewed
+manifest supplies observations. Paths absent from the reviewed manifest are
+recorded as unreviewed rather than inferred from their directory or dependency
+tags.
+
+Each reviewed unsupported path records two different facts:
+
+ -  its semantic or harness prerequisite, using the frozen ADR 0013 dependency
+    vocabulary; and
+ -  its closure owner, which is either a remediation node or an accepted ADR
+    that authorizes a bounded M5 exclusion.
+
+A dependency tag is not an exclusion authorization. In particular, ADR 0013
+keeps realms, agents, shared memory, and missing harness capabilities inside
+the claim. Those tags identify work until a separate accepted record says
+otherwise. ADR 0016 and ADR 0019 authorize only the bounded dynamic source
+surface they describe and retain their documented reopening triggers.
+
+The ledger is derived data. Tools regenerate its classification counts from
+the reviewed manifest and reject duplicate, absent, or out-of-inventory paths.
+Manual notes may explain ownership, but they never override an observation.
+
+
+Work graph construction
+-----------------------
+
+M5c begins with measurement because neither directory size nor an unsupported
+count estimates the implementation work. The bootstrap graph therefore orders
+these steps:
+
+1.  Build the closure ledger from the exact inventory and reviewed manifest.
+2.  Audit reviewed unsupported results for remediation or authorized exclusion
+    ownership.
+3.  Partition unreviewed paths into deterministic observation batches.
+4.  Audit the proposed authorized exclusions against their accepted records.
+5.  Replace the measured unknown tail with bounded remediation and evidence
+    nodes.
+6.  Run the terminal M5 exit audit after every generated terminal node lands.
+
+The remediation graph is an intended expansion point, not a placeholder for a
+single 19,708-path session. Its landing change adds the measured nodes and
+makes every terminal node a dependency of `m5-exit-audit`. The graph validator
+rejects a node that is not on the exit-audit dependency path.
+
+Observation batches are deterministic and small enough for one reviewer to
+inspect their applicability and classifications. A batch records its path
+selector, exact path count, shared prerequisites, and expected manifest
+regeneration cost. It does not mix unrelated semantic implementation with a
+harness capability merely because both appear in one directory.
+
+When an observation batch exposes a shared missing prerequisite, the graph
+adds one prerequisite node and makes every affected batch depend on it. When a
+path is already supported, the batch admits it without inventing a semantic
+node. When a failure exposes a regression, the regression is repaired before
+the batch lands.
+
+
+Concurrency and serialization
+-----------------------------
+
+Independent analysis and implementation nodes may run in parallel. Nodes in
+one collision group do not. Manifest regeneration, the closure ledger, graph
+state, and the normative profile are serialization points and merge one at a
+time.
+
+Every semantic node retains the evidence contract from
+[*PLAN-M5.md*](./PLAN-M5.md): focused examples, applicable generated and
+forced-collection evidence, generic fallback and specialization misses,
+reviewed Test262 observations, and the normative family record. Observation
+and audit nodes add no runtime behavior and must not create evidence merely to
+look like semantic nodes.
+
+The graph baseline moves whenever the reviewed manifest moves. The same change
+updates the ledger and node state, so a clean checkout cannot describe one
+manifest while scheduling work from another.
+
+
+Gates
+-----
+
+Every graph change runs `mise run check:m5c-graph`. Semantic and evidence
+changes also run the ordinary repository gates and the extended property gate
+required by [*CONTRIBUTING.md*](./CONTRIBUTING.md). Manifest regeneration uses
+the canonical task and preserves the compatibility ratchet.
+
+The terminal audit additionally proves:
+
+ -  the inventory and manifest use the same pinned revision;
+ -  all 41,091 included paths occur exactly once in the closure ledger;
+ -  the reviewed manifest covers all included paths;
+ -  semantic, harness, and infrastructure failure counts are zero;
+ -  every remaining unsupported result is covered by an accepted record that
+    authorizes and bounds an M5 exclusion;
+ -  every accepted exclusion retains a stated reopening trigger;
+ -  the coverage report can be reproduced from checked-in inputs; and
+ -  `mise run check`, `mise run test`, and the extended property task pass from
+    a clean checkout.
+
+
+Exit and reporting
+------------------
+
+M5c is complete when `m5-exit-audit` lands. Its change records the final
+classification totals, authorized-exclusion count, exact inventory revision,
+and gate results. No queue-empty or all-current-nodes-landed condition can
+substitute for that audit, because the remediation graph may still need to
+expand after new observations.
+
+The completion report describes Oseo's measured M5 profile. It does not call
+the result unqualified ECMA-262 conformance while ADR 0016 remains accepted.

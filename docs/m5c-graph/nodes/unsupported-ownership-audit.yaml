@@ -1,0 +1,10 @@
+version: 1
+id: unsupported-ownership-audit
+title: Audit unsupported-result ownership
+delivers: "Assigns every reviewed unsupported result to a remediation owner
+  or to an accepted record that explicitly authorizes and bounds an M5
+  exclusion; a dependency tag alone is not authorization."
+dependencies:
+  - closure-ledger
+landed: false
+status: blocked

@@ -1,0 +1,10 @@
+version: 1
+id: observation-batch-plan
+title: Partition unreviewed observations
+delivers: "Partitions every unreviewed path into deterministic bounded batches
+  by shared prerequisites and path locality, with review size and manifest
+  regeneration cost recorded for each batch."
+dependencies:
+  - closure-ledger
+landed: false
+status: blocked

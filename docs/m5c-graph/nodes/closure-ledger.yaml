@@ -1,0 +1,10 @@
+version: 1
+id: closure-ledger
+title: Build the inventory closure ledger
+delivers: "Creates one canonical path-indexed ledger over all 41,091 included
+  inventory paths, deriving reviewed classifications from the manifest and
+  recording an explicit unreviewed state for every remaining path."
+dependencies:
+  - bootstrap-graph
+landed: false
+status: ready

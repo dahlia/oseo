@@ -1,0 +1,8 @@
+version: 1
+id: bootstrap-graph
+title: Bootstrap the M5c closure graph
+delivers: "Checks in the M5c plan, exact evidence baseline, work graph, and
+  validator that keeps graph state and the reviewed manifest synchronized."
+dependencies: []
+landed: true
+status: ready
