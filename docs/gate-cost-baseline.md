@@ -106,6 +106,175 @@ Run 36261458909, derived minutes from its measured job timestamps:
 
 Derived platform totals: macOS 764.12 min, Linux 578.80 min.
 
+### U7 duplicate-work audit
+
+This audit inspected *mise.toml*, *.github/workflows/main.yaml*, the
+runtime-archive cache action, and the property harness at `86180894`.
+The coordinator assigned repeated npm builds to U3 and explicitly directed
+U7 to retain the focused Linux checks. U7 therefore changes documentation
+only: the coordinator retained the small isolated selection-test duplicate,
+no workflow or task changes were made, and no branch CI run was requested.
+
+The table's costs are measured execution-step seconds from run 36261458909
+using `gh run view 36261458909 --repo dahlia/oseo --json headSha,jobs`.
+A slash separates the two compared executions, not hosts. Sharded costs are
+derived sums of measured step intervals, including task builds and startup;
+they are enclosing costs, not separately measured duplicate-case costs.
+The Node step includes all discovered tests. No savings estimate is inferred
+from these costs. Separate fixed build costs follow below.
+
+| Candidate                                                        | Compared configurations and evidence                                                                                                                                                      | Duplicate decision                                                                                                                   | macOS step s                                              | Linux step s                                              |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------- |
+| Ordinary native properties versus native support                 | Node, execution-host target, Zig in both; ordinary suite seed/small/1x versus override seed 1592590339/large/10x; concurrency also differs                                                | No: seeds differ; larger domain and budget do not prove a case superset                                                              | 2537 / 16474 (12-shard sum)                               | 1346 / 14753 (4-shard sum)                                |
+| Ordinary package properties versus focused extended package task | Same files under each respective Node or Deno host; suite seed/small/1x versus seeds 1592590337 and 1592590338/large/10x                                                                  | No: distinct seeds and size; Node and Deno must also remain separate                                                                 | Node 2537, Deno 47 / combined extended 10                 | Node 1346, Deno 38 / combined extended 13                 |
+| Deno root native properties versus native support                | `test:deno` is `deno test -A packages`, not root discovery; native support selects _tests/property/\*.property.test.ts_ under Node                                                        | No: Deno does not select the root native property files                                                                              | 47 / 16474                                                | 38 / 14753                                                |
+| Ordinary native/runtime tests versus host C sanitizer tasks      | Node and matching target, but ordinary Zig versus explicitly selected host-cc with ASan/UBSan; Linux compiler override also verifies GCC                                                  | No: compiler lane and instrumentation are separate evidence                                                                          | Node 2537 / runtime 273, property 1823                    | Node 1346 / runtime 290, property 1849                    |
+| Native fixtures versus native support and test262                | *tests/native.ts* selects fixture records; native support selects property files; *tools/test262.ts* selects reviewed corpus paths; fixture `test262Host` installs an API, not the corpus | No identical input/observation matrix established                                                                                    | native 2582 / property 16474 / test262 18686 (shard sums) | native 2585 / property 14753 / test262 11291 (shard sums) |
+| Native fixtures versus sanitizer native fixtures                 | Same fixture runner and execution target, Zig versus host-cc with ASan/UBSan                                                                                                              | No: separate compiler lane                                                                                                           | 2582 / 1810                                               | 2585 / 2068                                               |
+| Sanitizer self checks repeated across macOS jobs                 | Real Apple Clang instrumentation probes in *tests/host-cc-sanitizer.test.ts*, separate native/property job processes                                                                      | Keep real compiler probes: each job must independently validate its compiler; isolated selection cases are recorded separately below | 7 / 5                                                     | n/a                                                       |
+| Linux sanitizer self checks                                      | Default compiler selection versus explicit `OSEO_HOST_CC=gcc`                                                                                                                             | No for real probes: default prefers Clang when installed; explicit override supplies GCC evidence                                    | n/a                                                       | 4 / 4                                                     |
+| Focused tooling unit tests in check versus root Node discovery   | Same Linux/Node test sources; check uses full-history checkout and baseline/range setup, Node uses shallow checkout; isolated file selection versus root concurrent discovery             | Unproven identical complete configuration; retain per coordinator, costs below                                                       | n/a (check is Linux only)                                 | check step 66 / Node 1346                                 |
+| Isolated compiler-selection unit cases                           | *tests/host-cc-selection.test.ts* runs the same three fake-compiler cases in root Node and sanitizer self; each child gets a fully specified isolated environment                         | Yes for these cases; retain per coordinator because the few-second bound does not justify full gates and a CI cycle                  | Inside Node 2537 and self steps 7 / 5                     | Inside Node 1346 and self steps 4 / 4                     |
+| Repeated npm package builds                                      | Cache action runs `build`; later independent mise invocations repeat the same workspace build; sanitizer env differs but build command/config has no native compiler selection            | Yes for repeated npm build work; delegated to U3, retained by U7                                                                     | Per-job table below                                       | Per-job table below                                       |
+| Linux versus macOS jobs, Node versus Deno jobs                   | Different OS/arch or JavaScript host, including macOS execution and Apple Clang sanitizer lanes                                                                                           | No: preserve host evidence                                                                                                           | Listed separately above                                   | Listed separately above                                   |
+
+#### Property seed and case inclusion evidence
+
+*packages/testkit/tests/property-support.ts* returns `seed ?? options.seed`:
+an environment seed replaces the suite's seed, rather than adding a replay of
+it. Absent overrides, `propertySize` returns `small` and run scale is one.
+Extended native shards set seed 1592590339, scale 10, and size `large`.
+Extended package tasks run each host with seeds 1592590337 and 1592590338,
+scale 10, and size `large`. Every shard keeps its configured seed and budget.
+No removed run's cases need reconstruction because no run is removed.
+
+For a concrete generator difference, the package runner property changes
+maximum list length from 32 to 128; native for-await-of properties also
+select their generator bounds with `propertySize`. A larger domain does not
+establish that its deterministic generated sequence contains a smaller one.
+Even fixed-domain properties use the replaced seed. The same-seed/path premise
+needed for a first-N inclusion proof is absent, so no such proof is claimed.
+
+A measured local counterexample used fast-check 4.9.0 and the actual
+`propertyParameters`/`propertySize` functions via
+[*docs/evidence/u7/property-probe.mjs.txt*](./evidence/u7/property-probe.mjs.txt).
+The preserved probe uses `fc.assert`, recording predicate arguments rather than
+`fc.sample`; [its output](./evidence/u7/property-probe.log) and the
+[reproduction commands](./evidence/u7/README.md) are retained. With suite seed
+`0x60001200`, budget 12, and `fc.integer()`, the ordinary first four
+observations were 556484374, 1586950928, 1425465318, and 10. The
+extended-native configuration produced 24, -2147483644, 1324788078, and
+-226402400, at budget 120. The first extended-package seed produced -820612415,
+107459006, -23, and 1035396571, also at budget 120. This is a harness
+counterexample, not a measurement of native gate cost or an exhaustive
+comparison of suite outputs. Source inspection establishes the seed mismatch;
+the probe demonstrates why a budget multiplier alone is insufficient. Ordinary
+evidence stays on each currently selected host.
+
+#### Focused Linux tooling checks
+
+Measured Node runner `duration_ms` from each run's check-job log follows.
+These times cover the unit-test subprocess, excluding the subsequent checker
+CLI in the native guard/toolchain tasks. They are not additive wall-clock
+savings because check tasks execute concurrently. The enclosing check steps
+were measured at 67 s and 66 s respectively. No macOS check job exists.
+
+| Test file                          | Measured s, run 36243816479 | Measured s, run 36261458909 |
+| ---------------------------------- | --------------------------- | --------------------------- |
+| *tests/anti-slop.test.ts*          | 11.941                      | 12.515                      |
+| *tests/native-host-guards.test.ts* | 2.797                       | 2.751                       |
+| *tests/native-toolchains.test.ts*  | 7.708                       | 6.684                       |
+
+The focused tasks execute actual unit tests and then, where configured, a
+repository scan; the scan is not the same work as its unit tests. This audit
+records repeated test-file selection without asserting a behavior difference
+caused by checkout depth or concurrency, or claiming identical complete
+configuration. The coordinator directed retention of this Linux-only work.
+
+#### Repeated npm build input for U3
+
+The runtime-archive composite action first runs `mise run build`, including
+for Deno jobs on non-Windows hosts. Each later independent task invocation
+with `depends = ["build"]` runs it again. Within a single mise dependency
+DAG, shared dependencies run once; this audit does not count them twice.
+The build is `aube exec -- tsdown --workspace`, with `clean: true`, validating
+ESM, declarations, publint, and attw. No build source input is intentionally
+changed between these invocations. Native compiler choice affects native
+execution, not this npm build command.
+
+Each row below identifies the source job by its workflow name. Columns are
+derived per-job sums of measured runner-log timestamp intervals from each
+later `[build] $ aube exec -- tsdown --workspace` line to the next test-task
+launch; the initial cache-action build is excluded. They include dispatch
+cost and are neither an isolated tsdown duration nor measured recoverable
+savings. Logs were retrieved with
+`gh api repos/dahlia/oseo/actions/runs/RUN/logs`; main run IDs are in the
+column headings. The [extraction script](./evidence/u7/extract-ci.py)
+retains compact timestamp inputs and exact end markers for both runs;
+[reproduction instructions](./evidence/u7/README.md) cover every table.
+No Zig cold/warm speedup is claimed: this is npm build work,
+and the observed runtime archive states do not establish Zig cache contents.
+
+| Source job                              | Later builds per job | Derived repeated interval s, 36243816479 | Derived repeated interval s, 36261458909 |
+| --------------------------------------- | -------------------- | ---------------------------------------- | ---------------------------------------- |
+| host C sanitizers (Linux)               | 5                    | 8.32                                     | 8.93                                     |
+| host C sanitizers (macOS, native)       | 3                    | 6.37                                     | 7.40                                     |
+| host C sanitizers (macOS, property)     | 2                    | 2.45                                     | 2.70                                     |
+| native (linux-x86\_64-gnu, 1/3)         | 1                    | 1.42                                     | 1.90                                     |
+| native (linux-x86\_64-gnu, 2/3)         | 1                    | 1.71                                     | 1.95                                     |
+| native (linux-x86\_64-gnu, 3/3)         | 1                    | 2.06                                     | 1.95                                     |
+| native (macos-aarch64, 1/3)             | 1                    | 1.87                                     | 1.26                                     |
+| native (macos-aarch64, 2/3)             | 1                    | 1.31                                     | 1.63                                     |
+| native (macos-aarch64, 3/3)             | 1                    | 1.77                                     | 1.88                                     |
+| native support (linux-x86\_64-gnu, 1/4) | 2                    | 3.81                                     | 3.94                                     |
+| native support (linux-x86\_64-gnu, 2/4) | 1                    | 1.72                                     | 1.90                                     |
+| native support (linux-x86\_64-gnu, 3/4) | 1                    | 1.20                                     | 1.46                                     |
+| native support (linux-x86\_64-gnu, 4/4) | 1                    | 2.16                                     | 1.72                                     |
+| native support (macos-aarch64, 10/12)   | 1                    | 1.62                                     | 2.33                                     |
+| native support (macos-aarch64, 11/12)   | 1                    | 1.15                                     | 1.45                                     |
+| native support (macos-aarch64, 12/12)   | 1                    | 1.68                                     | 1.41                                     |
+| native support (macos-aarch64, 1/12)    | 2                    | 2.92                                     | 2.50                                     |
+| native support (macos-aarch64, 2/12)    | 1                    | 2.95                                     | 1.45                                     |
+| native support (macos-aarch64, 3/12)    | 1                    | 1.10                                     | 1.55                                     |
+| native support (macos-aarch64, 4/12)    | 1                    | 1.72                                     | 2.10                                     |
+| native support (macos-aarch64, 5/12)    | 1                    | 1.67                                     | 2.15                                     |
+| native support (macos-aarch64, 6/12)    | 1                    | 1.60                                     | 1.70                                     |
+| native support (macos-aarch64, 7/12)    | 1                    | 1.14                                     | 2.23                                     |
+| native support (macos-aarch64, 8/12)    | 1                    | 1.92                                     | 1.44                                     |
+| native support (macos-aarch64, 9/12)    | 1                    | 1.71                                     | 1.23                                     |
+| test (macos-latest, node)               | 1                    | 1.46                                     | 1.70                                     |
+| test (ubuntu-latest, node)              | 1                    | 1.75                                     | 1.32                                     |
+| test262 (linux-x86\_64-gnu, 10/10)      | 1                    | 1.12                                     | 1.68                                     |
+| test262 (linux-x86\_64-gnu, 1/10)       | 1                    | 1.93                                     | 1.91                                     |
+| test262 (linux-x86\_64-gnu, 2/10)       | 1                    | 1.75                                     | 1.51                                     |
+| test262 (linux-x86\_64-gnu, 3/10)       | 1                    | 1.91                                     | 1.86                                     |
+| test262 (linux-x86\_64-gnu, 4/10)       | 1                    | 1.89                                     | 1.94                                     |
+| test262 (linux-x86\_64-gnu, 5/10)       | 1                    | 1.91                                     | 1.97                                     |
+| test262 (linux-x86\_64-gnu, 6/10)       | 1                    | 1.73                                     | 1.88                                     |
+| test262 (linux-x86\_64-gnu, 7/10)       | 1                    | 1.85                                     | 1.49                                     |
+| test262 (linux-x86\_64-gnu, 8/10)       | 1                    | 2.25                                     | 1.93                                     |
+| test262 (linux-x86\_64-gnu, 9/10)       | 1                    | 1.71                                     | 1.15                                     |
+| test262 (macos-aarch64, 10/10)          | 1                    | 1.22                                     | 2.29                                     |
+| test262 (macos-aarch64, 1/10)           | 1                    | 1.97                                     | 1.19                                     |
+| test262 (macos-aarch64, 2/10)           | 1                    | 1.93                                     | 1.68                                     |
+| test262 (macos-aarch64, 3/10)           | 1                    | 2.24                                     | 2.79                                     |
+| test262 (macos-aarch64, 4/10)           | 1                    | 1.66                                     | 1.70                                     |
+| test262 (macos-aarch64, 5/10)           | 1                    | 2.57                                     | 1.14                                     |
+| test262 (macos-aarch64, 6/10)           | 1                    | 1.39                                     | 1.51                                     |
+| test262 (macos-aarch64, 7/10)           | 1                    | 2.13                                     | 1.39                                     |
+| test262 (macos-aarch64, 8/10)           | 1                    | 1.33                                     | 1.67                                     |
+| test262 (macos-aarch64, 9/10)           | 1                    | 2.88                                     | 1.16                                     |
+
+Deno's cache-action build has no later `build` dependency to duplicate.
+`test:deno` reads package source entry points through the Deno workspace,
+not built npm output; its initial npm build is an unconsumed-build candidate
+for U3. This does not establish whether the restored runtime archive is used.
+Windows skips that action and builds once for Node. U3 owns whether and how
+to reuse the already validated npm output; U7 does not remove its validation.
+These two different-commit samples describe observed costs, not an
+implementation improvement. There is no before/after branch comparison and
+no claimed macOS minute reduction from this documentation-only audit.
+
 ### macOS test262 execution series
 
 The measured series below covers every main workflow run from `32ece7f4`

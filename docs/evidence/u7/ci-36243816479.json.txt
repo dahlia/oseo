@@ -1,0 +1,1147 @@
+{
+  "sourceRun": "36243816479",
+  "headSha": "00153abee217ce97699a0f29d4384545adc56810",
+  "jobs": [
+    {
+      "name": "check",
+      "id": 108409155406,
+      "steps": [
+        {
+          "name": "Run mise run check",
+          "start": "2026-09-26T13:02:30Z",
+          "end": "2026-09-26T13:03:37Z",
+          "seconds": 67.0
+        }
+      ],
+      "laterBuilds": [],
+      "toolingTestSeconds": {
+        "native-host-guards": 2.797329639,
+        "native-toolchains": 7.7077539580000005,
+        "anti-slop": 11.940741292999999
+      }
+    },
+    {
+      "name": "test (ubuntu-latest, deno)",
+      "id": 108409155475,
+      "steps": [
+        {
+          "name": "Run mise run test:deno",
+          "start": "2026-09-26T13:02:31Z",
+          "end": "2026-09-26T13:03:16Z",
+          "seconds": 45.0
+        }
+      ],
+      "laterBuilds": [],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "host C sanitizers (macOS, property)",
+      "id": 108409155477,
+      "steps": [
+        {
+          "name": "Run mise run test:sanitizer:self",
+          "start": "2026-09-26T13:03:08Z",
+          "end": "2026-09-26T13:03:13Z",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:property",
+          "start": "2026-09-26T13:03:13Z",
+          "end": "2026-09-26T13:37:04Z",
+          "seconds": 2031.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:03:09.0145990Z",
+          "end": "2026-09-26T13:03:10.2309220Z",
+          "endMarker": "[test:sanitizer:self] $",
+          "seconds": 1.216323
+        },
+        {
+          "start": "2026-09-26T13:03:13.5280450Z",
+          "end": "2026-09-26T13:03:14.7590100Z",
+          "endMarker": "[test:sanitizer:property] $",
+          "seconds": 1.230965
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test (ubuntu-latest, node)",
+      "id": 108409155494,
+      "steps": [
+        {
+          "name": "Run mise run test:node",
+          "start": "2026-09-26T13:02:30Z",
+          "end": "2026-09-26T13:38:22Z",
+          "seconds": 2152.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:30.6640824Z",
+          "end": "2026-09-26T13:02:32.4154627Z",
+          "endMarker": "[test:node] $",
+          "seconds": 1.75138
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "host C sanitizers (macOS, native)",
+      "id": 108409155499,
+      "steps": [
+        {
+          "name": "Run mise run test:sanitizer:self",
+          "start": "2026-09-26T14:01:25Z",
+          "end": "2026-09-26T14:01:32Z",
+          "seconds": 7.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:runtime",
+          "start": "2026-09-26T14:01:32Z",
+          "end": "2026-09-26T14:06:49Z",
+          "seconds": 317.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:native",
+          "start": "2026-09-26T14:06:49Z",
+          "end": "2026-09-26T14:40:08Z",
+          "seconds": 1999.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:01:25.2433000Z",
+          "end": "2026-09-26T14:01:27.5265930Z",
+          "endMarker": "[test:sanitizer:self] $",
+          "seconds": 2.283293
+        },
+        {
+          "start": "2026-09-26T14:01:32.6733780Z",
+          "end": "2026-09-26T14:01:34.8002360Z",
+          "endMarker": "[test:sanitizer:runtime] $",
+          "seconds": 2.126858
+        },
+        {
+          "start": "2026-09-26T14:06:49.7611870Z",
+          "end": "2026-09-26T14:06:51.7231640Z",
+          "endMarker": "[test:sanitizer:native] $",
+          "seconds": 1.961977
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 4/12)",
+      "id": 108409155507,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=4/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:03:15Z",
+          "end": "2026-09-26T13:34:25Z",
+          "seconds": 1870.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:03:15.1063640Z",
+          "end": "2026-09-26T13:03:16.8221430Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.715779
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 3/10)",
+      "id": 108409155512,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 3/10",
+          "start": "2026-09-26T13:25:16Z",
+          "end": "2026-09-26T13:56:20Z",
+          "seconds": 1864.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:25:16.6508820Z",
+          "end": "2026-09-26T13:25:18.8873830Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 2.236501
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 2/12)",
+      "id": 108409155515,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=2/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:03:19Z",
+          "end": "2026-09-26T13:26:23Z",
+          "seconds": 1384.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:03:19.4555270Z",
+          "end": "2026-09-26T13:03:22.4087560Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 2.953229
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "host C sanitizers (Linux)",
+      "id": 108409155518,
+      "steps": [
+        {
+          "name": "Run mise run test:sanitizer:self",
+          "start": "2026-09-26T13:02:35Z",
+          "end": "2026-09-26T13:02:43Z",
+          "seconds": 8.0
+        },
+        {
+          "name": "Verify GCC sanitizer instrumentation",
+          "start": "2026-09-26T13:02:43Z",
+          "end": "2026-09-26T13:02:47Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:runtime",
+          "start": "2026-09-26T13:02:47Z",
+          "end": "2026-09-26T13:07:28Z",
+          "seconds": 281.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:native",
+          "start": "2026-09-26T13:07:28Z",
+          "end": "2026-09-26T13:38:36Z",
+          "seconds": 1868.0
+        },
+        {
+          "name": "Run mise run test:sanitizer:property",
+          "start": "2026-09-26T13:38:36Z",
+          "end": "2026-09-26T14:06:56Z",
+          "seconds": 1700.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:35.9155898Z",
+          "end": "2026-09-26T13:02:37.5290508Z",
+          "endMarker": "[test:sanitizer:self] $",
+          "seconds": 1.613461
+        },
+        {
+          "start": "2026-09-26T13:02:43.6467278Z",
+          "end": "2026-09-26T13:02:45.2735060Z",
+          "endMarker": "[test:sanitizer:self] $",
+          "seconds": 1.626779
+        },
+        {
+          "start": "2026-09-26T13:02:47.8944768Z",
+          "end": "2026-09-26T13:02:49.5934867Z",
+          "endMarker": "[test:sanitizer:runtime] $",
+          "seconds": 1.69901
+        },
+        {
+          "start": "2026-09-26T13:07:28.8899049Z",
+          "end": "2026-09-26T13:07:30.5976131Z",
+          "endMarker": "[test:sanitizer:native] $",
+          "seconds": 1.707709
+        },
+        {
+          "start": "2026-09-26T13:38:36.2975040Z",
+          "end": "2026-09-26T13:38:37.9697650Z",
+          "endMarker": "[test:sanitizer:property] $",
+          "seconds": 1.672261
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (macos-aarch64, 1/3)",
+      "id": 108409155521,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 1/3",
+          "start": "2026-09-26T13:57:13Z",
+          "end": "2026-09-26T14:12:50Z",
+          "seconds": 937.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:57:14.0439800Z",
+          "end": "2026-09-26T13:57:15.9101270Z",
+          "endMarker": "[test:native] $",
+          "seconds": 1.866147
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (linux-x86_64-gnu, 1/3)",
+      "id": 108409155524,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 1/3",
+          "start": "2026-09-26T13:02:33Z",
+          "end": "2026-09-26T13:15:14Z",
+          "seconds": 761.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:33.3035355Z",
+          "end": "2026-09-26T13:02:34.7198156Z",
+          "endMarker": "[test:native] $",
+          "seconds": 1.41628
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 7/12)",
+      "id": 108409155527,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=7/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:02:54Z",
+          "end": "2026-09-26T13:22:28Z",
+          "seconds": 1174.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:55.0110750Z",
+          "end": "2026-09-26T13:02:56.1526280Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.141553
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 2/4)",
+      "id": 108409155530,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=2/4 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:02:35Z",
+          "end": "2026-09-26T13:51:50Z",
+          "seconds": 2955.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:35.7938541Z",
+          "end": "2026-09-26T13:02:37.5142605Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.720406
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 4/4)",
+      "id": 108409155531,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=4/4 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:02:35Z",
+          "end": "2026-09-26T14:03:05Z",
+          "seconds": 3630.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:35.2286267Z",
+          "end": "2026-09-26T13:02:37.3912399Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 2.162613
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test (macos-latest, deno)",
+      "id": 108409155533,
+      "steps": [
+        {
+          "name": "Run mise run test:deno",
+          "start": "2026-09-26T13:23:25Z",
+          "end": "2026-09-26T13:24:03Z",
+          "seconds": 38.0
+        }
+      ],
+      "laterBuilds": [],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (macos-aarch64, 2/3)",
+      "id": 108409155536,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 2/3",
+          "start": "2026-09-26T13:27:21Z",
+          "end": "2026-09-26T13:38:35Z",
+          "seconds": 674.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:27:21.3406580Z",
+          "end": "2026-09-26T13:27:22.6535980Z",
+          "endMarker": "[test:native] $",
+          "seconds": 1.31294
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 9/12)",
+      "id": 108409155541,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=9/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:03:11Z",
+          "end": "2026-09-26T13:19:22Z",
+          "seconds": 971.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:03:11.5300810Z",
+          "end": "2026-09-26T13:03:13.2381800Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.708099
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 1/4)",
+      "id": 108409155547,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:package",
+          "start": "2026-09-26T13:02:32Z",
+          "end": "2026-09-26T13:02:44Z",
+          "seconds": 12.0
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=1/4 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:02:44Z",
+          "end": "2026-09-26T14:28:22Z",
+          "seconds": 5138.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:32.5418451Z",
+          "end": "2026-09-26T13:02:34.3076782Z",
+          "endMarker": "[test:property:extended:package] $",
+          "seconds": 1.765833
+        },
+        {
+          "start": "2026-09-26T13:02:44.9093744Z",
+          "end": "2026-09-26T13:02:46.9494090Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 2.040035
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 8/12)",
+      "id": 108409155548,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=8/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:38:06Z",
+          "end": "2026-09-26T13:56:12Z",
+          "seconds": 1086.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:38:07.0073890Z",
+          "end": "2026-09-26T13:38:08.9298360Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.922447
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test (macos-latest, node)",
+      "id": 108409155552,
+      "steps": [
+        {
+          "name": "Run mise run test:node",
+          "start": "2026-09-26T13:20:24Z",
+          "end": "2026-09-26T13:59:52Z",
+          "seconds": 2368.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:20:24.7391190Z",
+          "end": "2026-09-26T13:20:26.1979150Z",
+          "endMarker": "[test:node] $",
+          "seconds": 1.458796
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 3/12)",
+      "id": 108409155559,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=3/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:39:22Z",
+          "end": "2026-09-26T14:05:59Z",
+          "seconds": 1597.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:39:22.5951380Z",
+          "end": "2026-09-26T13:39:23.6954200Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.100282
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 10/10)",
+      "id": 108409155570,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 10/10",
+          "start": "2026-09-26T13:02:31Z",
+          "end": "2026-09-26T13:13:33Z",
+          "seconds": 662.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:31.4631252Z",
+          "end": "2026-09-26T13:02:32.5855878Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.122462
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 2/10)",
+      "id": 108409155571,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 2/10",
+          "start": "2026-09-26T13:02:29Z",
+          "end": "2026-09-26T13:18:40Z",
+          "seconds": 971.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:29.5215099Z",
+          "end": "2026-09-26T13:02:31.2717363Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.750227
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 1/12)",
+      "id": 108409155577,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:package",
+          "start": "2026-09-26T14:14:22Z",
+          "end": "2026-09-26T14:14:33Z",
+          "seconds": 11.0
+        },
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=1/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T14:14:33Z",
+          "end": "2026-09-26T14:35:04Z",
+          "seconds": 1231.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:14:22.6668290Z",
+          "end": "2026-09-26T14:14:24.0048710Z",
+          "endMarker": "[test:property:extended:package] $",
+          "seconds": 1.338042
+        },
+        {
+          "start": "2026-09-26T14:14:33.5531390Z",
+          "end": "2026-09-26T14:14:35.1361980Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.583059
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 3/10)",
+      "id": 108409155579,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 3/10",
+          "start": "2026-09-26T13:02:31Z",
+          "end": "2026-09-26T13:27:32Z",
+          "seconds": 1501.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:31.3079857Z",
+          "end": "2026-09-26T13:02:33.2229092Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.914924
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (linux-x86_64-gnu, 3/3)",
+      "id": 108409155580,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 3/3",
+          "start": "2026-09-26T13:02:29Z",
+          "end": "2026-09-26T13:16:52Z",
+          "seconds": 863.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:29.9444753Z",
+          "end": "2026-09-26T13:02:32.0046382Z",
+          "endMarker": "[test:native] $",
+          "seconds": 2.060163
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 5/12)",
+      "id": 108409155582,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=5/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T14:25:35Z",
+          "end": "2026-09-26T15:32:46Z",
+          "seconds": 4031.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:25:35.4182490Z",
+          "end": "2026-09-26T14:25:37.0874120Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.669163
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 4/10)",
+      "id": 108409155583,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 4/10",
+          "start": "2026-09-26T13:02:53Z",
+          "end": "2026-09-26T13:26:41Z",
+          "seconds": 1428.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:53.1458448Z",
+          "end": "2026-09-26T13:02:55.0314983Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.885654
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 7/10)",
+      "id": 108409155585,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 7/10",
+          "start": "2026-09-26T13:03:03Z",
+          "end": "2026-09-26T13:22:00Z",
+          "seconds": 1137.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:03:03.0873487Z",
+          "end": "2026-09-26T13:03:04.9410040Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.853656
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 12/12)",
+      "id": 108409155587,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=12/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T14:06:56Z",
+          "end": "2026-09-26T14:24:33Z",
+          "seconds": 1057.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:06:56.8906700Z",
+          "end": "2026-09-26T14:06:58.5665270Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.675857
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 5/10)",
+      "id": 108409155592,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 5/10",
+          "start": "2026-09-26T13:02:33Z",
+          "end": "2026-09-26T13:21:34Z",
+          "seconds": 1141.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:33.7266243Z",
+          "end": "2026-09-26T13:02:35.6318434Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.905219
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 10/12)",
+      "id": 108409155596,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=10/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:35:30Z",
+          "end": "2026-09-26T13:55:21Z",
+          "seconds": 1191.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:35:30.4703450Z",
+          "end": "2026-09-26T13:35:32.0888710Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.618526
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 6/12)",
+      "id": 108409155597,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=6/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T14:11:24Z",
+          "end": "2026-09-26T14:36:12Z",
+          "seconds": 1488.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:11:24.7390630Z",
+          "end": "2026-09-26T14:11:26.3362800Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.597217
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (macos-aarch64, 3/3)",
+      "id": 108409155599,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 3/3",
+          "start": "2026-09-26T13:57:19Z",
+          "end": "2026-09-26T14:10:14Z",
+          "seconds": 775.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:57:19.8544370Z",
+          "end": "2026-09-26T13:57:21.6207520Z",
+          "endMarker": "[test:native] $",
+          "seconds": 1.766315
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native (linux-x86_64-gnu, 2/3)",
+      "id": 108409155604,
+      "steps": [
+        {
+          "name": "Run mise run test:native --shard 2/3",
+          "start": "2026-09-26T13:02:33Z",
+          "end": "2026-09-26T13:13:24Z",
+          "seconds": 651.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:33.8689203Z",
+          "end": "2026-09-26T13:02:35.5769757Z",
+          "endMarker": "[test:native] $",
+          "seconds": 1.708055
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 9/10)",
+      "id": 108409155610,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 9/10",
+          "start": "2026-09-26T13:02:34Z",
+          "end": "2026-09-26T13:15:49Z",
+          "seconds": 795.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:34.0566818Z",
+          "end": "2026-09-26T13:02:35.7675232Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.710842
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 3/4)",
+      "id": 108409155623,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=3/4 tests/property/*.property.test.ts",
+          "start": "2026-09-26T13:02:31Z",
+          "end": "2026-09-26T13:40:58Z",
+          "seconds": 2307.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:31.1801066Z",
+          "end": "2026-09-26T13:02:32.3764285Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.196322
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 6/10)",
+      "id": 108409155642,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 6/10",
+          "start": "2026-09-26T13:56:25Z",
+          "end": "2026-09-26T14:28:50Z",
+          "seconds": 1945.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:56:25.5207190Z",
+          "end": "2026-09-26T13:56:26.9142650Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.393546
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "native support (macos-aarch64, 11/12)",
+      "id": 108409155646,
+      "steps": [
+        {
+          "name": "Run mise run test:property:extended:native:shard --test-shard=11/12 tests/property/*.property.test.ts",
+          "start": "2026-09-26T14:29:42Z",
+          "end": "2026-09-26T14:44:13Z",
+          "seconds": 871.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:29:42.2009580Z",
+          "end": "2026-09-26T14:29:43.3476340Z",
+          "endMarker": "[test:property:extended:native:shard] $",
+          "seconds": 1.146676
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 8/10)",
+      "id": 108409155652,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 8/10",
+          "start": "2026-09-26T13:02:33Z",
+          "end": "2026-09-26T13:22:50Z",
+          "seconds": 1217.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:33.4634367Z",
+          "end": "2026-09-26T13:02:35.7115151Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 2.248079
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 1/10)",
+      "id": 108409155660,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 1/10",
+          "start": "2026-09-26T14:41:22Z",
+          "end": "2026-09-26T15:09:03Z",
+          "seconds": 1661.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:41:22.5151420Z",
+          "end": "2026-09-26T14:41:24.4892840Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.974142
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 8/10)",
+      "id": 108409155661,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 8/10",
+          "start": "2026-09-26T14:45:13Z",
+          "end": "2026-09-26T15:16:41Z",
+          "seconds": 1888.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:45:13.0660370Z",
+          "end": "2026-09-26T14:45:14.3948830Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.328846
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 10/10)",
+      "id": 108409155669,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 10/10",
+          "start": "2026-09-26T14:37:04Z",
+          "end": "2026-09-26T15:03:31Z",
+          "seconds": 1587.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:37:04.4917840Z",
+          "end": "2026-09-26T14:37:05.7116630Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.219879
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 6/10)",
+      "id": 108409155670,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 6/10",
+          "start": "2026-09-26T13:02:31Z",
+          "end": "2026-09-26T13:25:04Z",
+          "seconds": 1353.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:31.1560898Z",
+          "end": "2026-09-26T13:02:32.8892972Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.733208
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 1/10)",
+      "id": 108409155674,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 1/10",
+          "start": "2026-09-26T13:02:29Z",
+          "end": "2026-09-26T13:20:57Z",
+          "seconds": 1108.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T13:02:30.0380782Z",
+          "end": "2026-09-26T13:02:31.9695118Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.931433
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 5/10)",
+      "id": 108409155679,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 5/10",
+          "start": "2026-09-26T14:36:38Z",
+          "end": "2026-09-26T15:19:11Z",
+          "seconds": 2553.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T14:36:38.3363670Z",
+          "end": "2026-09-26T14:36:40.9048260Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 2.568459
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 4/10)",
+      "id": 108409155693,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 4/10",
+          "start": "2026-09-26T15:17:54Z",
+          "end": "2026-09-26T15:50:34Z",
+          "seconds": 1960.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T15:17:54.6319480Z",
+          "end": "2026-09-26T15:17:56.2948830Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.662935
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 9/10)",
+      "id": 108409155696,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 9/10",
+          "start": "2026-09-26T15:20:23Z",
+          "end": "2026-09-26T15:51:55Z",
+          "seconds": 1892.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T15:20:23.5144070Z",
+          "end": "2026-09-26T15:20:26.3929220Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 2.878515
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 7/10)",
+      "id": 108409155700,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 7/10",
+          "start": "2026-09-26T15:04:45Z",
+          "end": "2026-09-26T15:37:31Z",
+          "seconds": 1966.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T15:04:45.2636590Z",
+          "end": "2026-09-26T15:04:47.3909900Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 2.127331
+        }
+      ],
+      "toolingTestSeconds": {}
+    },
+    {
+      "name": "test262 (macos-aarch64, 2/10)",
+      "id": 108409155714,
+      "steps": [
+        {
+          "name": "Run mise run test:test262 --shard 2/10",
+          "start": "2026-09-26T15:10:09Z",
+          "end": "2026-09-26T15:37:08Z",
+          "seconds": 1619.0
+        }
+      ],
+      "laterBuilds": [
+        {
+          "start": "2026-09-26T15:10:09.1889230Z",
+          "end": "2026-09-26T15:10:11.1155170Z",
+          "endMarker": "[test:test262] $",
+          "seconds": 1.926594
+        }
+      ],
+      "toolingTestSeconds": {}
+    }
+  ]
+}

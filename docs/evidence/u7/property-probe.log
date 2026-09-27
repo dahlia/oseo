@@ -1,0 +1,3 @@
+{"name":"ordinary","seed":1610617344,"numRuns":12,"size":"small","firstCases":[556484374,1586950928,1425465318,10]}
+{"name":"extendedNative","seed":1592590339,"numRuns":120,"size":"large","firstCases":[24,-2147483644,1324788078,-226402400]}
+{"name":"extendedPackage","seed":1592590337,"numRuns":120,"size":"large","firstCases":[-820612415,107459006,-23,1035396571]}
