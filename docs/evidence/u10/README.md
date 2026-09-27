@@ -29,12 +29,33 @@ a disposable checkout at the named historical commit.
 in this follow-up. The original corpus and CI extraction drivers are retained
 as *u10-corpus.py* and *u10-ci-summary.py*, with source lines wrapped.
 The CI driver also retains the runtime-archive restore log line, added during
-this preservation pass. The latter reads the saved response
+this preservation pass. *ci-summary.json.txt* was re-extracted from the
+retained raw job logs with that extended driver during preservation. Every
+field present in the original *ci-summary.json* extraction is unchanged;
+the preserved copy adds provenance fields and wraps each run with its SHA.
+The latter driver reads the saved response
 from `gh run view RUN --json headSha,jobs` and that run's downloaded job logs.
 Each run preserves its `headSha` and `jobs`; recomputation checks the SHA
 against the named historical commit. The corpus driver requires PyYAML
 with its LibYAML `CSafeLoader`. Those original raw CI files need not exist
 to recompute the checked-in table.
+
+
+Host observations
+-----------------
+
+*host-pressure.log* preserves a sanitized extraction of the original
+*/tmp/u10-evidence/host-pressure.log*, with the original timestamp offsets.
+Each entry retains the observed load averages, available memory, and swap
+capacity/use/free bytes. Uptime, login counts, and other memory columns are
+omitted. The swap entry at `2026-09-27T20:15:08+09:00` records zero free
+bytes. This is historical output, not a new measurement.
+
+The initial memory, swap, filesystem-space, and load snapshot has no retained
+source output or timestamp in the raw evidence or available shell history.
+The gate-process checkpoint observations likewise have no preserved process
+lists. The baseline labels these as unpreserved observations; this later
+pressure log does not substantiate them.
 
 
 Table inputs

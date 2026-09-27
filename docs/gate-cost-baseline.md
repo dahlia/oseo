@@ -639,11 +639,19 @@ the endpoints.
 
 The Linux comparison ran on Linux 7.2.7-200.fc44.x86\_64, an AMD Ryzen
 7 7700X with eight physical cores and sixteen hardware threads, using
-Node.js 24.18.0 and Zig 0.16.0. The initial measured host snapshot had
-34 GiB available memory, 254 MiB free swap, 190 GiB free on the temporary
-filesystem, and load averages of 0.99/1.08/0.86. Swap later filled;
-these are shared-host measurements, not an isolated-host benchmark.
-No other `mise run test` gate was observed at the recorded checkpoints.
+Node.js 24.18.0 and Zig 0.16.0. The initial host snapshot was an
+unpreserved observation: 34 GiB available memory, 254 MiB free swap,
+190 GiB free on the temporary filesystem, and load averages of
+0.99/1.08/0.86. Its source output and timestamp were not retained, so
+these figures are not artifact-backed measurements.
+
+The preserved, sanitized
+[*host-pressure.log*](./evidence/u10/host-pressure.log) contains later
+observations with their original timestamps. Its swap row at
+`2026-09-27T20:15:08+09:00` records zero free bytes. These are shared-host
+measurements, not an isolated-host benchmark. The statement that no other
+`mise run test` gate was observed at checkpoints is also an unpreserved
+observation; no timestamped process-list output supports it.
 
 A detached historical checkout was built at every commit with
 
