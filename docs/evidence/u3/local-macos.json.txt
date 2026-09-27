@@ -1,0 +1,47 @@
+{
+  "root": "/Users/dahlia/Desktop/oseo-m5ci-job-fixed-cost",
+  "aube": "/Users/dahlia/.local/share/mise/installs/aube/2.5.0/.mise-bins/aube",
+  "node": "/Users/dahlia/.local/share/mise/installs/node/24.21.0/bin/node",
+  "runs": [
+    {
+      "label": "cold-install",
+      "seconds": 10.957884458999999
+    },
+    {
+      "label": "save-tar",
+      "seconds": 1.6477317089999985
+    },
+    {
+      "label": "restore-0",
+      "seconds": 5.3739082499999995
+    },
+    {
+      "label": "warm-install-0",
+      "seconds": 6.6998202080000056
+    },
+    {
+      "label": "restore-1",
+      "seconds": 5.152002375000002
+    },
+    {
+      "label": "warm-install-1",
+      "seconds": 6.840087875000009
+    }
+  ],
+  "freshStore": {
+    "sha256": "81867af02dc30e8fbde9d051824a8ae6ae99efb38235ad20ae5a9d271b2cf9c1",
+    "files": 58811,
+    "bytes": 192167185
+  },
+  "tarBytes": 46831390,
+  "restoredStore0": {
+    "sha256": "81867af02dc30e8fbde9d051824a8ae6ae99efb38235ad20ae5a9d271b2cf9c1",
+    "files": 58811,
+    "bytes": 192167185
+  },
+  "restoredStore1": {
+    "sha256": "81867af02dc30e8fbde9d051824a8ae6ae99efb38235ad20ae5a9d271b2cf9c1",
+    "files": 58811,
+    "bytes": 192167185
+  }
+}

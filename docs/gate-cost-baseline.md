@@ -106,6 +106,187 @@ Run 36261458909, derived minutes from its measured job timestamps:
 
 Derived platform totals: macOS 764.12 min, Linux 578.80 min.
 
+### U3 fixed-cost cache audit
+
+U3 leaves the workflow unchanged. Mise already caches the installed tools;
+an additional aube store cache did not meet the local cost test below. Npm
+builds are too short to justify another cross-job artifact restore. This
+is an audit-only result, with no claimed runner-minute reduction and no
+branch CI experiment. The coordinator directed an audit-only commit if
+local store restore was not clearly cheaper than the install's download
+part. No install or build is skipped, and no coverage changes.
+
+#### Existing CI step decomposition
+
+Sources are runs 36243816479, 36261458909 and 36312192623, fetched with
+`gh run view RUN --repo dahlia/oseo --json headSha,jobs` and
+`gh api repos/dahlia/oseo/actions/runs/RUN/logs`. The third run is at
+`af9bb68c`; runtime versions differ from the first two as recorded under U8.
+These are historical observations, not before/after measurements of a change.
+The same named jobs appear in each run. The
+[compact inputs and reproduction scripts](./evidence/u3/README.md)
+preserve these observations after GitHub log retention expires.
+
+Each row below covers all 29 macOS jobs or all 20 Linux test-family jobs;
+Linux's separate `check`, Windows and aggregation are excluded. Step seconds
+are measured timestamp differences; displayed means are derived. The archive
+step includes the initial npm build, key calculation and runtime archive
+restore, so its column must not be added to those substeps again.
+
+| Run         | Host  | Checkout mean s | Mise-action mean s | Runtime archive action mean s |
+| ----------- | ----- | --------------- | ------------------ | ----------------------------- |
+| 36243816479 | macOS | 4.07            | 40.34              | 5.90                          |
+| 36261458909 | macOS | 3.97            | 35.97              | 5.41                          |
+| 36312192623 | macOS | 3.62            | 39.21              | 5.52                          |
+| 36243816479 | Linux | 2.00            | 13.85              | 3.20                          |
+| 36261458909 | Linux | 1.85            | 14.45              | 3.30                          |
+| 36312192623 | Linux | 1.85            | 61.20              | 2.95                          |
+
+Mise-action is the largest setup step, but its name hides the dependency
+install that the `[deps.aube]` provider runs when the postinstall hook
+invokes `mise run install-hooks`. Its `cache` input
+already defaults to `true`, as the run logs confirm. The action restores
+its mise data directory, including installed tools. The source inspected
+was the action revision reported by run 36312192623,
+[`c2a87611`].
+Its default key includes platform/image and configuration content; a mise
+version is included only when the workflow supplies that input. Adding a
+second installed-tool cache would duplicate the existing restore.
+
+The next table splits that step using runner-log markers. Restore means are
+derived from measured intervals between `Restoring mise cache` and the
+restored-key/miss message, including miss lookups. Dependency means are
+derived from aube's measured `in Ns` summary, including download, store
+population and linking. The observed cache counts are restored/missing
+entries, not evidence about the Zig compilation cache.
+
+| Run         | Host  | Mise restored/missing jobs | Mise restore/lookup mean s | Aube install mean s |
+| ----------- | ----- | -------------------------- | -------------------------- | ------------------- |
+| 36243816479 | macOS | 29/0                       | 13.12                      | 26.51               |
+| 36261458909 | macOS | 29/0                       | 11.50                      | 23.74               |
+| 36312192623 | macOS | 24/5                       | 10.42                      | 21.99               |
+| 36243816479 | Linux | 20/0                       | 5.95                       | 7.46                |
+| 36261458909 | Linux | 20/0                       | 5.90                       | 7.97                |
+| 36312192623 | Linux | 2/18                       | 1.34                       | 4.00                |
+
+For the same `native (macos-aarch64, 1/3)` job, the measured tool-install
+summaries report zero new tools and nine already installed in 14/11/46 ms,
+respectively. Aube instead downloads 61 packages, measured at 30.9 MB,
+in 25.8/18.1/23.5 s. The derived tails from the first `linking` progress
+message to its completion are 11.25/10.09/11.02 s. Subtracting those tails
+from aube's summary gives derived earlier intervals of 14.55/8.01/12.48 s.
+Those intervals include fetching, unpacking and content-addressed store
+population; they are not isolated network-download measurements. A store
+cache replaces fetching and store population with archive extraction; the
+mandatory frozen install still performs linking.
+
+The matching `native (linux-x86_64-gnu, 1/3)` job reports zero new tools in
+5/6 ms in the first two runs, then nine tools installed in 12.9 s on a
+mise miss in the third. Its measured aube installs are 9.2/6.5/4.9 s,
+downloading 61 packages at 33.0 MB. For a cold macOS example in the third
+run, `test262 (macos-aarch64, 6/10)` installs nine tools in a measured
+17.6 s; progress reports Zig extracting at elapsed 8.8, 11.9 and 15.0 s.
+Concurrent, sparse tool progress does not separate total download and
+extraction times. The third Linux action mean mixes cold and warm tool
+states and includes cache saves; it is not evidence of slower aube installs.
+
+The initial npm build is inside the small runtime archive action above.
+U7's per-job table separately records later npm builds at derived intervals
+of about 1.1–8.9 s, including task dispatch. A cached dist would add a
+restore and complete build-input key while most jobs repeat only one short
+build. No measured net benefit supports that additional cache here.
+
+#### Local store restore experiment
+
+The local probe used source `16e8c62e`, Node 24.21.0 and aube 2.5.0. Linux
+used an exported tree at */tmp/u3-linux-install*; macOS used a bundle clone
+at *~/Desktop/oseo-m5ci-job-fixed-cost* on `ssh macbook-air`. It did not
+modify or commit in the macOS project checkout. Every probe subprocess had
+`ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-job-fixed-cost`; no Zig build
+was part of this experiment.
+
+`CI=true`, `AUBE_STORE_DIR` and `AUBE_CACHE_DIR` selected initially empty
+probe directories. The cold operation was `aube install --frozen-lockfile`.
+Before each warm trial, the probe deleted the store and all root/package
+*node\_modules* directories, extracted the saved store, and ran the same
+frozen install. It did not restore *node\_modules* or dependency freshness
+state. The [preserved probes and outputs](./evidence/u3/README.md) use Python
+`time.perf_counter()` to measure subprocess wall time. The
+macOS restore command used Homebrew GNU tar and `unzstd`, matching the
+cache action's extraction tools. Both archive creation and extraction
+used GNU tar; an earlier BSD-tar probe was discarded because it introduced
+AppleDouble metadata files. Linux's uncompressed local tar is a
+favorable lower-cost control, with no decompression or network transfer.
+
+| Local host  | Empty-store install s, measured once | Restore s, measured trials | Mandatory warm install s, measured trials | Restore + install s, derived trials |
+| ----------- | ------------------------------------ | -------------------------- | ----------------------------------------- | ----------------------------------- |
+| Linux x64   | 2.99                                 | 1.41/1.38                  | 1.20/1.22                                 | 2.61/2.59                           |
+| macOS arm64 | 10.96                                | 5.37/5.15                  | 6.70/6.84                                 | 12.07/11.99                         |
+
+The macOS archive was measured at 46,831,390 bytes compressed,
+containing 58,811 regular files and 192,167,185 bytes of
+file content. Content comparison hashes relative file paths and each file's
+SHA-256 in sorted path order, excluding filesystem timestamps. The fresh
+store and both extracted stores had the same observed digest,
+`81867af02dc30e8fbde9d051824a8ae6ae99efb38235ad20ae5a9d271b2cf9c1`.
+Linux's corresponding digest also matched both restores, with 58,812 files
+and 198,987,020 bytes of content:
+`ee130b59f525e1d452b513d3a37254aa3b9b66ba1a5df9ad0e8c40516ba7311c`. This
+verifies local archive byte preservation, not an implemented GitHub cache or
+dependency-output cache.
+
+The macOS compressed extraction plus frozen install is slower than the
+empty-store install even before cache lookup,
+download or action startup. The Linux control leaves only a derived
+0.38/0.40 s against one cold sample, before those omitted costs. Neither
+supports a measured cross-job saving. No new cache key is implemented,
+so exact-key miss mutation tests and branch cold/warm cache comparisons
+are not applicable. Aube store caching, *node\_modules* caching and dist
+caching remain disabled; the existing runtime archive and mise caches are
+unchanged. These local store-cold/store-warm observations say nothing
+about Zig cache warmth or GitHub runner variance.
+
+To reproduce the store probe, use a disposable checkout of `16e8c62e`
+with its pinned tools installed. Export `CI=true`, point `AUBE_STORE_DIR`
+and `AUBE_CACHE_DIR` at new absolute *probe-store* and *probe-cache*
+directories inside that checkout, and put the pinned Node binary on `PATH`.
+Set the assigned Zig cache variable above. The measured subprocess commands
+were:
+
+~~~~ sh
+aube install --frozen-lockfile
+# macOS archive creation and each restore:
+gtar --use-compress-program='zstd -T0' -cf store-clean.tar.zst \
+  -C "$PWD" probe-store
+gtar --use-compress-program=unzstd -xf store-clean.tar.zst -C "$PWD"
+# Linux control archive creation and each restore:
+tar -cf store.tar -C "$PWD" probe-store
+tar -xf store.tar -C "$PWD"
+~~~~
+
+Before each restore remove only those disposable probe directories and all
+root/package *node\_modules* directories; the archive stays outside the store.
+Run the frozen install after each extraction. Measure each subprocess with
+`time.perf_counter()` around `subprocess.run(..., check=True)`, redirecting
+its stdout/stderr to a log outside the measured store. For the content digest,
+use this reader immediately after the cold install and each restore, before
+the subsequent install changes any bookkeeping files:
+
+~~~~ python
+import hashlib
+from pathlib import Path
+
+store = Path("probe-store")
+digest = hashlib.sha256()
+for path in sorted(store.rglob("*")):
+    if path.is_file():
+        digest.update(str(path.relative_to(store)).encode() + b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+print(digest.hexdigest())
+~~~~
+
+[`c2a87611`]: https://github.com/jdx/mise-action/tree/c2a87611a18de5b3828c5652fe268e992400cb5c
+
 ### U7 duplicate-work audit
 
 This audit inspected *mise.toml*, *.github/workflows/main.yaml*, the
