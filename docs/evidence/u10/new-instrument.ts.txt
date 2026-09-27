@@ -1,0 +1,39 @@
+const metrics = { processes: [], sources: [] };
+const caseIds = new Map();
+const originalRunnerHost = createNodeHost();
+const runnerHost = {
+  ...originalRunnerHost,
+  async run(request) {
+    const start = performance.now();
+    const result = await originalRunnerHost.run(request);
+    metrics.processes.push({
+      command: request.command,
+      args: request.args,
+      cwd: request.cwd,
+      sourceId: caseIds.get(request.cwd),
+      milliseconds: performance.now() - start,
+      status: result.exitStatus,
+    });
+    return result;
+  },
+  async writeTextFile(path, text) {
+    if (path.endsWith("/case.c") || path.endsWith("/launcher.c")) {
+      const { createHash } = await import("node:crypto");
+      const sourceId = /oseo_context_source_location\(context, "([^"]+)"/.exec(
+        text,
+      )?.[1];
+      if (sourceId) caseIds.set(path.slice(0, path.lastIndexOf("/")), sourceId);
+      metrics.sources.push({
+        name: path.split("/").at(-1),
+        bytes: Buffer.byteLength(text),
+        hash: createHash("sha256").update(text).digest("hex"),
+      });
+    }
+    return await originalRunnerHost.writeTextFile(path, text);
+  },
+};
+
+import { writeFileSync as saveMetrics } from "node:fs";
+process.on("exit", () =>
+  saveMetrics(process.env.U10_RESULT + ".metrics", JSON.stringify(metrics)),
+);

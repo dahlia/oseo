@@ -567,6 +567,11 @@ allocations with the startup limitation stated above.
 
 ### Historical per-path test262 investigation
 
+The measurement sources, exact per-run values, and table-to-artifact map
+are preserved in [*evidence/u10/README.md*](./evidence/u10/README.md).
+Its recomputation commands cover every table and derived percentage in
+this investigation, including the native attribution and generated-C hashes.
+
 The largest measured new cost is three 10,000-element TypedArray
 `copyWithin` detachment security cases admitted by `1a879b2e`. They
 account for a derived 97.4/97.3 percent of summed native elapsed
@@ -586,7 +591,8 @@ come from main runs 35456667007, 35463308291, and 35493049199;
 has one CI run in this comparison, so these measurements do not establish
 a repeatable CI improvement or an exact causal allocation.
 
-Measured macOS execution-step seconds and source job IDs:
+Measured macOS execution-step seconds and source job IDs, from
+[*ci-summary.json.txt*](./evidence/u10/ci-summary.json.txt):
 
 | Shard | 32ece7f4 job | Step s | e99620d5 job | Step s | aff3ade3 job | Step s |
 | ----- | ------------ | ------ | ------------ | ------ | ------------ | ------ |
@@ -648,7 +654,8 @@ ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-test262-per-path-rise \
 
 Package installation and those builds are outside the timing table. The exact
 209 path strings were frozen from shard `3/100` of the `32ece7f4` reviewed
-order, rather than reselecting a shard at each commit. A temporary wrapper
+order, rather than reselecting a shard at each commit. The preserved
+[*bench.ts.txt*](./evidence/u10/bench.ts.txt) wrapper
 calls `createReviewedManifest`, uses each commit's current reviewed entries for
 those strings, and asserts equality with `serializeTest262Manifest` of the
 corresponding canonical records. It never writes the reviewed subset or results.
@@ -666,6 +673,10 @@ is derived from the latter three measurements. Runner time excludes
 manifest preparation and verification outside `createReviewedManifest`.
 The difference between command wall and runner time is a derived wrapper
 cost, not a native-execution estimate.
+
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt), keyed by commit and
+cache trial. CPU/wall is `(user + system) / wall`; the derived warm increase
+compares the endpoints' two-trial mean runner seconds.
 
 | Commit     | Cache | Runner s | Wall s | User s | System s | CPU/wall |
 | ---------- | ----- | -------- | ------ | ------ | -------- | -------- |
@@ -732,6 +743,11 @@ completion delivery, overlap under eight workers, and are neither CPU
 time nor task-wall allocations. Instrumentation has its own overhead,
 so these runner times are not comparisons with the uninstrumented table.
 
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt) and
+[*control-metrics.json.txt*](./evidence/u10/control-metrics.json.txt). Divide
+each phase's summed milliseconds by 1000; the shared C hash multiset preserves
+all four runs after exact equality checks.
+
 | Commit     | Trial | Runner s | Wall s | User s | System s | Compile/link sum s | Native sum s |
 | ---------- | ----- | -------- | ------ | ------ | -------- | ------------------ | ------------ |
 | `32ece7f4` | warm1 | 35.23    | 41.45  | 104.87 | 71.70    | 90.24              | 14.72        |
@@ -752,6 +768,9 @@ eight workers, no retry, and no failure.
 
 Measured command and runner seconds, from the same GNU-time command:
 
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt), keys `new-prime`,
+`new-warm1`, and `new-warm2`.
+
 | New-path trial | Harness state | Runner s | Wall s | User s  | System s |
 | -------------- | ------------- | -------- | ------ | ------- | -------- |
 | new-prime      | mixed         | 310.12   | 316.56 | 1459.54 | 166.20   |
@@ -770,7 +789,10 @@ paths were added to the reviewed subset by `1a879b2e`. The test262
 runner leaves the collector policy unset, so these measurements use
 the runtime's ordinary collection policy, as described in ADR 0018.
 
-Derived sums from the warm repeats' observed `host.run` intervals:
+Derived sums from the warm repeats' observed `host.run` intervals in
+[*new-metrics.json.txt*](./evidence/u10/new-metrics.json.txt). Sum each path's
+four native milliseconds and divide by 1000. For each attribution percentage,
+divide the three-path sum by all paths' native sum and multiply by 100:
 
 | Path stem                                  | Variants/run | First native sum s | Second native sum s |
 | ------------------------------------------ | ------------ | ------------------ | ------------------- |
@@ -795,6 +817,10 @@ the matching headers, `-fsanitize=address,undefined`, and `-fno-lto`.
 This is a diagnostic microbenchmark, not gate time or an executed-case
 budget. Object counts and CPU seconds are measured; no full-gate
 projection is derived from them.
+
+Inputs: [*gc-probe.log*](./evidence/u10/gc-probe.log), emitted by the
+preserved [*gc-probe.c*](./evidence/u10/gc-probe.c) source. The object and
+CPU columns copy observed values directly, with no derived projection.
 
 | Commit     | Symbol objects | Symbol CPU s, two trials | TypedArray objects | TypedArray CPU s, two trials |
 | ---------- | -------------- | ------------------------ | ------------------ | ---------------------------- |
