@@ -1,0 +1,62 @@
+# Compact extraction of the U4 macOS shard logs.
+# Source: ~/Desktop/m5ci-results/{A-warmup,B-cold1,C-warm1,P3-cold1,
+# P3-warm1,P3-cold2,P3-warm2}.log in the throwaway ~/Desktop/oseo-m5ci
+# clone on the Apple M4 Mac mini. Each run's per-path progress output is
+# omitted; every line below is verbatim from its log. The pool=3 runs used
+# the patch in pool3.patch.txt and OSEO_TEST262_POOL=3.
+
+== A-warmup.log
+=== A-warmup shard=1/10 harness=cold start 2026-09-27T21:22:25+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=1638718.56ms pool=8 retries=0
+Finished in 1648.82s
+WALL 1649 s
+=== exit 0 end 2026-09-27T21:49:54+09:00
+
+== B-cold1.log
+=== B-cold1 shard=1/10 harness=cold start 2026-09-27T21:49:54+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=1680587.38ms pool=8 retries=0
+Finished in 1697.45s
+WALL 1698 s
+=== exit 0 end 2026-09-27T22:18:12+09:00
+
+== C-warm1.log
+=== C-warm1 shard=1/10 harness=warm start 2026-09-27T22:18:12+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=1625003.74ms pool=8 retries=0
+Finished in 1635.00s
+WALL 1635 s
+=== exit 0 end 2026-09-27T22:45:27+09:00
+
+== P3-cold1.log
+=== P3-cold1 shard=1/10 harness=cold start 2026-09-27T22:56:15+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=2042212.82ms pool=3 retries=0
+Finished in 2051.86s
+WALL 2052 s
+=== exit 0 end 2026-09-27T23:30:27+09:00
+
+== P3-warm1.log
+=== P3-warm1 shard=1/10 harness=warm start 2026-09-27T23:30:27+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=2093745.74ms pool=3 retries=0
+Finished in 2104.68s
+WALL 2105 s
+=== exit 0 end 2026-09-28T00:05:32+09:00
+
+== P3-cold2.log
+=== P3-cold2 shard=1/10 harness=cold start 2026-09-28T00:05:32+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=2333145.74ms pool=3 retries=0
+Finished in 2342.99s
+WALL 2343 s
+=== exit 0 end 2026-09-28T00:44:35+09:00
+
+== P3-warm2.log
+=== P3-warm2 shard=1/10 harness=warm start 2026-09-28T00:44:35+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=2472512.01ms pool=3 retries=0
+Finished in 2481.44s
+WALL 2482 s
+=== exit 0 end 2026-09-28T01:25:57+09:00

@@ -1,0 +1,96 @@
+# Environment and measured checkout revision for the U4 local timing series.
+# Neither host is a GitHub runner.
+
+== Measured revision
+
+Both hosts ran the source of commit e76e235b, the merge the U4 branch started
+from. That branch's only later commit, 68e4f77b, changes PLAN-GATE.md and
+docs/gate-cost-baseline.md and no source:
+
+$ git diff --stat e76e235b 68e4f77b
+ PLAN-GATE.md               | 127 ++++++++++++++++++-----------
+ docs/gate-cost-baseline.md | 197 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 275 insertions(+), 49 deletions(-)
+
+The macOS host ran a throwaway clone rsynced from the Linux worktree, without
+.git, so its revision is established by content. Of the 130 tracked files that
+the harness object key covers, 129 are byte-identical in the two trees and only
+tools/test262.ts differs, by the preserved pool patch:
+
+$ git ls-files -- aube-lock.yaml mise.toml tools/test262.ts \
+    packages/compiler/src packages/compiler/package.json \
+    packages/backend-c/src packages/backend-c/package.json \
+    packages/parser-babel/src packages/parser-babel/package.json \
+    packages/cli/src packages/cli/package.json \
+    packages/unicode/src packages/unicode/package.json \
+    packages/runtime-c tests/test262/harness \
+  | LC_ALL=C sort > /tmp/keyfiles.txt
+$ wc -l < /tmp/keyfiles.txt
+130
+$ xargs -a /tmp/keyfiles.txt sha256sum | LC_ALL=C sort -k2 > /tmp/keys-linux.txt
+$ scp /tmp/keyfiles.txt mac-mini-m4:/tmp/keyfiles.txt
+$ ssh mac-mini-m4 'cd ~/Desktop/oseo-m5ci \
+    && xargs shasum -a 256 < /tmp/keyfiles.txt | LC_ALL=C sort -k2' \
+  > /tmp/keys-mac.txt
+$ diff /tmp/keys-linux.txt /tmp/keys-mac.txt \
+    | grep '^[<>]' | awk '{print $NF}' | sort | uniq -c
+      2 tools/test262.ts
+
+$ sha256sum tools/test262.ts                     # e76e235b, unpatched
+e521917358499c3bdaf5943c55df58807a4ca414c7a084745b308b9eb2e9a48d
+$ ssh mac-mini-m4 'shasum -a 256 ~/Desktop/oseo-m5ci/tools/test262.ts'
+b81f4eea567660174e25d50d3192a0e074cea8d2deedc7ca3cafb817ab10ee6f
+
+Applying pool3.patch.txt to e76e235b's tools/test262.ts reproduces the second
+digest, so the macOS pool=3 runs carry exactly that one edit:
+
+$ mkdir -p /tmp/u4-patch/tools
+$ git show e76e235b:tools/test262.ts > /tmp/u4-patch/tools/test262.ts
+$ git -C /tmp/u4-patch apply -p1 "$PWD/docs/evidence/u4/pool3.patch.txt"
+$ sha256sum /tmp/u4-patch/tools/test262.ts
+b81f4eea567660174e25d50d3192a0e074cea8d2deedc7ca3cafb817ab10ee6f
+
+These three comparisons were run during this preservation pass, on the same
+two hosts, against the trees the measurement left in place. The digests are
+properties of those retained trees, not new timings.
+
+== Linux host
+
+$ grep -m1 'model name' /proc/cpuinfo
+model name	: AMD Ryzen 7 7700X 8-Core Processor
+$ nproc
+16
+$ uname -srm
+Linux 7.2.7-200.fc44.x86_64 x86_64
+$ node -e 'console.log(require("node:os").availableParallelism())'
+16
+
+availableParallelism is 16 here, so the pool=8 rows are the runner's own
+min(8, availableParallelism()) cap rather than the host's width, and the
+pool=3 rows come from taskset -c 0-2. Every log line records the pool the run
+actually used. mise.toml pins zig = "0.16.0" at this revision, and
+ZIG_GLOBAL_CACHE_DIR was /data/zig-cache/m5ci-harness-object-cache throughout.
+XDG_CACHE_HOME pointed at the session scratchpad, so the harness object
+directory under test was $XDG_CACHE_HOME/oseo/harness-objects.
+
+== macOS host
+
+Observed before the series, 2026-09-27T21:05+09:00:
+
+$ ssh mac-mini-m4 'sysctl -n machdep.cpu.brand_string; sysctl -n hw.ncpu; \
+    sw_vers -productVersion; df -h ~ | tail -1'
+Apple M4
+10
+15.2
+/dev/disk3s5   228Gi   178Gi    13Gi    93%    514k  141M    0%   /System/Volumes/Data
+
+Observed during the pool=8 series, 2026-09-27T22:10+09:00:
+
+$ ssh mac-mini-m4 'echo "loadavg: $(sysctl -n vm.loadavg)"; df -h ~ | tail -1'
+loadavg: { 7.10 8.19 8.28 }
+/dev/disk3s5   228Gi   177Gi    13Gi    94%    723k  134M    1%   /System/Volumes/Data
+
+The baseline's "94 percent full" is the second of these. The macOS harness
+object directory is ~/Library/Caches/oseo/harness-objects, which
+XDG_CACHE_HOME does not redirect. Both timestamps are the originating tool
+call's own, converted to +09:00.

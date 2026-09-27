@@ -1,0 +1,81 @@
+# The U4 measurement drivers from the local Linux host, concatenated with one
+# header per original file. Only one edit was made: the session scratchpad
+# path these scripts assign to S is shortened to /tmp/u4-scratch. That
+# directory held XDG_CACHE_HOME, so the harness object directory and the mise
+# tool cache stayed out of the developer's real caches, and it also received
+# every run log. Each run exported
+# ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-harness-object-cache.
+#
+# run-shard.sh runs at the host's own pool, which availableParallelism reports
+# as 8 here. run-shard3.sh pins the run to three CPUs with taskset, which
+# availableParallelism honors, giving the pool of 3 that models the macos-15
+# runner. Neither needs the tools/test262.ts patch the macOS host required.
+# trim-pool3.sh stopped the first pool-3 series after its second run so the
+# host could be released; linux-pool3b.sh then ran the remaining four.
+
+# ===== run-shard.sh
+#!/bin/bash
+# $1 = label, $2 = shard, $3 = "cold" | "warm" (cold removes harness-objects first)
+set -u
+S=/tmp/u4-scratch
+export XDG_CACHE_HOME="$S/cache"
+export ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-harness-object-cache
+cd /home/dahlia/orca/workspaces/oseo/m5ci-harness-object-cache
+if [ "$3" = "cold" ]; then rm -rf "$XDG_CACHE_HOME/oseo/harness-objects"; fi
+echo "=== $1 shard=$2 harness=$3 start $(date -Is)" > "$S/$1.log"
+/usr/bin/time -f "WALL %e s" mise run test:test262 --shard "$2" >> "$S/$1.log" 2>&1
+echo "=== exit $? end $(date -Is)" >> "$S/$1.log"
+
+# ===== run-shard3.sh
+#!/bin/bash
+# $1 = label, $2 = shard, $3 = cold|warm -- pinned to 3 CPUs to emulate the runner pool
+set -u
+S=/tmp/u4-scratch
+export XDG_CACHE_HOME="$S/cache"
+export ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-harness-object-cache
+cd /home/dahlia/orca/workspaces/oseo/m5ci-harness-object-cache
+if [ "$3" = "cold" ]; then rm -rf "$XDG_CACHE_HOME/oseo/harness-objects"; fi
+echo "=== $1 shard=$2 harness=$3 cpus=0-2 start $(date -Is)" > "$S/$1.log"
+/usr/bin/time -f "WALL %e s" taskset -c 0-2 mise run test:test262 --shard "$2" >> "$S/$1.log" 2>&1
+echo "=== exit $? end $(date -Is)" >> "$S/$1.log"
+
+# ===== linux-series.sh
+#!/bin/bash
+set -u
+S=/tmp/u4-scratch
+for run in B-cold1 C-warm1 D-cold2 E-warm2; do
+  case "$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  "$S/run-shard.sh" "$run" 1/10 "$mode"
+done
+echo ALLDONE > "$S/linux-series.done"
+
+# ===== linux-pool3.sh
+#!/bin/bash
+set -u
+S=/tmp/u4-scratch
+until [ -f "$S/linux-series.done" ]; do sleep 30; done
+for run in P3-cold1 P3-warm1 P3-cold2 P3-warm2; do
+  case "$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  "$S/run-shard3.sh" "$run" 1/10 "$mode"
+done
+echo ALLDONE > "$S/linux-pool3.done"
+
+# ===== linux-pool3b.sh
+#!/bin/bash
+set -u
+S=/tmp/u4-scratch
+for run in P3-cold2 P3-warm2 P3-cold3 P3-warm3; do
+  case "$run" in *cold*) mode=cold;; *) mode=warm;; esac
+  "$S/run-shard3.sh" "$run" 1/10 "$mode"
+done
+echo ALLDONE > "$S/linux-pool3b.done"
+
+# ===== trim-pool3.sh
+#!/bin/bash
+set -u
+S=/tmp/u4-scratch
+until grep -qa "=== exit" "$S/P3-warm1.log" 2>/dev/null; do sleep 30; done
+pkill -f "$S/linux-pool3.sh"
+sleep 2
+pkill -f "tools/test262.ts --shard 1/10"
+echo TRIMMED > "$S/linux-pool3.done"

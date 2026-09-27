@@ -1,0 +1,93 @@
+# Compact extraction of the U4 local Linux shard logs.
+# Source: A-warmup.log, B-cold1.log, C-warm1.log, D-cold2.log, E-warm2.log,
+# P3-cold1.log, P3-warm1.log, P3-cold2.log, P3-warm2.log, P3-cold3.log,
+# P3-warm3.log in the U4 session scratchpad. Each run's per-path progress
+# output is omitted; every line below is verbatim from its log.
+
+== A-warmup.log
+=== A-warmup shard=1/10 harness=cold start 2026-09-27T21:14:16+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=425382.56ms pool=8 retries=0
+Finished in 432.92s
+WALL 432.98 s
+=== exit 0 end 2026-09-27T21:21:29+09:00
+
+== B-cold1.log
+=== B-cold1 shard=1/10 harness=cold start 2026-09-27T21:21:59+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=402284.43ms pool=8 retries=0
+Finished in 410.35s
+WALL 410.40 s
+=== exit 0 end 2026-09-27T21:28:50+09:00
+
+== C-warm1.log
+=== C-warm1 shard=1/10 harness=warm start 2026-09-27T21:28:50+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=388017.02ms pool=8 retries=0
+Finished in 396.31s
+WALL 396.37 s
+=== exit 0 end 2026-09-27T21:35:26+09:00
+
+== D-cold2.log
+=== D-cold2 shard=1/10 harness=cold start 2026-09-27T21:35:26+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=406157.25ms pool=8 retries=0
+Finished in 414.91s
+WALL 414.95 s
+=== exit 0 end 2026-09-27T21:42:21+09:00
+
+== E-warm2.log
+=== E-warm2 shard=1/10 harness=warm start 2026-09-27T21:42:21+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=421566.24ms pool=8 retries=0
+Finished in 429.24s
+WALL 429.29 s
+=== exit 0 end 2026-09-27T21:49:30+09:00
+
+== P3-cold1.log
+=== P3-cold1 shard=1/10 harness=cold cpus=0-2 start 2026-09-27T21:49:36+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=638270.48ms pool=3 retries=0
+Finished in 646.17s
+WALL 646.21 s
+=== exit 0 end 2026-09-27T22:00:22+09:00
+
+== P3-warm1.log
+=== P3-warm1 shard=1/10 harness=warm cpus=0-2 start 2026-09-27T22:00:22+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=615860.59ms pool=3 retries=0
+Finished in 623.69s
+WALL 623.72 s
+=== exit 0 end 2026-09-27T22:10:46+09:00
+
+== P3-cold2.log
+=== P3-cold2 shard=1/10 harness=cold cpus=0-2 start 2026-09-27T22:11:19+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=627451.42ms pool=3 retries=0
+Finished in 635.39s
+WALL 635.43 s
+=== exit 0 end 2026-09-27T22:21:54+09:00
+
+== P3-warm2.log
+=== P3-warm2 shard=1/10 harness=warm cpus=0-2 start 2026-09-27T22:21:54+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=662625.81ms pool=3 retries=0
+Finished in 671.16s
+WALL 671.19 s
+=== exit 0 end 2026-09-27T22:33:05+09:00
+
+== P3-cold3.log
+=== P3-cold3 shard=1/10 harness=cold cpus=0-2 start 2026-09-27T22:33:05+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":96,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=643696.12ms pool=3 retries=0
+Finished in 651.59s
+WALL 651.63 s
+=== exit 0 end 2026-09-27T22:43:57+09:00
+
+== P3-warm3.log
+=== P3-warm3 shard=1/10 harness=warm cpus=0-2 start 2026-09-27T22:43:57+09:00
+test262-builds {"attempts":{"split":7195,"agents":52,"diagnostic":12,"module":8,"with":4},"executed":{"split":7193,"agents":52,"module":8,"with":4},"harnessComparisons":7099,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":96}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=587883.53ms pool=3 retries=0
+Finished in 599.75s
+WALL 599.78 s
+=== exit 0 end 2026-09-27T22:53:57+09:00

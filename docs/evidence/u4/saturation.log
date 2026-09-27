@@ -1,0 +1,82 @@
+# The saturation and key-churn observations behind the U4 paragraphs on why k
+# stays far below the path count and how often a cross-job key would match.
+# Each entry is verbatim command and output from the U4 session; timestamps are
+# the originating tool call's own, converted to +09:00. The scripts are
+# preserved beside this file under names that end in .txt, so each has to be
+# copied to a .ts or .sh path before node or bash will run it.
+
+== 2026-09-27T21:13+09:00  reviewed subset, per shard and per shard total
+$ node count-k.ts        # preserved as shard-signatures.ts.txt
+subset order: 21383, reviewed metadata: 21383
+total=1 shard=1 paths=21383 split=21139 fallback=244 distinctSources=53 distinctVariantKeys=210
+total=2 shard=1 paths=10692 split=10571 fallback=121 distinctSources=49 distinctVariantKeys=194
+total=5 shard=1 paths=4277 split=4227 fallback=50 distinctSources=35 distinctVariantKeys=140
+total=10 shard=1 paths=2139 split=2114 fallback=25 distinctSources=30 distinctVariantKeys=120
+total=20 shard=1 paths=1070 split=1058 fallback=12 distinctSources=25 distinctVariantKeys=100
+total=50 shard=1 paths=428 split=424 fallback=4 distinctSources=23 distinctVariantKeys=92
+total=100 shard=1 paths=214 split=212 fallback=2 distinctSources=18 distinctVariantKeys=72
+total=200 shard=1 paths=107 split=106 fallback=1 distinctSources=13 distinctVariantKeys=52
+--- all 10 shards at total=10 ---
+shard 1/10 paths=2139 split=2114 distinctSources=30 distinctVariantKeys=120
+shard 2/10 paths=2139 split=2115 distinctSources=29 distinctVariantKeys=116
+shard 3/10 paths=2139 split=2115 distinctSources=34 distinctVariantKeys=136
+shard 4/10 paths=2138 split=2114 distinctSources=36 distinctVariantKeys=144
+shard 5/10 paths=2138 split=2114 distinctSources=37 distinctVariantKeys=148
+shard 6/10 paths=2138 split=2113 distinctSources=33 distinctVariantKeys=132
+shard 7/10 paths=2138 split=2114 distinctSources=35 distinctVariantKeys=138
+shard 8/10 paths=2138 split=2113 distinctSources=33 distinctVariantKeys=130
+shard 9/10 paths=2138 split=2114 distinctSources=36 distinctVariantKeys=144
+shard 10/10 paths=2138 split=2113 distinctSources=33 distinctVariantKeys=132
+sum distinctSources over 10 shards = 336; sum variant keys = 1340
+
+# The whole reviewed corpus uses 53 distinct source signatures, which is the
+# 212-key bound the baseline states once both strictness modes and both
+# specialization policies are counted; 210 of those keys are realized. These
+# counts are structural, computed from the reviewed metadata rather than from a
+# run, and they are a ceiling, not a prediction: a shard's realized variant
+# keys here, 116 to 148, exceed the 96 to 128 objects the CI jobs built,
+# because not every admitted variant reaches a split.
+
+== 2026-09-27T21:47+09:00  pinned upstream suite
+$ node upstream-sigs.ts  # preserved as upstream-signatures.ts.txt
+files=48583 raw=32 module=821 distinctSourceSignatures=75
+variantCeiling(x4)=300
+  32017	[false,[]]
+  4412	[true,[]]
+  4135	[false,["propertyHelper.js"]]
+  1452	[false,["testTypedArray.js"]]
+  1143	[false,["temporalHelpers.js"]]
+
+# 75 signatures bound any shard of the whole suite at 300 keys. The suite is
+# the revision pinned at e76e235b, f2d1435644797268dca1f7988cad5a4e89ccd8d2,
+# which every preserved run log also records.
+
+== 2026-09-27T21:53+09:00  key-input churn on main
+$ grep -n "^zig" mise.toml
+18:zig = "0.16.0"
+$ ./keychurn2.sh 80     # preserved as key-churn.sh.txt
+steps=79 unchanged=51 changed=28
+
+# Both ran in one shell invocation. The first confirms the Zig pin the script
+# compares across commits and is not part of the script's own output; only the
+# second line is. 80 first-parent commits give 79 steps, of which 51 leave every
+# key input unchanged: the derived 64.6 percent the baseline uses as an assumed
+# hit rate. HEAD was e76e235b.
+
+# All three scripts were re-run during this preservation pass and reproduced
+# their own output above exactly. Run each from the repository root, through
+# standard input, so that node and git resolve the workspace's packages and
+# history rather than a temporary directory's:
+#
+#   mise exec -- node --input-type=module-typescript \
+#     < docs/evidence/u4/shard-signatures.ts.txt
+#   mise exec -- node --input-type=module-typescript \
+#     < docs/evidence/u4/upstream-signatures.ts.txt
+#
+# The churn script reads git history and hard-codes the U4 worktree path, so
+# rewrite its cd target, and pin it to e76e235b because the branch's HEAD is one
+# commit later:
+#
+#   sed -e 's#^cd /home/.*#cd "$(git rev-parse --show-toplevel)"#' \
+#       -e 's/HEAD)$/e76e235b)/' docs/evidence/u4/key-churn.sh.txt \
+#     | bash -s 80

@@ -1028,6 +1028,225 @@ concurrently, and competing files affect each other's duration. They identify
 the own-key and Reflect property files as the work to inspect when balancing
 shards. They do not establish a speedup between these commits.
 
+### Harness object count and cross-job cache value
+
+The test262 runner builds one harness object for each distinct combination of
+harness sources, strictness, and specialization policy that a shard reaches,
+and reuses it for every later case in the same process. Whether sharing those
+objects between CI jobs is worth doing depends on how many distinct objects one
+shard builds, which this section calls k, and on how much wall time removing
+those builds recovers.
+
+k is measured, not derived. Every reviewed test262 job prints
+`test262-builds` with `objectsBuilt` and `objectsReused`, and the two baseline
+runs agree exactly:
+
+| Shard | k (objects built) | Reused |
+| ----- | ----------------: | -----: |
+| 1/10  |                96 |      0 |
+| 2/10  |                96 |      0 |
+| 3/10  |               116 |      0 |
+| 4/10  |               128 |      0 |
+| 5/10  |               128 |      0 |
+| 6/10  |               108 |      0 |
+| 7/10  |               109 |      0 |
+| 8/10  |               112 |      0 |
+| 9/10  |               116 |      0 |
+| 10/10 |               108 |      0 |
+
+The sum is 1,117 objects for the ten shards of one target, and the mean is
+111.7. The same ten values appear in run [36243816479] and run
+[36261458909], on `macos-aarch64` and on `linux-x86_64-gnu` alike, so k is a
+property of the shard's reviewed path set rather than of the host. Shard 1/10
+was also measured locally on Linux and built the same 96 objects.
+`objectsReused` counts hits in the persistent object directory, and it is zero
+in every job because that directory starts empty on a fresh runner. Later cases
+in the same job still share each prepared object through the runner's own
+promise map, which is why k is far below the number of split attempts.
+
+k saturates well below the path count, because it is bounded by the harness
+include vocabulary rather than by the corpus. The reviewed corpus of 21,383
+paths uses 53 distinct combinations of the asynchronous flag and the ordered
+include list, which bounds the whole corpus at 212 keys once the two
+strictness modes and the two specialization policies are counted. Scanning the
+pinned upstream suite at revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`,
+excluding *intl402/*, *staging/*, and fixture files, finds 48,583 script files
+carrying only 75 distinct combinations, so all of test262 is bounded at 300.
+The measured growth matches that ceiling: a 101-path shard built 36 objects in
+the harness-split measurement recorded above, and a 2,139-path shard of the
+same corpus builds 96. Twenty-one times the paths yields 2.7 times the
+objects.
+
+Cold and warm shard wall times were measured on two hosts, at each host's own
+pool size and again at 3. The reviewed runner sets its pool to
+`min(8, availableParallelism())`, which the job logs report as 3 on the
+`macos-15` runner and 4 on `ubuntu-latest`; the pool 3 rows model the macOS
+runner's concurrency, and the Linux runner's pool of 4 was not reproduced. Cold
+means that the host harness object directory was removed before the run; warm
+means every object was reused. Each run executed the same shard 1/10, 2,139
+reviewed paths, k of 96. The runtime archive and toolchain were already present
+in every run in the table. Each host also ran one earlier warm-up with a cold
+runtime archive and Zig cache, 432.98 s on Linux at pool 8 and 1,649 s on macOS
+at pool 8; the macOS warm-up was 49 s faster than the table's cold run despite
+starting colder, which is the spread these hosts show.
+
+Both hosts ran the source of `e76e235b`, the commit this branch started from;
+the macOS clone carried one patch, an explicit pool-size override, and nothing
+else. Every run's log lines, the two hosts' environments, that patch, the
+drivers, and the revision check are preserved under
+[*docs/evidence/u4/*](./evidence/u4/README.md), along with the saturation and
+key-churn scans below. `python3 docs/evidence/u4/summarize.py` recomputes this
+table, the differences and per-object rates that follow it, and the two
+projections built on them, from those logs; the object counts, the 300-key
+ceiling, and the input-stability proportion it applies are constants sourced
+elsewhere in this section rather than recomputed.
+
+| Host               | Pool | Harness cache | Wall seconds           | Mean   |
+| ------------------ | ---- | ------------- | ---------------------- | ------ |
+| Linux, Ryzen 7700X | 8    | cold          | 410.40, 414.95         | 412.68 |
+| Linux, Ryzen 7700X | 8    | warm          | 396.37, 429.29         | 412.83 |
+| Linux, Ryzen 7700X | 3    | cold          | 646.21, 635.43, 651.63 | 644.42 |
+| Linux, Ryzen 7700X | 3    | warm          | 623.72, 671.19, 599.78 | 631.56 |
+| macOS, Apple M4    | 8    | cold          | 1698                   | 1698   |
+| macOS, Apple M4    | 8    | warm          | 1635                   | 1635   |
+| macOS, Apple M4    | 3    | cold          | 2052, 2343             | 2197.5 |
+| macOS, Apple M4    | 3    | warm          | 2105, 2482             | 2293.5 |
+
+The derived cold-minus-warm difference, computed before rounding, is -0.16 s
+on Linux at pool 8, 12.86 s on Linux at pool 3, 63 s on macOS at pool 8, and
+-96 s on macOS at pool 3. In two of the four configurations the warm runs were
+the slower ones, so no configuration separates the cache from its own sample's
+spread. The three warm Linux runs at pool 3 span 71.41 s, a wider range than
+the 12.86 s the cache is credited with there. The four macOS runs at pool 3
+ran consecutively and got monotonically slower, 2052, 2105, 2343, and 2482 s.
+Host drift is the explanation these observations suggest, and it is not
+established here; either way the cache effect is not separable from the 430 s
+those four runs span.
+
+One proportion in the same logs suggests why the saving is small, without
+establishing it. Shard 1/10 performs 7,195 split attempts against 96 harness
+objects, so harness preparation is 1.3 percent of the compile and link units
+the shard starts, and a pool with other work to schedule can overlap it. The
+earlier 101-path measurement in [*PLAN-GATE.md*](../PLAN-GATE.md) has 36
+objects against 316 variants, a ratio nine times larger, which is the most
+likely reason its relative saving was larger; that comparison is a hypothesis
+about the mechanism, not a second measurement.
+
+The Linux pool 3 figures use `taskset -c 0-2`, which `availableParallelism`
+honors; every such run reported `pool=3`. That models the macOS runner's pool
+on the Linux host; it is not the Linux runner's own pool of 4. The macOS pool
+3 figures come from a throwaway clone whose runner was patched to accept an
+explicit pool size. Neither host is a GitHub runner. The `macos-15` runner
+completed the same shard in 1,890 s at pool 3 in run [36261458909], faster
+than either local macOS pool 3 run, and this Mac mini's storage was 94 percent
+full during the series. These hosts supply the inputs to the conditional
+estimate below; they do not reproduce the runner.
+
+The only two configurations with a positive difference give a per-object wall
+saving of 0.656 s on macOS at pool 8 and 0.134 s on Linux at pool 3. Applying
+the larger of those to the measured 1,117 objects of the ten macOS shards gives
+a derived 733 s, or 12.2 min, for one complete CI run at the current workload.
+That figure is an estimate conditioned on three assumptions: that the one
+positive macOS pair measures the cache rather than the host, that every job
+restores an exact hit, and that a GitHub runner behaves like this Mac mini. The
+two baseline runs do not establish an improvement of this size either way:
+their derived same-job spread for a macOS test262 shard ranges from 0.35 to
+16.53 min, and each job was measured once per commit, so demonstrating a change
+this small would need matched repeated measurements of the same job.
+
+At the projected corpus of 41,091 paths the same rate gives a larger bound,
+and the estimate above must not be carried over unchanged. Each shard would
+select up to 4,110 paths instead of up to 2,139, and the upstream signature
+count bounds a shard at 300 distinct keys, so ten shards are bounded at 3,000
+objects and a derived 1,969 s, or 32.8 min, at the unrounded 63/96 s for each.
+That is a bound rather than an expectation, because a shard covering a tenth
+of the corpus need not reach every signature, and it rests on the same
+per-object rate that two of the four configurations did not reproduce. It is
+the figure that would justify revisiting U4, and revisiting it would need the
+per-object saving confirmed on a runner first.
+
+A cross-job cache does not hit on every run. The harness object key covers
+*aube-lock.yaml*, every TypeScript source and manifest of the compiler,
+backend, parser, CLI, and Unicode packages, the runtime assets in
+*packages/runtime-c/*, the reviewed harness sources in *tests/test262/harness/*,
+the target, the toolchain identity from `zig env`, and the compile flags. Over
+the 79 first-parent steps on main ending at `e76e235b`, a measured 51 leave
+every one of those inputs unchanged and 28 change at least one, a derived 64.6
+percent. That is a historical input-stability proportion, not an observed cache
+hit rate, and using it as one assumes the next run's key matches the previous
+run's published entry. Every branch that changes the compiler misses until
+its own first run publishes, and a GitHub Actions cache written on a branch is
+not visible to other branches.
+
+Object bytes were measured on the same shard; the transfer cost around them is
+an estimate built from other caches. The 96 objects occupy a measured 239.4
+MiB, with a mean of 2.49 MiB and a maximum of 6.47 MiB, and compress to 35.5
+MiB with `tar | zstd -3`; the largest shard's 128 objects scale that to a
+derived 47 MiB, or 49.6 MB. The M column above measures restoring the 306 MB
+macOS mise cache in 10.52 to 19.61 s, a derived 15.6 to 29.1 MB/s, which puts
+that 49.6 MB restore at a derived 1.7 to 3.2 s of transfer. Assuming
+publication costs twice a restore and that the action overhead resembles the 2
+s the R column shows for the runtime archive, a hit costs a derived 4 to 5 s
+and a miss, which restores nothing but still publishes, a derived 5 to 8 s; ten
+shards are then a derived 0.6 to 1.4 macOS min either way, aggregated before
+rounding rather than from those whole seconds. Those assumptions are not
+measured here, and a branch run measuring the action itself would replace
+them. Scaling the compressed 35.5 MiB by the measured 1,117
+objects of the ten shards and by the two targets, which assumes macOS objects
+compress like these Linux ones, gives a derived 825 MiB, or 865 MB, for each
+distinct key, against a measured 4.06 GB, a derived 3.78 GiB, of the 10 GB
+repository limit already held in 69 entries, twelve of them mise tool caches of
+297 to 425 MB. Whether that pressure evicts those entries, and what the
+resulting reinstalls would cost, is an unquantified risk rather than a measured
+cost.
+
+The object byte measurement, with the exact compression invocation behind the
+35.5 MiB, and the cache occupancy listing are preserved in
+[*object-sizes.log*](./evidence/u4/object-sizes.log) and
+[*cache-usage.log*](./evidence/u4/cache-usage.log). The objects measured are
+`linux-x86_64-gnu`; no macOS object bytes were measured. The entry counts come
+from a complete listing of the same cache state, which reports byte-for-byte
+the same usage as the original observation; an earlier truncated listing of 8
+of the 69 entries is why this paragraph previously named four mise caches.
+
+Reproducing these observations:
+
+~~~~ sh
+# k for every shard of a CI run, from that run's job logs.
+gh run view 36261458909 --json jobs \
+  --jq '.jobs[] | select(.name | test("test262 "))
+        | [.databaseId, .name] | @tsv'
+gh api --allow-escape-sequences repos/dahlia/oseo/actions/jobs/JOB/logs \
+  | grep -a 'test262-builds\|pool='
+
+# Cold and warm shard wall time on the local host.
+rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/oseo/harness-objects"
+time mise run test:test262 --shard 1/10   # cold, prints objectsBuilt
+time mise run test:test262 --shard 1/10   # warm, prints objectsReused
+
+# Object bytes for one shard's cache directory.
+find "${XDG_CACHE_HOME:-$HOME/.cache}/oseo/harness-objects" -name '*.o' \
+  -printf '%s\n' | awk '{s+=$1} END {print NR, s}'
+
+# Repository cache pressure.
+gh api repos/dahlia/oseo/actions/cache/usage
+~~~~
+
+On macOS the cache directory is *~/Library/Caches/oseo/harness-objects*, which
+`XDG_CACHE_HOME` does not redirect. The pool size follows
+`availableParallelism`, so `taskset -c 0-2` gives a pool of 3 on Linux and
+nothing in the checked-in runner sets an explicit pool on macOS.
+
+The derived recovery for U4 at the current workload is therefore 12.2 macOS
+min for a complete run on its most favorable assumptions, a derived 7.9 min if
+the 64.6 percent input-stability proportion is taken as a hit rate, less a
+derived 0.6 to 1.4 min of transfer paid on every run. Two of the four measured
+configurations, including the one at the macOS runner's own pool size, show no
+saving at all. That is below the 15 macOS min the unit set as its threshold, so
+no cross-job harness object cache was implemented. The derived 32.8 min bound
+at 41,091 paths is the condition under which that decision should be taken
+again.
+
 ### Reproducing the CI measurements
 
 Retrieve main runs, retaining failed and cancelled runs when reproducing the
