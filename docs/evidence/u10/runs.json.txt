@@ -1,0 +1,1397 @@
+{
+  "1a879b2e-cold": {
+    "rawJson": "1a879b2e-cold.json",
+    "rawLog": "1a879b2e-cold.log",
+    "metadata": {
+      "durationMilliseconds": 61090.97,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 68.19,
+      "userSeconds": 160.37,
+      "systemSeconds": 80.73,
+      "maxRssKiB": 1096340.0
+    }
+  },
+  "1a879b2e-warm1": {
+    "rawJson": "1a879b2e-warm1.json",
+    "rawLog": "1a879b2e-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 33303.77,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.35,
+      "userSeconds": 106.01,
+      "systemSeconds": 69.67,
+      "maxRssKiB": 1124012.0
+    }
+  },
+  "1a879b2e-warm2": {
+    "rawJson": "1a879b2e-warm2.json",
+    "rawLog": "1a879b2e-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 33901.42,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.97,
+      "userSeconds": 105.02,
+      "systemSeconds": 69.9,
+      "maxRssKiB": 1206584.0
+    }
+  },
+  "32ece7f4-cold": {
+    "rawJson": "32ece7f4-cold.json",
+    "rawLog": "32ece7f4-cold.log",
+    "metadata": {
+      "durationMilliseconds": 56838.43,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 25
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 666,
+        "module": 2
+      },
+      "executed": {
+        "split": 666,
+        "module": 2
+      },
+      "harnessComparisons": 614,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 668,
+    "time": {
+      "wallSeconds": 62.86,
+      "userSeconds": 149.56,
+      "systemSeconds": 76.43,
+      "maxRssKiB": 1126224.0
+    }
+  },
+  "32ece7f4-instrument-prime": {
+    "rawJson": "32ece7f4-instrument-prime.json",
+    "rawLog": "32ece7f4-instrument-prime.log",
+    "metadata": {
+      "durationMilliseconds": 43869.36,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 51.15,
+      "userSeconds": 121.31,
+      "systemSeconds": 81.76,
+      "maxRssKiB": 1154740.0
+    }
+  },
+  "32ece7f4-instrument-warm1": {
+    "rawJson": "32ece7f4-instrument-warm1.json",
+    "rawLog": "32ece7f4-instrument-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 35228.12,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 41.45,
+      "userSeconds": 104.87,
+      "systemSeconds": 71.7,
+      "maxRssKiB": 1136148.0
+    }
+  },
+  "32ece7f4-instrument-warm2": {
+    "rawJson": "32ece7f4-instrument-warm2.json",
+    "rawLog": "32ece7f4-instrument-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 35283.16,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 41.7,
+      "userSeconds": 103.63,
+      "systemSeconds": 71.82,
+      "maxRssKiB": 1174040.0
+    }
+  },
+  "32ece7f4-warm1": {
+    "rawJson": "32ece7f4-warm1.json",
+    "rawLog": "32ece7f4-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 32299.87,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 25
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 666,
+        "module": 2
+      },
+      "executed": {
+        "split": 666,
+        "module": 2
+      },
+      "harnessComparisons": 614,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 668,
+    "time": {
+      "wallSeconds": 38.17,
+      "userSeconds": 98.62,
+      "systemSeconds": 66.72,
+      "maxRssKiB": 1172188.0
+    }
+  },
+  "32ece7f4-warm2": {
+    "rawJson": "32ece7f4-warm2.json",
+    "rawLog": "32ece7f4-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 31680.2,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 25
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 666,
+        "module": 2
+      },
+      "executed": {
+        "split": 666,
+        "module": 2
+      },
+      "harnessComparisons": 614,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 668,
+    "time": {
+      "wallSeconds": 37.62,
+      "userSeconds": 98.53,
+      "systemSeconds": 66.41,
+      "maxRssKiB": 1102604.0
+    }
+  },
+  "61a5214d-cold": {
+    "rawJson": "61a5214d-cold.json",
+    "rawLog": "61a5214d-cold.log",
+    "metadata": {
+      "durationMilliseconds": 57400.04,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 63.39,
+      "userSeconds": 154.54,
+      "systemSeconds": 77.87,
+      "maxRssKiB": 1066844.0
+    }
+  },
+  "61a5214d-warm1": {
+    "rawJson": "61a5214d-warm1.json",
+    "rawLog": "61a5214d-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 32631.89,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 38.63,
+      "userSeconds": 102.14,
+      "systemSeconds": 68.65,
+      "maxRssKiB": 1183472.0
+    }
+  },
+  "61a5214d-warm2": {
+    "rawJson": "61a5214d-warm2.json",
+    "rawLog": "61a5214d-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 33632.1,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.67,
+      "userSeconds": 102.98,
+      "systemSeconds": 69.59,
+      "maxRssKiB": 1242744.0
+    }
+  },
+  "7df433ae-cold": {
+    "rawJson": "7df433ae-cold.json",
+    "rawLog": "7df433ae-cold.log",
+    "metadata": {
+      "durationMilliseconds": 57830.65,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 63.81,
+      "userSeconds": 155.19,
+      "systemSeconds": 77.76,
+      "maxRssKiB": 1070484.0
+    }
+  },
+  "7df433ae-warm1": {
+    "rawJson": "7df433ae-warm1.json",
+    "rawLog": "7df433ae-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 33342.26,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.32,
+      "userSeconds": 104.18,
+      "systemSeconds": 69.57,
+      "maxRssKiB": 1210860.0
+    }
+  },
+  "7df433ae-warm2": {
+    "rawJson": "7df433ae-warm2.json",
+    "rawLog": "7df433ae-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 33325.2,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.28,
+      "userSeconds": 103.15,
+      "systemSeconds": 68.98,
+      "maxRssKiB": 1139392.0
+    }
+  },
+  "9e71f689-cold": {
+    "rawJson": "9e71f689-cold.json",
+    "rawLog": "9e71f689-cold.log",
+    "metadata": {
+      "durationMilliseconds": 58007.09,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 64.01,
+      "userSeconds": 156.47,
+      "systemSeconds": 78.13,
+      "maxRssKiB": 1070556.0
+    }
+  },
+  "9e71f689-warm1": {
+    "rawJson": "9e71f689-warm1.json",
+    "rawLog": "9e71f689-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 34723.14,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.78,
+      "userSeconds": 106.3,
+      "systemSeconds": 71.05,
+      "maxRssKiB": 1211800.0
+    }
+  },
+  "9e71f689-warm2": {
+    "rawJson": "9e71f689-warm2.json",
+    "rawLog": "9e71f689-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 34835.6,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 41.01,
+      "userSeconds": 108.44,
+      "systemSeconds": 71.66,
+      "maxRssKiB": 1150420.0
+    }
+  },
+  "9ecf1642-cold": {
+    "rawJson": "9ecf1642-cold.json",
+    "rawLog": "9ecf1642-cold.log",
+    "metadata": {
+      "durationMilliseconds": 57938.59,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 63.93,
+      "userSeconds": 154.76,
+      "systemSeconds": 77.59,
+      "maxRssKiB": 1051496.0
+    }
+  },
+  "9ecf1642-warm1": {
+    "rawJson": "9ecf1642-warm1.json",
+    "rawLog": "9ecf1642-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 33933.66,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.1,
+      "userSeconds": 103.83,
+      "systemSeconds": 69.76,
+      "maxRssKiB": 1193444.0
+    }
+  },
+  "9ecf1642-warm2": {
+    "rawJson": "9ecf1642-warm2.json",
+    "rawLog": "9ecf1642-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 33859.37,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 39.88,
+      "userSeconds": 104.87,
+      "systemSeconds": 69.58,
+      "maxRssKiB": 1186160.0
+    }
+  },
+  "a41aeb0b-cold": {
+    "rawJson": "a41aeb0b-cold.json",
+    "rawLog": "a41aeb0b-cold.log",
+    "metadata": {
+      "durationMilliseconds": 62897.5,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 68.88,
+      "userSeconds": 167.35,
+      "systemSeconds": 83.35,
+      "maxRssKiB": 1151872.0
+    }
+  },
+  "a41aeb0b-warm1": {
+    "rawJson": "a41aeb0b-warm1.json",
+    "rawLog": "a41aeb0b-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 34065.52,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.22,
+      "userSeconds": 105.89,
+      "systemSeconds": 70.11,
+      "maxRssKiB": 1162292.0
+    }
+  },
+  "a41aeb0b-warm2": {
+    "rawJson": "a41aeb0b-warm2.json",
+    "rawLog": "a41aeb0b-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 34136.44,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.08,
+      "userSeconds": 106.38,
+      "systemSeconds": 70.46,
+      "maxRssKiB": 1146444.0
+    }
+  },
+  "aff3ade3-cold": {
+    "rawJson": "aff3ade3-cold.json",
+    "rawLog": "aff3ade3-cold.log",
+    "metadata": {
+      "durationMilliseconds": 61906.04,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 70.35,
+      "userSeconds": 164.74,
+      "systemSeconds": 81.36,
+      "maxRssKiB": 1079120.0
+    }
+  },
+  "aff3ade3-instrument-prime": {
+    "rawJson": "aff3ade3-instrument-prime.json",
+    "rawLog": "aff3ade3-instrument-prime.log",
+    "metadata": {
+      "durationMilliseconds": 35450.57,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 41.83,
+      "userSeconds": 104.09,
+      "systemSeconds": 72.41,
+      "maxRssKiB": 1270864.0
+    }
+  },
+  "aff3ade3-instrument-warm1": {
+    "rawJson": "aff3ade3-instrument-warm1.json",
+    "rawLog": "aff3ade3-instrument-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 37153.55,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 43.36,
+      "userSeconds": 107.23,
+      "systemSeconds": 74.33,
+      "maxRssKiB": 1231828.0
+    }
+  },
+  "aff3ade3-instrument-warm2": {
+    "rawJson": "aff3ade3-instrument-warm2.json",
+    "rawLog": "aff3ade3-instrument-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 34447.91,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 167,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 663,
+        "module": 2
+      },
+      "executed": {
+        "split": 663,
+        "module": 2
+      },
+      "harnessComparisons": 611,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 665,
+    "time": {
+      "wallSeconds": 40.73,
+      "userSeconds": 102.87,
+      "systemSeconds": 70.91,
+      "maxRssKiB": 1201760.0
+    }
+  },
+  "aff3ade3-warm1": {
+    "rawJson": "aff3ade3-warm1.json",
+    "rawLog": "aff3ade3-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 33882.95,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.28,
+      "userSeconds": 106.56,
+      "systemSeconds": 70.05,
+      "maxRssKiB": 1205552.0
+    }
+  },
+  "aff3ade3-warm2": {
+    "rawJson": "aff3ade3-warm2.json",
+    "rawLog": "aff3ade3-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 34144.15,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 40.31,
+      "userSeconds": 104.46,
+      "systemSeconds": 70.61,
+      "maxRssKiB": 1170492.0
+    }
+  },
+  "e99620d5-cold": {
+    "rawJson": "e99620d5-cold.json",
+    "rawLog": "e99620d5-cold.log",
+    "metadata": {
+      "durationMilliseconds": 58137.69,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 52,
+      "objectsReused": 0
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 64.1,
+      "userSeconds": 158.52,
+      "systemSeconds": 78.53,
+      "maxRssKiB": 1090888.0
+    }
+  },
+  "e99620d5-warm1": {
+    "rawJson": "e99620d5-warm1.json",
+    "rawLog": "e99620d5-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 38505.99,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 44.56,
+      "userSeconds": 114.78,
+      "systemSeconds": 76.15,
+      "maxRssKiB": 1145792.0
+    }
+  },
+  "e99620d5-warm2": {
+    "rawJson": "e99620d5-warm2.json",
+    "rawLog": "e99620d5-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 34982.91,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 17,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 170,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 22
+    },
+    "builds": {
+      "attempts": {
+        "diagnostic": 13,
+        "split": 675,
+        "module": 2
+      },
+      "executed": {
+        "split": 675,
+        "module": 2
+      },
+      "harnessComparisons": 623,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 52
+    },
+    "variants": 677,
+    "time": {
+      "wallSeconds": 41.16,
+      "userSeconds": 108.06,
+      "systemSeconds": 71.52,
+      "maxRssKiB": 1086504.0
+    }
+  },
+  "new-prime": {
+    "rawJson": "new-prime.json",
+    "rawLog": "new-prime.log",
+    "metadata": {
+      "durationMilliseconds": 310120.46,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 0,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 303,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 12
+    },
+    "builds": {
+      "attempts": {
+        "split": 1208
+      },
+      "executed": {
+        "split": 1208
+      },
+      "harnessComparisons": 1152,
+      "deterministicObjects": 0,
+      "objectsBuilt": 32,
+      "objectsReused": 24
+    },
+    "variants": 1208,
+    "time": {
+      "wallSeconds": 316.56,
+      "userSeconds": 1459.54,
+      "systemSeconds": 166.2,
+      "maxRssKiB": 1419228.0
+    }
+  },
+  "new-warm1": {
+    "rawJson": "new-warm1.json",
+    "rawLog": "new-warm1.log",
+    "metadata": {
+      "durationMilliseconds": 331544.5,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 0,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 303,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 12
+    },
+    "builds": {
+      "attempts": {
+        "split": 1208
+      },
+      "executed": {
+        "split": 1208
+      },
+      "harnessComparisons": 1152,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 56
+    },
+    "variants": 1208,
+    "time": {
+      "wallSeconds": 337.61,
+      "userSeconds": 1575.73,
+      "systemSeconds": 168.97,
+      "maxRssKiB": 1546752.0
+    }
+  },
+  "new-warm2": {
+    "rawJson": "new-warm2.json",
+    "rawLog": "new-warm2.log",
+    "metadata": {
+      "durationMilliseconds": 326583.98,
+      "poolLimit": 8,
+      "retries": 0
+    },
+    "summary": {
+      "expectedNegatives": 0,
+      "harnessFailures": 0,
+      "infrastructureFailures": 0,
+      "passes": 303,
+      "semanticFailures": 0,
+      "unsupportedProfileFeatures": 12
+    },
+    "builds": {
+      "attempts": {
+        "split": 1208
+      },
+      "executed": {
+        "split": 1208
+      },
+      "harnessComparisons": 1152,
+      "deterministicObjects": 0,
+      "objectsBuilt": 0,
+      "objectsReused": 56
+    },
+    "variants": 1208,
+    "time": {
+      "wallSeconds": 332.87,
+      "userSeconds": 1513.92,
+      "systemSeconds": 170.19,
+      "maxRssKiB": 1471368.0
+    }
+  }
+}

@@ -565,6 +565,301 @@ observations. API timestamps have second resolution; nested log timestamps
 and durations have finer resolution, but normalized rates remain derived
 allocations with the startup limitation stated above.
 
+### Historical per-path test262 investigation
+
+The measurement sources, exact per-run values, and table-to-artifact map
+are preserved in [*evidence/u10/README.md*](./evidence/u10/README.md).
+Its recomputation commands cover every table and derived percentage in
+this investigation, including the native attribution and generated-C hashes.
+
+The largest measured new cost is three 10,000-element TypedArray
+`copyWithin` detachment security cases admitted by `1a879b2e`. They
+account for a derived 97.4/97.3 percent of summed native elapsed
+time among the 315 newly reviewed paths in two warm Linux runs. The
+fixed old-path sample's warm-trial mean runner time grows from 31.99
+to 34.01 seconds, a derived 6.3 percent; the
+CI series grows 21.0 percent in normalized step time. U10 finds no lost
+reuse or runner change, retains the required semantic work, and claims
+no recovered CI capacity. The macOS remainder is not causally allocated
+by these Linux measurements.
+
+The U10 comparison uses the historical commits `32ece7f4`,
+`e99620d5`, and `aff3ade3`. The measured CI execution steps below
+come from main runs 35456667007, 35463308291, and 35493049199;
+`gh run view RUN --json headSha,jobs` supplies timestamps and
+`gh run view RUN --job JOB --log` supplies runner metadata. Each commit
+has one CI run in this comparison, so these measurements do not establish
+a repeatable CI improvement or an exact causal allocation.
+
+Measured macOS execution-step seconds and source job IDs, from
+[*ci-summary.json.txt*](./evidence/u10/ci-summary.json.txt):
+
+| Shard | 32ece7f4 job | Step s | e99620d5 job | Step s | aff3ade3 job | Step s |
+| ----- | ------------ | ------ | ------------ | ------ | ------------ | ------ |
+| 1/10  | 105933065487 | 1444   | 105950927491 | 1525   | 106031164715 | 1736   |
+| 2/10  | 105933065424 | 1442   | 105950927505 | 1593   | 106031164796 | 1425   |
+| 3/10  | 105933065463 | 1308   | 105950927497 | 1341   | 106031164885 | 1233   |
+| 4/10  | 105933065510 | 1104   | 105950927440 | 1523   | 106031165008 | 1916   |
+| 5/10  | 105933065474 | 1213   | 105950927415 | 1239   | 106031165096 | 1936   |
+| 6/10  | 105933065464 | 1450   | 105950927498 | 1766   | 106031164745 | 1477   |
+| 7/10  | 105933065576 | 1153   | 105950927494 | 1565   | 106031164849 | 1824   |
+| 8/10  | 105933065570 | 1448   | 105950927449 | 1085   | 106031164759 | 1167   |
+| 9/10  | 105933065434 | 1421   | 105950927495 | 1279   | 106031164782 | 1603   |
+| 10/10 | 105933065675 | 1120   | 105950927552 | 1207   | 106031164930 | 1779   |
+
+The derived sums are 13,103, 14,123, and 16,096 seconds. Dividing by
+the measured reviewed counts of 20,841, 20,898, and 21,156 gives
+0.629, 0.676, and 0.761 seconds per path. The derived rate increase is 21.0
+percent; the execution-sum increase is 22.8 percent. Job setup is outside these
+steps. The mise task's prerequisite package build remains inside each step and
+has not been subtracted here. Shard indices use each commit's reviewed order,
+so an equal index does not select an equal path set across these commits.
+
+All thirty observed runner logs report `pool=3` and `retries=0`.
+The measured harness-object build/reuse sums are 954/0, 954/0, and
+992/0, respectively. The cold harness state was already present at the
+baseline, so it is not a newly lost cache in this interval. The measured
+runtime archive restore-hit counts are 9/10, 7/10, and 10/10. The
+TypedArray run has the highest normalized cost despite restoring every
+archive; archive misses cannot explain that endpoint increase.
+
+The measured canonical execution-variant counts are 68,275, 68,557,
+and 69,552, obtained by reading every partition from
+`git archive REV tests/test262/results` and counting
+`execution.variants`. Their derived endpoint increase is 1.87 percent.
+The original 20,841 paths account for 68,275, 68,341, and 68,344
+variants; 22 old paths become pass with Symbol support and one more
+with TypedArray mutation. The measured new-path counts are 57 at
+`e99620d5` and 315 at `aff3ade3`, with 216 and 1,208 variants.
+The runtime changes are `a41aeb0b` (Symbol), its identity/lifetime
+repairs `9ecf1642`, `7df433ae`, and `61a5214d`, and `1a879b2e`
+(TypedArray mutation). The historical test262 runner, fragment runner,
+compiler sources, and C backend sources have identical bytes between
+the endpoints.
+
+The Linux comparison ran on Linux 7.2.7-200.fc44.x86\_64, an AMD Ryzen
+7 7700X with eight physical cores and sixteen hardware threads, using
+Node.js 24.18.0 and Zig 0.16.0. The initial host snapshot was an
+unpreserved observation: 34 GiB available memory, 254 MiB free swap,
+190 GiB free on the temporary filesystem, and load averages of
+0.99/1.08/0.86. Its source output and timestamp were not retained, so
+these figures are not artifact-backed measurements.
+
+The preserved, sanitized
+[*host-pressure.log*](./evidence/u10/host-pressure.log) contains later
+observations with their original timestamps. Its swap row at
+`2026-09-27T20:15:08+09:00` records zero free bytes. These are shared-host
+measurements, not an isolated-host benchmark. The statement that no other
+`mise run test` gate was observed at checkpoints is also an unpreserved
+observation; no timestamped process-list output supports it.
+
+A detached historical checkout was built at every commit with
+
+~~~~ sh
+ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-test262-per-path-rise \
+  mise run build
+~~~~
+
+Package installation and those builds are outside the timing table. The exact
+209 path strings were frozen from shard `3/100` of the `32ece7f4` reviewed
+order, rather than reselecting a shard at each commit. The preserved
+[*bench.ts.txt*](./evidence/u10/bench.ts.txt) wrapper
+calls `createReviewedManifest`, uses each commit's current reviewed entries for
+those strings, and asserts equality with `serializeTest262Manifest` of the
+corresponding canonical records. It never writes the reviewed subset or results.
+
+The measured command was GNU time around
+`mise exec -- node tools/u10-bench.ts`, with the lane above and a separate
+`XDG_CACHE_HOME` for each commit. Before each cold run, both the lane's
+Zig cache and that commit's Oseo cache were empty. Two warm runs retained
+both caches after the cold run. Every cold run built 52 harness objects;
+every warm run reused all 52 and built none. All runs used the observed
+eight-worker bound and no retry.
+
+Measured runner, command-wall, user, and system seconds follow; CPU/wall
+is derived from the latter three measurements. Runner time excludes
+manifest preparation and verification outside `createReviewedManifest`.
+The difference between command wall and runner time is a derived wrapper
+cost, not a native-execution estimate.
+
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt), keyed by commit and
+cache trial. CPU/wall is `(user + system) / wall`; the derived warm increase
+compares the endpoints' two-trial mean runner seconds.
+
+| Commit     | Cache | Runner s | Wall s | User s | System s | CPU/wall |
+| ---------- | ----- | -------- | ------ | ------ | -------- | -------- |
+| `32ece7f4` | cold  | 56.84    | 62.86  | 149.56 | 76.43    | 3.60     |
+| `32ece7f4` | warm1 | 32.30    | 38.17  | 98.62  | 66.72    | 4.33     |
+| `32ece7f4` | warm2 | 31.68    | 37.62  | 98.53  | 66.41    | 4.38     |
+| `a41aeb0b` | cold  | 62.90    | 68.88  | 167.35 | 83.35    | 3.64     |
+| `a41aeb0b` | warm1 | 34.07    | 40.22  | 105.89 | 70.11    | 4.38     |
+| `a41aeb0b` | warm2 | 34.14    | 40.08  | 106.38 | 70.46    | 4.41     |
+| `9ecf1642` | cold  | 57.94    | 63.93  | 154.76 | 77.59    | 3.63     |
+| `9ecf1642` | warm1 | 33.93    | 40.10  | 103.83 | 69.76    | 4.33     |
+| `9ecf1642` | warm2 | 33.86    | 39.88  | 104.87 | 69.58    | 4.37     |
+| `7df433ae` | cold  | 57.83    | 63.81  | 155.19 | 77.76    | 3.65     |
+| `7df433ae` | warm1 | 33.34    | 39.32  | 104.18 | 69.57    | 4.42     |
+| `7df433ae` | warm2 | 33.33    | 39.28  | 103.15 | 68.98    | 4.38     |
+| `61a5214d` | cold  | 57.40    | 63.39  | 154.54 | 77.87    | 3.67     |
+| `61a5214d` | warm1 | 32.63    | 38.63  | 102.14 | 68.65    | 4.42     |
+| `61a5214d` | warm2 | 33.63    | 39.67  | 102.98 | 69.59    | 4.35     |
+| `e99620d5` | cold  | 58.14    | 64.10  | 158.52 | 78.53    | 3.70     |
+| `e99620d5` | warm1 | 38.51    | 44.56  | 114.78 | 76.15    | 4.28     |
+| `e99620d5` | warm2 | 34.98    | 41.16  | 108.06 | 71.52    | 4.36     |
+| `9e71f689` | cold  | 58.01    | 64.01  | 156.47 | 78.13    | 3.67     |
+| `9e71f689` | warm1 | 34.72    | 40.78  | 106.30 | 71.05    | 4.35     |
+| `9e71f689` | warm2 | 34.84    | 41.01  | 108.44 | 71.66    | 4.39     |
+| `1a879b2e` | cold  | 61.09    | 68.19  | 160.37 | 80.73    | 3.54     |
+| `1a879b2e` | warm1 | 33.30    | 39.35  | 106.01 | 69.67    | 4.46     |
+| `1a879b2e` | warm2 | 33.90    | 39.97  | 105.02 | 69.90    | 4.38     |
+| `aff3ade3` | cold  | 61.91    | 70.35  | 164.74 | 81.36    | 3.50     |
+| `aff3ade3` | warm1 | 33.88    | 40.28  | 106.56 | 70.05    | 4.38     |
+| `aff3ade3` | warm2 | 34.14    | 40.31  | 104.46 | 70.61    | 4.34     |
+
+The measured baseline sample has 167 passes, 17 expected negatives,
+25 unsupported paths, and 668 variants. Symbol support promotes three
+sample paths, giving 170 passes, 17 expected negatives, 22 unsupported,
+and 677 variants at every later point. Every sample has zero semantic,
+harness, or infrastructure failures and matches its own reviewed records.
+These historical promotions are workload changes, not manifest edits by U10.
+
+The warm-trial mean runner time rises from 31.99 to 34.01 seconds, a
+derived 6.3 percent, below the 21.0 percent CI step-rate increase. The observed
+increase appears in the `a41aeb0b` samples, which also include the three
+promotions. The subsequent repairs and TypedArray implementation do not produce
+another consistent warm step in this sample. `61a5214d` and `e99620d5` have
+identical trees, yet their measured warm ranges are 32.63–33.63 and 34.98–38.51
+seconds. This observed variation precludes assigning small timing differences
+to the merge itself.
+
+The unchanged-classification control removes those three promotions,
+leaving the same 206 paths, 167 passes, 17 expected negatives,
+22 unsupported results, and 665 recorded variants at both endpoints.
+An instrumented wrapper records elapsed `host.run` intervals and hashes
+the generated launcher/body C before writing it. Two module variants use
+the whole-Script fallback and are outside this fragment-host instrumentation;
+all 665 variants still execute and match the reviewed results.
+After an untimed-for-comparison primer, the two warm runs capture 663
+compile/link and 663 native-executable calls each. The 1,326 observed C
+files have identical name/length/SHA-256 multisets at both endpoints,
+totaling a derived 29,969,883 bytes each. Larger generated body C is
+therefore not the source of the fixed control's cost.
+
+Measured command/runner seconds and derived sums of observed subprocess
+elapsed seconds follow. Those sums include process creation and asynchronous
+completion delivery, overlap under eight workers, and are neither CPU
+time nor task-wall allocations. Instrumentation has its own overhead,
+so these runner times are not comparisons with the uninstrumented table.
+
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt) and
+[*control-metrics.json.txt*](./evidence/u10/control-metrics.json.txt). Divide
+each phase's summed milliseconds by 1000; the shared C hash multiset preserves
+all four runs after exact equality checks.
+
+| Commit     | Trial | Runner s | Wall s | User s | System s | Compile/link sum s | Native sum s |
+| ---------- | ----- | -------- | ------ | ------ | -------- | ------------------ | ------------ |
+| `32ece7f4` | warm1 | 35.23    | 41.45  | 104.87 | 71.70    | 90.24              | 14.72        |
+| `32ece7f4` | warm2 | 35.28    | 41.70  | 103.63 | 71.82    | 88.21              | 15.10        |
+| `aff3ade3` | warm1 | 37.15    | 43.36  | 107.23 | 74.33    | 92.94              | 15.67        |
+| `aff3ade3` | warm2 | 34.45    | 40.73  | 102.87 | 70.91    | 87.18              | 14.44        |
+
+The observed control ranges overlap in both phases. It does not establish
+a repeatable slowdown of unchanged old cases or a generated-C regression.
+
+All 315 paths newly reviewed between the endpoints were then measured
+at `aff3ade3`, using the same runner wrapper and the unchanged reviewed
+expectations. The first run retained the populated Zig/runtime caches
+and had a mixed harness cache: 32 objects built and 24 reused. Each
+instrumented warm repeat reused all 56 harness objects and built none.
+Every run retained 303 passes, 12 unsupported results, 1,208 variants,
+eight workers, no retry, and no failure.
+
+Measured command and runner seconds, from the same GNU-time command:
+
+Inputs: [*runs.json.txt*](./evidence/u10/runs.json.txt), keys `new-prime`,
+`new-warm1`, and `new-warm2`.
+
+| New-path trial | Harness state | Runner s | Wall s | User s  | System s |
+| -------------- | ------------- | -------- | ------ | ------- | -------- |
+| new-prime      | mixed         | 310.12   | 316.56 | 1459.54 | 166.20   |
+| new-warm1      | warm          | 331.54   | 337.61 | 1575.73 | 168.97   |
+| new-warm2      | warm          | 326.58   | 332.87 | 1513.92 | 170.19   |
+
+The three expensive paths are under the upstream
+*test/built-ins/TypedArray/prototype/copyWithin/* directory:
+*coerced-values-end-detached.js*,
+*coerced-values-end-detached-prototype.js*, and
+*coerced-values-start-detached.js*. Each explicitly fills an array of
+length 10,000 before constructing typed arrays and detaching a buffer
+during index coercion. The upstream comment identifies the large array
+as a way to expose access after the memory has been freed. All three
+paths were added to the reviewed subset by `1a879b2e`. The test262
+runner leaves the collector policy unset, so these measurements use
+the runtime's ordinary collection policy, as described in ADR 0018.
+
+Derived sums from the warm repeats' observed `host.run` intervals in
+[*new-metrics.json.txt*](./evidence/u10/new-metrics.json.txt). Sum each path's
+four native milliseconds and divide by 1000. For each attribution percentage,
+divide the three-path sum by all paths' native sum and multiply by 100:
+
+| Path stem                                  | Variants/run | First native sum s | Second native sum s |
+| ------------------------------------------ | ------------ | ------------------ | ------------------- |
+| *coerced-values-end-detached.js*           | 4            | 455.46             | 428.25              |
+| *coerced-values-end-detached-prototype.js* | 4            | 463.77             | 427.43              |
+| *coerced-values-start-detached.js*         | 4            | 433.86             | 417.31              |
+
+The derived three-path totals are 1,353.09 and 1,272.99 seconds,
+out of 1,389.12 and 1,308.36 seconds for all new-path native
+calls: 97.4 and 97.3 percent. Compile/link sums for the
+same runs are 208.21 and 215.08 seconds. This isolates the added
+cost to required native security-case work rather than a much larger
+generated program or newly lost reuse. It does not convert Linux timings
+into a macOS budget estimate.
+
+A separate sanitized C probe materializes Symbol or the TypedArray
+prototype, collects once to remove transient objects, counts the remaining
+owned heap objects, and times 10,000 further `oseo_collect` calls with
+`clock()`. It links each commit's retained runtime archive using
+`zig cc -target x86_64-linux-gnu -std=c11 -Wall -Wextra -Werror -pedantic`,
+the matching headers, `-fsanitize=address,undefined`, and `-fno-lto`.
+This is a diagnostic microbenchmark, not gate time or an executed-case
+budget. Object counts and CPU seconds are measured; no full-gate
+projection is derived from them.
+
+Inputs: [*gc-probe.log*](./evidence/u10/gc-probe.log), emitted by the
+preserved [*gc-probe.c*](./evidence/u10/gc-probe.c) source. The object and
+CPU columns copy observed values directly, with no derived projection.
+
+| Commit     | Symbol objects | Symbol CPU s, two trials | TypedArray objects | TypedArray CPU s, two trials |
+| ---------- | -------------- | ------------------------ | ------------------ | ---------------------------- |
+| `32ece7f4` | 363            | 0.074722/0.076069        | 1049               | 0.225213/0.225948            |
+| `a41aeb0b` | 391            | 0.082519/0.082485        | 1079               | 0.232866/0.231823            |
+| `9ecf1642` | 391            | 0.084049/0.085079        | 1079               | 0.233143/0.232689            |
+| `7df433ae` | 391            | 0.082937/0.082685        | 1079               | 0.230107/0.229598            |
+| `61a5214d` | 391            | 0.084244/0.083773        | 1079               | 0.233293/0.235265            |
+| `1a879b2e` | 391            | 0.084416/0.083141        | 1127               | 0.240724/0.239648            |
+| `aff3ade3` | 391            | 0.082979/0.082814        | 1127               | 0.242209/0.240837            |
+
+Symbol support expands the retained intrinsic graph; TypedArray mutation
+adds six method objects and their descriptors. Tracing the larger graphs
+is observable in this probe. The unchanged-classification task control
+still has overlapping phase times, so this microbenchmark does not assign
+the CI rise or the small fixed-sample difference to GC alone.
+
+U10 records a measured semantic-work explanation and implements no
+infrastructure change. No lost cache, pool reduction, extra retry, or
+larger generated body for unchanged old cases was demonstrated. Reducing
+the upstream security arrays would discard the evidence that made these
+paths worth admitting. A future collector
+or runtime optimization must retain those arrays, every recorded variant,
+and the same native targets and sanitizer flags.
+
+The single-run macOS series cannot establish an exact allocation of its
+21.0 percent rise between these new cases, historical promotions, and
+runner spread. Repeated macOS runs of fixed old and new path sets would
+be needed for that allocation. U10 claims zero recovered CI capacity;
+the reviewed manifests, classifications, and language profile are unchanged.
+
 
 Historical local baseline (2026-07-25)
 --------------------------------------

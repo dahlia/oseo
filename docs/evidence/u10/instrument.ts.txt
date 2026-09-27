@@ -1,0 +1,27 @@
+const metrics = { processes: [], sources: [] };
+const originalRunnerHost = createNodeHost();
+const runnerHost = {
+  ...originalRunnerHost,
+  async run(request) {
+    const start = performance.now();
+    const result = await originalRunnerHost.run(request);
+    metrics.processes.push({
+      command: request.command,
+      args: request.args,
+      milliseconds: performance.now() - start,
+      status: result.exitStatus,
+    });
+    return result;
+  },
+  async writeTextFile(path, text) {
+    if (path.endsWith("/case.c") || path.endsWith("/launcher.c")) {
+      const { createHash } = await import("node:crypto");
+      metrics.sources.push({
+        name: path.split("/").at(-1),
+        bytes: Buffer.byteLength(text),
+        hash: createHash("sha256").update(text).digest("hex"),
+      });
+    }
+    return await originalRunnerHost.writeTextFile(path, text);
+  },
+};

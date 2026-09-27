@@ -1,0 +1,303 @@
+{
+  "32ece7f4": {
+    "all": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17198,
+        "unsupported-profile-feature": 2087,
+        "expected-negative": 1556
+      },
+      "variants": 68275,
+      "executedPaths": 17306
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17198,
+        "unsupported-profile-feature": 2087,
+        "expected-negative": 1556
+      },
+      "variants": 68275,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 0,
+      "classes": {},
+      "variants": 0,
+      "executedPaths": 0
+    },
+    "transitions": {}
+  },
+  "a41aeb0b": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "9ecf1642": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "7df433ae": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "61a5214d": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "e99620d5": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "9e71f689": {
+    "all": {
+      "paths": 20898,
+      "classes": {
+        "pass": 17275,
+        "unsupported-profile-feature": 2067,
+        "expected-negative": 1556
+      },
+      "variants": 68557,
+      "executedPaths": 17361
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17220,
+        "unsupported-profile-feature": 2065,
+        "expected-negative": 1556
+      },
+      "variants": 68341,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 57,
+      "classes": {
+        "pass": 55,
+        "unsupported-profile-feature": 2
+      },
+      "variants": 216,
+      "executedPaths": 55
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 22
+    }
+  },
+  "1a879b2e": {
+    "all": {
+      "paths": 21156,
+      "classes": {
+        "pass": 17524,
+        "unsupported-profile-feature": 2076,
+        "expected-negative": 1556
+      },
+      "variants": 69552,
+      "executedPaths": 17609
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17221,
+        "unsupported-profile-feature": 2064,
+        "expected-negative": 1556
+      },
+      "variants": 68344,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 315,
+      "classes": {
+        "pass": 303,
+        "unsupported-profile-feature": 12
+      },
+      "variants": 1208,
+      "executedPaths": 303
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 23
+    }
+  },
+  "aff3ade3": {
+    "all": {
+      "paths": 21156,
+      "classes": {
+        "pass": 17524,
+        "unsupported-profile-feature": 2076,
+        "expected-negative": 1556
+      },
+      "variants": 69552,
+      "executedPaths": 17609
+    },
+    "old": {
+      "paths": 20841,
+      "classes": {
+        "pass": 17221,
+        "unsupported-profile-feature": 2064,
+        "expected-negative": 1556
+      },
+      "variants": 68344,
+      "executedPaths": 17306
+    },
+    "new": {
+      "paths": 315,
+      "classes": {
+        "pass": 303,
+        "unsupported-profile-feature": 12
+      },
+      "variants": 1208,
+      "executedPaths": 303
+    },
+    "transitions": {
+      "('unsupported-profile-feature', 'pass')": 23
+    }
+  }
+}

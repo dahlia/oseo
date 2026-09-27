@@ -1,0 +1,57 @@
+import { readFile, writeFile } from "node:fs/promises";
+import assert from "node:assert/strict";
+import {
+  parseReviewedSubset,
+  createReviewedManifest,
+  suiteRoot,
+  readHarnesses,
+  canonicalizeManifestTarget,
+  readSerializedManifest,
+  fragmentExecutor,
+} from "./u10-runner.ts";
+import {
+  parseReviewedManifest,
+  serializeTest262Manifest,
+} from "./test262-manifest.ts";
+import { summarizeTest262 } from "../packages/testkit/src/test262-summary.ts";
+const paths = new Set(
+  JSON.parse(await readFile("/tmp/u10-evidence/paths.json", "utf8")),
+);
+const subset = parseReviewedSubset(
+  await readFile("tests/test262/subset.yaml", "utf8"),
+);
+const selected = {
+  ...subset,
+  tests: subset.tests.filter((t) => paths.has(t.path)),
+};
+assert.equal(selected.tests.length, paths.size);
+const expected = await readSerializedManifest();
+const parts = new Map(expected.partitions.map((p) => [p.path, p.text]));
+const reviewed = parseReviewedManifest(expected.indexText, (p) => parts.get(p));
+const results = reviewed.results.filter((r) => paths.has(r.case.path));
+const wanted = serializeTest262Manifest({
+  ...reviewed,
+  results,
+  summary: summarizeTest262(results),
+});
+const run = await createReviewedManifest(
+  selected,
+  await suiteRoot(subset.suiteRevision),
+  await readHarnesses(),
+);
+const actual = serializeTest262Manifest(
+  canonicalizeManifestTarget(run.manifest),
+);
+assert.deepEqual(actual, wanted);
+console.log(
+  JSON.stringify({
+    metadata: run.metadata,
+    summary: run.manifest.summary,
+    builds: fragmentExecutor.counts,
+    variants: run.manifest.results.reduce(
+      (n, r) => n + (r.execution?.variants.length ?? 0),
+      0,
+    ),
+  }),
+);
+await writeFile(process.env.U10_RESULT, JSON.stringify(run));
