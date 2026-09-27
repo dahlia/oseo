@@ -612,3 +612,384 @@ Clang execution were measured locally. macOS runner execution and CI
 before/after wall time remain unmeasured in this change. The earlier macOS work
 projection is an estimate and must not be presented as an observed CI
 improvement.
+
+
+Projected cost at the M5c edition denominator
+---------------------------------------------
+
+This projection extends the measured CI baseline in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
+21,383 reviewed paths to the measured 41,091-path edition denominator that
+[*PLAN-M5C.md*](./PLAN-M5C.md) records and `mise run check:test262-inventory`
+reports. It contains no new measurement and triggered no CI run. Every figure
+is either quoted from that baseline as measured or derived from it by the model
+stated below, and each is labeled.
+
+The planning ceiling is 628 macOS runner minutes for one CI run. The baseline
+records it as the value the M5CI planning brief specifies and states that its
+exact value is not reproduced by rounding or flooring the preserved timestamps,
+so it is a specified planning budget rather than a measurement. The brief names
+main run 35456667007 at `32ece7f4` as its source. That run's separately derived
+macOS family total is 629.52 min from measured job timestamps, or 629 min when
+the aggregate is floored, at a measured 20,841 reviewed paths. Runner minutes
+here are the sum of elapsed macOS job minutes, the same quantity the baseline's
+family tables report; wall clock is projected separately below.
+
+The projection model is:
+
+ -  a family whose work is selected from the reviewed path set scales linearly
+    in that count;
+ -  every other family is held at its measured value, because its input
+    inventory is the property file set, the native fixture set, or the
+    sanitizer suites, and the reviewed corpus selects none of them;
+ -  each projected test262 job keeps one job fixed cost, taken from the
+    baseline's derived mean F, which is 59.82 s for run 36243816479 and 56.81 s
+    for run 36261458909, while a held family keeps whatever fixed cost is
+    already inside its measured minutes; and
+ -  the shard totals stay at their measured current values, test262 10 and
+    native support 12.
+
+Two limits apply to every derived number below. A constant second-per-path
+rate assumes that the further paths carry the same classification and variant
+mix as the measured 21,383, which no measurement establishes. That remainder is
+a derived 19,708 paths, the difference of the two measured counts, and
+`mise run check:m5c-graph` reports the same value as `unreviewed`; the
+baseline states that neither of its residual rates supports a linear
+projection over a changed semantic workload. And F re-adds the repeated build
+intervals that also fall inside the execution step. The baseline's B column is
+total build time, the initial build plus those later intervals, and does not
+separate them, so that overlap is not quantified here. It is bounded above by B
+summed over a run's ten macOS test262 jobs, a derived 0.68 min for run
+36261458909 and 0.74 min for run 36243816479.
+
+### What scales with reviewed paths
+
+The per-family scaling below is derived from the job definitions in
+*.github/workflows/main.yaml*, the task bodies in *mise.toml*, and the source
+sets those tasks name. Job counts are measured from the workflow matrices.
+
+| Family            | macOS jobs | What one job executes                                                                                                            | Scales with reviewed paths       |
+| ----------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| test262           | 10         | `mise run test:test262 --shard N/10`, which is `node tools/test262.ts`                                                           | Yes, linearly in the sharded set |
+| native support    | 12         | `test:property:extended:native:shard` over _tests/property/\*.property.test.ts_, and `test:property:extended:package` on shard 1 | No                               |
+| host C sanitizers | 2          | `test:sanitizer:self`, then `runtime` and `native`, or `property`                                                                | No                               |
+| test              | 2          | `test:node`, which is `node --test` at the root, and `test:deno`                                                                 | Only in parse-bound components   |
+| native            | 3          | `mise run test:native --shard N/3`, which is `node tests/native.ts`                                                              | No                               |
+
+Only `test262` selects its work from the reviewed path set. *tools/shard.ts*
+takes zero-based positions modulo the shard total from the reviewed order the
+manifest reader reconstructs, so each of the ten macOS shards receives one
+tenth of whatever the reviewed set holds.
+
+The `native support` family runs the observed 128 files matched by
+_tests/property/\*.property.test.ts_ under Node's `--test-shard`, plus the
+package property suites on shard 1. Its unit is a property file, and the
+baseline's derived rates for it are seconds per selected property file, not per
+reviewed path. Nothing in the task reads the reviewed manifest: the three
+property files whose sources mention test262 cover the harness promise helper,
+the shared-memory agent harness, and the native function matcher, none of which
+enumerates reviewed paths. The family therefore grows when property files,
+domains, or case budgets are added, which is the separately measured
+bottleneck the baseline records, and not when the corpus grows.
+
+The `host C sanitizers` family runs `test:sanitizer:self`,
+`test:sanitizer:runtime`, `test:sanitizer:native`, and
+`test:sanitizer:property`. The workflow never invokes
+`test:sanitizer:test262`, so this family executes no reviewed standards case
+and its cost is independent of the corpus.
+
+The `native` family runs `node tests/native.ts`, whose inputs are the reviewed
+native fixtures. Its `test262Host` field selects the test262 host API for a
+fixture; it does not read the reviewed corpus.
+
+The `test` family is the one partial case. `node --test` at the repository root
+discovers at least two components whose input grows with the reviewed count.
+*tests/test262-runner.test.ts* reads the checked-in index and every partition in
+its `round-trips and shards the checked-in reviewed manifest` test, and
+*tests/regexp-probes.test.ts* reads the whole of *tests/test262/subset.yaml* and
+searches it once for each cited probe path. This section does not claim that
+list is exhaustive. Both are file reading, parse, and validation work rather
+than native execution: the closest isolated measurement in the baseline is
+`check:compatibility-ratchet` at 2.90 s over 4,861 records. Neither is
+separately measured inside CI, so this projection holds the whole `test` family
+at its derived value and records the omission rather than estimating it. The
+same job also runs the observed 128 ordinary property files, which is the
+duplication U7 examines.
+
+### Projected workload at 41,091 paths
+
+Derived macOS test262 family minutes at 41,091 paths with 10 shards held
+constant. Every column is derived: the rate column is the baseline's derived
+step-level seconds per path, itself a quotient of a derived execution sum over
+measured step timestamps and a measured path count. Fixed cost is 10 jobs times
+the derived mean F of the named run.
+
+| Derived s/path | Source commit | Derived execution min | Derived 10-job fixed cost min | Derived family min |
+| -------------- | ------------- | --------------------- | ----------------------------- | ------------------ |
+| 0.629          | `32ece7f4`    | 430.77                | 9.97 (A) / 9.47 (B)           | 440.74 / 440.24    |
+| 0.741          | `475dfbad`    | 507.47                | 9.97 (A) / 9.47 (B)           | 517.44 / 516.94    |
+| 0.874          | `c9b3cc80`    | 598.56                | 9.97 (A) / 9.47 (B)           | 608.53 / 608.03    |
+| 0.886          | `00153abe`    | 606.78                | 9.97 (A) / 9.47 (B)           | 616.75 / 616.25    |
+
+A is run 36243816479 and B is run 36261458909. The 0.629 rate is the lowest
+level in the series, and 0.741 to 0.886 is the observed current band from
+`aff3ade3` onward.
+
+The four other macOS families are held at their per-run sums, which the baseline
+derives from measured job timestamps. Their derived totals are 403.25 min for
+run 35456667007, 443.71 min for run 36261458909, and 469.37 min for run
+36243816479.
+
+Derived macOS workload at 41,091 paths against the 628-minute ceiling:
+
+| Scenario                   | Derived test262 min | Derived held families min | Derived total min | Derived gap min | Derived test262 share |
+| -------------------------- | ------------------- | ------------------------- | ----------------- | --------------- | --------------------- |
+| 0.629, run 35456667007 set | 440.74              | 403.25                    | 843.99            | +215.99         | 52.2%                 |
+| 0.629, run 36261458909 set | 440.24              | 443.71                    | 883.95            | +255.95         | 49.8%                 |
+| 0.741, run 36261458909 set | 516.94              | 443.71                    | 960.65            | +332.65         | 53.8%                 |
+| 0.874, run 36261458909 set | 608.03              | 443.71                    | 1051.74           | +423.74         | 57.8%                 |
+| 0.886, run 36243816479 set | 616.75              | 469.37                    | 1086.12           | +458.12         | 56.8%                 |
+
+Run 35456667007 has no F measurement of its own, so its scenario uses run
+36243816479's derived mean F, the A column above, for its projected test262
+jobs, and the same mean stands in for the unmeasured F inside its held families'
+minutes. That is the same F the recovery stack below uses, so one fixed-cost
+assumption holds across a scenario and the stack built on it.
+
+The derived comparison points, from measured job timestamps, are 629.52 min at
+20,841 paths, 764.12 min at 21,383 paths for run 36261458909, and 795.45 min at
+21,383 paths for run 36243816479. Neither current run fits the ceiling at its
+own smaller measured workload, so the whole projected range is above it by
+construction.
+
+The derived total macOS job fixed cost is small. With 29 macOS jobs across the
+five families, the derived mean F values give 28.91 min for run 36243816479 and
+27.46 min for run 36261458909, a derived 1 min or so for each job. Those are the
+measured runs' totals; a projected scenario embeds a slightly different amount,
+because its ten test262 jobs carry 10 times the mean F in place of their own
+derived F, and U3 below gives each scenario's value. The two
+components of F that a cross-job cache could plausibly remove, the measured aube
+dependency interval D and the derived build interval B, give a derived 13.97 min
+and 12.56 min respectively. The rest of F is checkout, mise cache restore,
+action gaps, job setup and cleanup, and the post-step reporting tail that the
+baseline's macOS Deno outlier shows can reach 82 s on its own.
+
+### Projected lower bound on wall clock
+
+macOS has five concurrent slots, so one run's wall clock is at least the
+workload divided by five, and never less than its longest single job.
+
+| Scenario                   | Derived workload min | Derived workload / 5 min | Longest job min | Longest job             |
+| -------------------------- | -------------------- | ------------------------ | --------------- | ----------------------- |
+| 0.629, run 35456667007 set | 843.99               | 168.80                   | 58.55           | native support, derived |
+| 0.741, run 36261458909 set | 960.65               | 192.13                   | 51.71           | test262 shard, derived  |
+| 0.874, run 36261458909 set | 1051.74              | 210.35                   | 60.82           | test262 shard, derived  |
+| 0.886, run 36243816479 set | 1086.12              | 217.22                   | 68.13           | native support, derived |
+
+The longest-job column is the larger of the derived projected test262 shard
+below and the derived maximum job among the four held families in that
+scenario's source run. In every scenario the workload term binds and the
+longest job does not, so the projected wall-clock lower bound is 169 to 217
+min. Substituting the slowest derived per-shard rate, which projects a derived
+82.72 to 86.78 min for the longest test262 shard, does not change that: the
+workload term remains at least 1.9 times the longest job.
+
+The projected longest test262 shard at the current total of 10 holds a derived
+4,110 paths, since 41,091 is 10 times 4,109 plus 1. At the family-level rates
+that shard is a derived 44.03 to 44.08 min at 0.629 s/path, depending on which
+run's mean F is used, and 61.69 min at 0.886 with run 36243816479's F. The
+baseline's derived per-shard residual rates spread wider than the family mean.
+The slowest macOS shards are 1.193 s/path in run 36243816479 and 1.253 s/path in
+run 36261458909, which with each run's own mean F project a derived 82.72 min
+and 86.78 min for the slowest shard. Against the workflow's 120-minute
+`test_test262` timeout that leaves a derived 33.22 min of headroom in the least
+favorable case, so the current shard total does not itself breach the timeout at
+41,091 paths.
+
+The derived `native support` maximum is 68.13 min in run 36243816479 and 51.58
+min in run 36261458909, with a derived max/mean of 2.64 and 2.17. The observed
+dominant file *tests/property/m5-object-own-keys.property.test.ts* alone reports
+a derived 59.42 min in run 36243816479 and 42.98 min in run 36261458909, which
+is where a rebalanced partition's tail would sit if those durations held. They
+are concurrent observations, and the baseline states that competing files affect
+each other's duration, so they do not establish an irreducible longest job:
+repartitioning changes the contention that produced them.
+
+### Dominant family, the gap, and estimated recovery
+
+At 41,091 paths `test262` becomes the dominant macOS family in every scenario,
+at a derived 49.8 to 57.8 percent of the projected workload. That is a change
+from the present, where the derived test262 total of 320.40 to 326.08 min and
+the derived native support total of 284.85 to 310.20 min are comparable. The
+derived gap against the 628-minute ceiling is +215.99 min in the most favorable
+scenario and +458.12 min in the least favorable one, a factor of 1.34 to 1.73.
+
+The recovery figures below are estimates, not measurements. Each names the
+measured evidence it extrapolates from and the assumption that makes it an
+estimate. They are attributed first to the measured cost component they act on
+and then to the plan unit that owns that component. Every subtraction is an
+estimated ceiling unless it says otherwise.
+
+Job fixed cost, U3. The derived ceiling is the whole macOS job fixed cost that
+a scenario embeds, and the derived figure for the dependency and build
+components alone is 13.97 min or 12.56 min of the measured runs' 28.91 min and
+27.46 min. A scenario embeds 10 times the derived mean F for its projected
+test262 jobs, 9.97 min at run 36243816479's mean, plus the F inside its 19
+held-family jobs. That held sum is a derived 18.09 min in run 36243816479, so
+the least favorable scenario's ceiling is 28.06 min. Run 35456667007 has no
+per-job F, so its held families are assumed at the same mean and the most
+favorable scenario's ceiling is the full 28.91 min. Even the ceiling is 13.4
+percent of the smallest derived gap and 6.1 percent of the largest. U3 cannot
+close this gap; its value is that it is cheap, measurable, and does not touch
+coverage. Raising a shard total under U6 adds a derived 1 min or so of fixed
+cost for each added macOS job, which works against this same budget.
+
+test262 per-path execution, U4 and U10. U10 is the only lever whose estimated
+magnitude can be put against the gap from the evidence available. U4 acts on the
+same family, but its size depends on a count no measurement supplies.
+
+U10 recovers the observed rise from 0.629 s/path to the 0.741 to 0.886 band.
+Returning to 0.629 is a derived saving of 76.70 min from 0.741, 167.79 min from
+0.874, and 176.01 min from 0.886. The baseline states that the cause is not
+identified; it also shows that most of the increase in macOS test262 minutes
+relative to the brief's baseline run is per-path execution cost rather than
+corpus size or fixed cost. The onset in the series lies between
+`e99620d5` at 0.676 and `aff3ade3` at 0.761, a range whose only non-merge
+commits are `9e71f689` and `1a879b2e`. That interval is a pointer for U10's own
+investigation, not an attribution: the baseline records the same runs as a
+run-to-run spread with no established cause, and runner variance and cache
+warmth are not improvements.
+
+U4 shares the test262 harness object cache across jobs. The relevant local
+evidence is already in this plan: on one Linux host and reviewed shard 3/200,
+the Zig split path took a measured 57.94 s with a cold harness cache and 29.91 s
+warm, while building 36 harness objects over 101 reviewed paths. The derived
+difference is 28.03 s for 36 objects, or 0.78 s for each object. That is the
+shape of the saving. A cross-job cache removes the cost of building one job's
+distinct harness objects, not a cost that each reviewed path pays, because
+within a job the runner already reuses an object after its first build. Scaling
+the local 48.4 percent reduction by path count would instead assume that each
+added path pays the cold-cache penalty again, so this projection does not do
+that.
+
+The unmeasured input is k, the number of distinct harness objects one macOS
+test262 shard builds. At the derived 0.78 s for each object, ten shards recover
+an estimated 0.13k min: 4.67 min at k equal to the locally observed 36, 12.98
+min at 100, 64.88 min at 500, and 190.11 min at 1,465. That last value is what
+extrapolating the local sample's observed ratio of 36 objects over 101 paths to
+4,110 paths would give, and it exceeds the k of about 1,154 that would close the
+residual in the most favorable stack below. Whether k grows with path count that
+way or saturates once a shard has covered the harness corpus is exactly what is
+unmeasured, so this projection draws no conclusion about U4's magnitude in
+either direction. Three further assumptions also remain: the ratio was measured
+on Linux with Zig while macOS runner execution is unmeasured, the local wall
+time includes task setup and manifest checks rather than only harness work, and
+a cross-job cache adds restore and publication transfer that the local
+comparison does not contain. U4's contribution stays unestablished until the
+distinct-object count for a macOS shard and that shard's harness preparation
+cost are measured.
+
+The harness split landed at `f131a798` and `30c9f690` on 2026-09-17, before
+`32ece7f4`, so the derived 0.629 s/path rate already includes the split path
+with a per-job cold harness cache. On the evidence available the two levers
+therefore act on different costs. That chronology does not prove independence:
+the cause of the later per-path rise is unidentified and could itself lie in
+harness preparation, so treating U4 and U10 as additive is an assumption U10's
+investigation has to confirm.
+
+Zig compilation cache, U5. The baseline infers a cold Zig compilation cache on
+fresh runners and states that it did not inspect the cache contents, so there
+is no measured hit rate to project from. The runtime archive is already cached
+by *.github/actions/runtime-archive-cache*, and generated program translation
+units differ for each case, so the remaining reusable surface is small. This
+projection assigns U5 no derived recovery, and the plan's own note that doing
+nothing is a valid result stands.
+
+Shard sizing, U6. Raising the test262 or native support shard total leaves the
+executed work unchanged, so it recovers no runner minutes and adds a derived
+1 min or so of fixed cost for each added macOS job. Its effect is on the tail
+and the timeout margin. At 41,091 paths the projected wall-clock lower bound is
+set by the workload term at 169 to 217 min, while the longest job is a derived
+44 to 87 min, so rebalancing does not move the projected lower bound either. U6
+is timeout insurance and tail control here, not workload recovery.
+
+Duplicate work and host split, U7 and U8. The macOS `test` family is a derived
+41.85 min in run 36243816479 and 46.18 min in run 36261458909, of which the Node
+job is a derived 40.35 min and 43.15 min from its measured elapsed seconds.
+Both units act inside that family: U7 on the 128 ordinary property files that
+`node --test` discovers at the root while the native support shards run the
+same files at ten times the case budget, and U8 on whichever evidence in it is
+host independent. Their ceilings overlap and are not additive; together they
+are bounded by that family's derived value in the run a scenario uses, which is
+39.30 min for run 35456667007, 41.85 min for run 36243816479, and 46.18 min for
+run 36261458909. When stacked after U3 they must be taken net of the fixed cost
+U3 already removed from the same two jobs; otherwise that fixed cost is
+subtracted twice. Where a scenario's held families come from a run the baseline
+decomposes job by job, that share is those two jobs' own derived F: 52.00 s and
+54.46 s in run 36243816479, a 1.77 min sum, and 135.00 s and 53.70 s in run
+36261458909, a 3.15 min sum. Taking twice the mean there would substitute an
+average for a quantity the baseline measures directly. Run 35456667007 has no
+such decomposition, so its share is twice the derived mean F, 1.99 min at run
+36243816479's mean.
+Neither unit can move `test262` or `native support` off macOS, because both
+execute native code on `macos-aarch64` and macOS native
+execution is proven only there. The Apple Clang sanitizer coverage the
+milestone also protects belongs to the separate `host C sanitizers` family, not
+to these two.
+
+### Whether 628 minutes is reachable
+
+No projection built on measured evidence reaches 628 min. The two stacks below
+compare U10 recovered against U10 unrecovered inside one scenario each, so the
+held families stay fixed rather than moving with the scenario. Neither stack
+subtracts U4, whose magnitude is unmeasured, so the residual each leaves is the
+residual before U4.
+
+The most favorable scenario is 843.99 derived min at 0.629 s/path with run
+35456667007's held families, in which U10 is already recovered. Removing the
+28.91 min of embedded macOS job fixed cost that U3 could reach leaves 815.08
+min. Removing the whole macOS `test` family that U7 and U8 act inside, net of
+the 1.99 min U3 already took from its two jobs, leaves an estimated 777.77 min,
+or +149.77 min against the ceiling.
+
+The least favorable scenario is 1086.12 derived min at 0.886 s/path with run
+36243816479's held families. Recovering the rise to 0.629 under U10 leaves
+910.11 min, the 28.06 min U3 could reach leaves 882.05 min, and U7 with U8 net
+of the 1.77 min of derived F U3 already took from those two jobs leave an
+estimated 841.97 min, or +213.97 min against the ceiling. U5 and U6 recover no
+runner minutes at all.
+
+So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.7
+percent of the excess in the most favorable scenario and 53.3 percent in the
+least favorable one, roughly a third to a half, and leave 150 to 214 min before
+U4. Closing the most favorable scenario's residual through U4 alone would need k
+of about 1,154 distinct harness objects for each shard. That figure is a lower
+objects-per-path ratio than the local sample observed, so it is not excluded by
+the local evidence; it is also not supported by it, because no measurement
+establishes how k grows with shard size on macOS. Reachability therefore turns
+on a quantity this plan has not measured.
+
+Those subtractions are already generous in three ways. U3's ceiling is the whole
+of F, including the cleanup and reporting tails no cache can remove. U7 and U8
+are credited with the entire `test` family although neither the duplication nor
+the host independence is established. And both stacks use run 36243816479's
+derived mean F where run 35456667007 has no F measurement of its own.
+
+Nothing in this projection proposes reducing coverage, and this plan's preserved
+invariants and the milestone coverage rules forbid it. The options that would
+reduce it, such as running the full corpus less often than every merge, reducing
+case counts, seeds, or property case budgets, removing reviewed paths, changing
+an expected classification, or dropping a macOS job, are recorded here only as
+choices that require an explicit decision from the maintainer; this plan selects
+none of them. Lowering a shard total is forbidden by the same rules but belongs
+in a different category: running all shards of a smaller partition still
+executes the complete corpus, so its cost is longer jobs and timeout risk
+rather than omitted evidence.
+
+The explicit statement this projection owes its plan is therefore narrower than
+a verdict. No coverage-lossless projection here reaches 628 min on measured
+evidence, and the only lever that could close the remaining 150 to 214 min is
+U4 at an object count nothing has measured. Until that measurement exists, the
+alternatives are a lever this plan has not yet identified or a maintainer
+decision that the ceiling itself moves. This projection makes neither and does
+not claim the ceiling is reachable.
